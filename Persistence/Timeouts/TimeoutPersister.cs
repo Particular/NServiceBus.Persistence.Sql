@@ -13,6 +13,7 @@ class TimeoutPersister : IPersistTimeouts
     string selectCommand;
     string removeBySagaCommand;
     string removeByIdCommand;
+    string deleteAndSelectCommand;
 
     public TimeoutPersister(string connectionString,string schema, string endpointName)
     {
@@ -33,13 +34,30 @@ INSERT INTO [{0}].[{1}.TimeoutData] (Id, Destination, SagaId, State, Time, Heade
 VALUES (@Id, @Destination, @SagaId, @State, @Time, @Headers)", schema, endpointName);
 
         selectCommand = string.Format(@"
-SELECT Destination, SagaId, State, Time, Headers 
-FROM [{0}].[{1}.TimeoutData] 
+SELECT 
+    deleted.Destination, 
+    deleted.SagaId, 
+    deleted.State, 
+    deleted.Time, 
+    deleted.Headers 
+FROM 
+    [{0}].[{1}.TimeoutData] 
+WHERE 
+    Id = @id", schema, endpointName);
+        deleteAndSelectCommand = string.Format(@"
+DELETE FROM [{0}].[{1}.TimeoutData] 
+OUTPUT 
+    deleted.Destination, 
+    deleted.SagaId, 
+    deleted.State, 
+    deleted.Time, 
+    deleted.Headers 
 WHERE Id = @id", schema, endpointName);
 
         removeBySagaCommand = string.Format(@"
 DELETE FROM [{0}].[{1}.TimeoutData] 
 WHERE SagaId = @SagaId", schema, endpointName);
+
         removeByIdCommand = string.Format(@"
 DELETE FROM [{0}].[{1}.TimeoutData] 
 WHERE Id = @Id", schema, endpointName);
@@ -102,7 +120,7 @@ WHERE Id = @Id", schema, endpointName);
     {
         using (var connection = OpenSqlConnection.New(connectionString))
         {
-            using (var command = new SqlCommand(selectCommand, connection))
+            using (var command = new SqlCommand(deleteAndSelectCommand, connection))
             {
                 command.AddParameter("Id", timeoutId);
                 using (var reader = command.ExecuteReader())
@@ -123,11 +141,6 @@ WHERE Id = @Id", schema, endpointName);
                         Headers = HeaderSerializer.FromString(reader.GetString(4)),
                     };
                 }
-            }
-            using (var command = new SqlCommand(removeByIdCommand, connection))
-            {
-                command.AddParameter("Id", timeoutId);
-                command.ExecuteNonQuery();
             }
             return true;
         }
