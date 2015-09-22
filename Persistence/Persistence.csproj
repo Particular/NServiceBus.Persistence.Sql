@@ -52,7 +52,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Serialization\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="OpenSqlConnection.cs" />
+    <Compile Include="SqlHelpers.cs" />
     <Compile Include="Sagas\SagaTableNameConvention.cs" />
     <Compile Include="Serialization\Header.cs" />
     <Compile Include="SqlPersistence.cs" />

@@ -1,5 +1,4 @@
-﻿using System.Data.SqlClient;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.SqlPersistence;
 
@@ -16,10 +15,13 @@ class TimeoutInstaller : INeedToInstallSomething
     internal static void Install(string endpointName, string connectionString)
     {
         var script = TimeoutScriptBuilder.BuildCreate("dbo", endpointName);
-        using (var sqlConnection = OpenSqlConnection.New(connectionString))
-        using (var command = new SqlCommand(script, sqlConnection))
-        {
-            command.ExecuteNonQuery();
-        }
+        SqlHelpers.Execute(connectionString, script);
     }
+    internal static void Drop(string endpointName, string connectionString)
+    {
+        var script = TimeoutScriptBuilder.BuildDrop("dbo", endpointName);
+        SqlHelpers.Execute(connectionString,script);
+    }
+
+
 }

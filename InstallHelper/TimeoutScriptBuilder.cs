@@ -19,5 +19,15 @@ BEGIN
 END
 ", schema, endpointName);
         }
+
+        public static string BuildDrop(string schema, string endpointName)
+        {
+            return string.Format(@"
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
+BEGIN
+    DROP TABLE [{0}].[{1}.TimeoutData]
+END
+", schema, endpointName);
+        }
     }
 }

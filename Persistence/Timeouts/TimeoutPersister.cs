@@ -10,9 +10,7 @@ class TimeoutPersister : IPersistTimeouts
     string rangeComand;
     string nextCommand;
     string addCommand;
-    string selectCommand;
     string removeBySagaCommand;
-    string removeByIdCommand;
     string deleteAndSelectCommand;
 
     public TimeoutPersister(string connectionString,string schema, string endpointName)
@@ -30,20 +28,25 @@ WHERE Time > @EndTime
 ORDER BY TIME", schema, endpointName);
 
         addCommand = string.Format(@"
-INSERT INTO [{0}].[{1}.TimeoutData] (Id, Destination, SagaId, State, Time, Headers) 
-VALUES (@Id, @Destination, @SagaId, @State, @Time, @Headers)", schema, endpointName);
+INSERT INTO [{0}].[{1}.TimeoutData] 
+(
+    Id, 
+    Destination, 
+    SagaId, 
+    State, 
+    Time, 
+    Headers
+) 
+VALUES 
+(
+    @Id, 
+    @Destination, 
+    @SagaId, 
+    @State, 
+    @Time, 
+    @Headers
+)", schema, endpointName);
 
-        selectCommand = string.Format(@"
-SELECT 
-    deleted.Destination, 
-    deleted.SagaId, 
-    deleted.State, 
-    deleted.Time, 
-    deleted.Headers 
-FROM 
-    [{0}].[{1}.TimeoutData] 
-WHERE 
-    Id = @id", schema, endpointName);
         deleteAndSelectCommand = string.Format(@"
 DELETE FROM [{0}].[{1}.TimeoutData] 
 OUTPUT 
@@ -58,16 +61,13 @@ WHERE Id = @id", schema, endpointName);
 DELETE FROM [{0}].[{1}.TimeoutData] 
 WHERE SagaId = @SagaId", schema, endpointName);
 
-        removeByIdCommand = string.Format(@"
-DELETE FROM [{0}].[{1}.TimeoutData] 
-WHERE Id = @Id", schema, endpointName);
     }
 
     public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
     {
         var list = new List<Tuple<string, DateTime>>();
         var now = DateTime.UtcNow;
-        using (var connection = OpenSqlConnection.New(connectionString))
+        using (var connection = SqlHelpers.New(connectionString))
         {
             using (var command = new SqlCommand(rangeComand, connection))
             {
@@ -85,13 +85,13 @@ WHERE Id = @Id", schema, endpointName);
             {
                 command.AddParameter("EndTime", now);
                 var executeScalar = command.ExecuteScalar();
-                if (executeScalar != null)
+                if (executeScalar == null)
                 {
-                    nextTimeToRunQuery = (DateTime) executeScalar;
+                    nextTimeToRunQuery = now.AddMinutes(10);
                 }
                 else
                 {
-                    nextTimeToRunQuery = DateTime.UtcNow.AddMinutes(10);
+                    nextTimeToRunQuery = (DateTime) executeScalar;
                 }
             }
         }
@@ -100,7 +100,7 @@ WHERE Id = @Id", schema, endpointName);
 
     public void Add(TimeoutData timeout)
     {
-        using (var connection = OpenSqlConnection.New(connectionString))
+        using (var connection = SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(addCommand, connection))
         {
             var id = Guid.NewGuid();
@@ -118,7 +118,7 @@ WHERE Id = @Id", schema, endpointName);
 
     public bool TryRemove(string timeoutId, out TimeoutData timeoutData)
     {
-        using (var connection = OpenSqlConnection.New(connectionString))
+        using (var connection = SqlHelpers.New(connectionString))
         {
             using (var command = new SqlCommand(deleteAndSelectCommand, connection))
             {
@@ -148,7 +148,7 @@ WHERE Id = @Id", schema, endpointName);
 
     public void RemoveTimeoutBy(Guid sagaId)
     {
-        using (var connection = OpenSqlConnection.New(connectionString))
+        using (var connection = SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(removeBySagaCommand, connection))
         {
             command.AddParameter("SagaId", sagaId);
