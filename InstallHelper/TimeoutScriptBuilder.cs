@@ -3,7 +3,7 @@
     public static class TimeoutScriptBuilder
     {
 
-        public static string Build(string schema, string endpointName)
+        public static string BuildCreate(string schema, string endpointName)
         {
             return string.Format(@"
 IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))

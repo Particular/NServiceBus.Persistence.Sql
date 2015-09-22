@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="HeaderSerializerTest.cs" />
+    <Compile Include="TimeoutPersisterTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

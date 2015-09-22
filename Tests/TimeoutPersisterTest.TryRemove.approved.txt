@@ -1,0 +1,14 @@
+﻿{
+  "Id": "timeoutId",
+  "Destination": {
+    "Queue": "theDestination",
+    "Machine": "RETINA"
+  },
+  "SagaId": "ec1be111-39e5-403c-9960-f91282269455",
+  "State": "AQ==",
+  "Time": "2000-01-01T00:00:00",
+  "OwningTimeoutManager": null,
+  "Headers": {
+    "HeaderKey": "HeaderValue"
+  }
+}
