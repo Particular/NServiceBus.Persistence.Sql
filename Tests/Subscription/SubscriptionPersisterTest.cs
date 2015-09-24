@@ -8,9 +8,9 @@ public class SubscriptionPersisterTest
     [Test]
     public void Subscribe()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new SubscriptionDatabase())
         {
-            var persister = testDatabase.SubscriptionPersister;
+            var persister = testDatabase.Persister;
             var messageTypes = new List<string>
             {
                 "type1",
@@ -26,9 +26,9 @@ public class SubscriptionPersisterTest
     [Test]
     public void Subscribe_duplicate_add()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new SubscriptionDatabase())
         {
-            var persister = testDatabase.SubscriptionPersister;
+            var persister = testDatabase.Persister;
             var messageTypes = new List<string>
             {
                 "type1",
@@ -44,9 +44,9 @@ public class SubscriptionPersisterTest
     [Test]
     public void Unsubscribe()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new SubscriptionDatabase())
         {
-            var persister = testDatabase.SubscriptionPersister;
+            var persister = testDatabase.Persister;
             var message2 = "type2";
             var message1 = "type1";
             var messageTypes = new List<string>

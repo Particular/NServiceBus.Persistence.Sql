@@ -11,9 +11,9 @@ public class TimeoutPersisterTest
     [Test]
     public void TryRemove()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new TimeoutDatabase())
         {
-            var persister = testDatabase.TimeoutPersister;
+            var persister = testDatabase.Persister;
             var timeout = new TimeoutData
             {
                 Destination = Address.Parse("theDestination"),
@@ -33,12 +33,13 @@ public class TimeoutPersisterTest
             Assert.IsNull(result);
         }
     }
+
     [Test]
     public void RemoveTimeoutBy()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new TimeoutDatabase())
         {
-            var persister = testDatabase.TimeoutPersister;
+            var persister = testDatabase.Persister;
             var sagaId = new Guid("ec1be111-39e5-403c-9960-f91282269455");
             var timeout = new TimeoutData
             {
@@ -59,12 +60,13 @@ public class TimeoutPersisterTest
             Assert.IsNull(result);
         }
     }
+
     [Test]
     public void GetNextChunk()
     {
-        using (var testDatabase = new TestDatabase())
+        using (var testDatabase = new TimeoutDatabase())
         {
-            var persister = testDatabase.TimeoutPersister;
+            var persister = testDatabase.Persister;
             var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
             var timeout1Time = startSlice.AddSeconds(1);
             var timeout2Time = DateTime.UtcNow.AddSeconds(10);
@@ -87,8 +89,7 @@ public class TimeoutPersisterTest
             DateTime nextTime;
             var nextChunk = persister.GetNextChunk(startSlice, out nextTime);
             Assert.That(nextTime, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
-            ObjectApprover.VerifyWithJson(nextChunk,s => s.Replace(timeout1.Id,"theId"));
+            ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
         }
     }
-
 }

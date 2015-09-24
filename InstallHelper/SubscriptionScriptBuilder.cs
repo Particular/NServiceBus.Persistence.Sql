@@ -1,10 +1,12 @@
-﻿namespace NServiceBus.SqlPersistence
+﻿using System.IO;
+
+namespace NServiceBus.SqlPersistence
 {
     public static class SubscriptionScriptBuilder
     {
-        public static string BuildCreate(string schema, string endpointName)
+        public static void BuildCreate(string schema, string endpointName, TextWriter writerBuilder)
         {
-            return string.Format(@"
+            writerBuilder.Write(@"
 IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.SubscriptionData]') AND type in (N'U'))
 BEGIN
     CREATE TABLE [{0}].[{1}.SubscriptionData](
@@ -21,9 +23,9 @@ END
             
         }
 
-        public static string BuildDrop(string schema, string endpointName)
+        public static void BuildDrop(string schema, string endpointName, TextWriter writerBuilder)
         {
-            return string.Format(@"
+            writerBuilder.Write(@"
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.SubscriptionData]') AND type in (N'U'))
 BEGIN
     DROP TABLE [{0}].[{1}.SubscriptionData]

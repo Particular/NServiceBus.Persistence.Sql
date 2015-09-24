@@ -8,15 +8,6 @@ class TimeoutFeature : Feature
     TimeoutFeature()
     {
         DependsOn<TimeoutManager>();
-        base.RegisterStartupTask<StartupTask>();
-    }
-
-    class StartupTask:FeatureStartupTask
-    {
-        protected override void OnStart()
-        {
-            
-        }
     }
 
     protected override void Setup(FeatureConfigurationContext context)

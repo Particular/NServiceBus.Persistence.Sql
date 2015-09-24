@@ -11,9 +11,9 @@ static class HeaderSerializer
 
     static HeaderSerializer()
     {
-        
-emptyNamespace = new XmlSerializerNamespaces();
-emptyNamespace.Add("", "");
+
+        emptyNamespace = new XmlSerializerNamespaces();
+        emptyNamespace.Add("", "");
         serializer = new XmlSerializer(
             type: typeof (List<Header>),
             root: new XmlRootAttribute("Headers"));

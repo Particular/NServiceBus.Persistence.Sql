@@ -50,25 +50,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Sagas\SagaConfigExtentions.cs" />
-    <Compile Include="Serialization\HeaderSerializer.cs" />
+    <Compile Include="Saga\SagaConfigExtentions.cs" />
+    <Compile Include="Saga\SagaMetaDataReader.cs" />
+    <Compile Include="Saga\SagaPropertyMapper.cs" />
+    <Compile Include="Saga\SagaSerializer.cs" />
+    <Compile Include="Saga\SagaTableNameBuilder.cs" />
+    <Compile Include="Timeout\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
-    <Compile Include="Sagas\SagaTableNameConvention.cs" />
-    <Compile Include="Serialization\Header.cs" />
+    <Compile Include="Timeout\Header.cs" />
     <Compile Include="SqlPersistence.cs" />
-    <Compile Include="Sagas\SagaFeature.cs" />
-    <Compile Include="Sagas\SagaInstaller.cs" />
+    <Compile Include="Saga\SagaFeature.cs" />
+    <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="SqlPersistenceConfig.cs" />
-    <Compile Include="Subscriptions\SubscriptionConfigExtentions.cs" />
-    <Compile Include="Subscriptions\SubscriptionInstaller.cs" />
-    <Compile Include="Subscriptions\SubscriptionFeature.cs" />
-    <Compile Include="Timeouts\TimeoutConfigExtentions.cs" />
-    <Compile Include="Timeouts\TimeoutFeature.cs" />
-    <Compile Include="Timeouts\TimeoutInstaller.cs" />
-    <Compile Include="Timeouts\TimeoutPersister.cs" />
-    <Compile Include="Sagas\SagaPersister.cs" />
-    <Compile Include="Subscriptions\SubscriptionPersister.cs" />
+    <Compile Include="Subscription\SubscriptionConfigExtentions.cs" />
+    <Compile Include="Subscription\SubscriptionInstaller.cs" />
+    <Compile Include="Subscription\SubscriptionFeature.cs" />
+    <Compile Include="Timeout\TimeoutConfigExtentions.cs" />
+    <Compile Include="Timeout\TimeoutFeature.cs" />
+    <Compile Include="Timeout\TimeoutInstaller.cs" />
+    <Compile Include="Timeout\TimeoutPersister.cs" />
+    <Compile Include="Saga\SagaPersister.cs" />
+    <Compile Include="Subscription\SubscriptionPersister.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
