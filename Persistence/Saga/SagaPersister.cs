@@ -96,16 +96,15 @@ SELECT
     OriginalMessageId,
     Data
 FROM  [{0}].[{1}.{2}] 
-WHERE [Data].exist('/Data/{3}[.= ""{4}""]') = 1
-", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(typeof(TSagaData)), propertyName, propertyValue);
+WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
+", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(typeof(TSagaData)), propertyName);
         using (var connection = SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(getComand, connection))
         {
-            //command.AddParameter("Id", "");
+            command.AddParameter("propertyValue", propertyValue);
             return GetSagaData<TSagaData>(command);
         }
     }
-
 
 
     static TSagaData GetSagaData<TSagaData>(SqlCommand command) where TSagaData : IContainSagaData
