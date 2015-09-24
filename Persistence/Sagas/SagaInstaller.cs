@@ -5,6 +5,7 @@
 //using NServiceBus;
 //using NServiceBus.Installation;
 //using NServiceBus.Saga;
+//using NServiceBus.Settings;
 //using NServiceBus.SqlPersistence;
 
 //class SagaInstaller : INeedToInstallSomething
@@ -12,7 +13,7 @@
 //    string connectionString;
 //    Func<Type, string> tableNamingConvention;
 
-//    public SagaInstaller(string connectionString,Func<Type, string> tableNamingConvention)
+//    public SagaInstaller(string connectionString, Func<Type, string> tableNamingConvention)
 //    {
 //        this.connectionString = connectionString;
 //        this.tableNamingConvention = tableNamingConvention;
@@ -20,6 +21,14 @@
 
 //    public void Install(string identity, Configure config)
 //    {
+//        return;
+
+
+//        var settings = config.Settings;
+//        if (!settings.IsSagaEnabled())
+//        {
+//            return;
+//        }
 //        var sagaDefinitions = GetSagaDefinitions(config);
 
 //        using (var sqlConnection = new SqlConnection(connectionString))
@@ -36,7 +45,7 @@
 //    {
 //        foreach (var sagaType in GetSagaTypes(config))
 //        {
-//         //   var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
+//            //   var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
 
 //            yield return new SagaDefinition
 //            {
@@ -49,7 +58,7 @@
 //    static List<string> GetUniquePropertyNames(Type sagaType)
 //    {
 //        return UniqueAttribute.GetUniqueProperties(sagaType)
-//            .Select(x=>x.Name)
+//            .Select(x => x.Name)
 //            .ToList();
 //    }
 

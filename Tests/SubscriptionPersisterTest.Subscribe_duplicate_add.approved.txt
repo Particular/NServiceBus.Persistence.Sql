@@ -1,0 +1,3 @@
+﻿[
+  "address1@machine1"
+]

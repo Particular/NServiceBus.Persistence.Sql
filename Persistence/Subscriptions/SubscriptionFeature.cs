@@ -1,4 +1,5 @@
-﻿using NServiceBus.Features;
+﻿using NServiceBus;
+using NServiceBus.Features;
 
 class SubscriptionFeature : Feature
 {
@@ -9,6 +10,10 @@ class SubscriptionFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        //context.Container.ConfigureComponent<SubscriptionInstaller>(DependencyLifecycle.InstancePerCall);
+        var connectionString = context.Settings.GetConnectionString();
+        var schema = context.Settings.GetSchema();
+        var endpointName = context.Settings.EndpointName();
+        var persister = new SubscriptionPersister(connectionString, schema, endpointName);
+        context.Container.ConfigureComponent(() => persister, DependencyLifecycle.InstancePerCall);
     }
 }

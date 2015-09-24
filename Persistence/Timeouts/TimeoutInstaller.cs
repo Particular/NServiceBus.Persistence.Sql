@@ -7,8 +7,13 @@ class TimeoutInstaller : INeedToInstallSomething
     
     public void Install(string identity, Configure config)
     {
-        var connectionString = config.Settings.GetConnectionString();
-        var endpointName = config.Settings.EndpointName();
+        var settings = config.Settings;
+        if (!settings.IsTimeoutEnabled())
+        {
+            return;
+        }
+        var connectionString = settings.GetConnectionString();
+        var endpointName = settings.EndpointName();
         Install(endpointName, connectionString);
     }
 

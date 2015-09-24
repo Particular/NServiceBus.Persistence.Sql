@@ -65,7 +65,7 @@ public class TimeoutPersisterTest
         using (var testDatabase = new TestDatabase())
         {
             var persister = testDatabase.TimeoutPersister;
-            var startSlice = new DateTime(2000, 1, 1,1,1,1,DateTimeKind.Utc);
+            var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
             var timeout1Time = startSlice.AddSeconds(1);
             var timeout2Time = DateTime.UtcNow.AddSeconds(10);
             var timeout1 = new TimeoutData
@@ -85,9 +85,9 @@ public class TimeoutPersisterTest
             persister.Add(timeout1);
             persister.Add(timeout2);
             DateTime nextTime;
-            var nextChunk = persister.GetNextChunk(startSlice, out nextTime );
-            Assert.That( nextTime, Is.EqualTo( timeout2Time ).Within(TimeSpan.FromSeconds(1)));
-            ObjectApprover.VerifyWithJson(nextChunk);
+            var nextChunk = persister.GetNextChunk(startSlice, out nextTime);
+            Assert.That(nextTime, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
+            ObjectApprover.VerifyWithJson(nextChunk,s => s.Replace(timeout1.Id,"theId"));
         }
     }
 

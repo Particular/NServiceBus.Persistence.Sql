@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Sagas\SagaConfigExtentions.cs" />
     <Compile Include="Serialization\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
@@ -59,8 +60,10 @@
     <Compile Include="Sagas\SagaFeature.cs" />
     <Compile Include="Sagas\SagaInstaller.cs" />
     <Compile Include="SqlPersistenceConfig.cs" />
+    <Compile Include="Subscriptions\SubscriptionConfigExtentions.cs" />
     <Compile Include="Subscriptions\SubscriptionInstaller.cs" />
     <Compile Include="Subscriptions\SubscriptionFeature.cs" />
+    <Compile Include="Timeouts\TimeoutConfigExtentions.cs" />
     <Compile Include="Timeouts\TimeoutFeature.cs" />
     <Compile Include="Timeouts\TimeoutInstaller.cs" />
     <Compile Include="Timeouts\TimeoutPersister.cs" />

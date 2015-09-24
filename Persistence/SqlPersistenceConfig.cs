@@ -11,11 +11,6 @@ namespace NServiceBus
             persistenceConfiguration.GetSettings()
                 .Set("SqlPersistence.ConnectionString", connectionString);
         }
-        public static void Schema(this PersistenceExtentions<Persistence.SqlPersistence> persistenceConfiguration, string schema)
-        {
-            persistenceConfiguration.GetSettings()
-                .Set("SqlPersistence.Schema", schema);
-        }
 
         internal static string GetConnectionString(this ReadOnlySettings settings)
         {
@@ -25,6 +20,12 @@ namespace NServiceBus
                 throw new Exception("ConnectionString must be defined.");
             }
             return connectionString;
+        }
+
+        public static void Schema(this PersistenceExtentions<Persistence.SqlPersistence> persistenceConfiguration, string schema)
+        {
+            persistenceConfiguration.GetSettings()
+                .Set("SqlPersistence.Schema", schema);
         }
         internal static string GetSchema(this ReadOnlySettings settings)
         {

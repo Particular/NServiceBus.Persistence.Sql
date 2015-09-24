@@ -6,9 +6,21 @@ namespace NServiceBus.Persistence
     {
         public SqlPersistence()
         {
-            Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<TimeoutFeature>());
-            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<SagaFeature>());
-            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<SubscriptionFeature>());
+            Supports<StorageType.Timeouts>(s =>
+            {
+                s.EnableFeatureByDefault<TimeoutFeature>();
+                s.SetTimeoutIsEnabled();
+            });
+            Supports<StorageType.Sagas>(s =>
+            {
+                s.EnableFeatureByDefault<SagaFeature>();
+                s.SetSagaIsEnabled();
+            });
+            Supports<StorageType.Subscriptions>(s =>
+            {
+                s.EnableFeatureByDefault<SubscriptionFeature>();
+                s.SetSubscriptionIsEnabled();
+            });
         }
     }
 }

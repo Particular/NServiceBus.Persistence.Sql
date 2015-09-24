@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         var busConfiguration = new BusConfiguration();
-        busConfiguration.EndpointName("SqlPersistenceSample");
+        busConfiguration.EndpointName("SqlPersistence.TimeoutSample");
         busConfiguration.UseSerialization<JsonSerializer>();
         busConfiguration.EnableInstallers();
         busConfiguration.UsePersistence<InMemoryPersistence>();
@@ -17,10 +17,9 @@ class Program
 
         using (var bus = Bus.Create(busConfiguration).Start())
         {
-            bus.SendLocal(new StartOrder
-            {
-                OrderId = "123"
-            });
+            var deferMessage = new DeferMessage {Property = "PropertyValue"};
+            bus.Defer(TimeSpan.FromSeconds(2), deferMessage);
+            bus.SendLocal(new StartSaga());
             Console.WriteLine("Press any key to exit");
             Console.ReadKey();
         }

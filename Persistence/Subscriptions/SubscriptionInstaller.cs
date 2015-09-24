@@ -1,38 +1,31 @@
-﻿//using System.Data.SqlClient;
-//using NServiceBus;
-//using NServiceBus.Installation;
+﻿using NServiceBus;
+using NServiceBus.Installation;
+using NServiceBus.SqlPersistence;
 
-//class SubscriptionInstaller : INeedToInstallSomething
-//{
-//    string connectionString;
+class SubscriptionInstaller : INeedToInstallSomething
+{
 
-//    public SubscriptionInstaller(string connectionString)
-//    {
-//        this.connectionString = connectionString;
-//    }
-//    public void Install(string identity, Configure config)
-//    {
-//        var script = @"
-//if not exists (select * from sysobjects where name='Subscription' and xtype='U')
-//
-//CREATE TABLE [dbo].[Subscription](
-//	[SubscriberEndpoint] [varchar](450) NOT NULL,
-//	[MessageType] [varchar](450) NOT NULL,
-//	[Version] [varchar](450) NULL,
-//	[TypeName] [varchar](450) NULL,
-//PRIMARY KEY CLUSTERED 
-//(
-//	[SubscriberEndpoint] ASC,
-//	[MessageType] ASC
-//)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-//) ON [PRIMARY]
-//
-//GO
-//";
-//        using (var sqlConnection = new SqlConnection(connectionString))
-//        using (var command = new SqlCommand(script, sqlConnection))
-//        {
-//            command.ExecuteNonQuery();
-//        }
-//    }
-//}
+    public void Install(string identity, Configure config)
+    {
+        var settings = config.Settings;
+        if (!settings.IsSubscriptionEnabled())
+        {
+            return;
+        }
+        var connectionString = settings.GetConnectionString();
+        var endpointName = settings.EndpointName();
+        Install(endpointName, connectionString);
+    }
+
+    internal static void Install(string endpointName, string connectionString)
+    {
+        var script = SubscriptionScriptBuilder.BuildCreate("dbo", endpointName);
+        SqlHelpers.Execute(connectionString, script);
+    }
+
+    internal static void Drop(string endpointName, string connectionString)
+    {
+        var script = SubscriptionScriptBuilder.BuildDrop("dbo", endpointName);
+        SqlHelpers.Execute(connectionString, script);
+    }
+}
