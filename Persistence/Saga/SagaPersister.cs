@@ -101,7 +101,8 @@ WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
         using (var connection = SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(getComand, connection))
         {
-            command.AddParameter("propertyValue", propertyValue);
+            //TODO: support better typing for xml query
+            command.AddParameter("propertyValue", propertyValue.ToString());
             return GetSagaData<TSagaData>(command);
         }
     }

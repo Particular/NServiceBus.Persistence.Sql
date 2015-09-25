@@ -1,0 +1,1 @@
+EXECUTE DBNAME.sys.sp_db_selective_xml_index DBNAME, TRUE

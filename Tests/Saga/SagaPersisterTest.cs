@@ -65,7 +65,7 @@ public class SagaPersisterTest
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof (MySagaData)),
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
             MappedProperties = new List<string>
             {
                 "Property"
@@ -84,6 +84,36 @@ public class SagaPersisterTest
             });
             var result = persister.Get<MySagaData>("Property", "theProperty");
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        }
+    }
+    [Test]
+    public void SaveDuplicateShouldThrow()
+    {
+        var sagaDefinition = new SagaDefinition
+        {
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
+            MappedProperties = new List<string>
+            {
+                "Property"
+            }
+        };
+        using (var testDatabase = new SagaDatabase(sagaDefinition))
+        {
+            var persister = testDatabase.Persister;
+            persister.Save(new MySagaData
+            {
+                Id = Guid.NewGuid(),
+                OriginalMessageId = "theOriginalMessageId",
+                Originator = "theOriginator",
+                Property = "theProperty"
+            });
+            persister.Save(new MySagaData
+            {
+                Id = Guid.NewGuid(),
+                OriginalMessageId = "theOriginalMessageId",
+                Originator = "theOriginator",
+                Property = "theProperty"
+            });
         }
     }
 
