@@ -19,7 +19,7 @@ class TimeoutInstaller : INeedToInstallSomething
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreate("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
 
         SqlHelpers.Execute(connectionString, builder.ToString());

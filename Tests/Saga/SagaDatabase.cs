@@ -9,14 +9,16 @@ class SagaDatabase : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     string endpointName = "Endpoint";
+
     [Time]
     public SagaDatabase(SagaDefinition sagaDefinition)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            var sagaDefinitions = new List<SagaDefinition> { sagaDefinition };
-            SagaScriptBuilder.BuildDropScript("dbo", endpointName, sagaDefinitions, s => writer);
+            var sagaDefinitions = new List<SagaDefinition> {sagaDefinition};
+            var sagaNames = new List<string> {sagaDefinition.Name};
+            SagaScriptBuilder.BuildDropScript("dbo", endpointName, sagaNames, s => writer);
             SagaScriptBuilder.BuildCreateScript("dbo", endpointName, sagaDefinitions, s => writer);
         }
         var script = builder.ToString();

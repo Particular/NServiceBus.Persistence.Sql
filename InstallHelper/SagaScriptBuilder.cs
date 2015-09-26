@@ -77,17 +77,17 @@ END
 ", tableName);
         }
 
-        public static void BuildDropScript(string schema, string endpointName, IEnumerable<SagaDefinition> sagas, Func<string, TextWriter> writerBuilder)
+        public static void BuildDropScript(string schema, string endpointName, IEnumerable<string> sagaNames, Func<string, TextWriter> writerBuilder)
         {
-            foreach (var saga in sagas)
+            foreach (var saga in sagaNames)
             {
-                var writer = writerBuilder(saga.Name);
+                var writer = writerBuilder(saga);
                 writer.Write(@"
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.{2}]') AND type in (N'U'))
 BEGIN
     DROP TABLE [{0}].[{1}.{2}]
 END
-", schema, endpointName, saga.Name);
+", schema, endpointName, saga);
             }
         }
 

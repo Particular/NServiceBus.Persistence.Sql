@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using ObjectApproval;
 
+
 [TestFixture]
 public class SubscriptionPersisterTest
 {

@@ -1,0 +1,13 @@
+﻿
+IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.SubscriptionData]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [theschema].[theendpointname.SubscriptionData](
+	    [Subscriber] [varchar](450) NOT NULL,
+	    [MessageType] [varchar](450) NOT NULL,
+        PRIMARY KEY CLUSTERED 
+        (
+	        [Subscriber] ASC,
+	        [MessageType] ASC
+        )
+    )
+END

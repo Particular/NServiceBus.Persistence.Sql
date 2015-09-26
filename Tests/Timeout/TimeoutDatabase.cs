@@ -14,8 +14,8 @@ class TimeoutDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDrop("dbo", endpointName, writer);
-            TimeoutScriptBuilder.BuildCreate("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);

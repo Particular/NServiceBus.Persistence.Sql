@@ -1,0 +1,41 @@
+﻿
+IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.theSaga]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [theschema].[theendpointname.theSaga](
+	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+	    [Originator] [nvarchar](255) NULL,
+	    [OriginalMessageId] [nvarchar](255) NULL,
+	    [Data] [xml] NOT NULL
+    )
+END
+
+declare @query nvarchar(max);
+select @query = 
+(SELECT  'DROP INDEX ' + ix.name + ' ON [theschema].[theendpointname.theSaga]; '
+FROM  sysindexes ix
+WHERE 
+	ix.Name IS NOT null AND 
+	ix.Name LIKE 'PropertyIndex_%' AND
+	ix.Name NOT IN ('Property1', 'Property2')
+for xml path(''));
+exec sp_executesql @query
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'PropertyIndex_Property1' AND object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]'))
+BEGIN
+    CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
+    ON [theschema].[theendpointname.theSaga](Data)
+    FOR 
+    (
+        Property1 = '/Data/Property1' AS XQUERY 'xs:string' SINGLETON
+    )
+END
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'PropertyIndex_Property2' AND object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]'))
+BEGIN
+    CREATE  SELECTIVE XML INDEX PropertyIndex_Property2
+    ON [theschema].[theendpointname.theSaga](Data)
+    FOR 
+    (
+        Property2 = '/Data/Property2' AS XQUERY 'xs:string' SINGLETON
+    )
+END

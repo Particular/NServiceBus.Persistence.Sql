@@ -19,7 +19,7 @@ class SubscriptionInstaller : INeedToInstallSomething
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreate("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
 
         SqlHelpers.Execute(connectionString, builder.ToString());

@@ -14,8 +14,8 @@ class SubscriptionDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDrop("dbo", endpointName, writer);
-            SubscriptionScriptBuilder.BuildCreate("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);

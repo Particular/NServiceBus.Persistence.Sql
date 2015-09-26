@@ -1,0 +1,12 @@
+﻿
+IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.TimeoutData]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [theschema].[theendpointname.TimeoutData](
+	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+	    [Destination] [nvarchar](1024) NULL,
+	    [SagaId] [uniqueidentifier] NULL,
+	    [State] [varbinary](max) NULL,
+	    [Time] [datetime] NULL,
+	    [Headers] [xml] NULL
+    )
+END
