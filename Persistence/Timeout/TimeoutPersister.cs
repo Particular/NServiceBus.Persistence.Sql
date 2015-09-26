@@ -23,11 +23,11 @@ class TimeoutPersister : IPersistTimeouts
         var now = DateTime.UtcNow;
         using (var connection = SqlHelpers.New(connectionString))
         {
-        var rangeComand = string.Format(@"
+            var rangeComandText = string.Format(@"
 SELECT Id, Time 
 FROM [{0}].[{1}.TimeoutData]
 WHERE time BETWEEN @StartTime AND @EndTime", schema, endpointName);
-            using (var command = new SqlCommand(rangeComand, connection))
+            using (var command = new SqlCommand(rangeComandText, connection))
             {
                 command.AddParameter("StartTime", startSlice);
                 command.AddParameter("EndTime", now);
@@ -39,12 +39,12 @@ WHERE time BETWEEN @StartTime AND @EndTime", schema, endpointName);
                     }
                 }
             }
-            var nextCommand = string.Format(@"
+            var nextCommandText = string.Format(@"
 SELECT TOP 1 Time FROM [{0}].[{1}.TimeoutData]
 WHERE Time > @EndTime
 ORDER BY TIME", schema, endpointName);
 
-            using (var command = new SqlCommand(nextCommand, connection))
+            using (var command = new SqlCommand(nextCommandText, connection))
             {
                 command.AddParameter("EndTime", now);
                 var executeScalar = command.ExecuteScalar();
@@ -63,7 +63,7 @@ ORDER BY TIME", schema, endpointName);
 
     public void Add(TimeoutData timeout)
     {
-        var addCommand = string.Format(@"
+        var commandText = string.Format(@"
 INSERT INTO [{0}].[{1}.TimeoutData] 
 (
     Id, 
@@ -83,7 +83,7 @@ VALUES
     @Headers
 )", schema, endpointName);
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(addCommand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             var id = Guid.NewGuid();
             timeout.Id = id.ToString();
@@ -100,7 +100,7 @@ VALUES
 
     public bool TryRemove(string timeoutId, out TimeoutData timeoutData)
     {
-        var deleteAndSelectCommand = string.Format(@"
+        var commandText = string.Format(@"
 DELETE FROM [{0}].[{1}.TimeoutData] 
 OUTPUT 
     deleted.Destination, 
@@ -110,7 +110,7 @@ OUTPUT
     deleted.Headers 
 WHERE Id = @Id", schema, endpointName);
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(deleteAndSelectCommand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("Id", timeoutId);
             using (var reader = command.ExecuteReader())
@@ -137,11 +137,11 @@ WHERE Id = @Id", schema, endpointName);
 
     public void RemoveTimeoutBy(Guid sagaId)
     {
-        var removeBySagaCommand = string.Format(@"
+        var commandText = string.Format(@"
 DELETE FROM [{0}].[{1}.TimeoutData] 
 WHERE SagaId = @SagaId", schema, endpointName);
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(removeBySagaCommand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("SagaId", sagaId);
             command.ExecuteNonQuery();

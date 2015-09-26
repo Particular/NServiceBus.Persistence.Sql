@@ -26,7 +26,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
     internal void Subscribe(string client, IEnumerable<string> messageTypes)
     {
-        var subscribeCommand = string.Format(@"
+        var commandText = string.Format(@"
 IF NOT EXISTS 
 (
     SELECT * FROM [{0}].[{1}.SubscriptionData]
@@ -50,7 +50,7 @@ END", schema, endpointName);
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(subscribeCommand, connection))
+                using (var command = new SqlCommand(commandText, connection))
                 {
                     command.AddParameter("MessageType", messageType);
                     command.AddParameter("Subscriber", client);
@@ -67,7 +67,7 @@ END", schema, endpointName);
 
     internal void Unsubscribe(string client, IEnumerable<string> messageTypes)
     {
-        var unsubscribeCommand = string.Format(@"
+        var commandText = string.Format(@"
 DELETE FROM [{0}].[{1}.SubscriptionData] 
 WHERE 
     Subscriber = @Subscriber AND 
@@ -76,7 +76,7 @@ WHERE
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(unsubscribeCommand, connection))
+                using (var command = new SqlCommand(commandText, connection))
                 {
                     command.AddParameter("MessageType", messageType);
                     command.AddParameter("Subscriber", client);

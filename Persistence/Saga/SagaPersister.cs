@@ -19,7 +19,7 @@ class SagaPersister : ISagaPersister
     public void Save(IContainSagaData data)
     {
         var type = data.GetType();
-        var saveComand = string.Format(@"
+        var commandText = string.Format(@"
 INSERT INTO [{0}].[{1}.{2}] 
 (
     Id, 
@@ -35,7 +35,7 @@ VALUES
     @Data
 )", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(type));
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(saveComand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("Id", data.Id);
             command.AddParameter("OriginalMessageId", data.OriginalMessageId);
@@ -48,7 +48,7 @@ VALUES
     public void Update(IContainSagaData data)
     {
         var type = data.GetType();
-        var saveComand = string.Format(@"
+        var commandText = string.Format(@"
 UPDATE [{0}].[{1}.{2}] 
 SET
     Originator = @Originator, 
@@ -58,7 +58,7 @@ WHERE
     Id = @Id
 ", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(type));
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(saveComand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("Id", data.Id);
             command.AddParameter("OriginalMessageId", data.OriginalMessageId);
@@ -68,7 +68,8 @@ WHERE
         }
     }
 
-    public TSagaData Get<TSagaData>(Guid sagaId) where TSagaData : IContainSagaData
+    public TSagaData Get<TSagaData>(Guid sagaId) 
+        where TSagaData : IContainSagaData
     {
         var getComand = string.Format(@"
 SELECT
@@ -87,9 +88,10 @@ WHERE Id = @Id
         }
     }
 
-    public TSagaData Get<TSagaData>(string propertyName, object propertyValue) where TSagaData : IContainSagaData
+    public TSagaData Get<TSagaData>(string propertyName, object propertyValue) 
+        where TSagaData : IContainSagaData
     {
-        var getComand = string.Format(@"
+        var commandText = string.Format(@"
 SELECT
     Id,
     Originator,
@@ -99,7 +101,7 @@ FROM  [{0}].[{1}.{2}]
 WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
 ", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(typeof(TSagaData)), propertyName);
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(getComand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             //TODO: support better typing for xml query
             command.AddParameter("propertyValue", propertyValue.ToString());
@@ -108,7 +110,8 @@ WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
     }
 
 
-    static TSagaData GetSagaData<TSagaData>(SqlCommand command) where TSagaData : IContainSagaData
+    static TSagaData GetSagaData<TSagaData>(SqlCommand command) 
+        where TSagaData : IContainSagaData
     {
         using (var reader = command.ExecuteReader(CommandBehavior.SingleRow))
         {
@@ -133,12 +136,12 @@ WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
     public void Complete(IContainSagaData data)
     {
         var type = data.GetType();
-        var completeComand = string.Format(@"
+        var commandText = string.Format(@"
 DELETE FROM  [{0}].[{1}.{2}] 
 WHERE Id = @Id
 ", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(type));
         using (var connection = SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(completeComand, connection))
+        using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("Id", data.Id);
             command.ExecuteReader();

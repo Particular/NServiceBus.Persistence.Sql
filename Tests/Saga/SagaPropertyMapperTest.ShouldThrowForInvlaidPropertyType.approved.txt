@@ -1,0 +1,1 @@
+﻿The type System.Object is not valid to be used as a mapped message or as a unique property. The valid types are System.String, System.Char, System.Int32, System.Int64, System.Int16, System.UInt32, System.UInt64, System.UInt16, System.Guid, System.Single, System.DateTime, System.DateTimeOffset, System.TimeSpan

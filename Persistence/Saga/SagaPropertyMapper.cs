@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using NServiceBus.Saga;
 
 class SagaPropertyMapper : IConfigureHowToFindSagaWithMessage
@@ -8,7 +9,16 @@ class SagaPropertyMapper : IConfigureHowToFindSagaWithMessage
     public List<string> Properties  = new List<string>();
     public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty) where TSagaEntity : IContainSagaData
     {
-        Properties.Add(ExtractProperty(sagaEntityProperty));
+        try
+        {
+            var extractProperty = ExtractProperty(sagaEntityProperty);
+            Properties.Add(extractProperty);
+        }
+        catch (Exception exception)
+        {
+            var message = string.Format("Could not configure mapping for {0}. {1}.", typeof(TSagaEntity), exception.Message);
+            throw new Exception(message);
+        }
     }
 
     internal static string ExtractProperty<TSagaEntity>(Expression<Func<TSagaEntity, object>> expression)
@@ -18,6 +28,14 @@ class SagaPropertyMapper : IConfigureHowToFindSagaWithMessage
         {
             throw new Exception("Not a MemberExpression");
         }
-        return member.Member.Name;
+
+        var property = member.Member as PropertyInfo;
+
+        if (property == null)
+        {
+            throw new Exception("Not a Property Expression");
+        }
+        MappedTypeVerifier.Verify(property.PropertyType.FullName);
+        return property.Name;
     }
 }

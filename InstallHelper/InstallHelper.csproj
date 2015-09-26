@@ -36,6 +36,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="MappedTypeVerifier.cs" />
     <Compile Include="SagaDefinition.cs" />
     <Compile Include="SagaScriptBuilder.cs" />
     <Compile Include="SubscriptionScriptBuilder.cs" />
