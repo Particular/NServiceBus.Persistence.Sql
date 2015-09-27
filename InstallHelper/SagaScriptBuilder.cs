@@ -32,7 +32,14 @@ namespace NServiceBus.SqlPersistence
             foreach (var mappedProperty in saga.MappedProperties)
             {
                 writer.Write(@"
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'PropertyIndex_{0}' AND object_id = OBJECT_ID('{1}'))
+IF NOT EXISTS
+(
+    SELECT * 
+    FROM sys.indexes 
+    WHERE 
+        name = 'PropertyIndex_{0}' AND 
+        object_id = OBJECT_ID('{1}')
+)
 BEGIN
     CREATE  SELECTIVE XML INDEX PropertyIndex_{0}
     ON {1}(Data)
@@ -51,13 +58,15 @@ END
             writer.Write(@"
 declare @query nvarchar(max);
 select @query = 
-(SELECT  'DROP INDEX ' + ix.name + ' ON {0}; '
-FROM  sysindexes ix
-WHERE 
-	ix.Name IS NOT null AND 
-	ix.Name LIKE 'PropertyIndex_%' AND
-	ix.Name NOT IN ({1})
-for xml path(''));
+(
+    SELECT 'DROP INDEX ' + ix.name + ' ON {0}; '
+    FROM sysindexes ix
+    WHERE 
+	    ix.Name IS NOT null AND 
+	    ix.Name LIKE 'PropertyIndex_%' AND
+	    ix.Name NOT IN ({1})
+    for xml path('')
+);
 exec sp_executesql @query
 ", tableName, propertyInString);
         }
@@ -65,7 +74,14 @@ exec sp_executesql @query
         static void WriteCreateTable(TextWriter writer, string tableName)
         {
             writer.Write(@"
-IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{0}') AND type in (N'U'))
+IF NOT EXISTS 
+(
+    SELECT * 
+    FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(N'{0}') AND 
+        type in (N'U')
+)
 BEGIN
     CREATE TABLE {0}(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
@@ -83,7 +99,14 @@ END
             {
                 var writer = writerBuilder(saga);
                 writer.Write(@"
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.{2}]') AND type in (N'U'))
+IF EXISTS 
+(
+    SELECT * 
+    FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(N'[{0}].[{1}.{2}]') 
+        AND type in (N'U')
+)
 BEGIN
     DROP TABLE [{0}].[{1}.{2}]
 END

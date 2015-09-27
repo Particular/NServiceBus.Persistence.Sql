@@ -1,5 +1,12 @@
 ﻿
-IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.theSaga]') AND type in (N'U'))
+IF NOT EXISTS 
+(
+    SELECT * 
+    FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(N'[theschema].[theendpointname.theSaga]') AND 
+        type in (N'U')
+)
 BEGIN
     CREATE TABLE [theschema].[theendpointname.theSaga](
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
@@ -11,16 +18,25 @@ END
 
 declare @query nvarchar(max);
 select @query = 
-(SELECT  'DROP INDEX ' + ix.name + ' ON [theschema].[theendpointname.theSaga]; '
-FROM  sysindexes ix
-WHERE 
-	ix.Name IS NOT null AND 
-	ix.Name LIKE 'PropertyIndex_%' AND
-	ix.Name NOT IN ('Property1', 'Property2')
-for xml path(''));
+(
+    SELECT 'DROP INDEX ' + ix.name + ' ON [theschema].[theendpointname.theSaga]; '
+    FROM sysindexes ix
+    WHERE 
+	    ix.Name IS NOT null AND 
+	    ix.Name LIKE 'PropertyIndex_%' AND
+	    ix.Name NOT IN ('Property1', 'Property2')
+    for xml path('')
+);
 exec sp_executesql @query
 
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'PropertyIndex_Property1' AND object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]'))
+IF NOT EXISTS
+(
+    SELECT * 
+    FROM sys.indexes 
+    WHERE 
+        name = 'PropertyIndex_Property1' AND 
+        object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]')
+)
 BEGIN
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
     ON [theschema].[theendpointname.theSaga](Data)
@@ -30,7 +46,14 @@ BEGIN
     )
 END
 
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'PropertyIndex_Property2' AND object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]'))
+IF NOT EXISTS
+(
+    SELECT * 
+    FROM sys.indexes 
+    WHERE 
+        name = 'PropertyIndex_Property2' AND 
+        object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]')
+)
 BEGIN
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property2
     ON [theschema].[theendpointname.theSaga](Data)

@@ -8,7 +8,7 @@ namespace NServiceBus.SqlPersistence
         public static void BuildCreateScript(string schema, string endpointName, TextWriter writer)
         {
             writer.Write(@"
-IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
 BEGIN
     CREATE TABLE [{0}].[{1}.TimeoutData](
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
@@ -25,7 +25,7 @@ END
         public static void BuildDropScript(string schema, string endpointName, TextWriter writer)
         {
             writer.Write(@"
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
 BEGIN
     DROP TABLE [{0}].[{1}.TimeoutData]
 END

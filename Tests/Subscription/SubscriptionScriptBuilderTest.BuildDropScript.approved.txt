@@ -1,5 +1,12 @@
 ﻿
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.SubscriptionData]') AND type in (N'U'))
+IF EXISTS 
+(
+    SELECT * 
+    FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(N'[theschema].[theendpointname.SubscriptionData]') AND 
+        type in (N'U')
+)
 BEGIN
     DROP TABLE [theschema].[theendpointname.SubscriptionData]
 END
