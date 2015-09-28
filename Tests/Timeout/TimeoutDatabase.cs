@@ -19,7 +19,7 @@ class TimeoutDatabase : IDisposable
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);
-        Persister = new TimeoutPersister(connectionString, "dbo", endpointName);
+        Persister = new TimeoutPersister(connectionString, "dbo",endpointName);
     }
 
     public TimeoutPersister Persister;

@@ -35,7 +35,7 @@ static class SagaMetaDataReader
             .Where(IsSagaClass);
     }
 
-    static List<string> GetMappedProperties(Type sagaType)
+    internal static List<string> GetMappedProperties(Type sagaType)
     {
         var instance = FormatterServices.GetUninitializedObject(sagaType);
         var configureHowToFindSaga = sagaType.GetMethod("ConfigureHowToFindSaga", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(IConfigureHowToFindSagaWithMessage)}, null);

@@ -22,5 +22,6 @@ namespace NServiceBus.Persistence
                 s.SetSubscriptionIsEnabled();
             });
         }
+        
     }
 }

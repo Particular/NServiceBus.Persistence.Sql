@@ -19,6 +19,7 @@ BEGIN
     CREATE TABLE [{0}].[{1}.SubscriptionData](
 	    [Subscriber] [varchar](450) NOT NULL,
 	    [MessageType] [varchar](450) NOT NULL,
+	    [PersistenceVersion] [nvarchar](23) NOT NULL,
         PRIMARY KEY CLUSTERED 
         (
 	        [Subscriber] ASC,

@@ -16,7 +16,8 @@ BEGIN
 	    [SagaId] [uniqueidentifier] NULL,
 	    [State] [varbinary](max) NULL,
 	    [Time] [datetime] NULL,
-	    [Headers] [xml] NULL
+	    [Headers] [xml] NULL,
+	    [PersistenceVersion] [nvarchar](23) NOT NULL
     )
 END
 ", schema, endpointName);

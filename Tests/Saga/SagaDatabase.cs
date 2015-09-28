@@ -23,7 +23,9 @@ class SagaDatabase : IDisposable
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);
-        Persister = new SagaPersister(connectionString, "dbo", endpointName);
+        var commandBuilder = new SagaCommandBuilder("dbo",endpointName);
+        var infoCache = new SagaInfoCache(null,null,commandBuilder);
+        Persister = new SagaPersister(connectionString,infoCache);
     }
 
     public SagaPersister Persister;

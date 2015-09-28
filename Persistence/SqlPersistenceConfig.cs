@@ -27,6 +27,7 @@ namespace NServiceBus
             persistenceConfiguration.GetSettings()
                 .Set("SqlPersistence.Schema", schema);
         }
+
         internal static string GetSchema(this ReadOnlySettings settings)
         {
             var schema = settings.GetOrDefault<string>("SqlPersistence.Schema");

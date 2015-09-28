@@ -11,22 +11,15 @@ class SubscriptionPersister : ISubscriptionStorage
     string connectionString;
     string schema;
     string endpointName;
+    string subscribeCommandText;
+    string unsubscribeCommandText;
 
     public SubscriptionPersister(string connectionString, string schema, string endpointName)
     {
         this.connectionString = connectionString;
         this.schema = schema;
         this.endpointName = endpointName;
-    }
-
-    public void Subscribe(Address client, IEnumerable<MessageType> messageTypes)
-    {
-        Subscribe(client.ToString(), messageTypes.Select(x => x.TypeName));
-    }
-
-    internal void Subscribe(string client, IEnumerable<string> messageTypes)
-    {
-        var commandText = string.Format(@"
+        subscribeCommandText = string.Format(@"
 IF NOT EXISTS 
 (
     SELECT * FROM [{0}].[{1}.SubscriptionData]
@@ -38,23 +31,40 @@ BEGIN
     INSERT INTO [{0}].[{1}.SubscriptionData] 
     (
         Subscriber, 
-        MessageType
+        MessageType,
+        PersistenceVersion
     ) 
     VALUES 
     (
         @Subscriber, 
-        @MessageType
+        @MessageType, 
+        @PersistenceVersion
     )
 END", schema, endpointName);
+        unsubscribeCommandText = string.Format(@"
+DELETE FROM [{0}].[{1}.SubscriptionData] 
+WHERE 
+    Subscriber = @Subscriber AND 
+    MessageType = @MessageType", schema, endpointName);
+    }
+
+    public void Subscribe(Address client, IEnumerable<MessageType> messageTypes)
+    {
+        Subscribe(client.ToString(), messageTypes.Select(x => x.TypeName));
+    }
+
+    internal void Subscribe(string client, IEnumerable<string> messageTypes)
+    {
         using (var connection = SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(commandText, connection))
+                using (var command = new SqlCommand(subscribeCommandText, connection))
                 {
                     command.AddParameter("MessageType", messageType);
                     command.AddParameter("Subscriber", client);
-                    command.ExecuteNonQuery();
+                    command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
+                    command.ExecuteNonQueryEx();
                 }
             }
         }
@@ -67,20 +77,15 @@ END", schema, endpointName);
 
     internal void Unsubscribe(string client, IEnumerable<string> messageTypes)
     {
-        var commandText = string.Format(@"
-DELETE FROM [{0}].[{1}.SubscriptionData] 
-WHERE 
-    Subscriber = @Subscriber AND 
-    MessageType = @MessageType", schema, endpointName);
         using (var connection = SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(commandText, connection))
+                using (var command = new SqlCommand(unsubscribeCommandText, connection))
                 {
                     command.AddParameter("MessageType", messageType);
                     command.AddParameter("Subscriber", client);
-                    command.ExecuteNonQuery();
+                    command.ExecuteNonQueryEx();
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionFeature : Feature
 {
@@ -14,6 +15,6 @@ class SubscriptionFeature : Feature
         var schema = context.Settings.GetSchema();
         var endpointName = context.Settings.EndpointName();
         var persister = new SubscriptionPersister(connectionString, schema, endpointName);
-        context.Container.ConfigureComponent(() => persister, DependencyLifecycle.InstancePerCall);
+        context.Container.RegisterSingleton(typeof(ISubscriptionStorage), persister);
     }
 }

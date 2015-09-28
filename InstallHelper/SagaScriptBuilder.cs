@@ -87,7 +87,9 @@ BEGIN
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
 	    [OriginalMessageId] [nvarchar](255) NULL,
-	    [Data] [xml] NOT NULL
+	    [Data] [xml] NOT NULL,
+	    [PersistenceVersion] [nvarchar](23) NOT NULL,
+	    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
 END
 ", tableName);

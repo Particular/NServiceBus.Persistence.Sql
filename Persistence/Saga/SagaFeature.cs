@@ -13,7 +13,9 @@ class SagaFeature : Feature
         var connectionString = context.Settings.GetConnectionString();
         var schema = context.Settings.GetSchema();
         var endpointName = context.Settings.EndpointName();
-        var persister = new SagaPersister(connectionString, schema, endpointName);
-        context.Container.ConfigureComponent(() => persister, DependencyLifecycle.InstancePerCall);
+
+        var commandBuilder = new SagaCommandBuilder(schema,endpointName);
+        var sagaInfoCache = new SagaInfoCache(null,null, commandBuilder);
+        context.Container.ConfigureComponent(() => new SagaPersister(connectionString,sagaInfoCache), DependencyLifecycle.InstancePerCall);
     }
 }
