@@ -21,6 +21,7 @@ namespace NServiceBus.Persistence
                 s.EnableFeatureByDefault<SubscriptionFeature>();
                 s.SetSubscriptionIsEnabled();
             });
+            
         }
         
     }

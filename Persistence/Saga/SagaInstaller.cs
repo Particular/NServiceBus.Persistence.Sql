@@ -2,6 +2,7 @@
 using System.Text;
 using NServiceBus;
 using NServiceBus.Installation;
+using NServiceBus.Persistence;
 using NServiceBus.SqlPersistence;
 
 class SagaInstaller : INeedToInstallSomething
@@ -16,7 +17,7 @@ class SagaInstaller : INeedToInstallSomething
         }
         var typesToScan = config.TypesToScan;
         var sagaDefinitions = SagaMetaDataReader.GetSagaDefinitions(typesToScan);
-        var connectionString = settings.GetConnectionString();
+        var connectionString = settings.GetConnectionString<StorageType.Sagas>();
         var endpointName = config.Settings.EndpointName();
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))

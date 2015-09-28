@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 
 class SagaFeature : Feature
 {
@@ -10,8 +11,8 @@ class SagaFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var connectionString = context.Settings.GetConnectionString();
-        var schema = context.Settings.GetSchema();
+        var connectionString = context.Settings.GetConnectionString<StorageType.Sagas>();
+        var schema = context.Settings.GetSchema<StorageType.Sagas>();
         var endpointName = context.Settings.EndpointName();
 
         var commandBuilder = new SagaCommandBuilder(schema,endpointName);

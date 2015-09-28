@@ -2,6 +2,7 @@
 using System.Text;
 using NServiceBus;
 using NServiceBus.Installation;
+using NServiceBus.Persistence;
 using NServiceBus.SqlPersistence;
 
 class SubscriptionInstaller : INeedToInstallSomething
@@ -14,7 +15,7 @@ class SubscriptionInstaller : INeedToInstallSomething
         {
             return;
         }
-        var connectionString = settings.GetConnectionString();
+        var connectionString = settings.GetConnectionString<StorageType.Subscriptions>();
         var endpointName = settings.EndpointName();
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))

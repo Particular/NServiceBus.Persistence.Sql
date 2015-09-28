@@ -2,6 +2,7 @@
 using System.Text;
 using NServiceBus;
 using NServiceBus.Installation;
+using NServiceBus.Persistence;
 using NServiceBus.SqlPersistence;
 
 class TimeoutInstaller : INeedToInstallSomething
@@ -14,7 +15,7 @@ class TimeoutInstaller : INeedToInstallSomething
         {
             return;
         }
-        var connectionString = settings.GetConnectionString();
+        var connectionString = settings.GetConnectionString<StorageType.Timeouts>();
         var endpointName = settings.EndpointName();
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))

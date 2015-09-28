@@ -11,7 +11,8 @@ class Program
         busConfiguration.UseSerialization<JsonSerializer>();
         busConfiguration.EnableInstallers();
         busConfiguration.UsePersistence<InMemoryPersistence>();
-        var persistenceExtentions = busConfiguration.UsePersistence<SqlPersistence, StorageType.Timeouts>();
+        var persistenceExtentions = busConfiguration
+            .UsePersistence<SqlPersistence, StorageType.Timeouts>();
         persistenceExtentions
             .ConnectionString(@"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceSample;Integrated Security=True");
 
