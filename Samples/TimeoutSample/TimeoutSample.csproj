@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="DeferHandler.cs" />
     <Compile Include="SagaTimout.cs" />
-    <Compile Include="ConfigErrorQueue.cs" />
     <Compile Include="DeferMessage.cs" />
     <Compile Include="MySaga.cs" />
     <Compile Include="Program.cs" />
@@ -66,6 +65,10 @@
     <ProjectReference Include="..\..\Persistence\Persistence.csproj">
       <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
       <Name>Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{595e1284-d95d-47ed-8a59-43bb17123be3}</Project>
+      <Name>Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

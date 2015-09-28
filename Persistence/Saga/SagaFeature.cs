@@ -11,12 +11,15 @@ class SagaFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var connectionString = context.Settings.GetConnectionString<StorageType.Sagas>();
-        var schema = context.Settings.GetSchema<StorageType.Sagas>();
-        var endpointName = context.Settings.EndpointName();
+        var settings = context.Settings;
+        var connectionString = settings.GetConnectionString<StorageType.Sagas>();
+        var schema = settings.GetSchema<StorageType.Sagas>();
+        var endpointName = settings.EndpointName();
 
         var commandBuilder = new SagaCommandBuilder(schema,endpointName);
-        var sagaInfoCache = new SagaInfoCache(null,null, commandBuilder);
+        var serializeBuilder = settings.GetSerializeBuilder();
+        var deserializeBuilder = settings.GetDeserializeBuilder();
+        var sagaInfoCache = new SagaInfoCache(deserializeBuilder, serializeBuilder, commandBuilder);
         context.Container.ConfigureComponent(() => new SagaPersister(connectionString,sagaInfoCache), DependencyLifecycle.InstancePerCall);
     }
 }

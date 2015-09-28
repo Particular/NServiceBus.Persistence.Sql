@@ -11,11 +11,11 @@ class SubscriptionInstaller : INeedToInstallSomething
     public void Install(string identity, Configure config)
     {
         var settings = config.Settings;
-        if (!settings.IsSubscriptionEnabled())
+        if (!settings.GetFeatureEnabled<StorageType.Subscriptions>())
         {
             return;
         }
-        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        if (settings.GetDisableInstaller<StorageType.Subscriptions>())
         {
             return;
         }

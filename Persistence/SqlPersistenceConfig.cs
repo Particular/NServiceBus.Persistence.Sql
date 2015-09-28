@@ -7,17 +7,17 @@ namespace NServiceBus
 {
     public static class SqlPersistenceConfig
     {
-        public static void ConnectionString(this PersistenceExtentions<Persistence.SqlPersistence> persistenceConfiguration, string connectionString)
+        public static void ConnectionString(this PersistenceExtentions<Persistence.SqlPersistence> configuration, string connectionString)
         {
-            persistenceConfiguration.GetSettings()
+            configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionString", connectionString);
         }
 
-        public static void ConnectionString<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> persistenceConfiguration, string connectionString)
+        public static void ConnectionString<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> configuration, string connectionString)
             where TStorageType : StorageType
         {
             var key = "SqlPersistence." + typeof (TStorageType).Name + ".ConnectionString";
-            persistenceConfiguration.GetSettings()
+            configuration.GetSettings()
                 .Set(key, connectionString);
         }
 
@@ -28,17 +28,17 @@ namespace NServiceBus
         }
 
 
-        public static void DisableInstaller(this PersistenceExtentions<Persistence.SqlPersistence> persistenceConfiguration)
+        public static void DisableInstaller(this PersistenceExtentions<Persistence.SqlPersistence> configuration)
         {
-            persistenceConfiguration.GetSettings()
+            configuration.GetSettings()
                 .Set("SqlPersistence.DisableInstaller", true);
         }
 
-        public static void DisableInstaller<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> persistenceConfiguration)
+        public static void DisableInstaller<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> configuration)
             where TStorageType : StorageType
         {
-            var key = "SqlPersistence." + typeof (TStorageType).Name + ".DisableInstaller";
-            persistenceConfiguration.GetSettings()
+            var key = "SqlPersistence." + typeof(TStorageType).Name + ".DisableInstaller";
+            configuration.GetSettings()
                 .Set(key, true);
         }
 
@@ -48,17 +48,30 @@ namespace NServiceBus
             return settings.GetValue<bool, TStorageType>("DisableInstaller", () => false);
         }
 
-        public static void Schema(this PersistenceExtentions<Persistence.SqlPersistence> persistenceConfiguration, string schema)
+        internal static void EnableFeature<TStorageType>(this SettingsHolder settingsHolder)
+            where TStorageType : StorageType
         {
-            persistenceConfiguration.GetSettings()
+            var key = "SqlPersistence." + typeof(TStorageType).Name + ".FeatureEnabled";
+            settingsHolder.Set(key, true);
+        }
+
+        internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
+            where TStorageType : StorageType
+        {
+            return settings.GetValue<bool, TStorageType>("FeatureEnabled", () => false);
+        }
+
+        public static void Schema(this PersistenceExtentions<Persistence.SqlPersistence> configuration, string schema)
+        {
+            configuration.GetSettings()
                 .Set("SqlPersistence.Schema", schema);
         }
 
-        public static void Schema<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> persistenceConfiguration, string schema)
+        public static void Schema<TStorageType>(this PersistenceExtentions<Persistence.SqlPersistence, TStorageType> configuration, string schema)
             where TStorageType : StorageType
         {
             var key = "SqlPersistence." + typeof (TStorageType).Name + ".Schema";
-            persistenceConfiguration.GetSettings()
+            configuration.GetSettings()
                 .Set(key, schema);
         }
 

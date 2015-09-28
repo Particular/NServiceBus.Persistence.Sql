@@ -72,10 +72,8 @@
     <Compile Include="Saga\SagaFeature.cs" />
     <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="SqlPersistenceConfig.cs" />
-    <Compile Include="Subscription\SubscriptionConfigExtentions.cs" />
     <Compile Include="Subscription\SubscriptionInstaller.cs" />
     <Compile Include="Subscription\SubscriptionFeature.cs" />
-    <Compile Include="Timeout\TimeoutConfigExtentions.cs" />
     <Compile Include="Timeout\TimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
     <Compile Include="Timeout\TimeoutPersister.cs" />

@@ -11,11 +11,11 @@ class SagaInstaller : INeedToInstallSomething
     public void Install(string identity, Configure config)
     {
         var settings = config.Settings;
-        if (!settings.IsSagaEnabled())
+        if (!settings.GetFeatureEnabled<StorageType.Sagas>())
         {
             return;
         }
-        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        if (settings.GetDisableInstaller<StorageType.Sagas>())
         {
             return;
         }

@@ -11,7 +11,7 @@ class TimeoutInstaller : INeedToInstallSomething
     public void Install(string identity, Configure config)
     {
         var settings = config.Settings;
-        if (!settings.IsTimeoutEnabled())
+        if (!settings.GetFeatureEnabled<StorageType.Subscriptions>())
         {
             return;
         }

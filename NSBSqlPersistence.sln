@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SagaSample", "Samples\SagaS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeoutSample", "Samples\TimeoutSample\TimeoutSample.csproj", "{49A58E93-8C64-44E7-855B-9C3531D1EFBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Samples\Shared\Shared.csproj", "{595E1284-D95D-47ED-8A59-43BB17123BE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{49A58E93-8C64-44E7-855B-9C3531D1EFBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49A58E93-8C64-44E7-855B-9C3531D1EFBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49A58E93-8C64-44E7-855B-9C3531D1EFBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,5 +67,6 @@ Global
 		{ED8090CF-EF33-4550-A0E8-5B60A5399C2D} = {51489E97-28E7-4F1F-B948-51444C9E96B9}
 		{A125C134-FE58-4068-9918-8E5342CE6AD7} = {51489E97-28E7-4F1F-B948-51444C9E96B9}
 		{49A58E93-8C64-44E7-855B-9C3531D1EFBC} = {51489E97-28E7-4F1F-B948-51444C9E96B9}
+		{595E1284-D95D-47ED-8A59-43BB17123BE3} = {51489E97-28E7-4F1F-B948-51444C9E96B9}
 	EndGlobalSection
 EndGlobal

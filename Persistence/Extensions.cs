@@ -7,10 +7,12 @@ static class Extensions
     {
         command.Parameters.AddWithValue(name, value);
     }
+
     public static void AddParameter(this SqlCommand command, string name, Version value)
     {
         command.Parameters.AddWithValue(name, value.ToString());
     }
+
     public static void ExecuteNonQueryEx(this SqlCommand command)
     {
         try
@@ -23,5 +25,4 @@ static class Extensions
             throw new Exception(message, exception);
         }
     }
-
 }

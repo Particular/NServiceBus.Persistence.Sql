@@ -6,7 +6,7 @@ public class MySaga : Saga<MySaga.SagaData>,
     IAmStartedByMessages<StartSaga>,
     IHandleTimeouts<SagaTimout>
 {
-    static ILog logger = LogManager.GetLogger(typeof(MySaga));
+    static ILog logger = LogManager.GetLogger(typeof (MySaga));
 
     protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
     {
@@ -18,7 +18,7 @@ public class MySaga : Saga<MySaga.SagaData>,
         {
             Property = "PropertyValue"
         };
-        RequestTimeout(TimeSpan.FromSeconds(3),timout);
+        RequestTimeout(TimeSpan.FromSeconds(3), timout);
     }
 
 
@@ -27,6 +27,7 @@ public class MySaga : Saga<MySaga.SagaData>,
         logger.Info("Timeout " + state.Property);
         MarkAsComplete();
     }
+
     public class SagaData : IContainSagaData
     {
         public Guid Id { get; set; }

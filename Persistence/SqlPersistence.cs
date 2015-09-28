@@ -9,17 +9,17 @@ namespace NServiceBus.Persistence
             Supports<StorageType.Timeouts>(s =>
             {
                 s.EnableFeatureByDefault<TimeoutFeature>();
-                s.SetTimeoutIsEnabled();
+                s.EnableFeature<StorageType.Timeouts>();
             });
             Supports<StorageType.Sagas>(s =>
             {
                 s.EnableFeatureByDefault<SagaFeature>();
-                s.SetSagaIsEnabled();
+                s.EnableFeature<StorageType.Sagas>();
             });
             Supports<StorageType.Subscriptions>(s =>
             {
                 s.EnableFeatureByDefault<SubscriptionFeature>();
-                s.SetSubscriptionIsEnabled();
+                s.EnableFeature<StorageType.Subscriptions>();
             });
             
         }
