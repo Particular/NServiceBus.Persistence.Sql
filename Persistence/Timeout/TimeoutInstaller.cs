@@ -15,6 +15,10 @@ class TimeoutInstaller : INeedToInstallSomething
         {
             return;
         }
+        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        {
+            return;
+        }
         var connectionString = settings.GetConnectionString<StorageType.Timeouts>();
         var endpointName = settings.EndpointName();
         var builder = new StringBuilder();

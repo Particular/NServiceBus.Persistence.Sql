@@ -15,6 +15,10 @@ class SubscriptionInstaller : INeedToInstallSomething
         {
             return;
         }
+        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        {
+            return;
+        }
         var connectionString = settings.GetConnectionString<StorageType.Subscriptions>();
         var endpointName = settings.EndpointName();
         var builder = new StringBuilder();

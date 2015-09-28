@@ -15,6 +15,10 @@ class SagaInstaller : INeedToInstallSomething
         {
             return;
         }
+        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        {
+            return;
+        }
         var typesToScan = config.TypesToScan;
         var sagaDefinitions = SagaMetaDataReader.GetSagaDefinitions(typesToScan);
         var connectionString = settings.GetConnectionString<StorageType.Sagas>();
