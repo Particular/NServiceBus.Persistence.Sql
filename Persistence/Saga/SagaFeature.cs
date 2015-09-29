@@ -16,10 +16,10 @@ class SagaFeature : Feature
         var schema = settings.GetSchema<StorageType.Sagas>();
         var endpointName = settings.EndpointName();
 
-        var commandBuilder = new SagaCommandBuilder(schema,endpointName);
-        var serializeBuilder = settings.GetSerializeBuilder();
-        var deserializeBuilder = settings.GetDeserializeBuilder();
-        var sagaInfoCache = new SagaInfoCache(deserializeBuilder, serializeBuilder, commandBuilder);
-        context.Container.ConfigureComponent(() => new SagaPersister(connectionString,sagaInfoCache), DependencyLifecycle.InstancePerCall);
+        var commandBuilder = new SagaCommandBuilder(schema, endpointName);
+        var serialize = settings.GetSerializeBuilder();
+        var deserialize = settings.GetDeserializeBuilder();
+        var infoCache = new SagaInfoCache(deserialize, serialize, commandBuilder, settings.GetXmlSerializerCustomize());
+        context.Container.ConfigureComponent(() => new SagaPersister(connectionString, infoCache), DependencyLifecycle.InstancePerCall);
     }
 }

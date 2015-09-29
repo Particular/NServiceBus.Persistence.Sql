@@ -35,10 +35,10 @@ static class SagaMetaDataReader
             .Where(IsSagaClass);
     }
 
-    internal static List<string> GetMappedProperties(Type sagaType)
+    internal static List<string> GetMappedProperties(Type sagaDataType)
     {
-        var instance = FormatterServices.GetUninitializedObject(sagaType);
-        var configureHowToFindSaga = sagaType.GetMethod("ConfigureHowToFindSaga", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(IConfigureHowToFindSagaWithMessage)}, null);
+        var instance = FormatterServices.GetUninitializedObject(sagaDataType);
+        var configureHowToFindSaga = sagaDataType.GetMethod("ConfigureHowToFindSaga", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(IConfigureHowToFindSagaWithMessage)}, null);
         var mapper = new SagaPropertyMapper();
         configureHowToFindSaga.Invoke(instance, new object[] {mapper});
         return mapper.Properties;
@@ -64,9 +64,9 @@ static class SagaMetaDataReader
 
     }
 
-    static List<string> GetUniquePropertyNames(Type sagaType)
+    static List<string> GetUniquePropertyNames(Type sagaDataType)
     {
-        return UniqueAttribute.GetUniqueProperties(sagaType)
+        return UniqueAttribute.GetUniqueProperties(sagaDataType)
             .Select(x => x.Name)
             .ToList();
     }

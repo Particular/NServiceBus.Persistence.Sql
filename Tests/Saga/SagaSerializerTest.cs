@@ -15,7 +15,7 @@ public class SagaSerializerTest
     [Test]
     public void WithInterface()
     {
-        var delegates = SagaXmlSerializerBuiler.BuildSerializationDelegate(typeof(SagaWithInterface));
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithInterface),(serializer, type) => {});
         var saga = new SagaWithInterface
         {
             Property = "theProperty"
@@ -29,7 +29,7 @@ public class SagaSerializerTest
     [Test]
     public void EnsureBasePropsAreNotWrittenWithInterface()
     {
-        var delegates = SagaXmlSerializerBuiler.BuildSerializationDelegate(typeof(SagaWithInterface));
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithInterface), (serializer, type) => { });
         var saga = new SagaWithInterface
         {
             Id = Guid.NewGuid(),
@@ -52,7 +52,7 @@ public class SagaSerializerTest
     [Test]
     public void WithAbstract()
     {
-        var delegates = SagaXmlSerializerBuiler.BuildSerializationDelegate(typeof(SagaWithAbstract));
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithAbstract), (serializer, type) => { });
         var saga = new SagaWithAbstract
         {
             Property = "PropertyValue"
@@ -65,7 +65,7 @@ public class SagaSerializerTest
     [Test]
     public void WithComplexSaga()
     {
-        var delegates = SagaXmlSerializerBuiler.BuildSerializationDelegate(typeof(ComplexSaga));
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(ComplexSaga), (serializer, type) => { });
         var saga = new ComplexSaga
         {
             Property = new NestedComplex
@@ -93,7 +93,7 @@ public class SagaSerializerTest
     [Test]
     public void EnsureBasePropsAreNotWrittenWithAbstract()
     {
-        var delegates = SagaXmlSerializerBuiler.BuildSerializationDelegate(typeof(SagaWithAbstract));
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithAbstract), (serializer, type) => { });
         var saga = new SagaWithAbstract
         {
             Id = Guid.NewGuid(),

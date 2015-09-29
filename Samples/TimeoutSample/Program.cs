@@ -5,8 +5,8 @@ class Program
 {
     static void Main()
     {
-        var busConfiguration = ConfigBuilder.Build("Timeouts");
-        using (var bus = Bus.Create(busConfiguration).Start())
+        var configuration = ConfigBuilder.Build("Timeouts");
+        using (var bus = Bus.Create(configuration).Start())
         {
             var deferMessage = new DeferMessage
             {

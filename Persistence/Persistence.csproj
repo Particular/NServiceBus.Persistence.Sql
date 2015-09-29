@@ -60,7 +60,8 @@
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
     <Compile Include="Saga\SagaTableNameBuilder.cs" />
-    <Compile Include="Saga\SagaXmlSerializerBuiler.cs" />
+    <Compile Include="Saga\XmlOverrideBuilder.cs" />
+    <Compile Include="Saga\SagaXmlSerializerBuilder.cs" />
     <Compile Include="Saga\Serialize.cs" />
     <Compile Include="Saga\SerializeBuilder.cs" />
     <Compile Include="StaticVersions.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 using NServiceBus.Saga;
 using NServiceBus.SqlPersistence.Saga;
 
@@ -11,6 +12,7 @@ class RuntimeSagaInfo
     SagaCommandBuilder commandBuilder;
     Type sagaDataType;
     DeserializeBuilder deserializeBuilder;
+    Action<XmlSerializer, Type> xmlSerializerCustomize;
     ConcurrentDictionary<Version, Deserialize> deserializers;
     Serialize defaultSerialize;
     public readonly Version CurrentVersion;
@@ -22,7 +24,12 @@ class RuntimeSagaInfo
 
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
 
-    public RuntimeSagaInfo(SagaCommandBuilder commandBuilder, Type sagaDataType, DeserializeBuilder deserializeBuilder, SerializeBuilder serializeBuilder)
+    public RuntimeSagaInfo(
+        SagaCommandBuilder commandBuilder, 
+        Type sagaDataType,
+        DeserializeBuilder deserializeBuilder,
+        SerializeBuilder serializeBuilder,
+        Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
         this.sagaDataType = sagaDataType;
         if (deserializeBuilder != null)
@@ -34,6 +41,7 @@ class RuntimeSagaInfo
         defaultDeserialize = defualtSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
         this.deserializeBuilder = deserializeBuilder;
+        this.xmlSerializerCustomize = xmlSerializerCustomize;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         CompleteCommand= commandBuilder.BuildCompleteCommand(sagaDataType);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(sagaDataType);
@@ -52,7 +60,7 @@ class RuntimeSagaInfo
                 return serialization;
             }
         }
-        return SagaXmlSerializerBuiler.BuildSerializationDelegate(sagaDataType);
+        return SagaXmlSerializerBuilder.BuildSerializationDelegate(sagaDataType, xmlSerializerCustomize);
     }
 
     public string GetMappedPropertyCommand(string propertyName)

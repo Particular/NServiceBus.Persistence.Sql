@@ -5,8 +5,8 @@ class Program
 {
     static void Main()
     {
-        var busConfiguration = ConfigBuilder.Build("Saga");
-        using (var bus = Bus.Create(busConfiguration).Start())
+        var configuration = ConfigBuilder.Build("Saga");
+        using (var bus = Bus.Create(configuration).Start())
         {
             bus.SendLocal(new StartSaga
             {
