@@ -35,7 +35,7 @@ static class MappedTypeVerifier
         {
             return;
         }
-        var message = string.Format("The type {0} is not valid to be used as a mapped message or as a unique property. The valid types are {1}", typeName, string.Join(", ", validTypes));
+        var message = $"The type {typeName} is not valid to be used as a mapped message or as a unique property. The valid types are {string.Join(", ", validTypes)}";
         throw new Exception(message);
     }
 }

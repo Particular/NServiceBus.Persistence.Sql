@@ -16,7 +16,7 @@ class SagaPropertyMapper : IConfigureHowToFindSagaWithMessage
         }
         catch (Exception exception)
         {
-            var message = string.Format("Could not configure mapping for {0}. {1}.", typeof(TSagaEntity), exception.Message);
+            var message = $"Could not configure mapping for {typeof (TSagaEntity)}. {exception.Message}.";
             throw new Exception(message);
         }
     }

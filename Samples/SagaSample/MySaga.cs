@@ -20,7 +20,7 @@ public class MySaga : Saga<MySaga.SagaData>,
     public void Handle(StartSaga message)
     {
         Data.MySagaId = message.MySagaId;
-        logger.Info(string.Format("Start Saga. Data.MySagaId:{0}. Message.MySagaId:{1}", Data.MySagaId, message.MySagaId));
+        logger.Info($"Start Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
         Bus.SendLocal(new CompleteSaga
                            {
                                MySagaId = Data.MySagaId
@@ -29,7 +29,7 @@ public class MySaga : Saga<MySaga.SagaData>,
 
     public void Handle(CompleteSaga message)
     {
-        logger.Info(string.Format("Completed Saga. Data.MySagaId:{0}. Message.MySagaId:{1}", Data.MySagaId, message.MySagaId));
+        logger.Info($"Completed Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
         MarkAsComplete();
     }
 

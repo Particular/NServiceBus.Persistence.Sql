@@ -18,7 +18,7 @@ namespace NServiceBus.SqlPersistence
 
         static void WriteSaga(string schema, string endpointName, SagaDefinition saga, TextWriter writer)
         {
-            var tableName = string.Format("[{0}].[{1}.{2}]", schema, endpointName, saga.Name);
+            var tableName = $"[{schema}].[{endpointName}.{saga.Name}]";
 
             WriteCreateTable(writer, tableName);
 

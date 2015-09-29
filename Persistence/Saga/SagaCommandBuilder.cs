@@ -13,8 +13,8 @@ class SagaCommandBuilder
 
     public string BuildSaveCommand(Type sagaDataType)
     {
-        return string.Format(@"
-INSERT INTO [{0}].[{1}.{2}] 
+        return $@"
+INSERT INTO [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
 (
     Id, 
     Originator, 
@@ -31,13 +31,13 @@ VALUES
     @Data, 
     @PersistenceVersion, 
     @SagaTypeVersion
-)", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(sagaDataType));
+)";
     }
 
     public string BuildUpdateCommand(Type sagaDataType)
     {
-        return string.Format(@"
-UPDATE [{0}].[{1}.{2}] 
+        return $@"
+UPDATE [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
 SET
     Originator = @Originator, 
     OriginalMessageId = @OriginalMessageId, 
@@ -46,42 +46,42 @@ SET
     SagaTypeVersion = @SagaTypeVersion
 WHERE
     Id = @Id
-", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(sagaDataType));
+";
     }
 
     public string BuildGetBySagaIdCommand(Type sagaDataType) 
     {
-        return string.Format(@"
+        return $@"
 SELECT
     Id,
     Originator,
     OriginalMessageId,
     Data, 
     SagaTypeVersion
-FROM  [{0}].[{1}.{2}] 
+FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
 WHERE Id = @Id
-", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(sagaDataType));
+";
     }
 
     public string BuildGetByPropertyCommand(Type sagaDataType, string propertyName) 
     {
-        return string.Format(@"
+        return $@"
 SELECT
     Id,
     Originator,
     OriginalMessageId,
     Data, 
     SagaTypeVersion
-FROM  [{0}].[{1}.{2}] 
-WHERE [Data].exist('/Data/{3}[.= (sql:variable(""@propertyValue""))]') = 1
-", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(sagaDataType), propertyName);
+FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]') = 1
+";
     }
 
     public string BuildCompleteCommand(Type sagaDataType)
     {
-        return string.Format(@"
-DELETE FROM  [{0}].[{1}.{2}] 
+        return $@"
+DELETE FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
 WHERE Id = @Id
-", schema, endpointName, SagaTableNameBuilder.GetTableSuffix(sagaDataType));
+";
     }
 }

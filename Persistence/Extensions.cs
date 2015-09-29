@@ -21,7 +21,7 @@ static class Extensions
         }
         catch (Exception exception)
         {
-            var message = string.Format("Failed to ExecuteNonQuery. CommandText:{0}{1}", Environment.NewLine, command.CommandText);
+            var message = $"Failed to ExecuteNonQuery. CommandText:{Environment.NewLine}{command.CommandText}";
             throw new Exception(message, exception);
         }
     }

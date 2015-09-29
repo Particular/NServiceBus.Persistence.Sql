@@ -17,18 +17,18 @@ class TimeoutPersister : IPersistTimeouts
     {
         this.connectionString = connectionString;
 
-        rangeComandText = string.Format(@"
+        rangeComandText = $@"
 SELECT Id, Time 
-FROM [{0}].[{1}.TimeoutData]
-WHERE time BETWEEN @StartTime AND @EndTime", schema, endpointName);
+FROM [{schema}].[{endpointName}.TimeoutData]
+WHERE time BETWEEN @StartTime AND @EndTime";
 
-        nextCommandText = string.Format(@"
-SELECT TOP 1 Time FROM [{0}].[{1}.TimeoutData]
+        nextCommandText = $@"
+SELECT TOP 1 Time FROM [{schema}].[{endpointName}.TimeoutData]
 WHERE Time > @EndTime
-ORDER BY TIME", schema, endpointName);
+ORDER BY TIME";
 
-        insertCommandText = string.Format(@"
-INSERT INTO [{0}].[{1}.TimeoutData] 
+        insertCommandText = $@"
+INSERT INTO [{schema}].[{endpointName}.TimeoutData] 
 (
     Id, 
     Destination, 
@@ -47,21 +47,21 @@ VALUES
     @Time, 
     @Headers, 
     @PersistenceVersion
-)", schema, endpointName);
+)";
 
-        removeByIdCommandText = string.Format(@"
-DELETE FROM [{0}].[{1}.TimeoutData] 
+        removeByIdCommandText = $@"
+DELETE FROM [{schema}].[{endpointName}.TimeoutData] 
 OUTPUT 
     deleted.Destination, 
     deleted.SagaId, 
     deleted.State, 
     deleted.Time, 
     deleted.Headers
-WHERE Id = @Id", schema, endpointName);
+WHERE Id = @Id";
 
-        removeBySagaIdCommandText = string.Format(@"
-DELETE FROM [{0}].[{1}.TimeoutData] 
-WHERE SagaId = @SagaId", schema, endpointName);
+        removeBySagaIdCommandText = $@"
+DELETE FROM [{schema}].[{endpointName}.TimeoutData] 
+WHERE SagaId = @SagaId";
     }
 
     public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)

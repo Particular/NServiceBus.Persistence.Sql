@@ -41,11 +41,11 @@ BEGIN
         @PersistenceVersion
     )
 END", schema, endpointName);
-        unsubscribeCommandText = string.Format(@"
-DELETE FROM [{0}].[{1}.SubscriptionData] 
+        unsubscribeCommandText = $@"
+DELETE FROM [{schema}].[{endpointName}.SubscriptionData] 
 WHERE 
     Subscriber = @Subscriber AND 
-    MessageType = @MessageType", schema, endpointName);
+    MessageType = @MessageType";
     }
 
     public void Subscribe(Address client, IEnumerable<MessageType> messageTypes)

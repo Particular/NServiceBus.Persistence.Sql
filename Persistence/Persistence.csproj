@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NServiceBus.SqlPersistence</RootNamespace>
     <AssemblyName>NServiceBus.SqlPersistence</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>72d64693</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -82,18 +83,34 @@
     <Compile Include="Subscription\SubscriptionPersister.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NugetAssets\NServiceBus.SqlPersistence.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\InstallHelper\InstallHelper.csproj">
-      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
-      <Name>InstallHelper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InstallHelper\InstallHelper.csproj">
+      <Project>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</Project>
+      <Name>InstallHelper</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <NugetDir>$(SolutionDir)NuGetBuild\Main\</NugetDir>
+  </PropertyGroup>
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+    <ItemGroup>
+      <FilesToDelete Include="$(NugetDir)**\*.*" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+    <MakeDir Directories="$(NugetDir)Lib\NET45\" />
+    <Copy SourceFiles="$(ProjectDir)NugetAssets\NServiceBus.SqlPersistence.nuspec" DestinationFolder="$(NugetDir)" />
+    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetDir)Lib\NET45\$(TargetFileName)&quot; /internalize  &quot;$(TargetPath)&quot; &quot;$(TargetDir)NServiceBus.SqlPersistence.Install.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot;" />
+    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetDir)" MetadataAssembly="$(OutputPath)NServiceBus.SqlPersistence.dll" />
+  </Target>
   <Import Project="..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets" Condition="Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

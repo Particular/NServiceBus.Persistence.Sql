@@ -52,13 +52,10 @@ class RuntimeSagaInfo
 
     DefualtSerialization GetSerializer(SerializeBuilder serializeBuilder)
     {
-        if (serializeBuilder != null)
+        var serialization = serializeBuilder?.Invoke(sagaDataType);
+        if (serialization != null)
         {
-            var serialization = serializeBuilder(sagaDataType);
-            if (serialization != null)
-            {
-                return serialization;
-            }
+            return serialization;
         }
         return SagaXmlSerializerBuilder.BuildSerializationDelegate(sagaDataType, xmlSerializerCustomize);
     }
