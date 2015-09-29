@@ -6,6 +6,9 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
+#if (!DEBUG)
+[Explicit]
+#endif
 public class SagaPersisterTest
 {
     [Test]
