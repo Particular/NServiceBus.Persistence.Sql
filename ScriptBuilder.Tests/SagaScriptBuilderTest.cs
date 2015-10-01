@@ -30,6 +30,7 @@ public class SagaScriptBuilderTest
             SagaScriptBuilder.BuildCreateScript("theschema", "theendpointname", sagas, s => writer);
         }
         var script = builder.ToString();
+
         SqlValidator.Validate(script);
         Approvals.Verify(script);
     }

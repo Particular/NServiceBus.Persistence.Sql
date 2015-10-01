@@ -21,11 +21,11 @@ namespace NServiceBus.SqlPersistence
             var tableName = $"[{schema}].[{endpointName}.{saga.Name}]";
 
             writer.Write(@"
-declare @schema char = '{1}';
-declare @endpointName char = '{2}';
-declare @sagaName char = '{3}';
-declare @tableName char = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
-");
+declare @schema nvarchar(max) = '{0}';
+declare @endpointName nvarchar(max) = '{1}';
+declare @sagaName nvarchar(max) = '{2}';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+", schema,endpointName,saga.Name);
 
             WriteCreateTable(writer, tableName);
 
@@ -91,9 +91,9 @@ IF NOT EXISTS
         type in (N'U')
 )
 BEGIN
-DECLARE @DynamicSQL nvarchar(1000);
+DECLARE @DynamicSQL nvarchar(max);
 SET @DynamicSQL = N'
-    CREATE TABLE {0}(
+    CREATE TABLE ' + @tableName + N'(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
 	    [OriginalMessageId] [nvarchar](255) NULL,
