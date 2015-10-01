@@ -1,13 +1,21 @@
 ﻿
+declare @schema char = '{1}';
+declare @endpointName char = '{2}';
+declare @sagaName char = '{3}';
+declare @tableName char = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+
+
 IF NOT EXISTS 
 (
     SELECT * 
     FROM sys.objects 
     WHERE 
-        object_id = OBJECT_ID(N'[theschema].[theendpointname.theSaga]') AND 
+        object_id = OBJECT_ID(@tableName) AND 
         type in (N'U')
 )
 BEGIN
+DECLARE @DynamicSQL nvarchar(1000);
+SET @DynamicSQL = N'
     CREATE TABLE [theschema].[theendpointname.theSaga](
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
@@ -16,12 +24,14 @@ BEGIN
 	    [PersistenceVersion] [nvarchar](23) NOT NULL,
 	    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
+';
+exec(@DynamicSQL);
 END
 
-declare @query nvarchar(max);
-select @query = 
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery = 
 (
-    SELECT 'DROP INDEX ' + ix.name + ' ON [theschema].[theendpointname.theSaga]; '
+    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE 
 	    ix.Name IS NOT null AND 
@@ -29,7 +39,7 @@ select @query =
 	    ix.Name NOT IN ('Property1', 'Property2')
     for xml path('')
 );
-exec sp_executesql @query
+exec sp_executesql @dropIndexQuery
 
 IF NOT EXISTS
 (

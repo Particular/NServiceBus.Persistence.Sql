@@ -20,9 +20,16 @@ namespace NServiceBus.SqlPersistence
         {
             var tableName = $"[{schema}].[{endpointName}.{saga.Name}]";
 
+            writer.Write(@"
+declare @schema char = '{1}';
+declare @endpointName char = '{2}';
+declare @sagaName char = '{3}';
+declare @tableName char = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+");
+
             WriteCreateTable(writer, tableName);
 
-            WritePurgeObsoleteIndexes(saga, writer, tableName);
+            WritePurgeObsoleteIndexes(saga, writer);
 
             WriteCreateIndexes(saga, writer, tableName);
         }
@@ -52,37 +59,40 @@ END
             }
         }
 
-        static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer, string tableName)
+        static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer)
         {
             var propertyInString = "'" + string.Join("', '", saga.MappedProperties) + "'";
             writer.Write(@"
-declare @query nvarchar(max);
-select @query = 
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery = 
 (
-    SELECT 'DROP INDEX ' + ix.name + ' ON {0}; '
+    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE 
 	    ix.Name IS NOT null AND 
 	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name NOT IN ({1})
+	    ix.Name NOT IN ({0})
     for xml path('')
 );
-exec sp_executesql @query
-", tableName, propertyInString);
+exec sp_executesql @dropIndexQuery
+", propertyInString);
         }
 
         static void WriteCreateTable(TextWriter writer, string tableName)
         {
             writer.Write(@"
+
 IF NOT EXISTS 
 (
     SELECT * 
     FROM sys.objects 
     WHERE 
-        object_id = OBJECT_ID(N'{0}') AND 
+        object_id = OBJECT_ID(@tableName) AND 
         type in (N'U')
 )
 BEGIN
+DECLARE @DynamicSQL nvarchar(1000);
+SET @DynamicSQL = N'
     CREATE TABLE {0}(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
@@ -91,6 +101,8 @@ BEGIN
 	    [PersistenceVersion] [nvarchar](23) NOT NULL,
 	    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
+';
+exec(@DynamicSQL);
 END
 ", tableName);
         }
