@@ -13,7 +13,7 @@ public class SagaMetaDataReaderTest
 
     public SagaMetaDataReaderTest()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "MsBuildTests.dll");
+        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilderTask.Tests.dll");
         module = ModuleDefinition.ReadModule(path);
     }
 
