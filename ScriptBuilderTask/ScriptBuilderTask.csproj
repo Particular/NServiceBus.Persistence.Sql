@@ -7,12 +7,13 @@
     <ProjectGuid>{63784399-65AF-424A-B2AD-0C94AE326823}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.SqlPersistence.MsBuild</RootNamespace>
-    <AssemblyName>NServiceBus.SqlPersistence.MsBuild</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>NServiceBus.SqlPersistence.ScriptBuilderTask</RootNamespace>
+    <AssemblyName>NServiceBus.SqlPersistence.ScriptBuilderTask</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,7 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NugetAssets\NServiceBus.SqlPersistence.MsBuild.nuspec">
+    <None Include="NugetAssets\NServiceBus.SqlPersistence.ScriptBuilderTask.nuspec">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
@@ -66,12 +67,14 @@
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CecilExtentions.cs" />
+    <Compile Include="SagaMetaDataReader.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstallHelper\InstallHelper.csproj">
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
       <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
-      <Name>InstallHelper</Name>
+      <Name>ScriptBuilder</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -84,9 +87,9 @@
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" />
     <MakeDir Directories="$(NugetDir)Lib\NET45\" />
-    <Copy SourceFiles="$(ProjectDir)NugetAssets\NServiceBus.SqlPersistence.MsBuild.nuspec" DestinationFolder="$(NugetDir)" />
+    <Copy SourceFiles="$(ProjectDir)NugetAssets\NServiceBus.SqlPersistence.ScriptBuilderTask.nuspec" DestinationFolder="$(NugetDir)" />
     <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetDir)Lib\NET45\$(TargetFileName)&quot; /internalize  &quot;$(TargetPath)&quot; &quot;$(TargetDir)Mono.Cecil.dll&quot; &quot;$(TargetDir)NServiceBus.SqlPersistence.Install.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot;" />
-    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetDir)" MetadataAssembly="$(OutputPath)NServiceBus.SqlPersistence.MsBuild.dll" />
+    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetDir)" MetadataAssembly="$(OutputPath)NServiceBus.SqlPersistence.ScriptBuilderTask.dll" />
   </Target>
   <Import Project="..\packages\Fody.1.29.3\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

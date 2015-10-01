@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-static class MappedTypeVerifier
+public static class MappedTypeVerifier
 {
     static List<string> validTypes;
     static MappedTypeVerifier()

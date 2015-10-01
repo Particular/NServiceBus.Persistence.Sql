@@ -16,7 +16,7 @@ static class SagaMetaDataReader
         foreach (var sagaType in GetSagaTypes(typesToScan))
         {
             Type sagaDataType;
-            if (!TryGetBaseSagaType(sagaType, out sagaDataType))
+            if (!TryGetSagaDataType(sagaType, out sagaDataType))
             {
                 continue;
             }
@@ -44,22 +44,22 @@ static class SagaMetaDataReader
         return mapper.Properties;
     }
 
-    internal static bool TryGetBaseSagaType(Type type, out Type sagaDataType)
+    internal static bool TryGetSagaDataType(Type sagaType, out Type sagaDataType)
     {
         while (true)
         {
-            if (type == typeof (object))
+            if (sagaType == typeof (object))
             {
                 sagaDataType = null;
                 return false;
             }
-            if (type.BaseType.IsGenericType && (type.BaseType.GetGenericTypeDefinition() == genericBaseSagaType))
+            if (sagaType.BaseType.IsGenericType && (sagaType.BaseType.GetGenericTypeDefinition() == genericBaseSagaType))
             {
-                sagaDataType = type.BaseType.GetGenericArguments().First();
+                sagaDataType = sagaType.BaseType.GetGenericArguments().First();
                 return true;
             }
 
-            type = type.BaseType;
+            sagaType = sagaType.BaseType;
         }
 
     }

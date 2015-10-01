@@ -5,9 +5,9 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 14.0.22823.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.Tests", "Persistence.Tests\Persistence.Tests.csproj", "{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsBuild", "MsBuild\MsBuild.csproj", "{63784399-65AF-424A-B2AD-0C94AE326823}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask", "ScriptBuilderTask\ScriptBuilderTask.csproj", "{63784399-65AF-424A-B2AD-0C94AE326823}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{51489E97-28E7-4F1F-B948-51444C9E96B9}"
 EndProject
@@ -19,7 +19,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeoutSample", "Samples\Ti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Samples\Shared\Shared.csproj", "{595E1284-D95D-47ED-8A59-43BB17123BE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallHelper", "InstallHelper\InstallHelper.csproj", "{438D76FC-8BB8-4B40-80A5-F846A450FBD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder", "ScriptBuilder\ScriptBuilder.csproj", "{438D76FC-8BB8-4B40-80A5-F846A450FBD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask.Tests", "ScriptBuilderTask.Tests\ScriptBuilderTask.Tests.csproj", "{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceLibrary", "ReferenceLibrary\ReferenceLibrary.csproj", "{D7A6948F-FE70-4BCB-92DD-072F4BAE7157}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder.Tests", "ScriptBuilder.Tests\ScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +65,18 @@ Global
 		{438D76FC-8BB8-4B40-80A5-F846A450FBD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{438D76FC-8BB8-4B40-80A5-F846A450FBD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{438D76FC-8BB8-4B40-80A5-F846A450FBD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7A6948F-FE70-4BCB-92DD-072F4BAE7157}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7A6948F-FE70-4BCB-92DD-072F4BAE7157}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7A6948F-FE70-4BCB-92DD-072F4BAE7157}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7A6948F-FE70-4BCB-92DD-072F4BAE7157}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

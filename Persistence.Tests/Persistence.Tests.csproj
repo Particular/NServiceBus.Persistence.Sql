@@ -7,8 +7,8 @@
     <ProjectGuid>{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
+    <RootNamespace>Persistence.Tests</RootNamespace>
+    <AssemblyName>Persistence.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>b83c7558</NuGetPackageImportStamp>
@@ -53,9 +53,21 @@
       <HintPath>..\packages\MethodTimer.Fody.1.15.7.0\Lib\portable-net4+sl5+wp8+win8+wpa81+MonoAndroid16+MonoTouch40\MethodTimer.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Tools\Microsoft.SqlServer.TransactSql.ScriptDom.dll</HintPath>
+    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -85,17 +97,13 @@
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="Saga\SagaDatabase.cs" />
     <Compile Include="Saga\SagaPersisterTest.cs" />
-    <Compile Include="Saga\SagaScriptBuilderTest.cs" />
     <Compile Include="Saga\SagaSerializerTest.cs" />
-    <Compile Include="Subscription\SagaScriptBuilderTest.cs" />
-    <Compile Include="Subscription\SqlValidator.cs" />
     <Compile Include="Subscription\SubscriptionDatabase.cs" />
     <Compile Include="Timeout\HeaderSerializerTest.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Saga\SagaMetaDataReaderTest.cs" />
     <Compile Include="Saga\SagaPropertyMapperTest.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTest.cs" />
-    <Compile Include="Timeout\TimeoutScriptBuilderTest.cs" />
     <Compile Include="Timeout\TimeoutDatabase.cs" />
     <Compile Include="Timeout\TimeoutPersisterTest.cs" />
   </ItemGroup>
@@ -103,9 +111,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstallHelper\InstallHelper.csproj">
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
       <Project>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</Project>
-      <Name>InstallHelper</Name>
+      <Name>ScriptBuilder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Persistence\Persistence.csproj">
       <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>

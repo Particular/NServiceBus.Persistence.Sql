@@ -12,7 +12,6 @@ class RuntimeSagaInfo
     SagaCommandBuilder commandBuilder;
     Type sagaDataType;
     DeserializeBuilder deserializeBuilder;
-    Action<XmlSerializer, Type> xmlSerializerCustomize;
     ConcurrentDictionary<Version, Deserialize> deserializers;
     Serialize defaultSerialize;
     public readonly Version CurrentVersion;
@@ -36,12 +35,11 @@ class RuntimeSagaInfo
         {
             deserializers = new ConcurrentDictionary<Version, Deserialize>();
         }
-        var defualtSerialization = GetSerializer(serializeBuilder);
+        var defualtSerialization = GetSerializer(serializeBuilder, sagaDataType, xmlSerializerCustomize);
         defaultSerialize = defualtSerialization.Serialize;
         defaultDeserialize = defualtSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
         this.deserializeBuilder = deserializeBuilder;
-        this.xmlSerializerCustomize = xmlSerializerCustomize;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         CompleteCommand= commandBuilder.BuildCompleteCommand(sagaDataType);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(sagaDataType);
@@ -50,7 +48,7 @@ class RuntimeSagaInfo
     }
 
 
-    DefualtSerialization GetSerializer(SerializeBuilder serializeBuilder)
+    static DefualtSerialization GetSerializer(SerializeBuilder serializeBuilder, Type sagaDataType, Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
         var serialization = serializeBuilder?.Invoke(sagaDataType);
         if (serialization != null)

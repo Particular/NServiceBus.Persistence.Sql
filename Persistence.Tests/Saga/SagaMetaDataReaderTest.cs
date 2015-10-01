@@ -9,7 +9,7 @@ public class SagaMetaDataReaderTest
     public void TryGetBaseSagaType()
     {
         Type sagaDataType;
-        Assert.IsTrue(SagaMetaDataReader.TryGetBaseSagaType(typeof(StandardSaga), out sagaDataType));
+        Assert.IsTrue(SagaMetaDataReader.TryGetSagaDataType(typeof(StandardSaga), out sagaDataType));
         Assert.AreEqual(typeof(StandardSaga.SagaDaga), sagaDataType);
     }
 
@@ -28,7 +28,7 @@ public class SagaMetaDataReaderTest
     public void TryGetBaseSagaType_Inherited()
     {
         Type sagaDataType;
-        Assert.IsTrue(SagaMetaDataReader.TryGetBaseSagaType(typeof(InheritedSaga), out sagaDataType));
+        Assert.IsTrue(SagaMetaDataReader.TryGetSagaDataType(typeof(InheritedSaga), out sagaDataType));
         Assert.AreEqual(typeof(StandardSaga.SagaDaga), sagaDataType);
     }
 
@@ -40,7 +40,7 @@ public class SagaMetaDataReaderTest
     public void TryGetBaseSagaType_not_a_generic_saga()
     {
         Type sagaDataType;
-        Assert.IsFalse(SagaMetaDataReader.TryGetBaseSagaType(typeof(NotASaga), out sagaDataType));
+        Assert.IsFalse(SagaMetaDataReader.TryGetSagaDataType(typeof(NotASaga), out sagaDataType));
         Assert.IsNull(sagaDataType);
     }
 
