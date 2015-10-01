@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
 
 class SqlHelpers
 {
@@ -11,9 +12,21 @@ class SqlHelpers
 
     internal static void Execute(string connectionString, string script)
     {
+        var connectionBuilder = new SqlConnectionStringBuilder
+        {
+            ConnectionString = connectionString
+        };
+
+        var database = connectionBuilder.InitialCatalog;
+
+        if (string.IsNullOrWhiteSpace(database))
+        {
+            throw new Exception("Expected to have a 'InitialCatalog' in the connection string.");
+        }
         using (var sqlConnection = New(connectionString))
         using (var command = new SqlCommand(script, sqlConnection))
         {
+            command.AddParameter("database", database);
             command.ExecuteNonQueryEx();
         }
     }
