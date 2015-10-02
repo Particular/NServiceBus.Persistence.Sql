@@ -21,6 +21,7 @@ class SagaMetaDataReader
             TypeReference fake;
             FindSagaDataType(type, out fake);
         }
+        
     }
 
     public bool FindSagaDataType(TypeDefinition type, out TypeReference sagaDataType)
