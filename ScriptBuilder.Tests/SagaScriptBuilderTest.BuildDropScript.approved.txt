@@ -1,12 +1,21 @@
 ﻿
+declare @schema nvarchar(max) = 'theschema';
+declare @endpointName nvarchar(max) = 'theendpointname';
+declare @sagaName nvarchar(max) = 'theSaga';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+
 IF EXISTS 
 (
     SELECT * 
     FROM sys.objects 
     WHERE 
-        object_id = OBJECT_ID(N'[theschema].[theendpointname.theSaga]') 
+        object_id = OBJECT_ID(@tableName) 
         AND type in (N'U')
 )
 BEGIN
-    DROP TABLE [theschema].[theendpointname.theSaga]
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
+    DROP TABLE ' + @tableName + '
+';
+exec(@createTable);
 END

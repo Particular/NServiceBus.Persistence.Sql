@@ -11,16 +11,32 @@ class SubscriptionDatabase : IDisposable
     [Time]
     public SubscriptionDatabase()
     {
+        Drop();
+        Create();
+
+        Persister = new SubscriptionPersister(connectionString, "dbo", endpointName);
+    }
+
+    void Create()
+    {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDropScript("dbo", endpointName, writer);
             SubscriptionScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);
+    }
 
-        Persister = new SubscriptionPersister(connectionString, "dbo", endpointName);
+    void Drop()
+    {
+        var builder = new StringBuilder();
+        using (var writer = new StringWriter(builder))
+        {
+            SubscriptionScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+        }
+        var script = builder.ToString();
+        SqlHelpers.Execute(connectionString, script);
     }
 
     public SubscriptionPersister Persister;

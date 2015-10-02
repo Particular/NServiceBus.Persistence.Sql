@@ -13,19 +13,36 @@ class SagaDatabase : IDisposable
     [Time]
     public SagaDatabase(SagaDefinition sagaDefinition)
     {
+        Drop(sagaDefinition);
+        Create(sagaDefinition);
+        var commandBuilder = new SagaCommandBuilder("dbo",endpointName);
+        var infoCache = new SagaInfoCache(null,null,commandBuilder,(serializer, type) => {});
+        Persister = new SagaPersister(connectionString,infoCache);
+    }
+
+    void Create(SagaDefinition sagaDefinition)
+    {
         var builder = new StringBuilder();
+        var sagaDefinitions = new List<SagaDefinition> {sagaDefinition};
         using (var writer = new StringWriter(builder))
         {
-            var sagaDefinitions = new List<SagaDefinition> {sagaDefinition};
-            var sagaNames = new List<string> {sagaDefinition.Name};
-            SagaScriptBuilder.BuildDropScript("dbo", endpointName, sagaNames, s => writer);
             SagaScriptBuilder.BuildCreateScript("dbo", endpointName, sagaDefinitions, s => writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);
-        var commandBuilder = new SagaCommandBuilder("dbo",endpointName);
-        var infoCache = new SagaInfoCache(null,null,commandBuilder,(serializer, type) => {});
-        Persister = new SagaPersister(connectionString,infoCache);
+    }
+
+    void Drop(SagaDefinition sagaDefinition)
+    {
+        var builder = new StringBuilder();
+        var sagaNames = new List<string> {sagaDefinition.Name};
+
+        using (var writer = new StringWriter(builder))
+        {
+            SagaScriptBuilder.BuildDropScript("dbo", endpointName, sagaNames, s => writer);
+        }
+        var script = builder.ToString();
+        SqlHelpers.Execute(connectionString, script);
     }
 
     public SagaPersister Persister;

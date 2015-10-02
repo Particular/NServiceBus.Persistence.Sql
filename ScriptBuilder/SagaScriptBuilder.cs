@@ -18,8 +18,6 @@ namespace NServiceBus.SqlPersistence
 
         static void WriteSaga(string schema, string endpointName, SagaDefinition saga, TextWriter writer)
         {
-            var tableName = $"[{schema}].[{endpointName}.{saga.Name}]";
-
             writer.Write(@"
 declare @schema nvarchar(max) = '{0}';
 declare @endpointName nvarchar(max) = '{1}';
@@ -28,9 +26,7 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' +
 ", schema,endpointName,saga.Name);
 
             WriteCreateTable(writer);
-
             WritePurgeObsoleteIndexes(saga, writer);
-
             WriteCreateIndexes(saga, writer);
         }
 
@@ -117,18 +113,28 @@ END
             {
                 var writer = writerBuilder(saga);
                 writer.Write(@"
+declare @schema nvarchar(max) = '{0}';
+declare @endpointName nvarchar(max) = '{1}';
+declare @sagaName nvarchar(max) = '{2}';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+", schema, endpointName, saga);
+                writer.Write(@"
 IF EXISTS 
 (
     SELECT * 
     FROM sys.objects 
     WHERE 
-        object_id = OBJECT_ID(N'[{0}].[{1}.{2}]') 
+        object_id = OBJECT_ID(@tableName) 
         AND type in (N'U')
 )
 BEGIN
-    DROP TABLE [{0}].[{1}.{2}]
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
+    DROP TABLE ' + @tableName + '
+';
+exec(@createTable);
 END
-", schema, endpointName, saga);
+");
             }
         }
 

@@ -1,12 +1,20 @@
 ﻿
+declare @schema nvarchar(max) = 'theschema';
+declare @endpointName nvarchar(max) = 'theendpointname';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
+
 IF EXISTS 
 (
     SELECT * 
     FROM sys.objects 
     WHERE 
-        object_id = OBJECT_ID(N'[theschema].[theendpointname.SubscriptionData]') AND 
+        object_id = OBJECT_ID(@tableName) AND 
         type in (N'U')
 )
 BEGIN
-    DROP TABLE [theschema].[theendpointname.SubscriptionData]
+DECLARE @dropTable nvarchar(max);
+SET @dropTable = N'
+    DROP TABLE ' + @tableName + '
+';
+exec(@dropTable);
 END
