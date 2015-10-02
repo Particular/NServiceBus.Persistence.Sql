@@ -8,9 +8,21 @@ namespace NServiceBus.SqlPersistence
         public static void BuildCreateScript(string schema, string endpointName, TextWriter writer)
         {
             writer.Write(@"
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
+declare @schema nvarchar(max) = '{0}';
+declare @endpointName nvarchar(max) = '{1}';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.TimeoutData]';
+", schema, endpointName);
+            writer.Write(@"
+IF NOT EXISTS (
+    SELECT * FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(@tableName) 
+        AND type in (N'U')
+)
 BEGIN
-    CREATE TABLE [{0}].[{1}.TimeoutData](
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
+    CREATE TABLE ' + @tableName + '(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Destination] [nvarchar](1024) NULL,
 	    [SagaId] [uniqueidentifier] NULL,
@@ -19,18 +31,36 @@ BEGIN
 	    [Headers] [xml] NULL,
 	    [PersistenceVersion] [nvarchar](23) NOT NULL
     )
+';
+exec(@createTable);
 END
-", schema, endpointName);
+");
         }
 
         public static void BuildDropScript(string schema, string endpointName, TextWriter writer)
         {
             writer.Write(@"
-IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[{1}.TimeoutData]') AND type in (N'U'))
-BEGIN
-    DROP TABLE [{0}].[{1}.TimeoutData]
-END
+declare @schema nvarchar(max) = '{0}';
+declare @endpointName nvarchar(max) = '{1}';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.TimeoutData]';
 ", schema, endpointName);
+            writer.Write(@"
+IF EXISTS 
+(
+    SELECT * 
+    FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(@tableName) AND 
+        type in (N'U')
+)
+BEGIN
+DECLARE @dropTable nvarchar(max);
+SET @dropTable = N'
+    DROP TABLE ' + @tableName + '
+';
+exec(@dropTable);
+END
+");
         }
     }
 }

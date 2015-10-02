@@ -1,7 +1,18 @@
 ﻿
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[theschema].[theendpointname.TimeoutData]') AND type in (N'U'))
+declare @schema nvarchar(max) = 'theschema';
+declare @endpointName nvarchar(max) = 'theendpointname';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.TimeoutData]';
+
+IF NOT EXISTS (
+    SELECT * FROM sys.objects 
+    WHERE 
+        object_id = OBJECT_ID(@tableName) 
+        AND type in (N'U')
+)
 BEGIN
-    CREATE TABLE [theschema].[theendpointname.TimeoutData](
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
+    CREATE TABLE ' + @tableName + '(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Destination] [nvarchar](1024) NULL,
 	    [SagaId] [uniqueidentifier] NULL,
@@ -10,4 +21,6 @@ BEGIN
 	    [Headers] [xml] NULL,
 	    [PersistenceVersion] [nvarchar](23) NOT NULL
     )
+';
+exec(@createTable);
 END

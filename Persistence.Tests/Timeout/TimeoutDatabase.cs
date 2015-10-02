@@ -11,15 +11,31 @@ class TimeoutDatabase : IDisposable
     [Time]
     public TimeoutDatabase()
     {
+        Drop();
+        Create();
+        Persister = new TimeoutPersister(connectionString, "dbo",endpointName);
+    }
+
+    void Create()
+    {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDropScript("dbo", endpointName, writer);
             TimeoutScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script);
-        Persister = new TimeoutPersister(connectionString, "dbo",endpointName);
+    }
+
+    void Drop()
+    {
+        var builder = new StringBuilder();
+        using (var writer = new StringWriter(builder))
+        {
+            TimeoutScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+        }
+        var script = builder.ToString();
+        SqlHelpers.Execute(connectionString, script);
     }
 
     public TimeoutPersister Persister;
