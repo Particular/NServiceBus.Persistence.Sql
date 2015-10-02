@@ -31,10 +31,10 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' +
 
             WritePurgeObsoleteIndexes(saga, writer);
 
-            WriteCreateIndexes(saga, writer, tableName);
+            WriteCreateIndexes(saga, writer);
         }
 
-        static void WriteCreateIndexes(SagaDefinition saga, TextWriter writer, string tableName)
+        static void WriteCreateIndexes(SagaDefinition saga, TextWriter writer)
         {
             foreach (var mappedProperty in saga.MappedProperties)
             {
@@ -51,7 +51,7 @@ BEGIN
 DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_{0}
-    ON {1}(Data)
+    ON ' + @tableName + '(Data)
     FOR 
     (
         {0} = ''/Data/{0}'' AS XQUERY ''xs:string'' SINGLETON
@@ -59,7 +59,7 @@ SET @createIndex = N'
 ';
 exec(@createIndex);
 END
-", mappedProperty, tableName);
+", mappedProperty);
             }
         }
 

@@ -53,7 +53,7 @@ BEGIN
 DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
-    ON [theschema].[theendpointname.theSaga](Data)
+    ON ' + @tableName + '(Data)
     FOR 
     (
         Property1 = ''/Data/Property1'' AS XQUERY ''xs:string'' SINGLETON
@@ -74,7 +74,7 @@ BEGIN
 DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property2
-    ON [theschema].[theendpointname.theSaga](Data)
+    ON ' + @tableName + '(Data)
     FOR 
     (
         Property2 = ''/Data/Property2'' AS XQUERY ''xs:string'' SINGLETON
