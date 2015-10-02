@@ -27,7 +27,7 @@ declare @sagaName nvarchar(max) = '{2}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
 ", schema,endpointName,saga.Name);
 
-            WriteCreateTable(writer, tableName);
+            WriteCreateTable(writer);
 
             WritePurgeObsoleteIndexes(saga, writer);
 
@@ -45,15 +45,19 @@ IF NOT EXISTS
     FROM sys.indexes 
     WHERE 
         name = 'PropertyIndex_{0}' AND 
-        object_id = OBJECT_ID('{1}')
+        object_id = OBJECT_ID(@tableName)
 )
 BEGIN
+DECLARE @createIndex nvarchar(max);
+SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_{0}
     ON {1}(Data)
     FOR 
     (
-        {0} = '/Data/{0}' AS XQUERY 'xs:string' SINGLETON
+        {0} = ''/Data/{0}'' AS XQUERY ''xs:string'' SINGLETON
     )
+';
+exec(@createIndex);
 END
 ", mappedProperty, tableName);
             }
@@ -78,7 +82,7 @@ exec sp_executesql @dropIndexQuery
 ", propertyInString);
         }
 
-        static void WriteCreateTable(TextWriter writer, string tableName)
+        static void WriteCreateTable(TextWriter writer)
         {
             writer.Write(@"
 
@@ -91,8 +95,8 @@ IF NOT EXISTS
         type in (N'U')
 )
 BEGIN
-DECLARE @DynamicSQL nvarchar(max);
-SET @DynamicSQL = N'
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
     CREATE TABLE ' + @tableName + N'(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
@@ -102,9 +106,9 @@ SET @DynamicSQL = N'
 	    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
 ';
-exec(@DynamicSQL);
+exec(@createTable);
 END
-", tableName);
+");
         }
 
         public static void BuildDropScript(string schema, string endpointName, IEnumerable<string> sagaNames, Func<string, TextWriter> writerBuilder)

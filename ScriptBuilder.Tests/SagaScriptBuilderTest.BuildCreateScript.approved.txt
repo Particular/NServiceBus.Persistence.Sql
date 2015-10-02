@@ -14,8 +14,8 @@ IF NOT EXISTS
         type in (N'U')
 )
 BEGIN
-DECLARE @DynamicSQL nvarchar(max);
-SET @DynamicSQL = N'
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
     CREATE TABLE ' + @tableName + N'(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
@@ -25,7 +25,7 @@ SET @DynamicSQL = N'
 	    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
 ';
-exec(@DynamicSQL);
+exec(@createTable);
 END
 
 declare @dropIndexQuery nvarchar(max);
@@ -47,15 +47,19 @@ IF NOT EXISTS
     FROM sys.indexes 
     WHERE 
         name = 'PropertyIndex_Property1' AND 
-        object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]')
+        object_id = OBJECT_ID(@tableName)
 )
 BEGIN
+DECLARE @createIndex nvarchar(max);
+SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
     ON [theschema].[theendpointname.theSaga](Data)
     FOR 
     (
-        Property1 = '/Data/Property1' AS XQUERY 'xs:string' SINGLETON
+        Property1 = ''/Data/Property1'' AS XQUERY ''xs:string'' SINGLETON
     )
+';
+exec(@createIndex);
 END
 
 IF NOT EXISTS
@@ -64,13 +68,17 @@ IF NOT EXISTS
     FROM sys.indexes 
     WHERE 
         name = 'PropertyIndex_Property2' AND 
-        object_id = OBJECT_ID('[theschema].[theendpointname.theSaga]')
+        object_id = OBJECT_ID(@tableName)
 )
 BEGIN
+DECLARE @createIndex nvarchar(max);
+SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property2
     ON [theschema].[theendpointname.theSaga](Data)
     FOR 
     (
-        Property2 = '/Data/Property2' AS XQUERY 'xs:string' SINGLETON
+        Property2 = ''/Data/Property2'' AS XQUERY ''xs:string'' SINGLETON
     )
+';
+exec(@createIndex);
 END
