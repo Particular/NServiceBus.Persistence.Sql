@@ -6,6 +6,9 @@ using NUnit.Framework;
 using ReferenceLibrary;
 
 
+public class SagaData : ContainSagaData
+{
+}
 [TestFixture]
 public class SagaMetaDataReaderTest
 {
@@ -20,20 +23,18 @@ public class SagaMetaDataReaderTest
     [Test]
     public void FindSagaDataType()
     {
-        TypeReference sagaDataType;
+        SagaDataMap map;
         var sagaType = module.GetTypeDefinition<StandardSaga>();
-        var sagaMetaDataReader = new SagaMetaDataReader(module);
-        Assert.IsTrue(sagaMetaDataReader.FindSagaDataType(sagaType, out sagaDataType));
-        Assert.AreEqual(typeof(StandardSaga.SagaDaga).FullName, sagaDataType.FullName.Replace("/", "+"));
+        var reader = new SagaMetaDataReader(module);
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(SagaData).FullName, map.Data.FullName.Replace("/", "+"));
+        Assert.AreEqual(typeof(StandardSaga).FullName, map.Saga.FullName.Replace("/", "+"));
     }
 
-    public class StandardSaga : Saga<StandardSaga.SagaDaga>
+    public class StandardSaga : Saga<SagaData>
     {
-        public class SagaDaga : ContainSagaData
-        {
-        }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaDaga> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -41,34 +42,47 @@ public class SagaMetaDataReaderTest
     [Test]
     public void FindSagaDataType_from_another_assembly()
     {
-        TypeReference sagaDataType;
-        var sagaType = module.GetTypeDefinition<ChildSaga>();
-        var sagaMetaDataReader = new SagaMetaDataReader(module);
-        Assert.IsTrue(sagaMetaDataReader.FindSagaDataType(sagaType, out sagaDataType));
-        Assert.AreEqual(typeof(BaseSagaData).FullName, sagaDataType.FullName.Replace("/", "+"));
+        SagaDataMap map;
+        var sagaType = module.GetTypeDefinition<ChildFromAnotherAssemblySaga>();
+        var reader = new SagaMetaDataReader(module);
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(BaseSagaData).FullName, map.Data.FullName.Replace("/", "+"));
+        Assert.AreEqual(typeof(ChildFromAnotherAssemblySaga).FullName, map.Saga.FullName.Replace("/", "+"));
     }
 
-    public class ChildSaga : BaseSaga
+    public class ChildFromAnotherAssemblySaga : BaseInAnotherAssemblySaga
+    {
+    }
+    [Test]
+    public void FindSagaDataType_generic_from_another_assembly()
+    {
+        SagaDataMap map;
+        var sagaType = module.GetTypeDefinition<ChildGenericFromAnotherAssemblySaga>();
+        var reader = new SagaMetaDataReader(module);
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(SagaData).FullName, map.Data.FullName.Replace("/", "+"));
+        Assert.AreEqual(typeof(ChildGenericFromAnotherAssemblySaga).FullName, map.Saga.FullName.Replace("/", "+"));
+    }
+
+    public class ChildGenericFromAnotherAssemblySaga : GenericBaseInAnotherAssemblySaga<SagaData>
     {
     }
 
     [Test]
     public void FindSagaDataType_abstract()
     {
-        TypeReference sagaDataType;
+        SagaDataMap map;
         var sagaType = module.GetTypeDefinition<AbstractSaga>();
-        var sagaMetaDataReader = new SagaMetaDataReader(module);
-        Assert.IsTrue(sagaMetaDataReader.FindSagaDataType(sagaType, out sagaDataType));
-        Assert.AreEqual(typeof(AbstractSaga.SagaDaga).FullName, sagaDataType.FullName.Replace("/", "+"));
+        var reader = new SagaMetaDataReader(module);
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(SagaData).FullName, map.Data.FullName.Replace("/", "+"));
+        Assert.AreEqual(typeof(AbstractSaga).FullName, map.Saga.FullName.Replace("/", "+"));
     }
 
-    public abstract class AbstractSaga : Saga<AbstractSaga.SagaDaga>
+    public abstract class AbstractSaga : Saga<SagaData>
     {
-        public class SagaDaga : ContainSagaData
-        {
-        }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaDaga> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -76,24 +90,63 @@ public class SagaMetaDataReaderTest
     [Test]
     public void FindSagaDataType_Inherited()
     {
-        TypeReference sagaDataType;
-        var sagaMetaDataReader = new SagaMetaDataReader(module);
+        SagaDataMap map;
+        var reader = new SagaMetaDataReader(module);
         var sagaType = module.GetTypeDefinition<InheritedSaga>();
-        Assert.IsTrue(sagaMetaDataReader.FindSagaDataType(sagaType, out sagaDataType));
-        Assert.AreEqual(typeof(StandardSaga.SagaDaga).FullName, sagaDataType.FullName.Replace("/","+"));
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(SagaData).FullName, map.Data.FullName.Replace("/","+"));
+        Assert.AreEqual(typeof(InheritedSaga).FullName, map.Saga.FullName.Replace("/","+"));
     }
 
     public class InheritedSaga : StandardSaga
     {
     }
+    [Test]
+    public void FindSagaDataType_Inherited_with_generic()
+    {
+        SagaDataMap map;
+        var reader = new SagaMetaDataReader(module);
+        var sagaType = module.GetTypeDefinition<InheritedFromSagaWithGeneric>();
+        Assert.IsTrue(reader.FindSagaDataType(sagaType, out map));
+        Assert.AreEqual(typeof(SagaData).FullName, map.Data.FullName.Replace("/","+"));
+        Assert.AreEqual(typeof(InheritedFromSagaWithGeneric).FullName, map.Saga.FullName.Replace("/","+"));
+    }
+
+    public abstract class SagaWithGenric<T,K> : Saga<K> where K : IContainSagaData, new()
+    {
+    }
+
+    public class InheritedFromSagaWithGeneric : SagaWithGenric<short, SagaData>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
 
     [Test]
     public void FindSagaDataType_not_a_generic_saga()
     {
-        TypeReference sagaDataType;
-        var sagaMetaDataReader = new SagaMetaDataReader(module);
+        SagaDataMap sagaDataType;
+        var reader = new SagaMetaDataReader(module);
+        var sagaType = module.GetTypeDefinition<NotAGenericSaga>();
+        Assert.IsFalse(reader.FindSagaDataType(sagaType, out sagaDataType));
+        Assert.IsNull(sagaDataType);
+    }
+
+    public class NotAGenericSaga : Saga
+    {
+        protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    [Test]
+    public void FindSagaDataType_not_a_saga()
+    {
+        SagaDataMap sagaDataType;
+        var reader = new SagaMetaDataReader(module);
         var sagaType = module.GetTypeDefinition<NotASaga>();
-        Assert.IsFalse(sagaMetaDataReader.FindSagaDataType(sagaType, out sagaDataType));
+        Assert.IsFalse(reader.FindSagaDataType(sagaType, out sagaDataType));
         Assert.IsNull(sagaDataType);
     }
 

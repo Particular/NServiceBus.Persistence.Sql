@@ -2,12 +2,11 @@
 using System.Linq;
 using Mono.Cecil;
 
-
 class SagaMetaDataReader
 {
     ModuleDefinition module;
     List<string> skippedTypes = new List<string>();
-    Dictionary<string, TypeReference> sagaToSagaDataMapping = new Dictionary<string, TypeReference>();
+    Dictionary<string, SagaDataMap> sagaToSagaDataMapping = new Dictionary<string, SagaDataMap>();
 
     public SagaMetaDataReader(ModuleDefinition module)
     {
@@ -18,48 +17,65 @@ class SagaMetaDataReader
     {
         foreach (var type in module.GetTypes())
         {
-            TypeReference fake;
-            FindSagaDataType(type, out fake);
+            SagaDataMap fake;
+            if (FindSagaDataType(type, out fake))
+            {
+            }
         }
         
     }
 
-    public bool FindSagaDataType(TypeDefinition type, out TypeReference sagaDataType)
+    public bool FindSagaDataType(TypeReference type, out SagaDataMap sagaDataMap)
     {
         if (skippedTypes.Contains(type.FullName))
         {
-            sagaDataType = null;
+            sagaDataMap = null;
             return false;
         }
-        if (sagaToSagaDataMapping.TryGetValue(type.FullName, out sagaDataType))
+        var tryGetValue = sagaToSagaDataMapping.TryGetValue(type.FullName, out sagaDataMap);
+        if (tryGetValue)
         {
             return true;
         }
 
-        if (!type.Module.AssemblyReferences.Any(x => x.Name.StartsWith("NServiceBus.Core")))
+        if (!type.ReferencesNServiceBus())
         {
             skippedTypes.Add(type.FullName);
             return false;
         }
 
-
-        var baseType = type.BaseType;
+        var baseType = type.GetBase();
         var genericInstanceType = baseType as GenericInstanceType;
         if (genericInstanceType != null)
         {
-            if (baseType.FullName.StartsWith("NServiceBus.Saga.Saga`1"))
+            if (baseType.IsSaga())
             {
-                sagaDataType = genericInstanceType.GenericArguments.First();
-                sagaToSagaDataMapping[type.FullName] = sagaDataType;
+                var sagaDataType = genericInstanceType.GenericArguments.First().Resolve();
+                sagaToSagaDataMapping[type.FullName] = sagaDataMap =
+                    new SagaDataMap
+                    {
+                        Data = sagaDataType,
+                        Saga = type
+                    };
                 return true;
             }
         }
-        return FindSagaDataType(baseType.Resolve(), out sagaDataType);
+        SagaDataMap baseMap;
+        if (FindSagaDataType(baseType, out baseMap))
+        {
+            sagaToSagaDataMapping[type.FullName] = sagaDataMap = new SagaDataMap
+            {
+                Data = baseMap.Data,
+                Saga = type
+            };
+            return true;
+        }
+        return false;
     }
 }
 
-class SagaDataInfo
+class SagaDataMap
 {
-    public List<string> MappedProperties = new List<string>();
-    public List<string> UniqueProperties = new List<string>();
+    public TypeReference Saga;
+    public TypeDefinition Data;
 }

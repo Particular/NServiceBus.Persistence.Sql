@@ -9,4 +9,14 @@ public static class Extensions
     {
         return moduleDefinition.GetAllTypes().First(x => x.FullName == typeof(T).FullName.Replace("+","/"));
     }
+
+    public static string DisplayName(this TypeReference typeReference)
+    {
+        var genericInstanceType = typeReference as GenericInstanceType;
+        if (genericInstanceType != null && genericInstanceType.HasGenericArguments)
+        {
+            return typeReference.Name.Split('`').First() + "<" + string.Join(", ", genericInstanceType.GenericArguments.Select(c => c.DisplayName())) + ">";
+        }
+        return typeReference.Name;
+    }
 }

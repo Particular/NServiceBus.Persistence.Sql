@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseSaga.cs" />
+    <Compile Include="BaseInAnotherAssemblySaga.cs" />
     <Compile Include="BaseSagaData.cs" />
   </ItemGroup>
   <ItemGroup>
