@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="SagaMetaDataReaderTest - Copy.cs" />
+    <Compile Include="GetBaseTypeTest.cs" />
     <Compile Include="SagaMetaDataReaderTest.cs" />
     <Compile Include="Extensions.cs" />
   </ItemGroup>
