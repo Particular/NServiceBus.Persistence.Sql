@@ -5,10 +5,6 @@ using Mono.Cecil;
 
 public static class CecilExtentions
 {
-    public static IEnumerable<TypeDefinition> GetRootTypes(this ModuleDefinition module)
-    {
-        return module.GetTypes().Where(type => !(type.BaseType is TypeDefinition));
-    }
     public static bool ReferencesNServiceBus(this TypeReference type)
     {
         return type.Module.AssemblyReferences.Any(x => x.Name.StartsWith("NServiceBus.Core"));

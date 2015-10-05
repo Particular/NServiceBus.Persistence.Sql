@@ -6,33 +6,33 @@ class SagaMetaDataReader
 {
     ModuleDefinition module;
     List<string> skippedTypes = new List<string>();
-    Dictionary<string, SagaDataMap> sagaToSagaDataMapping = new Dictionary<string, SagaDataMap>();
+    Dictionary<string, SagaDataMap> maps = new Dictionary<string, SagaDataMap>();
 
     public SagaMetaDataReader(ModuleDefinition module)
     {
         this.module = module;
     }
 
-    public void Foo()
+    public IEnumerable<SagaDataMap> GetSagaMaps()
     {
         foreach (var type in module.GetTypes())
         {
-            SagaDataMap fake;
-            if (FindSagaDataType(type, out fake))
+            SagaDataMap map;
+            if (FindSagaDataType(type, out map))
             {
+                yield return map;
             }
         }
-        
     }
 
-    public bool FindSagaDataType(TypeReference type, out SagaDataMap sagaDataMap)
+    public bool FindSagaDataType(TypeReference type, out SagaDataMap map)
     {
         if (skippedTypes.Contains(type.FullName))
         {
-            sagaDataMap = null;
+            map = null;
             return false;
         }
-        var tryGetValue = sagaToSagaDataMapping.TryGetValue(type.FullName, out sagaDataMap);
+        var tryGetValue = maps.TryGetValue(type.FullName, out map);
         if (tryGetValue)
         {
             return true;
@@ -51,7 +51,7 @@ class SagaMetaDataReader
             if (baseType.IsSaga())
             {
                 var sagaDataType = genericInstanceType.GenericArguments.First().Resolve();
-                sagaToSagaDataMapping[type.FullName] = sagaDataMap =
+                maps[type.FullName] = map =
                     new SagaDataMap
                     {
                         Data = sagaDataType,
@@ -63,19 +63,14 @@ class SagaMetaDataReader
         SagaDataMap baseMap;
         if (FindSagaDataType(baseType, out baseMap))
         {
-            sagaToSagaDataMapping[type.FullName] = sagaDataMap = new SagaDataMap
+            maps[type.FullName] = map = new SagaDataMap
             {
                 Data = baseMap.Data,
                 Saga = type
             };
             return true;
         }
+        skippedTypes.Add(type.FullName);
         return false;
     }
-}
-
-class SagaDataMap
-{
-    public TypeReference Saga;
-    public TypeDefinition Data;
 }
