@@ -1,6 +1,4 @@
 ﻿
-declare @schema nvarchar(max) = 'theschema';
-declare @endpointName nvarchar(max) = 'theendpointname';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.TimeoutData]';
 
 IF EXISTS 

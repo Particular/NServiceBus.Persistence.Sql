@@ -7,23 +7,21 @@ namespace NServiceBus.SqlPersistence
     public static class SagaScriptBuilder
     {
 
-        public static void BuildCreateScript(string schema, string endpointName, IEnumerable<SagaDefinition> sagas, Func<string, TextWriter> writerBuilder)
+        public static void BuildCreateScript(IEnumerable<SagaDefinition> sagas, Func<string, TextWriter> writerBuilder)
         {
             foreach (var saga in sagas)
             {
                 var writer = writerBuilder(saga.Name);
-                WriteSaga(schema, endpointName, saga, writer);
+                WriteSaga(saga, writer);
             }
         }
 
-        static void WriteSaga(string schema, string endpointName, SagaDefinition saga, TextWriter writer)
+        static void WriteSaga(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
-declare @schema nvarchar(max) = '{0}';
-declare @endpointName nvarchar(max) = '{1}';
-declare @sagaName nvarchar(max) = '{2}';
+declare @sagaName nvarchar(max) = '{0}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
-", schema,endpointName,saga.Name);
+",saga.Name);
 
             WriteCreateTable(writer);
             WritePurgeObsoleteIndexes(saga, writer);
@@ -107,17 +105,15 @@ END
 ");
         }
 
-        public static void BuildDropScript(string schema, string endpointName, IEnumerable<string> sagaNames, Func<string, TextWriter> writerBuilder)
+        public static void BuildDropScript(IEnumerable<string> sagaNames, Func<string, TextWriter> writerBuilder)
         {
             foreach (var saga in sagaNames)
             {
                 var writer = writerBuilder(saga);
                 writer.Write(@"
-declare @schema nvarchar(max) = '{0}';
-declare @endpointName nvarchar(max) = '{1}';
-declare @sagaName nvarchar(max) = '{2}';
+declare @sagaName nvarchar(max) = '{0}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
-", schema, endpointName, saga);
+", saga);
                 writer.Write(@"
 IF EXISTS 
 (

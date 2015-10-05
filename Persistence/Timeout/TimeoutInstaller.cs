@@ -24,9 +24,13 @@ class TimeoutInstaller : INeedToInstallSomething
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildCreateScript(writer);
         }
 
-        SqlHelpers.Execute(connectionString, builder.ToString());
+        SqlHelpers.Execute(connectionString, builder.ToString(), collection =>
+        {
+            collection.AddWithValue("schema", settings.GetSchema<StorageType.Timeouts>());
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 }

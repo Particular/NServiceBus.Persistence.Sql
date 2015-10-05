@@ -21,10 +21,14 @@ class TimeoutDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildCreateScript( writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     void Drop()
@@ -32,10 +36,14 @@ class TimeoutDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+            TimeoutScriptBuilder.BuildDropScript(writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     public TimeoutPersister Persister;

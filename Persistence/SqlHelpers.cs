@@ -10,7 +10,7 @@ class SqlHelpers
         return sqlConnection;
     }
 
-    internal static void Execute(string connectionString, string script)
+    internal static void Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters )
     {
         var connectionBuilder = new SqlConnectionStringBuilder
         {
@@ -27,6 +27,7 @@ class SqlHelpers
         using (var command = new SqlCommand(script, sqlConnection))
         {
             command.AddParameter("database", database);
+            manipulateParameters(command.Parameters);
             command.ExecuteNonQueryEx();
         }
     }

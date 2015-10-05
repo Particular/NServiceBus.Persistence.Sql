@@ -26,8 +26,12 @@ class SagaInstaller : INeedToInstallSomething
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript("dbo", endpointName, sagaDefinitions, s => writer);
+            SagaScriptBuilder.BuildCreateScript(sagaDefinitions, s => writer);
         }
-        SqlHelpers.Execute(connectionString, builder.ToString());
+        SqlHelpers.Execute(connectionString, builder.ToString(), collection =>
+        {
+            collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 }

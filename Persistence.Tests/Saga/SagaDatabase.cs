@@ -26,10 +26,14 @@ class SagaDatabase : IDisposable
         var sagaDefinitions = new List<SagaDefinition> {sagaDefinition};
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript("dbo", endpointName, sagaDefinitions, s => writer);
+            SagaScriptBuilder.BuildCreateScript(sagaDefinitions, s => writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     void Drop(SagaDefinition sagaDefinition)
@@ -39,10 +43,14 @@ class SagaDatabase : IDisposable
 
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildDropScript("dbo", endpointName, sagaNames, s => writer);
+            SagaScriptBuilder.BuildDropScript(sagaNames, s => writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     public SagaPersister Persister;

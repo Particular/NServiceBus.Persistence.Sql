@@ -22,10 +22,14 @@ class SubscriptionDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildCreateScript(writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     void Drop()
@@ -33,10 +37,14 @@ class SubscriptionDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDropScript("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildDropScript(writer);
         }
         var script = builder.ToString();
-        SqlHelpers.Execute(connectionString, script);
+        SqlHelpers.Execute(connectionString, script, collection =>
+        {
+            collection.AddWithValue("schema", "dbo");
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 
     public SubscriptionPersister Persister;

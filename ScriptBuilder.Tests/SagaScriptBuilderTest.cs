@@ -27,7 +27,7 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript("theschema", "theendpointname", sagas, s => writer);
+            SagaScriptBuilder.BuildCreateScript(sagas, s => writer);
         }
         var script = builder.ToString();
 
@@ -46,7 +46,7 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildDropScript("theschema", "theendpointname", sagas, s => writer);
+            SagaScriptBuilder.BuildDropScript(sagas, s => writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);

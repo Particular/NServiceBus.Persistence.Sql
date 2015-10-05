@@ -54,12 +54,12 @@ namespace NServiceBus.SqlPersistence
               AssemblyResolver  = assemblyResolver
             };
             var moduleDefinition = ModuleDefinition.ReadModule(TargetPath, readerParameters);
-            var targetDirectory = Path.GetDirectoryName(TargetPath);
-            var metaDataReader = new SagaMetaDataReader(moduleDefinition);
-            foreach (var map in metaDataReader.GetSagaMaps())
-            {
-                //SagaScriptBuilder.BuildCreateScript();
-            }
+            //var targetDirectory = Path.GetDirectoryName(TargetPath);
+            //var metaDataReader = new SagaMetaDataReader(moduleDefinition);
+            //foreach (var map in metaDataReader.GetSagaMaps())
+            //{
+            //    //SagaScriptBuilder.BuildCreateScript();
+            //}
         }
 
         void ValidateTargetPath()

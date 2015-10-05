@@ -24,9 +24,13 @@ class SubscriptionInstaller : INeedToInstallSomething
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreateScript("dbo", endpointName, writer);
+            SubscriptionScriptBuilder.BuildCreateScript(writer);
         }
 
-        SqlHelpers.Execute(connectionString, builder.ToString());
+        SqlHelpers.Execute(connectionString, builder.ToString(), collection =>
+        {
+            collection.AddWithValue("schema", settings.GetSchema<StorageType.Subscriptions>());
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 }

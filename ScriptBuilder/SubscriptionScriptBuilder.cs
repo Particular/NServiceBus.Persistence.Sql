@@ -4,13 +4,11 @@ namespace NServiceBus.SqlPersistence
 {
     public static class SubscriptionScriptBuilder
     {
-        public static void BuildCreateScript(string schema, string endpointName, TextWriter writer)
+        public static void BuildCreateScript(TextWriter writer)
         {
             writer.Write(@"
-declare @schema nvarchar(max) = '{0}';
-declare @endpointName nvarchar(max) = '{1}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
-", schema, endpointName);
+");
             writer.Write(@"
 IF NOT EXISTS 
 (
@@ -39,13 +37,11 @@ END
 ");
         }
 
-        public static void BuildDropScript(string schema, string endpointName, TextWriter writer)
+        public static void BuildDropScript(TextWriter writer)
         {
             writer.Write(@"
-declare @schema nvarchar(max) = '{0}';
-declare @endpointName nvarchar(max) = '{1}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
-", schema, endpointName);
+");
             writer.Write(@"
 IF EXISTS 
 (

@@ -13,7 +13,7 @@ public class SubscriptionScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreateScript("theschema", "theendpointname", writer);
+            SubscriptionScriptBuilder.BuildCreateScript(writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
@@ -26,7 +26,7 @@ public class SubscriptionScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDropScript("theschema", "theendpointname", writer);
+            SubscriptionScriptBuilder.BuildDropScript(writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);

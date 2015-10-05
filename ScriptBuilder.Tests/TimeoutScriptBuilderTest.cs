@@ -13,7 +13,7 @@ public class TimeoutScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreateScript("theschema", "theendpointname", writer);
+            TimeoutScriptBuilder.BuildCreateScript(writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
@@ -27,7 +27,7 @@ public class TimeoutScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDropScript("theschema", "theendpointname", writer);
+            TimeoutScriptBuilder.BuildDropScript(writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
