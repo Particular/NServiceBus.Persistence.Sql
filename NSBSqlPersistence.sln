@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceLibrary", "Referen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder.Tests", "ScriptBuilder.Tests\ScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuget", "NuGet\Nuget.csproj", "{66DDADC1-1631-4EC7-8CB2-DD8080188234}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,7 +7,7 @@
     <ProjectGuid>{63784399-65AF-424A-B2AD-0C94AE326823}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.SqlPersistence.ScriptBuilderTask</RootNamespace>
+    <RootNamespace>NServiceBus.SqlPersistence</RootNamespace>
     <AssemblyName>NServiceBus.SqlPersistence.ScriptBuilderTask</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Tasks.v4.0" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.dll</HintPath>
       <Private>True</Private>
@@ -59,9 +63,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NugetAssets\NServiceBus.SqlPersistence.ScriptBuilderTask.nuspec">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -69,7 +70,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="AssemblyResolver.cs" />
     <Compile Include="CecilExtentions.cs" />
+    <Compile Include="ErrorsException.cs" />
+    <Compile Include="ScriptBuilderTask.cs" />
     <Compile Include="SagaDataMap.cs" />
     <Compile Include="SagaMetaDataReader.cs" />
   </ItemGroup>
@@ -80,26 +84,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <NugetDir>$(SolutionDir)NuGetBuild\MsBuild\</NugetDir>
-  </PropertyGroup>
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <ItemGroup>
-      <FilesToDelete Include="$(NugetDir)**\*.*" />
-    </ItemGroup>
-    <Delete Files="@(FilesToDelete)" />
-    <MakeDir Directories="$(NugetDir)Lib\NET45\" />
-    <Copy SourceFiles="$(ProjectDir)NugetAssets\NServiceBus.SqlPersistence.ScriptBuilderTask.nuspec" DestinationFolder="$(NugetDir)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetDir)Lib\NET45\$(TargetFileName)&quot; /internalize  &quot;$(TargetPath)&quot; &quot;$(TargetDir)Mono.Cecil.dll&quot; &quot;$(TargetDir)NServiceBus.SqlPersistence.ScriptBuilder.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot;" />
-    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetDir)" MetadataAssembly="$(OutputPath)NServiceBus.SqlPersistence.ScriptBuilderTask.dll" />
-  </Target>
   <Import Project="..\packages\Fody.1.29.3\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets'))" />
   </Target>
-  <Import Project="..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets" Condition="Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" />
 </Project>

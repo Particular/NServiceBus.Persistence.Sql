@@ -99,9 +99,6 @@
     <Compile Include="Subscription\SubscriptionPersister.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NugetAssets\NServiceBus.SqlPersistence.nuspec">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -116,26 +113,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<!--  <PropertyGroup>
-    <NugetDir>$(SolutionDir)NuGetBuild\Main\</NugetDir>
-  </PropertyGroup>
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <ItemGroup>
-      <FilesToDelete Include="$(NugetDir)**\*.*" />
-    </ItemGroup>
-    <Delete Files="@(FilesToDelete)" />
-    <MakeDir Directories="$(NugetDir)Lib\NET45\" />
-    <Copy SourceFiles="$(ProjectDir)NugetAssets\NServiceBus.SqlPersistence.nuspec" DestinationFolder="$(NugetDir)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetDir)Lib\NET45\$(TargetFileName)&quot; /internalize  &quot;$(TargetPath)&quot; &quot;$(TargetDir)NServiceBus.SqlPersistence.Install.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot;" />
-    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetDir)" MetadataAssembly="$(OutputPath)NServiceBus.SqlPersistence.dll" />
-  </Target>
--->
-  <Import Project="..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets" Condition="Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets'))" />
     <Error Condition="!Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
   </Target>
   <Import Project="..\packages\Fody.1.29.3\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" />
