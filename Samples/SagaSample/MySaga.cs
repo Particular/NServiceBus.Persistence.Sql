@@ -9,12 +9,10 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
-    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+    protected override void ConfigureHowToFindSaga(MessagePropertyMapper<SagaData> mapper)
     {
-        mapper.ConfigureMapping<StartSaga>(m => m.MySagaId)
-                .ToSaga(s => s.MySagaId);
-        mapper.ConfigureMapping<CompleteSaga>(m => m.MySagaId)
-                .ToSaga(s => s.MySagaId);
+        mapper.MapMessage<StartSaga>(m => m.MySagaId);
+        mapper.MapMessage<CompleteSaga>(m => m.MySagaId);
     }
 
     public void Handle(StartSaga message)

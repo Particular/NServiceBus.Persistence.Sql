@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using Mono.Cecil;
-using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
 using NUnit.Framework;
-
 
 [TestFixture]
 public class SagaMetaDataReaderTest
@@ -34,10 +32,7 @@ public class SagaMetaDataReaderTest
             [CorrelationId]
             public string  Correlation { get; set; }
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        
     }
 
 }

@@ -15,7 +15,7 @@ public class SagaSerializerTest
 
 
     [Test]
-    public void WithAbstract()
+    public void WithSimple()
     {
         var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSaga), (serializer, type) => { });
         var saga = new SimpleSaga

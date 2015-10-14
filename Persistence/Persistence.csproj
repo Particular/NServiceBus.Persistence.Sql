@@ -69,6 +69,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Saga\CorrelationIdAttribute.cs" />
     <Compile Include="Saga\DefaultSagaSerialization.cs" />
+    <Compile Include="Saga\MessagePropertyMapper.cs" />
     <Compile Include="Saga\SagaDeserialize.cs" />
     <Compile Include="Saga\DeserializeBuilder.cs" />
     <Compile Include="Saga\SagaConfigExtentions.cs" />

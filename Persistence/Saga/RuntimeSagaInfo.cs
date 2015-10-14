@@ -73,7 +73,7 @@ class RuntimeSagaInfo
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            defaultSerialize(writer, sagaData);
+            defaultSerialize(writer, (XmlSagaData) sagaData);
         }
         return builder.ToString();
     }
@@ -81,7 +81,7 @@ class RuntimeSagaInfo
     public TSagaData FromString<TSagaData>(XmlReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
     {
         var deserialize = GetDeserialize(storedSagaTypeVersion);
-        return (TSagaData) deserialize(reader);
+        return (TSagaData) (IContainSagaData)deserialize(reader);
     }
 
     SagaDeserialize GetDeserialize(Version storedSagaTypeVersion) 

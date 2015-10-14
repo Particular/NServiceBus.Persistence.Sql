@@ -32,10 +32,7 @@ public class SagaConventionsTest
         public class BadNamedSagaData : XmlSagaData
         {
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<BadNamedSagaData> mapper)
-        {
-        }
+        
     }
     [Test]
     public void NestedInNonXmlSaga()
@@ -73,10 +70,7 @@ public class SagaConventionsTest
             [Unique]
             public string Foo { get; set; }
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        
     }
 
     [Test]
@@ -94,10 +88,7 @@ public class SagaConventionsTest
         public class SagaData : XmlSagaData
         {
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        
     }
 
     [Test]
@@ -115,10 +106,7 @@ public class SagaConventionsTest
         public class SagaData<K> : XmlSagaData
         {
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData<T>> mapper)
-        {
-        }
+        
     }
 
     [Test]
@@ -135,10 +123,7 @@ public class SagaConventionsTest
         public class SagaData : XmlSagaData
         {
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        
     }
 
     [Test]
@@ -160,10 +145,7 @@ public class SagaConventionsTest
         public class SagaData : XmlSagaData
         {
         }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        
     }
 
     [Test]

@@ -9,10 +9,6 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
 {
     static ILog logger = LogManager.GetLogger(typeof (MySaga));
 
-    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-    {
-    }
-
     public void Handle(StartSaga message)
     {
         var timout = new SagaTimout

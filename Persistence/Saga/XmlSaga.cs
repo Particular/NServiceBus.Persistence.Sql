@@ -8,6 +8,16 @@ namespace NServiceBus.SqlPersistence
         IContainSagaData, 
         new()
     {
-        
+
+        protected sealed override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
+        {
+            var messagePropertyMapper = new MessagePropertyMapper<TSagaData>(mapper, new TSagaData());
+            ConfigureHowToFindSaga(messagePropertyMapper);
+        }
+
+        protected virtual void ConfigureHowToFindSaga(MessagePropertyMapper<TSagaData> mapper)
+        {
+        }
+
     }
 }
