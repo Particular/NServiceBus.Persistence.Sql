@@ -1,0 +1,1 @@
+﻿Saga types cannot be abstract.

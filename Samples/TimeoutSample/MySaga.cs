@@ -1,8 +1,9 @@
 ﻿using System;
 using NServiceBus.Logging;
 using NServiceBus.Saga;
+using NServiceBus.SqlPersistence;
 
-public class MySaga : Saga<MySaga.SagaData>,
+public class MySaga : XmlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSaga>,
     IHandleTimeouts<SagaTimout>
 {
@@ -28,10 +29,7 @@ public class MySaga : Saga<MySaga.SagaData>,
         MarkAsComplete();
     }
 
-    public class SagaData : IContainSagaData
+    public class SagaData : XmlSagaData
     {
-        public Guid Id { get; set; }
-        public string Originator { get; set; }
-        public string OriginalMessageId { get; set; }
     }
 }

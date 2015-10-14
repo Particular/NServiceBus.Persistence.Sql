@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NServiceBus.SqlPersistence.Saga
+namespace NServiceBus.SqlPersistence
 {
-    public delegate Deserialize DeserializeBuilder(Type sagaDataType, Version sagaVersion);
+    public delegate SagaDeserialize DeserializeBuilder(Type sagaDataType, Version sagaVersion);
 }

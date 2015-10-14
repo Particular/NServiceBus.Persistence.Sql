@@ -5,55 +5,20 @@ using System.Text;
 using System.Xml;
 using ApprovalTests;
 using NServiceBus.Saga;
-using NServiceBus.SqlPersistence.Saga;
+using NServiceBus.SqlPersistence;
 using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
 public class SagaSerializerTest
 {
-    [Test]
-    public void WithInterface()
-    {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithInterface),(serializer, type) => {});
-        var saga = new SagaWithInterface
-        {
-            Property = "theProperty"
-        };
 
-        var xml = Serialize(delegates, saga);
-        var result = Deserialize(xml, delegates);
-        ObjectApprover.VerifyWithJson(result);
-    }
-
-    [Test]
-    public void EnsureBasePropsAreNotWrittenWithInterface()
-    {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithInterface), (serializer, type) => { });
-        var saga = new SagaWithInterface
-        {
-            Id = Guid.NewGuid(),
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
-            Property = "theProperty"
-        };
-        var xml = Serialize(delegates, saga);
-        Approvals.Verify(xml);
-    }
-
-    public class SagaWithInterface : IContainSagaData
-    {
-        public Guid Id { get; set; }
-        public string Originator { get; set; }
-        public string OriginalMessageId { get; set; }
-        public string Property { get; set; }
-    }
 
     [Test]
     public void WithAbstract()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithAbstract), (serializer, type) => { });
-        var saga = new SagaWithAbstract
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSaga), (serializer, type) => { });
+        var saga = new SimpleSaga
         {
             Property = "PropertyValue"
         };
@@ -80,7 +45,7 @@ public class SagaSerializerTest
         Approvals.Verify(xml);
     }
 
-    public class ComplexSaga : ContainSagaData
+    public class ComplexSaga : XmlSagaData
     {
         public NestedComplex Property { get; set; }
     }
@@ -91,10 +56,10 @@ public class SagaSerializerTest
     }
 
     [Test]
-    public void EnsureBasePropsAreNotWrittenWithAbstract()
+    public void EnsureBasePropsAreNotWritten()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SagaWithAbstract), (serializer, type) => { });
-        var saga = new SagaWithAbstract
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSaga), (serializer, type) => { });
+        var saga = new SimpleSaga
         {
             Id = Guid.NewGuid(),
             OriginalMessageId = "theOriginalMessageId",
@@ -105,12 +70,12 @@ public class SagaSerializerTest
         Approvals.Verify(xml);
     }
 
-    public class SagaWithAbstract : ContainSagaData
+    public class SimpleSaga : XmlSagaData
     {
         public string Property { get; set; }
     }
 
-    static string Serialize(DefualtSerialization delegates, IContainSagaData saga)
+    static string Serialize(DefaultSagaSerialization delegates, XmlSagaData saga)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -120,7 +85,7 @@ public class SagaSerializerTest
         return builder.ToString();
     }
 
-    static IContainSagaData Deserialize(string xml, DefualtSerialization delegates)
+    static IContainSagaData Deserialize(string xml, DefaultSagaSerialization delegates)
     {
         var reader = new StringReader(xml);
         var xmlTextReader = new XmlTextReader(reader);

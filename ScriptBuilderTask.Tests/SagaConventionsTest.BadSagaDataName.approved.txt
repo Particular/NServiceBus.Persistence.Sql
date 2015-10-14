@@ -1,0 +1,1 @@
+﻿Saga data types must be named 'SagaData'.

@@ -16,11 +16,7 @@ public class SagaScriptBuilderTest
             new SagaDefinition
             {
                 Name = "theSaga",
-                MappedProperties = new List<string>
-                {
-                    "Property1",
-                    "Property2"
-                }
+                CorrelationMember = "Property1",
             }
         };
 

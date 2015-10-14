@@ -9,6 +9,28 @@ public static class CecilExtentions
     {
         return type.Module.AssemblyReferences.Any(x => x.Name.StartsWith("NServiceBus.Core"));
     }
+    public static string GetFileName(this TypeDefinition type)
+    {
+        foreach (var method in type.Methods)
+        {
+            var body = method.Body;
+            if (body?.Instructions == null)
+            {
+                continue;
+            }
+            foreach (var instruction in body.Instructions)
+            {
+                var point = instruction.SequencePoint;
+                if (point?.Document?.Url == null)
+                {
+                    continue;
+                }
+                return point.Document.Url;
+            }
+        }
+        return null;
+    }
+
     public static TypeReference GetBase(this TypeReference type)
     {
         var definition = type as TypeDefinition;
@@ -48,6 +70,10 @@ public static class CecilExtentions
         return type.FullName.StartsWith("NServiceBus.Saga.Saga`1");
     }
 
+    public static bool ContainsAttribute(this ICustomAttributeProvider property, string attributeName)
+    {
+        return property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == attributeName);
+    }
 
     public static int IndexOf<T>(this IEnumerable<T> items, Func<T, bool> predicate)
     {

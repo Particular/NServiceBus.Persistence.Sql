@@ -25,14 +25,16 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' +
 
             WriteCreateTable(writer);
             WritePurgeObsoleteIndexes(saga, writer);
-            WriteCreateIndexes(saga, writer);
+            WriteCreateIndex(saga, writer);
         }
 
-        static void WriteCreateIndexes(SagaDefinition saga, TextWriter writer)
+        static void WriteCreateIndex(SagaDefinition saga, TextWriter writer)
         {
-            foreach (var mappedProperty in saga.MappedProperties)
+            if (saga.CorrelationMember == null)
             {
-                writer.Write(@"
+                return;
+            }
+            writer.Write(@"
 IF NOT EXISTS
 (
     SELECT * 
@@ -53,13 +55,11 @@ SET @createIndex = N'
 ';
 exec(@createIndex);
 END
-", mappedProperty);
-            }
+", saga.CorrelationMember);
         }
 
         static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer)
         {
-            var propertyInString = "'" + string.Join("', '", saga.MappedProperties) + "'";
             writer.Write(@"
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery = 
@@ -67,13 +67,14 @@ select @dropIndexQuery =
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE 
+		ix.Id = (select object_id from sys.objects where name = @tableName) AND
 	    ix.Name IS NOT null AND 
 	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name NOT IN ({0})
+	    ix.Name <> 'PropertyIndex_{0}' 
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
-", propertyInString);
+", saga.CorrelationMember);
         }
 
         static void WriteCreateTable(TextWriter writer)

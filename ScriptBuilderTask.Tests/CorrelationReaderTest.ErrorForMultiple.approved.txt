@@ -1,0 +1,6 @@
+﻿{
+  "Found": false,
+  "Errored": true,
+  "Name": null,
+  "Error": "The type CorrelationReaderTest/DataWithMultiple has multiple correlation members. Members: System.String CorrelationReaderTest/DataWithMultiple::Correlation1(),System.String CorrelationReaderTest/DataWithMultiple::Correlation2()"
+}

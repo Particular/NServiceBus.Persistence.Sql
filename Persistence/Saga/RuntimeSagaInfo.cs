@@ -5,21 +5,21 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using NServiceBus.Saga;
-using NServiceBus.SqlPersistence.Saga;
+using NServiceBus.SqlPersistence;
 
 class RuntimeSagaInfo
 {
     SagaCommandBuilder commandBuilder;
     Type sagaDataType;
     DeserializeBuilder deserializeBuilder;
-    ConcurrentDictionary<Version, Deserialize> deserializers;
-    Serialize defaultSerialize;
+    ConcurrentDictionary<Version, SagaDeserialize> deserializers;
+    SagaSerialize defaultSerialize;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
-    Deserialize defaultDeserialize;
+    SagaDeserialize defaultDeserialize;
 
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
 
@@ -27,15 +27,15 @@ class RuntimeSagaInfo
         SagaCommandBuilder commandBuilder, 
         Type sagaDataType,
         DeserializeBuilder deserializeBuilder,
-        SerializeBuilder serializeBuilder,
+        SagaSerializeBuilder sagaSerializeBuilder,
         Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
         this.sagaDataType = sagaDataType;
         if (deserializeBuilder != null)
         {
-            deserializers = new ConcurrentDictionary<Version, Deserialize>();
+            deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
         }
-        var defualtSerialization = GetSerializer(serializeBuilder, sagaDataType, xmlSerializerCustomize);
+        var defualtSerialization = GetSerializer(sagaSerializeBuilder, sagaDataType, xmlSerializerCustomize);
         defaultSerialize = defualtSerialization.Serialize;
         defaultDeserialize = defualtSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
@@ -48,9 +48,9 @@ class RuntimeSagaInfo
     }
 
 
-    static DefualtSerialization GetSerializer(SerializeBuilder serializeBuilder, Type sagaDataType, Action<XmlSerializer, Type> xmlSerializerCustomize)
+    static DefaultSagaSerialization GetSerializer(SagaSerializeBuilder sagaSerializeBuilder, Type sagaDataType, Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
-        var serialization = serializeBuilder?.Invoke(sagaDataType);
+        var serialization = sagaSerializeBuilder?.Invoke(sagaDataType);
         if (serialization != null)
         {
             return serialization;
@@ -84,7 +84,7 @@ class RuntimeSagaInfo
         return (TSagaData) deserialize(reader);
     }
 
-    Deserialize GetDeserialize(Version storedSagaTypeVersion) 
+    SagaDeserialize GetDeserialize(Version storedSagaTypeVersion) 
     {
         if (deserializeBuilder == null)
         {

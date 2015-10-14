@@ -1,9 +1,9 @@
-﻿using System;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Saga;
+using NServiceBus.SqlPersistence;
 
-public class MySaga : Saga<MySaga.SagaData>,
+public class MySaga : XmlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSaga>,
     IHandleMessages<CompleteSaga>
 {
@@ -33,11 +33,8 @@ public class MySaga : Saga<MySaga.SagaData>,
         MarkAsComplete();
     }
 
-    public class SagaData : IContainSagaData
+    public class SagaData : XmlSagaData
     {
-        public Guid Id { get; set; }
-        public string Originator { get; set; }
-        public string OriginalMessageId { get; set; }
         public string MySagaId { get; set; }
     }
 }

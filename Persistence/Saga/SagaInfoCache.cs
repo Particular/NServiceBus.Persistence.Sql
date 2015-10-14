@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Xml.Serialization;
-using NServiceBus.SqlPersistence.Saga;
+using NServiceBus.SqlPersistence;
 
 class SagaInfoCache
 {
     DeserializeBuilder deserializeBuilder;
-    SerializeBuilder serializeBuilder;
+    SagaSerializeBuilder serializeBuilder;
     SagaCommandBuilder commandBuilder;
     Action<XmlSerializer, Type> xmlSerializerCustomize;
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
 
     public SagaInfoCache(
         DeserializeBuilder deserializeBuilder, 
-        SerializeBuilder serializeBuilder, 
+        SagaSerializeBuilder serializeBuilder, 
         SagaCommandBuilder commandBuilder,
         Action<XmlSerializer, Type> xmlSerializerCustomize)
     {

@@ -20,7 +20,7 @@ namespace NServiceBus.SqlPersistence
             Log.LogMessageFromText($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing",MessageImportance.Normal);
 
             var stopwatch = Stopwatch.StartNew();
-
+            
             try
             {
                 Inner();
@@ -54,12 +54,13 @@ namespace NServiceBus.SqlPersistence
               AssemblyResolver  = assemblyResolver
             };
             var moduleDefinition = ModuleDefinition.ReadModule(TargetPath, readerParameters);
-            //var targetDirectory = Path.GetDirectoryName(TargetPath);
-            //var metaDataReader = new SagaMetaDataReader(moduleDefinition);
-            //foreach (var map in metaDataReader.GetSagaMaps())
-            //{
-            //    //SagaScriptBuilder.BuildCreateScript();
-            //}
+            var targetDirectory = Path.GetDirectoryName(TargetPath);
+            var metaDataReader = new SagaMetaDataReader(moduleDefinition, new BuildLogger(Log));
+            foreach (var saga in metaDataReader.GetSagas())
+            {
+                var sagaScriptPath = Path.Combine(targetDirectory,"SqlPersistenceScripts",saga.Name + ".sql");
+             //   SagaScriptBuilder.BuildCreateScript();
+            }
         }
 
         void ValidateTargetPath()

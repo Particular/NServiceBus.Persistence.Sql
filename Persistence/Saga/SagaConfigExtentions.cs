@@ -3,7 +3,7 @@ using NServiceBus;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.SqlPersistence.Saga;
+using NServiceBus.SqlPersistence;
 using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 public static class SagaConfigExtentions
@@ -24,15 +24,15 @@ public static class SagaConfigExtentions
         return (serializer, type) => {};
     }
 
-    public static void SerializeBuilder(this PersistenceExtentions<SqlPersistence, StorageType.Sagas> configuration, SerializeBuilder builder)
+    public static void SerializeBuilder(this PersistenceExtentions<SqlPersistence, StorageType.Sagas> configuration, SagaSerializeBuilder builder)
     {
         configuration.GetSettings()
-            .Set<SerializeBuilder>(builder);
+            .Set<SagaSerializeBuilder>(builder);
     }
 
-    internal static SerializeBuilder GetSerializeBuilder(this ReadOnlySettings settings)
+    internal static SagaSerializeBuilder GetSerializeBuilder(this ReadOnlySettings settings)
     {
-        SerializeBuilder value;
+        SagaSerializeBuilder value;
         settings.TryGet(out value);
         return value;
     }

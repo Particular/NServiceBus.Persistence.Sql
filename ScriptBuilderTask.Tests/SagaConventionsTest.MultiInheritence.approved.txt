@@ -1,0 +1,1 @@
+﻿Saga types must directly inherit from NServiceBus.SqlPersistence.XmlSaga<T>.

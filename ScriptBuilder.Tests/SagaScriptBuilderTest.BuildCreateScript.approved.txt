@@ -32,9 +32,10 @@ select @dropIndexQuery =
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE 
+		ix.Id = (select object_id from sys.objects where name = @tableName) AND
 	    ix.Name IS NOT null AND 
 	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name NOT IN ('Property1', 'Property2')
+	    ix.Name <> 'PropertyIndex_Property1' 
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
@@ -55,27 +56,6 @@ SET @createIndex = N'
     FOR 
     (
         Property1 = ''/Data/Property1'' AS XQUERY ''xs:string'' SINGLETON
-    )
-';
-exec(@createIndex);
-END
-
-IF NOT EXISTS
-(
-    SELECT * 
-    FROM sys.indexes 
-    WHERE 
-        name = 'PropertyIndex_Property2' AND 
-        object_id = OBJECT_ID(@tableName)
-)
-BEGIN
-DECLARE @createIndex nvarchar(max);
-SET @createIndex = N'
-    CREATE  SELECTIVE XML INDEX PropertyIndex_Property2
-    ON ' + @tableName + '(Data)
-    FOR 
-    (
-        Property2 = ''/Data/Property2'' AS XQUERY ''xs:string'' SINGLETON
     )
 ';
 exec(@createIndex);

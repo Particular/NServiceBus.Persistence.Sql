@@ -63,7 +63,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
@@ -71,10 +73,13 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="BuildLogger.cs" />
     <Compile Include="CecilExtentions.cs" />
+    <Compile Include="CorrelationResult.cs" />
+    <Compile Include="FileError.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="CorrelationReader.cs" />
     <Compile Include="ScriptBuilderTask.cs" />
-    <Compile Include="SagaDataMap.cs" />
     <Compile Include="SagaMetaDataReader.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -90,5 +95,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets'))" />
   </Target>
+  <Import Project="..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets" Condition="Exists('..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets')" />
 </Project>

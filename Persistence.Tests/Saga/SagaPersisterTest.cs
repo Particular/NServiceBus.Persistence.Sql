@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
 using NUnit.Framework;
@@ -69,10 +68,7 @@ public class SagaPersisterTest
         var sagaDefinition = new SagaDefinition
         {
             Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
-            MappedProperties = new List<string>
-            {
-                "Property"
-            }
+            CorrelationMember = "Property"
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
@@ -95,10 +91,7 @@ public class SagaPersisterTest
         var sagaDefinition = new SagaDefinition
         {
             Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
-            MappedProperties = new List<string>
-            {
-                "Property"
-            }
+            CorrelationMember = "Property"
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
