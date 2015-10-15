@@ -74,7 +74,6 @@
     <Compile Include="Saga\DeserializeBuilder.cs" />
     <Compile Include="Saga\SagaConfigExtentions.cs" />
     <Compile Include="Saga\SagaCommandBuilder.cs" />
-    <Compile Include="Saga\SagaPropertyMapper.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
     <Compile Include="Saga\SagaTableNameBuilder.cs" />

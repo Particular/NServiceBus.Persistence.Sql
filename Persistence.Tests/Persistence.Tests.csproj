@@ -101,7 +101,6 @@
     <Compile Include="Subscription\SubscriptionDatabase.cs" />
     <Compile Include="Timeout\HeaderSerializerTest.cs" />
     <Compile Include="MethodTimeLogger.cs" />
-    <Compile Include="Saga\SagaPropertyMapperTest.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTest.cs" />
     <Compile Include="Timeout\TimeoutDatabase.cs" />
     <Compile Include="Timeout\TimeoutPersisterTest.cs" />
