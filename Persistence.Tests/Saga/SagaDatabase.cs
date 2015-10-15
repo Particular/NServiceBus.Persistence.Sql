@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using MethodTimer;
@@ -23,10 +22,9 @@ class SagaDatabase : IDisposable
     void Create(SagaDefinition sagaDefinition)
     {
         var builder = new StringBuilder();
-        var sagaDefinitions = new List<SagaDefinition> {sagaDefinition};
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(sagaDefinitions, s => writer);
+            SagaScriptBuilder.WriteSaga(sagaDefinition, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script, collection =>
@@ -39,11 +37,10 @@ class SagaDatabase : IDisposable
     void Drop(SagaDefinition sagaDefinition)
     {
         var builder = new StringBuilder();
-        var sagaNames = new List<string> {sagaDefinition.Name};
 
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildDropScript(sagaNames, s => writer);
+            SagaScriptBuilder.BuildDropScript(sagaDefinition.Name, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script, collection =>

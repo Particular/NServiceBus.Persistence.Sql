@@ -6,7 +6,7 @@ using NServiceBus.Saga;
 
 class SagaPropertyMapper : IConfigureHowToFindSagaWithMessage
 {
-    public List<string> Properties  = new List<string>();
+    public List<string> Properties = new List<string>();
     public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty) where TSagaEntity : IContainSagaData
     {
         try

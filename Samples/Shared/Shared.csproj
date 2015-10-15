@@ -75,6 +75,10 @@
       <Project>{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}</Project>
       <Name>Persistence</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ScriptBuilder\ScriptBuilder.csproj">
+      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
+      <Name>ScriptBuilder</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

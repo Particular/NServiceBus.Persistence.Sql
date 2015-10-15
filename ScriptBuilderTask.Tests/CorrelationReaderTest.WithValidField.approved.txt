@@ -1,5 +1,4 @@
 ﻿{
-  "Found": true,
   "Errored": false,
   "Name": "Correlation",
   "Error": null

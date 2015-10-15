@@ -11,16 +11,13 @@ class CorrelationReader
 
         if (members.Count == 0)
         {
-            return new CorrelationResult
-            {
-                Found = false
-            };
+            return new CorrelationResult();
         }
         if (members.Count > 1)
         {
             return new CorrelationResult
             {
-                Error = string.Format("The type " + type.FullName + " has multiple correlation members. Members: " + string.Join(",", members)),
+                Error = $"The type '{type.FullName}' has multiple correlation members. Members: {string.Join(",", members)}",
                 Errored = true,
             };
         }
@@ -28,7 +25,7 @@ class CorrelationReader
         
         return new CorrelationResult
         {
-            Found = true,Name = member.Name
+            Name = member.Name
         };
     }
 

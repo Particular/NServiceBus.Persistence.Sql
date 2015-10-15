@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace NServiceBus.SqlPersistence
 {
     public static class SagaScriptBuilder
     {
 
-        public static void BuildCreateScript(IEnumerable<SagaDefinition> sagas, Func<string, TextWriter> writerBuilder)
-        {
-            foreach (var saga in sagas)
-            {
-                var writer = writerBuilder(saga.Name);
-                WriteSaga(saga, writer);
-            }
-        }
-
-        static void WriteSaga(SagaDefinition saga, TextWriter writer)
+        public static void WriteSaga(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
 declare @sagaName nvarchar(max) = '{0}';
@@ -106,16 +95,14 @@ END
 ");
         }
 
-        public static void BuildDropScript(IEnumerable<string> sagaNames, Func<string, TextWriter> writerBuilder)
+        
+        public static void BuildDropScript(string saga, TextWriter writer)
         {
-            foreach (var saga in sagaNames)
-            {
-                var writer = writerBuilder(saga);
-                writer.Write(@"
+            writer.Write(@"
 declare @sagaName nvarchar(max) = '{0}';
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
 ", saga);
-                writer.Write(@"
+            writer.Write(@"
 IF EXISTS 
 (
     SELECT * 
@@ -132,8 +119,6 @@ SET @createTable = N'
 exec(@createTable);
 END
 ");
-            }
         }
-
     }
 }

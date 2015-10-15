@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using ApprovalTests;
 using NServiceBus.SqlPersistence;
@@ -11,19 +10,16 @@ public class SagaScriptBuilderTest
     [Test]
     public void BuildCreateScript()
     {
-        var sagas = new List<SagaDefinition>
+        var saga = new SagaDefinition
         {
-            new SagaDefinition
-            {
-                Name = "theSaga",
-                CorrelationMember = "Property1",
-            }
+            Name = "theSaga",
+            CorrelationMember = "Property1",
         };
 
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(sagas, s => writer);
+            SagaScriptBuilder.WriteSaga(saga, writer);
         }
         var script = builder.ToString();
 
@@ -34,15 +30,11 @@ public class SagaScriptBuilderTest
     [Test]
     public void BuildDropScript()
     {
-        var sagas = new List<string>
-        {
-            "theSaga"
-        };
-
+        
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildDropScript(sagas, s => writer);
+            SagaScriptBuilder.BuildDropScript("theSaga", writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
