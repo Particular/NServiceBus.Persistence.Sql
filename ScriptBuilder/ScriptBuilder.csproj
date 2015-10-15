@@ -11,7 +11,8 @@
     <AssemblyName>NServiceBus.SqlPersistence.ScriptBuilder</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>a19be931</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,6 +49,10 @@
       <HintPath>..\packages\FodyCecil.1.29.2\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Resourcer, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Resourcer.Fody.1.4.0\lib\portable-net45+netcore45+wpa81+wp8\Resourcer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,6 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="SubscriptionCreate.sql" />
+    <EmbeddedResource Include="SubscriptionDrop.sql" />
+    <EmbeddedResource Include="TimeoutCreate.sql" />
+    <EmbeddedResource Include="TimeoutDrop.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NugetAssets\NServiceBus.SqlPersistence.ScriptBuilder.nuspec">
@@ -75,5 +84,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Resourcer.Fody.1.4.0\build\dotnet\Resourcer.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Resourcer.Fody.1.4.0\build\dotnet\Resourcer.Fody.targets'))" />
   </Target>
+  <Import Project="..\packages\Resourcer.Fody.1.4.0\build\dotnet\Resourcer.Fody.targets" Condition="Exists('..\packages\Resourcer.Fody.1.4.0\build\dotnet\Resourcer.Fody.targets')" />
 </Project>

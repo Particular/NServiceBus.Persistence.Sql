@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.IO;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
@@ -17,20 +17,15 @@ class SagaInstaller : INeedToInstallSomething
         {
             return;
         }
-        var typesToScan = config.TypesToScan;
         var connectionString = settings.GetConnectionString<StorageType.Sagas>();
         var endpointName = config.Settings.EndpointName();
-        var builder = new StringBuilder();
+        var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");
+        var sagaScripts = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql");
 
-        //TODO: execure scripts by convention
-        //using (var writer = new StringWriter(builder))
-        //{
-        //    SagaScriptBuilder.BuildCreateScript(sagaDefinitions, s => writer);
-        //}
-        //SqlHelpers.Execute(connectionString, builder.ToString(), collection =>
-        //{
-        //    collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
-        //    collection.AddWithValue("endpointName", endpointName);
-        //});
+        SqlHelpers.Execute(connectionString, sagaScripts, collection =>
+        {
+            collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
+            collection.AddWithValue("endpointName", endpointName);
+        });
     }
 }

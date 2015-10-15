@@ -61,6 +61,15 @@ namespace NServiceBus
             return settings.GetValue<bool, TStorageType>("FeatureEnabled", () => false);
         }
 
+
+        public static bool ShouldInstall<TStorageType>(this ReadOnlySettings settings)
+            where TStorageType : StorageType
+        {
+            return
+                settings.GetFeatureEnabled<TStorageType>() &&
+                !settings.GetDisableInstaller<TStorageType>();
+        }
+
         public static void Schema(this PersistenceExtentions<Persistence.SqlPersistence> configuration, string schema)
         {
             configuration.GetSettings()

@@ -1,9 +1,7 @@
 ﻿using System.IO;
-using System.Text;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
-using NServiceBus.SqlPersistence;
 
 class TimeoutInstaller : INeedToInstallSomething
 {
@@ -11,23 +9,15 @@ class TimeoutInstaller : INeedToInstallSomething
     public void Install(string identity, Configure config)
     {
         var settings = config.Settings;
-        if (!settings.GetFeatureEnabled<StorageType.Subscriptions>())
-        {
-            return;
-        }
-        if (settings.GetDisableInstaller<StorageType.Timeouts>())
+        if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
             return;
         }
         var connectionString = settings.GetConnectionString<StorageType.Timeouts>();
         var endpointName = settings.EndpointName();
-        var builder = new StringBuilder();
-        using (var writer = new StringWriter(builder))
-        {
-            TimeoutScriptBuilder.BuildCreateScript(writer);
-        }
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "TimeoutCreate.sql");
 
-        SqlHelpers.Execute(connectionString, builder.ToString(), collection =>
+        SqlHelpers.Execute(connectionString, createScript, collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Timeouts>());
             collection.AddWithValue("endpointName", endpointName);

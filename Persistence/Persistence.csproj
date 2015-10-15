@@ -80,21 +80,22 @@
     <Compile Include="Saga\SagaXmlSerializerBuilder.cs" />
     <Compile Include="Saga\SagaSerialize.cs" />
     <Compile Include="Saga\SagaSerializeBuilder.cs" />
+    <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="Saga\XmlSaga.cs" />
     <Compile Include="Saga\XmlSagaData.cs" />
+    <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
+    <Compile Include="Subscription\SubscriptionInstaller.cs" />
     <Compile Include="Timeout\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
     <Compile Include="Timeout\Header.cs" />
     <Compile Include="SqlPersistence.cs" />
     <Compile Include="Saga\SagaFeature.cs" />
-    <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="SqlPersistenceConfig.cs" />
-    <Compile Include="Subscription\SubscriptionInstaller.cs" />
     <Compile Include="Subscription\SubscriptionFeature.cs" />
-    <Compile Include="Timeout\TimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
+    <Compile Include="Timeout\TimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutPersister.cs" />
     <Compile Include="Saga\SagaPersister.cs" />
     <Compile Include="Subscription\SubscriptionPersister.cs" />
@@ -106,12 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
-      <Project>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</Project>
-      <Name>ScriptBuilder</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

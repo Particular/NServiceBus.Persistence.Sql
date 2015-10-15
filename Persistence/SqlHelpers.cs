@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 class SqlHelpers
@@ -10,7 +11,12 @@ class SqlHelpers
         return sqlConnection;
     }
 
-    internal static void Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters )
+    internal static void Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters)
+    {
+        Execute(connectionString, new List<string> {script}, manipulateParameters);
+    }
+
+    internal static void Execute(string connectionString, IEnumerable<string> scripts, Action<SqlParameterCollection> manipulateParameters)
     {
         var connectionBuilder = new SqlConnectionStringBuilder
         {
@@ -24,11 +30,16 @@ class SqlHelpers
             throw new Exception("Expected to have a 'InitialCatalog' in the connection string.");
         }
         using (var sqlConnection = New(connectionString))
-        using (var command = new SqlCommand(script, sqlConnection))
         {
-            command.AddParameter("database", database);
-            manipulateParameters(command.Parameters);
-            command.ExecuteNonQueryEx();
+            foreach (var script in scripts)
+            {
+                using (var command = new SqlCommand(script, sqlConnection))
+                {
+                    command.AddParameter("database", database);
+                    manipulateParameters(command.Parameters);
+                    command.ExecuteNonQueryEx();
+                }
+            }
         }
     }
 }
