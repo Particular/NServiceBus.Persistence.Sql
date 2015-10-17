@@ -15,9 +15,9 @@ class SubscriptionInstaller : INeedToInstallSomething
         }
         var connectionString = settings.GetConnectionString<StorageType.Subscriptions>();
         var endpointName = settings.EndpointName();
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "SubscriptionCreate.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Subscription_Create.sql");
 
-        SqlHelpers.Execute(connectionString, createScript, collection =>
+        SqlHelpers.Execute(connectionString, File.ReadAllText(createScript), collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Subscriptions>());
             collection.AddWithValue("endpointName", endpointName);

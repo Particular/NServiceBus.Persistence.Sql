@@ -19,7 +19,7 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.WriteSaga(saga, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, writer);
         }
         var script = builder.ToString();
 

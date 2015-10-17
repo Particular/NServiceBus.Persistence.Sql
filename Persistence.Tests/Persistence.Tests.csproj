@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
+    <Compile Include="Saga\MessagePropertyMapperTest.cs" />
     <Compile Include="Saga\SagaDatabase.cs" />
     <Compile Include="Saga\SagaPersisterTest.cs" />
     <Compile Include="Saga\SagaSerializerTest.cs" />

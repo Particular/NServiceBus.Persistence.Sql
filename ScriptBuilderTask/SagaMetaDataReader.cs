@@ -17,7 +17,7 @@ class SagaMetaDataReader
     {
         foreach (var type in module.GetTypes())
         {
-            if (type.BaseType.FullName == "NServiceBus.SqlPersistence.XmlSagaData")
+            if (type.BaseType != null && type.BaseType.FullName == "NServiceBus.SqlPersistence.XmlSagaData")
             {
                 string error;
                 SagaDefinition saga;

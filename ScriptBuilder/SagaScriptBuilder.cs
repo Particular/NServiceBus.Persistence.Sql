@@ -5,7 +5,7 @@ namespace NServiceBus.SqlPersistence
     public static class SagaScriptBuilder
     {
 
-        public static void WriteSaga(SagaDefinition saga, TextWriter writer)
+        public static void BuildCreateScript(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
 declare @sagaName nvarchar(max) = '{0}';

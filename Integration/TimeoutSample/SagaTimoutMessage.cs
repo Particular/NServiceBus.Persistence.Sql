@@ -1,6 +1,6 @@
 ﻿using NServiceBus;
 
-public class SagaTimout : IMessage
+public class SagaTimoutMessage : IMessage
 {
     public string Property { get; set; }
 }

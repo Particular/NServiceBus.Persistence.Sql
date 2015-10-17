@@ -4,14 +4,14 @@ using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
 
 public class MySaga : XmlSaga<MySaga.SagaData>,
-    IAmStartedByMessages<StartSaga>,
-    IHandleTimeouts<SagaTimout>
+    IAmStartedByMessages<StartSagaMessage>,
+    IHandleTimeouts<SagaTimoutMessage>
 {
     static ILog logger = LogManager.GetLogger(typeof (MySaga));
 
-    public void Handle(StartSaga message)
+    public void Handle(StartSagaMessage message)
     {
-        var timout = new SagaTimout
+        var timout = new SagaTimoutMessage
         {
             Property = "PropertyValue"
         };
@@ -19,7 +19,7 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
     }
 
 
-    public void Timeout(SagaTimout state)
+    public void Timeout(SagaTimoutMessage state)
     {
         logger.Info("Timeout " + state.Property);
         MarkAsComplete();

@@ -24,7 +24,7 @@ class SagaDatabase : IDisposable
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.WriteSaga(sagaDefinition, writer);
+            SagaScriptBuilder.BuildCreateScript(sagaDefinition, writer);
         }
         var script = builder.ToString();
         SqlHelpers.Execute(connectionString, script, collection =>

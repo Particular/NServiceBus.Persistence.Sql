@@ -15,9 +15,9 @@ class TimeoutInstaller : INeedToInstallSomething
         }
         var connectionString = settings.GetConnectionString<StorageType.Timeouts>();
         var endpointName = settings.EndpointName();
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "TimeoutCreate.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Timeout_Create.sql");
 
-        SqlHelpers.Execute(connectionString, createScript, collection =>
+        SqlHelpers.Execute(connectionString, File.ReadAllText(createScript), collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Timeouts>());
             collection.AddWithValue("endpointName", endpointName);

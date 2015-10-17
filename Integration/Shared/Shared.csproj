@@ -54,6 +54,10 @@
       <HintPath>..\..\packages\NServiceBus.5.2.6\lib\net45\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceBus.SqlPersistence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ForIntegration\NServiceBus.SqlPersistence.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -69,16 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Persistence\Persistence.csproj">
-      <Project>{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}</Project>
-      <Name>Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ScriptBuilder\ScriptBuilder.csproj">
-      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
-      <Name>ScriptBuilder</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

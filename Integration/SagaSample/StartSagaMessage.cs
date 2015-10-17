@@ -1,6 +1,6 @@
 using NServiceBus;
 
-public class StartSaga:IMessage
+public class StartSagaMessage:IMessage
 {
     public string MySagaId { get; set; }
 }

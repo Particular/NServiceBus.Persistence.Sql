@@ -8,24 +8,29 @@ namespace NServiceBus.SqlPersistence
     public class MessagePropertyMapper<TSagaData> where TSagaData : XmlSagaData, new()
     {
         SagaPropertyMapper<TSagaData> sagaPropertyMapper;
-        Expression<Func<object>> correlationExpression;
+        Expression<Func<TSagaData, object>> correlationExpression;
 
         internal MessagePropertyMapper(SagaPropertyMapper<TSagaData> sagaPropertyMapper)
         {
             this.sagaPropertyMapper = sagaPropertyMapper;
+            TryGetExpression(out correlationExpression);
+        }
 
-            var sagaDataType = typeof(TSagaData);
+        internal static bool TryGetExpression(out Expression<Func<TSagaData, object>> expression)
+        {
+            var sagaDataType = typeof (TSagaData);
             var correlationMember = sagaDataType
                 .GetMembers()
                 .FirstOrDefault(x => x.ContainsAttribute<CorrelationIdAttribute>());
             if (correlationMember == null)
             {
-                return;
+                expression = null;
+                return false;
             }
-            correlationExpression = Expression.Lambda<Func<object>>(
-                Expression.Convert(
-                    Expression.Property(
-                        Expression.Constant(this, sagaDataType), correlationMember.Name), typeof(object)));
+
+            var parameterExpression = Expression.Parameter(typeof (TSagaData), "s");
+            expression = Expression.Lambda<Func<TSagaData, object>>(Expression.PropertyOrField(parameterExpression, correlationMember.Name), parameterExpression);
+            return true;
         }
 
         /// <summary>
@@ -38,10 +43,11 @@ namespace NServiceBus.SqlPersistence
         {
             if (correlationExpression == null)
             {
-                throw new Exception("No correlation member has been defined.");
+                var message = $"You are attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Please add a [CorrelationIdAttribute] to the saga data member you wish to correlate on.";
+                throw new Exception(message);
             }
-            sagaPropertyMapper.ConfigureMapping(messageProperty)
-                .ToSaga(data => correlationExpression);
+            var configureMapping = sagaPropertyMapper.ConfigureMapping(messageProperty);
+            configureMapping.ToSaga(correlationExpression);
         }
     }
 }

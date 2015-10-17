@@ -57,6 +57,10 @@
       <HintPath>..\..\packages\NServiceBus.5.2.6\lib\net45\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceBus.SqlPersistence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ForIntegration\NServiceBus.SqlPersistence.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -68,24 +72,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeferHandler.cs" />
-    <Compile Include="SagaTimout.cs" />
+    <Compile Include="SagaTimoutMessage.cs" />
     <Compile Include="DeferMessage.cs" />
     <Compile Include="MySaga.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="StartSaga.cs" />
+    <Compile Include="StartSagaMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Persistence\Persistence.csproj">
-      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
-      <Name>Persistence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Shared\Shared.csproj">
-      <Project>{595e1284-d95d-47ed-8a59-43bb17123be3}</Project>
+      <Project>{595E1284-D95D-47ED-8A59-43BB17123BE3}</Project>
       <Name>Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\..\ForIntegration\build\net45\SqlPersistence.targets" />
 </Project>

@@ -1,6 +1,6 @@
 using NServiceBus;
 
-public class CompleteSaga : IMessage
+public class CompleteSagaMessage : IMessage
 {
     public string MySagaId { get; set; }
 }

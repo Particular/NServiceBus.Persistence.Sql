@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
@@ -20,7 +21,8 @@ class SagaInstaller : INeedToInstallSomething
         var connectionString = settings.GetConnectionString<StorageType.Sagas>();
         var endpointName = config.Settings.EndpointName();
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");
-        var sagaScripts = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql");
+        var sagaScripts = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql")
+            .Select(File.ReadAllText);
 
         SqlHelpers.Execute(connectionString, sagaScripts, collection =>
         {

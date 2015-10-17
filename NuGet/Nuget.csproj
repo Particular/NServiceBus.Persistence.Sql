@@ -39,30 +39,34 @@
       <Name>ScriptBuilderTask</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="ApprovalUtilities">
-      <HintPath>..\packages\ApprovalUtilities.1.22.1\lib\net35\ApprovalUtilities.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <PropertyGroup>
     <NugetBuild>$(SolutionDir)NuGetBuild\Main\</NugetBuild>
     <ScriptBuilderTask>$(SolutionDir)ScriptBuilderTask\bin\$(ConfigurationName)\NServiceBus.SqlPersistence.ScriptBuilderTask.dll</ScriptBuilderTask>
+    <MergedScriptBuilderTask>$(NugetBuild)NServiceBus.SqlPersistence.ScriptBuilderTask.dll</MergedScriptBuilderTask>
+    <MergedScriptBuilderTaskPdb>$(NugetBuild)NServiceBus.SqlPersistence.ScriptBuilderTask.pdb</MergedScriptBuilderTaskPdb>
     <Cecil>$(SolutionDir)ScriptBuilderTask\bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
     <ScriptBuilder>$(SolutionDir)ScriptBuilder\bin\$(ConfigurationName)\NServiceBus.SqlPersistence.ScriptBuilder.dll</ScriptBuilder>
     <Persistence>$(SolutionDir)Persistence\bin\$(ConfigurationName)\NServiceBus.SqlPersistence.dll</Persistence>
+    <PersistencePdb>$(SolutionDir)Persistence\bin\$(ConfigurationName)\NServiceBus.SqlPersistence.pdb</PersistencePdb>
+    <Targets>$(ProjectDir)SqlPersistence.targets</Targets>
   </PropertyGroup>
   <Target Name="Clean">
     <RemoveDir Directories="$(NugetBuild)" />
   </Target>
   <Target Name="Build" DependsOnTargets="NuGetBuild" />
   <Target Name="ReBuild" DependsOnTargets="NuGetBuild" />
-  <Target Name="NuGetBuild" DependsOnTargets="Clean" Condition="'$(Configuration)' == 'Release' ">
+  <Target Name="NuGetBuild" DependsOnTargets="Clean">
     <MakeDir Directories="$(NugetBuild)" />
     <Copy SourceFiles="$(TargetDir)NServiceBus.SqlPersistence.nuspec" DestinationFolder="$(NugetBuild)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.SqlPersistence.dll&quot; &quot;$(Persistence)&quot; &quot;$(ScriptBuilder)&quot;  /target:library /targetplatform:v4 /internalize" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.SqlPersistence.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot;  &quot;$(Cecil)&quot;  /target:library /targetplatform:v4 /internalize" />
-    <Copy SourceFiles="$(ProjectDir)SqlPersistence.targets" DestinationFolder="$(NugetBuild)build\net45" />
+    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.SqlPersistence.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuild)build\net45" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuild)" MetadataAssembly="$(Persistence)" />
+    <MakeDir Directories="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(Persistence)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(PersistencePdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build\net45" />
+    <Copy SourceFiles="$(MergedScriptBuilderTask)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergedScriptBuilderTaskPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>
   <Import Project="..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets" Condition="Exists('..\packages\PepitaPackage.1.21.4\build\PepitaPackage.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
