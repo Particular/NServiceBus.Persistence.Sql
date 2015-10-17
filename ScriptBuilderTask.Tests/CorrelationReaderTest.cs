@@ -30,19 +30,7 @@ public class CorrelationReaderTest
         public string Correlation { get; set; }
     }
 
-    [Test]
-    public void WithValidField()
-    {
-        var dataType = module.GetTypeDefinition<DataWithValidField>();
-        var correlationMember = CorrelationReader.GetCorrelationMember(dataType);
-        ObjectApprover.VerifyWithJson(correlationMember);
-    }
-
-    public class DataWithValidField
-    {
-        [CorrelationId] public string Correlation;
-    }
-
+    
     [Test]
     public void WithNone()
     {

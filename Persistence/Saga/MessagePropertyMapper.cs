@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using NServiceBus.Saga;
 
 namespace NServiceBus.SqlPersistence
@@ -19,17 +20,24 @@ namespace NServiceBus.SqlPersistence
         internal static bool TryGetExpression(out Expression<Func<TSagaData, object>> expression)
         {
             var sagaDataType = typeof (TSagaData);
-            var correlationMember = sagaDataType
-                .GetMembers()
+            var correlationProperty = sagaDataType
+                .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public)
                 .FirstOrDefault(x => x.ContainsAttribute<CorrelationIdAttribute>());
-            if (correlationMember == null)
+            if (correlationProperty == null)
             {
                 expression = null;
                 return false;
             }
-
             var parameterExpression = Expression.Parameter(typeof (TSagaData), "s");
-            expression = Expression.Lambda<Func<TSagaData, object>>(Expression.PropertyOrField(parameterExpression, correlationMember.Name), parameterExpression);
+
+            var propertyExpression = Expression.Property(parameterExpression, correlationProperty);
+            if (correlationProperty.PropertyType == typeof (string))
+            {
+                expression = Expression.Lambda<Func<TSagaData, object>>(propertyExpression, parameterExpression);
+                return true;
+            }
+            var convert = Expression.Convert(propertyExpression, typeof(object));
+            expression = Expression.Lambda<Func<TSagaData, object>>(convert, parameterExpression);
             return true;
         }
 

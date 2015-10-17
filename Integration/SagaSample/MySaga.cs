@@ -1,4 +1,5 @@
-﻿using NServiceBus;
+﻿using System;
+using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
@@ -34,6 +35,6 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
     public class SagaData : XmlSagaData
     {
         [CorrelationId]
-        public string MySagaId { get; set; }
+        public Guid MySagaId { get; set; }
     }
 }

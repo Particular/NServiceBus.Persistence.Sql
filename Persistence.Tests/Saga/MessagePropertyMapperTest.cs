@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using NServiceBus.SqlPersistence;
 using NUnit.Framework;
@@ -9,22 +8,58 @@ public class MessagePropertyMapperTest
 {
 
     [Test]
-    public void Complete()
+    public void StringCorrelationId()
     {
-        Expression<Func<SagaDataWithCorrelationId, object>> expression;
-        Assert.IsTrue(MessagePropertyMapper<SagaDataWithCorrelationId>.TryGetExpression(out expression));
-        var instance = new SagaDataWithCorrelationId
+        Expression<Func<SagaDataWithStringCorrelationId, object>> expression;
+        Assert.IsTrue(MessagePropertyMapper<SagaDataWithStringCorrelationId>.TryGetExpression(out expression));
+        var instance = new SagaDataWithStringCorrelationId
         {
             CorrelationProperty = "Foo"
         };
         var property = expression.Compile()(instance);
-        Assert.AreEqual("Foo",property);
+        Assert.AreEqual("Foo", property);
     }
 
-    public class SagaDataWithCorrelationId : XmlSagaData
+    public class SagaDataWithStringCorrelationId : XmlSagaData
     {
         [CorrelationId]
         public string CorrelationProperty { get; set; }
+    }
+    [Test]
+    public void IntCorrelationId()
+    {
+        Expression<Func<SagaDataWithIntCorrelationId, object>> expression;
+        Assert.IsTrue(MessagePropertyMapper<SagaDataWithIntCorrelationId>.TryGetExpression(out expression));
+        var instance = new SagaDataWithIntCorrelationId
+        {
+            CorrelationProperty = 10
+        };
+        var property = expression.Compile()(instance);
+        Assert.AreEqual(10, property);
+    }
+
+    public class SagaDataWithIntCorrelationId : XmlSagaData
+    {
+        [CorrelationId]
+        public int CorrelationProperty { get; set; }
+    }
+    [Test]
+    public void GuidCorrelationId()
+    {
+        Expression<Func<SagaDataWithGuidCorrelationId, object>> expression;
+        Assert.IsTrue(MessagePropertyMapper<SagaDataWithGuidCorrelationId>.TryGetExpression(out expression));
+        var guid = Guid.NewGuid();
+        var instance = new SagaDataWithGuidCorrelationId
+        {
+            CorrelationProperty = guid
+        };
+        var property = expression.Compile()(instance);
+        Assert.AreEqual(guid, property);
+    }
+    public class SagaDataWithGuidCorrelationId : XmlSagaData
+    {
+        [CorrelationId]
+        public Guid CorrelationProperty { get; set; }
     }
     public class MySaga : XmlSaga<SagaData>
     {

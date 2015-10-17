@@ -21,7 +21,7 @@ class Program
                 }
                 bus.SendLocal(new StartSagaMessage
                 {
-                    MySagaId = "123"
+                    MySagaId = Guid.NewGuid()
                 });
             }
             

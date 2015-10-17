@@ -2,7 +2,7 @@
 
 namespace NServiceBus.SqlPersistence
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class CorrelationIdAttribute : Attribute
     {
     }
