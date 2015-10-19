@@ -26,12 +26,7 @@ class SagaMetaDataReader
                     yield return saga;
                     continue;
                 }
-                var error1 = new FileError
-                {
-                    File = type.GetFileName(),
-                    Message = $"Error in '{type.FullName}'. Error:{error}"
-                };
-                buildLogger.LogError(error1);
+                buildLogger.LogError($"Error in '{type.FullName}'. Error:{error}",type.GetFileName());
             }
         }
     }

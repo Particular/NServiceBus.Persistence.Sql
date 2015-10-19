@@ -16,8 +16,12 @@ class BuildLogger
         loggingHelper.LogMessageFromText(message, MessageImportance.Normal);
     }
 
-    public void LogError(FileError fileError)
+    public void LogError(string message,string file)
     {
-        loggingHelper.LogError("", "", fileError.File, 0, 0, 0, 0, fileError.Message);
+        loggingHelper.LogError("", "", file, 0, 0, 0, 0, message);
+    }
+    public void LogError(string message)
+    {
+        loggingHelper.LogError("", "", null, 0, 0, 0, 0, message);
     }
 }

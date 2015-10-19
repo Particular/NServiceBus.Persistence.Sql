@@ -15,26 +15,32 @@ namespace NServiceBus.SqlPersistence
 #endif
 
     {
-        [Required]
-        public string TargetPath { get; set; }
+        BuildLogger logger;
 
         [Required]
-        public string References { get; set; }
-
+        public string AssemblyPath { get; set; }
+        [Required]
+        public string IntermediateDirectory { get; set; }
+        
         public override bool Execute()
         {
-            Log.LogMessageFromText($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing",MessageImportance.Normal);
-
-            var stopwatch = Stopwatch.StartNew();
+            logger = new BuildLogger(Log);
+            logger.LogInfo($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing");
             
+            var stopwatch = Stopwatch.StartNew();
+
             try
             {
+                if (!ValidateInputs())
+                {
+                    return false;
+                }
                 Inner();
-                return true;
+                return !Log.HasLoggedErrors;
             }
             catch (ErrorsException exception)
             {
-                Log.LogErrorFromException(exception, true, true, exception.FileName);
+                logger.LogError(exception.Message, exception.FileName);
                 return false;
             }
             catch (Exception exception)
@@ -44,34 +50,39 @@ namespace NServiceBus.SqlPersistence
             }
             finally
             {
-                Log.LogMessageFromText($"  Finished ScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.",MessageImportance.Normal);
+                logger.LogInfo($"  Finished ScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
             }
+        }
+
+        bool ValidateInputs()
+        {
+            if (!File.Exists(AssemblyPath))
+            {
+                logger.LogError($"AssemblyPath \"{AssemblyPath}\" does not exist.");
+                return false;
+            }
+
+            if (!Directory.Exists(IntermediateDirectory))
+            {
+                logger.LogError($"IntermediateDirectory \"{IntermediateDirectory}\" does not exist.");
+                return false;
+            }
+            return true;
         }
 
         void Inner()
         {
-            ValidateTargetPath();
-
-            var assemblyResolver = new AssemblyResolver(s => Log.LogMessageFromText(s,MessageImportance.Normal), References
-            .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            
-            var readerParameters = new ReaderParameters
-            {
-              AssemblyResolver  = assemblyResolver
-            };
-            var targetDirectory = Path.GetDirectoryName(TargetPath);
-
-            var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
+            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql");
             Directory.CreateDirectory(scriptPath);
-            WriteSagaScripts(readerParameters, scriptPath);
+            WriteSagaScripts(scriptPath);
             WriteTimeoutScript(scriptPath);
             WriteSubscriptionScript(scriptPath);
         }
 
-        void WriteSagaScripts(ReaderParameters readerParameters, string scriptPath)
+        void WriteSagaScripts(string scriptPath)
         {
-            var moduleDefinition = ModuleDefinition.ReadModule(TargetPath, readerParameters);
-            var metaDataReader = new SagaMetaDataReader(moduleDefinition, new BuildLogger(Log));
+            var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath);
+            var metaDataReader = new SagaMetaDataReader(moduleDefinition, logger);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
             Directory.CreateDirectory(sagasScriptPath);
             foreach (var saga in metaDataReader.GetSagas())
@@ -82,6 +93,7 @@ namespace NServiceBus.SqlPersistence
                 {
                     SagaScriptBuilder.BuildCreateScript(saga, writer);
                 }
+
                 var dropPath = Path.Combine(sagasScriptPath, saga.Name + "_Drop.sql");
                 File.Delete(dropPath);
                 using (var writer = File.CreateText(dropPath))
@@ -123,12 +135,5 @@ namespace NServiceBus.SqlPersistence
             }
         }
 
-        void ValidateTargetPath()
-        {
-            if (!File.Exists(TargetPath))
-            {
-                throw new ErrorsException($"TargetPath \"{TargetPath}\" does not exist.");
-            }
-        }
     }
 }

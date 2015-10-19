@@ -42,16 +42,15 @@ namespace NServiceBus.SqlPersistence
         }
 
         /// <summary>
-        /// Specify how to map between <typeparamref name="TSagaData"/> and <typeparamref name="TMessage"/>.
+        /// Specify how to map between <typeparamref name="TMessage"/> and the correlation property on <typeparamref name="TSagaData"/>.
         /// </summary>
         /// <typeparam name="TMessage">The message type to map to.</typeparam>
-        /// <param name="messageProperty">An <see cref="Expression"/> that represents the message.</param>
-        /// <returns>A <see cref="ToSagaExpression{TSagaData,TMessage}"/> that provides the fluent chained <see cref="ToSagaExpression{TSagaData,TMessage}.ToSaga"/> to link <paramref name="messageProperty"/> with <typeparamref name="TSagaData"/>.</returns>
+        /// <param name="messageProperty">An <see cref="Expression"/> that represents the message property to map to.</param>
         public void MapMessage<TMessage>(Expression<Func<TMessage, object>> messageProperty)
         {
             if (correlationExpression == null)
             {
-                var message = $"You are attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Please add a [CorrelationIdAttribute] to the saga data member you wish to correlate on.";
+                var message = $"You are attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Please add a [CorrelationIdAttribute] to the saga data property you wish to correlate on.";
                 throw new Exception(message);
             }
             var configureMapping = sagaPropertyMapper.ConfigureMapping(messageProperty);
