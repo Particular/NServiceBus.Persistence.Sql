@@ -16,7 +16,7 @@ class SagaFeature : Feature
         var schema = settings.GetSchema<StorageType.Sagas>();
         var endpointName = settings.EndpointName();
 
-        var commandBuilder = new SagaCommandBuilder(schema, endpointName);
+        var commandBuilder = new SagaCommandBuilder(schema, endpointName.ToString());
         var serialize = settings.GetSerializeBuilder();
         var deserialize = settings.GetDeserializeBuilder();
         var infoCache = new SagaInfoCache(deserialize, serialize, commandBuilder, settings.GetXmlSerializerCustomize());

@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using ApprovalTests;
-using NServiceBus.Saga;
+using NServiceBus;
 using NServiceBus.SqlPersistence;
 using NUnit.Framework;
 using ObjectApproval;

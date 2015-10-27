@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Xml.Serialization;
-using NServiceBus.Saga;
 
 namespace NServiceBus.SqlPersistence
 {

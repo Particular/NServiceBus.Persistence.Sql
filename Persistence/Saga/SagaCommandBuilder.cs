@@ -51,6 +51,7 @@ WHERE
 
     public string BuildGetBySagaIdCommand(Type sagaDataType) 
     {
+        //TODO: no need to return id if we already have it
         return $@"
 SELECT
     Id,

@@ -3,7 +3,7 @@ using System.Linq;
 using ApprovalTests;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
-using NServiceBus.Saga;
+using NServiceBus;
 using NServiceBus.SqlPersistence;
 using NUnit.Framework;
 
@@ -52,25 +52,6 @@ public class SagaConventionsTest
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
         }
-    }
-
-    [Test]
-    public void WithUnique()
-    {
-        var dataType = module.GetTypeDefinition<WithUniqueSaga.SagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
-    }
-
-    public class WithUniqueSaga : XmlSaga<WithUniqueSaga.SagaData>
-    {
-        public class SagaData : XmlSagaData
-        {
-            [Unique]
-            public string Foo { get; set; }
-        }
-        
     }
 
     [Test]

@@ -7,7 +7,7 @@ class SubscriptionFeature : Feature
 {
     SubscriptionFeature()
     {
-        DependsOn<StorageDrivenPublishing>();
+        DependsOn<MessageDrivenSubscriptions>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
@@ -15,7 +15,7 @@ class SubscriptionFeature : Feature
         var connectionString = context.Settings.GetConnectionString<StorageType.Subscriptions>();
         var schema = context.Settings.GetSchema<StorageType.Subscriptions>();
         var endpointName = context.Settings.EndpointName();
-        var persister = new SubscriptionPersister(connectionString, schema, endpointName);
+        var persister = new SubscriptionPersister(connectionString, schema, endpointName.ToString());
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }
 }

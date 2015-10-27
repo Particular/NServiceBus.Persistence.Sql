@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Reflection;
+using System.Threading.Tasks;
 
 static class Extensions
 {
@@ -19,11 +20,11 @@ static class Extensions
         command.Parameters.AddWithValue(name, value.ToString());
     }
 
-    public static void ExecuteNonQueryEx(this SqlCommand command)
+    public static async Task ExecuteNonQueryEx(this SqlCommand command)
     {
         try
         {
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
         catch (Exception exception)
         {

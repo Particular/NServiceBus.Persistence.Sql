@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 class SqlHelpers
 {
-    public static SqlConnection New(string connectionString)
+    public static async Task<SqlConnection> New(string connectionString)
     {
         var sqlConnection = new SqlConnection(connectionString);
-        sqlConnection.Open();
+        await sqlConnection.OpenAsync();
         return sqlConnection;
     }
 
-    internal static void Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters)
+    internal static Task Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters)
     {
-        Execute(connectionString, new List<string> {script}, manipulateParameters);
+        return Execute(connectionString, new List<string> {script}, manipulateParameters);
     }
 
-    internal static void Execute(string connectionString, IEnumerable<string> scripts, Action<SqlParameterCollection> manipulateParameters)
+    internal static async Task Execute(string connectionString, IEnumerable<string> scripts, Action<SqlParameterCollection> manipulateParameters)
     {
         var connectionBuilder = new SqlConnectionStringBuilder
         {
@@ -29,7 +30,7 @@ class SqlHelpers
         {
             throw new Exception("Expected to have a 'InitialCatalog' in the connection string.");
         }
-        using (var sqlConnection = New(connectionString))
+        using (var sqlConnection = await New(connectionString))
         {
             foreach (var script in scripts)
             {
@@ -37,7 +38,7 @@ class SqlHelpers
                 {
                     command.AddParameter("database", database);
                     manipulateParameters(command.Parameters);
-                    command.ExecuteNonQueryEx();
+                    await command.ExecuteNonQueryEx();
                 }
             }
         }

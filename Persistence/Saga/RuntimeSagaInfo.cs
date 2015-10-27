@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
-using NServiceBus.Saga;
+using NServiceBus;
 using NServiceBus.SqlPersistence;
+using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 class RuntimeSagaInfo
 {

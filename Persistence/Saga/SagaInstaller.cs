@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
@@ -7,7 +8,7 @@ using NServiceBus.Persistence;
 class SagaInstaller : INeedToInstallSomething
 {
 
-    public void Install(string identity, Configure config)
+    public async Task InstallAsync(string identity, Configure config)
     {
         var settings = config.Settings;
         if (!settings.GetFeatureEnabled<StorageType.Sagas>())
@@ -24,10 +25,11 @@ class SagaInstaller : INeedToInstallSomething
         var sagaScripts = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql")
             .Select(File.ReadAllText);
 
-        SqlHelpers.Execute(connectionString, sagaScripts, collection =>
+        await SqlHelpers.Execute(connectionString, sagaScripts, collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
             collection.AddWithValue("endpointName", endpointName);
         });
     }
+
 }

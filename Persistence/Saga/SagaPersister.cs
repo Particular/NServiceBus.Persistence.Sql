@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using NServiceBus.Saga;
+using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Extensibility;
+using NServiceBus.Sagas;
+
 
 class SagaPersister : ISagaPersister
 {
@@ -14,10 +19,10 @@ class SagaPersister : ISagaPersister
         this.sagaInfoCache = sagaInfoCache;
     }
 
-    public void Save(IContainSagaData data)
+    public async Task Save(IContainSagaData data, IDictionary<string, object> correlationProperties, ContextBag context)
     {
         var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.SaveCommand, connection))
         {
             command.AddParameter("Id", data.Id);
@@ -26,14 +31,14 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Data", sagaInfo.ToXml(data));
             command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx();
         }
     }
 
-    public void Update(IContainSagaData data)
+    public async Task Update(IContainSagaData data, ContextBag context)
     {
         var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.UpdateCommand, connection))
         {
             command.AddParameter("Id", data.Id);
@@ -42,42 +47,42 @@ class SagaPersister : ISagaPersister
             command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.Parameters.AddWithValue("Data", sagaInfo.ToXml(data));
-            command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx();
         }
     }
 
-    public TSagaData Get<TSagaData>(Guid sagaId)
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, ContextBag context) 
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.GetBySagaIdCommand, connection))
         {
             command.AddParameter("Id", sagaId);
-            return GetSagaData<TSagaData>(command, sagaInfo);
+            return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
 
-    public TSagaData Get<TSagaData>(string propertyName, object propertyValue)
+    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
         var commandText = sagaInfo.GetMappedPropertyCommand(propertyName);
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(commandText, connection))
         {
             command.AddParameter("propertyValue", propertyValue.ToString());
-            return GetSagaData<TSagaData>(command, sagaInfo);
+            return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
 
 
-    static TSagaData GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
+    static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
-        using (var reader = command.ExecuteReader(CommandBehavior.SingleRow))
+        using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
         {
-            if (!reader.Read())
+            if (!await reader.ReadAsync())
             {
                 return default(TSagaData);
             }
@@ -96,14 +101,16 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public void Complete(IContainSagaData data)
+    public async Task Complete(IContainSagaData data, ContextBag context)
     {
         var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.CompleteCommand, connection))
         {
             command.AddParameter("Id", data.Id);
-            command.ExecuteReader();
+            await command.ExecuteNonQueryAsync();
         }
     }
+    
+    
 }

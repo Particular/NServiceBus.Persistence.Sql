@@ -93,14 +93,6 @@ class SagaMetaDataReader
             error = "Saga types must directly inherit from NServiceBus.SqlPersistence.XmlSaga<T>.";
             return false;
         }
-        foreach (var property in sagaDataType.Properties)
-        {
-            if (property.ContainsAttribute("NServiceBus.Saga.UniqueAttribute"))
-            {
-                error = "UniqueAttribute are not supported. Property: " + property.Name;
-                return false;
-            }
-        }
         error = null;
         return true;
     }

@@ -1,5 +1,4 @@
-﻿using NServiceBus.Saga;
-
+﻿
 namespace NServiceBus.SqlPersistence
 {
     public abstract class XmlSaga<TSagaData> : Saga<TSagaData>
@@ -9,7 +8,7 @@ namespace NServiceBus.SqlPersistence
         new()
     {
         //TODO: throw in MSBuild if this is overriden in child class
-        protected sealed override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
         {
             var messagePropertyMapper = new MessagePropertyMapper<TSagaData>(mapper);
             ConfigureMapping(messagePropertyMapper);

@@ -2,7 +2,8 @@
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using NServiceBus;
+using System.Threading.Tasks;
+using NServiceBus.Extensibility;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
@@ -48,56 +49,43 @@ WHERE
     MessageType = @MessageType";
     }
 
-    public void Subscribe(Address client, IEnumerable<MessageType> messageTypes)
-    {
-        Subscribe(client.ToString(), messageTypes.Select(x => x.TypeName));
-    }
 
-    internal void Subscribe(string client, IEnumerable<string> messageTypes)
+    public async Task Subscribe(string client, IEnumerable<MessageType> messageTypes, ContextBag context)
     {
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
                 using (var command = new SqlCommand(subscribeCommandText, connection))
                 {
-                    command.AddParameter("MessageType", messageType);
+                    command.AddParameter("MessageType", messageType.TypeName);
                     command.AddParameter("Subscriber", client);
                     command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
-                    command.ExecuteNonQueryEx();
+                    await command.ExecuteNonQueryEx();
                 }
             }
         }
     }
 
-    public void Unsubscribe(Address client, IEnumerable<MessageType> messageTypes)
-    {
-        Unsubscribe(client.ToString(), messageTypes.Select(x => x.TypeName));
-    }
 
-    internal void Unsubscribe(string client, IEnumerable<string> messageTypes)
+    public async Task Unsubscribe(string client, IEnumerable<MessageType> messageTypes, ContextBag context)
     {
-        using (var connection = SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
                 using (var command = new SqlCommand(unsubscribeCommandText, connection))
                 {
-                    command.AddParameter("MessageType", messageType);
+                    command.AddParameter("MessageType", messageType.TypeName);
                     command.AddParameter("Subscriber", client);
-                    command.ExecuteNonQueryEx();
+                    await command.ExecuteNonQueryEx();
                 }
             }
         }
     }
 
-    public IEnumerable<Address> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes)
-    {
-        return GetSubscriberAddressesForMessage(messageTypes.Select(x => x.TypeName))
-            .Select(Address.Parse);
-    }
 
-    public IEnumerable<string> GetSubscriberAddressesForMessage(IEnumerable<string> messageTypes)
+    public async Task<IEnumerable<string>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
     {
         using (var command = new SqlCommand())
         {
@@ -112,29 +100,28 @@ WHERE MessageType IN (", schema, endpointName);
                 var messageType = types[i];
                 var paramName = "@type" + i;
                 builder.Append(paramName);
-                if (i < types.Count - 1)
+                if (i < (types.Count - 1))
                 {
                     builder.Append(", ");
                 }
-                command.AddParameter(paramName, messageType);
+                command.AddParameter(paramName, messageType.TypeName);
             }
             builder.Append(")");
             command.CommandText = builder.ToString();
-            using (var connection = SqlHelpers.New(connectionString))
+            using (var connection = await SqlHelpers.New(connectionString))
             {
                 command.Connection = connection;
-                using (var reader = command.ExecuteReader())
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    var addresses = new List<string>();
+                    while (await reader.ReadAsync())
                     {
-                        yield return reader.GetString(0);
+                        addresses.Add(reader.GetString(0));
                     }
+                    return addresses;
                 }
             }
         }
     }
 
-    public void Init()
-    {
-    }
 }
