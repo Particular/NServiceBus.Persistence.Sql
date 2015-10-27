@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
 using NServiceBus;
 
 class Program
 {
     static void Main()
     {
+        Start().GetAwaiter().GetResult();
+    }
+
+    static async Task Start()
+    {
         var configuration = ConfigBuilder.Build("Timeouts");
-        using (var bus = Bus.Create(configuration).Start())
+        using (var bus = await Bus.Create(configuration).StartAsync())
         {
             Console.WriteLine("Press 'S' to start a saga with a timeout");
             Console.WriteLine("Press 'D' to defer a message");
@@ -18,7 +24,7 @@ class Program
 
                 if (key.Key == ConsoleKey.S)
                 {
-                    bus.SendLocal(new StartSagaMessage());
+                    await bus.SendLocalAsync(new StartSagaMessage());
                     continue;
                 }
                 if (key.Key == ConsoleKey.D)
@@ -27,7 +33,12 @@ class Program
                     {
                         Property = "PropertyValue"
                     };
-                    bus.Defer(TimeSpan.FromSeconds(2), deferMessage);
+
+                    var options = new SendOptions();
+
+                    options.RouteToLocalEndpointInstance();
+                    options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
+                    await bus.SendAsync(deferMessage, options);
                     continue;
                 }
                 return;

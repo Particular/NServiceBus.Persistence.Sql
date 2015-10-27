@@ -16,8 +16,9 @@ class TimeoutFeature : Feature
     {
         var connectionString = context.Settings.GetConnectionString<StorageType.Timeouts>();
         var schema = context.Settings.GetSchema<StorageType.Timeouts>();
-        var endpointName = context.Settings.EndpointName();
-        var persister = new TimeoutPersister(connectionString, schema, endpointName.ToString());
+        var endpointName = context.Settings.EndpointName().ToString();
+        var persister = new TimeoutPersister(connectionString, schema, endpointName);
         context.Container.RegisterSingleton(typeof (IPersistTimeouts), persister);
+        context.Container.RegisterSingleton(typeof (IQueryTimeouts), persister);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
-using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
 
 public class MySaga : XmlSaga<MySaga.SagaData>,
@@ -16,20 +16,21 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
         mapper.MapMessage<CompleteSagaMessage>(m => m.MySagaId);
     }
 
-    public void Handle(StartSagaMessage message)
+    public async Task Handle(StartSagaMessage message, IMessageHandlerContext context)
     {
         Data.MySagaId = message.MySagaId;
         logger.Info($"Start Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
-        Bus.SendLocal(new CompleteSagaMessage
+        await context.SendLocalAsync(new CompleteSagaMessage
                            {
                                MySagaId = Data.MySagaId
                            });
     }
 
-    public void Handle(CompleteSagaMessage message)
+    public Task Handle(CompleteSagaMessage message, IMessageHandlerContext context)
     {
         logger.Info($"Completed Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
         MarkAsComplete();
+        return Task.FromResult(0);
     }
 
     public class SagaData : XmlSagaData
@@ -37,4 +38,5 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
         [CorrelationId]
         public Guid MySagaId { get; set; }
     }
+    
 }

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Logging;
-using NServiceBus.Saga;
 using NServiceBus.SqlPersistence;
 
 public class MySaga : XmlSaga<MySaga.SagaData>,
@@ -9,23 +10,26 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
 {
     static ILog logger = LogManager.GetLogger(typeof (MySaga));
 
-    public void Handle(StartSagaMessage message)
+    public async Task Handle(StartSagaMessage message, IMessageHandlerContext context)
     {
         var timout = new SagaTimoutMessage
         {
             Property = "PropertyValue"
         };
-        RequestTimeout(TimeSpan.FromSeconds(3), timout);
+        await RequestTimeoutAsync(context, TimeSpan.FromSeconds(3), timout);
     }
 
 
-    public void Timeout(SagaTimoutMessage state)
+    public Task Timeout(SagaTimoutMessage state, IMessageHandlerContext context)
     {
         logger.Info("Timeout " + state.Property);
         MarkAsComplete();
+        return Task.FromResult(0);
     }
 
     public class SagaData : XmlSagaData
     {
     }
+    
+    
 }

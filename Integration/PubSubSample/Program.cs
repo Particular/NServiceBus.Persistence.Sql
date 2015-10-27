@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
 using NServiceBus;
 
 class Program
 {
     static void Main()
     {
+        Start().GetAwaiter().GetResult();
+    }
+
+    static async Task Start()
+    {
         var configuration = ConfigBuilder.Build("PubSub");
-        using (var bus = Bus.Create(configuration).Start())
+        using (var bus = await Bus.Create(configuration).StartAsync())
         {
             Console.WriteLine("Press 'Enter' to publish a message");
             Console.WriteLine("Press any other key to exit");
@@ -23,9 +29,8 @@ class Program
                 {
                     Property = "PropertyValue"
                 };
-                bus.Publish(myEvent);
+                await bus.PublishAsync(myEvent);
             }
-            
         }
     }
 }
