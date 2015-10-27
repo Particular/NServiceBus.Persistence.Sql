@@ -12,7 +12,9 @@ static class SagaXmlSerializerBuilder
         emptyNamespace = new XmlSerializerNamespaces();
         emptyNamespace.Add("", "");
     }
-    public static DefaultSagaSerialization BuildSerializationDelegate(Type sagaDataType, Action<XmlSerializer, Type> customize)
+
+    public static DefaultSagaSerialization BuildSerializationDelegate(Type sagaDataType,
+        Action<XmlSerializer, Type> customize)
     {
         var xmlSerializer = BuildXmlSerializer(sagaDataType, customize);
         return new DefaultSagaSerialization

@@ -8,9 +8,8 @@ namespace NServiceBus.SqlPersistence
         public static void BuildCreateScript(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
-declare @sagaName nvarchar(max) = '{0}';
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
-",saga.Name);
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.{0}]';
+", saga.Name);
 
             WriteCreateTable(writer);
             WritePurgeObsoleteIndexes(saga, writer);
@@ -99,8 +98,7 @@ END
         public static void BuildDropScript(string saga, TextWriter writer)
         {
             writer.Write(@"
-declare @sagaName nvarchar(max) = '{0}';
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.' + @sagaName + ']';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.{0}]';
 ", saga);
             writer.Write(@"
 IF EXISTS 
