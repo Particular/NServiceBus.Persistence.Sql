@@ -13,5 +13,8 @@
     <description>Sql Server persistence fo NServiceBus.</description>
     <language>en-AU</language>
     <tags>NServiceBus, SqlServer</tags>
+    <dependencies>
+      <dependency id="NServiceBus" version="[5.2.8, 6.0.0)" />
+    </dependencies>
   </metadata>
 </package>
