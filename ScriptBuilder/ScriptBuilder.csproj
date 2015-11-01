@@ -54,10 +54,13 @@
     <Compile Include="SagaDefinition.cs" />
     <Compile Include="SagaScriptBuilder.cs" />
     <Compile Include="SubscriptionScriptBuilder.cs" />
+    <Compile Include="OutboxScriptBuilder.cs" />
     <Compile Include="TimeoutScriptBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="OutboxDrop.sql" />
+    <EmbeddedResource Include="OutboxCreate.sql" />
     <EmbeddedResource Include="SubscriptionCreate.sql" />
     <EmbeddedResource Include="SubscriptionDrop.sql" />
     <EmbeddedResource Include="TimeoutCreate.sql" />

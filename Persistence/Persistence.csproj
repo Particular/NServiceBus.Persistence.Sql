@@ -53,7 +53,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1008\lib\net451\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1041\lib\net451\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,6 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Outbox\OperationSerializer.cs" />
+    <Compile Include="Outbox\OutboxStorage.cs" />
+    <Compile Include="Outbox\OutboxInstaller.cs" />
+    <Compile Include="Outbox\SqlOutboxTransaction.cs" />
     <Compile Include="Saga\CorrelationIdAttribute.cs" />
     <Compile Include="Saga\DefaultSagaSerialization.cs" />
     <Compile Include="Saga\MessagePropertyMapper.cs" />
@@ -86,10 +90,10 @@
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
     <Compile Include="Subscription\SubscriptionInstaller.cs" />
+    <Compile Include="EmptyXmlNamespace.cs" />
     <Compile Include="Timeout\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
-    <Compile Include="Timeout\Header.cs" />
     <Compile Include="SqlPersistence.cs" />
     <Compile Include="Saga\SagaFeature.cs" />
     <Compile Include="SqlPersistenceConfig.cs" />

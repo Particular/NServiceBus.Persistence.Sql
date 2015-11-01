@@ -1,6 +1,3 @@
-﻿<Headers>
-  <Header>
-    <Key>TheKey</Key>
-    <Value>TheValue</Value>
-  </Header>
-</Headers>
+﻿<headers>
+  <header key="TheKey">TheValue</header>
+</headers>

@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompleteSagaMessage.cs" />
-    <Compile Include="MySaga.cs" />
+    <Compile Include="MySaga2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="StartSagaMessage.cs" />
   </ItemGroup>

@@ -13,18 +13,14 @@ public class HeaderSerializerTest
         var dictionary = new Dictionary<string, string> {{"TheKey", "TheValue"}};
         var xml = HeaderSerializer.ToXml(dictionary);
         Approvals.VerifyXml(xml);
- 
     }
 
     [Test]
     public void FromXml()
     {
-        var xml = @"<Headers>
-  <Header>
-    <Key>TheKey</Key>
-    <Value>TheValue</Value>
-  </Header>
-</Headers>";
+        var xml = @"<headers>
+  <header key=""TheKey"">TheValue</header>
+</headers>";
         ObjectApprover.VerifyWithJson(HeaderSerializer.FromString(xml));
     }
 }

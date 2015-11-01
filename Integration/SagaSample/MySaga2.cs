@@ -4,11 +4,11 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.SqlPersistence;
 
-public class MySaga : XmlSaga<MySaga.SagaData>,
+public class MySaga2 : XmlSaga<MySaga2.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>
 {
-    static ILog logger = LogManager.GetLogger(typeof(MySaga));
+    static ILog logger = LogManager.GetLogger(typeof(MySaga2));
 
     protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
     {
