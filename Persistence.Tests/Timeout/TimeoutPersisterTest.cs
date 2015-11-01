@@ -106,7 +106,7 @@ public class TimeoutPersisterTest
             persister.Add(timeout2, null).Await();
             var nextChunk = persister.GetNextChunk(startSlice).Result;
             Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
-            ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+            ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
         }
     }
 }
