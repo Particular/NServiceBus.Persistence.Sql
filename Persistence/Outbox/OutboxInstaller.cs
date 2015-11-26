@@ -1,15 +1,22 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
 
-class OutboxInstaller : INeedToInstallSomething
+class OutboxInstaller : IInstall
 {
+    BusConfiguration busConfiguration;
 
-    public async Task InstallAsync(string identity, Configure config)
+    public OutboxInstaller(BusConfiguration busConfiguration)
     {
-        var settings = config.Settings;
+        this.busConfiguration = busConfiguration;
+    }
+
+    public async Task Install(string identity)
+    {
+        var settings = busConfiguration.GetSettings();
         if (!settings.ShouldInstall<StorageType.Outbox>())
         {
             return;
@@ -24,5 +31,5 @@ class OutboxInstaller : INeedToInstallSomething
             collection.AddWithValue("endpointName", endpointName);
         });
     }
-    
+
 }

@@ -14,7 +14,7 @@ public class SagaPersisterTest
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData))
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof (MySagaData))
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
@@ -27,9 +27,9 @@ public class SagaPersisterTest
                 Originator = "theOriginator",
                 Property = "theProperty"
             };
-            persister.Save(sagaData, null, null).Await();
-            persister.Complete(sagaData, null).Await();
-            Assert.IsNull(persister.Get<MySagaData>(id, null).Result);
+            persister.Save(sagaData, null, null, null).Await();
+            persister.Complete(sagaData, null, null).Await();
+            Assert.IsNull(persister.Get<MySagaData>(id, null, null).Result);
         }
     }
 
@@ -38,20 +38,21 @@ public class SagaPersisterTest
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData))
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof (MySagaData))
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
             var persister = testDatabase.Persister;
             var id = Guid.NewGuid();
-            persister.Save(new MySagaData
+            var sagaData = new MySagaData
             {
                 Id = id,
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();
-            var result = persister.Get<MySagaData>(id,null).Result;
+            };
+            persister.Save(sagaData, null, null, null).Await();
+            var result = persister.Get<MySagaData>(id, null, null).Result;
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         }
     }
@@ -66,50 +67,54 @@ public class SagaPersisterTest
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof (MySagaData)),
             CorrelationMember = "Property"
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
             var persister = testDatabase.Persister;
             var id = Guid.NewGuid();
-            persister.Save(new MySagaData
+            var sagaData = new MySagaData
             {
                 Id = id,
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            }, null, null).Await();
-            var result = persister.Get<MySagaData>("Property", "theProperty",null).Result;
+            };
+            persister.Save(sagaData, null, null, null).Await();
+            var result = persister.Get<MySagaData>("Property", "theProperty", null).Result;
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         }
     }
+
     [Test]
     //TODO:
     public void SaveDuplicateShouldThrow()
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof (MySagaData)),
             CorrelationMember = "Property"
         };
         using (var testDatabase = new SagaDatabase(sagaDefinition))
         {
             var persister = testDatabase.Persister;
-            persister.Save(new MySagaData
+            var sagaData1 = new MySagaData
             {
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();
-            persister.Save(new MySagaData
+            };
+            persister.Save(sagaData1, null, null, null).Await();
+            var sagaData2 = new MySagaData
             {
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();
+            };
+            persister.Save(sagaData2, null, null, null).Await();
         }
     }
 

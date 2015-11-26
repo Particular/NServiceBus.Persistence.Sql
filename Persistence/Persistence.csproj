@@ -53,7 +53,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1041\lib\net451\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1135\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -89,6 +89,7 @@
     <Compile Include="Saga\XmlSagaData.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
+    <Compile Include="Subscription\SubscriberExtensions.cs" />
     <Compile Include="Subscription\SubscriptionInstaller.cs" />
     <Compile Include="EmptyXmlNamespace.cs" />
     <Compile Include="Timeout\HeaderSerializer.cs" />

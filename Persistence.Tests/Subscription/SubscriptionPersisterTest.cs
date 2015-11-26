@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NServiceBus.Unicast.Subscriptions;
 using NUnit.Framework;
 using ObjectApproval;
@@ -22,9 +23,9 @@ public class SubscriptionPersisterTest
                 new MessageType("type1", new Version(0, 0, 0, 0)),
                 new MessageType("type2", new Version(0, 0, 0, 0)),
             };
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();
-            persister.Subscribe("address2@machine2", messageTypes, null).Await();
-            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
+            persister.Subscribe("address1@machine1".ToSubscriber(), messageTypes, null).Await();
+            persister.Subscribe("address2@machine2".ToSubscriber(), messageTypes, null).Await();
+            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result.Select(x=>x.ToAddress());
             ObjectApprover.VerifyWithJson(result);
         }
     }
@@ -40,9 +41,9 @@ public class SubscriptionPersisterTest
                 new MessageType("type1", new Version(0, 0, 0, 0)),
                 new MessageType("type2", new Version(0, 0, 0, 0)),
             };
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();
-            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
+            persister.Subscribe("address1@machine1".ToSubscriber(), messageTypes, null).Await();
+            persister.Subscribe("address1@machine1".ToSubscriber(), messageTypes, null).Await();
+            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result.Select(x => x.ToAddress());
             ObjectApprover.VerifyWithJson(result);
         }
     }
@@ -60,12 +61,12 @@ public class SubscriptionPersisterTest
                 message2,
                 message1,
             };
-            var address1 = "address1@machine1";
+            var address1 = "address1@machine1".ToSubscriber();
             persister.Subscribe(address1, messageTypes, null).Await();
-            var address2 = "address2@machine2";
+            var address2 = "address2@machine2".ToSubscriber();
             persister.Subscribe(address2, messageTypes, null).Await();
             persister.Unsubscribe(address1, new List<MessageType> {message2}, null).Await();
-            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
+            var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result.Select(x => x.ToAddress());
             ObjectApprover.VerifyWithJson(result);
         }
     }

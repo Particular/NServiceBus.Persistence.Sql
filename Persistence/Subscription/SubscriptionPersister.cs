@@ -50,42 +50,51 @@ WHERE
     }
 
 
-    public async Task Subscribe(string client, IEnumerable<MessageType> messageTypes, ContextBag context)
+    public async Task Subscribe(Subscriber subscriber, IEnumerable<MessageType> messageTypes, ContextBag context)
     {
         using (var connection = await SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(subscribeCommandText, connection))
-                {
-                    command.AddParameter("MessageType", messageType.TypeName);
-                    command.AddParameter("Subscriber", client);
-                    command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-                    await command.ExecuteNonQueryEx();
-                }
+                await Subscribe(subscriber, connection, messageType);
             }
         }
     }
 
+    async Task Subscribe(Subscriber subscriber, SqlConnection connection, MessageType messageType)
+    {
+        using (var command = new SqlCommand(subscribeCommandText, connection))
+        {
+            command.AddParameter("MessageType", messageType.TypeName);
+            command.AddParameter("Subscriber", subscriber.ToAddress());
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+            await command.ExecuteNonQueryEx();
+        }
+    }
 
-    public async Task Unsubscribe(string client, IEnumerable<MessageType> messageTypes, ContextBag context)
+
+    public async Task Unsubscribe(Subscriber subscriber, IEnumerable<MessageType> messageTypes, ContextBag context)
     {
         using (var connection = await SqlHelpers.New(connectionString))
         {
             foreach (var messageType in messageTypes)
             {
-                using (var command = new SqlCommand(unsubscribeCommandText, connection))
-                {
-                    command.AddParameter("MessageType", messageType.TypeName);
-                    command.AddParameter("Subscriber", client);
-                    await command.ExecuteNonQueryEx();
-                }
+                await Unsubscribe(subscriber, connection, messageType);
             }
         }
     }
 
+    private async Task Unsubscribe(Subscriber subscriber, SqlConnection connection, MessageType messageType)
+    {
+        using (var command = new SqlCommand(unsubscribeCommandText, connection))
+        {
+            command.AddParameter("MessageType", messageType.TypeName);
+            command.AddParameter("Subscriber", subscriber.ToAddress());
+            await command.ExecuteNonQueryEx();
+        }
+    }
 
-    public async Task<IEnumerable<string>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
+    public async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
     {
         using (var command = new SqlCommand())
         {
@@ -118,7 +127,7 @@ WHERE MessageType IN (", schema, endpointName);
                     {
                         addresses.Add(reader.GetString(0));
                     }
-                    return addresses;
+                    return addresses.Select(s => s.ToSubscriber());
                 }
             }
         }

@@ -2,15 +2,22 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
 
-class SagaInstaller : INeedToInstallSomething
+class SagaInstaller : IInstall
 {
+    BusConfiguration busConfiguration;
 
-    public async Task InstallAsync(string identity, Configure config)
+    public SagaInstaller(BusConfiguration busConfiguration)
     {
-        var settings = config.Settings;
+        this.busConfiguration = busConfiguration;
+    }
+
+    public async Task Install(string identity)
+    {
+        var settings = busConfiguration.GetSettings();
         if (!settings.GetFeatureEnabled<StorageType.Sagas>())
         {
             return;
@@ -20,7 +27,7 @@ class SagaInstaller : INeedToInstallSomething
             return;
         }
         var connectionString = settings.GetConnectionString<StorageType.Sagas>();
-        var endpointName = config.Settings.EndpointName().ToString();
+        var endpointName = settings.EndpointName().ToString();
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");
         var sagaScripts = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql")
             .Select(File.ReadAllText);

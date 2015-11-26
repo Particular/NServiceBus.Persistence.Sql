@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence;
 using NServiceBus.Sagas;
 
 
@@ -19,39 +19,39 @@ class SagaPersister : ISagaPersister
         this.sagaInfoCache = sagaInfoCache;
     }
 
-    public async Task Save(IContainSagaData data, IDictionary<string, object> correlationProperties, ContextBag context)
+    public async Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.SaveCommand, connection))
         {
-            command.AddParameter("Id", data.Id);
-            command.AddParameter("OriginalMessageId", data.OriginalMessageId);
-            command.AddParameter("Originator", data.Originator);
-            command.AddParameter("Data", sagaInfo.ToXml(data));
+            command.AddParameter("Id", sagaData.Id);
+            command.AddParameter("OriginalMessageId", sagaData.OriginalMessageId);
+            command.AddParameter("Originator", sagaData.Originator);
+            command.AddParameter("Data", sagaInfo.ToXml(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             await command.ExecuteNonQueryEx();
         }
     }
 
-    public async Task Update(IContainSagaData data, ContextBag context)
+    public async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.UpdateCommand, connection))
         {
-            command.AddParameter("Id", data.Id);
-            command.AddParameter("OriginalMessageId", data.OriginalMessageId);
-            command.AddParameter("Originator", data.Originator);
+            command.AddParameter("Id", sagaData.Id);
+            command.AddParameter("OriginalMessageId", sagaData.OriginalMessageId);
+            command.AddParameter("Originator", sagaData.Originator);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.Parameters.AddWithValue("Data", sagaInfo.ToXml(data));
+            command.Parameters.AddWithValue("Data", sagaInfo.ToXml(sagaData));
             await command.ExecuteNonQueryEx();
         }
     }
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, ContextBag context) 
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context) 
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
@@ -90,9 +90,9 @@ class SagaPersister : ISagaPersister
             var originator = reader.GetString(1);
             var originalMessageId = reader.GetString(2);
             var sagaTypeVersion = Version.Parse(reader.GetString(4));
-            using (var data = reader.GetSqlXml(3).CreateReader())
+            using (var xmlReader = reader.GetSqlXml(3).CreateReader())
             {
-                var sagaData = sagaInfo.FromString<TSagaData>(data, sagaTypeVersion);
+                var sagaData = sagaInfo.FromString<TSagaData>(xmlReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;
                 sagaData.OriginalMessageId = originalMessageId;
@@ -101,16 +101,21 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public async Task Complete(IContainSagaData data, ContextBag context)
+    public async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(data.GetType());
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         using (var connection = await SqlHelpers.New(connectionString))
         using (var command = new SqlCommand(sagaInfo.CompleteCommand, connection))
         {
-            command.AddParameter("Id", data.Id);
+            command.AddParameter("Id", sagaData.Id);
             await command.ExecuteNonQueryAsync();
         }
     }
-    
+
+
+    public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context) where TSagaData : IContainSagaData
+    {
+        throw new NotImplementedException();
+    }
     
 }
