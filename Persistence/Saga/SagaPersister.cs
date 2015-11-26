@@ -29,7 +29,7 @@ class SagaPersister : ISagaPersister
             command.AddParameter("OriginalMessageId", data.OriginalMessageId);
             command.AddParameter("Originator", data.Originator);
             command.AddParameter("Data", sagaInfo.ToXml(data));
-            command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             await command.ExecuteNonQueryEx();
         }
@@ -44,7 +44,7 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Id", data.Id);
             command.AddParameter("OriginalMessageId", data.OriginalMessageId);
             command.AddParameter("Originator", data.Originator);
-            command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.Parameters.AddWithValue("Data", sagaInfo.ToXml(data));
             await command.ExecuteNonQueryEx();

@@ -31,7 +31,7 @@ class SagaDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     void Drop(SagaDefinition sagaDefinition)
@@ -47,7 +47,7 @@ class SagaDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     public SagaPersister Persister;

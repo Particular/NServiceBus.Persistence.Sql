@@ -29,7 +29,7 @@ class SubscriptionDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     void Drop()
@@ -44,7 +44,7 @@ class SubscriptionDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     public SubscriptionPersister Persister;

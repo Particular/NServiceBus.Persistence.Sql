@@ -22,8 +22,8 @@ public class SubscriptionPersisterTest
                 new MessageType("type1", new Version(0, 0, 0, 0)),
                 new MessageType("type2", new Version(0, 0, 0, 0)),
             };
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();;
-            persister.Subscribe("address2@machine2", messageTypes, null).Await();;
+            persister.Subscribe("address1@machine1", messageTypes, null).Await();
+            persister.Subscribe("address2@machine2", messageTypes, null).Await();
             var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
             ObjectApprover.VerifyWithJson(result);
         }
@@ -40,8 +40,8 @@ public class SubscriptionPersisterTest
                 new MessageType("type1", new Version(0, 0, 0, 0)),
                 new MessageType("type2", new Version(0, 0, 0, 0)),
             };
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();;
-            persister.Subscribe("address1@machine1", messageTypes, null).Await();;
+            persister.Subscribe("address1@machine1", messageTypes, null).Await();
+            persister.Subscribe("address1@machine1", messageTypes, null).Await();
             var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
             ObjectApprover.VerifyWithJson(result);
         }
@@ -61,10 +61,10 @@ public class SubscriptionPersisterTest
                 message1,
             };
             var address1 = "address1@machine1";
-            persister.Subscribe(address1, messageTypes, null).Await();;
+            persister.Subscribe(address1, messageTypes, null).Await();
             var address2 = "address2@machine2";
-            persister.Subscribe(address2, messageTypes, null).Await();;
-            persister.Unsubscribe(address1, new List<MessageType> {message2}, null).Await();;
+            persister.Subscribe(address2, messageTypes, null).Await();
+            persister.Unsubscribe(address1, new List<MessageType> {message2}, null).Await();
             var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
             ObjectApprover.VerifyWithJson(result);
         }

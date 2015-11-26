@@ -27,7 +27,7 @@ public class TimeoutPersisterTest
                     {"HeaderKey", "HeaderValue"}
                 }
             };
-            persister.Add(timeout,null).Await();;
+            persister.Add(timeout,null).Await();
             Assert.IsTrue(persister.TryRemove(timeout.Id, null).Result);
             Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
         }
@@ -51,8 +51,8 @@ public class TimeoutPersisterTest
                     {"HeaderKey", "HeaderValue"}
                 }
             };
-            persister.Add(timeout, null).Await();;
-            persister.RemoveTimeoutBy(sagaId, null).Await();;
+            persister.Add(timeout, null).Await();
+            persister.RemoveTimeoutBy(sagaId, null).Await();
             Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
         }
     }
@@ -72,7 +72,7 @@ public class TimeoutPersisterTest
                 Time = timeout1Time,
                 Headers = new Dictionary<string, string>()
             };
-            persister.Add(timeout1, null).Await();;
+            persister.Add(timeout1, null).Await();
             var nextChunk = persister.Peek(timeout1.Id, null).Result;
             ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
         }

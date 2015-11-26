@@ -35,9 +35,9 @@ class RuntimeSagaInfo
         {
             deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
         }
-        var defualtSerialization = GetSerializer(sagaSerializeBuilder, sagaDataType, xmlSerializerCustomize);
-        defaultSerialize = defualtSerialization.Serialize;
-        defaultDeserialize = defualtSerialization.Deserialize;
+        var defaultSerialization = GetSerializer(sagaSerializeBuilder, sagaDataType, xmlSerializerCustomize);
+        defaultSerialize = defaultSerialization.Serialize;
+        defaultDeserialize = defaultSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
         this.deserializeBuilder = deserializeBuilder;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();

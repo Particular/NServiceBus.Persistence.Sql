@@ -108,9 +108,9 @@ public class SagaConventionsTest
     }
 
     [Test]
-    public void MultiInheritence()
+    public void MultiInheritance()
     {
-        var dataType = module.GetTypeDefinition<MultiInheritenceSaga.SagaData>();
+        var dataType = module.GetTypeDefinition<MultiInheritanceSaga.SagaData>();
         string error;
         Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
         Approvals.Verify(error);
@@ -121,7 +121,7 @@ public class SagaConventionsTest
 
     }
 
-    public class MultiInheritenceSaga : BaseSaga<MultiInheritenceSaga.SagaData>
+    public class MultiInheritanceSaga : BaseSaga<MultiInheritanceSaga.SagaData>
     {
         public class SagaData : XmlSagaData
         {

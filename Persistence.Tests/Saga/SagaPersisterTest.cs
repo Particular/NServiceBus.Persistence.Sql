@@ -27,8 +27,8 @@ public class SagaPersisterTest
                 Originator = "theOriginator",
                 Property = "theProperty"
             };
-            persister.Save(sagaData, null, null).Await();;
-            persister.Complete(sagaData, null).Await();;
+            persister.Save(sagaData, null, null).Await();
+            persister.Complete(sagaData, null).Await();
             Assert.IsNull(persister.Get<MySagaData>(id, null).Result);
         }
     }
@@ -50,7 +50,7 @@ public class SagaPersisterTest
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();;
+            },null,null).Await();
             var result = persister.Get<MySagaData>(id,null).Result;
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         }
@@ -79,7 +79,7 @@ public class SagaPersisterTest
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            }, null, null).Await();;
+            }, null, null).Await();
             var result = persister.Get<MySagaData>("Property", "theProperty",null).Result;
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         }
@@ -102,14 +102,14 @@ public class SagaPersisterTest
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();;
+            },null,null).Await();
             persister.Save(new MySagaData
             {
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
                 Property = "theProperty"
-            },null,null).Await();;
+            },null,null).Await();
         }
     }
 

@@ -28,7 +28,7 @@ class TimeoutDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     void Drop()
@@ -43,7 +43,7 @@ class TimeoutDatabase : IDisposable
         {
             collection.AddWithValue("schema", "dbo");
             collection.AddWithValue("endpointName", endpointName);
-        }).Await();;
+        }).Await();
     }
 
     public TimeoutPersister Persister;

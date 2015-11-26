@@ -60,7 +60,7 @@ WHERE
                 {
                     command.AddParameter("MessageType", messageType.TypeName);
                     command.AddParameter("Subscriber", client);
-                    command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
+                    command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
                     await command.ExecuteNonQueryEx();
                 }
             }
@@ -100,7 +100,7 @@ WHERE MessageType IN (", schema, endpointName);
                 var messageType = types[i];
                 var paramName = "@type" + i;
                 builder.Append(paramName);
-                if (i < (types.Count - 1))
+                if (i < types.Count - 1)
                 {
                     builder.Append(", ");
                 }

@@ -4,12 +4,12 @@ using System.Reflection;
 
 static class StaticVersions
 {
-    public static Version PeristenceVersion;
+    public static Version PersistenceVersion;
 
     static StaticVersions()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        PeristenceVersion = GetFileVersion(assembly);
+        PersistenceVersion = GetFileVersion(assembly);
     }
 
     internal static Version GetFileVersion(this Assembly assembly)

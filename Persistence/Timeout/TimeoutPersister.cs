@@ -111,7 +111,7 @@ ORDER BY TIME";
             command.AddParameter("State", timeout.State);
             command.AddParameter("Time", timeout.Time);
             command.AddParameter("Headers", HeaderSerializer.ToXml(timeout.Headers));
-            command.AddParameter("PersistenceVersion", StaticVersions.PeristenceVersion);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
     }
