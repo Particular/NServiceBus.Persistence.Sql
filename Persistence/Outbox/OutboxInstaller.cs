@@ -1,22 +1,21 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using NServiceBus;
-using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class OutboxInstaller : IInstall
 {
-    BusConfiguration busConfiguration;
+    ReadOnlySettings settings;
 
-    public OutboxInstaller(BusConfiguration busConfiguration)
+    public OutboxInstaller(ReadOnlySettings settings)
     {
-        this.busConfiguration = busConfiguration;
+        this.settings = settings;
     }
 
     public async Task Install(string identity)
     {
-        var settings = busConfiguration.GetSettings();
         if (!settings.ShouldInstall<StorageType.Outbox>())
         {
             return;

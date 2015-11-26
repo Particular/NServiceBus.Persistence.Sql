@@ -7,7 +7,6 @@ using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
 using NServiceBus.Sagas;
 
-
 class SagaPersister : ISagaPersister
 {
     string connectionString;
@@ -63,7 +62,7 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ContextBag context)
+    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context) 
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
@@ -75,7 +74,6 @@ class SagaPersister : ISagaPersister
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
-
 
     static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
@@ -112,10 +110,4 @@ class SagaPersister : ISagaPersister
         }
     }
 
-
-    public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context) where TSagaData : IContainSagaData
-    {
-        throw new NotImplementedException();
-    }
-    
 }

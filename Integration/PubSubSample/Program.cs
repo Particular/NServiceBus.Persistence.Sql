@@ -12,10 +12,12 @@ class Program
     static async Task Start()
     {
         var configuration = ConfigBuilder.Build("PubSub");
-        using (var bus = await Bus.Create(configuration).StartAsync())
+        var endpointInstance = await Endpoint.Start(configuration);
+        var busContext = endpointInstance.CreateBusContext();
+        Console.WriteLine("Press 'Enter' to publish a message");
+        Console.WriteLine("Press any other key to exit");
+        try
         {
-            Console.WriteLine("Press 'Enter' to publish a message");
-            Console.WriteLine("Press any other key to exit");
             while (true)
             {
                 var key = Console.ReadKey();
@@ -29,8 +31,12 @@ class Program
                 {
                     Property = "PropertyValue"
                 };
-                await bus.PublishAsync(myEvent);
+                await busContext.Publish(myEvent);
             }
+        }
+        finally
+        {
+            await endpointInstance.Stop();
         }
     }
 }

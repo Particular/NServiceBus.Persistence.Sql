@@ -12,10 +12,12 @@ class Program
     static async Task Start()
     {
         var configuration = ConfigBuilder.Build("Saga");
-        using (var bus = await Bus.Create(configuration).StartAsync())
+        var endpointInstance = await Endpoint.Start(configuration);
+        var busContext = endpointInstance.CreateBusContext();
+        Console.WriteLine("Press 'Enter' to start a saga");
+        Console.WriteLine("Press any other key to exit");
+        try
         {
-            Console.WriteLine("Press 'Enter' to start a saga");
-            Console.WriteLine("Press any other key to exit");
             while (true)
             {
                 var key = Console.ReadKey();
@@ -25,12 +27,16 @@ class Program
                 {
                     return;
                 }
-                await bus.SendLocalAsync(new StartSagaMessage
+                await busContext.SendLocal(new StartSagaMessage
                 {
                     MySagaId = Guid.NewGuid()
                 });
             }
-            
         }
+        finally
+        {
+            await endpointInstance.Stop();
+        }
+
     }
 }

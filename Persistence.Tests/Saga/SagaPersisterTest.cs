@@ -82,7 +82,7 @@ public class SagaPersisterTest
                 Property = "theProperty"
             };
             persister.Save(sagaData, null, null, null).Await();
-            var result = persister.Get<MySagaData>("Property", "theProperty", null).Result;
+            var result = persister.Get<MySagaData>("Property", "theProperty", null, null).Result;
             ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         }
     }

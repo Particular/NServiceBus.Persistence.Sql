@@ -20,7 +20,7 @@ public class MySaga2 : XmlSaga<MySaga2.SagaData>,
     {
         Data.MySagaId = message.MySagaId;
         logger.Info($"Start Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
-        await context.SendLocalAsync(new CompleteSagaMessage
+        await context.SendLocal(new CompleteSagaMessage
                            {
                                MySagaId = Data.MySagaId
                            });

@@ -12,13 +12,12 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
 
     public async Task Handle(StartSagaMessage message, IMessageHandlerContext context)
     {
-        var timout = new SagaTimoutMessage
+        var timeout = new SagaTimoutMessage
         {
             Property = "PropertyValue"
         };
-        await RequestTimeoutAsync(context, TimeSpan.FromSeconds(3), timout);
+        await RequestTimeout(context, TimeSpan.FromSeconds(3), timeout);
     }
-
 
     public Task Timeout(SagaTimoutMessage state, IMessageHandlerContext context)
     {
@@ -30,6 +29,5 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
     public class SagaData : XmlSagaData
     {
     }
-    
     
 }

@@ -2,22 +2,21 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
-using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class SagaInstaller : IInstall
 {
-    BusConfiguration busConfiguration;
+    ReadOnlySettings settings;
 
-    public SagaInstaller(BusConfiguration busConfiguration)
+    public SagaInstaller(ReadOnlySettings settings)
     {
-        this.busConfiguration = busConfiguration;
+        this.settings = settings;
     }
 
     public async Task Install(string identity)
     {
-        var settings = busConfiguration.GetSettings();
         if (!settings.GetFeatureEnabled<StorageType.Sagas>())
         {
             return;

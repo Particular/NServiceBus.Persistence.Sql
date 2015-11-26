@@ -1,22 +1,21 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using NServiceBus;
-using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Installation;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class SubscriptionInstaller : IInstall
 {
-    BusConfiguration busConfiguration;
+    ReadOnlySettings settings;
 
-    public SubscriptionInstaller(BusConfiguration busConfiguration)
+    public SubscriptionInstaller(ReadOnlySettings settings)
     {
-        this.busConfiguration = busConfiguration;
+        this.settings = settings;
     }
 
     public async Task Install(string identity)
     {
-        var settings = busConfiguration.GetSettings();
         if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
             return;

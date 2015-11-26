@@ -12,11 +12,13 @@ class Program
     static async Task Start()
     {
         var configuration = ConfigBuilder.Build("Timeouts");
-        using (var bus = await Bus.Create(configuration).StartAsync())
+        var endpointInstance = await Endpoint.Start(configuration);
+        var busContext = endpointInstance.CreateBusContext();
+        Console.WriteLine("Press 'S' to start a saga with a timeout");
+        Console.WriteLine("Press 'D' to defer a message");
+        Console.WriteLine("Press any other key to exit");
+        try
         {
-            Console.WriteLine("Press 'S' to start a saga with a timeout");
-            Console.WriteLine("Press 'D' to defer a message");
-            Console.WriteLine("Press any other key to exit");
             while (true)
             {
                 var key = Console.ReadKey();
@@ -24,7 +26,7 @@ class Program
 
                 if (key.Key == ConsoleKey.S)
                 {
-                    await bus.SendLocalAsync(new StartSagaMessage());
+                    await busContext.SendLocal(new StartSagaMessage());
                     continue;
                 }
                 if (key.Key == ConsoleKey.D)
@@ -38,11 +40,15 @@ class Program
 
                     options.RouteToLocalEndpointInstance();
                     options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
-                    await bus.SendAsync(deferMessage, options);
+                    await busContext.Send(deferMessage, options);
                     continue;
                 }
                 return;
             }
+        }
+        finally
+        {
+            await endpointInstance.Stop();
         }
     }
 }
