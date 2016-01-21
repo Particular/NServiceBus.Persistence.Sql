@@ -13,7 +13,7 @@ class Program
     {
         var configuration = ConfigBuilder.Build("Timeouts");
         var endpointInstance = await Endpoint.Start(configuration);
-        var busContext = endpointInstance.CreateBusContext();
+        var session = endpointInstance.CreateBusSession();
         Console.WriteLine("Press 'S' to start a saga with a timeout");
         Console.WriteLine("Press 'D' to defer a message");
         Console.WriteLine("Press any other key to exit");
@@ -26,7 +26,7 @@ class Program
 
                 if (key.Key == ConsoleKey.S)
                 {
-                    await busContext.SendLocal(new StartSagaMessage());
+                    await session.SendLocal(new StartSagaMessage());
                     continue;
                 }
                 if (key.Key == ConsoleKey.D)
@@ -40,7 +40,7 @@ class Program
 
                     options.RouteToLocalEndpointInstance();
                     options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
-                    await busContext.Send(deferMessage, options);
+                    await session.Send(deferMessage, options);
                     continue;
                 }
                 return;

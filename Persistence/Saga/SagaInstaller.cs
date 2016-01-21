@@ -6,7 +6,7 @@ using NServiceBus.Installation;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
-class SagaInstaller : IInstall
+class SagaInstaller : INeedToInstallSomething
 {
     ReadOnlySettings settings;
 

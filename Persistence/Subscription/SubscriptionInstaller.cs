@@ -5,7 +5,7 @@ using NServiceBus.Installation;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
-class SubscriptionInstaller : IInstall
+class SubscriptionInstaller : INeedToInstallSomething
 {
     ReadOnlySettings settings;
 

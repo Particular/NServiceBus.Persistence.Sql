@@ -1,4 +1,4 @@
-﻿using NServiceBus;
+﻿using NServiceBus.Routing;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 internal static class SubscriberExtensions

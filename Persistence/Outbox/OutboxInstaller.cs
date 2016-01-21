@@ -5,7 +5,7 @@ using NServiceBus.Installation;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
-class OutboxInstaller : IInstall
+class OutboxInstaller : INeedToInstallSomething
 {
     ReadOnlySettings settings;
 

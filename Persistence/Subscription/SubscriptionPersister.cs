@@ -50,14 +50,11 @@ WHERE
     }
 
 
-    public async Task Subscribe(Subscriber subscriber, IEnumerable<MessageType> messageTypes, ContextBag context)
+    public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
         using (var connection = await SqlHelpers.New(connectionString))
         {
-            foreach (var messageType in messageTypes)
-            {
-                await Subscribe(subscriber, connection, messageType);
-            }
+            await Subscribe(subscriber, connection, messageType);
         }
     }
 
@@ -73,18 +70,15 @@ WHERE
     }
 
 
-    public async Task Unsubscribe(Subscriber subscriber, IEnumerable<MessageType> messageTypes, ContextBag context)
+    public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
         using (var connection = await SqlHelpers.New(connectionString))
         {
-            foreach (var messageType in messageTypes)
-            {
-                await Unsubscribe(subscriber, connection, messageType);
-            }
+            await Unsubscribe(subscriber, connection, messageType);
         }
     }
 
-    private async Task Unsubscribe(Subscriber subscriber, SqlConnection connection, MessageType messageType)
+    async Task Unsubscribe(Subscriber subscriber, SqlConnection connection, MessageType messageType)
     {
         using (var command = new SqlCommand(unsubscribeCommandText, connection))
         {

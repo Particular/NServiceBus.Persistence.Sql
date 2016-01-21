@@ -5,7 +5,7 @@ using NServiceBus.Installation;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
-class TimeoutInstaller : IInstall
+class TimeoutInstaller : INeedToInstallSomething
 {
     ReadOnlySettings settings;
 
@@ -30,5 +30,5 @@ class TimeoutInstaller : IInstall
             collection.AddWithValue("endpointName", endpointName);
         });
     }
-    
+
 }

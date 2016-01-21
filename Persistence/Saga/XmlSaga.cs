@@ -7,7 +7,8 @@ namespace NServiceBus.SqlPersistence
         IContainSagaData, 
         new()
     {
-        //TODO: throw in MSBuild if this is overriden in child class
+        
+        //TODO: throw in MSBuild if this is overridden in child class
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
         {
             var messagePropertyMapper = new MessagePropertyMapper<TSagaData>(mapper);
