@@ -3,7 +3,6 @@ using NServiceBus.Features;
 using NServiceBus.Persistence;
 using NServiceBus.Timeout.Core;
 
-
 class TimeoutFeature : Feature
 {
 

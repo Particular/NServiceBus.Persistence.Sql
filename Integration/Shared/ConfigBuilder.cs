@@ -3,16 +3,15 @@ using NServiceBus.Persistence;
 
 public static class ConfigBuilder
 {
-    public static BusConfiguration Build(string enpointName)
+    public static EndpointConfiguration Build(string enpointName)
     {
-        var configuration = new BusConfiguration();
-        configuration.EndpointName("SqlPersistence.Sample" + enpointName);
+        var configuration = new EndpointConfiguration("SqlPersistence.Sample" + enpointName);
         configuration.UseSerialization<JsonSerializer>();
         configuration.EnableInstallers();
         configuration.UsePersistence<InMemoryPersistence>();
 
         var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceSample;Integrated Security=True";
-        
+
         var sagaPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Sagas>();
         sagaPersistence.ConnectionString(connectionString);
 

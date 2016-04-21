@@ -16,9 +16,9 @@ static class StaticVersions
     {
         var version = FileVersionInfo.GetVersionInfo(assembly.Location);
         return new Version(
-            major: version.FileMajorPart, 
-            minor: version.FileMinorPart, 
-            build: version.FileBuildPart, 
+            major: version.FileMajorPart,
+            minor: version.FileMinorPart,
+            build: version.FileBuildPart,
             revision: version.FilePrivatePart);
     }
 }

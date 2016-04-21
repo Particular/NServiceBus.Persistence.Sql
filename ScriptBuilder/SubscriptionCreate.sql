@@ -1,12 +1,12 @@
 ﻿
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
 
-IF NOT EXISTS 
+IF NOT EXISTS
 (
-    SELECT * 
-    FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) AND 
+    SELECT *
+    FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName) AND
         type in (N'U')
 )
 BEGIN
@@ -16,7 +16,7 @@ SET @createTable = N'
 	    [Subscriber] [varchar](450) NOT NULL,
 	    [MessageType] [varchar](450) NOT NULL,
 	    [PersistenceVersion] [nvarchar](23) NOT NULL,
-        PRIMARY KEY CLUSTERED 
+        PRIMARY KEY CLUSTERED
         (
 	        [Subscriber] ASC,
 	        [MessageType] ASC

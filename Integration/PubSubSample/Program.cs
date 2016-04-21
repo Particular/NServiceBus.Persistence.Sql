@@ -13,7 +13,6 @@ class Program
     {
         var configuration = ConfigBuilder.Build("PubSub");
         var endpointInstance = await Endpoint.Start(configuration);
-        var session = endpointInstance.CreateBusSession();
         Console.WriteLine("Press 'Enter' to publish a message");
         Console.WriteLine("Press any other key to exit");
         try
@@ -31,7 +30,7 @@ class Program
                 {
                     Property = "PropertyValue"
                 };
-                await session.Publish(myEvent);
+                await endpointInstance.Publish(myEvent);
             }
         }
         finally

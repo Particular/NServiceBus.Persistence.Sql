@@ -4,7 +4,7 @@ using NServiceBus.SqlPersistence;
 
 static class SagaXmlSerializerBuilder
 {
-    
+
     static XmlSerializerNamespaces emptyNamespace;
 
     static SagaXmlSerializerBuilder()
@@ -30,10 +30,10 @@ static class SagaXmlSerializerBuilder
     static XmlSerializer BuildXmlSerializer(Type sagaDataType, Action<XmlSerializer, Type> customize)
     {
         var xmlSerializer = new XmlSerializer(
-            sagaDataType, 
-            overrides: new XmlAttributeOverrides(), 
-            extraTypes: new Type[]{}, 
-            root: new XmlRootAttribute("Data"), 
+            sagaDataType,
+            overrides: new XmlAttributeOverrides(),
+            extraTypes: new Type[]{},
+            root: new XmlRootAttribute("Data"),
             defaultNamespace: ""
             );
         customize(xmlSerializer, sagaDataType);

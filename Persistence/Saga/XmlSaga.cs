@@ -2,12 +2,12 @@
 namespace NServiceBus.SqlPersistence
 {
     public abstract class XmlSaga<TSagaData> : Saga<TSagaData>
-        where TSagaData : 
-        XmlSagaData, 
-        IContainSagaData, 
+        where TSagaData :
+        XmlSagaData,
+        IContainSagaData,
         new()
     {
-        
+
         //TODO: throw in MSBuild if this is overridden in child class
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
         {

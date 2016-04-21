@@ -17,28 +17,28 @@ class OutboxStorage : IOutboxStorage
     {
         this.connectionString = connectionString;
         storeCommandText = $@"
-INSERT INTO [{schema}].[{endpointName}.OutboxData] 
+INSERT INTO [{schema}].[{endpointName}.OutboxData]
 (
-    MessageId, 
+    MessageId,
     Operations
-) 
-VALUES 
+)
+VALUES
 (
-    @MessageId, 
+    @MessageId,
     @Operations
 )";
 
         getCommandText = $@"
-SELECT 
+SELECT
     Operations
-FROM [{schema}].[{endpointName}.OutboxData] 
+FROM [{schema}].[{endpointName}.OutboxData]
 WHERE MessageId = @MessageId";
 
         setAsDispatchedCommandText = $@"
 UPDATE [{schema}].[{endpointName}.OutboxData]
 SET
-    Dispatched = 1, 
-    DispatchedAt = @DispatchedAt, 
+    Dispatched = 1,
+    DispatchedAt = @DispatchedAt,
 WHERE MessageId = @MessageId";
     }
 
@@ -75,7 +75,7 @@ WHERE MessageId = @MessageId";
                     return null;
                 }
                 return new OutboxMessage(
-                    messageId: messageId, 
+                    messageId: messageId,
                     operations: OperationSerializer.FromString(reader.GetString(0)).ToList());
             }
         }

@@ -12,9 +12,9 @@
     <iconUrl>https://github.com/SimonCropp/NsbSqlPersistence/master/Icons/package_icon.png</iconUrl>
     <description>Sql Server persistence fo NServiceBus.</description>
     <language>en-AU</language>
-    <tags>NServiceBus, SqlServer</tags>
+    <tags>NServiceBus, SqlServer, XMLS</tags>
     <dependencies>
-      <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
+      <dependency id="NServiceBus" version="[6.0.0-beta0001, 7.0.0)" />
     </dependencies>
   </metadata>
 </package>

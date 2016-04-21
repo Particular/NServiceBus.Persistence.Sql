@@ -12,6 +12,6 @@
     <iconUrl>https://github.com/SimonCropp/NsbSqlPersistence/master/Icons/package_icon.png</iconUrl>
     <description>Builds deployment scripts for the NServiceBus.SqlPersistence package.</description>
     <language>en-AU</language>
-    <tags>NServiceBus, SqlServer</tags>
+    <tags>NServiceBus, SqlServer, XML</tags>
   </metadata>
 </package>

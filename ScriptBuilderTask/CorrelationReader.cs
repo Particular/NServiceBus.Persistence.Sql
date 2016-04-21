@@ -22,7 +22,7 @@ class CorrelationReader
             };
         }
         var member = members.Single();
-        
+
         return new CorrelationResult
         {
             Name = member.Name

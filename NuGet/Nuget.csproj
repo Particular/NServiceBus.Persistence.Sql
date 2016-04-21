@@ -60,12 +60,12 @@
     <MakeDir Directories="$(NugetBuild)" />
     <Copy SourceFiles="$(TargetDir)NServiceBus.SqlPersistence.nuspec" DestinationFolder="$(NugetBuild)" />
     <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.SqlPersistence.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
-    <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuild)build\net45" />
+    <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuild)build\net452" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuild)" MetadataAssembly="$(Persistence)" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(Persistence)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(PersistencePdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build\net45" />
+    <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build\net452" />
     <Copy SourceFiles="$(MergedScriptBuilderTask)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(MergedScriptBuilderTaskPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>

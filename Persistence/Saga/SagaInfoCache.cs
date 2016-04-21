@@ -12,8 +12,8 @@ class SagaInfoCache
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
 
     public SagaInfoCache(
-        DeserializeBuilder deserializeBuilder, 
-        SagaSerializeBuilder serializeBuilder, 
+        DeserializeBuilder deserializeBuilder,
+        SagaSerializeBuilder serializeBuilder,
         SagaCommandBuilder commandBuilder,
         Action<XmlSerializer, Type> xmlSerializerCustomize)
     {

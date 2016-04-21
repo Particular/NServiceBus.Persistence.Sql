@@ -15,14 +15,14 @@ public class OperationSerializerTest
         var xml = OperationSerializer.ToXml(new List<TransportOperation>
         {
             new TransportOperation(
-                messageId: "Id1", 
+                messageId: "Id1",
                 options: new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                }, 
-                body: new byte[] {0x20,0x21}, 
+                },
+                body: new byte[] {0x20,0x21},
                 headers: new Dictionary<string, string>
                 {
                     {
@@ -40,9 +40,9 @@ public class OperationSerializerTest
         var xml = OperationSerializer.ToXml(new List<TransportOperation>
         {
             new TransportOperation(
-                messageId: "Id1", 
-                options: new Dictionary<string, string>(), 
-                body: new byte[] {0x20,0x21}, 
+                messageId: "Id1",
+                options: new Dictionary<string, string>(),
+                body: new byte[] {0x20,0x21},
                 headers: new Dictionary<string, string>())
         });
         var bytes = OperationSerializer.FromString(xml).First().Body;

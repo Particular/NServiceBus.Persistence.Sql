@@ -2,12 +2,12 @@
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.theSaga]';
 
 
-IF NOT EXISTS 
+IF NOT EXISTS
 (
-    SELECT * 
-    FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) AND 
+    SELECT *
+    FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName) AND
         type in (N'U')
 )
 BEGIN
@@ -26,25 +26,25 @@ exec(@createTable);
 END
 
 declare @dropIndexQuery nvarchar(max);
-select @dropIndexQuery = 
+select @dropIndexQuery =
 (
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
-    WHERE 
+    WHERE
 		ix.Id = (select object_id from sys.objects where name = @tableName) AND
-	    ix.Name IS NOT null AND 
+	    ix.Name IS NOT null AND
 	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name <> 'PropertyIndex_Property1' 
+	    ix.Name <> 'PropertyIndex_Property1'
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
 
 IF NOT EXISTS
 (
-    SELECT * 
-    FROM sys.indexes 
-    WHERE 
-        name = 'PropertyIndex_Property1' AND 
+    SELECT *
+    FROM sys.indexes
+    WHERE
+        name = 'PropertyIndex_Property1' AND
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
@@ -52,7 +52,7 @@ DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
     ON ' + @tableName + '(Data)
-    FOR 
+    FOR
     (
         Property1 = ''/Data/Property1'' AS XQUERY ''xs:string'' SINGLETON
     )

@@ -13,7 +13,6 @@ class Program
     {
         var configuration = ConfigBuilder.Build("Saga");
         var endpointInstance = await Endpoint.Start(configuration);
-        var session = endpointInstance.CreateBusSession();
         Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");
         try
@@ -27,7 +26,7 @@ class Program
                 {
                     return;
                 }
-                await session.SendLocal(new StartSagaMessage
+                await endpointInstance.SendLocal(new StartSagaMessage
                 {
                     MySagaId = Guid.NewGuid()
                 });

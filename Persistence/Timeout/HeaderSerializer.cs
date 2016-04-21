@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 static class HeaderSerializer
 {
-    
+
     public static string ToXml(Dictionary<string, string> dictionary)
     {
         var xElem = new XElement(

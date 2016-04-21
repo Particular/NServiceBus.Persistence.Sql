@@ -2,9 +2,9 @@
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.TimeoutData]';
 
 IF NOT EXISTS (
-    SELECT * FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) 
+    SELECT * FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName)
         AND type in (N'U')
 )
 BEGIN

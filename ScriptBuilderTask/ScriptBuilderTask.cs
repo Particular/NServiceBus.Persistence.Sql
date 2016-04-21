@@ -10,7 +10,7 @@ namespace NServiceBus.SqlPersistence
     public class ScriptBuilderTask:
 #if (DEBUG)
         AppDomainIsolatedTask
-#else        
+#else
         Task
 #endif
 
@@ -21,12 +21,12 @@ namespace NServiceBus.SqlPersistence
         public string AssemblyPath { get; set; }
         [Required]
         public string IntermediateDirectory { get; set; }
-        
+
         public override bool Execute()
         {
             logger = new BuildLogger(Log);
             logger.LogInfo($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing");
-            
+
             var stopwatch = Stopwatch.StartNew();
 
             try

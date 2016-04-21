@@ -25,10 +25,10 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.{0}
             writer.Write(@"
 IF NOT EXISTS
 (
-    SELECT * 
-    FROM sys.indexes 
-    WHERE 
-        name = 'PropertyIndex_{0}' AND 
+    SELECT *
+    FROM sys.indexes
+    WHERE
+        name = 'PropertyIndex_{0}' AND
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
@@ -36,7 +36,7 @@ DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
     CREATE  SELECTIVE XML INDEX PropertyIndex_{0}
     ON ' + @tableName + '(Data)
-    FOR 
+    FOR
     (
         {0} = ''/Data/{0}'' AS XQUERY ''xs:string'' SINGLETON
     )
@@ -50,15 +50,15 @@ END
         {
             writer.Write(@"
 declare @dropIndexQuery nvarchar(max);
-select @dropIndexQuery = 
+select @dropIndexQuery =
 (
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
-    WHERE 
+    WHERE
 		ix.Id = (select object_id from sys.objects where name = @tableName) AND
-	    ix.Name IS NOT null AND 
+	    ix.Name IS NOT null AND
 	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name <> 'PropertyIndex_{0}' 
+	    ix.Name <> 'PropertyIndex_{0}'
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
@@ -69,12 +69,12 @@ exec sp_executesql @dropIndexQuery
         {
             writer.Write(@"
 
-IF NOT EXISTS 
+IF NOT EXISTS
 (
-    SELECT * 
-    FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) AND 
+    SELECT *
+    FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName) AND
         type in (N'U')
 )
 BEGIN
@@ -94,19 +94,19 @@ END
 ");
         }
 
-        
+
         public static void BuildDropScript(string saga, TextWriter writer)
         {
             writer.Write(@"
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.{0}]';
 ", saga);
             writer.Write(@"
-IF EXISTS 
+IF EXISTS
 (
-    SELECT * 
-    FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) 
+    SELECT *
+    FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName)
         AND type in (N'U')
 )
 BEGIN
