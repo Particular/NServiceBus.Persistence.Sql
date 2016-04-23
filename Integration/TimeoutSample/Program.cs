@@ -12,7 +12,7 @@ class Program
     static async Task Start()
     {
         var configuration = ConfigBuilder.Build("Timeouts");
-        var endpointInstance = await Endpoint.Start(configuration);
+        var endpoint = await Endpoint.Start(configuration);
         Console.WriteLine("Press 'S' to start a saga with a timeout");
         Console.WriteLine("Press 'D' to defer a message");
         Console.WriteLine("Press any other key to exit");
@@ -25,7 +25,7 @@ class Program
 
                 if (key.Key == ConsoleKey.S)
                 {
-                    await endpointInstance.SendLocal(new StartSagaMessage());
+                    await endpoint.SendLocal(new StartSagaMessage());
                     continue;
                 }
                 if (key.Key == ConsoleKey.D)
@@ -39,7 +39,7 @@ class Program
 
                     options.RouteToThisInstance();
                     options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
-                    await endpointInstance.Send(deferMessage, options);
+                    await endpoint.Send(deferMessage, options);
                     continue;
                 }
                 return;
@@ -47,7 +47,7 @@ class Program
         }
         finally
         {
-            await endpointInstance.Stop();
+            await endpoint.Stop();
         }
     }
 }

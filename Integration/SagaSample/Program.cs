@@ -12,7 +12,7 @@ class Program
     static async Task Start()
     {
         var configuration = ConfigBuilder.Build("Saga");
-        var endpointInstance = await Endpoint.Start(configuration);
+        var endpoint = await Endpoint.Start(configuration);
         Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");
         try
@@ -26,7 +26,7 @@ class Program
                 {
                     return;
                 }
-                await endpointInstance.SendLocal(new StartSagaMessage
+                await endpoint.SendLocal(new StartSagaMessage
                 {
                     MySagaId = Guid.NewGuid()
                 });
@@ -34,7 +34,7 @@ class Program
         }
         finally
         {
-            await endpointInstance.Stop();
+            await endpoint.Stop();
         }
 
     }

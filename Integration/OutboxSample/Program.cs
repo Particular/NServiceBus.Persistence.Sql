@@ -6,14 +6,14 @@ class Program
 {
     static void Main()
     {
-        Start().GetAwaiter().GetResult();
+        AsyncMain().GetAwaiter().GetResult();
     }
 
-    static async Task Start()
+    static async Task AsyncMain()
     {
-        var configuration = ConfigBuilder.Build("PubSub");
+        var configuration = ConfigBuilder.Build("Outbox");
         var endpoint = await Endpoint.Start(configuration);
-        Console.WriteLine("Press 'Enter' to publish a message");
+        Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");
         try
         {
@@ -26,11 +26,10 @@ class Program
                 {
                     return;
                 }
-                var myEvent = new MyEvent
+                await endpoint.SendLocal(new StartSagaMessage
                 {
-                    Property = "PropertyValue"
-                };
-                await endpoint.Publish(myEvent);
+                    MySagaId = Guid.NewGuid()
+                });
             }
         }
         finally
