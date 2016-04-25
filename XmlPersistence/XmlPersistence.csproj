@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Guard.cs" />
+    <Compile Include="LogManager.cs" />
     <Compile Include="Outbox\OperationSerializer.cs" />
     <Compile Include="Outbox\OutboxCleaner.cs" />
     <Compile Include="Outbox\SqlXmlOutboxFeature.cs" />

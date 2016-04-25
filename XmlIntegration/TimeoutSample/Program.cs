@@ -37,7 +37,7 @@ class Program
 
                     var options = new SendOptions();
 
-                    options.RouteToThisInstance();
+                    options.RouteToThisEndpoint();
                     options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
                     await endpoint.Send(deferMessage, options);
                     continue;

@@ -2,11 +2,13 @@
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Installation;
+using NServiceBus.Logging;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
 class SubscriptionInstaller : INeedToInstallSomething
 {
+    static ILog log = LogManager.GetLogger<SubscriptionInstaller>();
     ReadOnlySettings settings;
 
     public SubscriptionInstaller(ReadOnlySettings settings)
@@ -23,7 +25,7 @@ class SubscriptionInstaller : INeedToInstallSomething
         var connectionString = settings.GetConnectionString<StorageType.Subscriptions>();
         var endpointName = settings.EndpointName().ToString();
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Subscription_Create.sql");
-
+        log.Info($"Executing '{createScript}'");
         await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript), collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Subscriptions>());

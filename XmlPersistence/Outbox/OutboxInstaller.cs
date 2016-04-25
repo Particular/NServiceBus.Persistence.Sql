@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Installation;
+using NServiceBus.Logging;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 
 class OutboxInstaller : INeedToInstallSomething
 {
     ReadOnlySettings settings;
+    static ILog log = LogManager.GetLogger<OutboxInstaller>();
 
     public OutboxInstaller(ReadOnlySettings settings)
     {
@@ -23,7 +25,7 @@ class OutboxInstaller : INeedToInstallSomething
         var connectionString = settings.GetConnectionString<StorageType.Outbox>();
         var endpointName = settings.EndpointName().ToString();
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
-
+        log.Info($"Executing '{createScript}'");
         await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript), collection =>
         {
             collection.AddWithValue("schema", settings.GetSchema<StorageType.Outbox>());

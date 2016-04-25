@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using NServiceBus.Logging;
 
 class SqlHelpers
 {
+    static ILog log = LogManager.GetLogger<SqlHelpers>();
+
     public static async Task<SqlConnection> New(string connectionString)
     {
         var sqlConnection = new SqlConnection(connectionString);
