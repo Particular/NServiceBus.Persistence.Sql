@@ -21,7 +21,7 @@ _UpgradeReport.*
 packages
 Release
 packages/
-NugetBuild/
+XmlNugetBuild/
 csx
 *.ncrunchproject
 *.ncrunchsolution
