@@ -1,0 +1,6 @@
+﻿{
+  "Property": "theProperty",
+  "Id": "theSagaId",
+  "Originator": "theOriginator",
+  "OriginalMessageId": "theOriginalMessageId"
+}

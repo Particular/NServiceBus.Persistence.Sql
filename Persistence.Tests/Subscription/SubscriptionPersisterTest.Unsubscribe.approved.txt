@@ -1,4 +1,0 @@
-﻿[
-  "address1@machine1",
-  "address2@machine2"
-]

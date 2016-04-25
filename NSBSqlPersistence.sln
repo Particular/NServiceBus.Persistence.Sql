@@ -1,21 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 14.0.22823.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlPersistence", "XmlPersistence\XmlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.Tests", "Persistence.Tests\Persistence.Tests.csproj", "{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlPersistence.Tests", "XmlPersistence.Tests\XmlPersistence.Tests.csproj", "{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask", "ScriptBuilderTask\ScriptBuilderTask.csproj", "{63784399-65AF-424A-B2AD-0C94AE326823}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlScriptBuilderTask", "XmlScriptBuilderTask\XmlScriptBuilderTask.csproj", "{63784399-65AF-424A-B2AD-0C94AE326823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder", "ScriptBuilder\ScriptBuilder.csproj", "{438D76FC-8BB8-4B40-80A5-F846A450FBD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlScriptBuilder", "XmlScriptBuilder\XmlScriptBuilder.csproj", "{438D76FC-8BB8-4B40-80A5-F846A450FBD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask.Tests", "ScriptBuilderTask.Tests\ScriptBuilderTask.Tests.csproj", "{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlScriptBuilderTask.Tests", "XmlScriptBuilderTask.Tests\XmlScriptBuilderTask.Tests.csproj", "{1E85A42C-FE6E-413B-AD63-A2B00E7A27F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder.Tests", "ScriptBuilder.Tests\ScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlScriptBuilder.Tests", "XmlScriptBuilder.Tests\XmlScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuget", "NuGet\Nuget.csproj", "{66DDADC1-1631-4EC7-8CB2-DD8080188234}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlNuget", "XmlNuGet\XmlNuget.csproj", "{66DDADC1-1631-4EC7-8CB2-DD8080188234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlAcceptanceTests.Msmq", "XmlAcceptanceTests.Msmq\XmlAcceptanceTests.Msmq.csproj", "{E5135DE6-1729-428D-B7C7-F387EC209161}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5135DE6-1729-428D-B7C7-F387EC209161}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5135DE6-1729-428D-B7C7-F387EC209161}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5135DE6-1729-428D-B7C7-F387EC209161}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5135DE6-1729-428D-B7C7-F387EC209161}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
