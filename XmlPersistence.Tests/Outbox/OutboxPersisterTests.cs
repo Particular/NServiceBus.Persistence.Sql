@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NUnit.Framework;
+using ObjectApproval;
 
 [TestFixture]
 #if (!DEBUG)
@@ -9,8 +10,6 @@ using NUnit.Framework;
 #endif
 public class OutboxPersisterTests
 {
-
-
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static string endpointName = "Endpoint";
     OutboxPersister persister;
@@ -28,7 +27,13 @@ public class OutboxPersisterTests
     }
 
     [Test]
-    public void Subscribe()
+    public void StoreDispatchAndGet()
+    {
+        var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result);
+    }
+
+    async Task<OutboxMessage> StoreDispatchAndGetAsync()
     {
         var operations = new List<TransportOperation>
         {
@@ -49,12 +54,53 @@ public class OutboxPersisterTests
                 }
                 )
         };
-        //TODO:
-        //persister.Store(new OutboxMessage("a", operations),).Await();
-        //persister.Subscribe("address1@machine1".ToSubscriber(), type2, null).Await();
-        //persister.Subscribe("address2@machine2".ToSubscriber(), type1, null).Await();
-        //persister.Subscribe("address2@machine2".ToSubscriber(), type2, null).Await();
-        //var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result.Select(x => x.ToAddress());
-        //ObjectApprover.VerifyWithJson(result);
+        var messageId = "a";
+        using (var connection = await SqlHelpers.New(connectionString))
+        using (var transaction = connection.BeginTransaction())
+        {
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            transaction.Commit();
+        }
+        await persister.SetAsDispatched(messageId, null);
+        return await persister.Get(messageId, null);
+    }
+
+    [Test]
+    public void StoreAndGet()
+    {
+        var result = StoreAndGetAsync().GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result);
+    }
+
+    async Task<OutboxMessage> StoreAndGetAsync()
+    {
+        var operations = new List<TransportOperation>
+        {
+            new TransportOperation(
+                messageId: "Id1",
+                options: new Dictionary<string, string>
+                {
+                    {
+                        "OptionKey1", "OptionValue1"
+                    }
+                },
+                body: new byte[] {0x20, 0x21},
+                headers: new Dictionary<string, string>
+                {
+                    {
+                        "HeaderKey1", "HeaderValue1"
+                    }
+                }
+                )
+        };
+
+        var messageId = "a";
+        using (var connection = await SqlHelpers.New(connectionString))
+        using (var transaction = connection.BeginTransaction())
+        {
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            transaction.Commit();
+        }
+        return await persister.Get(messageId, null);
     }
 }

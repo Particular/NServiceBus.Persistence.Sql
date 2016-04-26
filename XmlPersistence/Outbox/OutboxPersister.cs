@@ -45,7 +45,7 @@ WHERE MessageId = @MessageId";
 UPDATE [{schema}].[{endpointName}.OutboxData]
 SET
     Dispatched = 1,
-    DispatchedAt = @DispatchedAt,
+    DispatchedAt = @DispatchedAt
 WHERE MessageId = @MessageId";
     }
 
@@ -70,20 +70,27 @@ WHERE MessageId = @MessageId";
 
     public async Task<OutboxMessage> Get(string messageId, ContextBag context)
     {
+        using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
         using (var connection = await SqlHelpers.New(connectionString))
-        using (var command = new SqlCommand(getCommandText, connection))
+        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
-            command.AddParameter("MessageId", messageId);
-            using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+            OutboxMessage result;
+            using (var command = new SqlCommand(getCommandText, connection, transaction))
             {
-                if (!await reader.ReadAsync())
+                command.AddParameter("MessageId", messageId);
+                using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
-                    return null;
+                    if (!await reader.ReadAsync())
+                    {
+                        return null;
+                    }
+                    result = new OutboxMessage(
+                        messageId: messageId,
+                        operations: OperationSerializer.FromString(reader.GetString(0)).ToList());
                 }
-                return new OutboxMessage(
-                    messageId: messageId,
-                    operations: OperationSerializer.FromString(reader.GetString(0)).ToList());
             }
+            transaction.Commit();
+            return result;
         }
     }
 
