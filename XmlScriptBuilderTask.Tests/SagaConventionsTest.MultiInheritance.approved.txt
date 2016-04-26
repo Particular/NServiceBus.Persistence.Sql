@@ -1,1 +1,1 @@
-﻿Saga types must directly inherit from NServiceBus.SqlPersistence.XmlSaga<T>.
+﻿Saga types must directly inherit from NServiceBus.Persistence.SqlServerXml.XmlSaga<T>.

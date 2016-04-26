@@ -100,7 +100,6 @@
     <Compile Include="Outbox\OutboxDatabase.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
-    <Compile Include="Saga\SagaDatabase.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
     <Compile Include="Saga\SagaSerializerTests.cs" />
     <Compile Include="Subscription\SubscriptionDatabase.cs" />
