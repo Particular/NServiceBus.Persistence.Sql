@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Persistence.SqlServerXml;
 using NUnit.Framework;
 using ObjectApproval;
@@ -81,7 +82,7 @@ public class SagaPersisterTests
         }
     }
 
-    public class MySagaData : XmlSagaData
+    public class MySagaData : ContainSagaData
     {
         public string Property { get; set; }
     }

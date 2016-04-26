@@ -2,5 +2,5 @@
 
 namespace NServiceBus.Persistence.SqlServerXml
 {
-    public delegate XmlSagaData SagaDeserialize(XmlReader reader);
+    public delegate IContainSagaData SagaDeserialize(XmlReader reader);
 }

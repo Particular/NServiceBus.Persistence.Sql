@@ -72,7 +72,7 @@ public class MsmqTransportIntegrationTests
             return Task.FromResult(0);
         }
 
-        public class SagaData : XmlSagaData
+        public class SagaData : ContainSagaData
         {
         }
 

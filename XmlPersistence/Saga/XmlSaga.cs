@@ -3,7 +3,6 @@ namespace NServiceBus.Persistence.SqlServerXml
 {
     public abstract class XmlSaga<TSagaData> : Saga<TSagaData>
         where TSagaData :
-        XmlSagaData,
         IContainSagaData,
         new()
     {

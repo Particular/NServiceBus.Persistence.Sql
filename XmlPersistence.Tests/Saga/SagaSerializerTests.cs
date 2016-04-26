@@ -17,8 +17,8 @@ public class SagaSerializerTests
     [Test]
     public void WithSimple()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSaga), (serializer, type) => { });
-        var saga = new SimpleSaga
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSagaData), (serializer, type) => { });
+        var saga = new SimpleSagaData
         {
             Property = "PropertyValue"
         };
@@ -45,7 +45,7 @@ public class SagaSerializerTests
         Approvals.Verify(xml);
     }
 
-    public class ComplexSaga : XmlSagaData
+    public class ComplexSaga : ContainSagaData
     {
         public NestedComplex Property { get; set; }
     }
@@ -58,8 +58,22 @@ public class SagaSerializerTests
     [Test]
     public void EnsureBasePropsAreNotWritten()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSaga), (serializer, type) => { });
-        var saga = new SimpleSaga
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromContainSagaData), (serializer, type) => { });
+        var saga = new SimpleInheritingFromContainSagaData
+        {
+            Id = Guid.NewGuid(),
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            Property = "theProperty"
+        };
+        var xml = Serialize(delegates, saga);
+        Approvals.Verify(xml);
+    }
+    [Test]
+    public void EnsureBasePropsAreNotWrittenCustom()
+    {
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromIContainSagaData), (serializer, type) => { });
+        var saga = new SimpleInheritingFromIContainSagaData
         {
             Id = Guid.NewGuid(),
             OriginalMessageId = "theOriginalMessageId",
@@ -70,12 +84,23 @@ public class SagaSerializerTests
         Approvals.Verify(xml);
     }
 
-    public class SimpleSaga : XmlSagaData
+    public class SimpleSagaData : ContainSagaData
     {
         public string Property { get; set; }
     }
+    public class SimpleInheritingFromContainSagaData : ContainSagaData
+    {
+        public string Property { get; set; }
+    }
+    public class SimpleInheritingFromIContainSagaData : IContainSagaData
+    {
+        public string Property { get; set; }
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
 
-    static string Serialize(DefaultSagaSerialization delegates, XmlSagaData saga)
+    static string Serialize(DefaultSagaSerialization delegates, IContainSagaData saga)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))

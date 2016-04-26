@@ -29,10 +29,9 @@ public class SagaConventionsTest
 
     public class BadNamedSaga : XmlSaga<BadNamedSaga.BadNamedSagaData>
     {
-        public class BadNamedSagaData : XmlSagaData
+        public class BadNamedSagaData : ContainSagaData
         {
         }
-        
     }
     [Test]
     public void NestedInNonXmlSaga()
@@ -45,7 +44,7 @@ public class SagaConventionsTest
 
     public class NonXmlSaga : Saga<NonXmlSaga.SagaData>
     {
-        public class SagaData : XmlSagaData
+        public class SagaData : ContainSagaData
         {
         }
 
@@ -66,10 +65,9 @@ public class SagaConventionsTest
 
     public class GenericSaga<T> : XmlSaga<GenericSaga<T>.SagaData>
     {
-        public class SagaData : XmlSagaData
+        public class SagaData : ContainSagaData
         {
         }
-        
     }
 
     [Test]
@@ -84,7 +82,7 @@ public class SagaConventionsTest
 
     public class GenericSagaData<T> : XmlSaga<GenericSagaData<T>.SagaData<T>>
     {
-        public class SagaData<K> : XmlSagaData
+        public class SagaData<K> : ContainSagaData
         {
         }
         
@@ -101,7 +99,7 @@ public class SagaConventionsTest
 
     public abstract class AbstactSaga : XmlSaga<AbstactSaga.SagaData>
     {
-        public class SagaData : XmlSagaData
+        public class SagaData : ContainSagaData
         {
         }
         
@@ -116,14 +114,14 @@ public class SagaConventionsTest
         Approvals.Verify(error);
     }
 
-    public abstract class BaseSaga<T> : XmlSaga<T> where T : XmlSagaData, new()
+    public abstract class BaseSaga<T> : XmlSaga<T> where T : IContainSagaData, new()
     {
 
     }
 
     public class MultiInheritanceSaga : BaseSaga<MultiInheritanceSaga.SagaData>
     {
-        public class SagaData : XmlSagaData
+        public class SagaData : ContainSagaData
         {
         }
         
@@ -139,7 +137,7 @@ public class SagaConventionsTest
     }
 }
 
-public class SagaData : XmlSagaData
+public class SagaData : ContainSagaData
 {
 }
 

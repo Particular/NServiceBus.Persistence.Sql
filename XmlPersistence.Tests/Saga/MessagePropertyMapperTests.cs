@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using NServiceBus;
 using NServiceBus.Persistence.SqlServerXml;
 using NUnit.Framework;
 
@@ -20,7 +21,7 @@ public class MessagePropertyMapperTests
         Assert.AreEqual("Foo", property);
     }
 
-    public class SagaDataWithStringCorrelationId : XmlSagaData
+    public class SagaDataWithStringCorrelationId : ContainSagaData
     {
         [CorrelationId]
         public string CorrelationProperty { get; set; }
@@ -38,7 +39,7 @@ public class MessagePropertyMapperTests
         Assert.AreEqual(10, property);
     }
 
-    public class SagaDataWithIntCorrelationId : XmlSagaData
+    public class SagaDataWithIntCorrelationId : ContainSagaData
     {
         [CorrelationId]
         public int CorrelationProperty { get; set; }
@@ -56,7 +57,7 @@ public class MessagePropertyMapperTests
         var property = expression.Compile()(instance);
         Assert.AreEqual(guid, property);
     }
-    public class SagaDataWithGuidCorrelationId : XmlSagaData
+    public class SagaDataWithGuidCorrelationId : ContainSagaData
     {
         [CorrelationId]
         public Guid CorrelationProperty { get; set; }
@@ -67,15 +68,14 @@ public class MessagePropertyMapperTests
         {
             mapper.MapMessage<Message>(message => message.CorrelationProperty);
         }
-        
     }
 
-    public class SagaData : XmlSagaData
+    public class SagaData : ContainSagaData
     {
         [CorrelationId]
         public string CorrelationProperty { get; set; }
     }
-    public class Message 
+    public class Message
     {
         public string CorrelationProperty { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Mono.Cecil;
+using NServiceBus;
 using NServiceBus.Persistence.SqlServerXml;
 using NUnit.Framework;
 
@@ -27,7 +28,7 @@ public class SagaMetaDataReaderTest
     public class StandardSaga : XmlSaga<StandardSaga.SagaData>
     {
 
-        public class SagaData :XmlSagaData
+        public class SagaData : ContainSagaData
         {
             [CorrelationId]
             public string  Correlation { get; set; }

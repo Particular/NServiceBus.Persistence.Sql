@@ -108,7 +108,6 @@
     <Compile Include="Saga\SagaSerializeBuilder.cs" />
     <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="Saga\XmlSaga.cs" />
-    <Compile Include="Saga\XmlSagaData.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
     <Compile Include="Subscription\SubscriberExtensions.cs" />

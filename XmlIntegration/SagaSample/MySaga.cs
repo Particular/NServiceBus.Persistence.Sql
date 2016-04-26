@@ -33,10 +33,10 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
         return Task.FromResult(0);
     }
 
-    public class SagaData : XmlSagaData
+    public class SagaData : ContainSagaData
     {
         [CorrelationId]
         public Guid MySagaId { get; set; }
     }
-    
+
 }

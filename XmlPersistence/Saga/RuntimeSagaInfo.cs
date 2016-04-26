@@ -24,7 +24,7 @@ class RuntimeSagaInfo
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
 
     public RuntimeSagaInfo(
-        SagaCommandBuilder commandBuilder, 
+        SagaCommandBuilder commandBuilder,
         Type sagaDataType,
         DeserializeBuilder deserializeBuilder,
         SagaSerializeBuilder sagaSerializeBuilder,
@@ -73,7 +73,7 @@ class RuntimeSagaInfo
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            defaultSerialize(writer, (XmlSagaData) sagaData);
+            defaultSerialize(writer, sagaData);
         }
         return builder.ToString();
     }
@@ -84,7 +84,7 @@ class RuntimeSagaInfo
         return (TSagaData) (IContainSagaData)deserialize(reader);
     }
 
-    SagaDeserialize GetDeserialize(Version storedSagaTypeVersion) 
+    SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
     {
         if (deserializeBuilder == null)
         {

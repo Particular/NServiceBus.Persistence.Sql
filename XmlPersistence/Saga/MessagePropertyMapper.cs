@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace NServiceBus.Persistence.SqlServerXml
 {
-    public class MessagePropertyMapper<TSagaData> where TSagaData : XmlSagaData, new()
+    public class MessagePropertyMapper<TSagaData> where TSagaData : IContainSagaData, new()
     {
         SagaPropertyMapper<TSagaData> sagaPropertyMapper;
         Expression<Func<TSagaData, object>> correlationExpression;
