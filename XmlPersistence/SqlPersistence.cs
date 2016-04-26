@@ -8,7 +8,7 @@ namespace NServiceBus.Persistence.SqlServerXml
         {
             Defaults(s =>
             {
-                //we can always enable these ones since they will only enable if the outbox or sagas are on
+                // always enable these ones since they will only enable if the outbox or sagas are on
                 s.EnableFeatureByDefault<StorageSessionFeature>();
             });
             Supports<StorageType.Outbox>(s =>

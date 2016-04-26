@@ -29,6 +29,7 @@ static class SagaXmlSerializerBuilder
 
     static XmlSerializer BuildXmlSerializer(Type sagaDataType, Action<XmlSerializer, Type> customize)
     {
+        //TODO: if sagaDataType is not public instruct developer to override xml serialization or make type public
         var xmlSerializer = new XmlSerializer(
             sagaDataType,
             overrides: new XmlAttributeOverrides(),

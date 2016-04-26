@@ -12,7 +12,7 @@ static class SagaTableNameBuilder
         }
         if (typeof(Saga).IsAssignableFrom(declaringType))
         {
-            return declaringType.FullName;
+            return declaringType.FullName.Replace("+", "_");
         }
         return type.FullName.Replace("+", "_");
     }

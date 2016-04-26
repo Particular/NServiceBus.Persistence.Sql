@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -78,6 +79,10 @@
       <HintPath>..\packages\NServiceBus.6.0.0-beta0001\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceBus.Transports.SQLServer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.SqlServer.3.0.0-alpha0117\lib\net452\NServiceBus.Transports.SQLServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -88,6 +93,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,18 +102,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
+    <Compile Include="DbBuilder.cs" />
+    <Compile Include="Integration\EndpointConfigurationExtensions.cs" />
+    <Compile Include="Integration\SqlTransportIntegrationTests.cs" />
+    <Compile Include="Integration\MsmqTransportIntegrationTests.cs" />
+    <Compile Include="Integration\QueueDeletion.cs" />
+    <Compile Include="Integration\TypeScanner.cs" />
     <Compile Include="Outbox\OperationSerializerTests.cs" />
-    <Compile Include="Outbox\OutboxDatabase.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
     <Compile Include="Saga\SagaSerializerTests.cs" />
-    <Compile Include="Subscription\SubscriptionDatabase.cs" />
     <Compile Include="TaskEx.cs" />
     <Compile Include="Timeout\HeaderSerializerTests.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
-    <Compile Include="Timeout\TimeoutDatabase.cs" />
     <Compile Include="Timeout\TimeoutPersisterTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +134,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <Content Include="Outbox\OperationSerializerTests.FromXml.approved.txt" />
-    <Content Include="Outbox\OperationSerializerTests.ToXml.approved.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

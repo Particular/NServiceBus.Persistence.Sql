@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using NServiceBus.Persistence.SqlServerXml;
 using NUnit.Framework;
@@ -16,55 +14,23 @@ public class SagaPersisterTests
     static string endpointName = "Endpoint";
     SagaPersister persister;
 
-    [TestFixtureSetUp]
-    public void TestFixtureSetUp()
+    [SetUp]
+    public void SetUp()
     {
-        TestFixtureSetUpAsync().Await();
+        SetUpAsync().Await();
     }
 
-    async Task TestFixtureSetUpAsync()
+    async Task SetUpAsync()
     {
         var sagaDefinition = new SagaDefinition
         {
             Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData))
         };
-        await Drop(sagaDefinition);
-        await Create(sagaDefinition);
+        await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var commandBuilder = new SagaCommandBuilder("dbo", endpointName);
         var infoCache = new SagaInfoCache(null, null, commandBuilder, (serializer, type) => { });
         persister = new SagaPersister(infoCache);
     }
-
-    Task Create(SagaDefinition sagaDefinition)
-    {
-        var builder = new StringBuilder();
-        using (var writer = new StringWriter(builder))
-        {
-            SagaScriptBuilder.BuildCreateScript(sagaDefinition, writer);
-        }
-        var script = builder.ToString();
-        return SqlHelpers.Execute(connectionString, script, collection =>
-        {
-            collection.AddWithValue("schema", "dbo");
-            collection.AddWithValue("endpointName", endpointName);
-        });
-    }
-
-    Task Drop(SagaDefinition sagaDefinition)
-    {
-        var builder = new StringBuilder();
-        using (var writer = new StringWriter(builder))
-        {
-            SagaScriptBuilder.BuildDropScript(sagaDefinition.Name, writer);
-        }
-        var script = builder.ToString();
-        return SqlHelpers.Execute(connectionString, script, collection =>
-        {
-            collection.AddWithValue("schema", "dbo");
-            collection.AddWithValue("endpointName", endpointName);
-        });
-    }
-
 
     [Test]
     public async Task Complete()

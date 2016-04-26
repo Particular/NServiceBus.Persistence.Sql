@@ -14,22 +14,22 @@ class SagaCommandBuilder
     public string BuildSaveCommand(Type sagaDataType)
     {
         return $@"
-INSERT INTO [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+INSERT INTO [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 (
-    Id, 
-    Originator, 
-    OriginalMessageId, 
-    Data, 
-    PersistenceVersion, 
+    Id,
+    Originator,
+    OriginalMessageId,
+    Data,
+    PersistenceVersion,
     SagaTypeVersion
-) 
-VALUES 
+)
+VALUES
 (
-    @Id, 
-    @Originator, 
-    @OriginalMessageId, 
-    @Data, 
-    @PersistenceVersion, 
+    @Id,
+    @Originator,
+    @OriginalMessageId,
+    @Data,
+    @PersistenceVersion,
     @SagaTypeVersion
 )";
     }
@@ -37,19 +37,19 @@ VALUES
     public string BuildUpdateCommand(Type sagaDataType)
     {
         return $@"
-UPDATE [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+UPDATE [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 SET
-    Originator = @Originator, 
-    OriginalMessageId = @OriginalMessageId, 
-    Data = @Data, 
-    PersistenceVersion = @PersistenceVersion, 
+    Originator = @Originator,
+    OriginalMessageId = @OriginalMessageId,
+    Data = @Data,
+    PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion
 WHERE
     Id = @Id
 ";
     }
 
-    public string BuildGetBySagaIdCommand(Type sagaDataType) 
+    public string BuildGetBySagaIdCommand(Type sagaDataType)
     {
         //TODO: no need to return id if we already have it
         return $@"
@@ -57,23 +57,23 @@ SELECT
     Id,
     Originator,
     OriginalMessageId,
-    Data, 
+    Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE Id = @Id
 ";
     }
 
-    public string BuildGetByPropertyCommand(Type sagaDataType, string propertyName) 
+    public string BuildGetByPropertyCommand(Type sagaDataType, string propertyName)
     {
         return $@"
 SELECT
     Id,
     Originator,
     OriginalMessageId,
-    Data, 
+    Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]') = 1
 ";
     }
@@ -81,7 +81,7 @@ WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]'
     public string BuildCompleteCommand(Type sagaDataType)
     {
         return $@"
-DELETE FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}] 
+DELETE FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE Id = @Id
 ";
     }
