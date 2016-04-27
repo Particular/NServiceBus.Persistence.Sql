@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using NServiceBus;
 
-public static class EndpointConfigurationExtensions
+static class EndpointConfigurationExtensions
 {
     public static void SetTypesToScan(this EndpointConfiguration busConfiguration, IEnumerable<Type> typesToScan)
     {

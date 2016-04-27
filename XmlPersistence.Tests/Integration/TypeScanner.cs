@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using NServiceBus.Persistence.SqlServerXml;
 
-public static class TypeScanner
+static class TypeScanner
 {
     public static IEnumerable<Type> NestedTypes<T>(params Type[] extraTypes)
     {

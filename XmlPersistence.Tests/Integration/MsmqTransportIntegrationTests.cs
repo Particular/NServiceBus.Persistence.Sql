@@ -16,7 +16,7 @@ public class MsmqTransportIntegrationTests
     [TearDown]
     public void Setup()
     {
-        QueueDeletion.DeleteQueuesForEndpoint(endpointName);
+        MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
     }
 
     [Test]
@@ -31,9 +31,7 @@ public class MsmqTransportIntegrationTests
             Name = SagaTableNameBuilder.GetTableSuffix(typeof(Saga1))
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
-        var endpointConfiguration = new EndpointConfiguration(endpointName);
-        endpointConfiguration.SendFailedMessagesTo("error");
-        endpointConfiguration.EnableInstallers();
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<MsmqTransportIntegrationTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<MsmqTransport>();

@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Messaging;
 
-public static class QueueDeletion
+static class MsmqQueueDeletion
 {
-
-    public static void DeleteAllQueues()
-    {
-        var machineQueues = MessageQueue.GetPrivateQueuesByMachine(".");
-        foreach (var q in machineQueues)
-        {
-            MessageQueue.Delete(q.Path);
-        }
-    }
 
     public static void DeleteQueue(string queueName)
     {

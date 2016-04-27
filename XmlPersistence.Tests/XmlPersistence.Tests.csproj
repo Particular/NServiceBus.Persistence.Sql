@@ -76,11 +76,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-beta0001\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-beta0002\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Transports.SQLServer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.SqlServer.3.0.0-alpha0117\lib\net452\NServiceBus.Transports.SQLServer.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.SqlServer.3.0.0-alpha0135\lib\net452\NServiceBus.Transports.SQLServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
@@ -103,10 +103,12 @@
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="DbBuilder.cs" />
+    <Compile Include="Integration\EndpointConfigBuilder.cs" />
     <Compile Include="Integration\EndpointConfigurationExtensions.cs" />
+    <Compile Include="Integration\SqlQueueDeletion.cs" />
     <Compile Include="Integration\SqlTransportIntegrationTests.cs" />
     <Compile Include="Integration\MsmqTransportIntegrationTests.cs" />
-    <Compile Include="Integration\QueueDeletion.cs" />
+    <Compile Include="Integration\MsmqQueueDeletion.cs" />
     <Compile Include="Integration\TypeScanner.cs" />
     <Compile Include="Outbox\OperationSerializerTests.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
