@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -15,11 +14,11 @@ public class SqlTransportIntegrationTests
 
     [SetUp]
     [TearDown]
-    public void Setup()
+    public async Task Setup()
     {
-        using (var sqlConnection = new SqlConnection(connectionString))
+        using (var sqlConnection = await SqlHelpers.New(connectionString))
         {
-            SqlQueueDeletion.DeleteQueuesForEndpoint(sqlConnection ,"dbo",endpointName);
+            await SqlQueueDeletion.DeleteQueuesForEndpoint(sqlConnection ,"dbo",endpointName);
         }
     }
 
@@ -27,8 +26,7 @@ public class SqlTransportIntegrationTests
     [TestCase(TransportTransactionMode.TransactionScope)]
     [TestCase(TransportTransactionMode.SendsAtomicWithReceive)]
     [TestCase(TransportTransactionMode.ReceiveOnly)]
-    //TODO:
-    //[TestCase(TransportTransactionMode.None)]
+    [TestCase(TransportTransactionMode.None)]
     public async Task Write(TransportTransactionMode transactionMode)
     {
         var sagaDefinition = new SagaDefinition
