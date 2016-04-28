@@ -34,7 +34,7 @@ IF NOT EXISTS
 BEGIN
 DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
-    CREATE  SELECTIVE XML INDEX PropertyIndex_{0}
+    CREATE SELECTIVE XML INDEX PropertyIndex_{0}
     ON ' + @tableName + '(Data)
     FOR
     (
