@@ -50,7 +50,7 @@ IF NOT EXISTS
 BEGIN
 DECLARE @createIndex nvarchar(max);
 SET @createIndex = N'
-    CREATE  SELECTIVE XML INDEX PropertyIndex_Property1
+    CREATE SELECTIVE XML INDEX PropertyIndex_Property1
     ON ' + @tableName + '(Data)
     FOR
     (

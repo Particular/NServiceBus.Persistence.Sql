@@ -30,7 +30,6 @@ public class SagaScriptBuilderTest
     [Test]
     public void BuildDropScript()
     {
-        
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
