@@ -98,7 +98,7 @@ namespace NServiceBus.Persistence.SqlServerXml
                 File.Delete(dropPath);
                 using (var writer = File.CreateText(dropPath))
                 {
-                    SagaScriptBuilder.BuildDropScript(saga.Name, writer);
+                    SagaScriptBuilder.BuildDropScript(saga, writer);
                 }
             }
         }

@@ -1,0 +1,1 @@
+﻿"The type 'CorrelationReaderTest/DataWithMultiple' has multiple members marked with [CorrelationId]. Members: Correlation1,Correlation2"

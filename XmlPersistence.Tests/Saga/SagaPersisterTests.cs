@@ -16,16 +16,21 @@ public class SagaPersisterTests
     SagaPersister persister;
 
     [SetUp]
-    public void SetUp()
-    {
-        SetUpAsync().Await();
-    }
-
-    async Task SetUpAsync()
+    public async Task SetUp()
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData))
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
+            CorrelationMember = new CorrelationMember
+            {
+                Name = "CorrelationProperty",
+                Type = CorrelationMemberType.String
+            },
+            TransitionalCorrelationMember = new CorrelationMember
+            {
+                Name = "TransitionalCorrelationProperty",
+                Type = CorrelationMemberType.String
+            }
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var commandBuilder = new SagaCommandBuilder("dbo", endpointName);
@@ -42,7 +47,7 @@ public class SagaPersisterTests
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            Property = "theProperty"
+            CorrelationProperty = "theProperty"
         };
 
         using (var connection = await SqlHelpers.New(connectionString))
@@ -70,7 +75,9 @@ public class SagaPersisterTests
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            Property = "theProperty"
+            SimpleProperty = "theSimpleProperty",
+            CorrelationProperty = "theCorrelationProperty",
+            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
         };
 
         using (var connection = await SqlHelpers.New(connectionString))
@@ -84,7 +91,9 @@ public class SagaPersisterTests
 
     public class MySagaData : ContainSagaData
     {
-        public string Property { get; set; }
+        public string CorrelationProperty { get; set; }
+        public string TransitionalCorrelationProperty { get; set; }
+        public string SimpleProperty { get; set; }
     }
 
     [Test]
@@ -102,14 +111,16 @@ public class SagaPersisterTests
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            Property = "theProperty"
+            CorrelationProperty = "theCorrelationProperty",
+            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
+            SimpleProperty = "theSimpleProperty"
         };
         using (var connection = await SqlHelpers.New(connectionString))
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, null, storageSession, null);
-            return await persister.Get<MySagaData>("Property", "theProperty", storageSession, null);
+            return await persister.Get<MySagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, null);
         }
     }
 
@@ -122,7 +133,9 @@ public class SagaPersisterTests
             Id = Guid.NewGuid(),
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            Property = "theProperty"
+            CorrelationProperty = "theCorrelationProperty",
+            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
+            SimpleProperty = "theSimpleProperty"
         };
         using (var connection = await SqlHelpers.New(connectionString))
         using (var transaction = connection.BeginTransaction())
@@ -134,9 +147,13 @@ public class SagaPersisterTests
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
                 Originator = "theOriginator",
-                Property = "theProperty"
+                CorrelationProperty = "theCorrelationProperty",
+                TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
+                SimpleProperty = "theSimpleProperty"
             };
-            await persister.Save(sagaData2, null, storageSession, null);
+            var throwsAsync = Assert.ThrowsAsync<Exception>(() => persister.Save(sagaData2, null, storageSession, null));
+            Assert.IsTrue(throwsAsync.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"));
+            await storageSession.CompleteAsync();
         }
     }
 }

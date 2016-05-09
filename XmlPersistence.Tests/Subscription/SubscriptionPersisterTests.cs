@@ -18,12 +18,7 @@ public class SubscriptionPersisterTests
     SubscriptionPersister persister;
 
     [SetUp]
-    public void SetUp()
-    {
-        SetUpAsync().Await();
-    }
-
-    async Task SetUpAsync()
+    public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
         persister = new SubscriptionPersister(connectionString, "dbo", endpointName);

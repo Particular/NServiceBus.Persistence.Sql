@@ -13,8 +13,13 @@ public class SagaScriptBuilderTest
         var saga = new SagaDefinition
         {
             Name = "theSaga",
-            CorrelationMember = "Property1",
+            CorrelationMember = new CorrelationMember
+            {
+                Name = "Property1",
+                Type = CorrelationMemberType.String
+            }
         };
+
 
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -33,7 +38,8 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildDropScript("theSaga", writer);
+            var saga = new SagaDefinition {Name = "theSaga"};
+            SagaScriptBuilder.BuildDropScript(saga, writer);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);

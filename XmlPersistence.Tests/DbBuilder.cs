@@ -27,7 +27,7 @@ static class DbBuilder
     {
         foreach (var sagaDefinition in sagaDefinitions)
         {
-            await Execute(connection, endpointName, writer => SagaScriptBuilder.BuildDropScript(sagaDefinition.Name, writer));
+            await Execute(connection, endpointName, writer => SagaScriptBuilder.BuildDropScript(sagaDefinition, writer));
         }
         await Execute(connection, endpointName, SubscriptionScriptBuilder.BuildDropScript);
         await Execute(connection, endpointName, OutboxScriptBuilder.BuildDropScript);

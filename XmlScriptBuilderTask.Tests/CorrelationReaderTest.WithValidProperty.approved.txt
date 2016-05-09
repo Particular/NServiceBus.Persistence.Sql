@@ -1,5 +1,0 @@
-﻿{
-  "Errored": false,
-  "Name": "Correlation",
-  "Error": null
-}

@@ -88,12 +88,13 @@
     <Compile Include="Outbox\OutboxInstaller.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
+    <Compile Include="Saga\Attributes\TransitionalCorrelationIdAttribute.cs" />
     <Compile Include="SqlServerXmlStorageSessionExtensions.cs" />
     <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageAdapter.cs" />
-    <Compile Include="Saga\CorrelationIdAttribute.cs" />
+    <Compile Include="Saga\Attributes\CorrelationIdAttribute.cs" />
     <Compile Include="Saga\DefaultSagaSerialization.cs" />
     <Compile Include="Saga\MessagePropertyMapper.cs" />
     <Compile Include="Saga\SagaDeserialize.cs" />

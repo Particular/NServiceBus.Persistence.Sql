@@ -1,0 +1,80 @@
+﻿
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.theSaga]';
+
+IF NOT EXISTS
+(
+    SELECT *
+    FROM sys.objects
+    WHERE
+        object_id = OBJECT_ID(@tableName) AND
+        type in (N'U')
+)
+BEGIN
+DECLARE @createTable nvarchar(max);
+SET @createTable = N'
+    CREATE TABLE ' + @tableName + N'(
+	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+	    [Originator] [nvarchar](255) NULL,
+	    [OriginalMessageId] [nvarchar](255) NULL,
+	    [Data] [xml] NOT NULL,
+	    [PersistenceVersion] [nvarchar](23) NOT NULL,
+	    [SagaTypeVersion] [nvarchar](23) NOT NULL
+    )
+';
+exec(@createTable);
+END
+
+IF NOT EXISTS
+(
+  SELECT * FROM sys.columns
+  WHERE
+    name = 'Property_Property1' AND
+    object_id = OBJECT_ID(@tableName)
+)
+BEGIN
+  DECLARE @createColumnProperty_Property1 nvarchar(max);
+  SET @createColumnProperty_Property1 = N'
+  ALTER TABLE ' + @tableName  + '
+    ADD Property_Property1 nvarchar(450);
+  ';
+  exec(@createColumnProperty_Property1);
+END
+
+DECLARE @dataTypeProperty_Property1 nvarchar(max);
+SET @dataTypeProperty_Property1 = (
+  SELECT DATA_TYPE
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE
+    TABLE_NAME = ' + @tableName  + ' AND
+    COLUMN_NAME = 'Property_Property1'
+);
+IF (@dataTypeProperty_Property1 <> 'nvarchar(450)')
+  THROW 50000, 'Incorrect data type for nvarchar(450)', 0
+
+IF NOT EXISTS
+(
+  SELECT *
+    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_NAME = 'CONSTRAINT_theSaga_Property_Property1'
+)
+BEGIN
+  DECLARE @createConstraintProperty_Property1 nvarchar(max);
+  SET @createConstraintProperty_Property1 = '
+  ALTER TABLE ' + @tableName  + '
+    ADD CONSTRAINT CONSTRAINT_theSaga_Property_Property1 UNIQUE (Property_Property1);
+  ';
+  exec(@createConstraintProperty_Property1);
+END
+
+declare @dropPropertiesQuery nvarchar(max);
+select @dropPropertiesQuery =
+(
+    SELECT 'ALTER TABLE ' + @tableName  + ' DROP COLUMN ' + col.COLUMN_NAME '; '
+    FROM INFORMATION_SCHEMA.COLUMNS col
+    WHERE
+		col.TABLE_NAME = ' + @tableName  + ' AND
+	    col.COLUMN_NAME LIKE 'Property_%' AND
+	    col.COLUMN_NAME <> 'Property_Property1' AND
+	    col.COLUMN_NAME <> ''
+);
+exec sp_executesql @dropPropertiesQuery

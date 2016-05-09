@@ -15,12 +15,7 @@ public class OutboxPersisterTests
     OutboxPersister persister;
 
     [SetUp]
-    public void SetUp()
-    {
-        SetUpAsync().Await();
-    }
-
-    async Task SetUpAsync()
+    public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
         persister = new OutboxPersister(connectionString, "dbo", endpointName);

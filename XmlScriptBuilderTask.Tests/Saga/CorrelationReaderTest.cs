@@ -27,6 +27,8 @@ public class CorrelationReaderTest
     {
         [CorrelationId]
         public string Correlation { get; set; }
+        [TransitionalCorrelationId]
+        public string TransitionalCorrelation { get; set; }
     }
 
 
@@ -42,12 +44,13 @@ public class CorrelationReaderTest
     {
         public string Property{ get; set; }
     }
+
     [Test]
     public void ErrorForMultiple()
     {
         var dataType = module.GetTypeDefinition<DataWithMultiple>();
-        var correlationMember = CorrelationReader.GetCorrelationMember(dataType);
-        ObjectApprover.VerifyWithJson(correlationMember);
+        var exception = Assert.Throws<ErrorsException>(() => CorrelationReader.GetCorrelationMember(dataType));
+        ObjectApprover.VerifyWithJson(exception.Message);
     }
 
     public class DataWithMultiple

@@ -77,11 +77,11 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BuildLogger.cs" />
     <Compile Include="CecilExtentions.cs" />
-    <Compile Include="CorrelationResult.cs" />
+    <Compile Include="Saga\CorrelationResult.cs" />
     <Compile Include="ErrorsException.cs" />
-    <Compile Include="CorrelationReader.cs" />
+    <Compile Include="Saga\CorrelationReader.cs" />
     <Compile Include="ScriptBuilderTask.cs" />
-    <Compile Include="SagaMetaDataReader.cs" />
+    <Compile Include="Saga\SagaMetaDataReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XmlScriptBuilder\XmlScriptBuilder.csproj">

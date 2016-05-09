@@ -10,9 +10,7 @@ IF EXISTS
         AND type in (N'U')
 )
 BEGIN
-DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    DROP TABLE ' + @tableName + '
-';
-exec(@createTable);
+    DECLARE @createTable nvarchar(max);
+    SET @createTable = N'DROP TABLE ' + @tableName + '';
+    exec(@createTable);
 END

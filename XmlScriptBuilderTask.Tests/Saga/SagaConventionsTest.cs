@@ -22,9 +22,8 @@ public class SagaConventionsTest
     public void BadSagaDataName()
     {
         var dataType = module.GetTypeDefinition<BadNamedSaga.BadNamedSagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public class BadNamedSaga : XmlSaga<BadNamedSaga.BadNamedSagaData>
@@ -37,9 +36,8 @@ public class SagaConventionsTest
     public void NestedInNonXmlSaga()
     {
         var dataType = module.GetTypeDefinition<NonXmlSaga.SagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public class NonXmlSaga : Saga<NonXmlSaga.SagaData>
@@ -58,9 +56,8 @@ public class SagaConventionsTest
     {
         var type = typeof (GenericSaga<>.SagaData);
         var dataType = module.GetAllTypes().First(x => x.FullName == type.FullName.Replace("+", "/"));
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public class GenericSaga<T> : XmlSaga<GenericSaga<T>.SagaData>
@@ -75,9 +72,8 @@ public class SagaConventionsTest
     {
         var type = typeof (GenericSagaData<>.SagaData<>);
         var dataType = module.GetAllTypes().First(x => x.FullName == type.FullName.Replace("+", "/"));
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public class GenericSagaData<T> : XmlSaga<GenericSagaData<T>.SagaData<T>>
@@ -85,16 +81,15 @@ public class SagaConventionsTest
         public class SagaData<K> : ContainSagaData
         {
         }
-        
+
     }
 
     [Test]
     public void Abstract()
     {
         var dataType = module.GetTypeDefinition<AbstactSaga.SagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public abstract class AbstactSaga : XmlSaga<AbstactSaga.SagaData>
@@ -102,16 +97,15 @@ public class SagaConventionsTest
         public class SagaData : ContainSagaData
         {
         }
-        
+
     }
 
     [Test]
     public void MultiInheritance()
     {
         var dataType = module.GetTypeDefinition<MultiInheritanceSaga.SagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 
     public abstract class BaseSaga<T> : XmlSaga<T> where T : IContainSagaData, new()
@@ -124,16 +118,15 @@ public class SagaConventionsTest
         public class SagaData : ContainSagaData
         {
         }
-        
+
     }
 
     [Test]
     public void NotNestedSagaData()
     {
         var dataType = module.GetTypeDefinition<SagaData>();
-        string error;
-        Assert.IsFalse(SagaMetaDataReader.ValidateSagaConventions(dataType, out error));
-        Approvals.Verify(error);
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
+        Approvals.Verify(errorsException.Message);
     }
 }
 

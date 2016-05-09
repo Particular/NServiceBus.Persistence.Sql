@@ -1,0 +1,10 @@
+﻿{
+  "CorrelationMember": {
+    "Name": "Correlation",
+    "Type": "String"
+  },
+  "TransitionalCorrelationMember": {
+    "Name": "TransitionalCorrelation",
+    "Type": "String"
+  }
+}

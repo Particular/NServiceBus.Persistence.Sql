@@ -19,9 +19,7 @@ public class SagaMetaDataReaderTest
     public void FindSagaDataType()
     {
         var dataType = module.GetTypeDefinition<StandardSaga.SagaData>();
-        SagaDefinition map;
-        string error;
-        Assert.IsTrue(SagaMetaDataReader.TryBuildSagaDataMap(dataType, out map, out error));
+        var map= SagaMetaDataReader.BuildSagaDataMap(dataType);
         Assert.AreEqual(typeof(StandardSaga).FullName.Replace("+","/"), map.Name);
     }
 

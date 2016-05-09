@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="SagaScriptBuilderTest.cs" />
+    <Compile Include="Saga\SagaScriptBuilderTest.cs" />
     <Compile Include="SubscriptionScriptBuilderTest.cs" />
     <Compile Include="SqlValidator.cs" />
     <Compile Include="TimeoutScriptBuilderTest.cs" />

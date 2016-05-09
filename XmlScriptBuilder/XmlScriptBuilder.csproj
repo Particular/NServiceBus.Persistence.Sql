@@ -56,14 +56,17 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="SagaDefinition.cs" />
-    <Compile Include="SagaScriptBuilder.cs" />
+    <Compile Include="Saga\CorrelationMember.cs" />
+    <Compile Include="Saga\CorrelationMemberType.cs" />
+    <Compile Include="Saga\SagaDefinition.cs" />
+    <Compile Include="Saga\SagaScriptBuilder.cs" />
     <Compile Include="SubscriptionScriptBuilder.cs" />
     <Compile Include="OutboxScriptBuilder.cs" />
     <Compile Include="TimeoutScriptBuilder.cs" />
