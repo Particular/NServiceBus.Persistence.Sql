@@ -8,7 +8,7 @@ using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 public static class SagaConfigExtentions
 {
-    public static void XmlSerializerCustomize(this PersistenceExtentions<SqlXmlPersistence, StorageType.Sagas> configuration, Action<XmlSerializer, Type> xmlSerializerCustomize)
+    public static void XmlSerializerCustomize(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
         configuration.GetSettings()
             .Set("SqlPersistence.XmlSerializerCustomize", xmlSerializerCustomize);
@@ -24,7 +24,7 @@ public static class SagaConfigExtentions
         return (serializer, type) => {};
     }
 
-    public static void SerializeBuilder(this PersistenceExtentions<SqlXmlPersistence, StorageType.Sagas> configuration, SagaSerializeBuilder builder)
+    public static void SerializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, SagaSerializeBuilder builder)
     {
         configuration.GetSettings()
             .Set<SagaSerializeBuilder>(builder);
@@ -37,7 +37,7 @@ public static class SagaConfigExtentions
         return value;
     }
 
-    public static void DeserializeBuilder(this PersistenceExtentions<SqlXmlPersistence, StorageType.Sagas> configuration, DeserializeBuilder builder)
+    public static void DeserializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, DeserializeBuilder builder)
     {
         configuration.GetSettings()
             .Set<DeserializeBuilder>(builder);

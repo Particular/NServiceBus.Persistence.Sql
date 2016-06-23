@@ -8,13 +8,13 @@ namespace NServiceBus
 {
     public static class SqlServerXmlPersistenceConfig
     {
-        public static void ConnectionString(this PersistenceExtentions<SqlXmlPersistence> configuration, string connectionString)
+        public static void ConnectionString(this PersistenceExtensions<SqlXmlPersistence> configuration, string connectionString)
         {
             configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionString", connectionString);
         }
 
-        public static void ConnectionString<TStorageType>(this PersistenceExtentions<SqlXmlPersistence, TStorageType> configuration, string connectionString)
+        public static void ConnectionString<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, string connectionString)
             where TStorageType : StorageType
         {
             var key = "SqlPersistence." + typeof (TStorageType).Name + ".ConnectionString";
@@ -29,13 +29,13 @@ namespace NServiceBus
         }
 
 
-        public static void DisableInstaller(this PersistenceExtentions<SqlXmlPersistence> configuration)
+        public static void DisableInstaller(this PersistenceExtensions<SqlXmlPersistence> configuration)
         {
             configuration.GetSettings()
                 .Set("SqlPersistence.DisableInstaller", true);
         }
 
-        public static void DisableInstaller<TStorageType>(this PersistenceExtentions<SqlXmlPersistence, TStorageType> configuration)
+        public static void DisableInstaller<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration)
             where TStorageType : StorageType
         {
             var key = "SqlPersistence." + typeof(TStorageType).Name + ".DisableInstaller";
@@ -72,13 +72,13 @@ namespace NServiceBus
                 !disableInstaller;
         }
 
-        public static void Schema(this PersistenceExtentions<SqlXmlPersistence> configuration, string schema)
+        public static void Schema(this PersistenceExtensions<SqlXmlPersistence> configuration, string schema)
         {
             configuration.GetSettings()
                 .Set("SqlPersistence.Schema", schema);
         }
 
-        public static void Schema<TStorageType>(this PersistenceExtentions<SqlXmlPersistence, TStorageType> configuration, string schema)
+        public static void Schema<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, string schema)
             where TStorageType : StorageType
         {
             var key = "SqlPersistence." + typeof (TStorageType).Name + ".Schema";

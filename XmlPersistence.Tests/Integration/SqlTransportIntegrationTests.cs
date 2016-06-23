@@ -45,7 +45,11 @@ public class SqlTransportIntegrationTests
         persistence.DisableInstaller();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);
-        await endpoint.SendLocal(new StartSagaMessage());
+        var startSagaMessage = new StartSagaMessage
+        {
+            StartId = Guid.NewGuid()
+        };
+        await endpoint.SendLocal(startSagaMessage);
         ManualResetEvent.WaitOne();
         await endpoint.Stop();
     }
@@ -53,6 +57,7 @@ public class SqlTransportIntegrationTests
 
     public class StartSagaMessage : IMessage
     {
+        public Guid StartId { get; set; }
     }
 
     public class TimeoutMessage : IMessage
@@ -77,10 +82,13 @@ public class SqlTransportIntegrationTests
 
         public class SagaData : ContainSagaData
         {
+            [CorrelationIdAttribute]
+            public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
+            mapper.MapMessage<StartSagaMessage>(m => m.StartId);
         }
 
     }

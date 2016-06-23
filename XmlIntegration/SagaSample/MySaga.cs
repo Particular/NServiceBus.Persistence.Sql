@@ -20,10 +20,11 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
     {
         Data.MySagaId = message.MySagaId;
         logger.Info($"Start Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
-        return context.SendLocal(new CompleteSagaMessage
-                           {
-                               MySagaId = Data.MySagaId
-                           });
+        var completeSagaMessage = new CompleteSagaMessage
+        {
+            MySagaId = Data.MySagaId
+        };
+        return context.SendLocal(completeSagaMessage);
     }
 
     public Task Handle(CompleteSagaMessage message, IMessageHandlerContext context)
