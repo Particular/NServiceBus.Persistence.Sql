@@ -66,6 +66,7 @@ WHERE Id = @Id
 
     public string BuildGetByPropertyCommand(Type sagaDataType, string propertyName)
     {
+        //TODO: throw if property name 
         return $@"
 SELECT
     Id,

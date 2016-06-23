@@ -14,8 +14,8 @@ namespace NServiceBus.Persistence.SqlServerXml
             AddProperty(saga.TransitionalCorrelationMember, writer);
             VerifyColumnType(saga.CorrelationMember, writer);
             VerifyColumnType(saga.TransitionalCorrelationMember, writer);
-            WriteCreateConstraint(saga.CorrelationMember,saga.Name, writer);
-            WriteCreateConstraint(saga.TransitionalCorrelationMember, saga.Name, writer);
+            WriteCreateIndex(saga.CorrelationMember, writer);
+            WriteCreateIndex(saga.TransitionalCorrelationMember, writer);
             WritePurgeObsoleteProperties(saga,writer);
         }
 
@@ -44,7 +44,7 @@ IF NOT EXISTS
 )
 BEGIN
   DECLARE @createColumn{columnName} nvarchar(max);
-  SET @createColumn{columnName} = N'
+  SET @createColumn{columnName} = '
   ALTER TABLE ' + @tableName  + '
     ADD {columnName} {columnType};
   ';
@@ -92,55 +92,98 @@ IF (@dataType{columnName} <> '{columnType}')
             throw new Exception($"Could not convert {memberType}.");
         }
 
-        static void WriteCreateConstraint(CorrelationMember correlationMember, string sagaName, TextWriter writer)
+        static void WriteCreateIndex(CorrelationMember correlationMember, TextWriter writer)
         {
             if (correlationMember == null)
             {
                 return;
             }
-            var constraintName = GetConstraintName(correlationMember, sagaName);
+            var indexName = GetIndexName(correlationMember);
             var columnName = GetColumnName(correlationMember);
             writer.Write($@"
 IF NOT EXISTS
 (
-  SELECT *
-    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-    WHERE CONSTRAINT_NAME = '{constraintName}'
+    SELECT *
+    FROM sys.indexes
+    WHERE
+        name = '{indexName}' AND
+        object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createConstraint{columnName} nvarchar(max);
-  SET @createConstraint{columnName} = '
-  ALTER TABLE ' + @tableName  + '
-    ADD CONSTRAINT {constraintName} UNIQUE ({columnName});
-  ';
-  exec(@createConstraint{columnName});
+  DECLARE @createIndex{columnName} nvarchar(max);
+  SET @createIndex{columnName} = '
+  CREATE UNIQUE NONCLUSTERED INDEX {indexName}
+  ON ' + @tableName  + '({columnName})
+  WHERE {columnName} IS NOT NULL;
+';
+  exec(@createIndex{columnName});
 END
 ");
         }
 
         const string propertyPrefix = "Property_";
-        static string GetColumnName(CorrelationMember constraintMember)
+        static string GetColumnName(CorrelationMember correlationMember)
         {
-            return $"{propertyPrefix}{constraintMember.Name}";
+            return $"{propertyPrefix}{correlationMember.Name}";
         }
 
-        static string GetConstraintName(CorrelationMember constraintMember, string sagaName)
+        static string GetIndexName(CorrelationMember correlationMember)
         {
-            return $"CONSTRAINT_{sagaName}_{propertyPrefix}{constraintMember.Name}";
+            // Index names must be unique within a table or view but do not have to be unique within a database.
+            return $"Index_{propertyPrefix}{correlationMember.Name}";
         }
-
+        static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer)
+        {
+            writer.Write(@"
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery =
+(
+    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
+    FROM sysindexes ix
+    WHERE
+		ix.Id = (select object_id from sys.objects where name = @tableName) AND
+	    ix.Name IS NOT null AND
+	    ix.Name LIKE 'PropertyIndex_%' AND
+	    ix.Name <> 'PropertyIndex_{0}'
+    for xml path('')
+);
+exec sp_executesql @dropIndexQuery
+", saga.CorrelationMember);
+        }
         static void WritePurgeObsoleteProperties(SagaDefinition saga, TextWriter writer)
         {
             var correlationColumnName = "";
+            var correlationIndexName = "";
             if (saga.CorrelationMember != null)
             {
                 correlationColumnName = GetColumnName(saga.CorrelationMember);
+                correlationIndexName = GetIndexName(saga.CorrelationMember);
             }
             var transitionalColumnName = "";
+            var transitionalIndexName = "";
             if (saga.TransitionalCorrelationMember != null)
             {
                 transitionalColumnName = GetColumnName(saga.TransitionalCorrelationMember);
+                transitionalIndexName = GetIndexName(saga.TransitionalCorrelationMember);
             }
+
+            writer.Write($@"
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery =
+(
+    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
+    FROM sysindexes ix
+    WHERE
+		ix.Id = (select object_id from sys.objects where name = @tableName) AND
+	    ix.Name IS NOT null AND
+	    ix.Name LIKE 'PropertyIndex_%' AND
+	    ix.Name <> 'PropertyIndex_{correlationIndexName}' AND
+	    ix.Name <> 'PropertyIndex_{transitionalIndexName}'
+    for xml path('')
+);
+exec sp_executesql @dropIndexQuery
+");
+
             writer.Write($@"
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
@@ -165,12 +208,12 @@ IF NOT EXISTS
     FROM sys.objects
     WHERE
         object_id = OBJECT_ID(@tableName) AND
-        type in (N'U')
+        type in ('U')
 )
 BEGIN
 DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    CREATE TABLE ' + @tableName + N'(
+SET @createTable = '
+    CREATE TABLE ' + @tableName + '(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
 	    [OriginalMessageId] [nvarchar](255) NULL,
@@ -195,11 +238,11 @@ IF EXISTS
     FROM sys.objects
     WHERE
         object_id = OBJECT_ID(@tableName)
-        AND type in (N'U')
+        AND type in ('U')
 )
 BEGIN
     DECLARE @createTable nvarchar(max);
-    SET @createTable = N'DROP TABLE ' + @tableName + '';
+    SET @createTable = 'DROP TABLE ' + @tableName;
     exec(@createTable);
 END
 ");

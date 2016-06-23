@@ -7,12 +7,12 @@ IF NOT EXISTS
     FROM sys.objects
     WHERE
         object_id = OBJECT_ID(@tableName) AND
-        type in (N'U')
+        type in ('U')
 )
 BEGIN
 DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    CREATE TABLE ' + @tableName + N'(
+SET @createTable = '
+    CREATE TABLE ' + @tableName + '(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
 	    [Originator] [nvarchar](255) NULL,
 	    [OriginalMessageId] [nvarchar](255) NULL,
@@ -33,7 +33,7 @@ IF NOT EXISTS
 )
 BEGIN
   DECLARE @createColumnProperty_Property1 nvarchar(max);
-  SET @createColumnProperty_Property1 = N'
+  SET @createColumnProperty_Property1 = '
   ALTER TABLE ' + @tableName  + '
     ADD Property_Property1 nvarchar(450);
   ';
@@ -53,18 +53,36 @@ IF (@dataTypeProperty_Property1 <> 'nvarchar(450)')
 
 IF NOT EXISTS
 (
-  SELECT *
-    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-    WHERE CONSTRAINT_NAME = 'CONSTRAINT_theSaga_Property_Property1'
+    SELECT *
+    FROM sys.indexes
+    WHERE
+        name = 'Index_Property_Property1' AND
+        object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createConstraintProperty_Property1 nvarchar(max);
-  SET @createConstraintProperty_Property1 = '
-  ALTER TABLE ' + @tableName  + '
-    ADD CONSTRAINT CONSTRAINT_theSaga_Property_Property1 UNIQUE (Property_Property1);
-  ';
-  exec(@createConstraintProperty_Property1);
+  DECLARE @createIndexProperty_Property1 nvarchar(max);
+  SET @createIndexProperty_Property1 = '
+  CREATE UNIQUE NONCLUSTERED INDEX Index_Property_Property1
+  ON ' + @tableName  + '(Property_Property1)
+  WHERE Property_Property1 IS NOT NULL;
+';
+  exec(@createIndexProperty_Property1);
 END
+
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery =
+(
+    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
+    FROM sysindexes ix
+    WHERE
+		ix.Id = (select object_id from sys.objects where name = @tableName) AND
+	    ix.Name IS NOT null AND
+	    ix.Name LIKE 'PropertyIndex_%' AND
+	    ix.Name <> 'PropertyIndex_Index_Property_Property1' AND
+	    ix.Name <> 'PropertyIndex_'
+    for xml path('')
+);
+exec sp_executesql @dropIndexQuery
 
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =

@@ -69,6 +69,7 @@ public class SagaSerializerTests
         var xml = Serialize(delegates, saga);
         Approvals.Verify(xml);
     }
+
     [Test]
     public void EnsureBasePropsAreNotWrittenCustom()
     {
@@ -88,10 +89,12 @@ public class SagaSerializerTests
     {
         public string Property { get; set; }
     }
+
     public class SimpleInheritingFromContainSagaData : ContainSagaData
     {
         public string Property { get; set; }
     }
+
     public class SimpleInheritingFromIContainSagaData : IContainSagaData
     {
         public string Property { get; set; }

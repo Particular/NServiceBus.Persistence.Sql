@@ -7,10 +7,10 @@ IF EXISTS
     FROM sys.objects
     WHERE
         object_id = OBJECT_ID(@tableName)
-        AND type in (N'U')
+        AND type in ('U')
 )
 BEGIN
     DECLARE @createTable nvarchar(max);
-    SET @createTable = N'DROP TABLE ' + @tableName + '';
+    SET @createTable = 'DROP TABLE ' + @tableName;
     exec(@createTable);
 END

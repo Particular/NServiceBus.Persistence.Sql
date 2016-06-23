@@ -96,7 +96,7 @@ WHERE MessageId = @MessageId";
 
     public Task Store(OutboxMessage message, OutboxTransaction transaction, ContextBag context)
     {
-        var sqlOutboxTransaction = ((SqlOutboxTransaction) transaction);
+        var sqlOutboxTransaction = (SqlOutboxTransaction) transaction;
         var sqlTransaction = sqlOutboxTransaction.SqlTransaction;
         var sqlConnection = sqlOutboxTransaction.SqlConnection;
         return Store(message, sqlTransaction, sqlConnection);
