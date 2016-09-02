@@ -1,0 +1,166 @@
+﻿using System;
+using System.Data.SqlClient;
+using System.Threading;
+using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Configuration.AdvanceExtensibility;
+using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Pipeline;
+using NUnit.Framework;
+
+[TestFixture]
+public class UserDataConsistencyTests
+{
+    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
+    string endpointName = "SqlTransportIntegration";
+
+    internal const string CreateUserDataTableText = @"IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]') AND type in (N'U'))                  
+                    BEGIN
+                        CREATE TABLE [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
+                            [Id] [uniqueidentifier] NOT NULL                           
+                        ) ON [PRIMARY];
+                    END";
+
+    [SetUp]
+    [TearDown]
+    public async Task Setup()
+    {
+        using (var sqlConnection = await SqlHelpers.New(connectionString))
+        {
+            await SqlQueueDeletion.DeleteQueuesForEndpoint(sqlConnection, "dbo", endpointName);
+        }
+    }
+
+    [Test]
+    public async Task In_DTC_mode_enlists_in_the_ambient_transaction()
+    {
+        await RunTest(e =>
+        {
+            e.UseTransport<MsmqTransport>().Transactions(TransportTransactionMode.TransactionScope);
+        });
+    }
+
+    [Test]
+    public async Task In_native_SqlTransport_mode_enlists_in_native_transaction()
+    {
+        await RunTest(e =>
+        {            
+            e.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.SendsAtomicWithReceive).ConnectionString(connectionString);
+        });
+    }
+
+    [Test]
+    public async Task In_outbox_mode_enlists_in_outbox_transaction()
+    {
+        await RunTest(e =>
+        {
+            e.GetSettings().Set("DisableOutboxTransportCheck", true);
+            e.UseTransport<MsmqTransport>();
+            e.EnableOutbox();
+        });
+    }
+
+    async Task RunTest(Action<EndpointConfiguration> testCase)
+    {
+        ManualResetEvent.Reset();
+        string message = null;
+        await DbBuilder.ReCreate(connectionString, endpointName);
+        
+        await SqlHelpers.Execute(connectionString, CreateUserDataTableText, collection => {});
+
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
+        var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
+        endpointConfiguration.SetTypesToScan(typesToScan);
+        var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
+        testCase(endpointConfiguration);
+        transport.ConnectionString(connectionString);
+        var persistence = endpointConfiguration.UsePersistence<SqlXmlPersistence>();
+        persistence.ConnectionString(connectionString);
+        persistence.DisableInstaller();
+        endpointConfiguration.DefineCriticalErrorAction(c =>
+        {
+            message = c.Error;
+            ManualResetEvent.Set();
+            return Task.FromResult(0);
+        });
+        endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
+        endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");
+
+        var endpoint = await Endpoint.Start(endpointConfiguration);
+        var dataId = Guid.NewGuid();
+        await endpoint.SendLocal(new FailingMessage
+        {
+            EntityId = dataId
+        });
+        await endpoint.SendLocal(new CheckMessage
+        {
+            EntityId = dataId
+        });
+        ManualResetEvent.WaitOne();
+        await endpoint.Stop();
+
+        Assert.AreEqual("Success", message);
+    }
+
+    class FailureTrigger : Behavior<IIncomingLogicalMessageContext>
+    {
+        public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
+        {
+            await next();
+            if (context.Message.Instance is FailingMessage)
+            {
+                throw new Exception("Boom!");
+            }
+        }
+    }
+
+    public class FailingMessage : IMessage
+    {
+        public Guid EntityId { get; set; }
+    }
+
+    public class CheckMessage : IMessage
+    {
+        public Guid EntityId { get; set; }
+    }
+
+    public class Handler :
+        IHandleMessages<FailingMessage>,
+        IHandleMessages<CheckMessage>
+    {
+        public CriticalError CriticalError { get; set; }
+
+        public Task Handle(FailingMessage message, IMessageHandlerContext context)
+        {
+            var session = context.SynchronizedStorageSession.SqlPersistenceSession();
+            using (var command = new SqlCommand("INSERT INTO [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)", session.Connection, session.Transaction))
+            {
+                command.Parameters.AddWithValue("@Id", message.EntityId);
+                command.ExecuteNonQuery();
+            }
+            return Task.FromResult(0);
+        }
+
+        public Task Handle(CheckMessage message, IMessageHandlerContext context)
+        {
+            int count;
+            var session = context.SynchronizedStorageSession.SqlPersistenceSession();
+            using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] WHERE Id = @Id", session.Connection, session.Transaction))
+            {
+                command.Parameters.AddWithValue("@Id", message.EntityId);
+                count = (int)command.ExecuteScalar();
+            }
+
+            if (count > 0)
+            {
+                CriticalError.Raise("Failure", new Exception());
+            }
+            else
+            {
+                CriticalError.Raise("Success", new Exception());
+            }
+            return Task.FromResult(0);
+        }
+    }
+}

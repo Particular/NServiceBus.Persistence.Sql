@@ -27,7 +27,7 @@ public class SqlTransportIntegrationTests
     [TestCase(TransportTransactionMode.SendsAtomicWithReceive)]
     [TestCase(TransportTransactionMode.ReceiveOnly)]
     [TestCase(TransportTransactionMode.None)]
-    public async Task Write(TransportTransactionMode transactionMode)
+    public async Task SmokeTest(TransportTransactionMode transactionMode)
     {
         var sagaDefinition = new SagaDefinition
         {
