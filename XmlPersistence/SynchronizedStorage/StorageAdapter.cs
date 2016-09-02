@@ -1,6 +1,7 @@
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
@@ -28,21 +29,17 @@ class StorageAdapter : ISynchronizedStorageAdapter
         return EmptyResult;
     }
 
-    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        Transaction ambientTransaction;
-        if (transportTransaction.TryGet(out ambientTransaction))
+        SqlConnection existingSqlConnection;
+        SqlTransaction existingSqlTransaction;
+        //SQL server transport in native TX mode
+        if (transportTransaction.TryGet(out existingSqlConnection) && transportTransaction.TryGet(out existingSqlTransaction))
         {
-            SqlConnection existingSqlConnection;
-            //SQL server transport in ambient TX mode
-            if (transportTransaction.TryGet(out existingSqlConnection))
-            {
-                return new StorageSession(existingSqlConnection, null, false);
-            }
-            //Other transport in ambient TX mode
-            var connection = await SqlHelpers.New(connectionString);
-            return new StorageSession(connection, connection.BeginTransaction(), true);
+            CompletableSynchronizedStorageSession session = new StorageSession(existingSqlConnection, existingSqlTransaction, false);
+            return Task.FromResult(session);
         }
-        return null;
+        //Other modes handled by creating a new session.
+        return EmptyResult;
     }
 }
