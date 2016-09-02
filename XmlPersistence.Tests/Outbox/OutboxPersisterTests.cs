@@ -53,7 +53,7 @@ public class OutboxPersisterTests
         using (var connection = await SqlHelpers.New(connectionString))
         using (var transaction = connection.BeginTransaction())
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
             transaction.Commit();
         }
         await persister.SetAsDispatched(messageId, null);
@@ -69,7 +69,7 @@ public class OutboxPersisterTests
 
     async Task<OutboxMessage> StoreAndGetAsync()
     {
-        var operations = new List<TransportOperation>
+        var operations = new[]
         {
             new TransportOperation(
                 messageId: "Id1",

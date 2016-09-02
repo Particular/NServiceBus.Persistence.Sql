@@ -167,7 +167,7 @@ ORDER BY TIME";
                 }
             }
         }
-        return new TimeoutsChunk(list, nextTimeToRunQuery);
+        return new TimeoutsChunk(list.ToArray(), nextTimeToRunQuery);
     }
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)

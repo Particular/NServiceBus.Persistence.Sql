@@ -8,8 +8,8 @@ static class EndpointConfigBuilder
         var endpointConfiguration = new EndpointConfiguration(s);
         endpointConfiguration.SendFailedMessagesTo("error");
         endpointConfiguration.EnableInstallers();
-        endpointConfiguration.DisableFeature<FirstLevelRetries>();
-        endpointConfiguration.DisableFeature<SecondLevelRetries>();
+        endpointConfiguration.Recoverability().Immediate(c => c.NumberOfRetries(0));
+        endpointConfiguration.Recoverability().Delayed(c => c.NumberOfRetries(0));
         return endpointConfiguration;
     }
 }

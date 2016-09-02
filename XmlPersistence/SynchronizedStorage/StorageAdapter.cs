@@ -4,7 +4,7 @@ using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
-using NServiceBus.Transports;
+using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
 {
