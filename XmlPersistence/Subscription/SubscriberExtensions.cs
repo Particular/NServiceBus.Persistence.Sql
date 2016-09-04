@@ -1,7 +1,6 @@
-﻿using NServiceBus.Routing;
-using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
+﻿using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
-internal static class SubscriberExtensions
+static class SubscriberExtensions
 {
 
     internal static Subscriber ToSubscriber(this string s)

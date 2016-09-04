@@ -1,7 +1,5 @@
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using System.Transactions;
-using System.Xml;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;

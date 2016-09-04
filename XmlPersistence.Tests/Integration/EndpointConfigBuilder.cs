@@ -1,5 +1,4 @@
 ﻿using NServiceBus;
-using NServiceBus.Features;
 
 static class EndpointConfigBuilder
 {
@@ -8,8 +7,9 @@ static class EndpointConfigBuilder
         var endpointConfiguration = new EndpointConfiguration(s);
         endpointConfiguration.SendFailedMessagesTo("error");
         endpointConfiguration.EnableInstallers();
-        endpointConfiguration.Recoverability().Immediate(c => c.NumberOfRetries(0));
-        endpointConfiguration.Recoverability().Delayed(c => c.NumberOfRetries(0));
+        var recoverability = endpointConfiguration.Recoverability();
+        recoverability.Immediate(c => c.NumberOfRetries(0));
+        recoverability.Delayed(c => c.NumberOfRetries(0));
         return endpointConfiguration;
     }
 }
