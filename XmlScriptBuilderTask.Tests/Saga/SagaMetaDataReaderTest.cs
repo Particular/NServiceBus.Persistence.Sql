@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Mono.Cecil;
 using NServiceBus;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NUnit.Framework;
 
 [TestFixture]

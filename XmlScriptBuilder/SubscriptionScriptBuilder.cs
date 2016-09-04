@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public static class SubscriptionScriptBuilder
     {

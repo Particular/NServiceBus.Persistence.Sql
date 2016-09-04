@@ -57,9 +57,9 @@
       <HintPath>..\..\packages\NServiceBus.6.0.0-rc0001\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NServiceBus.Persistence.SqlServerXml">
+    <Reference Include="NServiceBus.Persistence.Sql.Xml">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ForXmlIntegration\NServiceBus.Persistence.SqlServerXml.dll</HintPath>
+      <HintPath>..\..\ForXmlIntegration\NServiceBus.Persistence.Sql.Xml.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -87,5 +87,5 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\..\ForXmlIntegration\build\net452\NServiceBus.Persistence.SqlServerXml.targets" />
+  <Import Project="$(SolutionDir)\..\ForXmlIntegration\build\net452\NServiceBus.Persistence.Sql.Xml.targets" />
 </Project>

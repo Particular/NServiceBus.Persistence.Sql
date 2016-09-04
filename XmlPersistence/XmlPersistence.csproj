@@ -7,8 +7,8 @@
     <ProjectGuid>{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Persistence.SqlServerXml</RootNamespace>
-    <AssemblyName>NServiceBus.Persistence.SqlServerXml</AssemblyName>
+    <RootNamespace>NServiceBus.Persistence.Sql.Xml</RootNamespace>
+    <AssemblyName>NServiceBus.Persistence.Sql.Xml</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -121,7 +121,7 @@
     <Compile Include="SqlHelpers.cs" />
     <Compile Include="SqlPersistence.cs" />
     <Compile Include="Saga\SqlXmlSagaFeature.cs" />
-    <Compile Include="SqlServerXmlPersistenceConfig.cs" />
+    <Compile Include="SqlXmlPersistenceConfig.cs" />
     <Compile Include="Subscription\SqlXmlSubscriptionFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
     <Compile Include="Timeout\SqlXmlTimeoutFeature.cs" />

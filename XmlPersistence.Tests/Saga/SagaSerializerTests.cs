@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using ApprovalTests;
 using NServiceBus;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NUnit.Framework;
 using ObjectApproval;
 

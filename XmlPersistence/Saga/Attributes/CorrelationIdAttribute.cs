@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     [AttributeUsage(AttributeTargets.Property|AttributeTargets.Field)]
     public class CorrelationIdAttribute : Attribute

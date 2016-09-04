@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 static class TypeScanner
 {

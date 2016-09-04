@@ -1,12 +1,12 @@
 using System;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NServiceBus.Settings;
 
 namespace NServiceBus
 {
-    public static class SqlServerXmlPersistenceConfig
+    public static class SqlXmlPersistenceConfig
     {
         public static void ConnectionString(this PersistenceExtensions<SqlXmlPersistence> configuration, string connectionString)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 using NServiceBus;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 static class SagaXmlSerializerBuilder

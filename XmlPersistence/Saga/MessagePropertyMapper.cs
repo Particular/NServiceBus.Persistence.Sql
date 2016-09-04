@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public class MessagePropertyMapper<TSagaData> where TSagaData : IContainSagaData, new()
     {

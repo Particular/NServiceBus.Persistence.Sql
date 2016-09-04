@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.SqlServerXml\</ScriptDirectory>
+    <ScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql.Xml\</ScriptDirectory>
   </PropertyGroup>
 
   <UsingTask
-      TaskName="NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask"
-      AssemblyFile="$(MSBuildThisFileDirectory)..\..\NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask.dll" />
+      TaskName="NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask"
+      AssemblyFile="$(MSBuildThisFileDirectory)..\..\NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask.dll" />
 
   <Target
       AfterTargets="BeforeBuild"
@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <Message Text="@(Scripts)"/>
-    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=Always;TargetPath=NServiceBus.Persistence.SqlServerXml\%(RecursiveDir)%(Filename)%(Extension)">
+    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=Always;TargetPath=NServiceBus.Persistence.Sql.Xml\%(RecursiveDir)%(Filename)%(Extension)">
       <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
     </CreateItem>
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 static class DbBuilder
 {

@@ -1,6 +1,6 @@
 ﻿using NServiceBus;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 public static class ConfigBuilder
 {

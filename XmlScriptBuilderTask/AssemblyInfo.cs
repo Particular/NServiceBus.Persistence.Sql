@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask")]
-[assembly: AssemblyProduct("NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask")]
+[assembly: AssemblyTitle("NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask")]
+[assembly: AssemblyProduct("NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask")]
 [assembly: InternalsVisibleTo("XmlScriptBuilderTask.Tests")]

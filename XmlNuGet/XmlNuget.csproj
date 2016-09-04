@@ -21,10 +21,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="NServiceBus.Persistence.SqlServerXml.nuspec">
+    <None Include="NServiceBus.Persistence.Sql.Xml.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="NServiceBus.Persistence.SqlServerXml.targets">
+    <None Include="NServiceBus.Persistence.Sql.Xml.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -42,14 +42,14 @@
   </ItemGroup>
   <PropertyGroup>
     <NugetBuild>$(SolutionDir)XmlNuGetBuild\</NugetBuild>
-    <ScriptBuilderTask>$(SolutionDir)XmlScriptBuilderTask\bin\$(ConfigurationName)\NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask.dll</ScriptBuilderTask>
-    <MergedScriptBuilderTask>$(NugetBuild)NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask.dll</MergedScriptBuilderTask>
-    <MergedScriptBuilderTaskPdb>$(NugetBuild)NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask.pdb</MergedScriptBuilderTaskPdb>
+    <ScriptBuilderTask>$(SolutionDir)XmlScriptBuilderTask\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask.dll</ScriptBuilderTask>
+    <MergedScriptBuilderTask>$(NugetBuild)NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask.dll</MergedScriptBuilderTask>
+    <MergedScriptBuilderTaskPdb>$(NugetBuild)NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask.pdb</MergedScriptBuilderTaskPdb>
     <Cecil>$(SolutionDir)XmlScriptBuilderTask\bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
-    <ScriptBuilder>$(SolutionDir)XmlScriptBuilder\bin\$(ConfigurationName)\NServiceBus.Persistence.SqlServerXml.ScriptBuilder.dll</ScriptBuilder>
-    <Persistence>$(SolutionDir)XmlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.SqlServerXml.dll</Persistence>
-    <PersistencePdb>$(SolutionDir)XmlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.SqlServerXml.pdb</PersistencePdb>
-    <Targets>$(ProjectDir)NServiceBus.Persistence.SqlServerXml.targets</Targets>
+    <ScriptBuilder>$(SolutionDir)XmlScriptBuilder\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Xml.ScriptBuilder.dll</ScriptBuilder>
+    <Persistence>$(SolutionDir)XmlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Xml.dll</Persistence>
+    <PersistencePdb>$(SolutionDir)XmlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Xml.pdb</PersistencePdb>
+    <Targets>$(ProjectDir)NServiceBus.Persistence.Sql.Xml.targets</Targets>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>XmlNuget</AssemblyName>
@@ -61,8 +61,8 @@
   <Target Name="ReBuild" DependsOnTargets="NuGetBuild" />
   <Target Name="NuGetBuild" DependsOnTargets="Clean">
     <MakeDir Directories="$(NugetBuild)" />
-    <Copy SourceFiles="$(TargetDir)NServiceBus.Persistence.SqlServerXml.nuspec" DestinationFolder="$(NugetBuild)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.Persistence.SqlServerXml.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Copy SourceFiles="$(TargetDir)NServiceBus.Persistence.Sql.Xml.nuspec" DestinationFolder="$(NugetBuild)" />
+    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.Persistence.Sql.Xml.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
     <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuild)build\net452" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuild)" MetadataAssembly="$(Persistence)" />
     <MakeDir Directories="$(SolutionDir)ForXmlIntegration" />

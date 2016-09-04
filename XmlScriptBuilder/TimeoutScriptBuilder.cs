@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Resourcer;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public static class TimeoutScriptBuilder
     {

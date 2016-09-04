@@ -1,4 +1,4 @@
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 class CorrelationResult
 {

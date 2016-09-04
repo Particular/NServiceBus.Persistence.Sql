@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlClient;
 using System;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 namespace NServiceBus
 {

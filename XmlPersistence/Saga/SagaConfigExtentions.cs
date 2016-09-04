@@ -3,7 +3,7 @@ using NServiceBus;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 public static class SagaConfigExtentions

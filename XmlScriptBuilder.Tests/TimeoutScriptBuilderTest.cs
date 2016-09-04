@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 using ApprovalTests;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NUnit.Framework;
 
 [TestFixture]

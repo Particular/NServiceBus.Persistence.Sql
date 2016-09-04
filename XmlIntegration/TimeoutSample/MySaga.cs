@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 public class MySaga : XmlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,

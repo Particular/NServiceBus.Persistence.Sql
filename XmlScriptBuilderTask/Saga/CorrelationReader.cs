@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Mono.Cecil;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 class CorrelationReader
 {
@@ -11,8 +11,8 @@ class CorrelationReader
     {
         CorrelationMember correlationMember = null;
         CorrelationMember transitionalMember = null;
-        var withCorrelationAttribute = type.MembersWithAttribute("NServiceBus.Persistence.SqlServerXml.CorrelationIdAttribute").ToList();
-        var withTransitionalAttribute = type.MembersWithAttribute("NServiceBus.Persistence.SqlServerXml.TransitionalCorrelationIdAttribute").ToList();
+        var withCorrelationAttribute = type.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.CorrelationIdAttribute").ToList();
+        var withTransitionalAttribute = type.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.TransitionalCorrelationIdAttribute").ToList();
 
         if (withCorrelationAttribute.Count > 1)
         {

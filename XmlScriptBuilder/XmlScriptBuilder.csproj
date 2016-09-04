@@ -7,8 +7,8 @@
     <ProjectGuid>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Persistence.SqlServerXml.ScriptBuilder</RootNamespace>
-    <AssemblyName>NServiceBus.Persistence.SqlServerXml.ScriptBuilder</AssemblyName>
+    <RootNamespace>NServiceBus.Persistence.Sql.Xml.ScriptBuilder</RootNamespace>
+    <AssemblyName>NServiceBus.Persistence.Sql.Xml.ScriptBuilder</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

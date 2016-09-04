@@ -1,6 +1,6 @@
 using System.Data.SqlClient;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public interface ISqlStorageSession
     {

@@ -4,7 +4,7 @@ using ApprovalTests;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using NServiceBus;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NUnit.Framework;
 
 [TestFixture]

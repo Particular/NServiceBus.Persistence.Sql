@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Janitor;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 [SkipWeaving]
 class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession

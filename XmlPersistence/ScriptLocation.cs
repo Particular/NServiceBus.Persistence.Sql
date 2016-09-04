@@ -8,6 +8,6 @@ static class ScriptLocation
     {
         var codeBase = Assembly.GetExecutingAssembly().CodeBase;
         var currentDirectory = Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.SqlServerXml");
+        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql.Xml");
     }
 }

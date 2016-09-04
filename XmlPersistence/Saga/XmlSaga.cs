@@ -1,5 +1,5 @@
 ﻿
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public abstract class XmlSaga<TSagaData> : Saga<TSagaData>
         where TSagaData :

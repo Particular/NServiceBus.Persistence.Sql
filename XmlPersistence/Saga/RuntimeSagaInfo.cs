@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using NServiceBus;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 class RuntimeSagaInfo

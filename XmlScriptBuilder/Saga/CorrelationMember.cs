@@ -1,4 +1,5 @@
-namespace NServiceBus.Persistence.SqlServerXml
+
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public class CorrelationMember
     {

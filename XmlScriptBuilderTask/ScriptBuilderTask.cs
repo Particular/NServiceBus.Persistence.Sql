@@ -5,7 +5,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
 
-namespace NServiceBus.Persistence.SqlServerXml
+namespace NServiceBus.Persistence.Sql.Xml
 {
     public class ScriptBuilderTask:
 #if (DEBUG)
@@ -72,7 +72,7 @@ namespace NServiceBus.Persistence.SqlServerXml
 
         void Inner()
         {
-            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.SqlServerXml");
+            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql.Xml");
             Directory.CreateDirectory(scriptPath);
             WriteSagaScripts(scriptPath);
             WriteTimeoutScript(scriptPath);

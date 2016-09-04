@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mono.Cecil;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 
 class SagaMetaDataReader
 {
@@ -18,16 +18,18 @@ class SagaMetaDataReader
         var sagas = new List<SagaDefinition>();
         foreach (var type in module.GetTypes())
         {
-            if (type.BaseType != null && type.BaseType.FullName == "NServiceBus.Persistence.SqlServerXml.XmlSagaData")
+            var baseType = type.BaseType;
+            if (baseType == null || baseType.FullName != "NServiceBus.Persistence.Sql.Xml.XmlSagaData")
             {
-                try
-                {
-                    sagas.Add(BuildSagaDataMap(type));
-                }
-                catch (ErrorsException exception)
-                {
-                    buildLogger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
-                }
+                continue;
+            }
+            try
+            {
+                sagas.Add(BuildSagaDataMap(type));
+            }
+            catch (ErrorsException exception)
+            {
+                buildLogger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
             }
         }
         return sagas;
@@ -73,9 +75,9 @@ class SagaMetaDataReader
         {
             throw new ErrorsException("Saga types cannot be generic.");
         }
-        if (!sagaType.BaseType.FullName.StartsWith("NServiceBus.Persistence.SqlServerXml.XmlSaga`1"))
+        if (!sagaType.BaseType.FullName.StartsWith("NServiceBus.Persistence.Sql.Xml.XmlSaga`1"))
         {
-            throw new ErrorsException("Saga types must directly inherit from NServiceBus.Persistence.SqlServerXml.XmlSaga<T>.");
+            throw new ErrorsException("Saga types must directly inherit from NServiceBus.Persistence.Sql.Xml.XmlSaga<T>.");
         }
     }
 }

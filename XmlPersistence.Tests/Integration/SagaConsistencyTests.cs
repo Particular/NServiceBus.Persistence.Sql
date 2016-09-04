@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence.SqlServerXml;
+using NServiceBus.Persistence.Sql.Xml;
 using NServiceBus.Pipeline;
 using NUnit.Framework;
 
@@ -26,37 +26,42 @@ public class SagaConsistencyTests
     }
 
     [Test]
-    public async Task In_DTC_mode_enlists_in_the_ambient_transaction()
+    public Task In_DTC_mode_enlists_in_the_ambient_transaction()
     {
-        await RunTest(e =>
+        return RunTest(e =>
         {
-            e.UseTransport<MsmqTransport>().Transactions(TransportTransactionMode.TransactionScope);
+            var transport = e.UseTransport<MsmqTransport>();
+            transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
 
     [Test]
-    public async Task In_DTC_SqlTransport_mode_does_not_escalate()
+    public Task In_DTC_SqlTransport_mode_does_not_escalate()
     {
-        await RunTest(e =>
+        return RunTest(e =>
         {
-            e.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.TransactionScope).ConnectionString(connectionString);
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.Transactions(TransportTransactionMode.TransactionScope);
+            transport.ConnectionString(connectionString);
             e.Pipeline.Register(new EscalationChecker(), "EscalationChecker");
         });
     }
 
     [Test]
-    public async Task In_native_SqlTransport_mode_enlists_in_native_transaction()
+    public Task In_native_SqlTransport_mode_enlists_in_native_transaction()
     {
-        await RunTest(e =>
-        {            
-            e.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.SendsAtomicWithReceive).ConnectionString(connectionString);
+        return RunTest(e =>
+        {
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
+            transport.ConnectionString(connectionString);
         });
     }
 
     [Test]
-    public async Task In_outbox_mode_enlists_in_outbox_transaction()
+    public Task In_outbox_mode_enlists_in_outbox_transaction()
     {
-        await RunTest(e =>
+        return RunTest(e =>
         {
             e.GetSettings().Set("DisableOutboxTransportCheck", true);
             e.UseTransport<MsmqTransport>();
