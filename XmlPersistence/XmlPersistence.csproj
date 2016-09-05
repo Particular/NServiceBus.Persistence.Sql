@@ -90,7 +90,7 @@
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
     <Compile Include="Saga\Attributes\TransitionalCorrelationIdAttribute.cs" />
-    <Compile Include="SqlServerXmlStorageSessionExtensions.cs" />
+    <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
     <Compile Include="SynchronizedStorage\StorageSession.cs" />

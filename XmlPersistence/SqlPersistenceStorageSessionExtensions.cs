@@ -9,7 +9,7 @@ namespace NServiceBus
     /// <summary>
     /// Shared session extensions for NHibernate persistence.
     /// </summary>
-    public static class SqlServerXmlStorageSessionExtensions
+    public static class SqlPersistenceStorageSessionExtensions
     {
         /// <summary>
         /// Gets the current context SqlPersistence <see cref="SqlTransaction"/>.
