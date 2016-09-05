@@ -12,11 +12,11 @@ DECLARE @createTable nvarchar(max);
 SET @createTable = N'
     CREATE TABLE ' + @tableName + '(
 	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
-	    [Destination] [nvarchar](1024) NULL,
-	    [SagaId] [uniqueidentifier] NULL,
-	    [State] [varbinary](max) NULL,
-	    [Time] [datetime] NULL,
-	    [Headers] [xml] NULL,
+	    [Destination] [nvarchar](1024),
+	    [SagaId] [uniqueidentifier],
+	    [State] [varbinary](max),
+	    [Time] [datetime],
+	    [Headers] [xml],
 	    [PersistenceVersion] [nvarchar](23) NOT NULL
     )
 ';
