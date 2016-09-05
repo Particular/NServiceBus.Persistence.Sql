@@ -12,15 +12,20 @@ using NUnit.Framework;
 public class UserDataConsistencyTests
 {
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
-    static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
+    static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 
-    internal const string CreateUserDataTableText = @"IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]') AND type in (N'U'))                  
-                    BEGIN
-                        CREATE TABLE [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
-                            [Id] [uniqueidentifier] NOT NULL                           
-                        ) ON [PRIMARY];
-                    END";
+    string createUserDataTableText = @"
+IF NOT  EXISTS (
+    SELECT * FROM sys.objects
+    WHERE object_id = OBJECT_ID(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]')
+    AND type in (N'U')
+)
+BEGIN
+    CREATE TABLE [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
+        [Id] [uniqueidentifier] NOT NULL
+    ) ON [PRIMARY];
+END";
 
     [SetUp]
     [TearDown]
@@ -66,11 +71,11 @@ public class UserDataConsistencyTests
 
     async Task RunTest(Action<EndpointConfiguration> testCase)
     {
-        ManualResetEvent.Reset();
+        manualResetEvent.Reset();
         string message = null;
         await DbBuilder.ReCreate(connectionString, endpointName);
 
-        await SqlHelpers.Execute(connectionString, CreateUserDataTableText, collection => {});
+        await SqlHelpers.Execute(connectionString, createUserDataTableText, collection => {});
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
@@ -84,7 +89,7 @@ public class UserDataConsistencyTests
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
             message = c.Error;
-            ManualResetEvent.Set();
+            manualResetEvent.Set();
             return Task.FromResult(0);
         });
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
@@ -100,7 +105,7 @@ public class UserDataConsistencyTests
         {
             EntityId = dataId
         });
-        ManualResetEvent.WaitOne();
+        manualResetEvent.WaitOne();
         await endpoint.Stop();
 
         Assert.AreEqual("Success", message);
@@ -134,25 +139,26 @@ public class UserDataConsistencyTests
     {
         public CriticalError CriticalError { get; set; }
 
-        public Task Handle(FailingMessage message, IMessageHandlerContext context)
+        public async Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            using (var command = new SqlCommand("INSERT INTO [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)", session.Connection, session.Transaction))
+            var commandText = "INSERT INTO [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
+            using (var command = new SqlCommand(commandText, session.Connection, session.Transaction))
             {
                 command.Parameters.AddWithValue("@Id", message.EntityId);
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
-            return Task.FromResult(0);
         }
 
-        public Task Handle(CheckMessage message, IMessageHandlerContext context)
+        public async Task Handle(CheckMessage message, IMessageHandlerContext context)
         {
             int count;
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            using (var command = new SqlCommand("SELECT COUNT(*) FROM [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] WHERE Id = @Id", session.Connection, session.Transaction))
+            var commandText = "SELECT COUNT(*) FROM [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] WHERE Id = @Id";
+            using (var command = new SqlCommand(commandText, session.Connection, session.Transaction))
             {
                 command.Parameters.AddWithValue("@Id", message.EntityId);
-                count = (int)command.ExecuteScalar();
+                count = (int)await command.ExecuteScalarAsync();
             }
 
             if (count > 0)
@@ -163,7 +169,6 @@ public class UserDataConsistencyTests
             {
                 CriticalError.Raise("Success", new Exception());
             }
-            return Task.FromResult(0);
         }
     }
 }
