@@ -22,7 +22,7 @@ public class SubscriptionPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new SubscriptionPersister(connectionString, "dbo", endpointName);
+        persister = new SubscriptionPersister(connectionString, "dbo", endpointName + ".");
     }
 
     [Test]

@@ -19,7 +19,7 @@ public class TimeoutPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new TimeoutPersister(connectionString, "dbo", endpointName);
+        persister = new TimeoutPersister(connectionString, "dbo", endpointName + ".");
     }
 
     [Test]

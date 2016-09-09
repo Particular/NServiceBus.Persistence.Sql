@@ -33,7 +33,7 @@ public class SagaPersisterTests
             }
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
-        var commandBuilder = new SagaCommandBuilder("dbo", endpointName);
+        var commandBuilder = new SagaCommandBuilder("dbo", endpointName + ".");
         var infoCache = new SagaInfoCache(null, null, commandBuilder, (serializer, type) => { });
         persister = new SagaPersister(infoCache);
     }
