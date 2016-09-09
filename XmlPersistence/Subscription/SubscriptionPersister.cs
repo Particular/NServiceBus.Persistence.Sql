@@ -20,30 +20,53 @@ class SubscriptionPersister : ISubscriptionStorage
         this.connectionString = connectionString;
         this.schema = schema;
         this.endpointName = endpointName;
-        subscribeCommandText = string.Format(@"
-IF NOT EXISTS
+//        subscribeCommandText = string.Format(@"
+//IF NOT EXISTS
+//(
+//    SELECT * FROM [{0}].[{1}SubscriptionData]
+//    WHERE
+//        Subscriber = @Subscriber AND
+//        MessageType = @MessageType
+//)
+//BEGIN
+//    INSERT INTO [{0}].[{1}SubscriptionData]
+//    (
+//        Subscriber,
+//        MessageType,
+//        PersistenceVersion
+//    )
+//    VALUES
+//    (
+//        @Subscriber,
+//        @MessageType,
+//        @PersistenceVersion
+//    )
+//END", schema, endpointName);
+
+        subscribeCommandText =$@"
+DECLARE @dummy int; MERGE [{schema}].[{endpointName}SubscriptionData] WITH (HOLDLOCK) AS target
+USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
+ON target.Endpoint = source.Endpoint AND target.Subscriber = source.Subscriber AND target.MessageType = source.MessageType
+WHEN MATCHED THEN
+    UPDATE SET @dummy = 0
+WHEN NOT MATCHED THEN
+INSERT
 (
-    SELECT * FROM [{0}].[{1}.SubscriptionData]
-    WHERE
-        Subscriber = @Subscriber AND
-        MessageType = @MessageType
+    Endpoint,
+    Subscriber,
+    MessageType,
+    PersistenceVersion
 )
-BEGIN
-    INSERT INTO [{0}].[{1}.SubscriptionData]
-    (
-        Subscriber,
-        MessageType,
-        PersistenceVersion
-    )
-    VALUES
-    (
-        @Subscriber,
-        @MessageType,
-        @PersistenceVersion
-    )
-END", schema, endpointName);
+VALUES
+(
+    @Endpoint,
+    @Subscriber,
+    @MessageType,
+    @PersistenceVersion
+);";
+
         unsubscribeCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}.SubscriptionData]
+DELETE FROM [{schema}].[{endpointName}SubscriptionData]
 WHERE
     Subscriber = @Subscriber AND
     MessageType = @MessageType";
@@ -63,7 +86,8 @@ WHERE
         using (var command = new SqlCommand(subscribeCommandText, connection))
         {
             command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.ToAddress());
+            command.AddParameter("Subscriber", subscriber.TransportAddress);
+            command.AddParameter("Endpoint", subscriber.Endpoint);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
@@ -83,7 +107,7 @@ WHERE
         using (var command = new SqlCommand(unsubscribeCommandText, connection))
         {
             command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.ToAddress());
+            command.AddParameter("Subscriber", subscriber.TransportAddress);
             await command.ExecuteNonQueryEx();
         }
     }
@@ -94,8 +118,8 @@ WHERE
         {
             var builder = new StringBuilder();
             builder.AppendFormat(@"
-SELECT DISTINCT Subscriber
-FROM [{0}].[{1}.SubscriptionData]
+SELECT Subscriber, Endpoint
+FROM [{0}].[{1}SubscriptionData]
 WHERE MessageType IN (", schema, endpointName);
             var types = messageTypes.ToList();
             for (var i = 0; i < types.Count; i++)
@@ -116,12 +140,14 @@ WHERE MessageType IN (", schema, endpointName);
                 command.Connection = connection;
                 using (var reader = await command.ExecuteReaderAsync())
                 {
-                    var addresses = new List<string>();
+                    var subscribers = new List<Subscriber>();
                     while (await reader.ReadAsync())
                     {
-                        addresses.Add(reader.GetString(0));
+                        var address = reader.GetString(0);
+                        var endpoint = reader.IsDBNull(1) ? null : reader.GetString(1);
+                        subscribers.Add(new Subscriber(address, endpoint));
                     }
-                    return addresses.Select(s => s.ToSubscriber());
+                    return subscribers;
                 }
             }
         }

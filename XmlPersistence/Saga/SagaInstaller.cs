@@ -25,7 +25,10 @@ class SagaInstaller : INeedToInstallSomething
             return Task.FromResult(0);
         }
         var connectionString = settings.GetConnectionString<StorageType.Sagas>();
-        var endpointName = settings.EndpointName().ToString();
+        var endpointName = settings.ShouldUseEndpointName<StorageType.Sagas>()
+            ? settings.EndpointName() + "."
+            : "";
+
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {

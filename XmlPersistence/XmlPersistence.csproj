@@ -80,6 +80,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="LogManager.cs" />
@@ -112,7 +113,6 @@
     <Compile Include="Saga\XmlSaga.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
-    <Compile Include="Subscription\SubscriberExtensions.cs" />
     <Compile Include="Subscription\SubscriptionInstaller.cs" />
     <Compile Include="EmptyXmlNamespace.cs" />
     <Compile Include="SynchronizedStorage\SynchronizedStorage.cs" />

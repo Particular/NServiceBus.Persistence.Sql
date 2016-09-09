@@ -10,26 +10,23 @@ namespace NServiceBus.Persistence.Sql.Xml
             {
                 // always enable these ones since they will only enable if the outbox or sagas are on
                 s.EnableFeatureByDefault<StorageSessionFeature>();
+                s.Set<EnabledStorageFeatures>(new EnabledStorageFeatures());
             });
             Supports<StorageType.Outbox>(s =>
             {
                 s.EnableFeatureByDefault<SqlXmlOutboxFeature>();
-                s.EnableFeature<StorageType.Outbox>();
             });
             Supports<StorageType.Timeouts>(s =>
             {
                 s.EnableFeatureByDefault<SqlXmlTimeoutFeature>();
-                s.EnableFeature<StorageType.Timeouts>();
             });
             Supports<StorageType.Sagas>(s =>
             {
                 s.EnableFeatureByDefault<SqlXmlSagaFeature>();
-                s.EnableFeature<StorageType.Sagas>();
             });
             Supports<StorageType.Subscriptions>(s =>
             {
                 s.EnableFeatureByDefault<SqlXmlSubscriptionFeature>();
-                s.EnableFeature<StorageType.Subscriptions>();
             });
         }
     }

@@ -1,5 +1,5 @@
 ﻿
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.OutboxData]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
 
 IF EXISTS
 (

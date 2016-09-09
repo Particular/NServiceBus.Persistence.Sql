@@ -22,7 +22,7 @@ namespace NServiceBus.Persistence.Sql.Xml
         static void WriteTableNameVariable(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.{0}]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]';
 ", saga.Name);
         }
 

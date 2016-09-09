@@ -29,13 +29,18 @@ class SagaPersister : ISagaPersister
         using (var command = new SqlCommand(sagaInfo.SaveCommand, sqlConnection, sqlTransaction))
         {
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("OriginalMessageId", sagaData.OriginalMessageId);
-            command.AddParameter("Originator", sagaData.Originator);
+            command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
+            command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("Data", sagaInfo.ToXml(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             await command.ExecuteNonQueryEx();
         }
+    }
+
+    static object DBNullify(object value)
+    {
+        return value ?? DBNull.Value;
     }
 
     public async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
@@ -45,8 +50,8 @@ class SagaPersister : ISagaPersister
         using (var command = new SqlCommand(sagaInfo.UpdateCommand, sqlSession.Connection, sqlSession.Transaction))
         {
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("OriginalMessageId", sagaData.OriginalMessageId);
-            command.AddParameter("Originator", sagaData.Originator);
+            command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
+            command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.Parameters.AddWithValue("Data", sagaInfo.ToXml(sagaData));

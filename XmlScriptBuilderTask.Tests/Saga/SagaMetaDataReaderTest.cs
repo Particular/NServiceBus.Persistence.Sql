@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql.Xml;
@@ -18,14 +20,35 @@ public class SagaMetaDataReaderTest
     [Test]
     public void FindSagaDataType()
     {
-        var dataType = module.GetTypeDefinition<StandardSaga.SagaData>();
+        var dataType = module.GetTypeDefinition<NestedSaga.SagaData>();
         var map= SagaMetaDataReader.BuildSagaDataMap(dataType);
-        Assert.AreEqual(typeof(StandardSaga).FullName.Replace("+","/"), map.Name);
+        Assert.AreEqual(typeof(NestedSaga).Name.Replace("+","/"), map.Name);
     }
 
-    public class StandardSaga : XmlSaga<StandardSaga.SagaData>
+    [Test]
+    public void ShouldDetectSagaData()
     {
+        var reader = new SagaMetaDataReader(module, null);
+        var sagas = reader.GetSagas().ToArray();
 
+        Assert.IsTrue(sagas.Any(s => s.Name == "NestedSaga"));
+        Assert.IsTrue(sagas.Any(s => s.Name == "NonNestedSagaData1"));
+        Assert.IsTrue(sagas.Any(s => s.Name == "NonNestedSagaData2"));
+    }
+
+    public class NonNestedSagaData1 : ContainSagaData
+    {
+    }
+
+    public class NonNestedSagaData2 : IContainSagaData
+    {
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
+
+    public class NestedSaga : XmlSaga<NestedSaga.SagaData>
+    {
         public class SagaData : ContainSagaData
         {
             [CorrelationId]

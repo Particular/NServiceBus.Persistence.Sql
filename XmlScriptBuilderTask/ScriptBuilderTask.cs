@@ -77,6 +77,7 @@ namespace NServiceBus.Persistence.Sql.Xml
             WriteSagaScripts(scriptPath);
             WriteTimeoutScript(scriptPath);
             WriteSubscriptionScript(scriptPath);
+            WriteOutboxScript(scriptPath);
         }
 
         void WriteSagaScripts(string scriptPath)
@@ -85,16 +86,24 @@ namespace NServiceBus.Persistence.Sql.Xml
             var metaDataReader = new SagaMetaDataReader(moduleDefinition, logger);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
             Directory.CreateDirectory(sagasScriptPath);
+            var index = 0;
             foreach (var saga in metaDataReader.GetSagas())
             {
-                var createPath = Path.Combine(sagasScriptPath, saga.Name + "_Create.sql");
+                var sagaFileName = saga.Name;
+                var maximumNameLength = 244 - sagasScriptPath.Length;
+                if (sagaFileName.Length > maximumNameLength)
+                {
+                    sagaFileName = sagaFileName.Substring(0, maximumNameLength) + "_" + index;
+                    index++;
+                }
+                var createPath = Path.Combine(sagasScriptPath, sagaFileName + "_Create.sql");
                 File.Delete(createPath);
                 using (var writer = File.CreateText(createPath))
                 {
                     SagaScriptBuilder.BuildCreateScript(saga, writer);
                 }
 
-                var dropPath = Path.Combine(sagasScriptPath, saga.Name + "_Drop.sql");
+                var dropPath = Path.Combine(sagasScriptPath, sagaFileName + "_Drop.sql");
                 File.Delete(dropPath);
                 using (var writer = File.CreateText(dropPath))
                 {
@@ -116,6 +125,22 @@ namespace NServiceBus.Persistence.Sql.Xml
             using (var writer = File.CreateText(dropPath))
             {
                 TimeoutScriptBuilder.BuildDropScript(writer);
+            }
+        }
+
+        static void WriteOutboxScript(string scriptPath)
+        {
+            var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
+            File.Delete(createPath);
+            using (var writer = File.CreateText(createPath))
+            {
+                OutboxScriptBuilder.BuildCreateScript(writer);
+            }
+            var dropPath = Path.Combine(scriptPath, "Outbox_Drop.sql");
+            File.Delete(dropPath);
+            using (var writer = File.CreateText(dropPath))
+            {
+                OutboxScriptBuilder.BuildDropScript(writer);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.Xml;
 
@@ -16,24 +17,58 @@ class SagaMetaDataReader
     public IEnumerable<SagaDefinition> GetSagas()
     {
         var sagas = new List<SagaDefinition>();
-        foreach (var type in module.GetTypes())
+        foreach (var dataType in module.GetTypes())
         {
-            var baseType = type.BaseType;
-            if (baseType == null || baseType.FullName != "NServiceBus.Persistence.Sql.Xml.XmlSagaData")
+            if (IsSagaDataType(dataType))
             {
-                continue;
-            }
-            try
-            {
-                sagas.Add(BuildSagaDataMap(type));
-            }
-            catch (ErrorsException exception)
-            {
-                buildLogger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
+                try
+                {
+                    sagas.Add(BuildSagaDataMap(dataType));
+                }
+                catch (ErrorsException exception)
+                {
+                    buildLogger?.LogError($"Error in '{dataType.FullName}'. Error:{exception.Message}", dataType.GetFileName());
+                }
             }
         }
         return sagas;
     }
+
+    bool IsSagaDataType(TypeDefinition type)
+    {
+        if (type.HasGenericParameters || type.IsAbstract)
+        {
+            return false;
+        }
+        if (type.BaseType != null && type.BaseType.FullName == "NServiceBus.ContainSagaData")
+        {
+            return true;
+        }
+        if (type.Interfaces.Any(i => i.FullName == "NServiceBus.IContainSagaData"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //TypeReference GetNestedSagaDataTypeReference(TypeDefinition type)
+    //{
+    //    if (type.HasGenericParameters)
+    //    {
+    //        return null;
+    //    }
+    //    var elementType = type.BaseType?.GetElementType();
+    //    if (elementType == null)
+    //    {
+    //        return null;
+    //    }
+    //    if (elementType.FullName != "NServiceBus.Saga`1" && elementType.FullName != "NServiceBus.Persistence.SqlServerXml.XmlSaga`1")
+    //    {
+    //        return null;
+    //    }
+    //    var genericInstanceType = (GenericInstanceType) type.BaseType;
+    //    return genericInstanceType.GenericArguments[0];
+    //}
 
     public static SagaDefinition BuildSagaDataMap(TypeDefinition type)
     {
@@ -42,10 +77,23 @@ class SagaMetaDataReader
 
         return new SagaDefinition
         {
-            Name = type.DeclaringType.FullName,
+            Name = BuildSagaName(type),
             CorrelationMember = correlationResult.CorrelationMember,
             TransitionalCorrelationMember = correlationResult.TransitionalCorrelationMember
         };
+    }
+
+    static string BuildSagaName(TypeDefinition type)
+    {
+        if (type.IsNested)
+        {
+            var parent = type.DeclaringType;
+            if (parent.BaseType != null && (parent.BaseType.FullName.StartsWith("NServiceBus.Saga`") || parent.BaseType.FullName.StartsWith("NServiceBus.Persistence.SqlServerXml.XmlSaga`1")))
+            {
+                return parent.Name;
+            }
+        }
+        return type.Name;
     }
 
     public static void ValidateSagaConventions(TypeDefinition sagaDataType)
@@ -54,10 +102,10 @@ class SagaMetaDataReader
         {
             throw new ErrorsException("Saga data types cannot be generic.");
         }
-        if (sagaDataType.Name != "SagaData")
-        {
-            throw new ErrorsException("Saga data types must be named 'SagaData'.");
-        }
+        //if (sagaDataType.Name != "SagaData")
+        //{
+        //    throw new ErrorsException("Saga data types must be named 'SagaData'.");
+        //}
         if (!sagaDataType.IsNested)
         {
             throw new ErrorsException("Saga data types must be nested under a XmlSaga.");
@@ -75,9 +123,9 @@ class SagaMetaDataReader
         {
             throw new ErrorsException("Saga types cannot be generic.");
         }
-        if (!sagaType.BaseType.FullName.StartsWith("NServiceBus.Persistence.Sql.Xml.XmlSaga`1"))
-        {
-            throw new ErrorsException("Saga types must directly inherit from NServiceBus.Persistence.Sql.Xml.XmlSaga<T>.");
-        }
+        //if (!sagaType.BaseType.FullName.StartsWith("NServiceBus.Persistence.SqlServerXml.XmlSaga`1"))
+        //{
+        //    throw new ErrorsException("Saga types must directly inherit from NServiceBus.Persistence.SqlServerXml.XmlSaga<T>.");
+        //}
     }
 }

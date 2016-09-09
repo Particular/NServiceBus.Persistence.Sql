@@ -28,6 +28,26 @@ namespace NServiceBus
             return settings.GetValue<string, TStorageType>("ConnectionString", () => { throw new Exception("ConnectionString must be defined."); });
         }
 
+        public static void UseEndpointName(this PersistenceExtensions<SqlXmlPersistence> configuration, bool useEndpointName)
+        {
+            configuration.GetSettings()
+                .Set("SqlPersistence.UseEndpointName", useEndpointName);
+        }
+
+        public static void UseEndpointName<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, bool useEndpointName)
+            where TStorageType : StorageType
+        {
+            var key = "SqlPersistence." + typeof(TStorageType).Name + ".UseEndpointName";
+            configuration.GetSettings()
+                .Set(key, useEndpointName);
+        }
+
+        internal static bool ShouldUseEndpointName<TStorageType>(this ReadOnlySettings settings)
+            where TStorageType : StorageType
+        {
+            return settings.GetValue<bool, TStorageType>("UseEndpointName", () => true);
+        }
+
 
         public static void DisableInstaller(this PersistenceExtensions<SqlXmlPersistence> configuration)
         {
@@ -49,17 +69,16 @@ namespace NServiceBus
             return settings.GetValue<bool, TStorageType>("DisableInstaller", () => false);
         }
 
-        internal static void EnableFeature<TStorageType>(this SettingsHolder settingsHolder)
+        internal static void EnableFeature<TStorageType>(this ReadOnlySettings settingsHolder)
             where TStorageType : StorageType
         {
-            var key = "SqlPersistence." + typeof(TStorageType).Name + ".FeatureEnabled";
-            settingsHolder.Set(key, true);
+            settingsHolder.Get<EnabledStorageFeatures>().Enable<TStorageType>();
         }
 
         internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetValue<bool, TStorageType>("FeatureEnabled", () => false);
+            return settings.GetOrDefault<EnabledStorageFeatures>()?.IsEnabled<TStorageType>() ?? false;
         }
 
         public static bool ShouldInstall<TStorageType>(this ReadOnlySettings settings)
@@ -106,6 +125,5 @@ namespace NServiceBus
             }
             return defaultValue();
         }
-
     }
 }

@@ -21,7 +21,7 @@ class OutboxPersister : IOutboxStorage
     {
         this.connectionString = connectionString;
         storeCommandText = $@"
-INSERT INTO [{schema}].[{endpointName}.OutboxData]
+INSERT INTO [{schema}].[{endpointName}OutboxData]
 (
     MessageId,
     Operations
@@ -33,16 +33,17 @@ VALUES
 )";
 
         cleanupCommandText = $@"
-delete from [{schema}].[{endpointName}.OutboxData] where Dispatched = true And DispatchedAt < @Date";
+delete from [{schema}].[{endpointName}OutboxData] where Dispatched = true And DispatchedAt < @Date";
 
         getCommandText = $@"
 SELECT
+    Dispatched,
     Operations
-FROM [{schema}].[{endpointName}.OutboxData]
+FROM [{schema}].[{endpointName}OutboxData]
 WHERE MessageId = @MessageId";
 
         setAsDispatchedCommandText = $@"
-UPDATE [{schema}].[{endpointName}.OutboxData]
+UPDATE [{schema}].[{endpointName}OutboxData]
 SET
     Dispatched = 1,
     DispatchedAt = @DispatchedAt
@@ -84,9 +85,15 @@ WHERE MessageId = @MessageId";
                     {
                         return null;
                     }
-                    result = new OutboxMessage(
-                        messageId: messageId,
-                        operations: OperationSerializer.FromString(reader.GetString(0)).ToArray());
+                    var dispatched = reader.GetBoolean(0);
+                    if (dispatched)
+                    {
+                        result = new OutboxMessage(messageId, new TransportOperation[0]);
+                    }
+                    else
+                    {
+                        result = new OutboxMessage(messageId,OperationSerializer.FromString(reader.GetString(1)).ToArray());
+                    }
                 }
             }
             transaction.Commit();

@@ -12,9 +12,13 @@ class SqlXmlSagaFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
+        context.Settings.EnableFeature<StorageType.Sagas>();
+
         var settings = context.Settings;
         var schema = settings.GetSchema<StorageType.Sagas>();
-        var endpointName = settings.EndpointName().ToString();
+        var endpointName = settings.ShouldUseEndpointName<StorageType.Sagas>()
+            ? settings.EndpointName() + "."
+            : "";
 
         var commandBuilder = new SagaCommandBuilder(schema, endpointName);
         var serialize = settings.GetSerializeBuilder();

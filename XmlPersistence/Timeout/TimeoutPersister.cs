@@ -21,7 +21,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         this.connectionString = connectionString;
 
         insertCommandText = $@"
-INSERT INTO [{schema}].[{endpointName}.TimeoutData]
+INSERT INTO [{schema}].[{endpointName}TimeoutData]
 (
     Id,
     Destination,
@@ -43,12 +43,12 @@ VALUES
 )";
 
         removeByIdCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}.TimeoutData]
+DELETE FROM [{schema}].[{endpointName}TimeoutData]
 OUTPUT deleted.SagaId
 WHERE Id = @Id";
 
         removeBySagaIdCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}.TimeoutData]
+DELETE FROM [{schema}].[{endpointName}TimeoutData]
 WHERE SagaId = @SagaId";
 
         selectByIdCommandText = $@"
@@ -58,16 +58,16 @@ SELECT
     State,
     Time,
     Headers
-FROM [{schema}].[{endpointName}.TimeoutData]
+FROM [{schema}].[{endpointName}TimeoutData]
 WHERE Id = @Id";
 
         rangeComandText = $@"
 SELECT Id, Time
-FROM [{schema}].[{endpointName}.TimeoutData]
+FROM [{schema}].[{endpointName}TimeoutData]
 WHERE time BETWEEN @StartTime AND @EndTime";
 
         nextCommandText = $@"
-SELECT TOP 1 Time FROM [{schema}].[{endpointName}.TimeoutData]
+SELECT TOP 1 Time FROM [{schema}].[{endpointName}TimeoutData]
 WHERE Time > @EndTime
 ORDER BY TIME";
     }

@@ -14,7 +14,7 @@ class SagaCommandBuilder
     public string BuildSaveCommand(Type sagaDataType)
     {
         return $@"
-INSERT INTO [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
+INSERT INTO [{schema}].[{endpointName}{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 (
     Id,
     Originator,
@@ -37,7 +37,7 @@ VALUES
     public string BuildUpdateCommand(Type sagaDataType)
     {
         return $@"
-UPDATE [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
+UPDATE [{schema}].[{endpointName}{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
@@ -59,7 +59,7 @@ SELECT
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
+FROM  [{schema}].[{endpointName}{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE Id = @Id
 ";
     }
@@ -74,7 +74,7 @@ SELECT
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
+FROM  [{schema}].[{endpointName}{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]') = 1
 ";
     }
@@ -82,7 +82,7 @@ WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]'
     public string BuildCompleteCommand(Type sagaDataType)
     {
         return $@"
-DELETE FROM  [{schema}].[{endpointName}.{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
+DELETE FROM  [{schema}].[{endpointName}{SagaTableNameBuilder.GetTableSuffix(sagaDataType)}]
 WHERE Id = @Id
 ";
     }

@@ -7,7 +7,7 @@ namespace NServiceBus.Persistence.Sql.Xml
         public static void BuildCreateScript(TextWriter writer)
         {
             writer.Write(@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
 ");
             writer.Write(@"
 IF NOT EXISTS
@@ -40,7 +40,7 @@ END
         public static void BuildDropScript(TextWriter writer)
         {
             writer.Write(@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '.SubscriptionData]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
 ");
             writer.Write(@"
 IF EXISTS 
