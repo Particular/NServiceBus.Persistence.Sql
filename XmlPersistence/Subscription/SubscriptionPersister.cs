@@ -118,7 +118,7 @@ WHERE
         {
             var builder = new StringBuilder();
             builder.AppendFormat(@"
-SELECT Subscriber, Endpoint
+SELECT DISTINCT Subscriber, Endpoint
 FROM [{0}].[{1}SubscriptionData]
 WHERE MessageType IN (", schema, endpointName);
             var types = messageTypes.ToList();
@@ -144,7 +144,7 @@ WHERE MessageType IN (", schema, endpointName);
                     while (await reader.ReadAsync())
                     {
                         var address = reader.GetString(0);
-                        var endpoint = reader.IsDBNull(1) ? null : reader.GetString(1);
+                        var endpoint = await reader.IsDBNullAsync(1) ? null : reader.GetString(1);
                         subscribers.Add(new Subscriber(address, endpoint));
                     }
                     return subscribers;
