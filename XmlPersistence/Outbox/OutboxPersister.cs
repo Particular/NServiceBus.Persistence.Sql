@@ -92,7 +92,8 @@ WHERE MessageId = @MessageId";
                     }
                     else
                     {
-                        result = new OutboxMessage(messageId,OperationSerializer.FromString(reader.GetString(1)).ToArray());
+                        result = new OutboxMessage(messageId,
+                            OperationSerializer.FromString(reader.GetString(1)).ToArray());
                     }
                 }
             }

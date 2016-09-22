@@ -2,9 +2,5 @@
   {
     "TransportAddress": "e@machine1",
     "Endpoint": "endpoint"
-  },
-  {
-    "TransportAddress": "e@machine1",
-    "Endpoint": "endpoint"
   }
 ]

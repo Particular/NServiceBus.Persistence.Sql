@@ -141,10 +141,10 @@ select @dropIndexQuery =
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE
-		ix.Id = (select object_id from sys.objects where name = @tableName) AND
-	    ix.Name IS NOT null AND
-	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name <> 'PropertyIndex_{0}'
+        ix.Id = (select object_id from sys.objects where name = @tableName) AND
+        ix.Name IS NOT null AND
+        ix.Name LIKE 'PropertyIndex_%' AND
+        ix.Name <> 'PropertyIndex_{0}'
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
@@ -174,11 +174,11 @@ select @dropIndexQuery =
     SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
     FROM sysindexes ix
     WHERE
-		ix.Id = (select object_id from sys.objects where name = @tableName) AND
-	    ix.Name IS NOT null AND
-	    ix.Name LIKE 'PropertyIndex_%' AND
-	    ix.Name <> 'PropertyIndex_{correlationIndexName}' AND
-	    ix.Name <> 'PropertyIndex_{transitionalIndexName}'
+        ix.Id = (select object_id from sys.objects where name = @tableName) AND
+        ix.Name IS NOT null AND
+        ix.Name LIKE 'PropertyIndex_%' AND
+        ix.Name <> 'PropertyIndex_{correlationIndexName}' AND
+        ix.Name <> 'PropertyIndex_{transitionalIndexName}'
     for xml path('')
 );
 exec sp_executesql @dropIndexQuery
@@ -191,10 +191,10 @@ select @dropPropertiesQuery =
     SELECT 'ALTER TABLE ' + @tableName  + ' DROP COLUMN ' + col.COLUMN_NAME '; '
     FROM INFORMATION_SCHEMA.COLUMNS col
     WHERE
-		col.TABLE_NAME = ' + @tableName  + ' AND
-	    col.COLUMN_NAME LIKE '{propertyPrefix}%' AND
-	    col.COLUMN_NAME <> '{correlationColumnName}' AND
-	    col.COLUMN_NAME <> '{transitionalColumnName}'
+        col.TABLE_NAME = ' + @tableName  + ' AND
+        col.COLUMN_NAME LIKE '{propertyPrefix}%' AND
+        col.COLUMN_NAME <> '{correlationColumnName}' AND
+        col.COLUMN_NAME <> '{transitionalColumnName}'
 );
 exec sp_executesql @dropPropertiesQuery
 ");
@@ -214,12 +214,12 @@ BEGIN
 DECLARE @createTable nvarchar(max);
 SET @createTable = '
     CREATE TABLE ' + @tableName + '(
-	    [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
-	    [Originator] [nvarchar](255),
-	    [OriginalMessageId] [nvarchar](255),
-	    [Data] [xml] NOT NULL,
-	    [PersistenceVersion] [nvarchar](23) NOT NULL,
-	    [SagaTypeVersion] [nvarchar](23) NOT NULL
+        [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+        [Originator] [nvarchar](255),
+        [OriginalMessageId] [nvarchar](255),
+        [Data] [xml] NOT NULL,
+        [PersistenceVersion] [nvarchar](23) NOT NULL,
+    [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
 ';
 exec(@createTable);

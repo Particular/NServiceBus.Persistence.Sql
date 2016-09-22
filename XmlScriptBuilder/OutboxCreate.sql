@@ -1,5 +1,4 @@
-﻿
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
 
 IF NOT EXISTS (
     SELECT * FROM sys.objects
@@ -11,10 +10,10 @@ BEGIN
 DECLARE @createTable nvarchar(max);
 SET @createTable = N'
     CREATE TABLE ' + @tableName + '(
-	    [MessageId] [nvarchar](1024) NOT NULL PRIMARY KEY,
-	    [Dispatched] [bit] NOT NULL DEFAULT 0,
-	    [DispatchedAt] [datetime],
-	    [Operations] [xml] NOT NULL,
+        [MessageId] [nvarchar](1024) NOT NULL PRIMARY KEY,
+        [Dispatched] [bit] NOT NULL DEFAULT 0,
+        [DispatchedAt] [datetime],
+        [Operations] [xml] NOT NULL,
     )
 ';
 exec(@createTable);

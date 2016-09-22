@@ -1,5 +1,4 @@
-﻿
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
 
 IF NOT EXISTS
 (
@@ -13,14 +12,14 @@ BEGIN
 DECLARE @createTable nvarchar(max);
 SET @createTable = N'
     CREATE TABLE ' + @tableName + '(
-	    [Subscriber] [varchar](450) NOT NULL,
-	    [Endpoint] [varchar](450) NULL,
-	    [MessageType] [varchar](450) NOT NULL,
-	    [PersistenceVersion] [nvarchar](23) NOT NULL,
+        [Subscriber] [varchar](450) NOT NULL,
+        [Endpoint] [varchar](450) NULL,
+        [MessageType] [varchar](450) NOT NULL,
+        [PersistenceVersion] [nvarchar](23) NOT NULL,
         PRIMARY KEY CLUSTERED
         (
-	        [Subscriber] ASC,
-	        [MessageType] ASC
+            [Subscriber] ASC,
+            [MessageType] ASC
         )
     )
 ';
