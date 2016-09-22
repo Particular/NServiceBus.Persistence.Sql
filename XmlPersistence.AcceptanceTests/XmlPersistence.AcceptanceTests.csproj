@@ -298,7 +298,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0-rc0001\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureEndpointSqlXmlPersistence.cs" />
     <Compile Include="EndpointConfigurer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
