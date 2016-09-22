@@ -23,17 +23,18 @@ class OutboxInstaller : INeedToInstallSomething
             return;
         }
         var connectionString = settings.GetConnectionString<StorageType.Outbox>();
-        var endpointName = settings.ShouldUseEndpointName<StorageType.Outbox>() 
+        var endpointName = settings.ShouldUseEndpointName<StorageType.Outbox>()
             ? settings.EndpointName() + "."
             : "";
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript), collection =>
-        {
-            collection.AddWithValue("schema", settings.GetSchema<StorageType.Outbox>());
-            collection.AddWithValue("endpointName", endpointName);
-        });
+        await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript),
+            manipulateParameters: collection =>
+            {
+                collection.AddWithValue("schema", settings.GetSchema<StorageType.Outbox>());
+                collection.AddWithValue("endpointName", endpointName);
+            });
     }
 
 }

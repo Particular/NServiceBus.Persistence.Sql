@@ -16,7 +16,8 @@ static class DbBuilder
     {
         foreach (var sagaDefinition in sagaDefinitions)
         {
-            await Execute(connection, endpointName, writer => SagaScriptBuilder.BuildCreateScript(sagaDefinition, writer));
+            await
+                Execute(connection, endpointName, writer => SagaScriptBuilder.BuildCreateScript(sagaDefinition, writer));
         }
         await Execute(connection, endpointName, SubscriptionScriptBuilder.BuildCreateScript);
         await Execute(connection, endpointName, OutboxScriptBuilder.BuildCreateScript);
@@ -42,10 +43,11 @@ static class DbBuilder
             action(writer);
         }
         var script = builder.ToString();
-        return SqlHelpers.Execute(connection, script, collection =>
-        {
-            collection.AddWithValue("schema", "dbo");
-            collection.AddWithValue("endpointName", endpointName + ".");
-        });
+        return SqlHelpers.Execute(connection, script,
+            manipulateParameters: collection =>
+            {
+                collection.AddWithValue("schema", "dbo");
+                collection.AddWithValue("endpointName", endpointName + ".");
+            });
     }
 }

@@ -31,16 +31,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.6.0.0-rc0001\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\..\packages\NServiceBus.AcceptanceTesting.6.0.0-rc0001\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-rc0001\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\..\packages\NServiceBus.6.0.0-rc0001\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceBus.Persistence.Sql.Xml">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ForXmlIntegration\NServiceBus.Persistence.Sql.Xml.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -304,12 +308,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\XmlPersistence\XmlPersistence.csproj">
-      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
-      <Name>XmlPersistence</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\ForXmlIntegration\build\net452\NServiceBus.Persistence.Sql.Xml.targets" />
+  <Import Project="$(SolutionDir)\..\ForXmlIntegration\build\net452\NServiceBus.Persistence.Sql.Xml.targets" />
 </Project>

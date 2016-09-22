@@ -41,11 +41,12 @@ class SagaInstaller : INeedToInstallSomething
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
 
-        return SqlHelpers.Execute(connectionString, sagaScripts, collection =>
-        {
-            collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
-            collection.AddWithValue("endpointName", endpointName);
-        });
+        return SqlHelpers.Execute(connectionString, sagaScripts,
+            manipulateParameters: collection =>
+            {
+                collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
+                collection.AddWithValue("endpointName", endpointName);
+            });
     }
 
 }
