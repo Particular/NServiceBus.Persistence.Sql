@@ -1,3 +1,10 @@
 ﻿[
-  "address1@machine1"
+  {
+    "TransportAddress": "e@machine1",
+    "Endpoint": "endpoint"
+  },
+  {
+    "TransportAddress": "e@machine1",
+    "Endpoint": "endpoint"
+  }
 ]

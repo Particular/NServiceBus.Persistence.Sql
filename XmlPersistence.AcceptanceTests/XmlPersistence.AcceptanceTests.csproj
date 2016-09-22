@@ -311,5 +311,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\ForXmlIntegration\build\net452\NServiceBus.Persistence.SqlServerXml.targets" />
+  <Import Project="..\ForXmlIntegration\build\net452\NServiceBus.Persistence.Sql.Xml.targets" />
 </Project>
