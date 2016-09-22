@@ -219,7 +219,7 @@ SET @createTable = '
         [OriginalMessageId] [nvarchar](255),
         [Data] [xml] NOT NULL,
         [PersistenceVersion] [nvarchar](23) NOT NULL,
-    [SagaTypeVersion] [nvarchar](23) NOT NULL
+        [SagaTypeVersion] [nvarchar](23) NOT NULL
     )
 ';
 exec(@createTable);
