@@ -7,20 +7,20 @@ using NServiceBus.Persistence.Sql.Xml;
 class CorrelationReader
 {
 
-    public static CorrelationResult GetCorrelationMember(TypeDefinition type)
+    public static CorrelationResult GetCorrelationMember(TypeDefinition sagaDataType)
     {
         CorrelationMember correlationMember = null;
         CorrelationMember transitionalMember = null;
-        var withCorrelationAttribute = type.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.CorrelationIdAttribute").ToList();
-        var withTransitionalAttribute = type.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.TransitionalCorrelationIdAttribute").ToList();
+        var withCorrelationAttribute = sagaDataType.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.CorrelationIdAttribute").ToList();
+        var withTransitionalAttribute = sagaDataType.MembersWithAttribute("NServiceBus.Persistence.Sql.Xml.TransitionalCorrelationIdAttribute").ToList();
 
         if (withCorrelationAttribute.Count > 1)
         {
-            throw new ErrorsException($"The type '{type.FullName}' has multiple members marked with [CorrelationId]. Members: {string.Join(",", withCorrelationAttribute.Select(_ => _.Name))}");
+            throw new ErrorsException($"The type '{sagaDataType.FullName}' has multiple members marked with [CorrelationId]. Members: {string.Join(",", withCorrelationAttribute.Select(_ => _.Name))}");
         }
         if (withTransitionalAttribute.Count > 1)
         {
-            throw new ErrorsException($"The type '{type.FullName}' has multiple members marked with [TransitionalCorrelationId]. Members: {string.Join(",", withTransitionalAttribute.Select(_ => _.Name))}");
+            throw new ErrorsException($"The type '{sagaDataType.FullName}' has multiple members marked with [TransitionalCorrelationId]. Members: {string.Join(",", withTransitionalAttribute.Select(_ => _.Name))}");
         }
         if (withCorrelationAttribute.Any())
         {
@@ -37,7 +37,7 @@ class CorrelationReader
             transitionalMember != null &&
             correlationMember.Name == transitionalMember.Name)
         {
-            throw new ErrorsException($"The type '{type.FullName}' has a [CorrelationId] applied to a member that also has a [TransitionalCorrelationId] applied. Member: {transitionalMember.Name}");
+            throw new ErrorsException($"The type '{sagaDataType.FullName}' has a [CorrelationId] applied to a member that also has a [TransitionalCorrelationId] applied. Member: {transitionalMember.Name}");
         }
         return new CorrelationResult
         {
@@ -54,7 +54,7 @@ class CorrelationReader
             Type = GetConstraintMemberType(member)
         };
     }
-    
+
     [SuppressMessage("ReSharper", "BuiltInTypeReferenceStyle")]
     static CorrelationMemberType GetConstraintMemberType(IMemberDefinition member)
     {

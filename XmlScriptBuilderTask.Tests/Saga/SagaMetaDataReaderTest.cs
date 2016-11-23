@@ -21,8 +21,8 @@ public class SagaMetaDataReaderTest
     public void FindSagaDataType()
     {
         var dataType = module.GetTypeDefinition<NestedSaga.SagaData>();
-        var map= SagaMetaDataReader.BuildSagaDataMap(dataType);
-        Assert.AreEqual(typeof(NestedSaga).Name.Replace("+","/"), map.Name);
+        var map = SagaMetaDataReader.BuildSagaDataMap(dataType);
+        Assert.AreEqual(typeof(NestedSaga).Name.Replace("+", "/"), map.Name);
     }
 
     [Test]

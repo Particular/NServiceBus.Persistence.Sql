@@ -70,30 +70,31 @@ class SagaMetaDataReader
     //    return genericInstanceType.GenericArguments[0];
     //}
 
-    public static SagaDefinition BuildSagaDataMap(TypeDefinition type)
+    public static SagaDefinition BuildSagaDataMap(TypeDefinition sagaDataType)
     {
-        ValidateSagaConventions(type);
-        var correlationResult = CorrelationReader.GetCorrelationMember(type);
+        ValidateSagaConventions(sagaDataType);
+        var correlationResult = CorrelationReader.GetCorrelationMember(sagaDataType);
 
         return new SagaDefinition
         {
-            Name = BuildSagaName(type),
+            Name = BuildSagaName(sagaDataType),
             CorrelationMember = correlationResult.CorrelationMember,
             TransitionalCorrelationMember = correlationResult.TransitionalCorrelationMember
         };
     }
 
-    static string BuildSagaName(TypeDefinition type)
+    static string BuildSagaName(TypeDefinition sagaDataType)
     {
-        if (type.IsNested)
+        if (sagaDataType.IsNested)
         {
-            var parent = type.DeclaringType;
-            if (parent.BaseType != null && (parent.BaseType.FullName.StartsWith("NServiceBus.Saga`") || parent.BaseType.FullName.StartsWith("NServiceBus.Persistence.SqlServerXml.XmlSaga`1")))
+            var parent = sagaDataType.DeclaringType;
+            var fullName = parent.BaseType.FullName;
+            if (parent.BaseType != null && (fullName.StartsWith("NServiceBus.Saga`") || fullName.StartsWith("NServiceBus.Persistence.Sql.Xml.XmlSaga`1")))
             {
                 return parent.Name;
             }
         }
-        return type.Name;
+        return sagaDataType.Name;
     }
 
     public static void ValidateSagaConventions(TypeDefinition sagaDataType)
