@@ -102,13 +102,9 @@ class SagaMetaDataReader
         {
             throw new ErrorsException("Saga data types cannot be generic.");
         }
-        //if (sagaDataType.Name != "SagaData")
-        //{
-        //    throw new ErrorsException("Saga data types must be named 'SagaData'.");
-        //}
         if (!sagaDataType.IsNested)
         {
-            throw new ErrorsException("Saga data types must be nested under a XmlSaga.");
+            throw new ErrorsException("Saga data types must be nested under a Saga.");
         }
         if (sagaDataType.HasGenericParameters)
         {
@@ -123,9 +119,5 @@ class SagaMetaDataReader
         {
             throw new ErrorsException("Saga types cannot be generic.");
         }
-        //if (!sagaType.BaseType.FullName.StartsWith("NServiceBus.Persistence.SqlServerXml.XmlSaga`1"))
-        //{
-        //    throw new ErrorsException("Saga types must directly inherit from NServiceBus.Persistence.SqlServerXml.XmlSaga<T>.");
-        //}
     }
 }

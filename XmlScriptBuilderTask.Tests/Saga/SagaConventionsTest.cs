@@ -19,39 +19,6 @@ public class SagaConventionsTest
     }
 
     [Test]
-    public void BadSagaDataName()
-    {
-        var dataType = module.GetTypeDefinition<BadNamedSaga.BadNamedSagaData>();
-        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
-        Approvals.Verify(errorsException.Message);
-    }
-
-    public class BadNamedSaga : XmlSaga<BadNamedSaga.BadNamedSagaData>
-    {
-        public class BadNamedSagaData : ContainSagaData
-        {
-        }
-    }
-    [Test]
-    public void NestedInNonXmlSaga()
-    {
-        var dataType = module.GetTypeDefinition<NonXmlSaga.SagaData>();
-        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
-        Approvals.Verify(errorsException.Message);
-    }
-
-    public class NonXmlSaga : Saga<NonXmlSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
-    }
-
-    [Test]
     public void WithGenericSaga()
     {
         var type = typeof (GenericSaga<>.SagaData);
@@ -100,24 +67,8 @@ public class SagaConventionsTest
 
     }
 
-    [Test]
-    public void MultiInheritance()
-    {
-        var dataType = module.GetTypeDefinition<MultiInheritanceSaga.SagaData>();
-        var errorsException = Assert.Throws<ErrorsException>(() => SagaMetaDataReader.ValidateSagaConventions(dataType));
-        Approvals.Verify(errorsException.Message);
-    }
-
     public abstract class BaseSaga<T> : XmlSaga<T> where T : IContainSagaData, new()
     {
-
-    }
-
-    public class MultiInheritanceSaga : BaseSaga<MultiInheritanceSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-        }
 
     }
 

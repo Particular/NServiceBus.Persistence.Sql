@@ -52,7 +52,7 @@ public class SagaMetaDataReaderTest
         public class SagaData : ContainSagaData
         {
             [CorrelationId]
-            public string  Correlation { get; set; }
+            public string Correlation { get; set; }
         }
 
     }

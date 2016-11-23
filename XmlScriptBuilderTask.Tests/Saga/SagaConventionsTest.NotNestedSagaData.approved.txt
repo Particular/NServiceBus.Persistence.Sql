@@ -1,1 +1,1 @@
-﻿Saga data types must be nested under a XmlSaga.
+﻿Saga data types must be nested under a Saga.

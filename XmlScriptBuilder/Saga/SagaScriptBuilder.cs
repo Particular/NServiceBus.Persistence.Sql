@@ -16,7 +16,7 @@ namespace NServiceBus.Persistence.Sql.Xml
             VerifyColumnType(saga.TransitionalCorrelationMember, writer);
             WriteCreateIndex(saga.CorrelationMember, writer);
             WriteCreateIndex(saga.TransitionalCorrelationMember, writer);
-            WritePurgeObsoleteProperties(saga,writer);
+            WritePurgeObsoleteProperties(saga, writer);
         }
 
         static void WriteTableNameVariable(SagaDefinition saga, TextWriter writer)
@@ -52,6 +52,7 @@ BEGIN
 END
 ");
         }
+
         static void VerifyColumnType(CorrelationMember correlationMember, TextWriter writer)
         {
             if (correlationMember == null)
@@ -79,13 +80,13 @@ IF (@dataType{columnName} <> '{columnType}')
             switch (memberType)
             {
                 case CorrelationMemberType.DateTime:
-                   return "datetime";
+                    return "datetime";
                 case CorrelationMemberType.DateTimeOffset:
-                   return "datetimeoffset";
+                    return "datetimeoffset";
                 case CorrelationMemberType.String:
-                   return "nvarchar(450)";
+                    return "nvarchar(450)";
                 case CorrelationMemberType.Int:
-                   return "bigint";
+                    return "bigint";
                 case CorrelationMemberType.Guid:
                     return "uniqueidentifier";
             }
@@ -122,6 +123,7 @@ END
         }
 
         const string propertyPrefix = "Property_";
+
         static string GetColumnName(CorrelationMember correlationMember)
         {
             return $"{propertyPrefix}{correlationMember.Name}";
@@ -132,6 +134,8 @@ END
             // Index names must be unique within a table or view but do not have to be unique within a database.
             return $"Index_{propertyPrefix}{correlationMember.Name}";
         }
+
+        // ReSharper disable once UnusedMember.Local
         static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer)
         {
             writer.Write(@"
@@ -150,6 +154,7 @@ select @dropIndexQuery =
 exec sp_executesql @dropIndexQuery
 ", saga.CorrelationMember);
         }
+
         static void WritePurgeObsoleteProperties(SagaDefinition saga, TextWriter writer)
         {
             var correlationColumnName = "";
@@ -199,6 +204,7 @@ select @dropPropertiesQuery =
 exec sp_executesql @dropPropertiesQuery
 ");
         }
+
         static void WriteCreateTable(TextWriter writer)
         {
             writer.Write(@"
