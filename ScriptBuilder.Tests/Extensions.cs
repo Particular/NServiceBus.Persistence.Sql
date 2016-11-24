@@ -15,7 +15,7 @@ public static class Extensions
         var genericInstanceType = typeReference as GenericInstanceType;
         if (genericInstanceType != null && genericInstanceType.HasGenericArguments)
         {
-            return typeReference.Name.Split('`').First() + "<" + string.Join(", ", genericInstanceType.GenericArguments.Select(c => c.DisplayName())) + ">";
+            return $"{typeReference.Name.Split('`').First()}<{string.Join(", ", genericInstanceType.GenericArguments.Select(c => c.DisplayName()))}>";
         }
         return typeReference.Name;
     }

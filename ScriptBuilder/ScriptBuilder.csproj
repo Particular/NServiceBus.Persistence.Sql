@@ -63,9 +63,13 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CecilExtentions.cs" />
+    <Compile Include="ErrorsException.cs" />
+    <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationMember.cs" />
     <Compile Include="Saga\CorrelationMemberType.cs" />
     <Compile Include="Saga\SagaDefinition.cs" />
+    <Compile Include="Saga\SagaDefinitionReader.cs" />
     <Compile Include="Saga\SagaScriptBuilder.cs" />
     <Compile Include="SubscriptionScriptBuilder.cs" />
     <Compile Include="OutboxScriptBuilder.cs" />

@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 
 class AllSagaDefinitionReader
 {
     ModuleDefinition module;
-    BuildLogger buildLogger;
 
-    public AllSagaDefinitionReader(ModuleDefinition module, BuildLogger buildLogger)
+    public AllSagaDefinitionReader(ModuleDefinition module)
     {
         this.module = module;
-        this.buildLogger = buildLogger;
     }
 
-    public IEnumerable<SagaDefinition> GetSagas()
+    public IEnumerable<SagaDefinition> GetSagas(Action<ErrorsException, TypeDefinition> logError)
     {
         var sagas = new List<SagaDefinition>();
         foreach (var type in module.AllClasses())
@@ -28,7 +27,7 @@ class AllSagaDefinitionReader
             }
             catch (ErrorsException exception)
             {
-                buildLogger?.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
+                logError(exception, type);
             }
         }
         return sagas;

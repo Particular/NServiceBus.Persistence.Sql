@@ -80,11 +80,14 @@ namespace NServiceBus.Persistence.Sql
         void WriteSagaScripts(string scriptPath)
         {
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath);
-            var metaDataReader = new AllSagaDefinitionReader(moduleDefinition, logger);
+            var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
             Directory.CreateDirectory(sagasScriptPath);
             var index = 0;
-            foreach (var saga in metaDataReader.GetSagas())
+            foreach (var saga in metaDataReader.GetSagas((exception, type) =>
+            {
+                logger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
+            }))
             {
                 var sagaFileName = saga.Name;
                 var maximumNameLength = 244 - sagasScriptPath.Length;

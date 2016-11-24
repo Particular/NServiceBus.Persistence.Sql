@@ -91,13 +91,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="Saga\SagaMetaDataReaderTest.cs" />
-    <Compile Include="Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilder.Tests\ScriptBuilder.Tests.csproj">
+      <Project>{f5d5557d-0a16-490a-a0db-b8865cb4d77e}</Project>
+      <Name>ScriptBuilder.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj">
       <Project>{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}</Project>
       <Name>SqlPersistence</Name>
