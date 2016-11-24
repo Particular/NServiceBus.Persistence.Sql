@@ -14,7 +14,7 @@
     <language>en-AU</language>
     <tags>NServiceBus, Sql, XML</tags>
     <dependencies>
-      <dependency id="NServiceBus" version="[6.0.0-rc0001, 7.0.0)" />
+      <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
     </dependencies>
   </metadata>
 </package>

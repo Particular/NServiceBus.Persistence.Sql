@@ -11,8 +11,8 @@ class Program
 
     static async Task Start()
     {
-        var configuration = ConfigBuilder.Build("Timeouts");
-        var endpoint = await Endpoint.Start(configuration);
+        var endpointConfiguration = ConfigBuilder.Build("Timeouts");
+        var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press 'S' to start a saga with a timeout");
         Console.WriteLine("Press 'D' to defer a message");
         Console.WriteLine("Press any other key to exit");

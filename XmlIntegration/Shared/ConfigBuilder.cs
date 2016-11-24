@@ -22,6 +22,9 @@ public static class ConfigBuilder
         var subscriptionPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Subscriptions>();
         subscriptionPersistence.ConnectionString(connectionString);
 
+        var outboxPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Outbox>();
+        outboxPersistence.ConnectionString(connectionString);
+
         return configuration;
     }
 }

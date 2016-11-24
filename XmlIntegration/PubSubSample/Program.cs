@@ -11,8 +11,8 @@ class Program
 
     static async Task Start()
     {
-        var configuration = ConfigBuilder.Build("PubSub");
-        var endpoint = await Endpoint.Start(configuration);
+        var endpointConfiguration = ConfigBuilder.Build("PubSub");
+        var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press 'Enter' to publish a message");
         Console.WriteLine("Press any other key to exit");
         try

@@ -11,8 +11,9 @@ class Program
 
     static async Task AsyncMain()
     {
-        var configuration = ConfigBuilder.Build("Outbox");
-        var endpoint = await Endpoint.Start(configuration);
+        var endpointConfiguration = ConfigBuilder.Build("Outbox");
+        endpointConfiguration.EnableOutbox();
+        var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");
         try
