@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</ScriptDirectory>
+  </PropertyGroup>
+
+  <UsingTask
+      TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
+      AssemblyFile="$(MSBuildThisFileDirectory)..\..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
+
+  <Target
+      AfterTargets="BeforeBuild"
+      Name="SqlPersistenceScriptCleaner">
+   <RemoveDir Directories="$(ScriptDirectory)" />
+  </Target>
+
+  <Target
+      AfterTargets="AfterCompile"
+      Name="SqlPersistenceScriptBuilder">
+
+    <ScriptBuilderTask
+          AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
+          IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"/>
+    <ItemGroup>
+      <Scripts Include="$(ScriptDirectory)\**\*.sql" />
+    </ItemGroup>
+
+    <Message Text="@(Scripts)"/>
+    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=Always;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
+    </CreateItem>
+
+  </Target>
+
+
+  <!--Support for ncrunch-->
+  <ItemGroup  Condition="'$(NCrunch)' == '1'">
+    <None Include="$(MSBuildThisFileDirectory)..\..\*.*" />
+  </ItemGroup>
+
+</Project>
