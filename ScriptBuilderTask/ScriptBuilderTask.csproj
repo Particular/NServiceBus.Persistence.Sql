@@ -76,11 +76,8 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BuildLogger.cs" />
-    <Compile Include="CecilExtentions.cs" />
-    <Compile Include="ErrorsException.cs" />
-    <Compile Include="Saga\SagaDefinitionReader.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ScriptBuilderTask.cs" />
-    <Compile Include="Saga\AllSagaDefinitionReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
