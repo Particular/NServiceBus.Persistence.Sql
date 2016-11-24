@@ -60,6 +60,9 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(PlaceOrderSagaData.DataId)
+             )]
             class PlaceOrderSaga : Saga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)

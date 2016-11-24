@@ -82,6 +82,9 @@
                 Context TestContext;
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(SagaData.SomeId)
+             )]
             public class Saga : Saga<SagaData>, IAmStartedByMessages<OriginalMessage>, IAmStartedByMessages<NewMessage>
             {
                 public Saga(Context testContext)

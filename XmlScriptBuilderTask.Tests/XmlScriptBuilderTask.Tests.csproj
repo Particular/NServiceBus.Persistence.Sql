@@ -91,8 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="Saga\CorrelationReaderTest.cs" />
-    <Compile Include="Saga\SagaConventionsTest.cs" />
     <Compile Include="Saga\SagaMetaDataReaderTest.cs" />
     <Compile Include="Extensions.cs" />
   </ItemGroup>

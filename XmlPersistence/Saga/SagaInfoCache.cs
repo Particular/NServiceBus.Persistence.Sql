@@ -23,14 +23,14 @@ class SagaInfoCache
         this.xmlSerializerCustomize = xmlSerializerCustomize;
     }
 
-    public RuntimeSagaInfo GetInfo(Type sagaDataType)
+    public RuntimeSagaInfo GetInfo(Type sagaDataType, Type sagaType)
     {
         var handle = sagaDataType.TypeHandle;
-        return serializerCache.GetOrAdd(handle, _ => BuildSagaInfo(sagaDataType));
+        return serializerCache.GetOrAdd(handle, _ => BuildSagaInfo(sagaDataType, sagaType));
     }
 
-    RuntimeSagaInfo BuildSagaInfo(Type sagaDataType)
+    RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
     {
-        return new RuntimeSagaInfo(commandBuilder, sagaDataType, deserializeBuilder, serializeBuilder, xmlSerializerCustomize);
+        return new RuntimeSagaInfo(commandBuilder, sagaDataType, deserializeBuilder, serializeBuilder, xmlSerializerCustomize, sagaType);
     }
 }

@@ -4,16 +4,21 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql.Xml;
 
-public class MySaga : XmlSaga<MySaga.SagaData>,
+[SqlSaga(
+     correlationId: nameof(SagaData.MySagaId)
+ )]
+public class MySaga : Saga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
-    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
     {
-        mapper.MapMessage<StartSagaMessage>(m => m.MySagaId);
-        mapper.MapMessage<CompleteSagaMessage>(m => m.MySagaId);
+        mapper.ConfigureMapping<StartSagaMessage>(m => m.MySagaId)
+            .ToSaga(data => data.MySagaId);
+        mapper.ConfigureMapping<CompleteSagaMessage>(m => m.MySagaId)
+            .ToSaga(data => data.MySagaId);
     }
 
     public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -36,7 +41,6 @@ public class MySaga : XmlSaga<MySaga.SagaData>,
 
     public class SagaData : ContainSagaData
     {
-        [CorrelationId]
         public Guid MySagaId { get; set; }
     }
 

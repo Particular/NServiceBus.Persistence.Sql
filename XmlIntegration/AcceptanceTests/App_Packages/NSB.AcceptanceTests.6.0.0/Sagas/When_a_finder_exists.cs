@@ -46,7 +46,7 @@
                     return Task.FromResult(default(TestSaga06.SagaData06));
                 }
             }
-
+            
             public class TestSaga06 : Saga<TestSaga06.SagaData06>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }

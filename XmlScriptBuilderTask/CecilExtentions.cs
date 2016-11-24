@@ -6,10 +6,9 @@ using Mono.Cecil;
 public static class CecilExtentions
 {
 
-    public static IEnumerable<IMemberDefinition> MembersWithAttribute(this TypeDefinition type, string attributeName)
+    public static CustomAttribute GetSingleAttribute(this TypeDefinition type, string attributeName)
     {
-        return type.Members()
-            .Where(_ => _.ContainsAttribute(attributeName));
+        return type.CustomAttributes.SingleOrDefault(x => x.AttributeType.FullName == attributeName);
     }
 
     public static TypeReference MemberType(this IMemberDefinition member)
@@ -38,6 +37,10 @@ public static class CecilExtentions
             yield return member;
         }
     }
+    public static IEnumerable<TypeDefinition> AllClasses(this ModuleDefinition module)
+    {
+        return module.GetTypes().Where(x => x.IsClass);
+    }
 
     public static string GetFileName(this TypeDefinition type)
     {
@@ -59,11 +62,6 @@ public static class CecilExtentions
             }
         }
         return null;
-    }
-
-    public static bool ContainsAttribute(this ICustomAttributeProvider property, string attributeName)
-    {
-        return property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == attributeName);
     }
 
 }

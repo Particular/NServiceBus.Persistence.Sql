@@ -47,6 +47,9 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(TestSagaData09.SomeId)
+             )]
             public class TestSaga09 : Saga<TestSagaData09>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>

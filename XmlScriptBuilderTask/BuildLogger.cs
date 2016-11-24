@@ -1,27 +1,35 @@
 ﻿using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
 class BuildLogger
 {
 
-    TaskLoggingHelper loggingHelper;
+    IBuildEngine buildEngine;
 
-    public BuildLogger(TaskLoggingHelper loggingHelper)
+    public BuildLogger(IBuildEngine buildEngine)
     {
-         this.loggingHelper = loggingHelper;
+        this.buildEngine = buildEngine;
     }
 
     public void LogInfo(string message)
     {
-        loggingHelper.LogMessageFromText(message, MessageImportance.Normal);
+        buildEngine.LogMessageEvent(new BuildMessageEventArgs(PrependMessage(message), "", "SqlPersistenceTask", MessageImportance.Normal));
     }
 
-    public void LogError(string message,string file)
+    static string PrependMessage(string message)
     {
-        loggingHelper.LogError("", "", file, 0, 0, 0, 0, message);
+        return $"SqlPersistenceTask: {message}";
     }
+
+    public void LogError(string message, string file)
+    {
+        ErrorOccurred = true;
+        buildEngine.LogErrorEvent(new BuildErrorEventArgs("", "", file, 0, 0, 0, 0, PrependMessage(message), "", "SqlPersistenceTask"));
+    }
+
+    public bool ErrorOccurred;
+
     public void LogError(string message)
     {
-        loggingHelper.LogError("", "", null, 0, 0, 0, 0, message);
+        LogError(message, null);
     }
 }

@@ -1,19 +1,21 @@
 ﻿using System;
-using NServiceBus;
+using System.Reflection;
+using NServiceBus.Persistence.Sql.Xml;
 
 static class SagaTableNameBuilder
 {
-    public static string GetTableSuffix(Type type)
+    public static string GetTableSuffix(Type sagaType)
     {
-        var declaringType = type.DeclaringType;
-        if (declaringType == null)
+        var attribute = sagaType.GetCustomAttribute<SqlSagaAttribute>(false);
+        if (attribute == null)
         {
-            return type.Name;
+            throw new Exception($"Expected to find a [{nameof(SqlSagaAttribute)}] on saga '{sagaType.FullName}'.");
         }
-        if (typeof(Saga).IsAssignableFrom(declaringType))
+        var tableName = attribute.TableName;
+        if (tableName == null)
         {
-            return declaringType.Name.Replace("+", "_");
+            return sagaType.Name;
         }
-        return type.Name.Replace("+", "_");
+        return tableName;
     }
 }

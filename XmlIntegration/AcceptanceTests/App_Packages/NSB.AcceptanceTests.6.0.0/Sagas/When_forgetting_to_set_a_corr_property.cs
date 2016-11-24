@@ -37,6 +37,9 @@
                 EndpointSetup<DefaultServer>();
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(NullCorrPropertySagaData.SomeId)
+             )]
             public class NullCorrPropertySaga : Saga<NullCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }

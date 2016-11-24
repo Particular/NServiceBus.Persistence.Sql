@@ -66,6 +66,9 @@
                     .AddMapping<BaseEvent>(typeof(Publisher));
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(SagaStartedByBaseEventSagaData.DataId)
+             )]
             public class SagaStartedByBaseEvent : Saga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }

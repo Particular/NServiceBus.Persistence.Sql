@@ -47,6 +47,9 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(MultiTimeoutsSaga1Data.ContextId)
+             )]
             public class MultiTimeoutsSaga1 : Saga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>,
@@ -104,7 +107,7 @@
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MultiTimeoutsSaga1Data> mapper)
                 {
                     mapper.ConfigureMapping<StartSaga1>(m => m.ContextId)
-                        .ToSaga(s => s.Id);
+                        .ToSaga(s => s.ContextId);
                 }
 
                 public class MultiTimeoutsSaga1Data : ContainSagaData

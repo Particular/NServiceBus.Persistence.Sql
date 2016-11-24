@@ -77,6 +77,9 @@
                     .AddMapping<GroupPendingEvent>(typeof(Publisher));
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(MySaga1Data.DataId)
+             )]
             public class Saga1 : Saga<Saga1.MySaga1Data>,
                 IAmStartedByMessages<GroupPendingEvent>,
                 IHandleMessages<CompleteSaga1Now>
@@ -114,6 +117,9 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(MySaga2Data.DataId)
+             )]
             public class Saga2 : Saga<Saga2.MySaga2Data>,
                 IAmStartedByMessages<StartSaga2>,
                 IHandleMessages<GroupPendingEvent>

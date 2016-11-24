@@ -305,6 +305,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0\UnicastRoutingExtensions.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureEndpointSqlXmlPersistence.cs" />
+    <Compile Include="ConfigureScenariosForSqlXmlPersistence.cs" />
     <Compile Include="EndpointConfigurer.cs" />
   </ItemGroup>
   <ItemGroup>

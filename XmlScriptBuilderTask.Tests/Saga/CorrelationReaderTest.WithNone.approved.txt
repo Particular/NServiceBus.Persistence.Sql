@@ -1,4 +1,0 @@
-﻿{
-  "CorrelationMember": null,
-  "TransitionalCorrelationMember": null
-}

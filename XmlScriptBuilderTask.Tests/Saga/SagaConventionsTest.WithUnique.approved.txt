@@ -1,1 +1,0 @@
-﻿UniqueAttribute are not supported. Property: Foo

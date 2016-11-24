@@ -155,7 +155,10 @@ public class SagaConsistencyTests
         public Guid SagaId { get; set; }
     }
 
-    public class Saga1 : XmlSaga<Saga1.SagaData>,
+    [SqlSaga(
+         correlationId: nameof(SagaData.CorrelationId)
+     )]
+    public class Saga1 : Saga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleMessages<FailingMessage>,
         IHandleMessages<CheckMessage>
@@ -164,17 +167,20 @@ public class SagaConsistencyTests
 
         public class SagaData : ContainSagaData
         {
-            [CorrelationIdAttribute]
             public Guid CorrelationId { get; set; }
             public bool PersistedFailingMessageResult { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
-            mapper.MapMessage<FailingMessage>(m => m.SagaId);
-            mapper.MapMessage<CheckMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<StartSagaMessage>(m => m.SagaId)
+                .ToSaga(data => data.CorrelationId);
+            mapper.ConfigureMapping<FailingMessage>(m => m.SagaId)
+                .ToSaga(data => data.CorrelationId);
+            mapper.ConfigureMapping<CheckMessage>(m => m.SagaId)
+                .ToSaga(data => data.CorrelationId);
         }
+
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
             return Task.FromResult(0);

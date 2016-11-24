@@ -20,7 +20,7 @@ public class SagaPersisterTests
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySagaData)),
+            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySaga)),
             CorrelationMember = new CorrelationMember
             {
                 Name = "CorrelationProperty",
@@ -42,7 +42,7 @@ public class SagaPersisterTests
     public async Task Complete()
     {
         var id = Guid.NewGuid();
-        var sagaData = new MySagaData
+        var sagaData = new MySaga.MySagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -54,11 +54,12 @@ public class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, null, storageSession, null);
-            await persister.Complete(sagaData, storageSession, null);
-            Assert.IsNull(await persister.Get<MySagaData>(id, storageSession, null));
+            await persister.Save(sagaData, storageSession,typeof(MySaga));
+            await persister.Complete(sagaData, storageSession, typeof(MySaga));
+            Assert.IsNull(await persister.Get<MySaga.MySagaData>(id, storageSession, typeof(MySaga)));
         }
     }
+
 
     [Test]
     public void GetById()
@@ -68,9 +69,9 @@ public class SagaPersisterTests
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<MySagaData> GetByIdAsync(Guid id)
+    async Task<MySaga.MySagaData> GetByIdAsync(Guid id)
     {
-        var sagaData = new MySagaData
+        var sagaData = new MySaga.MySagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -84,16 +85,27 @@ public class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, null, storageSession, null);
-            return await persister.Get<MySagaData>(id, storageSession, null);
+            await persister.Save(sagaData, storageSession, typeof(MySaga));
+            return await persister.Get<MySaga.MySagaData>(id, storageSession, typeof(MySaga));
         }
     }
 
-    public class MySagaData : ContainSagaData
+    [SqlSaga(
+        correlationId:nameof(MySagaData.CorrelationProperty),
+        transitionalCorrelationId:nameof(MySagaData.TransitionalCorrelationProperty)
+        )]
+    public class MySaga : Saga<MySaga.MySagaData>
     {
-        public string CorrelationProperty { get; set; }
-        public string TransitionalCorrelationProperty { get; set; }
-        public string SimpleProperty { get; set; }
+        public class MySagaData : ContainSagaData
+        {
+            public string CorrelationProperty { get; set; }
+            public string TransitionalCorrelationProperty { get; set; }
+            public string SimpleProperty { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
+        {
+        }
     }
 
     [Test]
@@ -104,9 +116,9 @@ public class SagaPersisterTests
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<MySagaData> GetByMappingAsync(Guid id)
+    async Task<MySaga.MySagaData> GetByMappingAsync(Guid id)
     {
-        var sagaData = new MySagaData
+        var sagaData = new MySaga.MySagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -119,8 +131,8 @@ public class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, null, storageSession, null);
-            return await persister.Get<MySagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, null);
+            await persister.Save(sagaData, storageSession, typeof(MySaga));
+            return await persister.Get<MySaga.MySagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(MySaga));
         }
     }
 
@@ -128,7 +140,7 @@ public class SagaPersisterTests
     //TODO:
     public async Task SaveDuplicateShouldThrow()
     {
-        var sagaData1 = new MySagaData
+        var sagaData1 = new MySaga.MySagaData
         {
             Id = Guid.NewGuid(),
             OriginalMessageId = "theOriginalMessageId",
@@ -141,8 +153,8 @@ public class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData1, null, storageSession, null);
-            var sagaData2 = new MySagaData
+            await persister.Save(sagaData1, storageSession, typeof(MySaga));
+            var sagaData2 = new MySaga.MySagaData
             {
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
@@ -151,7 +163,7 @@ public class SagaPersisterTests
                 TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
-            await persister.Save(sagaData2, null, storageSession, null);
+            await persister.Save(sagaData2, storageSession, typeof(MySaga));
             //var throwsAsync = Assert.ThrowsAsync<Exception>(() => persister.Save(sagaData2, null, storageSession, null));
             //Assert.IsTrue(throwsAsync.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"));
             await storageSession.CompleteAsync();

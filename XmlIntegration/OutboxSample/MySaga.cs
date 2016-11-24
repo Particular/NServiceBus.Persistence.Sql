@@ -4,26 +4,32 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql.Xml;
 
-public class MySaga2 : XmlSaga<MySaga2.SagaData>,
+[SqlSaga(
+     correlationId: nameof(SagaData.MySagaId)
+ )]
+public class MySaga2 : Saga<MySaga2.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga2));
 
-    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
     {
-        mapper.MapMessage<StartSagaMessage>(m => m.MySagaId);
-        mapper.MapMessage<CompleteSagaMessage>(m => m.MySagaId);
+        mapper.ConfigureMapping<StartSagaMessage>(m => m.MySagaId)
+            .ToSaga(data => data.MySagaId);
+        mapper.ConfigureMapping<CompleteSagaMessage>(m => m.MySagaId)
+            .ToSaga(data => data.MySagaId);
     }
 
     public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
     {
         Data.MySagaId = message.MySagaId;
         logger.Info($"Start Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
-        return context.SendLocal(new CompleteSagaMessage
-                           {
-                               MySagaId = Data.MySagaId
-                           });
+        var completeSagaMessage = new CompleteSagaMessage
+        {
+            MySagaId = Data.MySagaId
+        };
+        return context.SendLocal(completeSagaMessage);
     }
 
     public Task Handle(CompleteSagaMessage message, IMessageHandlerContext context)
@@ -35,7 +41,6 @@ public class MySaga2 : XmlSaga<MySaga2.SagaData>,
 
     public class SagaData : ContainSagaData
     {
-        [CorrelationId]
         public Guid MySagaId { get; set; }
     }
 

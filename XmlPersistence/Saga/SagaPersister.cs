@@ -18,15 +18,16 @@ class SagaPersister : ISagaPersister
 
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
-        var sqlSession = session.SqlPersistenceSession();
-        return Save(sagaData, sqlSession.Connection, sqlSession.Transaction);
+        var sagaType = GetSagaType(context);
+        return Save(sagaData, session, sagaType);
     }
 
-
-    internal async Task Save(IContainSagaData sagaData, SqlConnection sqlConnection, SqlTransaction sqlTransaction)
+    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
-        using (var command = new SqlCommand(sagaInfo.SaveCommand, sqlConnection, sqlTransaction))
+        //TODO: verify SagaCorrelationProperty against our attribute
+        var sqlSession = session.SqlPersistenceSession();
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
+        using (var command = new SqlCommand(sagaInfo.SaveCommand, sqlSession.Connection, sqlSession.Transaction))
         {
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
@@ -38,15 +39,29 @@ class SagaPersister : ISagaPersister
         }
     }
 
+    static Type GetSagaType(ContextBag context)
+    {
+        var activeSagaInstance = context.Get<ActiveSagaInstance>();
+        var sagaType = activeSagaInstance.Instance.GetType();
+        return sagaType;
+    }
+
+
     static object DBNullify(object value)
     {
         return value ?? DBNull.Value;
     }
 
-    public async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
+    public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
+    {
+        var sagaType = GetSagaType(context);
+        return Update(sagaData, session, sagaType);
+    }
+
+    async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
     {
         var sqlSession = session.SqlPersistenceSession();
-        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
         using (var command = new SqlCommand(sagaInfo.UpdateCommand, sqlSession.Connection, sqlSession.Transaction))
         {
             command.AddParameter("Id", sagaData.Id);
@@ -59,10 +74,16 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+    public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
+        var sagaType = GetSagaType(context);
+        return Get<TSagaData>(sagaId, session, sagaType);
+    }
+
+    internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         var sqlSession = session.SqlPersistenceSession();
         using (var command = new SqlCommand(sagaInfo.GetBySagaIdCommand, sqlSession.Connection, sqlSession.Transaction))
         {
@@ -71,10 +92,16 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
+    public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof (TSagaData));
+        var sagaType = GetSagaType(context);
+        return Get<TSagaData>(propertyName, propertyValue, session, sagaType);
+    }
+
+    internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         var commandText = sagaInfo.GetMappedPropertyCommand(propertyName);
         var sqlSession = session.SqlPersistenceSession();
         using (var command = new SqlCommand(commandText, sqlSession.Connection, sqlSession.Transaction))
@@ -108,9 +135,15 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    public async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
+    public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
+        var sagaType = GetSagaType(context);
+        return Complete(sagaData, session, sagaType);
+    }
+
+    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
         var sqlSession = session.SqlPersistenceSession();
         using (var command = new SqlCommand(sagaInfo.CompleteCommand, sqlSession.Connection, sqlSession.Transaction))
         {
@@ -118,5 +151,4 @@ class SagaPersister : ISagaPersister
             await command.ExecuteNonQueryAsync();
         }
     }
-
 }

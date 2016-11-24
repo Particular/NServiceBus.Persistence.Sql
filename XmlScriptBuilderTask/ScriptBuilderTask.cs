@@ -13,7 +13,6 @@ namespace NServiceBus.Persistence.Sql.Xml
 #else
         Task
 #endif
-
     {
         BuildLogger logger;
 
@@ -24,7 +23,7 @@ namespace NServiceBus.Persistence.Sql.Xml
 
         public override bool Execute()
         {
-            logger = new BuildLogger(Log);
+            logger = new BuildLogger(BuildEngine);
             logger.LogInfo($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing");
 
             var stopwatch = Stopwatch.StartNew();
@@ -36,22 +35,20 @@ namespace NServiceBus.Persistence.Sql.Xml
                     return false;
                 }
                 Inner();
-                return !Log.HasLoggedErrors;
             }
             catch (ErrorsException exception)
             {
                 logger.LogError(exception.Message, exception.FileName);
-                return false;
             }
             catch (Exception exception)
             {
-                Log.LogErrorFromException(exception, true, true, null);
-                return false;
+                logger.LogError(exception.ToFriendlyString());
             }
             finally
             {
                 logger.LogInfo($"  Finished ScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
             }
+            return !logger.ErrorOccurred;
         }
 
         bool ValidateInputs()
@@ -83,7 +80,7 @@ namespace NServiceBus.Persistence.Sql.Xml
         void WriteSagaScripts(string scriptPath)
         {
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath);
-            var metaDataReader = new SagaMetaDataReader(moduleDefinition, logger);
+            var metaDataReader = new AllSagaDefinitionReader(moduleDefinition, logger);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
             Directory.CreateDirectory(sagasScriptPath);
             var index = 0;

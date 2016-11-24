@@ -36,6 +36,9 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(TwoSaga1Saga1Data.DataId)
+             )]
             public class TwoSaga1Saga1 : Saga<TwoSaga1Saga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageSaga1WillHandle>
             {
                 public Task Handle(StartSaga1 message, IMessageHandlerContext context)
@@ -68,6 +71,9 @@
                 public virtual Guid DataId { get; set; }
             }
 
+            [NServiceBus.Persistence.Sql.Xml.SqlSaga(
+                 correlationId: nameof(TwoSaga1Saga2Data.DataId)
+             )]
             public class TwoSaga1Saga2 : Saga<TwoSaga1Saga2.TwoSaga1Saga2Data>, IAmStartedByMessages<StartSaga2>
             {
                 public Context Context { get; set; }

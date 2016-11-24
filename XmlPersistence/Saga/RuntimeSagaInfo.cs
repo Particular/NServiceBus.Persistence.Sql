@@ -20,6 +20,7 @@ class RuntimeSagaInfo
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
     SagaDeserialize defaultDeserialize;
+    string tableSuffix;
 
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
 
@@ -28,7 +29,8 @@ class RuntimeSagaInfo
         Type sagaDataType,
         DeserializeBuilder deserializeBuilder,
         SagaSerializeBuilder sagaSerializeBuilder,
-        Action<XmlSerializer, Type> xmlSerializerCustomize)
+        Action<XmlSerializer, Type> xmlSerializerCustomize,
+        Type sagaType)
     {
         this.sagaDataType = sagaDataType;
         if (deserializeBuilder != null)
@@ -41,10 +43,11 @@ class RuntimeSagaInfo
         this.commandBuilder = commandBuilder;
         this.deserializeBuilder = deserializeBuilder;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
-        CompleteCommand= commandBuilder.BuildCompleteCommand(sagaDataType);
-        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(sagaDataType);
-        SaveCommand = commandBuilder.BuildSaveCommand(sagaDataType);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(sagaDataType);
+        tableSuffix = SagaTableNameBuilder.GetTableSuffix(sagaType);
+        CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
+        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
+        SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix);
+        UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix);
     }
 
 
@@ -65,7 +68,7 @@ class RuntimeSagaInfo
 
     string BuildGetByPropertyCommand(string propertyName)
     {
-        return commandBuilder.BuildGetByPropertyCommand(sagaDataType,propertyName);
+        return commandBuilder.BuildGetByPropertyCommand(tableSuffix, propertyName);
     }
 
     public string ToXml(IContainSagaData sagaData)

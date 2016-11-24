@@ -64,7 +64,10 @@ public class SqlTransportIntegrationTests
     {
     }
 
-    public class Saga1 : XmlSaga<Saga1.SagaData>,
+    [SqlSaga(
+         correlationId: nameof(SagaData.StartId)
+     )]
+    public class Saga1 : Saga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
     {
@@ -82,15 +85,14 @@ public class SqlTransportIntegrationTests
 
         public class SagaData : ContainSagaData
         {
-            [CorrelationIdAttribute]
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(m => m.StartId);
+            mapper.ConfigureMapping<StartSagaMessage>(m => m.StartId)
+                .ToSaga(data => data.StartId);
         }
-
     }
 
     class MessageToReply : IMessage

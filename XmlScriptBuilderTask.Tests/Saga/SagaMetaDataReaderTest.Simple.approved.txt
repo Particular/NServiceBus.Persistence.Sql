@@ -1,10 +1,11 @@
 ﻿{
+  "Name": "SimpleSaga",
   "CorrelationMember": {
     "Name": "Correlation",
     "Type": "String"
   },
   "TransitionalCorrelationMember": {
-    "Name": "TransitionalCorrelation",
+    "Name": "Transitional",
     "Type": "String"
   }
 }
