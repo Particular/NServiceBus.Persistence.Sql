@@ -42,10 +42,19 @@ namespace NServiceBus
                 .Set(key, useEndpointName);
         }
 
-        internal static bool ShouldUseEndpointName<TStorageType>(this ReadOnlySettings settings)
+        static bool ShouldUseEndpointName<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
             return settings.GetValue<bool, TStorageType>("UseEndpointName", () => true);
+        }
+
+        internal static string GetEndpointNamePrefix<T>(this ReadOnlySettings settings) where T : StorageType
+        {
+            if (settings.ShouldUseEndpointName<T>())
+            {
+                return $"{settings.EndpointName()}.";
+            }
+            return "";
         }
 
 

@@ -120,7 +120,7 @@
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
-    <Compile Include="Saga\SagaSerializerTests.cs" />
+    <Compile Include="Saga\SagaXmlSerializerBuilderTests.cs" />
     <Compile Include="TaskEx.cs" />
     <Compile Include="Timeout\HeaderSerializerTests.cs" />
     <Compile Include="MethodTimeLogger.cs" />

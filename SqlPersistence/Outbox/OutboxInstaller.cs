@@ -23,9 +23,8 @@ class OutboxInstaller : INeedToInstallSomething
             return;
         }
         var connectionString = settings.GetConnectionString<StorageType.Outbox>();
-        var endpointName = settings.ShouldUseEndpointName<StorageType.Outbox>()
-            ? settings.EndpointName() + "."
-            : "";
+
+        var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");

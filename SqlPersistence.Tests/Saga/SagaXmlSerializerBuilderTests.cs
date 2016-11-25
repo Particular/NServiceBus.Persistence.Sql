@@ -10,14 +10,14 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class SagaSerializerTests
+public class SagaXmlSerializerBuilderTests
 {
 
 
     [Test]
     public void WithSimple()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSagaData), (serializer, type) => { });
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleSagaData));
         var saga = new SimpleSagaData
         {
             Property = "PropertyValue"
@@ -30,7 +30,7 @@ public class SagaSerializerTests
     [Test]
     public void WithComplexSaga()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(ComplexSaga), (serializer, type) => { });
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(ComplexSaga));
         var saga = new ComplexSaga
         {
             Property = new NestedComplex
@@ -58,7 +58,7 @@ public class SagaSerializerTests
     [Test]
     public void EnsureBasePropsAreNotWritten()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromContainSagaData), (serializer, type) => { });
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromContainSagaData));
         var saga = new SimpleInheritingFromContainSagaData
         {
             Id = Guid.NewGuid(),
@@ -73,7 +73,7 @@ public class SagaSerializerTests
     [Test]
     public void EnsureBasePropsAreNotWrittenCustom()
     {
-        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromIContainSagaData), (serializer, type) => { });
+        var delegates = SagaXmlSerializerBuilder.BuildSerializationDelegate(typeof(SimpleInheritingFromIContainSagaData));
         var saga = new SimpleInheritingFromIContainSagaData
         {
             Id = Guid.NewGuid(),

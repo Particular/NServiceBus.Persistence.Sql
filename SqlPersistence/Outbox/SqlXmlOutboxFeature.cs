@@ -15,9 +15,8 @@ class SqlXmlOutboxFeature : Feature
         var settings = context.Settings;
         var connectionString = settings.GetConnectionString<StorageType.Outbox>();
         var schema = settings.GetSchema<StorageType.Outbox>();
-        var endpointName = settings.ShouldUseEndpointName<StorageType.Outbox>()
-            ? settings.EndpointName() + "."
-            : "";
+
+        var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
         var outboxPersister = new OutboxPersister(connectionString, schema, endpointName);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
     }

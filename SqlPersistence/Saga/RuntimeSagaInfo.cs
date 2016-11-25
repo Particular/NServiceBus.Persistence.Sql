@@ -5,21 +5,20 @@ using System.Text;
 using System.Xml;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
-using XmlSerializer = System.Xml.Serialization.XmlSerializer;
 
 class RuntimeSagaInfo
 {
     SagaCommandBuilder commandBuilder;
     Type sagaDataType;
     VersionDeserializeBuilder versionDeserializeBuilder;
+    SagaDeserialize deserialize;
+    SagaSerialize serialize;
     ConcurrentDictionary<Version, SagaDeserialize> deserializers;
-    SagaSerialize defaultSerialize;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
-    SagaDeserialize defaultDeserialize;
     string tableSuffix;
 
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
@@ -28,20 +27,19 @@ class RuntimeSagaInfo
         SagaCommandBuilder commandBuilder,
         Type sagaDataType,
         VersionDeserializeBuilder versionDeserializeBuilder,
-        SagaSerializeBuilder sagaSerializeBuilder,
-        Action<XmlSerializer, Type> xmlSerializerCustomize,
-        Type sagaType)
+        Type sagaType,
+        SagaDeserialize deserialize,
+        SagaSerialize serialize)
     {
         this.sagaDataType = sagaDataType;
         if (versionDeserializeBuilder != null)
         {
             deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
         }
-        var defaultSerialization = GetSerializer(sagaSerializeBuilder, sagaDataType, xmlSerializerCustomize);
-        defaultSerialize = defaultSerialization.Serialize;
-        defaultDeserialize = defaultSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
         this.versionDeserializeBuilder = versionDeserializeBuilder;
+        this.deserialize = deserialize;
+        this.serialize = serialize;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         tableSuffix = SagaTableNameBuilder.GetTableSuffix(sagaType);
         CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
@@ -50,16 +48,6 @@ class RuntimeSagaInfo
         UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix);
     }
 
-
-    static DefaultSagaSerialization GetSerializer(SagaSerializeBuilder sagaSerializeBuilder, Type sagaDataType, Action<XmlSerializer, Type> xmlSerializerCustomize)
-    {
-        var serialization = sagaSerializeBuilder?.Invoke(sagaDataType);
-        if (serialization != null)
-        {
-            return serialization;
-        }
-        return SagaXmlSerializerBuilder.BuildSerializationDelegate(sagaDataType, xmlSerializerCustomize);
-    }
 
     public string GetMappedPropertyCommand(string propertyName)
     {
@@ -76,7 +64,7 @@ class RuntimeSagaInfo
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            defaultSerialize(writer, sagaData);
+            serialize(writer, sagaData);
         }
         return builder.ToString();
     }
@@ -84,14 +72,14 @@ class RuntimeSagaInfo
     public TSagaData FromString<TSagaData>(XmlReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
     {
         var deserialize = GetDeserialize(storedSagaTypeVersion);
-        return (TSagaData) (IContainSagaData)deserialize(reader);
+        return (TSagaData) deserialize(reader);
     }
 
     SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionDeserializeBuilder == null)
         {
-            return defaultDeserialize;
+            return deserialize;
         }
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
@@ -100,7 +88,7 @@ class RuntimeSagaInfo
             {
                 return customDeserialize;
             }
-            return defaultDeserialize;
+            return deserialize;
         });
     }
 
