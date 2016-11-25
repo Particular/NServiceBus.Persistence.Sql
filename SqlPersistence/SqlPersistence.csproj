@@ -89,7 +89,7 @@
     <Compile Include="Saga\DefaultSagaSerialization.cs" />
     <Compile Include="Saga\MessagePropertyMapper.cs" />
     <Compile Include="Saga\SagaDeserialize.cs" />
-    <Compile Include="Saga\DeserializeBuilder.cs" />
+    <Compile Include="Saga\VersionDeserializeBuilder.cs" />
     <Compile Include="Saga\SagaConfigExtentions.cs" />
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />

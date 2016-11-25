@@ -11,7 +11,7 @@ class RuntimeSagaInfo
 {
     SagaCommandBuilder commandBuilder;
     Type sagaDataType;
-    DeserializeBuilder deserializeBuilder;
+    VersionDeserializeBuilder versionDeserializeBuilder;
     ConcurrentDictionary<Version, SagaDeserialize> deserializers;
     SagaSerialize defaultSerialize;
     public readonly Version CurrentVersion;
@@ -27,13 +27,13 @@ class RuntimeSagaInfo
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
         Type sagaDataType,
-        DeserializeBuilder deserializeBuilder,
+        VersionDeserializeBuilder versionDeserializeBuilder,
         SagaSerializeBuilder sagaSerializeBuilder,
         Action<XmlSerializer, Type> xmlSerializerCustomize,
         Type sagaType)
     {
         this.sagaDataType = sagaDataType;
-        if (deserializeBuilder != null)
+        if (versionDeserializeBuilder != null)
         {
             deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
         }
@@ -41,7 +41,7 @@ class RuntimeSagaInfo
         defaultSerialize = defaultSerialization.Serialize;
         defaultDeserialize = defaultSerialization.Deserialize;
         this.commandBuilder = commandBuilder;
-        this.deserializeBuilder = deserializeBuilder;
+        this.versionDeserializeBuilder = versionDeserializeBuilder;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         tableSuffix = SagaTableNameBuilder.GetTableSuffix(sagaType);
         CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
@@ -89,13 +89,13 @@ class RuntimeSagaInfo
 
     SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
     {
-        if (deserializeBuilder == null)
+        if (versionDeserializeBuilder == null)
         {
             return defaultDeserialize;
         }
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
-            var customDeserialize = deserializeBuilder(sagaDataType,storedSagaTypeVersion);
+            var customDeserialize = versionDeserializeBuilder(sagaDataType,storedSagaTypeVersion);
             if (customDeserialize != null)
             {
                 return customDeserialize;

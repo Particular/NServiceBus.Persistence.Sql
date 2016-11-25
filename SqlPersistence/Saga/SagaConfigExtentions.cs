@@ -37,15 +37,15 @@ public static class SagaConfigExtentions
         return value;
     }
 
-    public static void DeserializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, DeserializeBuilder builder)
+    public static void DeserializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, VersionDeserializeBuilder builder)
     {
         configuration.GetSettings()
-            .Set<DeserializeBuilder>(builder);
+            .Set<VersionDeserializeBuilder>(builder);
     }
 
-    internal static DeserializeBuilder GetDeserializeBuilder(this ReadOnlySettings settings)
+    internal static VersionDeserializeBuilder GetDeserializeBuilder(this ReadOnlySettings settings)
     {
-        DeserializeBuilder value;
+        VersionDeserializeBuilder value;
         settings.TryGet(out value);
         return value;
     }

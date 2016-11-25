@@ -5,19 +5,19 @@ using NServiceBus.Persistence.Sql;
 
 class SagaInfoCache
 {
-    DeserializeBuilder deserializeBuilder;
+    VersionDeserializeBuilder versionDeserializeBuilder;
     SagaSerializeBuilder serializeBuilder;
     SagaCommandBuilder commandBuilder;
     Action<XmlSerializer, Type> xmlSerializerCustomize;
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
 
     public SagaInfoCache(
-        DeserializeBuilder deserializeBuilder,
+        VersionDeserializeBuilder versionDeserializeBuilder,
         SagaSerializeBuilder serializeBuilder,
         SagaCommandBuilder commandBuilder,
         Action<XmlSerializer, Type> xmlSerializerCustomize)
     {
-        this.deserializeBuilder = deserializeBuilder;
+        this.versionDeserializeBuilder = versionDeserializeBuilder;
         this.serializeBuilder = serializeBuilder;
         this.commandBuilder = commandBuilder;
         this.xmlSerializerCustomize = xmlSerializerCustomize;
@@ -31,6 +31,6 @@ class SagaInfoCache
 
     RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
     {
-        return new RuntimeSagaInfo(commandBuilder, sagaDataType, deserializeBuilder, serializeBuilder, xmlSerializerCustomize, sagaType);
+        return new RuntimeSagaInfo(commandBuilder, sagaDataType, versionDeserializeBuilder, serializeBuilder, xmlSerializerCustomize, sagaType);
     }
 }
