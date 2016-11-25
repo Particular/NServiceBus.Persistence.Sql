@@ -138,7 +138,7 @@ END
         // ReSharper disable once UnusedMember.Local
         static void WritePurgeObsoleteIndexes(SagaDefinition saga, TextWriter writer)
         {
-            writer.Write(@"
+            writer.Write($@"
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
 (
@@ -148,11 +148,10 @@ select @dropIndexQuery =
         ix.Id = (select object_id from sys.objects where name = @tableName) AND
         ix.Name IS NOT null AND
         ix.Name LIKE 'PropertyIndex_%' AND
-        ix.Name <> 'PropertyIndex_{0}'
-    for xml path('')
+        ix.Name <> 'PropertyIndex_{saga.CorrelationMember}'
 );
 exec sp_executesql @dropIndexQuery
-", saga.CorrelationMember);
+");
         }
 
         static void WritePurgeObsoleteProperties(SagaDefinition saga, TextWriter writer)
