@@ -25,8 +25,8 @@ class SqlXmlSagaFeature : Feature
         {
             serialize = SagaXmlSerializerBuilder.BuildSerializationDelegate;
         }
-        var deserialize = settings.GetVersionDeserializeBuilder();
-        var infoCache = new SagaInfoCache(deserialize, serialize, commandBuilder);
+        var versionDeserializeBuilder = settings.GetVersionDeserializeBuilder();
+        var infoCache = new SagaInfoCache(versionDeserializeBuilder, serialize, commandBuilder);
         var sagaPersister = new SagaPersister(infoCache);
         context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }

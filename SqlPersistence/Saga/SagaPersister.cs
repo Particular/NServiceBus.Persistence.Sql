@@ -18,7 +18,7 @@ class SagaPersister : ISagaPersister
 
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaType = GetSagaType(context);
+        var sagaType = context.GetSagaType();
         return Save(sagaData, session, sagaType);
     }
 
@@ -39,14 +39,6 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    static Type GetSagaType(ContextBag context)
-    {
-        var activeSagaInstance = context.Get<ActiveSagaInstance>();
-        var sagaType = activeSagaInstance.Instance.GetType();
-        return sagaType;
-    }
-
-
     static object DBNullify(object value)
     {
         return value ?? DBNull.Value;
@@ -54,7 +46,7 @@ class SagaPersister : ISagaPersister
 
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaType = GetSagaType(context);
+        var sagaType = context.GetSagaType();
         return Update(sagaData, session, sagaType);
     }
 
@@ -77,7 +69,7 @@ class SagaPersister : ISagaPersister
     public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaType = GetSagaType(context);
+        var sagaType = context.GetSagaType();
         return Get<TSagaData>(sagaId, session, sagaType);
     }
 
@@ -95,7 +87,7 @@ class SagaPersister : ISagaPersister
     public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaType = GetSagaType(context);
+        var sagaType = context.GetSagaType();
         return Get<TSagaData>(propertyName, propertyValue, session, sagaType);
     }
 
@@ -137,7 +129,7 @@ class SagaPersister : ISagaPersister
 
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaType = GetSagaType(context);
+        var sagaType = context.GetSagaType();
         return Complete(sagaData, session, sagaType);
     }
 

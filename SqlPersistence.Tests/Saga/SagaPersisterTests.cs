@@ -34,7 +34,7 @@ public class SagaPersisterTests
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var commandBuilder = new SagaCommandBuilder("dbo", endpointName + ".");
-        var infoCache = new SagaInfoCache(null, null, commandBuilder);
+        var infoCache = new SagaInfoCache(null, SagaXmlSerializerBuilder.BuildSerializationDelegate, commandBuilder);
         persister = new SagaPersister(infoCache);
     }
 
@@ -54,7 +54,7 @@ public class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, storageSession,typeof(MySaga));
+            await persister.Save(sagaData, storageSession, typeof(MySaga));
             await persister.Complete(sagaData, storageSession, typeof(MySaga));
             Assert.IsNull(await persister.Get<MySaga.MySagaData>(id, storageSession, typeof(MySaga)));
         }
