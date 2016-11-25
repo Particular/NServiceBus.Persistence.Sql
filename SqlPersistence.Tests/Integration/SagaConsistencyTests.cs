@@ -75,7 +75,12 @@ public class SagaConsistencyTests
         string message = null;
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(Saga1))
+            Name = nameof(Saga1),
+            CorrelationMember = new CorrelationMember
+            {
+                Name = nameof(Saga1.SagaData.CorrelationId),
+                Type = CorrelationMemberType.Guid
+            }
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);

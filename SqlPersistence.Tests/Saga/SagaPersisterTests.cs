@@ -20,7 +20,7 @@ public class SagaPersisterTests
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(MySaga)),
+            Name = "MySaga",
             CorrelationMember = new CorrelationMember
             {
                 Name = "CorrelationProperty",

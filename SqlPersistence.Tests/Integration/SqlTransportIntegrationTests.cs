@@ -31,7 +31,12 @@ public class SqlTransportIntegrationTests
     {
         var sagaDefinition = new SagaDefinition
         {
-            Name = SagaTableNameBuilder.GetTableSuffix(typeof(Saga1))
+            Name = "Saga1",
+            CorrelationMember = new CorrelationMember
+            {
+                Name = "StartId",
+                Type =  CorrelationMemberType.Guid
+            }
         };
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);

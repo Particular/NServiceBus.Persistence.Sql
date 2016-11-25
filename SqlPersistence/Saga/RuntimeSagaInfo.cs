@@ -41,7 +41,8 @@ class RuntimeSagaInfo
         this.deserialize = deserialize;
         this.serialize = serialize;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
-        tableSuffix = SagaTableNameBuilder.GetTableSuffix(sagaType);
+        var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
+        tableSuffix = sqlSagaAttributeData.TableSuffix;
         CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
         SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix);

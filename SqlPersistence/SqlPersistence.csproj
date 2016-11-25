@@ -95,7 +95,7 @@
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
-    <Compile Include="Saga\SagaTableNameBuilder.cs" />
+    <Compile Include="Saga\SqlSagaAttributeReader.cs" />
     <Compile Include="Saga\Xml\SagaXmlSerializerBuilder.cs" />
     <Compile Include="Saga\SagaSerialize.cs" />
     <Compile Include="Saga\SagaSerializeBuilder.cs" />
