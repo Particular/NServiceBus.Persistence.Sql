@@ -184,7 +184,6 @@ select @dropIndexQuery =
         ix.Name LIKE 'PropertyIndex_%' AND
         ix.Name <> 'PropertyIndex_{correlationIndexName}' AND
         ix.Name <> 'PropertyIndex_{transitionalIndexName}'
-    for xml path('')
 );
 exec sp_executesql @dropIndexQuery
 ");

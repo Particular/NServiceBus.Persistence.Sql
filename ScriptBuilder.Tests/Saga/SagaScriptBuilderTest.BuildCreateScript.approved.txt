@@ -80,7 +80,6 @@ select @dropIndexQuery =
         ix.Name LIKE 'PropertyIndex_%' AND
         ix.Name <> 'PropertyIndex_Index_Property_Property1' AND
         ix.Name <> 'PropertyIndex_'
-    for xml path('')
 );
 exec sp_executesql @dropIndexQuery
 
