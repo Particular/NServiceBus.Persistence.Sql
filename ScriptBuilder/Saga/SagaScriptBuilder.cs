@@ -11,11 +11,14 @@ namespace NServiceBus.Persistence.Sql
             WriteTableNameVariable(saga, writer);
             WriteCreateTable(writer);
             AddProperty(saga.CorrelationMember, writer);
-            AddProperty(saga.TransitionalCorrelationMember, writer);
             VerifyColumnType(saga.CorrelationMember, writer);
-            VerifyColumnType(saga.TransitionalCorrelationMember, writer);
             WriteCreateIndex(saga.CorrelationMember, writer);
-            WriteCreateIndex(saga.TransitionalCorrelationMember, writer);
+            if (saga.TransitionalCorrelationMember != null)
+            {
+                AddProperty(saga.TransitionalCorrelationMember, writer);
+                VerifyColumnType(saga.TransitionalCorrelationMember, writer);
+                WriteCreateIndex(saga.TransitionalCorrelationMember, writer);
+            }
             WritePurgeObsoleteIndex(saga, writer);
             WritePurgeObsoleteProperties(saga, writer);
         }
@@ -29,10 +32,6 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]
 
         static void AddProperty(CorrelationMember correlationMember, TextWriter writer)
         {
-            if (correlationMember == null)
-            {
-                return;
-            }
             var columnType = GetColumnType(correlationMember.Type);
             writer.Write($@"
 IF NOT EXISTS
@@ -55,10 +54,6 @@ END
 
         static void VerifyColumnType(CorrelationMember correlationMember, TextWriter writer)
         {
-            if (correlationMember == null)
-            {
-                return;
-            }
             var columnType = GetColumnType(correlationMember.Type);
             writer.Write($@"
 DECLARE @dataType_{correlationMember.Name} nvarchar(max);
@@ -94,24 +89,19 @@ IF (@dataType_{correlationMember.Name} <> '{columnType}')
 
         static void WriteCreateIndex(CorrelationMember correlationMember, TextWriter writer)
         {
-            if (correlationMember == null)
-            {
-                return;
-            }
-            var indexName = GetIndexName(correlationMember);
             writer.Write($@"
 IF NOT EXISTS
 (
     SELECT *
     FROM sys.indexes
     WHERE
-        name = '{indexName}' AND
+        name = 'Index_Correlation_{correlationMember.Name}' AND
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
   DECLARE @createIndex_{correlationMember.Name} nvarchar(max);
   SET @createIndex_{correlationMember.Name} = '
-  CREATE UNIQUE NONCLUSTERED INDEX {indexName}
+  CREATE UNIQUE NONCLUSTERED INDEX Index_Correlation_{correlationMember.Name}
   ON ' + @tableName  + '(Correlation_{correlationMember.Name})
   WHERE Correlation_{correlationMember.Name} IS NOT NULL;
 ';
@@ -120,23 +110,8 @@ END
 ");
         }
 
-        const string propertyPrefix = "Property_";
-
-        static string GetIndexName(CorrelationMember correlationMember)
-        {
-            // Index names must be unique within a table or view but do not have to be unique within a database.
-            return $"Index_{propertyPrefix}{correlationMember.Name}";
-        }
-
         static void WritePurgeObsoleteProperties(SagaDefinition saga, TextWriter writer)
         {
-            var correlationColumnName = $"Correlation_{saga.CorrelationMember.Name}";
-            var transitionalColumnName = "";
-            if (saga.TransitionalCorrelationMember != null)
-            {
-                transitionalColumnName = $"Correlation_{saga.TransitionalCorrelationMember.Name}";
-            }
-            
             writer.Write($@"
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
@@ -145,22 +120,16 @@ select @dropPropertiesQuery =
     FROM INFORMATION_SCHEMA.COLUMNS col
     WHERE
         col.TABLE_NAME = ' + @tableName  + ' AND
-        col.COLUMN_NAME LIKE '{propertyPrefix}%' AND
-        col.COLUMN_NAME <> '{correlationColumnName}' AND
-        col.COLUMN_NAME <> '{transitionalColumnName}'
+        col.COLUMN_NAME LIKE 'Correlation_%' AND
+        col.COLUMN_NAME <> 'Correlation_{saga.CorrelationMember.Name}' AND
+        col.COLUMN_NAME <> 'Correlation_{saga.TransitionalCorrelationMember?.Name}'
 );
 exec sp_executesql @dropPropertiesQuery
 ");
         }
+
         static void WritePurgeObsoleteIndex(SagaDefinition saga, TextWriter writer)
         {
-            var correlationIndexName = GetIndexName(saga.CorrelationMember);
-            var transitionalIndexName = "";
-            if (saga.TransitionalCorrelationMember != null)
-            {
-                transitionalIndexName = GetIndexName(saga.TransitionalCorrelationMember);
-            }
-
             writer.Write($@"
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
@@ -170,13 +139,12 @@ select @dropIndexQuery =
     WHERE
         ix.Id = (select object_id from sys.objects where name = @tableName) AND
         ix.Name IS NOT null AND
-        ix.Name LIKE 'PropertyIndex_%' AND
-        ix.Name <> 'PropertyIndex_{correlationIndexName}' AND
-        ix.Name <> 'PropertyIndex_{transitionalIndexName}'
+        ix.Name LIKE 'Index_Correlation_%' AND
+        ix.Name <> 'Index_Correlation_{saga.CorrelationMember.Name}' AND
+        ix.Name <> 'Index_Correlation_{saga.TransitionalCorrelationMember?.Name}'
 );
 exec sp_executesql @dropIndexQuery
 ");
-
         }
 
         static void WriteCreateTable(TextWriter writer)
@@ -206,7 +174,6 @@ exec(@createTable);
 END
 ");
         }
-
 
         public static void BuildDropScript(SagaDefinition saga, TextWriter writer)
         {
