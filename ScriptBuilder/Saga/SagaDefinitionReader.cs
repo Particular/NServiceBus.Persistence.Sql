@@ -105,20 +105,20 @@ class SagaDefinitionReader
         throw new ErrorsException($"The type '{sagaType.FullName}' needs to override ConfigureHowToFindSaga(SagaPropertyMapper).");
     }
 
-    static CorrelationMember BuildConstraintMember(TypeDefinition sagaDataTypeDefinition, string member)
+    static CorrelationMember BuildConstraintMember(TypeDefinition sagaDataTypeDefinition, string propertyName)
     {
-        var memberDefinition = sagaDataTypeDefinition.Members().SingleOrDefault(x => x.Name == member);
+        var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
 
-        if (memberDefinition == null)
+        if (propertyDefinition == null)
         {
-            throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property or a field named '{member}'.");
+            throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
         }
 
         //todo: verify not readonly
-        return BuildConstraintMember(memberDefinition);
+        return BuildConstraintMember(propertyDefinition);
     }
 
-    static CorrelationMember BuildConstraintMember(IMemberDefinition member)
+    static CorrelationMember BuildConstraintMember(PropertyDefinition member)
     {
         return new CorrelationMember
         {
@@ -127,9 +127,9 @@ class SagaDefinitionReader
         };
     }
 
-    static CorrelationMemberType GetConstraintMemberType(IMemberDefinition member)
+    static CorrelationMemberType GetConstraintMemberType(PropertyDefinition propertyDefinition)
     {
-        var memberType = member.MemberType();
+        var memberType = propertyDefinition.PropertyType;
         var fullName = memberType.FullName;
         if (
             fullName == typeof(short).FullName ||
