@@ -43,7 +43,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(ChangeCorrPropertySagaData.SomeId)
+                 correlationProperty: nameof(ChangeCorrPropertySagaData.SomeId)
              )]
             public class ChangeCorrPropertySaga : Saga<ChangeCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {

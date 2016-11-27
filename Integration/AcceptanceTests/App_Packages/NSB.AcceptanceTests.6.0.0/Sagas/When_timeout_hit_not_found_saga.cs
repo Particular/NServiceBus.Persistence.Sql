@@ -38,7 +38,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(TimeoutHitsNotFoundSagaData.DataId)
+                 correlationProperty: nameof(TimeoutHitsNotFoundSagaData.DataId)
              )]
             public class TimeoutHitsNotFoundSaga : Saga<TimeoutHitsNotFoundSaga.TimeoutHitsNotFoundSagaData>,
                 IAmStartedByMessages<StartSaga>,

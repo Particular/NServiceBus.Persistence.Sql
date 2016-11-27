@@ -37,7 +37,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(TwoSaga1Saga1Data.DataId)
+                 correlationProperty: nameof(TwoSaga1Saga1Data.DataId)
              )]
             public class TwoSaga1Saga1 : Saga<TwoSaga1Saga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageSaga1WillHandle>
             {
@@ -72,7 +72,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(TwoSaga1Saga2Data.DataId)
+                 correlationProperty: nameof(TwoSaga1Saga2Data.DataId)
              )]
             public class TwoSaga1Saga2 : Saga<TwoSaga1Saga2.TwoSaga1Saga2Data>, IAmStartedByMessages<StartSaga2>
             {

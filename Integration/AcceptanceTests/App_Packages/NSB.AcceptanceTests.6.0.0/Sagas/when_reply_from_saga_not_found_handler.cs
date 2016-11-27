@@ -57,7 +57,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(NotFoundHandlerSaga1Data.ContextId)
+                 correlationProperty: nameof(NotFoundHandlerSaga1Data.ContextId)
              )]
             public class NotFoundHandlerSaga1 : Saga<NotFoundHandlerSaga1.NotFoundHandlerSaga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageToSaga>
             {

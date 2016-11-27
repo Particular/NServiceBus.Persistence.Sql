@@ -50,7 +50,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(UnmappedMsgSagaData.SomeId)
+                 correlationProperty: nameof(UnmappedMsgSagaData.SomeId)
              )]
             public class UnmappedMsgSaga : Saga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,

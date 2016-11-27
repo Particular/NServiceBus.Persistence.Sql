@@ -58,7 +58,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(EventFromOtherSaga1Data.DataId)
+                 correlationProperty: nameof(EventFromOtherSaga1Data.DataId)
              )]
             public class EventFromOtherSaga1 : Saga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
                 IAmStartedByMessages<StartSaga>,
@@ -113,7 +113,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(EventFromOtherSaga2Data.DataId)
+                 correlationProperty: nameof(EventFromOtherSaga2Data.DataId)
              )]
             public class EventFromOtherSaga2 : Saga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
                 IAmStartedByMessages<SomethingHappenedEvent>,

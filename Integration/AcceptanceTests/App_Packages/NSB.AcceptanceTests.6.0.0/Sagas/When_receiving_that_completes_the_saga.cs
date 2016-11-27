@@ -91,7 +91,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(TestSagaData10.SomeId)
+                 correlationProperty: nameof(TestSagaData10.SomeId)
              )]
             public class TestSaga10 : Saga<TestSagaData10>,
                 IAmStartedByMessages<StartSagaMessage>,

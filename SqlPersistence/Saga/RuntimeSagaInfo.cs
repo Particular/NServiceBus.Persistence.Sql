@@ -45,7 +45,7 @@ class RuntimeSagaInfo
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
         tableSuffix = sqlSagaAttributeData.TableSuffix;
-        CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
+        CompleteCommand = commandBuilder.BuildCompleteCommand(tableSuffix);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
         SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
         UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix, sqlSagaAttributeData.TransitionalCorrelationProperty);
@@ -56,9 +56,7 @@ class RuntimeSagaInfo
             HasTransitionalCorrelationProperty = true;
             TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(transitionalCorrelationMember);
         }
-
     }
-
 
 
     public string GetMappedPropertyCommand(string propertyName)
@@ -66,10 +64,12 @@ class RuntimeSagaInfo
         return mappedPropertyCommands.GetOrAdd(propertyName, _ => BuildGetByPropertyCommand(propertyName));
     }
 
+
     string BuildGetByPropertyCommand(string propertyName)
     {
         return commandBuilder.BuildGetByPropertyCommand(tableSuffix, propertyName);
     }
+
 
     public string ToXml(IContainSagaData sagaData)
     {
@@ -81,11 +81,13 @@ class RuntimeSagaInfo
         return builder.ToString();
     }
 
+
     public TSagaData FromString<TSagaData>(XmlReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
     {
         var deserialize = GetDeserialize(storedSagaTypeVersion);
         return (TSagaData) deserialize(reader);
     }
+
 
     SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
     {

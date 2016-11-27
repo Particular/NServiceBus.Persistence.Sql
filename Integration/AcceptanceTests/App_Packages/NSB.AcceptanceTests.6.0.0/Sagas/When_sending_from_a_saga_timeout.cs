@@ -37,7 +37,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(SendFromTimeoutSaga1Data.DataId)
+                 correlationProperty: nameof(SendFromTimeoutSaga1Data.DataId)
              )]
             public class SendFromTimeoutSaga1 : Saga<SendFromTimeoutSaga1.SendFromTimeoutSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
@@ -72,7 +72,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(SendFromTimeoutSaga2Data.DataId)
+                 correlationProperty: nameof(SendFromTimeoutSaga2Data.DataId)
              )]
             public class SendFromTimeoutSaga2 : Saga<SendFromTimeoutSaga2.SendFromTimeoutSaga2Data>, IAmStartedByMessages<StartSaga2>
             {

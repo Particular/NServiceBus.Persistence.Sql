@@ -61,7 +61,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(PlaceOrderSagaData.DataId)
+                 correlationProperty: nameof(PlaceOrderSagaData.DataId)
              )]
             class PlaceOrderSaga : Saga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {

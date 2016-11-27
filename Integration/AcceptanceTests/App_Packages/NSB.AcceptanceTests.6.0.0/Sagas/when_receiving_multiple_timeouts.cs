@@ -48,7 +48,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(MultiTimeoutsSaga1Data.ContextId)
+                 correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId)
              )]
             public class MultiTimeoutsSaga1 : Saga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,

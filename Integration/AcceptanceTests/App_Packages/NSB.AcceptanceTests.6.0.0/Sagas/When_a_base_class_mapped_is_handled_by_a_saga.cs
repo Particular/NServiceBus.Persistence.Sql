@@ -41,7 +41,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(BaseClassIsMappedSagaData.SomeId)
+                 correlationProperty: nameof(BaseClassIsMappedSagaData.SomeId)
              )]
             public class BaseClassIsMappedSaga : Saga<BaseClassIsMappedSaga.BaseClassIsMappedSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,

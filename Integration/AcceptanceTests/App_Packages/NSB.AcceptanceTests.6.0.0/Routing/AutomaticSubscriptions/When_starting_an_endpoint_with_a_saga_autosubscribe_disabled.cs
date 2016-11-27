@@ -60,7 +60,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(NotAutoSubscribedSagaSagaData.SomeId)
+                 correlationProperty: nameof(NotAutoSubscribedSagaSagaData.SomeId)
              )]
             public class NotAutoSubscribedSaga : Saga<NotAutoSubscribedSaga.NotAutoSubscribedSagaSagaData>, IAmStartedByMessages<MyEvent>
             {
@@ -81,7 +81,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(NotAutosubscribeSuperClassEventSagaData.SomeId)
+                 correlationProperty: nameof(NotAutosubscribeSuperClassEventSagaData.SomeId)
              )]
             public class NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent : Saga<NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent.NotAutosubscribeSuperClassEventSagaData>,
                 IAmStartedByMessages<MyEventBase>

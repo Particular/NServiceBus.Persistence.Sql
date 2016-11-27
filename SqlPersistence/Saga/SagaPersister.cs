@@ -16,11 +16,13 @@ class SagaPersister : ISagaPersister
         this.sagaInfoCache = sagaInfoCache;
     }
 
+
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
         return Save(sagaData, session, sagaType, correlationProperty.Value);
     }
+
 
     internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, object correlationId)
     {
@@ -41,6 +43,7 @@ class SagaPersister : ISagaPersister
         }
     }
 
+
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, SqlCommand command)
     {
         if (!sagaInfo.HasTransitionalCorrelationProperty)
@@ -56,16 +59,19 @@ class SagaPersister : ISagaPersister
         command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
+
     static object DBNullify(object value)
     {
         return value ?? DBNull.Value;
     }
+
 
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
         return Update(sagaData, session, sagaType);
     }
+
 
     async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
     {
@@ -84,12 +90,14 @@ class SagaPersister : ISagaPersister
         }
     }
 
+
     public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
         return Get<TSagaData>(sagaId, session, sagaType);
     }
+
 
     internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
     {
@@ -102,12 +110,14 @@ class SagaPersister : ISagaPersister
         }
     }
 
+
     public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
         return Get<TSagaData>(propertyName, propertyValue, session, sagaType);
     }
+
 
     internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
     {
@@ -120,6 +130,7 @@ class SagaPersister : ISagaPersister
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
+
 
     static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
@@ -145,11 +156,13 @@ class SagaPersister : ISagaPersister
         }
     }
 
+
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
         return Complete(sagaData, session, sagaType);
     }
+
 
     internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
     {

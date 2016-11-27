@@ -76,7 +76,7 @@
             }
 
             [NServiceBus.Persistence.Sql.SqlSaga(
-                 correlationId: nameof(ReplyToPubMsgSagaData.DataId)
+                 correlationProperty: nameof(ReplyToPubMsgSagaData.DataId)
              )]
             public class ReplyToPubMsgSaga : Saga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
