@@ -26,14 +26,14 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]
 ", saga.Name);
         }
 
-        static void AddProperty(CorrelationMember constraintMember, TextWriter writer)
+        static void AddProperty(CorrelationMember correlationMember, TextWriter writer)
         {
-            if (constraintMember == null)
+            if (correlationMember == null)
             {
                 return;
             }
-            var columnType = GetColumnType(constraintMember.Type);
-            var columnName = GetColumnName(constraintMember);
+            var columnType = GetColumnType(correlationMember.Type);
+            var columnName = GetColumnName(correlationMember);
             writer.Write($@"
 IF NOT EXISTS
 (
@@ -43,12 +43,12 @@ IF NOT EXISTS
     object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createColumn{columnName} nvarchar(max);
-  SET @createColumn{columnName} = '
+  DECLARE @createColumn_{correlationMember.Name} nvarchar(max);
+  SET @createColumn_{correlationMember.Name} = '
   ALTER TABLE ' + @tableName  + '
     ADD {columnName} {columnType};
   ';
-  exec(@createColumn{columnName});
+  exec(@createColumn_{correlationMember.Name});
 END
 ");
         }
@@ -62,15 +62,15 @@ END
             var columnType = GetColumnType(correlationMember.Type);
             var columnName = GetColumnName(correlationMember);
             writer.Write($@"
-DECLARE @dataType{columnName} nvarchar(max);
-SET @dataType{columnName} = (
+DECLARE @dataType_{correlationMember.Name} nvarchar(max);
+SET @dataType_{correlationMember.Name} = (
   SELECT DATA_TYPE
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE
     TABLE_NAME = ' + @tableName  + ' AND
     COLUMN_NAME = '{columnName}'
 );
-IF (@dataType{columnName} <> '{columnType}')
+IF (@dataType_{correlationMember.Name} <> '{columnType}')
   THROW 50000, 'Incorrect data type for {columnType}', 0
 ");
         }
@@ -111,13 +111,13 @@ IF NOT EXISTS
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createIndex{columnName} nvarchar(max);
-  SET @createIndex{columnName} = '
+  DECLARE @createIndex_{correlationMember.Name} nvarchar(max);
+  SET @createIndex_{correlationMember.Name} = '
   CREATE UNIQUE NONCLUSTERED INDEX {indexName}
   ON ' + @tableName  + '({columnName})
   WHERE {columnName} IS NOT NULL;
 ';
-  exec(@createIndex{columnName});
+  exec(@createIndex_{correlationMember.Name});
 END
 ");
         }

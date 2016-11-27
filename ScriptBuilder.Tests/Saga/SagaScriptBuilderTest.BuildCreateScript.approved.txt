@@ -32,23 +32,23 @@ IF NOT EXISTS
     object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createColumnProperty_Property1 nvarchar(max);
-  SET @createColumnProperty_Property1 = '
+  DECLARE @createColumn_Property1 nvarchar(max);
+  SET @createColumn_Property1 = '
   ALTER TABLE ' + @tableName  + '
     ADD Property_Property1 nvarchar(450);
   ';
-  exec(@createColumnProperty_Property1);
+  exec(@createColumn_Property1);
 END
 
-DECLARE @dataTypeProperty_Property1 nvarchar(max);
-SET @dataTypeProperty_Property1 = (
+DECLARE @dataType_Property1 nvarchar(max);
+SET @dataType_Property1 = (
   SELECT DATA_TYPE
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE
     TABLE_NAME = ' + @tableName  + ' AND
     COLUMN_NAME = 'Property_Property1'
 );
-IF (@dataTypeProperty_Property1 <> 'nvarchar(450)')
+IF (@dataType_Property1 <> 'nvarchar(450)')
   THROW 50000, 'Incorrect data type for nvarchar(450)', 0
 
 IF NOT EXISTS
@@ -60,13 +60,13 @@ IF NOT EXISTS
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createIndexProperty_Property1 nvarchar(max);
-  SET @createIndexProperty_Property1 = '
+  DECLARE @createIndex_Property1 nvarchar(max);
+  SET @createIndex_Property1 = '
   CREATE UNIQUE NONCLUSTERED INDEX Index_Property_Property1
   ON ' + @tableName  + '(Property_Property1)
   WHERE Property_Property1 IS NOT NULL;
 ';
-  exec(@createIndexProperty_Property1);
+  exec(@createIndex_Property1);
 END
 
 declare @dropIndexQuery nvarchar(max);
