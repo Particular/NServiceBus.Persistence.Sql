@@ -48,7 +48,7 @@ class RuntimeSagaInfo
         CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
         SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix);
+        UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix, sqlSagaAttributeData.TransitionalCorrelationProperty);
 
         var transitionalCorrelationMember = sqlSagaAttributeData.TransitionalCorrelationProperty;
         if (transitionalCorrelationMember != null)

@@ -60,9 +60,11 @@ VALUES
 )";
     }
 
-    public string BuildUpdateCommand(string tableSuffx)
+    public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty)
     {
-        return $@"
+        if (transitionalCorrelationProperty == null)
+        {
+            return $@"
 UPDATE [{schema}].[{endpointName}{tableSuffx}]
 SET
     Originator = @Originator,
@@ -70,6 +72,20 @@ SET
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion
+WHERE
+    Id = @Id
+";
+        }
+
+        return $@"
+UPDATE [{schema}].[{endpointName}{tableSuffx}]
+SET
+    Originator = @Originator,
+    OriginalMessageId = @OriginalMessageId,
+    Data = @Data,
+    PersistenceVersion = @PersistenceVersion,
+    SagaTypeVersion = @SagaTypeVersion,
+    Correlation_{transitionalCorrelationProperty}
 WHERE
     Id = @Id
 ";

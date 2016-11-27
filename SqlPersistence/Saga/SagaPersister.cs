@@ -36,18 +36,24 @@ class SagaPersister : ISagaPersister
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddParameter("CorrelationId", correlationId);
-            if (sagaInfo.HasTransitionalCorrelationProperty)
-            {
-                var transitionalId = sagaInfo.TransitionalAccessor(sagaData);
-                if (transitionalId == null)
-                {
-                    //TODO:  validate non default for value types
-                    throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaType: {sagaType.FullName}.");
-                }
-                command.AddParameter("TransitionalCorrelationId", transitionalId);
-            }
+            AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
+    }
+
+    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, SqlCommand command)
+    {
+        if (!sagaInfo.HasTransitionalCorrelationProperty)
+        {
+            return;
+        }
+        var transitionalId = sagaInfo.TransitionalAccessor(sagaData);
+        if (transitionalId == null)
+        {
+            //TODO:  validate non default for value types
+            throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaDataType: {sagaData.GetType().FullName}.");
+        }
+        command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
     static object DBNullify(object value)
@@ -73,6 +79,7 @@ class SagaPersister : ISagaPersister
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.Parameters.AddWithValue("Data", sagaInfo.ToXml(sagaData));
+            AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
     }
