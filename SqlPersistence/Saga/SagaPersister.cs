@@ -19,10 +19,10 @@ class SagaPersister : ISagaPersister
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
-        return Save(sagaData, session, sagaType);
+        return Save(sagaData, session, sagaType, correlationProperty.Value);
     }
 
-    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType)
+    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, object correlationId)
     {
         //TODO: verify SagaCorrelationProperty against our attribute
         var sqlSession = session.SqlPersistenceSession();
@@ -35,6 +35,17 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Data", sagaInfo.ToXml(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
+            command.AddParameter("CorrelationId", correlationId);
+            if (sagaInfo.HasTransitionalCorrelationProperty)
+            {
+                var transitionalId = sagaInfo.TransitionalAccessor(sagaData);
+                if (transitionalId == null)
+                {
+                    //TODO:  validate non default for value types
+                    throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaType: {sagaType.FullName}.");
+                }
+                command.AddParameter("TransitionalCorrelationId", transitionalId);
+            }
             await command.ExecuteNonQueryEx();
         }
     }

@@ -161,7 +161,7 @@ public class SagaConsistencyTests
     }
 
     [SqlSaga(
-         correlationId: nameof(SagaData.CorrelationId)
+         correlationProperty: nameof(SagaData.CorrelationId)
      )]
     public class Saga1 : Saga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,

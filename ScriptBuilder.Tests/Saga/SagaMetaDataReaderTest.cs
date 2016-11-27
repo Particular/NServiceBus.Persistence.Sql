@@ -26,8 +26,8 @@ public class SagaMetaDataReaderTest
     }
 
     [SqlSaga(
-         correlationId: nameof(SagaData.Correlation),
-         transitionalCorrelationId: nameof(SagaData.Transitional)
+         correlationProperty: nameof(SagaData.Correlation),
+         transitionalCorrelationProperty: nameof(SagaData.Transitional)
      )]
     public class SimpleSaga : Saga<SimpleSaga.SagaData>
     {

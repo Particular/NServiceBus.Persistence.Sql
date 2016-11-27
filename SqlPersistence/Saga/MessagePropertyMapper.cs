@@ -30,7 +30,7 @@ namespace NServiceBus.Persistence.Sql
             }
             var correlationProperty = sagaDataType
                 .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public)
-                .FirstOrDefault(x => x.Name == sqlSagaAttribute.CorrelationId);
+                .FirstOrDefault(x => x.Name == sqlSagaAttribute.CorrelationProperty);
             if (correlationProperty == null)
             {
                 expression = null;

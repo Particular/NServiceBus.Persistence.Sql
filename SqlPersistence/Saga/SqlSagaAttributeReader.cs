@@ -19,15 +19,8 @@ static class SqlSagaAttributeReader
         return new SqlSagaAttributeData
         {
             TableSuffix = tableName,
-            CorrelationId = attribute.CorrelationId,
-            TransitionalCorrelationId = attribute.TransitionalCorrelationId
+            CorrelationProperty = attribute.CorrelationProperty,
+            TransitionalCorrelationProperty = attribute.TransitionalCorrelationProperty
         };
     }
-}
-
-class SqlSagaAttributeData
-{
-    public string TableSuffix;
-    public string CorrelationId;
-    public string TransitionalCorrelationId;
 }

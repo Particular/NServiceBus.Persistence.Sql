@@ -9,9 +9,11 @@
         this.endpointName = endpointName;
     }
 
-    public string BuildSaveCommand(string tableSuffx)
+    public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty)
     {
-        return $@"
+        if (transitionalCorrelationProperty == null)
+        {
+            return $@"
 INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
 (
     Id,
@@ -19,7 +21,8 @@ INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
     OriginalMessageId,
     Data,
     PersistenceVersion,
-    SagaTypeVersion
+    SagaTypeVersion,
+    Correlation_{correlationProperty}
 )
 VALUES
 (
@@ -28,7 +31,32 @@ VALUES
     @OriginalMessageId,
     @Data,
     @PersistenceVersion,
-    @SagaTypeVersion
+    @SagaTypeVersion,
+    @CorrelationId
+)";
+        }
+        return $@"
+INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
+(
+    Id,
+    Originator,
+    OriginalMessageId,
+    Data,
+    PersistenceVersion,
+    SagaTypeVersion,
+    Correlation_{correlationProperty},
+    Correlation_{transitionalCorrelationProperty}
+)
+VALUES
+(
+    @Id,
+    @Originator,
+    @OriginalMessageId,
+    @Data,
+    @PersistenceVersion,
+    @SagaTypeVersion,
+    @CorrelationId,
+    @TransitionalCorrelationId
 )";
     }
 

@@ -70,7 +70,7 @@ public class SqlTransportIntegrationTests
     }
 
     [SqlSaga(
-         correlationId: nameof(SagaData.StartId)
+         correlationProperty: nameof(SagaData.StartId)
      )]
     public class Saga1 : Saga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,

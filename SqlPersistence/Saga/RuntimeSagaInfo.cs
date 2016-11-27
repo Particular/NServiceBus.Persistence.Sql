@@ -19,6 +19,8 @@ class RuntimeSagaInfo
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
+    public readonly Func<IContainSagaData, object> TransitionalAccessor;
+    public readonly bool HasTransitionalCorrelationProperty;
     string tableSuffix;
 
     ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
@@ -45,9 +47,18 @@ class RuntimeSagaInfo
         tableSuffix = sqlSagaAttributeData.TableSuffix;
         CompleteCommand= commandBuilder.BuildCompleteCommand(tableSuffix);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
-        SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix);
+        SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
         UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix);
+
+        var transitionalCorrelationMember = sqlSagaAttributeData.TransitionalCorrelationProperty;
+        if (transitionalCorrelationMember != null)
+        {
+            HasTransitionalCorrelationProperty = true;
+            TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(transitionalCorrelationMember);
+        }
+
     }
+
 
 
     public string GetMappedPropertyCommand(string propertyName)
