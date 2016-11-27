@@ -33,20 +33,19 @@ declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]
                 return;
             }
             var columnType = GetColumnType(correlationMember.Type);
-            var columnName = GetColumnName(correlationMember);
             writer.Write($@"
 IF NOT EXISTS
 (
   SELECT * FROM sys.columns
   WHERE
-    name = '{columnName}' AND
+    name = 'Correlation_{correlationMember.Name}' AND
     object_id = OBJECT_ID(@tableName)
 )
 BEGIN
   DECLARE @createColumn_{correlationMember.Name} nvarchar(max);
   SET @createColumn_{correlationMember.Name} = '
   ALTER TABLE ' + @tableName  + '
-    ADD {columnName} {columnType};
+    ADD Correlation_{correlationMember.Name} {columnType};
   ';
   exec(@createColumn_{correlationMember.Name});
 END
@@ -60,7 +59,6 @@ END
                 return;
             }
             var columnType = GetColumnType(correlationMember.Type);
-            var columnName = GetColumnName(correlationMember);
             writer.Write($@"
 DECLARE @dataType_{correlationMember.Name} nvarchar(max);
 SET @dataType_{correlationMember.Name} = (
@@ -68,7 +66,7 @@ SET @dataType_{correlationMember.Name} = (
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE
     TABLE_NAME = ' + @tableName  + ' AND
-    COLUMN_NAME = '{columnName}'
+    COLUMN_NAME = 'Correlation_{correlationMember.Name}'
 );
 IF (@dataType_{correlationMember.Name} <> '{columnType}')
   THROW 50000, 'Incorrect data type for {columnType}', 0
@@ -100,7 +98,6 @@ IF (@dataType_{correlationMember.Name} <> '{columnType}')
                 return;
             }
             var indexName = GetIndexName(correlationMember);
-            var columnName = GetColumnName(correlationMember);
             writer.Write($@"
 IF NOT EXISTS
 (
@@ -114,8 +111,8 @@ BEGIN
   DECLARE @createIndex_{correlationMember.Name} nvarchar(max);
   SET @createIndex_{correlationMember.Name} = '
   CREATE UNIQUE NONCLUSTERED INDEX {indexName}
-  ON ' + @tableName  + '({columnName})
-  WHERE {columnName} IS NOT NULL;
+  ON ' + @tableName  + '(Correlation_{correlationMember.Name})
+  WHERE Correlation_{correlationMember.Name} IS NOT NULL;
 ';
   exec(@createIndex_{correlationMember.Name});
 END
@@ -123,11 +120,6 @@ END
         }
 
         const string propertyPrefix = "Property_";
-
-        static string GetColumnName(CorrelationMember correlationMember)
-        {
-            return $"{propertyPrefix}{correlationMember.Name}";
-        }
 
         static string GetIndexName(CorrelationMember correlationMember)
         {
@@ -160,14 +152,14 @@ exec sp_executesql @dropIndexQuery
             var correlationIndexName = "";
             if (saga.CorrelationMember != null)
             {
-                correlationColumnName = GetColumnName(saga.CorrelationMember);
+                correlationColumnName = $"Correlation_{saga.CorrelationMember.Name}";
                 correlationIndexName = GetIndexName(saga.CorrelationMember);
             }
             var transitionalColumnName = "";
             var transitionalIndexName = "";
             if (saga.TransitionalCorrelationMember != null)
             {
-                transitionalColumnName = GetColumnName(saga.TransitionalCorrelationMember);
+                transitionalColumnName = $"Correlation_{saga.TransitionalCorrelationMember.Name}";
                 transitionalIndexName = GetIndexName(saga.TransitionalCorrelationMember);
             }
 
