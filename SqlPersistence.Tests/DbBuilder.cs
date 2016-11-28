@@ -47,7 +47,7 @@ static class DbBuilder
             manipulateParameters: collection =>
             {
                 collection.AddWithValue("schema", "dbo");
-                collection.AddWithValue("endpointName", endpointName + ".");
+                collection.AddWithValue("endpointName", $"{endpointName}.");
             });
     }
 }

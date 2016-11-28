@@ -5,7 +5,7 @@ namespace NServiceBus.Persistence.Sql
     {
         public SagaDefinition(string tableSuffix, string name, CorrelationProperty correlationProperty = null, CorrelationProperty transitionalCorrelationProperty = null)
         {
-            Guard.AgainstEmpty(nameof(tableSuffix), tableSuffix);
+            Guard.AgainstNullAndEmpty(nameof(tableSuffix), tableSuffix);
             Guard.AgainstNullAndEmpty(nameof(name), name);
             TableSuffix = tableSuffix;
             Name = name;

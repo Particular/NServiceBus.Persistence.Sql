@@ -19,12 +19,12 @@ static class MsmqQueueDeletion
         DeleteQueue(endpointName);
 
         //retries queue
-        DeleteQueue(endpointName + ".retries");
+        DeleteQueue($"{endpointName}.retries");
 
         //timeout queue
-        DeleteQueue(endpointName + ".timeouts");
+        DeleteQueue($"{endpointName}.timeouts");
 
         //timeout dispatcher queue
-        DeleteQueue(endpointName + ".timeoutsdispatcher");
+        DeleteQueue($"{endpointName}.timeoutsdispatcher");
     }
 }

@@ -114,14 +114,17 @@ WHERE
 
     public async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
     {
+        var builder = new StringBuilder();
+
+        builder.Append($@"
+SELECT DISTINCT Subscriber, Endpoint
+FROM [{schema}].[{endpointName}SubscriptionData]
+WHERE MessageType IN (");
+
+        var types = messageTypes.ToList();
+
         using (var command = new SqlCommand())
         {
-            var builder = new StringBuilder();
-            builder.AppendFormat(@"
-SELECT DISTINCT Subscriber, Endpoint
-FROM [{0}].[{1}SubscriptionData]
-WHERE MessageType IN (", schema, endpointName);
-            var types = messageTypes.ToList();
             for (var i = 0; i < types.Count; i++)
             {
                 var messageType = types[i];

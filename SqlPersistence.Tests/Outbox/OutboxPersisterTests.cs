@@ -18,7 +18,7 @@ public class OutboxPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new OutboxPersister(connectionString, "dbo", endpointName + ".");
+        persister = new OutboxPersister(connectionString, "dbo", $"{endpointName}.");
     }
 
     [Test]

@@ -93,17 +93,17 @@ namespace NServiceBus.Persistence.Sql
                 var maximumNameLength = 244 - sagasScriptPath.Length;
                 if (sagaFileName.Length > maximumNameLength)
                 {
-                    sagaFileName = sagaFileName.Substring(0, maximumNameLength) + "_" + index;
+                    sagaFileName = $"{sagaFileName.Substring(0, maximumNameLength)}_{index}";
                     index++;
                 }
-                var createPath = Path.Combine(sagasScriptPath, sagaFileName + "_Create.sql");
+                var createPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Create.sql");
                 File.Delete(createPath);
                 using (var writer = File.CreateText(createPath))
                 {
                     SagaScriptBuilder.BuildCreateScript(saga, writer);
                 }
 
-                var dropPath = Path.Combine(sagasScriptPath, sagaFileName + "_Drop.sql");
+                var dropPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Drop.sql");
                 File.Delete(dropPath);
                 using (var writer = File.CreateText(dropPath))
                 {
