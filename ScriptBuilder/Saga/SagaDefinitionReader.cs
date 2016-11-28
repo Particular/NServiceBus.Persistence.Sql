@@ -6,73 +6,66 @@ using NServiceBus.Persistence.Sql;
 class SagaDefinitionReader
 {
 
-    public static bool TryGetSqlSagaDefinition(TypeDefinition sagaType, out SagaDefinition definition)
+    public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
-        var attribute = sagaType.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
+        var typeFullName = type.FullName;
+        var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
         if (attribute == null)
         {
+            if (!type.IsAbstract && type.BaseType != null)
+            {
+                var baseTypeFullName = type.BaseType.FullName;
+                if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
+                {
+                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Saga but is missing a [SqlSagaAttribute].");
+                }
+                if (baseTypeFullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga"))
+                {
+                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Persistence.Sql.SqlSaga but is missing a [SqlSagaAttribute].");
+                }
+            }
             definition = null;
             return false;
         }
-        if (sagaType.HasGenericParameters)
+        if (type.HasGenericParameters)
         {
-            throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] but has generic parameters.");
+            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has generic parameters.");
         }
-        if (sagaType.IsAbstract)
+        if (type.IsAbstract)
         {
-            throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] but has is abstract.");
-        }
-
-        var correlationArgumentValue = (string)attribute.ConstructorArguments[0].Value;
-        if (string.IsNullOrWhiteSpace(correlationArgumentValue))
-        {
-            throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] but a null or empty string is passed to correlationId.");
+            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has is abstract.");
         }
 
-        var transitionalArgumentValue = (string)attribute.ConstructorArguments[1].Value;
-        if (transitionalArgumentValue != null && string.IsNullOrWhiteSpace(transitionalArgumentValue))
-        {
-            throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] but an empty string is passed to transitionalCorrelationId.");
-        }
+        var arguments = attribute.ConstructorArguments;
+        var correlationArgumentValue = (string)arguments[0].Value;
+        var transitionalArgumentValue = (string)arguments[1].Value;
+        var tableSuffixArgumentValue = (string)arguments[2].Value;
+        SagaDefinitionValidator.ValidateSagaDefinition(correlationArgumentValue, typeFullName, transitionalArgumentValue, tableSuffixArgumentValue);
 
-        var tableNameArgumentValue = (string)attribute.ConstructorArguments[2].Value;
-        string tableName;
-        if (tableNameArgumentValue == null)
+        string tableSuffix;
+
+        if (tableSuffixArgumentValue == null)
         {
-            tableName = sagaType.Name;
+            tableSuffix = type.Name;
         }
         else
         {
-            if (string.IsNullOrWhiteSpace(tableNameArgumentValue))
-            {
-                throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] but an empty string is passed to tableName.");
-            }
-            tableName = tableNameArgumentValue;
+            tableSuffix = tableSuffixArgumentValue;
         }
 
+        var sagaDataType = GetSagaDataTypeFromSagaType(type);
 
-        if (correlationArgumentValue == transitionalArgumentValue)
-        {
-            throw new ErrorsException($"The type '{sagaType.FullName}' has a [SqlSagaAttribute] where the correlationId and transitionalCorrelationId are the same. Member: {correlationArgumentValue}");
-        }
-
-        var sagaDataType = GetSagaDataTypeFromSagaType(sagaType);
-
-        var correlationMember = BuildConstraintMember(sagaDataType, correlationArgumentValue);
-        CorrelationMember transitionalMember = null;
-        if (transitionalArgumentValue != null)
-        {
-            transitionalMember = BuildConstraintMember(sagaDataType, transitionalArgumentValue);
-        }
         definition = new SagaDefinition
-        {
-            CorrelationMember = correlationMember,
-            TransitionalCorrelationMember = transitionalMember,
-            Name = tableName
-        };
+        (
+            correlationProperty: BuildConstraintMember(sagaDataType, correlationArgumentValue),
+            transitionalCorrelationProperty: BuildConstraintMember(sagaDataType, transitionalArgumentValue),
+            tableSuffix: tableSuffix,
+            name: type.FullName
+        );
         return true;
     }
 
+   
     static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
     {
         foreach (var method in sagaType.Methods)
@@ -105,8 +98,12 @@ class SagaDefinitionReader
         throw new ErrorsException($"The type '{sagaType.FullName}' needs to override ConfigureHowToFindSaga(SagaPropertyMapper).");
     }
 
-    static CorrelationMember BuildConstraintMember(TypeDefinition sagaDataTypeDefinition, string propertyName)
+    static CorrelationProperty BuildConstraintMember(TypeDefinition sagaDataTypeDefinition, string propertyName)
     {
+        if (propertyName == null)
+        {
+            return null;
+        }
         var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
 
         if (propertyDefinition == null)
@@ -118,9 +115,9 @@ class SagaDefinitionReader
         return BuildConstraintMember(propertyDefinition);
     }
 
-    static CorrelationMember BuildConstraintMember(PropertyDefinition member)
+    static CorrelationProperty BuildConstraintMember(PropertyDefinition member)
     {
-        return new CorrelationMember
+        return new CorrelationProperty
         {
             Name = member.Name,
             Type = GetConstraintMemberType(member)

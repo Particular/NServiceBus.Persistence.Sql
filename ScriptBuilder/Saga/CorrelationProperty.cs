@@ -1,6 +1,6 @@
 namespace NServiceBus.Persistence.Sql
 {
-    public class CorrelationMember
+    public class CorrelationProperty
     {
         public string Name;
         public CorrelationMemberType Type;

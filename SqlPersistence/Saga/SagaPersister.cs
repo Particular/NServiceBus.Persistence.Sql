@@ -20,7 +20,7 @@ class SagaPersister : ISagaPersister
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
-        return Save(sagaData, session, sagaType, correlationProperty.Value);
+        return Save(sagaData, session, sagaType, correlationProperty?.Value);
     }
 
 
@@ -37,7 +37,10 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Data", sagaInfo.ToXml(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.AddParameter("CorrelationId", correlationId);
+            if (correlationId != null)
+            {
+                command.AddParameter("CorrelationId", correlationId);
+            }
             AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
@@ -99,7 +102,8 @@ class SagaPersister : ISagaPersister
     }
 
 
-    internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
+    internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
+        where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         var sqlSession = session.SqlPersistenceSession();
@@ -119,7 +123,8 @@ class SagaPersister : ISagaPersister
     }
 
 
-    internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) where TSagaData : IContainSagaData
+    internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) 
+        where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         var commandText = sagaInfo.GetMappedPropertyCommand(propertyName);

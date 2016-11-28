@@ -8,18 +8,65 @@ using NUnit.Framework;
 public class SagaScriptBuilderTest
 {
     [Test]
-    public void BuildCreateScript()
+    public void CreateWithCorrelation()
     {
-        var saga = new SagaDefinition
-        {
-            Name = "theSaga",
-            CorrelationMember = new CorrelationMember
+        var saga = new SagaDefinition(
+            name: "theSaga",
+            tableSuffix: "theSaga",
+            correlationProperty: new CorrelationProperty
             {
-                Name = "Property1",
+                Name = "CorrelationProperty",
                 Type = CorrelationMemberType.String
             }
-        };
+        );
 
+        var builder = new StringBuilder();
+        using (var writer = new StringWriter(builder))
+        {
+            SagaScriptBuilder.BuildCreateScript(saga, writer);
+        }
+        var script = builder.ToString();
+
+        SqlValidator.Validate(script);
+        Approvals.Verify(script);
+    }
+
+    [Test]
+    public void CreateWithNoCorrelation()
+    {
+        var saga = new SagaDefinition(
+            tableSuffix: "theSaga",
+            name: "theSaga"
+        );
+
+        var builder = new StringBuilder();
+        using (var writer = new StringWriter(builder))
+        {
+            SagaScriptBuilder.BuildCreateScript(saga, writer);
+        }
+        var script = builder.ToString();
+
+        SqlValidator.Validate(script);
+        Approvals.Verify(script);
+    }
+
+    [Test]
+    public void CreateWithCorrelationAndTransitional()
+    {
+        var saga = new SagaDefinition(
+            tableSuffix: "theSaga",
+            name: "theSaga",
+            correlationProperty: new CorrelationProperty
+            {
+                Name = "CorrelationProperty",
+                Type = CorrelationMemberType.String
+            },
+            transitionalCorrelationProperty: new CorrelationProperty
+            {
+                Name = "TransitionalProperty",
+                Type = CorrelationMemberType.String
+            }
+        );
 
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -38,7 +85,10 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            var saga = new SagaDefinition {Name = "theSaga"};
+            var saga = new SagaDefinition(
+                tableSuffix: "theSaga",
+                name: "theSaga"
+            );
             SagaScriptBuilder.BuildDropScript(saga, writer);
         }
         var script = builder.ToString();

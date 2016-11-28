@@ -26,15 +26,15 @@ public class MsmqTransportIntegrationTests
     [TestCase(TransportTransactionMode.None)]
     public async Task Write(TransportTransactionMode transactionMode)
     {
-        var sagaDefinition = new SagaDefinition
-        {
-            Name = nameof(Saga1),
-            CorrelationMember = new  CorrelationMember
+        var sagaDefinition = new SagaDefinition(
+            tableSuffix: nameof(Saga1),
+            name: nameof(Saga1),
+            correlationProperty: new  CorrelationProperty
             {
                 Name = nameof(Saga1.SagaData.StartId),
                 Type =  CorrelationMemberType.Guid
-            },
-        };
+            }
+        );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<MsmqTransportIntegrationTests>();

@@ -89,7 +89,7 @@ namespace NServiceBus.Persistence.Sql
                 logger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
             }))
             {
-                var sagaFileName = saga.Name;
+                var sagaFileName = saga.TableSuffix;
                 var maximumNameLength = 244 - sagasScriptPath.Length;
                 if (sagaFileName.Length > maximumNameLength)
                 {

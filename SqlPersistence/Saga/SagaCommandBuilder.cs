@@ -1,4 +1,6 @@
-﻿class SagaCommandBuilder
+﻿using System.Text;
+
+class SagaCommandBuilder
 {
     string schema;
     string endpointName;
@@ -11,30 +13,20 @@
 
     public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty)
     {
-        if (transitionalCorrelationProperty == null)
+        var valuesBuilder = new StringBuilder();
+        var insertBuilder = new StringBuilder();
+
+        if (correlationProperty != null)
         {
-            return $@"
-INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
-(
-    Id,
-    Originator,
-    OriginalMessageId,
-    Data,
-    PersistenceVersion,
-    SagaTypeVersion,
-    Correlation_{correlationProperty}
-)
-VALUES
-(
-    @Id,
-    @Originator,
-    @OriginalMessageId,
-    @Data,
-    @PersistenceVersion,
-    @SagaTypeVersion,
-    @CorrelationId
-)";
+            insertBuilder.Append($",\r\nCorrelation_{correlationProperty}");
+            valuesBuilder.Append(",\r\n@CorrelationId");
         }
+        if (transitionalCorrelationProperty != null)
+        {
+            insertBuilder.Append($",\r\nCorrelation_{transitionalCorrelationProperty}");
+            valuesBuilder.Append(",\r\n@TransitionalCorrelationId");
+        }
+
         return $@"
 INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
 (
@@ -43,9 +35,7 @@ INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
     OriginalMessageId,
     Data,
     PersistenceVersion,
-    SagaTypeVersion,
-    Correlation_{correlationProperty},
-    Correlation_{transitionalCorrelationProperty}
+    SagaTypeVersion{insertBuilder}
 )
 VALUES
 (
@@ -54,27 +44,19 @@ VALUES
     @OriginalMessageId,
     @Data,
     @PersistenceVersion,
-    @SagaTypeVersion,
-    @CorrelationId,
-    @TransitionalCorrelationId
+    @SagaTypeVersion{valuesBuilder}
 )";
     }
 
+
     public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty)
     {
-        if (transitionalCorrelationProperty == null)
+        // no need to set CorrelationProperty since it is immutable
+
+        var correlationSet = "";
+        if (transitionalCorrelationProperty != null)
         {
-            return $@"
-UPDATE [{schema}].[{endpointName}{tableSuffx}]
-SET
-    Originator = @Originator,
-    OriginalMessageId = @OriginalMessageId,
-    Data = @Data,
-    PersistenceVersion = @PersistenceVersion,
-    SagaTypeVersion = @SagaTypeVersion
-WHERE
-    Id = @Id
-";
+            correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty}";
         }
 
         return $@"
@@ -84,8 +66,7 @@ SET
     OriginalMessageId = @OriginalMessageId,
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
-    SagaTypeVersion = @SagaTypeVersion,
-    Correlation_{transitionalCorrelationProperty}
+    SagaTypeVersion = @SagaTypeVersion{correlationSet}
 WHERE
     Id = @Id
 ";

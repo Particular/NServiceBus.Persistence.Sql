@@ -3,8 +3,19 @@ namespace NServiceBus.Persistence.Sql
 {
     public class SagaDefinition
     {
-        public string Name;
-        public CorrelationMember CorrelationMember;
-        public CorrelationMember TransitionalCorrelationMember;
+        public SagaDefinition(string tableSuffix, string name, CorrelationProperty correlationProperty = null, CorrelationProperty transitionalCorrelationProperty = null)
+        {
+            Guard.AgainstEmpty(nameof(tableSuffix), tableSuffix);
+            Guard.AgainstNullAndEmpty(nameof(name), name);
+            TableSuffix = tableSuffix;
+            Name = name;
+            CorrelationProperty = correlationProperty;
+            TransitionalCorrelationProperty = transitionalCorrelationProperty;
+        }
+
+        public string TableSuffix { get; }
+        public CorrelationProperty CorrelationProperty { get; }
+        public CorrelationProperty TransitionalCorrelationProperty { get; }
+        public string Name { get; }
     }
 }

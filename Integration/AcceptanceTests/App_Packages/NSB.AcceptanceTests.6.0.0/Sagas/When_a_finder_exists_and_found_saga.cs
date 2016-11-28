@@ -10,6 +10,7 @@
     using Persistence;
 
     [TestFixture]
+    [Explicit]
     public class When_a_finder_exists_and_found_saga : NServiceBusAcceptanceTest
     {
         [Test]

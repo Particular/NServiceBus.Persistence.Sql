@@ -1,5 +1,4 @@
-﻿
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     public abstract class SqlSaga<TSagaData> : Saga<TSagaData>
         where TSagaData :

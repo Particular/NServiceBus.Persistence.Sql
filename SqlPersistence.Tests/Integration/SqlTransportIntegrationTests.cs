@@ -29,15 +29,15 @@ public class SqlTransportIntegrationTests
     [TestCase(TransportTransactionMode.None)]
     public async Task SmokeTest(TransportTransactionMode transactionMode)
     {
-        var sagaDefinition = new SagaDefinition
-        {
-            Name = "Saga1",
-            CorrelationMember = new CorrelationMember
+        var sagaDefinition = new SagaDefinition(
+            tableSuffix : "Saga1",
+            name : "Saga1",
+            correlationProperty : new CorrelationProperty
             {
                 Name = "StartId",
                 Type =  CorrelationMemberType.Guid
             }
-        };
+        );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SqlTransportIntegrationTests>();

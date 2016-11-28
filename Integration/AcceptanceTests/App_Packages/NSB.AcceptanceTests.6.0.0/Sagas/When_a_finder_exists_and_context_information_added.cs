@@ -56,7 +56,9 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
 
-            public class TestSaga07 : Saga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
+            [NServiceBus.Persistence.Sql.SqlSaga]
+            public class TestSaga07 : Saga<TestSaga07.SagaData07>,
+                IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }
 

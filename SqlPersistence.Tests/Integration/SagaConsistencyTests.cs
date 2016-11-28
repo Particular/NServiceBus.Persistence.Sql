@@ -73,15 +73,15 @@ public class SagaConsistencyTests
     {
         ManualResetEvent.Reset();
         string message = null;
-        var sagaDefinition = new SagaDefinition
-        {
-            Name = nameof(Saga1),
-            CorrelationMember = new CorrelationMember
+        var sagaDefinition = new SagaDefinition(
+            tableSuffix: nameof(Saga1),
+            name: nameof(Saga1),
+            correlationProperty: new CorrelationProperty
             {
                 Name = nameof(Saga1.SagaData.CorrelationId),
                 Type = CorrelationMemberType.Guid
             }
-        };
+        );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SagaConsistencyTests>();

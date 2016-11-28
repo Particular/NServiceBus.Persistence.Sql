@@ -42,4 +42,46 @@ public class SagaMetaDataReaderTest
         }
     }
 
+    [Test]
+    public void WithNoCorrelation()
+    {
+        var dataType = module.GetTypeDefinition<WithNoCorrelationSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [SqlSaga]
+    public class WithNoCorrelationSaga : Saga<WithNoCorrelationSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void WithNoTransitionalCorrelation()
+    {
+        var dataType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [SqlSaga]
+    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
 }

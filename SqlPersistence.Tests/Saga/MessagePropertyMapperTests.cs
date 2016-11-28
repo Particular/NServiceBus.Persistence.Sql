@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
@@ -11,8 +10,7 @@ public class MessagePropertyMapperTests
     [Test]
     public void StringCorrelationId()
     {
-        Expression<Func<SagaWithStringCorrelationId.SagaData, object>> expression;
-        Assert.IsTrue(MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.TryGetExpression(typeof(SagaWithStringCorrelationId), out expression));
+        var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));;
         var instance = new SagaWithStringCorrelationId.SagaData
         {
             CorrelationProperty = "Foo"
@@ -34,8 +32,7 @@ public class MessagePropertyMapperTests
     [Test]
     public void IntCorrelationId()
     {
-        Expression<Func<SagaWithIntCorrelationId.SagaData, object>> expression;
-        Assert.IsTrue(MessagePropertyMapper<SagaWithIntCorrelationId.SagaData>.TryGetExpression(typeof(SagaWithIntCorrelationId), out expression));
+        var expression = MessagePropertyMapper<SagaWithIntCorrelationId.SagaData>.GetExpression(typeof(SagaWithIntCorrelationId));
         var instance = new SagaWithIntCorrelationId.SagaData
         {
             CorrelationProperty = 10
@@ -56,8 +53,7 @@ public class MessagePropertyMapperTests
     [Test]
     public void GuidCorrelationId()
     {
-        Expression<Func<SagaWithGuidCorrelationId.SagaData, object>> expression;
-        Assert.IsTrue(MessagePropertyMapper<SagaWithGuidCorrelationId.SagaData>.TryGetExpression(typeof(SagaWithGuidCorrelationId), out expression));
+        var expression = MessagePropertyMapper<SagaWithGuidCorrelationId.SagaData>.GetExpression(typeof(SagaWithGuidCorrelationId));
         var guid = Guid.NewGuid();
         var instance = new SagaWithGuidCorrelationId.SagaData
         {

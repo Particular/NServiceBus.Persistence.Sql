@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -16,37 +15,39 @@ namespace NServiceBus.Persistence.Sql
         internal MessagePropertyMapper(SagaPropertyMapper<TSagaData> sagaPropertyMapper, Type sagaType)
         {
             this.sagaPropertyMapper = sagaPropertyMapper;
-            TryGetExpression(sagaType, out correlationExpression);
+            correlationExpression = GetExpression(sagaType);
         }
 
-        internal static bool TryGetExpression(Type sagaType, out Expression<Func<TSagaData, object>> expression)
+        internal static Expression<Func<TSagaData, object>>  GetExpression(Type sagaType)
         {
             var sagaDataType = typeof (TSagaData);
             var sqlSagaAttribute = sagaType.GetCustomAttribute<SqlSagaAttribute>();
             if (sqlSagaAttribute == null)
             {
-                expression = null;
-                return false;
+                var message = $"Implementations of SqlSaga require a [{nameof(SqlSagaAttribute)}] to be applied.";
+                throw new Exception(message);
+            }
+            if (sqlSagaAttribute.CorrelationProperty == null)
+            {
+                var message = $"When implementing a SqlSaga it is necessary to provide a CorrelationProperty via a [{nameof(SqlSagaAttribute)}]. Either provide a CorrelationProperty or inherit from {nameof(Saga)} instead.";
+                throw new Exception(message);
             }
             var correlationProperty = sagaDataType
-                .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public)
-                .FirstOrDefault(x => x.Name == sqlSagaAttribute.CorrelationProperty);
+                .GetProperty(sqlSagaAttribute.CorrelationProperty, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
             if (correlationProperty == null)
             {
-                expression = null;
-                return false;
+                var message = $"Expected to fing a property named {sqlSagaAttribute.CorrelationProperty} on  [{sagaDataType.FullName}].";
+                throw new Exception(message);
             }
             var parameterExpression = Expression.Parameter(typeof (TSagaData), "s");
 
             var propertyExpression = Expression.Property(parameterExpression, correlationProperty);
             if (correlationProperty.PropertyType == typeof (string))
             {
-                expression = Expression.Lambda<Func<TSagaData, object>>(propertyExpression, parameterExpression);
-                return true;
+                return Expression.Lambda<Func<TSagaData, object>>(propertyExpression, parameterExpression);
             }
             var convert = Expression.Convert(propertyExpression, typeof(object));
-            expression = Expression.Lambda<Func<TSagaData, object>>(convert, parameterExpression);
-            return true;
+            return Expression.Lambda<Func<TSagaData, object>>(convert, parameterExpression);
         }
 
         /// <summary>

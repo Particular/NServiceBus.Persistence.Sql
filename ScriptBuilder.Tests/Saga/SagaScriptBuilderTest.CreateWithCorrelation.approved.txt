@@ -28,27 +28,27 @@ IF NOT EXISTS
 (
   SELECT * FROM sys.columns
   WHERE
-    name = 'Correlation_Property1' AND
+    name = 'Correlation_CorrelationProperty' AND
     object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createColumn_Property1 nvarchar(max);
-  SET @createColumn_Property1 = '
+  DECLARE @createColumn_CorrelationProperty nvarchar(max);
+  SET @createColumn_CorrelationProperty = '
   ALTER TABLE ' + @tableName  + '
-    ADD Correlation_Property1 nvarchar(450);
+    ADD Correlation_CorrelationProperty nvarchar(450);
   ';
-  exec(@createColumn_Property1);
+  exec(@createColumn_CorrelationProperty);
 END
 
-DECLARE @dataType_Property1 nvarchar(max);
-SET @dataType_Property1 = (
+DECLARE @dataType_CorrelationProperty nvarchar(max);
+SET @dataType_CorrelationProperty = (
   SELECT DATA_TYPE
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE
     TABLE_NAME = ' + @tableName  + ' AND
-    COLUMN_NAME = 'Correlation_Property1'
+    COLUMN_NAME = 'Correlation_CorrelationProperty'
 );
-IF (@dataType_Property1 <> 'nvarchar(450)')
+IF (@dataType_CorrelationProperty <> 'nvarchar(450)')
   THROW 50000, 'Incorrect data type for nvarchar(450)', 0
 
 IF NOT EXISTS
@@ -56,17 +56,17 @@ IF NOT EXISTS
     SELECT *
     FROM sys.indexes
     WHERE
-        name = 'Index_Correlation_Property1' AND
+        name = 'Index_Correlation_CorrelationProperty' AND
         object_id = OBJECT_ID(@tableName)
 )
 BEGIN
-  DECLARE @createIndex_Property1 nvarchar(max);
-  SET @createIndex_Property1 = '
-  CREATE UNIQUE NONCLUSTERED INDEX Index_Correlation_Property1
-  ON ' + @tableName  + '(Correlation_Property1)
-  WHERE Correlation_Property1 IS NOT NULL;
+  DECLARE @createIndex_CorrelationProperty nvarchar(max);
+  SET @createIndex_CorrelationProperty = '
+  CREATE UNIQUE NONCLUSTERED INDEX Index_Correlation_CorrelationProperty
+  ON ' + @tableName  + '(Correlation_CorrelationProperty)
+  WHERE Correlation_CorrelationProperty IS NOT NULL;
 ';
-  exec(@createIndex_Property1);
+  exec(@createIndex_CorrelationProperty);
 END
 
 declare @dropIndexQuery nvarchar(max);
@@ -78,8 +78,7 @@ select @dropIndexQuery =
         ix.Id = (select object_id from sys.objects where name = @tableName) AND
         ix.Name IS NOT null AND
         ix.Name LIKE 'Index_Correlation_%' AND
-        ix.Name <> 'Index_Correlation_Property1' AND
-        ix.Name <> 'Index_Correlation_'
+        ix.Name <> 'Index_Correlation_CorrelationProperty'
 );
 exec sp_executesql @dropIndexQuery
 
@@ -91,7 +90,6 @@ select @dropPropertiesQuery =
     WHERE
         col.TABLE_NAME = ' + @tableName  + ' AND
         col.COLUMN_NAME LIKE 'Correlation_%' AND
-        col.COLUMN_NAME <> 'Correlation_Property1' AND
-        col.COLUMN_NAME <> 'Correlation_'
+        col.COLUMN_NAME <> 'Correlation_CorrelationProperty'
 );
 exec sp_executesql @dropPropertiesQuery

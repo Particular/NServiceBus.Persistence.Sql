@@ -69,10 +69,12 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Guard.cs">
+      <Link>Guard.cs</Link>
+    </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Guard.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Outbox\OperationSerializer.cs" />
     <Compile Include="Outbox\OutboxCleaner.cs" />

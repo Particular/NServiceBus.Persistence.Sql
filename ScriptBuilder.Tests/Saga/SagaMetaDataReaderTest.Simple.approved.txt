@@ -1,11 +1,12 @@
 ﻿{
-  "Name": "SimpleSaga",
-  "CorrelationMember": {
+  "TableSuffix": "SimpleSaga",
+  "CorrelationProperty": {
     "Name": "Correlation",
     "Type": "String"
   },
-  "TransitionalCorrelationMember": {
+  "TransitionalCorrelationProperty": {
     "Name": "Transitional",
     "Type": "String"
-  }
+  },
+  "Name": "SagaMetaDataReaderTest/SimpleSaga"
 }

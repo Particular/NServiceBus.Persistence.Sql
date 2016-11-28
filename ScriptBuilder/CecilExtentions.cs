@@ -12,7 +12,8 @@ public static class CecilExtentions
 
     public static IEnumerable<TypeDefinition> AllClasses(this ModuleDefinition module)
     {
-        return module.GetTypes().Where(x => x.IsClass);
+        return module.GetTypes()
+            .Where(x => x.IsClass);
     }
 
     public static string GetFileName(this TypeDefinition type)
