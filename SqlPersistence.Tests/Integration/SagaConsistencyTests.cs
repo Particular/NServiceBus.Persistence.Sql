@@ -77,10 +77,10 @@ public class SagaConsistencyTests
             tableSuffix: nameof(Saga1),
             name: nameof(Saga1),
             correlationProperty: new CorrelationProperty
-            {
-                Name = nameof(Saga1.SagaData.CorrelationId),
-                Type = CorrelationMemberType.Guid
-            }
+            (
+                name: nameof(Saga1.SagaData.CorrelationId),
+                type: CorrelationPropertyType.Guid
+            )
         );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);

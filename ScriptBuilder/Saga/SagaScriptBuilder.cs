@@ -82,22 +82,22 @@ IF (@dataType_{correlationProperty.Name} <> '{columnType}')
 ");
         }
 
-        static string GetColumnType(CorrelationMemberType memberType)
+        static string GetColumnType(CorrelationPropertyType propertyType)
         {
-            switch (memberType)
+            switch (propertyType)
             {
-                case CorrelationMemberType.DateTime:
+                case CorrelationPropertyType.DateTime:
                     return "datetime";
-                case CorrelationMemberType.DateTimeOffset:
+                case CorrelationPropertyType.DateTimeOffset:
                     return "datetimeoffset";
-                case CorrelationMemberType.String:
+                case CorrelationPropertyType.String:
                     return "nvarchar(450)";
-                case CorrelationMemberType.Int:
+                case CorrelationPropertyType.Int:
                     return "bigint";
-                case CorrelationMemberType.Guid:
+                case CorrelationPropertyType.Guid:
                     return "uniqueidentifier";
             }
-            throw new Exception($"Could not convert {memberType}.");
+            throw new Exception($"Could not convert {propertyType}.");
         }
 
         static void WriteCreateIndex(CorrelationProperty correlationProperty, TextWriter writer)

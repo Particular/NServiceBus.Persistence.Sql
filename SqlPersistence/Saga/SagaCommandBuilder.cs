@@ -74,7 +74,6 @@ WHERE
 
     public string BuildGetBySagaIdCommand(string tableSuffx)
     {
-        //TODO: no need to return id if we already have it
         return $@"
 SELECT
     Id,
@@ -89,7 +88,6 @@ WHERE Id = @Id
 
     public string BuildGetByPropertyCommand(string tableSuffx, string propertyName)
     {
-        //TODO: throw if property name
         return $@"
 SELECT
     Id,
@@ -98,7 +96,7 @@ SELECT
     Data,
     SagaTypeVersion
 FROM  [{schema}].[{endpointName}{tableSuffx}]
-WHERE [Data].exist('/Data/{propertyName}[.= (sql:variable(""@propertyValue""))]') = 1
+WHERE Correlation_{propertyName} = @propertyValue
 ";
     }
 

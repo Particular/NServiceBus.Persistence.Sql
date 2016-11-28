@@ -22,8 +22,10 @@ class RuntimeSagaInfo
     public readonly Func<IContainSagaData, object> TransitionalAccessor;
     public readonly bool HasTransitionalCorrelationProperty;
     string tableSuffix;
-
-    ConcurrentDictionary<string, string> mappedPropertyCommands = new ConcurrentDictionary<string, string>();
+    public readonly bool HasCorrelationProperty;
+    public readonly string CorrelationProperty;
+    public readonly string TransitionalCorrelationProperty;
+    public readonly string GetByCorrelationPropertyCommand;
 
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
@@ -50,24 +52,19 @@ class RuntimeSagaInfo
         SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
         UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix, sqlSagaAttributeData.TransitionalCorrelationProperty);
 
-        var transitionalCorrelationMember = sqlSagaAttributeData.TransitionalCorrelationProperty;
-        if (transitionalCorrelationMember != null)
+        CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
+        HasCorrelationProperty = CorrelationProperty != null;
+        if (HasCorrelationProperty)
         {
-            HasTransitionalCorrelationProperty = true;
-            TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(transitionalCorrelationMember);
+            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty);
         }
-    }
 
-
-    public string GetMappedPropertyCommand(string propertyName)
-    {
-        return mappedPropertyCommands.GetOrAdd(propertyName, _ => BuildGetByPropertyCommand(propertyName));
-    }
-
-
-    string BuildGetByPropertyCommand(string propertyName)
-    {
-        return commandBuilder.BuildGetByPropertyCommand(tableSuffix, propertyName);
+        TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;
+        HasTransitionalCorrelationProperty = TransitionalCorrelationProperty != null;
+        if (HasTransitionalCorrelationProperty)
+        {
+            TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(TransitionalCorrelationProperty);
+        }
     }
 
 

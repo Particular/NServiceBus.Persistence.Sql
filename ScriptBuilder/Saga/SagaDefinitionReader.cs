@@ -57,8 +57,8 @@ class SagaDefinitionReader
 
         definition = new SagaDefinition
         (
-            correlationProperty: BuildConstraintMember(sagaDataType, correlationArgumentValue),
-            transitionalCorrelationProperty: BuildConstraintMember(sagaDataType, transitionalArgumentValue),
+            correlationProperty: BuildConstraintProperty(sagaDataType, correlationArgumentValue),
+            transitionalCorrelationProperty: BuildConstraintProperty(sagaDataType, transitionalArgumentValue),
             tableSuffix: tableSuffix,
             name: type.FullName
         );
@@ -98,7 +98,7 @@ class SagaDefinitionReader
         throw new ErrorsException($"The type '{sagaType.FullName}' needs to override ConfigureHowToFindSaga(SagaPropertyMapper).");
     }
 
-    static CorrelationProperty BuildConstraintMember(TypeDefinition sagaDataTypeDefinition, string propertyName)
+    static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataTypeDefinition, string propertyName)
     {
         if (propertyName == null)
         {
@@ -112,22 +112,22 @@ class SagaDefinitionReader
         }
 
         //todo: verify not readonly
-        return BuildConstraintMember(propertyDefinition);
+        return BuildConstraintProperty(propertyDefinition);
     }
 
-    static CorrelationProperty BuildConstraintMember(PropertyDefinition member)
+    static CorrelationProperty BuildConstraintProperty(PropertyDefinition member)
     {
         return new CorrelationProperty
-        {
-            Name = member.Name,
-            Type = GetConstraintMemberType(member)
-        };
+        (
+            name: member.Name,
+            type: GetConstraintMemberType(member)
+        );
     }
 
-    static CorrelationMemberType GetConstraintMemberType(PropertyDefinition propertyDefinition)
+    static CorrelationPropertyType GetConstraintMemberType(PropertyDefinition propertyDefinition)
     {
-        var memberType = propertyDefinition.PropertyType;
-        var fullName = memberType.FullName;
+        var propertyType = propertyDefinition.PropertyType;
+        var fullName = propertyType.FullName;
         if (
             fullName == typeof(short).FullName ||
             fullName == typeof(int).FullName ||
@@ -136,24 +136,24 @@ class SagaDefinitionReader
             fullName == typeof(uint).FullName
             )
         {
-            return CorrelationMemberType.Int;
+            return CorrelationPropertyType.Int;
         }
         if (fullName == typeof(Guid).FullName)
         {
-            return CorrelationMemberType.Guid;
+            return CorrelationPropertyType.Guid;
         }
         if (fullName == typeof(DateTime).FullName)
         {
-            return CorrelationMemberType.DateTime;
+            return CorrelationPropertyType.DateTime;
         }
         if (fullName == typeof(DateTimeOffset).FullName)
         {
-            return CorrelationMemberType.DateTimeOffset;
+            return CorrelationPropertyType.DateTimeOffset;
         }
         if (fullName == typeof(string).FullName)
         {
-            return CorrelationMemberType.String;
+            return CorrelationPropertyType.String;
         }
-        throw new ErrorsException($"Could not convert '{fullName}' to {typeof(CorrelationMemberType).Name}.");
+        throw new ErrorsException($"Could not convert '{fullName}' to {typeof(CorrelationPropertyType).Name}.");
     }
 }

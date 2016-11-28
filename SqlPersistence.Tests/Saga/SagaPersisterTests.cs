@@ -22,15 +22,15 @@ public class SagaPersisterTests
             tableSuffix: "SagaWithCorrelation",
             name: "SagaWithCorrelation",
             correlationProperty: new CorrelationProperty
-            {
-                Name = "CorrelationProperty",
-                Type = CorrelationMemberType.String
-            },
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
             transitionalCorrelationProperty: new CorrelationProperty
-            {
-                Name = "TransitionalCorrelationProperty",
-                Type = CorrelationMemberType.String
-            }
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
         );
         var sagaWithNoCorrelation = new SagaDefinition(
             tableSuffix: "SagaWithNoCorrelation",

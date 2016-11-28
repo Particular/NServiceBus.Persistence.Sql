@@ -14,10 +14,10 @@ public class SagaScriptBuilderTest
             name: "theSaga",
             tableSuffix: "theSaga",
             correlationProperty: new CorrelationProperty
-            {
-                Name = "CorrelationProperty",
-                Type = CorrelationMemberType.String
-            }
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
         );
 
         var builder = new StringBuilder();
@@ -57,15 +57,15 @@ public class SagaScriptBuilderTest
             tableSuffix: "theSaga",
             name: "theSaga",
             correlationProperty: new CorrelationProperty
-            {
-                Name = "CorrelationProperty",
-                Type = CorrelationMemberType.String
-            },
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
             transitionalCorrelationProperty: new CorrelationProperty
-            {
-                Name = "TransitionalProperty",
-                Type = CorrelationMemberType.String
-            }
+            (
+                name: "TransitionalProperty",
+                type: CorrelationPropertyType.String
+            )
         );
 
         var builder = new StringBuilder();

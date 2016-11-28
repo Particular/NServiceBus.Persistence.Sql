@@ -60,7 +60,7 @@
     <Compile Include="ErrorsException.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationProperty.cs" />
-    <Compile Include="Saga\CorrelationMemberType.cs" />
+    <Compile Include="Saga\CorrelationPropertyType.cs" />
     <Compile Include="Saga\SagaDefinition.cs" />
     <Compile Include="Saga\SagaDefinitionReader.cs" />
     <Compile Include="Saga\SagaDefinitionValidator.cs" />

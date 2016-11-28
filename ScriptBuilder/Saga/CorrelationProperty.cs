@@ -2,7 +2,15 @@ namespace NServiceBus.Persistence.Sql
 {
     public class CorrelationProperty
     {
-        public string Name;
-        public CorrelationMemberType Type;
+        public CorrelationProperty(string name, CorrelationPropertyType type)
+        {
+            Guard.AgainstNullAndEmpty(nameof(name), name);
+            Name = name;
+            Type = type;
+        }
+
+        public CorrelationPropertyType Type { get; }
+
+        public string Name { get; }
     }
 }

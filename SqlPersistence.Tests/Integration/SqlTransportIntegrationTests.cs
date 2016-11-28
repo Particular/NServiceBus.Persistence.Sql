@@ -33,10 +33,10 @@ public class SqlTransportIntegrationTests
             tableSuffix : "Saga1",
             name : "Saga1",
             correlationProperty : new CorrelationProperty
-            {
-                Name = "StartId",
-                Type =  CorrelationMemberType.Guid
-            }
+            (
+                name: "StartId",
+                type:  CorrelationPropertyType.Guid
+            )
         );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
