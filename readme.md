@@ -15,6 +15,8 @@ https://www.nuget.org/packages/NServiceBus.Persistence.Sql/
 
 ## Documentation
 
+https://docs.particular.net/nservicebus/sql-persistence/
+
 
 ## Usage
 
