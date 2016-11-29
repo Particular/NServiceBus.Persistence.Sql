@@ -4,10 +4,11 @@ using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 [TestFixture]
-public class MessagePropertyMapperTests
-{
+    public class MessagePropertyMapperTests
+    {
 
-    [Test]
+
+        [Test]
     public void StringCorrelationId()
     {
         var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));;

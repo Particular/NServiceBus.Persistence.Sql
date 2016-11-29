@@ -37,28 +37,22 @@ class SagaDefinitionReader
         }
 
         var arguments = attribute.ConstructorArguments;
-        var correlationArgumentValue = (string)arguments[0].Value;
-        var transitionalArgumentValue = (string)arguments[1].Value;
-        var tableSuffixArgumentValue = (string)arguments[2].Value;
-        SagaDefinitionValidator.ValidateSagaDefinition(correlationArgumentValue, typeFullName, transitionalArgumentValue, tableSuffixArgumentValue);
-
-        string tableSuffix;
-
-        if (tableSuffixArgumentValue == null)
+        var correlation = (string)arguments[0].Value;
+        var transitional = (string)arguments[1].Value;
+        var tableSuffix = (string)arguments[2].Value;
+        SagaDefinitionValidator.ValidateSagaDefinition(correlation, typeFullName, transitional, tableSuffix);
+        
+        if (tableSuffix == null)
         {
             tableSuffix = type.Name;
-        }
-        else
-        {
-            tableSuffix = tableSuffixArgumentValue;
         }
 
         var sagaDataType = GetSagaDataTypeFromSagaType(type);
 
         definition = new SagaDefinition
         (
-            correlationProperty: BuildConstraintProperty(sagaDataType, correlationArgumentValue),
-            transitionalCorrelationProperty: BuildConstraintProperty(sagaDataType, transitionalArgumentValue),
+            correlationProperty: BuildConstraintProperty(sagaDataType, correlation),
+            transitionalCorrelationProperty: BuildConstraintProperty(sagaDataType, transitional),
             tableSuffix: tableSuffix,
             name: type.FullName
         );
@@ -70,32 +64,46 @@ class SagaDefinitionReader
     {
         foreach (var method in sagaType.Methods)
         {
-            if (method.Name != "ConfigureHowToFindSaga")
+            if (method.Name == "ConfigureHowToFindSaga")
             {
-                continue;
+                if (method.Parameters.Count == 1)
+                {
+                    var parameterType = method.Parameters[0].ParameterType;
+                    var parameterTypeName = parameterType.Name;
+                    if (parameterTypeName.StartsWith("SagaPropertyMapper"))
+                    {
+                        var genericInstanceType = (GenericInstanceType)parameterType;
+                        var argument = genericInstanceType.GenericArguments.Single();
+                        return ToTypeDefinition(sagaType, argument);
+                    }
+                }
             }
-            if (method.Parameters.Count != 1)
+            if (method.Name == "ConfigureMapping")
             {
-                continue;
+                if (method.Parameters.Count == 1)
+                {
+                    var parameterType = method.Parameters[0].ParameterType;
+                    var parameterTypeName = parameterType.Name;
+                    if (parameterTypeName.StartsWith("MessagePropertyMapper"))
+                    {
+                        var genericInstanceType = (GenericInstanceType)parameterType;
+                        var argument = genericInstanceType.GenericArguments.Single();
+                        return ToTypeDefinition(sagaType, argument);
+                    }
+                }
             }
-
-            var parameterType = method.Parameters[0].ParameterType;
-            var parameterTypeName = parameterType.Name;
-            if (!parameterTypeName.StartsWith("SagaPropertyMapper"))
-            {
-                continue;
-            }
-            var genericInstanceType = (GenericInstanceType)parameterType;
-            var argument = genericInstanceType.GenericArguments.Single();
-            var sagaDataType = argument as TypeDefinition;
-            if (sagaDataType == null)
-            {
-                throw new ErrorsException($"The type '{sagaType.FullName}' uses a sagadata type not defined in the same assembly.");
-            }
-            return sagaDataType;
-
         }
-        throw new ErrorsException($"The type '{sagaType.FullName}' needs to override ConfigureHowToFindSaga(SagaPropertyMapper).");
+        throw new ErrorsException($"The type '{sagaType.FullName}' needs to override Saga.ConfigureHowToFindSaga(SagaPropertyMapper) or SqlSaga.ConfigureHowToFindSaga(MessagePropertyMapper).");
+    }
+
+    static TypeDefinition ToTypeDefinition(TypeDefinition sagaType, TypeReference argument)
+    {
+        var sagaDataType = argument as TypeDefinition;
+        if (sagaDataType == null)
+        {
+            throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type not defined in the same assembly.");
+        }
+        return sagaDataType;
     }
 
     static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataTypeDefinition, string propertyName)

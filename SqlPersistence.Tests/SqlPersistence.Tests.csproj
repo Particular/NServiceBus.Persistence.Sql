@@ -118,6 +118,7 @@
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
+    <Compile Include="Saga\SqlSagaTests.cs" />
     <Compile Include="TaskEx.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />

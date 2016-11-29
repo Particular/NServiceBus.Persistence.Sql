@@ -1,0 +1,1 @@
+﻿SqlSaga should only have ConfigureMapping(MessagePropertyMapper) overriden and not ConfigureHowToFindSaga(SagaPropertyMapper). Saga: SqlSagaTests+SagaWithBadOverride.

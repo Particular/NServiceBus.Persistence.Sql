@@ -1,9 +1,12 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 using ObjectApproval;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 [TestFixture]
 #if (!DEBUG)
@@ -38,7 +41,16 @@ public class SagaPersisterTests
         );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
-        var infoCache = new SagaInfoCache(null, null, null, null, commandBuilder);
+        var infoCache = new SagaInfoCache(
+            versionDeserializeBuilder: null, 
+            jsonSerializer: JsonSerializer.CreateDefault(), 
+            commandBuilder: commandBuilder,
+            readerCreator: reader => new JsonTextReader(reader),
+            writerCreator: builder =>
+            {
+                var writer = new StringWriter(builder);
+                return new JsonTextWriter(writer);
+            });
         persister = new SagaPersister(infoCache);
     }
 

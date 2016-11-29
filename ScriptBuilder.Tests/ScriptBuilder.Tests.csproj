@@ -95,7 +95,7 @@
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Saga\SagaMetaDataReaderTest.cs" />
+    <Compile Include="Saga\SagaDefinitionReaderTest.cs" />
     <Compile Include="Saga\SagaDefinitionValidatorTest.cs" />
     <Compile Include="Saga\SagaScriptBuilderTest.cs" />
     <Compile Include="SubscriptionScriptBuilderTest.cs" />

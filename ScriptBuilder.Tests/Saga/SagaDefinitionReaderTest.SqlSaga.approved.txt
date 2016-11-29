@@ -1,5 +1,5 @@
 ﻿{
-  "TableSuffix": "SimpleSaga",
+  "TableSuffix": "SimpleSqlSaga",
   "CorrelationProperty": {
     "Type": "String",
     "Name": "Correlation"
@@ -8,5 +8,5 @@
     "Type": "String",
     "Name": "Transitional"
   },
-  "Name": "SagaMetaDataReaderTest/SimpleSaga"
+  "Name": "SagaDefinitionReaderTest/SimpleSqlSaga"
 }

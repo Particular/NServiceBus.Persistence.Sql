@@ -6,11 +6,11 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class SagaMetaDataReaderTest
+public class SagaDefinitionReaderTest
 {
     ModuleDefinition module;
 
-    public SagaMetaDataReaderTest()
+    public SagaDefinitionReaderTest()
     {
         var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         module = ModuleDefinition.ReadModule(path);
@@ -38,6 +38,31 @@ public class SagaMetaDataReaderTest
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+    [Test]
+    public void SqlSaga()
+    {
+        var dataType = module.GetTypeDefinition<SimpleSqlSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [SqlSaga(
+         correlationProperty: nameof(SagaData.Correlation),
+         transitionalCorrelationProperty: nameof(SagaData.Transitional)
+     )]
+    public class SimpleSqlSaga : SqlSaga<SimpleSqlSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+            public string Transitional { get; set; }
+        }
+
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }

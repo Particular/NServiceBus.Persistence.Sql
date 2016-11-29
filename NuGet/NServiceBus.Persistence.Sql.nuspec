@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NServiceBus.Persistence.Sql</id>
-    <version>$version$</version>
+    <version>$version$-beta0001</version>
     <title>NServiceBus.Persistence.Sql</title>
     <authors>Simon Cropp, Szymon Pobiega</authors>
     <owners>Simon Cropp, Szymon Pobiega</owners>
@@ -15,6 +15,7 @@
     <tags>NServiceBus, Sql</tags>
     <dependencies>
       <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
+      <dependency id="Newtonsoft.Json" version="[9.0.0, 10.0.0)" />
     </dependencies>
   </metadata>
 </package>
