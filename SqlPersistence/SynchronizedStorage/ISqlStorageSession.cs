@@ -1,10 +1,10 @@
-using System.Data.SqlClient;
+using System.Data.Common;
 
 namespace NServiceBus.Persistence.Sql
 {
     public interface ISqlStorageSession
     {
-        SqlTransaction Transaction { get; }
-        SqlConnection Connection { get; }
+        DbTransaction Transaction { get; }
+        DbConnection Connection { get; }
     }
 }

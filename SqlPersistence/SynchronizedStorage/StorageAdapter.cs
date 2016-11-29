@@ -1,4 +1,3 @@
-using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
@@ -8,13 +7,6 @@ using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
 {
-    Func<Task<SqlConnection>> connectionBuilder;
-
-    public StorageAdapter(Func<Task<SqlConnection>> connectionBuilder)
-    {
-        this.connectionBuilder = connectionBuilder;
-    }
-
     static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -22,7 +14,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         var outboxTransaction = transaction as SqlOutboxTransaction;
         if (outboxTransaction != null)
         {
-            CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.SqlConnection, outboxTransaction.SqlTransaction, false);
+            CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false);
             return Task.FromResult(session);
         }
         return EmptyResult;

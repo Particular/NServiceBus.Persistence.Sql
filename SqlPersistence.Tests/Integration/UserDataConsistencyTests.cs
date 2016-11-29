@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -31,9 +30,9 @@ END";
     [TearDown]
     public async Task Setup()
     {
-        using (var sqlConnection = await SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         {
-            await SqlQueueDeletion.DeleteQueuesForEndpoint(sqlConnection, "dbo", endpointName);
+            await SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
         }
     }
 
@@ -143,9 +142,11 @@ END";
         {
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
             var commandText = "INSERT INTO [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
-            using (var command = new SqlCommand(commandText, session.Connection, session.Transaction))
+            using (var command = session.Connection.CreateCommand())
             {
-                command.Parameters.AddWithValue("@Id", message.EntityId);
+                command.Transaction = session.Transaction;
+                command.CommandText = commandText;
+                command.AddParameter("@Id", message.EntityId);
                 await command.ExecuteNonQueryAsync();
             }
         }
@@ -155,9 +156,11 @@ END";
             int count;
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
             var commandText = "SELECT COUNT(*) FROM [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] WHERE Id = @Id";
-            using (var command = new SqlCommand(commandText, session.Connection, session.Transaction))
+            using (var command = session.Connection.CreateCommand())
             {
-                command.Parameters.AddWithValue("@Id", message.EntityId);
+                command.Transaction = session.Transaction;
+                command.CommandText = commandText;
+                command.AddParameter("@Id", message.EntityId);
                 count = (int)await command.ExecuteScalarAsync();
             }
 

@@ -29,10 +29,10 @@ class TimeoutInstaller : INeedToInstallSomething
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Timeout_Create.sql");
         log.Info($"Executing '{createScript}'");
         await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: collection =>
+            manipulateParameters: command =>
             {
-                collection.AddWithValue("schema", settings.GetSchema<StorageType.Timeouts>());
-                collection.AddWithValue("endpointName", endpointName);
+                command.AddParameter("schema", settings.GetSchema<StorageType.Timeouts>());
+                command.AddParameter("endpointName", endpointName);
             });
     }
 

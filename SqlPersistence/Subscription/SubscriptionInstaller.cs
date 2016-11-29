@@ -28,10 +28,10 @@ class SubscriptionInstaller : INeedToInstallSomething
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Subscription_Create.sql");
         log.Info($"Executing '{createScript}'");
         await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: collection =>
+            manipulateParameters: command =>
             {
-                collection.AddWithValue("schema", settings.GetSchema<StorageType.Subscriptions>());
-                collection.AddWithValue("endpointName", endpointName);
+                command.AddParameter("schema", settings.GetSchema<StorageType.Subscriptions>());
+                command.AddParameter("endpointName", endpointName);
             });
     }
 

@@ -1,19 +1,22 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 static class Extensions
 {
-    public static void AddParameter(this SqlCommand command, string name, object value)
+    public static void AddParameter(this DbCommand command, string name, object value)
     {
-        command.Parameters.AddWithValue(name, value);
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = name;
+        parameter.Value = value;
+        command.Parameters.Add(parameter);
     }
 
-    public static void AddParameter(this SqlCommand command, string name, Version value)
+    public static void AddParameter(this DbCommand command, string name, Version value)
     {
-        command.Parameters.AddWithValue(name, value.ToString());
+        command.AddParameter(name, value.ToString());
     }
 
     internal static Func<T, object> GetPropertyAccessor<T>(this Type sagaDataType, string propertyName)
@@ -25,12 +28,13 @@ static class Extensions
         }
         return data => propertyInfo.GetValue(data);
     }
-    public static Task ExecuteNonQueryEx(this SqlCommand command)
+
+    public static Task ExecuteNonQueryEx(this DbCommand command)
     {
         return ExecuteNonQueryEx(command, CancellationToken.None);
     }
 
-    public static async Task ExecuteNonQueryEx(this SqlCommand command, CancellationToken cancellationToken)
+    public static async Task ExecuteNonQueryEx(this DbCommand command, CancellationToken cancellationToken)
     {
         try
         {

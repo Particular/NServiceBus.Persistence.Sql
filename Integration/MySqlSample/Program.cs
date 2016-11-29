@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 class Program
 {
@@ -11,7 +13,20 @@ class Program
 
     static async Task Start()
     {
-        var endpointConfiguration = ConfigBuilder.Build("Saga");
+        var endpointConfiguration = new EndpointConfiguration("SqlPersistence.Sample.MySql");
+        endpointConfiguration.UseSerialization<JsonSerializer>();
+        endpointConfiguration.EnableInstallers();
+
+
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.ConnectionBuilder(async () =>
+        {
+            var connectionString = "server=localhost;user=root;database=sqlpersistencesample;port=3306;password=Password1;";
+            var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+            return connection;
+        });
+
         var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");

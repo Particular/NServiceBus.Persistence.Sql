@@ -10,7 +10,7 @@ class StorageSessionFeature : Feature
         var connectionBuilder = context.Settings.GetConnectionBuilder<StorageType.Sagas>();
         var container = context.Container;
         container.ConfigureComponent(b => new SynchronizedStorage(connectionBuilder), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(b => new StorageAdapter(connectionBuilder), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(b => new StorageAdapter(), DependencyLifecycle.SingleInstance);
     }
 
 }

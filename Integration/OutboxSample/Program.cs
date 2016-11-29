@@ -27,10 +27,11 @@ class Program
                 {
                     return;
                 }
-                await endpoint.SendLocal(new StartSagaMessage
+                var startSagaMessage = new StartSagaMessage
                 {
                     MySagaId = Guid.NewGuid()
-                });
+                };
+                await endpoint.SendLocal(startSagaMessage);
             }
         }
         finally

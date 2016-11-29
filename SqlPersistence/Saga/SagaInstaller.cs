@@ -40,10 +40,10 @@ class SagaInstaller : INeedToInstallSomething
             .Select(File.ReadAllText);
 
         return SqlHelpers.Execute(connectionString, sagaScripts,
-            manipulateParameters: collection =>
+            manipulateParameters: dbCommand =>
             {
-                collection.AddWithValue("schema", settings.GetSchema<StorageType.Sagas>());
-                collection.AddWithValue("endpointName", endpointName);
+                dbCommand.AddParameter("schema", settings.GetSchema<StorageType.Sagas>());
+                dbCommand.AddParameter("endpointName", endpointName);
             });
     }
 

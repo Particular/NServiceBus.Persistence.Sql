@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
-    Func<Task<SqlConnection>> connectionBuilder;
+    Func<Task<DbConnection>> connectionBuilder;
 
-    public SynchronizedStorage(Func<Task<SqlConnection>> connectionBuilder)
+    public SynchronizedStorage(Func<Task<DbConnection>> connectionBuilder)
     {
         this.connectionBuilder = connectionBuilder;
     }

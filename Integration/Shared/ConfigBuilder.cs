@@ -10,7 +10,7 @@ public static class ConfigBuilder
         configuration.UseSerialization<JsonSerializer>();
         configuration.EnableInstallers();
 
-        var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceSample;Integrated Security=True";
+        var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
 
         var sagaPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Sagas>();
         sagaPersistence.ConnectionString(connectionString);

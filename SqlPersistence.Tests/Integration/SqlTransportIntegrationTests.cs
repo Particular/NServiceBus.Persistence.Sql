@@ -16,9 +16,9 @@ public class SqlTransportIntegrationTests
     [TearDown]
     public async Task Setup()
     {
-        using (var sqlConnection = await SqlHelpers.New(connectionString))
+        using (var connection = await SqlHelpers.New(connectionString))
         {
-            await SqlQueueDeletion.DeleteQueuesForEndpoint(sqlConnection ,"dbo",endpointName);
+            await SqlQueueDeletion.DeleteQueuesForEndpoint(connection ,"dbo",endpointName);
         }
     }
 

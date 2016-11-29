@@ -1,4 +1,4 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
 using System.Threading.Tasks;
 using Janitor;
 using NServiceBus.Persistence;
@@ -9,7 +9,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
 
-    public StorageSession(SqlConnection connection, SqlTransaction transaction, bool ownsTransaction)
+    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction)
     {
         Guard.AgainstNull(nameof(connection), connection);
         Guard.AgainstNull(nameof(transaction), transaction);
@@ -18,8 +18,8 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         Transaction = transaction;
     }
 
-    public SqlTransaction Transaction { get; }
-    public SqlConnection Connection { get; }
+    public DbTransaction Transaction { get; }
+    public DbConnection Connection { get; }
 
     public Task CompleteAsync()
     {

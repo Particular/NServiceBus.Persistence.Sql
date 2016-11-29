@@ -1,5 +1,4 @@
-﻿using System.Data.SqlClient;
-using System;
+﻿using System;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 
@@ -12,7 +11,7 @@ namespace NServiceBus
     public static class SqlPersistenceStorageSessionExtensions
     {
         /// <summary>
-        /// Gets the current context SqlPersistence <see cref="SqlTransaction"/>.
+        /// Gets the current context SqlPersistence <see cref="ISqlStorageSession"/>.
         /// </summary>
         public static ISqlStorageSession SqlPersistenceSession(this SynchronizedStorageSession session)
         {

@@ -45,8 +45,8 @@ static class DbBuilder
         return SqlHelpers.Execute(connection, script,
             manipulateParameters: collection =>
             {
-                collection.AddWithValue("schema", "dbo");
-                collection.AddWithValue("endpointName", $"{endpointName}.");
+                collection.AddParameter("schema", "dbo");
+                collection.AddParameter("endpointName", $"{endpointName}.");
             });
     }
 }

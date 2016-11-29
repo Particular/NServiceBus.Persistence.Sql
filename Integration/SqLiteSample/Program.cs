@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 class Program
 {
@@ -11,7 +13,20 @@ class Program
 
     static async Task Start()
     {
-        var endpointConfiguration = ConfigBuilder.Build("Saga");
+        SQLiteConnection.CreateFile("MyDatabase.sqlite");
+        var endpointConfiguration = new EndpointConfiguration("SqlPersistence.Sample.SqlLiteSaga");
+        endpointConfiguration.UseSerialization<JsonSerializer>();
+        endpointConfiguration.EnableInstallers();
+
+
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.ConnectionBuilder(async () =>
+        {
+            var connection = new SQLiteConnection("Data Source=MyDatabase.sqlite");
+            await connection.OpenAsync();
+            return connection;
+        });
+
         var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press 'Enter' to start a saga");
         Console.WriteLine("Press any other key to exit");

@@ -29,10 +29,10 @@ class OutboxInstaller : INeedToInstallSomething
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
         await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: collection =>
+            manipulateParameters: command =>
             {
-                collection.AddWithValue("schema", settings.GetSchema<StorageType.Outbox>());
-                collection.AddWithValue("endpointName", endpointName);
+                command.AddParameter("schema", settings.GetSchema<StorageType.Outbox>());
+                command.AddParameter("endpointName", endpointName);
             });
     }
 

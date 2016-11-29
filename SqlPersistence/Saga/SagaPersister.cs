@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -29,8 +29,11 @@ class SagaPersister : ISagaPersister
         //TODO: verify SagaCorrelationProperty against our attribute
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
-        using (var command = new SqlCommand(sagaInfo.SaveCommand, sqlSession.Connection, sqlSession.Transaction))
+
+        using (var command = sqlSession.Connection.CreateCommand())
         {
+            command.Transaction = sqlSession.Transaction;
+            command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
@@ -47,7 +50,7 @@ class SagaPersister : ISagaPersister
     }
 
 
-    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, SqlCommand command)
+    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, DbCommand command)
     {
         if (!sagaInfo.HasTransitionalCorrelationProperty)
         {
@@ -80,14 +83,17 @@ class SagaPersister : ISagaPersister
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
-        using (var command = new SqlCommand(sagaInfo.UpdateCommand, sqlSession.Connection, sqlSession.Transaction))
+
+        using (var command = sqlSession.Connection.CreateCommand())
         {
+            command.CommandText = sagaInfo.UpdateCommand;
+            command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.Parameters.AddWithValue("Data", sagaInfo.ToJson(sagaData));
+            command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
@@ -107,8 +113,10 @@ class SagaPersister : ISagaPersister
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         var sqlSession = session.SqlPersistenceSession();
-        using (var command = new SqlCommand(sagaInfo.GetBySagaIdCommand, sqlSession.Connection, sqlSession.Transaction))
+        using (var command = sqlSession.Connection.CreateCommand())
         {
+            command.CommandText = sagaInfo.GetBySagaIdCommand;
+            command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaId);
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
@@ -138,15 +146,18 @@ class SagaPersister : ISagaPersister
         }
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
         var sqlSession = session.SqlPersistenceSession();
-        using (var command = new SqlCommand(commandText, sqlSession.Connection, sqlSession.Transaction))
+
+        using (var command = sqlSession.Connection.CreateCommand())
         {
+            command.CommandText = commandText;
+            command.Transaction = sqlSession.Transaction;
             command.AddParameter("propertyValue", propertyValue.ToString());
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
 
 
-    static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
+    static async Task<TSagaData> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
         using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
@@ -182,8 +193,11 @@ class SagaPersister : ISagaPersister
     {
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
         var sqlSession = session.SqlPersistenceSession();
-        using (var command = new SqlCommand(sagaInfo.CompleteCommand, sqlSession.Connection, sqlSession.Transaction))
+
+        using (var command = sqlSession.Connection.CreateCommand())
         {
+            command.CommandText = sagaInfo.CompleteCommand;
+            command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
             await command.ExecuteNonQueryAsync();
         }

@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutboxSample", "OutboxSampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTests", "AcceptanceTests\AcceptanceTests.csproj", "{AE2CA736-FB07-46C8-BE37-D732C1884626}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqLiteSample", "SqLiteSample\SqLiteSample.csproj", "{0AEAB72A-3B36-42D4-83DD-2BBD24451BCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlSample", "MySqlSample\MySqlSample.csproj", "{785A51DE-68BA-44E5-8727-7C0D57D38B0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{AE2CA736-FB07-46C8-BE37-D732C1884626}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE2CA736-FB07-46C8-BE37-D732C1884626}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE2CA736-FB07-46C8-BE37-D732C1884626}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AEAB72A-3B36-42D4-83DD-2BBD24451BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AEAB72A-3B36-42D4-83DD-2BBD24451BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AEAB72A-3B36-42D4-83DD-2BBD24451BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AEAB72A-3B36-42D4-83DD-2BBD24451BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

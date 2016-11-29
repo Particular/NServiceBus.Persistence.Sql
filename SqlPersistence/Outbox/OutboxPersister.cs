@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +15,7 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    Func<Task<SqlConnection>> connectionBuilder;
+    Func<Task<DbConnection>> connectionBuilder;
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<StringBuilder, JsonWriter> writerCreator;
@@ -25,7 +25,7 @@ class OutboxPersister : IOutboxStorage
     string cleanupCommandText;
 
     public OutboxPersister(
-        Func<Task<SqlConnection>> connectionBuilder, 
+        Func<Task<DbConnection>> connectionBuilder, 
         string schema, 
         string endpointName,
         JsonSerializer jsonSerializer,
@@ -68,17 +68,18 @@ WHERE MessageId = @MessageId";
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var sqlConnection = await connectionBuilder();
-        var sqlTransaction = sqlConnection.BeginTransaction();
-        return new SqlOutboxTransaction(sqlTransaction, sqlConnection);
+        var connection = await connectionBuilder();
+        var transaction = connection.BeginTransaction();
+        return new SqlOutboxTransaction(transaction, connection);
     }
 
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
         using (var connection = await connectionBuilder())
-        using (var command = new SqlCommand(setAsDispatchedCommandText, connection))
+        using (var command = connection.CreateCommand())
         {
+            command.CommandText = setAsDispatchedCommandText;
             command.AddParameter("MessageId", messageId);
             command.AddParameter("DispatchedAt", DateTime.UtcNow);
             await command.ExecuteNonQueryEx();
@@ -92,8 +93,10 @@ WHERE MessageId = @MessageId";
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;
-            using (var command = new SqlCommand(getCommandText, connection, transaction))
+            using (var command = connection.CreateCommand())
             {
+                command.CommandText = getCommandText;
+                command.Transaction = transaction;
                 command.AddParameter("MessageId", messageId);
                 using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
@@ -124,18 +127,20 @@ WHERE MessageId = @MessageId";
         }
     }
 
-    public Task Store(OutboxMessage message, OutboxTransaction transaction, ContextBag context)
+    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context)
     {
-        var sqlOutboxTransaction = (SqlOutboxTransaction) transaction;
-        var sqlTransaction = sqlOutboxTransaction.SqlTransaction;
-        var sqlConnection = sqlOutboxTransaction.SqlConnection;
-        return Store(message, sqlTransaction, sqlConnection);
+        var sqlOutboxTransaction = (SqlOutboxTransaction) outboxTransaction;
+        var transaction = sqlOutboxTransaction.Transaction;
+        var connection = sqlOutboxTransaction.Connection;
+        return Store(message, transaction, connection);
     }
 
-    internal async Task Store(OutboxMessage message, SqlTransaction sqlTransaction, SqlConnection sqlConnection)
+    internal async Task Store(OutboxMessage message, DbTransaction transaction, DbConnection connection)
     {
-        using (var command = new SqlCommand(storeCommandText, sqlConnection, sqlTransaction))
+        using (var command = connection.CreateCommand())
         {
+            command.CommandText = storeCommandText;
+            command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
             command.AddParameter("Operations", OperationsToString(message.TransportOperations));
             await command.ExecuteNonQueryEx();
@@ -157,8 +162,10 @@ WHERE MessageId = @MessageId";
         using (new TransactionScope(TransactionScopeOption.Suppress))
         using (var connection = await connectionBuilder())
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-        using (var command = new SqlCommand(cleanupCommandText, connection, transaction))
+        using (var command = connection.CreateCommand())
         {
+            command.CommandText = cleanupCommandText;
+            command.Transaction = transaction;
             command.AddParameter("Date", dateTime);
             await command.ExecuteNonQueryEx(cancellationToken);
         }

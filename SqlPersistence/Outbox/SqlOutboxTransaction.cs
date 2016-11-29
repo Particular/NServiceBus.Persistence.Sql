@@ -1,4 +1,4 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
 using System.Threading.Tasks;
 using Janitor;
 using NServiceBus.Outbox;
@@ -6,24 +6,24 @@ using NServiceBus.Outbox;
 [SkipWeaving]
 class SqlOutboxTransaction : OutboxTransaction
 {
-    public readonly SqlTransaction SqlTransaction;
-    public readonly SqlConnection SqlConnection;
+    public readonly DbTransaction Transaction;
+    public readonly DbConnection Connection;
 
-    public SqlOutboxTransaction(SqlTransaction sqlTransaction, SqlConnection sqlConnection)
+    public SqlOutboxTransaction(DbTransaction transaction, DbConnection connection)
     {
-        SqlTransaction = sqlTransaction;
-        SqlConnection = sqlConnection;
+        Transaction = transaction;
+        Connection = connection;
     }
 
     public void Dispose()
     {
-        SqlTransaction?.Dispose();
-        SqlConnection?.Dispose();
+        Transaction?.Dispose();
+        Connection?.Dispose();
     }
 
     public Task Commit()
     {
-        SqlTransaction.Commit();
+        Transaction.Commit();
         return Task.FromResult(0);
     }
 }
