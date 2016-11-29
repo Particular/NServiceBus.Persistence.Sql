@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
-    public delegate IContainSagaData SagaDeserialize(XmlReader reader);
+    public delegate IContainSagaData SagaDeserialize<TReader>(TReader reader);
 }

@@ -84,6 +84,7 @@
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
     <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\SqlSagaAttributeData.cs" />
+    <Compile Include="SqlPersistenceSerializer.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
@@ -112,15 +113,16 @@
     <Compile Include="Timeout\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
-    <Compile Include="SqlPersistence.cs" />
+    <Compile Include="Saga\Xml\SqlXmlPersistence.cs" />
     <Compile Include="Saga\SqlXmlSagaFeature.cs" />
-    <Compile Include="SqlXmlPersistenceConfig.cs" />
+    <Compile Include="Saga\Xml\SqlXmlPersistenceConfig.cs" />
     <Compile Include="Subscription\SqlXmlSubscriptionFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
     <Compile Include="Timeout\SqlXmlTimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutPersister.cs" />
     <Compile Include="Saga\SagaPersister.cs" />
     <Compile Include="Subscription\SubscriptionPersister.cs" />
+    <Compile Include="Saga\Xml\XmlPersistenceSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

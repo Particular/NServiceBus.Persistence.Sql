@@ -2,6 +2,7 @@
 
 namespace NServiceBus.Persistence.Sql
 {
+
     public class SqlXmlPersistence : PersistenceDefinition
     {
         public SqlXmlPersistence()

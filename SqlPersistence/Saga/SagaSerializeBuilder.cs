@@ -2,5 +2,5 @@
 
 namespace NServiceBus.Persistence.Sql
 {
-    public delegate DefaultSagaSerialization SagaSerializeBuilder(Type sagaDataType);
+    public delegate DefaultSagaSerialization<TReader> SagaSerializeBuilder<TReader>(Type sagaDataType);
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Xml;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ public class SagaPersisterTests
 {
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static string endpointName = "Endpoint";
-    SagaPersister persister;
+    SagaPersister<XmlReader> persister;
 
     [SetUp]
     public async Task SetUp()
@@ -38,8 +39,10 @@ public class SagaPersisterTests
         );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
-        var infoCache = new SagaInfoCache(null, SagaXmlSerializerBuilder.BuildSerializationDelegate, commandBuilder);
-        persister = new SagaPersister(infoCache);
+        var xmlPersistenceSerializer = new XmlPersistenceSerializer();
+        xmlPersistenceSerializer.SetSerializeBuilder(null);
+        var infoCache = new SagaInfoCache<XmlReader>(commandBuilder, xmlPersistenceSerializer);
+        persister = new SagaPersister<XmlReader>(infoCache, xmlPersistenceSerializer);
     }
 
     [Test]
