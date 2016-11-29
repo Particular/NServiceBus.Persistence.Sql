@@ -42,7 +42,7 @@ public class SagaPersisterTests
         await DbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
         var infoCache = new SagaInfoCache(
-            versionDeserializeBuilder: null, 
+            versionSpecificSettings: null, 
             jsonSerializer: JsonSerializer.CreateDefault(), 
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),

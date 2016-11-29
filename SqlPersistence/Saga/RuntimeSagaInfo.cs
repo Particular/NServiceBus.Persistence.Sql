@@ -11,7 +11,7 @@ using NewtonSerializer = Newtonsoft.Json.JsonSerializer;
 class RuntimeSagaInfo
 {
     Type sagaDataType;
-    VersionDeserializeBuilder versionDeserializeBuilder;
+    RetrieveVersionSpecificJsonSettings versionSpecificSettings;
     NewtonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<StringBuilder, JsonWriter> writerCreator;
@@ -31,18 +31,18 @@ class RuntimeSagaInfo
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
         Type sagaDataType,
-        VersionDeserializeBuilder versionDeserializeBuilder,
+        RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
         NewtonSerializer jsonSerializer,
             Func<TextReader, JsonReader> readerCreator,
             Func<StringBuilder, JsonWriter> writerCreator)
     {
         this.sagaDataType = sagaDataType;
-        if (versionDeserializeBuilder != null)
+        if (versionSpecificSettings != null)
         {
             deserializers = new ConcurrentDictionary<Version, NewtonSerializer>();
         }
-        this.versionDeserializeBuilder = versionDeserializeBuilder;
+        this.versionSpecificSettings = versionSpecificSettings;
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
@@ -94,13 +94,13 @@ class RuntimeSagaInfo
 
     NewtonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
-        if (versionDeserializeBuilder == null)
+        if (versionSpecificSettings == null)
         {
             return jsonSerializer;
         }
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
-            var settings = versionDeserializeBuilder(sagaDataType, storedSagaTypeVersion);
+            var settings = versionSpecificSettings(sagaDataType, storedSagaTypeVersion);
             if (settings != null)
             {
                 return JsonSerializer.Create(settings); 

@@ -7,15 +7,15 @@ using NServiceBus.Persistence.Sql;
 public static class SagaConfigExtentions
 {
 
-    public static void VersionSettings(this PersistenceExtensions<SqlPersistence, StorageType.Sagas> configuration, VersionDeserializeBuilder builder)
+    public static void JsonSettingsForVersion(this PersistenceExtensions<SqlPersistence, StorageType.Sagas> configuration, RetrieveVersionSpecificJsonSettings builder)
     {
         configuration.GetSettings()
-            .Set<VersionDeserializeBuilder>(builder);
+            .Set<RetrieveVersionSpecificJsonSettings>(builder);
     }
 
-    internal static VersionDeserializeBuilder GetVersionSettings(this ReadOnlySettings settings)
+    internal static RetrieveVersionSpecificJsonSettings GetVersionSettings(this ReadOnlySettings settings)
     {
-        return settings.GetOrDefault<VersionDeserializeBuilder>();
+        return settings.GetOrDefault<RetrieveVersionSpecificJsonSettings>();
     }
 
 }

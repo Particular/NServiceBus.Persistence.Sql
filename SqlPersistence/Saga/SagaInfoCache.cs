@@ -7,7 +7,7 @@ using NServiceBus.Persistence.Sql;
 
 class SagaInfoCache
 {
-    VersionDeserializeBuilder versionDeserializeBuilder;
+    RetrieveVersionSpecificJsonSettings versionSpecificSettings;
     SagaCommandBuilder commandBuilder;
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
     JsonSerializer jsonSerializer;
@@ -15,13 +15,13 @@ class SagaInfoCache
     Func<StringBuilder, JsonWriter> writerCreator;
 
     public SagaInfoCache(
-        VersionDeserializeBuilder versionDeserializeBuilder,
+        RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<StringBuilder, JsonWriter> writerCreator,
         SagaCommandBuilder commandBuilder)
     {
-        this.versionDeserializeBuilder = versionDeserializeBuilder;
+        this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
         this.readerCreator = readerCreator;
         this.jsonSerializer = jsonSerializer;
@@ -40,7 +40,7 @@ class SagaInfoCache
         return new RuntimeSagaInfo(
             commandBuilder: commandBuilder,
             sagaDataType: sagaDataType,
-            versionDeserializeBuilder: versionDeserializeBuilder,
+            versionSpecificSettings: versionSpecificSettings,
             sagaType: sagaType,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
