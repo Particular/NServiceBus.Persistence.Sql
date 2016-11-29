@@ -1,4 +1,4 @@
-![Icon](https://raw.githubusercontent.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/master/Icon/package_icon.png)
+![Icon](https://raw.githubusercontent.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/master/Icons/package_icon.png)
 
 NServiceBus.SqlPersistence
 ===========================
