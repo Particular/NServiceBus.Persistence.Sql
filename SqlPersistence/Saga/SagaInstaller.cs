@@ -24,7 +24,7 @@ class SagaInstaller : INeedToInstallSomething
         {
             return Task.FromResult(0);
         }
-        var connectionString = settings.GetConnectionString<StorageType.Sagas>();
+        var connectionString = settings.GetConnectionBuilder<StorageType.Sagas>();
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Sagas>();
 
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");

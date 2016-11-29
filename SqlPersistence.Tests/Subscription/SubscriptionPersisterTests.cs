@@ -21,7 +21,7 @@ public class SubscriptionPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new SubscriptionPersister(connectionString, "dbo", $"{endpointName}.");
+        persister = new SubscriptionPersister(() => SqlHelpers.New(connectionString), "dbo", $"{endpointName}.");
     }
 
     [Test]

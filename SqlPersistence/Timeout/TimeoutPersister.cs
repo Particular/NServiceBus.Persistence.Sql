@@ -11,7 +11,7 @@ using NServiceBus.Extensibility;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
-    string connectionString;
+    Func<Task<SqlConnection>> connectionBuilder;
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<StringBuilder, JsonWriter> writerCreator;
@@ -22,12 +22,12 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     string rangeComandText;
     string nextCommandText;
 
-    public TimeoutPersister(string connectionString, string schema, string endpointName,
+    public TimeoutPersister(Func<Task<SqlConnection>> connectionBuilder, string schema, string endpointName,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<StringBuilder, JsonWriter> writerCreator)
     {
-        this.connectionString = connectionString;
+        this.connectionBuilder = connectionBuilder;
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
@@ -86,7 +86,7 @@ ORDER BY TIME";
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var command = new SqlCommand(selectByIdCommandText, connection))
         {
             command.AddParameter("Id", timeoutId);
@@ -123,7 +123,7 @@ ORDER BY TIME";
 
     public async Task Add(TimeoutData timeout, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var command = new SqlCommand(insertCommandText, connection))
         {
             var id = Guid.NewGuid();
@@ -151,7 +151,7 @@ ORDER BY TIME";
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var command = new SqlCommand(removeByIdCommandText, connection))
         {
             command.AddParameter("Id", timeoutId);
@@ -170,7 +170,7 @@ ORDER BY TIME";
         var list = new List<TimeoutsChunk.Timeout>();
         var now = DateTime.UtcNow;
         DateTime nextTimeToRunQuery;
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         {
             using (var command = new SqlCommand(rangeComandText, connection))
             {
@@ -205,7 +205,7 @@ ORDER BY TIME";
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var command = new SqlCommand(removeBySagaIdCommandText, connection))
         {
             command.AddParameter("SagaId", sagaId);

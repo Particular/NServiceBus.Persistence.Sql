@@ -22,13 +22,13 @@ class OutboxInstaller : INeedToInstallSomething
         {
             return;
         }
-        var connectionString = settings.GetConnectionString<StorageType.Outbox>();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
 
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript),
+        await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
             manipulateParameters: collection =>
             {
                 collection.AddWithValue("schema", settings.GetSchema<StorageType.Outbox>());

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -9,39 +10,17 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    string connectionString;
+    Func<Task<SqlConnection>> connectionBuilder;
     string schema;
     string endpointName;
     string subscribeCommandText;
     string unsubscribeCommandText;
 
-    public SubscriptionPersister(string connectionString, string schema, string endpointName)
+    public SubscriptionPersister(Func<Task<SqlConnection>> connectionBuilder, string schema, string endpointName)
     {
-        this.connectionString = connectionString;
+        this.connectionBuilder = connectionBuilder;
         this.schema = schema;
         this.endpointName = endpointName;
-//        subscribeCommandText = string.Format(@"
-//IF NOT EXISTS
-//(
-//    SELECT * FROM [{0}].[{1}SubscriptionData]
-//    WHERE
-//        Subscriber = @Subscriber AND
-//        MessageType = @MessageType
-//)
-//BEGIN
-//    INSERT INTO [{0}].[{1}SubscriptionData]
-//    (
-//        Subscriber,
-//        MessageType,
-//        PersistenceVersion
-//    )
-//    VALUES
-//    (
-//        @Subscriber,
-//        @MessageType,
-//        @PersistenceVersion
-//    )
-//END", schema, endpointName);
 
         subscribeCommandText =$@"
 DECLARE @dummy int; MERGE [{schema}].[{endpointName}SubscriptionData] WITH (HOLDLOCK) AS target
@@ -75,7 +54,7 @@ WHERE
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         {
             await Subscribe(subscriber, connection, messageType);
         }
@@ -96,7 +75,7 @@ WHERE
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         {
             await Unsubscribe(subscriber, connection, messageType);
         }
@@ -138,7 +117,7 @@ WHERE MessageType IN (");
             }
             builder.Append(")");
             command.CommandText = builder.ToString();
-            using (var connection = await SqlHelpers.New(connectionString))
+            using (var connection = await connectionBuilder())
             {
                 command.Connection = connection;
                 using (var reader = await command.ExecuteReaderAsync())

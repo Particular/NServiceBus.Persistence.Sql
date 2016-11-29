@@ -22,7 +22,7 @@ public class TimeoutPersisterTests
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
         persister = new TimeoutPersister(
-            connectionString: connectionString, 
+            connectionBuilder: () => SqlHelpers.New(connectionString), 
             schema: "dbo", 
             endpointName: $"{endpointName}.",
             jsonSerializer: JsonSerializer.CreateDefault(),

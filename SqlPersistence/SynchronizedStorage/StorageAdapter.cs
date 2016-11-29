@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
@@ -7,11 +8,11 @@ using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
 {
-    string connectionString;
+    Func<Task<SqlConnection>> connectionBuilder;
 
-    public StorageAdapter(string connectionString)
+    public StorageAdapter(Func<Task<SqlConnection>> connectionBuilder)
     {
-        this.connectionString = connectionString;
+        this.connectionBuilder = connectionBuilder;
     }
 
     static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);

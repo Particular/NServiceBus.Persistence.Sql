@@ -13,29 +13,27 @@ class SqlHelpers
         return sqlConnection;
     }
 
-    internal static Task Execute(string connectionString, string script, Action<SqlParameterCollection> manipulateParameters)
+    internal static Task Execute(Func<Task<SqlConnection>> connectionBuilder, string script, Action<SqlParameterCollection> manipulateParameters)
     {
-        return Execute(connectionString, new List<string> {script}, manipulateParameters);
+        return Execute(connectionBuilder, new List<string> { script }, manipulateParameters);
+    }
+    internal static Task Execute(string connection, string script, Action<SqlParameterCollection> manipulateParameters)
+    {
+        return Execute(() => New(connection), new List<string> { script }, manipulateParameters);
     }
 
-    internal static async Task Execute(string connectionString, IEnumerable<string> scripts, Action<SqlParameterCollection> manipulateParameters)
+    internal static async Task Execute(Func<Task<SqlConnection>> connectionBuilder, IEnumerable<string> scripts, Action<SqlParameterCollection> manipulateParameters)
     {
-        var connectionBuilder = new SqlConnectionStringBuilder
+        using (var connection = await connectionBuilder())
         {
-            ConnectionString = connectionString
-        };
-
-        var database = connectionBuilder.InitialCatalog;
-
-        if (string.IsNullOrWhiteSpace(database))
-        {
-            throw new Exception("Expected to have a 'InitialCatalog' in the connection string.");
-        }
-        using (var sqlConnection = await New(connectionString))
-        {
+            var database = connection.Database;
+            if (string.IsNullOrWhiteSpace(database))
+            {
+                throw new Exception("Expected to have a 'InitialCatalog' in the connection string.");
+            }
             foreach (var script in scripts)
             {
-                using (var command = new SqlCommand(script, sqlConnection))
+                using (var command = new SqlCommand(script, connection))
                 {
                     command.AddParameter("database", database);
                     manipulateParameters(command.Parameters);

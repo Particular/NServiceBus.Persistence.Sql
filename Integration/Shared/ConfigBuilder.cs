@@ -9,7 +9,6 @@ public static class ConfigBuilder
         var configuration = new EndpointConfiguration($"SqlPersistence.Sample{enpointName}");
         configuration.UseSerialization<JsonSerializer>();
         configuration.EnableInstallers();
-        configuration.UsePersistence<InMemoryPersistence>();
 
         var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceSample;Integrated Security=True";
 

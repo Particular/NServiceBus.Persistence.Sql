@@ -15,7 +15,7 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    string connectionString;
+    Func<Task<SqlConnection>> connectionBuilder;
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<StringBuilder, JsonWriter> writerCreator;
@@ -25,14 +25,14 @@ class OutboxPersister : IOutboxStorage
     string cleanupCommandText;
 
     public OutboxPersister(
-        string connectionString, 
+        Func<Task<SqlConnection>> connectionBuilder, 
         string schema, 
         string endpointName,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<StringBuilder, JsonWriter> writerCreator)
     {
-        this.connectionString = connectionString;
+        this.connectionBuilder = connectionBuilder;
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
@@ -68,7 +68,7 @@ WHERE MessageId = @MessageId";
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var sqlConnection = await SqlHelpers.New(connectionString);
+        var sqlConnection = await connectionBuilder();
         var sqlTransaction = sqlConnection.BeginTransaction();
         return new SqlOutboxTransaction(sqlTransaction, sqlConnection);
     }
@@ -76,7 +76,7 @@ WHERE MessageId = @MessageId";
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var command = new SqlCommand(setAsDispatchedCommandText, connection))
         {
             command.AddParameter("MessageId", messageId);
@@ -88,7 +88,7 @@ WHERE MessageId = @MessageId";
     public async Task<OutboxMessage> Get(string messageId, ContextBag context)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;
@@ -155,7 +155,7 @@ WHERE MessageId = @MessageId";
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress))
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = await connectionBuilder())
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         using (var command = new SqlCommand(cleanupCommandText, connection, transaction))
         {

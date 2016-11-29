@@ -21,7 +21,7 @@ public class OutboxPersisterTests
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
         persister = new OutboxPersister(
-            connectionString: connectionString, 
+            connectionBuilder: () => SqlHelpers.New(connectionString), 
             schema: "dbo", 
             endpointName: $"{endpointName}.", 
             jsonSerializer: JsonSerializer.CreateDefault(),

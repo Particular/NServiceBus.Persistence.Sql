@@ -1,6 +1,8 @@
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence;
@@ -72,24 +74,40 @@ namespace NServiceBus
         }
 
 
-        public static void ConnectionString(this PersistenceExtensions<SqlPersistence> configuration, string connectionString)
+        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<Task<SqlConnection>> connectionBuilder)
         {
             configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionString", connectionString);
+                .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
+        }
+
+        public static void ConnectionBuilder<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, Func<Task<SqlConnection>> connectionBuilder)
+            where TStorageType : StorageType
+        {
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionBuilder";
+            configuration.GetSettings()
+                .Set(key, connectionBuilder);
+        }
+
+        public static void ConnectionString(this PersistenceExtensions<SqlPersistence> configuration, string connectionString)
+        {
+            var value = new Func<Task<SqlConnection>>(() => SqlHelpers.New(connectionString));
+            configuration.GetSettings()
+                .Set("SqlPersistence.ConnectionBuilder", value);
         }
 
         public static void ConnectionString<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, string connectionString)
             where TStorageType : StorageType
         {
-            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionString";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionBuilder";
+            var value = new Func<Task<SqlConnection>>(() => SqlHelpers.New(connectionString));
             configuration.GetSettings()
-                .Set(key, connectionString);
+                .Set(key, value);
         }
 
-        internal static string GetConnectionString<TStorageType>(this ReadOnlySettings settings)
+        internal static Func<Task<SqlConnection>> GetConnectionBuilder<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetValue<string, TStorageType>("ConnectionString", () => { throw new Exception("ConnectionString must be defined."); });
+            return settings.GetValue<Func<Task<SqlConnection>>, TStorageType>("ConnectionBuilder", () => { throw new Exception("ConnectionString must be defined."); });
         }
 
 

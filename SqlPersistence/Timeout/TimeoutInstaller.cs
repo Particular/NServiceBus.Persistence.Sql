@@ -22,13 +22,13 @@ class TimeoutInstaller : INeedToInstallSomething
         {
             return;
         }
-        var connectionString = settings.GetConnectionString<StorageType.Timeouts>();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Timeouts>();
 
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Timeouts>();
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Timeout_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionString, File.ReadAllText(createScript),
+        await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
             manipulateParameters: collection =>
             {
                 collection.AddWithValue("schema", settings.GetSchema<StorageType.Timeouts>());
