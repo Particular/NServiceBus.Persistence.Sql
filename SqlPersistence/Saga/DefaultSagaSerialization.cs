@@ -1,11 +1,11 @@
 ﻿namespace NServiceBus.Persistence.Sql
 {
-    public class DefaultSagaSerialization<TReader>
+    public class DefaultSagaSerialization
     {
         public readonly SagaSerialize Serialize;
-        public readonly SagaDeserialize<TReader> Deserialize;
+        public readonly SagaDeserialize Deserialize;
 
-        public DefaultSagaSerialization(SagaSerialize serialize, SagaDeserialize<TReader> deserialize)
+        public DefaultSagaSerialization(SagaSerialize serialize, SagaDeserialize deserialize)
         {
             Serialize = serialize;
             Deserialize = deserialize;

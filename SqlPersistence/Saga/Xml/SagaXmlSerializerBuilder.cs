@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace NServiceBus.Persistence.Sql
@@ -15,10 +14,10 @@ namespace NServiceBus.Persistence.Sql
             emptyNamespace.Add("", "");
         }
 
-        public static DefaultSagaSerialization<XmlReader> BuildSerializationDelegate(Type sagaDataType)
+        public static DefaultSagaSerialization BuildSerializationDelegate(Type sagaDataType)
         {
             var xmlSerializer = BuildXmlSerializer(sagaDataType);
-            return new DefaultSagaSerialization<XmlReader>
+            return new DefaultSagaSerialization
             (
                 (writer, data) =>
                 {

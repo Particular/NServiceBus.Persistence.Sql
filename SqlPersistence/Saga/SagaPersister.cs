@@ -5,20 +5,15 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
-class SagaPersister<TReader> : 
-    ISagaPersister 
-    where TReader : IDisposable
+class SagaPersister : ISagaPersister
 {
-    SagaInfoCache<TReader> sagaInfoCache;
-    SqlPersistenceSerializer<TReader> persistenceSerializer;
+    SagaInfoCache sagaInfoCache;
 
-    public SagaPersister(SagaInfoCache<TReader> sagaInfoCache, SqlPersistenceSerializer<TReader> persistenceSerializer)
+    public SagaPersister(SagaInfoCache sagaInfoCache)
     {
         this.sagaInfoCache = sagaInfoCache;
-        this.persistenceSerializer = persistenceSerializer;
     }
 
 
@@ -39,7 +34,7 @@ class SagaPersister<TReader> :
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
-            command.AddParameter("Data", sagaInfo.SagaToString(sagaData));
+            command.AddParameter("Data", sagaInfo.ToXml(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             if (correlationId != null)
@@ -52,7 +47,7 @@ class SagaPersister<TReader> :
     }
 
 
-    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo<TReader> sagaInfo, SqlCommand command)
+    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, SqlCommand command)
     {
         if (!sagaInfo.HasTransitionalCorrelationProperty)
         {
@@ -92,7 +87,7 @@ class SagaPersister<TReader> :
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.Parameters.AddWithValue("Data", sagaInfo.SagaToString(sagaData));
+            command.Parameters.AddWithValue("Data", sagaInfo.ToXml(sagaData));
             AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
@@ -151,23 +146,22 @@ class SagaPersister<TReader> :
     }
 
 
-    async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo<TReader> sagaInfo)
+    static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
-        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+        using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
         {
-            if (!await dataReader.ReadAsync())
+            if (!await reader.ReadAsync())
             {
                 return default(TSagaData);
             }
-            var id = dataReader.GetGuid(0);
-            var originator = dataReader.GetString(1);
-            var originalMessageId = dataReader.GetString(2);
-            var sagaTypeVersion = Version.Parse(dataReader.GetString(4));
-
-            using (var reader = persistenceSerializer.GetReader(dataReader, 3))
+            var id = reader.GetGuid(0);
+            var originator = reader.GetString(1);
+            var originalMessageId = reader.GetString(2);
+            var sagaTypeVersion = Version.Parse(reader.GetString(4));
+            using (var xmlReader = reader.GetSqlXml(3).CreateReader())
             {
-                var sagaData = sagaInfo.SagaFromReader<TSagaData>(reader, sagaTypeVersion);
+                var sagaData = sagaInfo.FromString<TSagaData>(xmlReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;
                 sagaData.OriginalMessageId = originalMessageId;

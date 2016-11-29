@@ -2,5 +2,5 @@
 
 namespace NServiceBus.Persistence.Sql
 {
-    public delegate SagaDeserialize<TReader> VersionDeserializeBuilder<TReader>(Type sagaDataType, Version sagaVersion);
+    public delegate SagaDeserialize VersionDeserializeBuilder(Type sagaDataType, Version sagaVersion);
 }

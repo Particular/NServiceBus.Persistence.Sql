@@ -1,5 +1,4 @@
-﻿using System;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Persistence;
 using NServiceBus.Settings;
 using NServiceBus.Configuration.AdvanceExtensibility;
@@ -8,32 +7,28 @@ using NServiceBus.Persistence.Sql;
 public static class SagaConfigExtentions
 {
  
-    public static void SerializeBuilder<TSerializer, TReader>(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, SagaSerializeBuilder<TReader> builder) 
-        where TSerializer : SqlPersistenceSerializer<TReader>, new() 
-        where TReader : IDisposable
+    public static void SerializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, SagaSerializeBuilder builder)
     {
         configuration.GetSettings()
-            .Set<SagaSerializeBuilder<TReader>>(builder);
+            .Set<SagaSerializeBuilder>(builder);
     }
 
-    internal static SagaSerializeBuilder<TReader> GetSerializeBuilder<TReader>(this ReadOnlySettings settings)
+    internal static SagaSerializeBuilder GetSerializeBuilder(this ReadOnlySettings settings)
     {
-        SagaSerializeBuilder<TReader> value;
+        SagaSerializeBuilder value;
         settings.TryGet(out value);
         return value;
     }
 
-    public static void VersionDeserializeBuilder<TSerializer, TReader>(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, VersionDeserializeBuilder<TReader> builder) 
-        where TSerializer : SqlPersistenceSerializer<TReader>, new() 
-        where TReader : IDisposable
+    public static void VersionDeserializeBuilder(this PersistenceExtensions<SqlXmlPersistence, StorageType.Sagas> configuration, VersionDeserializeBuilder builder)
     {
         configuration.GetSettings()
-            .Set<VersionDeserializeBuilder<TReader>>(builder);
+            .Set<VersionDeserializeBuilder>(builder);
     }
 
-    internal static VersionDeserializeBuilder<TReader> GetVersionDeserializeBuilder<TReader>(this ReadOnlySettings settings)
+    internal static VersionDeserializeBuilder GetVersionDeserializeBuilder(this ReadOnlySettings settings)
     {
-        VersionDeserializeBuilder<TReader> value;
+        VersionDeserializeBuilder value;
         settings.TryGet(out value);
         return value;
     }

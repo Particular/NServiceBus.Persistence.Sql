@@ -2,17 +2,18 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
+using System.Xml;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 
-class RuntimeSagaInfo<TReader> 
-    where TReader : IDisposable
+class RuntimeSagaInfo
 {
+    SagaCommandBuilder commandBuilder;
     Type sagaDataType;
-    SagaDeserialize<TReader> deserialize;
+    VersionDeserializeBuilder versionDeserializeBuilder;
+    SagaDeserialize deserialize;
     SagaSerialize serialize;
-    SqlPersistenceSerializer<TReader> sqlPersistenceSerializer;
-    ConcurrentDictionary<Version, SagaDeserialize<TReader>> deserializers;
+    ConcurrentDictionary<Version, SagaDeserialize> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string GetBySagaIdCommand;
@@ -29,18 +30,20 @@ class RuntimeSagaInfo<TReader>
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
         Type sagaDataType,
-        Type sagaType, 
-        SqlPersistenceSerializer<TReader> sqlPersistenceSerializer)
+        VersionDeserializeBuilder versionDeserializeBuilder,
+        Type sagaType,
+        SagaDeserialize deserialize,
+        SagaSerialize serialize)
     {
         this.sagaDataType = sagaDataType;
-        if (sqlPersistenceSerializer.VersionDeserializeBuilder != null)
+        if (versionDeserializeBuilder != null)
         {
-            deserializers = new ConcurrentDictionary<Version, SagaDeserialize<TReader>>();
+            deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
         }
-        var defaultSagaSerialization = sqlPersistenceSerializer.SerializationBuilder(sagaDataType);
-        deserialize = defaultSagaSerialization.Deserialize;
-        serialize = defaultSagaSerialization.Serialize;
-        this.sqlPersistenceSerializer = sqlPersistenceSerializer;
+        this.commandBuilder = commandBuilder;
+        this.versionDeserializeBuilder = versionDeserializeBuilder;
+        this.deserialize = deserialize;
+        this.serialize = serialize;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
         tableSuffix = sqlSagaAttributeData.TableSuffix;
@@ -65,7 +68,7 @@ class RuntimeSagaInfo<TReader>
     }
 
 
-    public string SagaToString(IContainSagaData sagaData)
+    public string ToXml(IContainSagaData sagaData)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -76,23 +79,22 @@ class RuntimeSagaInfo<TReader>
     }
 
 
-    public TSagaData SagaFromReader<TSagaData>(TReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
+    public TSagaData FromString<TSagaData>(XmlReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
     {
         var deserialize = GetDeserialize(storedSagaTypeVersion);
         return (TSagaData) deserialize(reader);
     }
 
 
-    SagaDeserialize<TReader> GetDeserialize(Version storedSagaTypeVersion)
+    SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
     {
-        var deserializeBuilder = sqlPersistenceSerializer.VersionDeserializeBuilder;
-        if (deserializeBuilder == null)
+        if (versionDeserializeBuilder == null)
         {
             return deserialize;
         }
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
-            var customDeserialize = deserializeBuilder(sagaDataType,storedSagaTypeVersion);
+            var customDeserialize = versionDeserializeBuilder(sagaDataType,storedSagaTypeVersion);
             if (customDeserialize != null)
             {
                 return customDeserialize;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 static class TypeScanner
 {
@@ -15,7 +15,7 @@ static class TypeScanner
             yield return nestedType;
         }
 
-        var persistenceTypes = typeof(SqlXmlPersistenceConfig).Assembly.GetTypes();
+        var persistenceTypes = typeof(SqlXmlPersistence).Assembly.GetTypes();
         foreach (var extraType in persistenceTypes)
         {
             yield return extraType;

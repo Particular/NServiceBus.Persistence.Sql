@@ -103,7 +103,7 @@ public class SagaXmlSerializerBuilderTests
         public string OriginalMessageId { get; set; }
     }
 
-    static string Serialize(DefaultSagaSerialization<XmlReader> delegates, IContainSagaData saga)
+    static string Serialize(DefaultSagaSerialization delegates, IContainSagaData saga)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -113,7 +113,7 @@ public class SagaXmlSerializerBuilderTests
         return builder.ToString();
     }
 
-    static IContainSagaData Deserialize(string xml, DefaultSagaSerialization<XmlReader> delegates)
+    static IContainSagaData Deserialize(string xml, DefaultSagaSerialization delegates)
     {
         var reader = new StringReader(xml);
         var xmlTextReader = new XmlTextReader(reader);

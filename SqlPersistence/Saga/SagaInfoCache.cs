@@ -2,31 +2,40 @@
 using System.Collections.Concurrent;
 using NServiceBus.Persistence.Sql;
 
-class SagaInfoCache<TReader>
-    where TReader : IDisposable
+class SagaInfoCache
 {
+    VersionDeserializeBuilder versionDeserializeBuilder;
+    SagaSerializeBuilder serializeBuilder;
     SagaCommandBuilder commandBuilder;
-    SqlPersistenceSerializer<TReader> sqlPersistenceSerializer;
-    ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo<TReader>> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo<TReader>>();
+    ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
 
-    public SagaInfoCache(SagaCommandBuilder commandBuilder, SqlPersistenceSerializer<TReader> sqlPersistenceSerializer)
+    public SagaInfoCache(
+        VersionDeserializeBuilder versionDeserializeBuilder,
+        SagaSerializeBuilder serializeBuilder,
+        SagaCommandBuilder commandBuilder)
     {
+        this.versionDeserializeBuilder = versionDeserializeBuilder;
+        this.serializeBuilder = serializeBuilder;
         this.commandBuilder = commandBuilder;
-        this.sqlPersistenceSerializer = sqlPersistenceSerializer;
     }
 
-    public RuntimeSagaInfo<TReader> GetInfo(Type sagaDataType, Type sagaType)
+    public RuntimeSagaInfo GetInfo(Type sagaDataType, Type sagaType)
     {
         var handle = sagaDataType.TypeHandle;
         return serializerCache.GetOrAdd(handle, _ => BuildSagaInfo(sagaDataType, sagaType));
     }
 
-    RuntimeSagaInfo<TReader> BuildSagaInfo(Type sagaDataType, Type sagaType)
+    RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
     {
-        return new RuntimeSagaInfo<TReader>(
+        var serialization = serializeBuilder(sagaDataType);
+        var deserialize = serialization.Deserialize;
+        var serialize = serialization.Serialize;
+        return new RuntimeSagaInfo(
             commandBuilder: commandBuilder,
             sagaDataType: sagaDataType,
-            sagaType: sagaType, 
-            sqlPersistenceSerializer: sqlPersistenceSerializer);
+            versionDeserializeBuilder: versionDeserializeBuilder,
+            sagaType: sagaType,
+            deserialize: deserialize,
+            serialize:serialize);
     }
 }

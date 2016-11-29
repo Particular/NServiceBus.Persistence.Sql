@@ -11,13 +11,13 @@ namespace NServiceBus
         public static void ConnectionString(this PersistenceExtensions<SqlXmlPersistence> configuration, string connectionString)
         {
             configuration.GetSettings()
-                .Set("SqlXmlPersistence.ConnectionString", connectionString);
+                .Set("SqlPersistence.ConnectionString", connectionString);
         }
 
         public static void ConnectionString<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, string connectionString)
             where TStorageType : StorageType
         {
-            var key = $"SqlXmlPersistence.{typeof(TStorageType).Name}.ConnectionString";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionString";
             configuration.GetSettings()
                 .Set(key, connectionString);
         }
@@ -25,22 +25,19 @@ namespace NServiceBus
         internal static string GetConnectionString<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetValue<string, TStorageType>("ConnectionString", () =>
-            {
-                throw new Exception("ConnectionString must be defined.");
-            });
+            return settings.GetValue<string, TStorageType>("ConnectionString", () => { throw new Exception("ConnectionString must be defined."); });
         }
 
         public static void UseEndpointName(this PersistenceExtensions<SqlXmlPersistence> configuration, bool useEndpointName)
         {
             configuration.GetSettings()
-                .Set("SqlXmlPersistence.UseEndpointName", useEndpointName);
+                .Set("SqlPersistence.UseEndpointName", useEndpointName);
         }
 
         public static void UseEndpointName<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, bool useEndpointName)
             where TStorageType : StorageType
         {
-            var key = $"SqlXmlPersistence.{typeof(TStorageType).Name}.UseEndpointName";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.UseEndpointName";
             configuration.GetSettings()
                 .Set(key, useEndpointName);
         }
@@ -51,10 +48,9 @@ namespace NServiceBus
             return settings.GetValue<bool, TStorageType>("UseEndpointName", () => true);
         }
 
-        internal static string GetEndpointNamePrefix<TStorageType>(this ReadOnlySettings settings) 
-            where TStorageType : StorageType
+        internal static string GetEndpointNamePrefix<T>(this ReadOnlySettings settings) where T : StorageType
         {
-            if (settings.ShouldUseEndpointName<TStorageType>())
+            if (settings.ShouldUseEndpointName<T>())
             {
                 return $"{settings.EndpointName()}.";
             }
@@ -65,13 +61,13 @@ namespace NServiceBus
         public static void DisableInstaller(this PersistenceExtensions<SqlXmlPersistence> configuration)
         {
             configuration.GetSettings()
-                .Set("SqlXmlPersistence.DisableInstaller", true);
+                .Set("SqlPersistence.DisableInstaller", true);
         }
 
         public static void DisableInstaller<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration)
             where TStorageType : StorageType
         {
-            var key = $"SqlXmlPersistence.{typeof(TStorageType).Name}.DisableInstaller";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.DisableInstaller";
             configuration.GetSettings()
                 .Set(key, true);
         }
@@ -107,13 +103,13 @@ namespace NServiceBus
         public static void Schema(this PersistenceExtensions<SqlXmlPersistence> configuration, string schema)
         {
             configuration.GetSettings()
-                .Set("SqlXmlPersistence.Schema", schema);
+                .Set("SqlPersistence.Schema", schema);
         }
 
         public static void Schema<TStorageType>(this PersistenceExtensions<SqlXmlPersistence, TStorageType> configuration, string schema)
             where TStorageType : StorageType
         {
-            var key = $"SqlXmlPersistence.{typeof(TStorageType).Name}.Schema";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.Schema";
             configuration.GetSettings()
                 .Set(key, schema);
         }
@@ -126,13 +122,13 @@ namespace NServiceBus
         internal static TValue GetValue<TValue, TStorageType>(this ReadOnlySettings settings, string suffix, Func<TValue> defaultValue)
             where TStorageType : StorageType
         {
-            var key = $"SqlXmlPersistence.{typeof (TStorageType).Name}.{suffix}";
+            var key = $"SqlPersistence.{typeof (TStorageType).Name}.{suffix}";
             TValue value;
             if (settings.TryGet(key, out value))
             {
                 return value;
             }
-            if (settings.TryGet($"SqlXmlPersistence.{suffix}", out value))
+            if (settings.TryGet($"SqlPersistence.{suffix}", out value))
             {
                 return value;
             }

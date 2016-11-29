@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder.Tests", "Scri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuget", "NuGet\Nuget.csproj", "{66DDADC1-1631-4EC7-8CB2-DD8080188234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlPersistence.NewtonSoft", "SqlPersistence.NewtonSoft\SqlPersistence.NewtonSoft.csproj", "{DB0131F8-43D1-4CB3-82C2-3A9C7A3CB05A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB0131F8-43D1-4CB3-82C2-3A9C7A3CB05A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB0131F8-43D1-4CB3-82C2-3A9C7A3CB05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB0131F8-43D1-4CB3-82C2-3A9C7A3CB05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB0131F8-43D1-4CB3-82C2-3A9C7A3CB05A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
