@@ -97,11 +97,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
@@ -116,13 +114,11 @@
     <Compile Include="Integration\MsmqTransportIntegrationTests.cs" />
     <Compile Include="Integration\MsmqQueueDeletion.cs" />
     <Compile Include="Integration\TypeScanner.cs" />
-    <Compile Include="Outbox\OperationSerializerTests.cs" />
+    <Compile Include="Outbox\OperationConverterTests.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
-    <Compile Include="Saga\SagaXmlSerializerBuilderTests.cs" />
     <Compile Include="TaskEx.cs" />
-    <Compile Include="Timeout\HeaderSerializerTests.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
     <Compile Include="Timeout\TimeoutPersisterTests.cs" />

@@ -2,18 +2,20 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
-using System.Xml;
+using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+using NewtonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class RuntimeSagaInfo
 {
-    SagaCommandBuilder commandBuilder;
     Type sagaDataType;
     VersionDeserializeBuilder versionDeserializeBuilder;
-    SagaDeserialize deserialize;
-    SagaSerialize serialize;
-    ConcurrentDictionary<Version, SagaDeserialize> deserializers;
+    NewtonSerializer jsonSerializer;
+    Func<TextReader, JsonReader> readerCreator;
+    Func<StringBuilder, JsonWriter> writerCreator;
+    ConcurrentDictionary<Version, NewtonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string GetBySagaIdCommand;
@@ -21,7 +23,6 @@ class RuntimeSagaInfo
     public readonly string UpdateCommand;
     public readonly Func<IContainSagaData, object> TransitionalAccessor;
     public readonly bool HasTransitionalCorrelationProperty;
-    string tableSuffix;
     public readonly bool HasCorrelationProperty;
     public readonly string CorrelationProperty;
     public readonly string TransitionalCorrelationProperty;
@@ -32,21 +33,22 @@ class RuntimeSagaInfo
         Type sagaDataType,
         VersionDeserializeBuilder versionDeserializeBuilder,
         Type sagaType,
-        SagaDeserialize deserialize,
-        SagaSerialize serialize)
+        NewtonSerializer jsonSerializer,
+            Func<TextReader, JsonReader> readerCreator,
+            Func<StringBuilder, JsonWriter> writerCreator)
     {
         this.sagaDataType = sagaDataType;
         if (versionDeserializeBuilder != null)
         {
-            deserializers = new ConcurrentDictionary<Version, SagaDeserialize>();
+            deserializers = new ConcurrentDictionary<Version, NewtonSerializer>();
         }
-        this.commandBuilder = commandBuilder;
         this.versionDeserializeBuilder = versionDeserializeBuilder;
-        this.deserialize = deserialize;
-        this.serialize = serialize;
+        this.jsonSerializer = jsonSerializer;
+        this.readerCreator = readerCreator;
+        this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
-        tableSuffix = sqlSagaAttributeData.TableSuffix;
+        var tableSuffix = sqlSagaAttributeData.TableSuffix;
         CompleteCommand = commandBuilder.BuildCompleteCommand(tableSuffix);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
         SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
@@ -68,38 +70,42 @@ class RuntimeSagaInfo
     }
 
 
-    public string ToXml(IContainSagaData sagaData)
+    public string ToJson(IContainSagaData sagaData)
     {
         var builder = new StringBuilder();
-        using (var writer = new StringWriter(builder))
+        using (var writer = writerCreator(builder))
         {
-            serialize(writer, sagaData);
+            jsonSerializer.Serialize(writer, sagaData);
         }
         return builder.ToString();
     }
 
 
-    public TSagaData FromString<TSagaData>(XmlReader reader, Version storedSagaTypeVersion) where TSagaData : IContainSagaData
+    public TSagaData FromString<TSagaData>(TextReader reader, Version storedSagaTypeVersion)
+        where TSagaData : IContainSagaData
     {
-        var deserialize = GetDeserialize(storedSagaTypeVersion);
-        return (TSagaData) deserialize(reader);
+        var serializer = GetDeserialize(storedSagaTypeVersion);
+        using (var jsonReader = readerCreator(reader))
+        {
+            return serializer.Deserialize<TSagaData>(jsonReader);
+        }
     }
 
 
-    SagaDeserialize GetDeserialize(Version storedSagaTypeVersion)
+    NewtonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionDeserializeBuilder == null)
         {
-            return deserialize;
+            return jsonSerializer;
         }
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
-            var customDeserialize = versionDeserializeBuilder(sagaDataType,storedSagaTypeVersion);
-            if (customDeserialize != null)
+            var settings = versionDeserializeBuilder(sagaDataType, storedSagaTypeVersion);
+            if (settings != null)
             {
-                return customDeserialize;
+                return JsonSerializer.Create(settings); 
             }
-            return deserialize;
+            return jsonSerializer;
         });
     }
 

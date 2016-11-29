@@ -13,16 +13,16 @@ public static class ConfigBuilder
 
         var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceSample;Integrated Security=True";
 
-        var sagaPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Sagas>();
+        var sagaPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Sagas>();
         sagaPersistence.ConnectionString(connectionString);
 
-        var timeoutPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Timeouts>();
+        var timeoutPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Timeouts>();
         timeoutPersistence.ConnectionString(connectionString);
 
-        var subscriptionPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Subscriptions>();
+        var subscriptionPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Subscriptions>();
         subscriptionPersistence.ConnectionString(connectionString);
 
-        var outboxPersistence = configuration.UsePersistence<SqlXmlPersistence, StorageType.Outbox>();
+        var outboxPersistence = configuration.UsePersistence<SqlPersistence, StorageType.Outbox>();
         outboxPersistence.ConnectionString(connectionString);
 
         return configuration;

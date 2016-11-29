@@ -1,23 +1,33 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql;
 
 class SagaInfoCache
 {
     VersionDeserializeBuilder versionDeserializeBuilder;
-    SagaSerializeBuilder serializeBuilder;
     SagaCommandBuilder commandBuilder;
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
+    JsonSerializer jsonSerializer;
+    Func<TextReader, JsonReader> readerCreator;
+    Func<StringBuilder, JsonWriter> writerCreator;
 
     public SagaInfoCache(
         VersionDeserializeBuilder versionDeserializeBuilder,
-        SagaSerializeBuilder serializeBuilder,
+        JsonSerializer jsonSerializer,
+        Func<TextReader, JsonReader> readerCreator,
+        Func<StringBuilder, JsonWriter> writerCreator,
         SagaCommandBuilder commandBuilder)
     {
         this.versionDeserializeBuilder = versionDeserializeBuilder;
-        this.serializeBuilder = serializeBuilder;
+        this.writerCreator = writerCreator;
+        this.readerCreator = readerCreator;
+        this.jsonSerializer = jsonSerializer;
         this.commandBuilder = commandBuilder;
     }
+    
 
     public RuntimeSagaInfo GetInfo(Type sagaDataType, Type sagaType)
     {
@@ -27,15 +37,13 @@ class SagaInfoCache
 
     RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
     {
-        var serialization = serializeBuilder(sagaDataType);
-        var deserialize = serialization.Deserialize;
-        var serialize = serialization.Serialize;
         return new RuntimeSagaInfo(
             commandBuilder: commandBuilder,
             sagaDataType: sagaDataType,
             versionDeserializeBuilder: versionDeserializeBuilder,
             sagaType: sagaType,
-            deserialize: deserialize,
-            serialize:serialize);
+            jsonSerializer: jsonSerializer,
+            readerCreator: readerCreator,
+            writerCreator: writerCreator);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
 using ObjectApproval;
@@ -19,7 +21,17 @@ public class TimeoutPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new TimeoutPersister(connectionString, "dbo", $"{endpointName}.");
+        persister = new TimeoutPersister(
+            connectionString: connectionString, 
+            schema: "dbo", 
+            endpointName: $"{endpointName}.",
+            jsonSerializer: JsonSerializer.CreateDefault(),
+            readerCreator: reader => new JsonTextReader(reader),
+            writerCreator: builder =>
+            {
+                var writer = new StringWriter(builder);
+                return new JsonTextWriter(writer);
+            });
     }
 
     [Test]

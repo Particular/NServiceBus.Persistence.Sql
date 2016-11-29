@@ -83,7 +83,7 @@ END";
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
         transport.ConnectionString(connectionString);
-        var persistence = endpointConfiguration.UsePersistence<SqlXmlPersistence>();
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionString(connectionString);
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>

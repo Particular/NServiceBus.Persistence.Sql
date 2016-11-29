@@ -13,7 +13,7 @@ SET @createTable = N'
         [MessageId] [nvarchar](1024) NOT NULL PRIMARY KEY,
         [Dispatched] [bit] NOT NULL DEFAULT 0,
         [DispatchedAt] [datetime],
-        [OperationsXml] [xml] NOT NULL,
+        [Operations] [nvarchar](max) NOT NULL
     )
 ';
 exec(@createTable);

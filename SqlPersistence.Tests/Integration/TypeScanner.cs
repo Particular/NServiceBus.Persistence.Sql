@@ -15,7 +15,7 @@ static class TypeScanner
             yield return nestedType;
         }
 
-        var persistenceTypes = typeof(SqlXmlPersistence).Assembly.GetTypes();
+        var persistenceTypes = typeof(SqlPersistence).Assembly.GetTypes();
         foreach (var extraType in persistenceTypes)
         {
             yield return extraType;

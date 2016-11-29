@@ -3,9 +3,9 @@ using NServiceBus.Features;
 using NServiceBus.Persistence;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
-class SqlXmlSubscriptionFeature : Feature
+class SqlSubscriptionFeature : Feature
 {
-    SqlXmlSubscriptionFeature()
+    SqlSubscriptionFeature()
     {
         DependsOn<MessageDrivenSubscriptions>();
     }

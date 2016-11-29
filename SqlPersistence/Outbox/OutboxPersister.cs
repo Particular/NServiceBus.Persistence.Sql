@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using Newtonsoft.Json;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -12,19 +16,31 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     string connectionString;
+    JsonSerializer jsonSerializer;
+    Func<TextReader, JsonReader> readerCreator;
+    Func<StringBuilder, JsonWriter> writerCreator;
     string storeCommandText;
     string getCommandText;
     string setAsDispatchedCommandText;
     string cleanupCommandText;
 
-    public OutboxPersister(string connectionString, string schema, string endpointName)
+    public OutboxPersister(
+        string connectionString, 
+        string schema, 
+        string endpointName,
+        JsonSerializer jsonSerializer,
+        Func<TextReader, JsonReader> readerCreator,
+        Func<StringBuilder, JsonWriter> writerCreator)
     {
         this.connectionString = connectionString;
+        this.jsonSerializer = jsonSerializer;
+        this.readerCreator = readerCreator;
+        this.writerCreator = writerCreator;
         storeCommandText = $@"
 INSERT INTO [{schema}].[{endpointName}OutboxData]
 (
     MessageId,
-    OperationsXml
+    Operations
 )
 VALUES
 (
@@ -38,7 +54,7 @@ delete from [{schema}].[{endpointName}OutboxData] where Dispatched = true And Di
         getCommandText = $@"
 SELECT
     Dispatched,
-    OperationsXml
+    Operations
 FROM [{schema}].[{endpointName}OutboxData]
 WHERE MessageId = @MessageId";
 
@@ -79,21 +95,27 @@ WHERE MessageId = @MessageId";
             using (var command = new SqlCommand(getCommandText, connection, transaction))
             {
                 command.AddParameter("MessageId", messageId);
-                using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+                using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
-                    if (!await reader.ReadAsync())
+                    if (!await dataReader.ReadAsync())
                     {
                         return null;
                     }
-                    var dispatched = reader.GetBoolean(0);
+                    var dispatched = dataReader.GetBoolean(0);
                     if (dispatched)
                     {
                         result = new OutboxMessage(messageId, new TransportOperation[0]);
                     }
                     else
                     {
-                        result = new OutboxMessage(messageId,
-                            OperationSerializer.FromString(reader.GetString(1)).ToArray());
+                        using (var textReader = dataReader.GetTextReader(1))
+                        using (var jsonReader = readerCreator(textReader))
+                        {
+                            var transportOperations = jsonSerializer.Deserialize<IEnumerable<SerializableOperation>>(jsonReader)
+                                .FromSerializable()
+                                .ToArray();
+                            result = new OutboxMessage(messageId, transportOperations);
+                        }
                     }
                 }
             }
@@ -115,9 +137,19 @@ WHERE MessageId = @MessageId";
         using (var command = new SqlCommand(storeCommandText, sqlConnection, sqlTransaction))
         {
             command.AddParameter("MessageId", message.MessageId);
-            command.AddParameter("Operations", OperationSerializer.ToXml(message.TransportOperations));
+            command.AddParameter("Operations", OperationsToString(message.TransportOperations));
             await command.ExecuteNonQueryEx();
         }
+    }
+
+    string OperationsToString(TransportOperation[] operations)
+    {
+        var stringBuilder = new StringBuilder();
+        using (var jsonWriter = writerCreator(stringBuilder))
+        {
+            jsonSerializer.Serialize(jsonWriter, operations.ToSerializable());
+        }
+        return stringBuilder.ToString();
     }
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)

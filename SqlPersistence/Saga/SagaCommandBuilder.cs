@@ -33,7 +33,7 @@ INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
     Id,
     Originator,
     OriginalMessageId,
-    DataXml,
+    Data,
     PersistenceVersion,
     SagaTypeVersion{insertBuilder}
 )
@@ -64,7 +64,7 @@ UPDATE [{schema}].[{endpointName}{tableSuffx}]
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
-    DataXml = @Data,
+    Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion{correlationSet}
 WHERE
@@ -79,7 +79,7 @@ SELECT
     Id,
     Originator,
     OriginalMessageId,
-    DataXml,
+    Data,
     SagaTypeVersion
 FROM  [{schema}].[{endpointName}{tableSuffx}]
 WHERE Id = @Id
@@ -93,7 +93,7 @@ SELECT
     Id,
     Originator,
     OriginalMessageId,
-    DataXml,
+    Data,
     SagaTypeVersion
 FROM  [{schema}].[{endpointName}{tableSuffx}]
 WHERE Correlation_{propertyName} = @propertyValue

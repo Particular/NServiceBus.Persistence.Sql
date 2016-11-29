@@ -2,9 +2,9 @@
 
 namespace NServiceBus.Persistence.Sql
 {
-    public class SqlXmlPersistence : PersistenceDefinition
+    public class SqlPersistence : PersistenceDefinition
     {
-        public SqlXmlPersistence()
+        public SqlPersistence()
         {
             Defaults(s =>
             {
@@ -14,19 +14,19 @@ namespace NServiceBus.Persistence.Sql
             });
             Supports<StorageType.Outbox>(s =>
             {
-                s.EnableFeatureByDefault<SqlXmlOutboxFeature>();
+                s.EnableFeatureByDefault<SqlOutboxFeature>();
             });
             Supports<StorageType.Timeouts>(s =>
             {
-                s.EnableFeatureByDefault<SqlXmlTimeoutFeature>();
+                s.EnableFeatureByDefault<SqlTimeoutFeature>();
             });
             Supports<StorageType.Sagas>(s =>
             {
-                s.EnableFeatureByDefault<SqlXmlSagaFeature>();
+                s.EnableFeatureByDefault<SqlSagaFeature>();
             });
             Supports<StorageType.Subscriptions>(s =>
             {
-                s.EnableFeatureByDefault<SqlXmlSubscriptionFeature>();
+                s.EnableFeatureByDefault<SqlSubscriptionFeature>();
             });
         }
     }

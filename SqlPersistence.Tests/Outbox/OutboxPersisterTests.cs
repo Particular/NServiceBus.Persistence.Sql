@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NServiceBus.Outbox;
 using NUnit.Framework;
 using ObjectApproval;
@@ -18,7 +20,17 @@ public class OutboxPersisterTests
     public async Task SetUp()
     {
         await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new OutboxPersister(connectionString, "dbo", $"{endpointName}.");
+        persister = new OutboxPersister(
+            connectionString: connectionString, 
+            schema: "dbo", 
+            endpointName: $"{endpointName}.", 
+            jsonSerializer: JsonSerializer.CreateDefault(),
+            readerCreator: reader => new JsonTextReader(reader),
+            writerCreator: builder =>
+            {
+                var writer = new StringWriter(builder);
+                return new JsonTextWriter(writer);
+            });
     }
 
     [Test]

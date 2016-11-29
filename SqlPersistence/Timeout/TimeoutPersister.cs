@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Text;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NServiceBus.Extensibility;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
     string connectionString;
+    JsonSerializer jsonSerializer;
+    Func<TextReader, JsonReader> readerCreator;
+    Func<StringBuilder, JsonWriter> writerCreator;
     string insertCommandText;
     string removeByIdCommandText;
     string removeBySagaIdCommandText;
@@ -16,9 +22,15 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     string rangeComandText;
     string nextCommandText;
 
-    public TimeoutPersister(string connectionString, string schema, string endpointName)
+    public TimeoutPersister(string connectionString, string schema, string endpointName,
+        JsonSerializer jsonSerializer,
+        Func<TextReader, JsonReader> readerCreator,
+        Func<StringBuilder, JsonWriter> writerCreator)
     {
         this.connectionString = connectionString;
+        this.jsonSerializer = jsonSerializer;
+        this.readerCreator = readerCreator;
+        this.writerCreator = writerCreator;
 
         insertCommandText = $@"
 INSERT INTO [{schema}].[{endpointName}TimeoutData]
@@ -28,7 +40,7 @@ INSERT INTO [{schema}].[{endpointName}TimeoutData]
     SagaId,
     State,
     Time,
-    HeadersXml,
+    Headers,
     PersistenceVersion
 )
 VALUES
@@ -57,7 +69,7 @@ SELECT
     SagaId,
     State,
     Time,
-    HeadersXml
+    Headers
 FROM [{schema}].[{endpointName}TimeoutData]
 WHERE Id = @Id";
 
@@ -84,6 +96,8 @@ ORDER BY TIME";
                 {
                     return null;
                 }
+
+                var headers = ReadHeaders(reader);
                 return new TimeoutData
                 {
                     Id = timeoutId,
@@ -91,11 +105,20 @@ ORDER BY TIME";
                     SagaId = reader.GetGuid(1),
                     State = reader.GetSqlBinary(2).Value,
                     Time = reader.GetDateTime(3),
-                    Headers = HeaderSerializer.FromString(reader.GetString(4)),
+                    Headers = headers,
                 };
             }
         }
 
+    }
+
+    Dictionary<string, string> ReadHeaders(SqlDataReader reader)
+    {
+        using (var textReader = reader.GetTextReader(4))
+        using (var jsonReader = readerCreator(textReader))
+        {
+            return jsonSerializer.Deserialize<Dictionary<string, string>>(jsonReader);
+        }
     }
 
     public async Task Add(TimeoutData timeout, ContextBag context)
@@ -110,10 +133,20 @@ ORDER BY TIME";
             command.AddParameter("SagaId", timeout.SagaId);
             command.AddParameter("State", timeout.State);
             command.AddParameter("Time", timeout.Time);
-            command.AddParameter("Headers", HeaderSerializer.ToXml(timeout.Headers));
+            command.AddParameter("Headers", HeadersToString(timeout.Headers));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
+    }
+
+    string HeadersToString(Dictionary<string, string> headers)
+    {
+        var stringBuilder = new StringBuilder();
+        using (var jsonWriter = writerCreator(stringBuilder))
+        {
+            jsonSerializer.Serialize(jsonWriter, headers);
+        }
+        return stringBuilder.ToString();
     }
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)

@@ -1,12 +1,11 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
-class SqlXmlSagaFeature : Feature
+class SqlSagaFeature : Feature
 {
-    SqlXmlSagaFeature()
+    SqlSagaFeature()
     {
         DependsOn<Sagas>();
     }
@@ -20,13 +19,11 @@ class SqlXmlSagaFeature : Feature
 
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Sagas>();
         var commandBuilder = new SagaCommandBuilder(schema, endpointName);
-        var serialize = settings.GetSerializeBuilder();
-        if (serialize == null)
-        {
-            serialize = SagaXmlSerializerBuilder.BuildSerializationDelegate;
-        }
-        var versionDeserializeBuilder = settings.GetVersionDeserializeBuilder();
-        var infoCache = new SagaInfoCache(versionDeserializeBuilder, serialize, commandBuilder);
+        var jsonSerializer = settings.GetJsonSerializer<StorageType.Sagas>();
+        var readerCreator = settings.GetReaderCreator<StorageType.Sagas>();
+        var writerCreator = settings.GetWriterCreator<StorageType.Sagas>();
+        var versionDeserializeBuilder = settings.GetVersionSettings();
+        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder);
         var sagaPersister = new SagaPersister(infoCache);
         context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }

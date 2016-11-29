@@ -38,7 +38,7 @@ public class SagaPersisterTests
         );
         await DbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
-        var infoCache = new SagaInfoCache(null, SagaXmlSerializerBuilder.BuildSerializationDelegate, commandBuilder);
+        var infoCache = new SagaInfoCache(null, null, null, null, commandBuilder);
         persister = new SagaPersister(infoCache);
     }
 

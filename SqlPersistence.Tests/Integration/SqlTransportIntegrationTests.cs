@@ -45,7 +45,7 @@ public class SqlTransportIntegrationTests
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         transport.Transactions(transactionMode);
         transport.ConnectionString(connectionString);
-        var persistence = endpointConfiguration.UsePersistence<SqlXmlPersistence>();
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionString(connectionString);
         persistence.DisableInstaller();
 

@@ -41,7 +41,7 @@ public class MsmqTransportIntegrationTests
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<MsmqTransport>();
         transport.Transactions(transactionMode);
-        var persistence = endpointConfiguration.UsePersistence<SqlXmlPersistence>();
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionString(connectionString);
         persistence.DisableInstaller();
 

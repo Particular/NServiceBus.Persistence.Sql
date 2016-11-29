@@ -51,6 +51,10 @@
       <HintPath>..\packages\Janitor.Fody.1.2.1.0\lib\dotnet\Janitor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
@@ -59,11 +63,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -76,9 +78,10 @@
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />
-    <Compile Include="Outbox\OperationSerializer.cs" />
+    <Compile Include="Outbox\OperationConverter.cs" />
     <Compile Include="Outbox\OutboxCleaner.cs" />
-    <Compile Include="Outbox\SqlXmlOutboxFeature.cs" />
+    <Compile Include="Outbox\SerializableOperation.cs" />
+    <Compile Include="Outbox\SqlOutboxFeature.cs" />
     <Compile Include="Outbox\OutboxInstaller.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
@@ -90,34 +93,28 @@
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageAdapter.cs" />
     <Compile Include="Saga\SqlSagaAttribute.cs" />
-    <Compile Include="Saga\DefaultSagaSerialization.cs" />
     <Compile Include="Saga\MessagePropertyMapper.cs" />
-    <Compile Include="Saga\SagaDeserialize.cs" />
     <Compile Include="Saga\VersionDeserializeBuilder.cs" />
     <Compile Include="Saga\SagaConfigExtentions.cs" />
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
     <Compile Include="Saga\SqlSagaAttributeReader.cs" />
-    <Compile Include="Saga\Xml\SagaXmlSerializerBuilder.cs" />
     <Compile Include="Saga\SagaSerialize.cs" />
-    <Compile Include="Saga\SagaSerializeBuilder.cs" />
     <Compile Include="Saga\SagaInstaller.cs" />
     <Compile Include="Saga\SqlSaga.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
     <Compile Include="Subscription\SubscriptionInstaller.cs" />
-    <Compile Include="EmptyXmlNamespace.cs" />
     <Compile Include="SynchronizedStorage\SynchronizedStorage.cs" />
-    <Compile Include="Timeout\HeaderSerializer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="SqlHelpers.cs" />
     <Compile Include="SqlPersistence.cs" />
-    <Compile Include="Saga\SqlXmlSagaFeature.cs" />
-    <Compile Include="SqlXmlPersistenceConfig.cs" />
-    <Compile Include="Subscription\SqlXmlSubscriptionFeature.cs" />
+    <Compile Include="Saga\SqlSagaFeature.cs" />
+    <Compile Include="SqlPersistenceConfig.cs" />
+    <Compile Include="Subscription\SqlSubscriptionFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
-    <Compile Include="Timeout\SqlXmlTimeoutFeature.cs" />
+    <Compile Include="Timeout\SqlTimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutPersister.cs" />
     <Compile Include="Saga\SagaPersister.cs" />
     <Compile Include="Subscription\SubscriptionPersister.cs" />

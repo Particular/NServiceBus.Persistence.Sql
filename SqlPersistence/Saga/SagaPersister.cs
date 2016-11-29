@@ -34,7 +34,7 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
-            command.AddParameter("Data", sagaInfo.ToXml(sagaData));
+            command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             if (correlationId != null)
@@ -87,7 +87,7 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.Parameters.AddWithValue("Data", sagaInfo.ToXml(sagaData));
+            command.Parameters.AddWithValue("Data", sagaInfo.ToJson(sagaData));
             AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
@@ -149,19 +149,19 @@ class SagaPersister : ISagaPersister
     static async Task<TSagaData> GetSagaData<TSagaData>(SqlCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
-        using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
         {
-            if (!await reader.ReadAsync())
+            if (!await dataReader.ReadAsync())
             {
                 return default(TSagaData);
             }
-            var id = reader.GetGuid(0);
-            var originator = reader.GetString(1);
-            var originalMessageId = reader.GetString(2);
-            var sagaTypeVersion = Version.Parse(reader.GetString(4));
-            using (var xmlReader = reader.GetSqlXml(3).CreateReader())
+            var id = dataReader.GetGuid(0);
+            var originator = dataReader.GetString(1);
+            var originalMessageId = dataReader.GetString(2);
+            var sagaTypeVersion = Version.Parse(dataReader.GetString(4));
+            using (var textReader = dataReader.GetTextReader(3))
             {
-                var sagaData = sagaInfo.FromString<TSagaData>(xmlReader, sagaTypeVersion);
+                var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;
                 sagaData.OriginalMessageId = originalMessageId;
