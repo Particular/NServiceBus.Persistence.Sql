@@ -15,7 +15,7 @@ SET @createTable = N'
         [SagaId] [uniqueidentifier],
         [State] [varbinary](max),
         [Time] [datetime],
-        [Headers] [xml],
+        [HeadersXml] [xml],
         [PersistenceVersion] [nvarchar](23) NOT NULL
     )
 ';

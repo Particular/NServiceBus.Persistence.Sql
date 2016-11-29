@@ -10,9 +10,9 @@ static class OperationSerializer
     public static string ToXml(IEnumerable<TransportOperation> operations)
     {
         var xElem = new XElement(
-                      "operations",
-                       operations.Select(BuildOperationElement)
-                   );
+            "operations",
+            operations.Select(BuildOperationElement)
+        );
         return xElem.ToString();
     }
 
@@ -23,11 +23,11 @@ static class OperationSerializer
             new XElement(
                 "headers",
                 operation.Headers.Select(BuildHeaderElement)
-                ),
+            ),
             new XElement(
                 "options",
                 operation.Options.Select(BuildOptionElement)
-                ),
+            ),
             new XElement("body", Convert.ToBase64String(operation.Body)));
     }
 
@@ -35,6 +35,7 @@ static class OperationSerializer
     {
         return new XElement("header", new XAttribute("key", header.Key), header.Value);
     }
+
     static XElement BuildOptionElement(KeyValuePair<string, string> header)
     {
         return new XElement("option", new XAttribute("key", header.Key), header.Value);
@@ -62,8 +63,8 @@ static class OperationSerializer
         return xElement
             .Elements("option")
             .ToDictionary(
-            optionElement => (string)optionElement.Attribute("key"),
-            optionElement => optionElement.Value
+                optionElement => (string) optionElement.Attribute("key"),
+                optionElement => optionElement.Value
             );
     }
 
@@ -72,8 +73,8 @@ static class OperationSerializer
         return transportElement.Element("headers")
             .Elements("header")
             .ToDictionary(
-            optionElement => (string)optionElement.Attribute("key"),
-            optionElement => optionElement.Value
+                optionElement => (string) optionElement.Attribute("key"),
+                optionElement => optionElement.Value
             );
     }
 }

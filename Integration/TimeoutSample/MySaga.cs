@@ -15,6 +15,7 @@ public class MySaga : Saga<MySaga.SagaData>,
 
     public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
     {
+        Data.MySagaId = message.MySagaId;
         var timeout = new SagaTimoutMessage
         {
             Property = "PropertyValue"

@@ -24,7 +24,7 @@ class OutboxPersister : IOutboxStorage
 INSERT INTO [{schema}].[{endpointName}OutboxData]
 (
     MessageId,
-    Operations
+    OperationsXml
 )
 VALUES
 (
@@ -38,7 +38,7 @@ delete from [{schema}].[{endpointName}OutboxData] where Dispatched = true And Di
         getCommandText = $@"
 SELECT
     Dispatched,
-    Operations
+    OperationsXml
 FROM [{schema}].[{endpointName}OutboxData]
 WHERE MessageId = @MessageId";
 

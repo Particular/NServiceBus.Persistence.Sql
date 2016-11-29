@@ -28,7 +28,7 @@ INSERT INTO [{schema}].[{endpointName}TimeoutData]
     SagaId,
     State,
     Time,
-    Headers,
+    HeadersXml,
     PersistenceVersion
 )
 VALUES
@@ -57,7 +57,7 @@ SELECT
     SagaId,
     State,
     Time,
-    Headers
+    HeadersXml
 FROM [{schema}].[{endpointName}TimeoutData]
 WHERE Id = @Id";
 

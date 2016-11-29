@@ -25,7 +25,11 @@ class Program
 
                 if (key.Key == ConsoleKey.S)
                 {
-                    await endpoint.SendLocal(new StartSagaMessage());
+                    var startSagaMessage = new StartSagaMessage
+                    {
+                        MySagaId = Guid.NewGuid()
+                    };
+                    await endpoint.SendLocal(startSagaMessage);
                     continue;
                 }
                 if (key.Key == ConsoleKey.D)

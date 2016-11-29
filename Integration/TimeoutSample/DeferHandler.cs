@@ -9,7 +9,7 @@ public class DeferHandler : IHandleMessages<DeferMessage>
 
     public Task Handle(DeferMessage message, IMessageHandlerContext context)
     {
-        logger.Info("Received DeferMessage  "+ message.Property);
+        logger.Info($"Received DeferMessage {message.Property}");
         return Task.FromResult(0);
     }
 

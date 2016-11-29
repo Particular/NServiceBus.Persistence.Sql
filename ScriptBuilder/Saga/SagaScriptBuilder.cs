@@ -195,7 +195,7 @@ SET @createTable = '
         [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
         [Originator] [nvarchar](255),
         [OriginalMessageId] [nvarchar](255),
-        [Data] [xml] NOT NULL,
+        [DataXml] [xml] NOT NULL,
         [PersistenceVersion] [nvarchar](23) NOT NULL,
         [SagaTypeVersion] [nvarchar](23) NOT NULL
     )

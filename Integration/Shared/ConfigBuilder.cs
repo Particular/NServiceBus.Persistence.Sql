@@ -6,7 +6,7 @@ public static class ConfigBuilder
 {
     public static EndpointConfiguration Build(string enpointName)
     {
-        var configuration = new EndpointConfiguration("SqlPersistence.Sample" + enpointName);
+        var configuration = new EndpointConfiguration($"SqlPersistence.Sample{enpointName}");
         configuration.UseSerialization<JsonSerializer>();
         configuration.EnableInstallers();
         configuration.UsePersistence<InMemoryPersistence>();
