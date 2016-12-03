@@ -34,16 +34,6 @@ class Program
                 }
                 if (key.Key == ConsoleKey.D)
                 {
-                    var deferMessage = new DeferMessage
-                    {
-                        Property = "PropertyValue"
-                    };
-
-                    var options = new SendOptions();
-
-                    options.RouteToThisEndpoint();
-                    options.DelayDeliveryWith(TimeSpan.FromSeconds(2));
-                    await endpoint.Send(deferMessage, options);
                     continue;
                 }
                 return;

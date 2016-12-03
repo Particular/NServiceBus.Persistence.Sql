@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using SqlVarient = NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient;
 
 [TestFixture]
 public class MsmqTransportIntegrationTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    static string connection = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "MsmqTransportIntegration";
 
@@ -35,14 +38,16 @@ public class MsmqTransportIntegrationTests
                 type: CorrelationPropertyType.Guid
             )
         );
-        await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
+
+        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, SqlVarient.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, SqlVarient.MsSqlServer));
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<MsmqTransportIntegrationTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<MsmqTransport>();
         transport.Transactions(transactionMode);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionString(connectionString);
+        persistence.ConnectionString(connection);
         persistence.DisableInstaller();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);
@@ -53,6 +58,21 @@ public class MsmqTransportIntegrationTests
         await endpoint.SendLocal(startSagaMessage);
         ManualResetEvent.WaitOne();
         await endpoint.Stop();
+    }
+
+    void Execute(string script)
+    {
+        using (var sqlConnection = new SqlConnection(connection))
+        {
+            sqlConnection.Open();
+            using (var command = sqlConnection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.AddParameter("schema", "dbo");
+                command.AddParameter("endpointName", $"{endpointName}.");
+                command.ExecuteNonQuery();
+            }
+        }
     }
 
     public class StartSagaMessage : IMessage
@@ -67,7 +87,7 @@ public class MsmqTransportIntegrationTests
     [SqlSaga(
          correlationProperty: nameof(SagaData.StartId)
      )]
-    public class Saga1 : Saga<Saga1.SagaData>,
+    public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
     {
@@ -80,7 +100,7 @@ public class MsmqTransportIntegrationTests
         {
             MarkAsComplete();
             ManualResetEvent.Set();
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public class SagaData : ContainSagaData
@@ -88,11 +108,11 @@ public class MsmqTransportIntegrationTests
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
-            mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId)
-                .ToSaga(data => data.StartId);
+            mapper.MapMessage<StartSagaMessage>(message => message.StartId);
         }
+
     }
 
     class MessageToReply : IMessage

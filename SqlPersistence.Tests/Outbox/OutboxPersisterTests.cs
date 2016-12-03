@@ -1,29 +1,32 @@
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus.Outbox;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-#if (!DEBUG)
-[Explicit]
-#endif
 public class OutboxPersisterTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
-    static string endpointName = "Endpoint";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     OutboxPersister persister;
+    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
 
-    [SetUp]
-    public async Task SetUp()
+    public OutboxPersisterTests()
     {
-        await DbBuilder.ReCreate(connectionString, endpointName);
         persister = new OutboxPersister(
-            connectionBuilder: () => SqlHelpers.New(connectionString), 
-            schema: "dbo", 
-            endpointName: $"{endpointName}.", 
+            connectionBuilder: () =>
+            {
+                DbConnection connection = new SqlConnection(connectionString);
+                connection.Open();
+                return Task.FromResult(connection);
+            },
+            schema: "dbo",
+            endpointName: "Endpoint",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>
@@ -31,6 +34,13 @@ public class OutboxPersisterTests
                 var writer = new StringWriter(builder);
                 return new JsonTextWriter(writer);
             });
+    }
+
+    [SetUp]
+    public void Setup()
+    {
+        Execute(OutboxScriptBuilder.BuildDropScript(sqlVarient));
+        Execute(OutboxScriptBuilder.BuildCreateScript(sqlVarient));
     }
 
     [Test]
@@ -109,5 +119,20 @@ public class OutboxPersisterTests
             transaction.Commit();
         }
         return await persister.Get(messageId, null);
+    }
+    
+    void Execute(string script)
+    {
+        using (var connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.AddParameter("schema", "dbo");
+                command.AddParameter("endpointName", "Endpoint");
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

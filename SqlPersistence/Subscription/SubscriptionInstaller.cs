@@ -16,19 +16,20 @@ class SubscriptionInstaller : INeedToInstallSomething
         this.settings = settings;
     }
 
-    public async Task Install(string identity)
+    public Task Install(string identity)
     {
         if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
-            return;
+            return Task.FromResult(0);
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
+        var sqlVarient = settings.GetSqlVarient();
 
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Subscriptions>();
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Subscription_Create.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Subscription_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: command =>
+        return SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
+            manipulateCommand: command =>
             {
                 command.AddParameter("schema", settings.GetSchema<StorageType.Subscriptions>());
                 command.AddParameter("endpointName", endpointName);

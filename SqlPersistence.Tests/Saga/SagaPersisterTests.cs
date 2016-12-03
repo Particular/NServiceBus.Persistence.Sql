@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -19,7 +20,7 @@ public class SagaPersisterTests
     SagaPersister persister;
 
     [SetUp]
-    public async Task SetUp()
+    public void SetUp()
     {
         var sagaWithCorrelation = new SagaDefinition(
             tableSuffix: "SagaWithCorrelation",
@@ -39,7 +40,7 @@ public class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
-        await DbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
+        SagaDbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null, 

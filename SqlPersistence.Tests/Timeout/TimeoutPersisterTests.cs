@@ -1,30 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-#if (!DEBUG)
-[Explicit]
-#endif
 public class TimeoutPersisterTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
-    static string endpointName = "Endpoint";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     TimeoutPersister persister;
+    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
 
-    [SetUp]
-    public async Task SetUp()
+    Func<Task<DbConnection>> connectionBuilder;
+    public TimeoutPersisterTests()
     {
-        await DbBuilder.ReCreate(connectionString, endpointName);
+        connectionBuilder = async () =>
+        {
+            DbConnection connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+            return connection;
+        };
         persister = new TimeoutPersister(
-            connectionBuilder: () => SqlHelpers.New(connectionString), 
+            connectionBuilder: connectionBuilder, 
             schema: "dbo", 
-            endpointName: $"{endpointName}.",
+            endpointName: "Endpoint",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>
@@ -32,6 +37,13 @@ public class TimeoutPersisterTests
                 var writer = new StringWriter(builder);
                 return new JsonTextWriter(writer);
             });
+    }
+
+    [SetUp]
+    public async Task Setup()
+    {
+        await Execute(TimeoutScriptBuilder.BuildDropScript(sqlVarient));
+        await Execute(TimeoutScriptBuilder.BuildCreateScript(sqlVarient));
     }
 
     [Test]
@@ -116,5 +128,17 @@ public class TimeoutPersisterTests
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+    }
+
+    async Task Execute(string script)
+    {
+        using (var connection = await connectionBuilder())
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = script;
+            command.AddParameter("schema", "dbo");
+            command.AddParameter("endpointName", "Endpoint");
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }

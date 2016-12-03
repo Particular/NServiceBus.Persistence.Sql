@@ -58,25 +58,45 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="ResourceReader.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationProperty.cs" />
     <Compile Include="Saga\CorrelationPropertyType.cs" />
+    <Compile Include="Saga\CorrelationPropertyTypeConverter.cs" />
+    <Compile Include="Saga\ISagaScriptWriter.cs" />
+    <Compile Include="Saga\Writers\MySqlSagaScriptWriter.cs" />
+    <Compile Include="Saga\Writers\PostgreSqlSagaScriptWriter.cs" />
     <Compile Include="Saga\SagaDefinition.cs" />
     <Compile Include="Saga\SagaDefinitionReader.cs" />
     <Compile Include="Saga\SagaDefinitionValidator.cs" />
+    <Compile Include="Saga\Writers\MsSqlServerSagaScriptWriter.cs" />
     <Compile Include="Saga\SagaScriptBuilder.cs" />
-    <Compile Include="SubscriptionScriptBuilder.cs" />
-    <Compile Include="OutboxScriptBuilder.cs" />
-    <Compile Include="TimeoutScriptBuilder.cs" />
+    <Compile Include="SqlVarient.cs" />
+    <Compile Include="SqlVarientReader.cs" />
+    <Compile Include="Subscription\SubscriptionScriptBuilder.cs" />
+    <Compile Include="Outbox\OutboxScriptBuilder.cs" />
+    <Compile Include="Timeout\TimeoutScriptBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <EmbeddedResource Include="OutboxDrop.sql" />
-    <EmbeddedResource Include="OutboxCreate.sql" />
-    <EmbeddedResource Include="SubscriptionCreate.sql" />
-    <EmbeddedResource Include="SubscriptionDrop.sql" />
-    <EmbeddedResource Include="TimeoutCreate.sql" />
-    <EmbeddedResource Include="TimeoutDrop.sql" />
+    <EmbeddedResource Include="Timeout\Drop_MySql.sql" />
+    <EmbeddedResource Include="Timeout\Create_MySql.sql" />
+    <EmbeddedResource Include="Subscription\Drop_MySql.sql" />
+    <EmbeddedResource Include="Subscription\Create_MySql.sql" />
+    <EmbeddedResource Include="Outbox\Create_MySql.sql" />
+    <EmbeddedResource Include="Outbox\Drop_MySql.sql" />
+    <EmbeddedResource Include="Timeout\Drop_PostgreSql.sql" />
+    <EmbeddedResource Include="Timeout\Create_PostgreSql.sql" />
+    <EmbeddedResource Include="Subscription\Drop_PostgreSql.sql" />
+    <EmbeddedResource Include="Subscription\Create_PostgreSql.sql" />
+    <EmbeddedResource Include="Outbox\Create_PostgreSql.sql" />
+    <EmbeddedResource Include="Outbox\Drop_PostgreSql.sql" />
+    <EmbeddedResource Include="Outbox\Drop_MsSqlServer.sql" />
+    <EmbeddedResource Include="Outbox\Create_MsSqlServer.sql" />
+    <EmbeddedResource Include="Subscription\Create_MsSqlServer.sql" />
+    <EmbeddedResource Include="Subscription\Drop_MsSqlServer.sql" />
+    <EmbeddedResource Include="Timeout\Create_MsSqlServer.sql" />
+    <EmbeddedResource Include="Timeout\Drop_MsSqlServer.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

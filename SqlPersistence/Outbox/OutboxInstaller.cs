@@ -16,20 +16,21 @@ class OutboxInstaller : INeedToInstallSomething
         this.settings = settings;
     }
 
-    public async Task Install(string identity)
+    public Task Install(string identity)
     {
         if (!settings.ShouldInstall<StorageType.Outbox>())
         {
-            return;
+            return Task.FromResult(0);
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
 
+        var sqlVarient = settings.GetSqlVarient();
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
 
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Outbox_Create.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: command =>
+        return SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
+            manipulateCommand: command =>
             {
                 command.AddParameter("schema", settings.GetSchema<StorageType.Outbox>());
                 command.AddParameter("endpointName", endpointName);

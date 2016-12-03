@@ -1,27 +1,40 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-#if (!DEBUG)
-[Explicit]
-#endif
 public class SubscriptionPersisterTests
 {
-
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
-    static string endpointName = "Endpoint";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     SubscriptionPersister persister;
+    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+
+    public SubscriptionPersisterTests()
+    {
+        persister = new SubscriptionPersister(
+            connectionBuilder: () =>
+            {
+                DbConnection connection = new SqlConnection(connectionString);
+                connection.Open();
+                return Task.FromResult(connection);
+            },
+            schema: "dbo",
+            endpointName: "Endpoint"
+            );
+    }
 
     [SetUp]
-    public async Task SetUp()
+    public void Setup()
     {
-        await DbBuilder.ReCreate(connectionString, endpointName);
-        persister = new SubscriptionPersister(() => SqlHelpers.New(connectionString), "dbo", $"{endpointName}.");
+        Execute(SubscriptionScriptBuilder.BuildDropScript(sqlVarient));
+        Execute(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient));
     }
 
     [Test]
@@ -80,4 +93,20 @@ public class SubscriptionPersisterTests
         var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
         ObjectApprover.VerifyWithJson(result);
     }
+
+    void Execute(string script)
+    {
+        using (var connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.AddParameter("schema", "dbo");
+                command.AddParameter("endpointName", "Endpoint");
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
 }

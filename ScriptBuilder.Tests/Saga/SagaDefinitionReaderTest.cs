@@ -2,6 +2,7 @@
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 
@@ -13,7 +14,8 @@ public class SagaDefinitionReaderTest
     public SagaDefinitionReaderTest()
     {
         var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
-        module = ModuleDefinition.ReadModule(path);
+        var readerParameters = new ReaderParameters(ReadingMode.Deferred);
+        module = ModuleDefinition.ReadModule(path, readerParameters);
     }
 
     [Test]

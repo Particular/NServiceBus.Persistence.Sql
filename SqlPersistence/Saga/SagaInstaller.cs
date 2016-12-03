@@ -27,7 +27,8 @@ class SagaInstaller : INeedToInstallSomething
         var connectionString = settings.GetConnectionBuilder<StorageType.Sagas>();
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Sagas>();
 
-        var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(), "Sagas");
+        var sqlVarient = settings.GetSqlVarient();
+        var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
             log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
@@ -40,7 +41,7 @@ class SagaInstaller : INeedToInstallSomething
             .Select(File.ReadAllText);
 
         return SqlHelpers.Execute(connectionString, sagaScripts,
-            manipulateParameters: dbCommand =>
+            manipulateCommand: dbCommand =>
             {
                 dbCommand.AddParameter("schema", settings.GetSchema<StorageType.Sagas>());
                 dbCommand.AddParameter("endpointName", endpointName);

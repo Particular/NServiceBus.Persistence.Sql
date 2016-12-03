@@ -76,9 +76,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeferHandler.cs" />
-    <Compile Include="SagaTimoutMessage.cs" />
-    <Compile Include="DeferMessage.cs" />
     <Compile Include="MySaga.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="StartSagaMessage.cs" />

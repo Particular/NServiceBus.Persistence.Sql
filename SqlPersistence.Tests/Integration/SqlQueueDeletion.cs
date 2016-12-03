@@ -1,10 +1,9 @@
 using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 
 static class SqlQueueDeletion
 {
-    public static async Task DeleteQueue(DbConnection connection, string schema, string queueName)
+    static void DeleteQueue(DbConnection connection, string schema, string queueName)
     {
         var deleteScript = $@"
                     IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{schema}].[{queueName}]') AND type in (N'U'))
@@ -12,26 +11,17 @@ static class SqlQueueDeletion
         using (var command = connection.CreateCommand())
         {
             command.CommandText = deleteScript;
-            await command.ExecuteNonQueryAsync();
+            command.ExecuteNonQuery();
         }
     }
 
-    public static async Task DeleteQueuesForEndpoint(DbConnection connection, string schema, string endpointName)
+    public static void DeleteQueuesForEndpoint(DbConnection connection, string schema, string endpointName)
     {
-        //main queue
-        await DeleteQueue(connection, schema, endpointName);
-
-        //callback queue
-        await DeleteQueue(connection, schema, $"{endpointName}.{Environment.MachineName}");
-
-        //retries queue
-        await DeleteQueue(connection, schema, $"{endpointName}.Retries");
-
-        //timeout queue
-        await DeleteQueue(connection, schema, $"{endpointName}.Timeouts");
-
-        //timeout dispatcher queue
-        await DeleteQueue(connection, schema, $"{endpointName}.TimeoutsDispatcher");
+        DeleteQueue(connection, schema, endpointName);
+        DeleteQueue(connection, schema, $"{endpointName}.{Environment.MachineName}");
+        DeleteQueue(connection, schema, $"{endpointName}.Retries");
+        DeleteQueue(connection, schema, $"{endpointName}.Timeouts");
+        DeleteQueue(connection, schema, $"{endpointName}.TimeoutsDispatcher");
     }
 
 }

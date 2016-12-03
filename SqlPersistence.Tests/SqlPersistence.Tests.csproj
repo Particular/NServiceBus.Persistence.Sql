@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SqlPersistence.Tests</RootNamespace>
     <AssemblyName>SqlPersistence.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -103,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="DbBuilder.cs" />
+    <Compile Include="SagaTableRebuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
     <Compile Include="Integration\EndpointConfigurationExtensions.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="Integration\TypeScanner.cs" />
     <Compile Include="Outbox\OperationConverterTests.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
+    <Compile Include="Saga\DbBuilder.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
     <Compile Include="Saga\SqlSagaTests.cs" />

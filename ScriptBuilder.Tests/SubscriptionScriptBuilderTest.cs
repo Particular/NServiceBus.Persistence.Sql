@@ -1,35 +1,45 @@
 using System.IO;
 using System.Text;
 using ApprovalTests;
-using NServiceBus.Persistence.Sql;
+using ApprovalTests.Namers;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
 public class SubscriptionScriptBuilderTest
 {
     [Test]
-    public void BuildCreateScript()
+    [TestCase(SqlVarient.MsSqlServer)]
+    public void BuildCreateScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreateScript(writer);
+            SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVarient);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
-        Approvals.Verify(script);
+
+        using (ApprovalResults.ForScenario(sqlVarient))
+        {
+            Approvals.Verify(script);
+        }
     }
 
     [Test]
-    public void BuildDropScript()
+    [TestCase(SqlVarient.MsSqlServer)]
+    public void BuildDropScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDropScript(writer);
+            SubscriptionScriptBuilder.BuildDropScript(writer, sqlVarient);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
-        Approvals.Verify(script);
+        using (ApprovalResults.ForScenario(sqlVarient))
+        {
+            Approvals.Verify(script);
+        }
     }
 }

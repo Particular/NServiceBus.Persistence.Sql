@@ -75,6 +75,8 @@
       <Link>Guard.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
+    <Compile Include="Config\SqlVarientConfig.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />
@@ -88,6 +90,8 @@
     <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\SqlSagaAttributeData.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
+    <Compile Include="SqlPersistenceSettingsAttribute.cs" />
+    <Compile Include="SqlVarients.cs" />
     <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
@@ -111,7 +115,7 @@
     <Compile Include="SqlHelpers.cs" />
     <Compile Include="SqlPersistence.cs" />
     <Compile Include="Saga\SqlSagaFeature.cs" />
-    <Compile Include="SqlPersistenceConfig.cs" />
+    <Compile Include="Config\SqlPersistenceConfig.cs" />
     <Compile Include="Subscription\SqlSubscriptionFeature.cs" />
     <Compile Include="Timeout\TimeoutInstaller.cs" />
     <Compile Include="Timeout\SqlTimeoutFeature.cs" />

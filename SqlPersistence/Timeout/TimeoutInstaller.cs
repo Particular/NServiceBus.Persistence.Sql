@@ -16,20 +16,21 @@ class TimeoutInstaller : INeedToInstallSomething
         this.settings = settings;
     }
 
-    public async Task Install(string identity)
+    public Task Install(string identity)
     {
         if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
-            return;
+            return Task.FromResult(0);
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Timeouts>();
 
+        var sqlVarient = settings.GetSqlVarient();
         var endpointName = settings.GetEndpointNamePrefix<StorageType.Timeouts>();
 
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(), "Timeout_Create.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Timeout_Create.sql");
         log.Info($"Executing '{createScript}'");
-        await SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateParameters: command =>
+        return SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
+            manipulateCommand: command =>
             {
                 command.AddParameter("schema", settings.GetSchema<StorageType.Timeouts>());
                 command.AddParameter("endpointName", endpointName);

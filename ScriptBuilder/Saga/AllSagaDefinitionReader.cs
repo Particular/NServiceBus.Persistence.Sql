@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class AllSagaDefinitionReader
 {

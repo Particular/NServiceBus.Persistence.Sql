@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
 using NUnit.Framework;
 
@@ -28,11 +30,12 @@ END";
 
     [SetUp]
     [TearDown]
-    public async Task Setup()
+    public void Setup()
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = new SqlConnection(connectionString))
         {
-            await SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
+            connection.Open();
+            SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
         }
     }
 
@@ -68,13 +71,41 @@ END";
         });
     }
 
+
+    void Execute(string endpointName, string script)
+    {
+        using (var sqlConnection = new SqlConnection(connectionString))
+        {
+            sqlConnection.Open();
+            using (var command = sqlConnection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.AddParameter("schema", "dbo");
+                command.AddParameter("endpointName", $"{endpointName}.");
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+    void Execute(string script)
+    {
+        using (var sqlConnection = new SqlConnection(connectionString))
+        {
+            sqlConnection.Open();
+            using (var command = sqlConnection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.ExecuteNonQuery();
+            }
+        }
+    }
     async Task RunTest(Action<EndpointConfiguration> testCase)
     {
         manualResetEvent.Reset();
         string message = null;
-        await DbBuilder.ReCreate(connectionString, endpointName);
 
-        await SqlHelpers.Execute(connectionString, createUserDataTableText, collection => {});
+        Execute(endpointName, OutboxScriptBuilder.BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient.MsSqlServer));
+        Execute(endpointName, OutboxScriptBuilder.BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient.MsSqlServer));
+        Execute(createUserDataTableText);
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();

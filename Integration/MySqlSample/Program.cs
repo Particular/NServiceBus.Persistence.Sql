@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -11,47 +10,18 @@ class Program
         Start().GetAwaiter().GetResult();
     }
 
-    static async Task Start()
+    static Task Start()
     {
-        var endpointConfiguration = new EndpointConfiguration("SqlPersistence.Sample.MySql");
-        endpointConfiguration.UseSerialization<JsonSerializer>();
-        endpointConfiguration.EnableInstallers();
-
-
-        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(async () =>
+        return EndpointStarter.Start("SqlPersistence.Sample.MySql", persistence =>
         {
-            var connectionString = "server=localhost;user=root;database=sqlpersistencesample;port=3306;password=Password1;";
-            var connection = new MySqlConnection(connectionString);
-            await connection.OpenAsync();
-            return connection;
-        });
-
-        var endpoint = await Endpoint.Start(endpointConfiguration);
-        Console.WriteLine("Press 'Enter' to start a saga");
-        Console.WriteLine("Press any other key to exit");
-        try
-        {
-            while (true)
+            persistence.SqlVarient(SqlVarient.MySql);
+            persistence.ConnectionBuilder(async () =>
             {
-                var key = Console.ReadKey();
-                Console.WriteLine();
-
-                if (key.Key != ConsoleKey.Enter)
-                {
-                    return;
-                }
-                var startSagaMessage = new StartSagaMessage
-                {
-                    MySagaId = Guid.NewGuid()
-                };
-                await endpoint.SendLocal(startSagaMessage);
-            }
-        }
-        finally
-        {
-            await endpoint.Stop();
-        }
-
+                var connectionString = "server=localhost;user=root;database=sqlpersistencesample;port=3306;password=Password1;Allow User Variables=True";
+                var connection = new MySqlConnection(connectionString);
+                await connection.OpenAsync();
+                return connection;
+            });
+        });
     }
 }

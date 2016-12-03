@@ -15,16 +15,9 @@ static class MsmqQueueDeletion
 
     public static void DeleteQueuesForEndpoint(string endpointName)
     {
-        //main queue
         DeleteQueue(endpointName);
-
-        //retries queue
         DeleteQueue($"{endpointName}.retries");
-
-        //timeout queue
         DeleteQueue($"{endpointName}.timeouts");
-
-        //timeout dispatcher queue
         DeleteQueue($"{endpointName}.timeoutsdispatcher");
     }
 }

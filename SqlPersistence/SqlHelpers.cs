@@ -14,25 +14,28 @@ class SqlHelpers
         return connection;
     }
 
-    internal static Task Execute(Func<Task<DbConnection>> connectionBuilder, string script, Action<DbCommand> manipulateParameters)
+    internal static Task Execute(Func<Task<DbConnection>> connectionBuilder, string script, Action<DbCommand> manipulateCommand)
     {
-        return Execute(connectionBuilder, new List<string> { script }, manipulateParameters);
-    }
-    internal static Task Execute(string connection, string script, Action<DbCommand> manipulateParameters)
-    {
-        return Execute(() => New(connection), new List<string> { script }, manipulateParameters);
+        return Execute(connectionBuilder, new List<string> {script}, manipulateCommand);
     }
 
-    internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, IEnumerable<string> scripts, Action<DbCommand> manipulateParameters)
+    internal static Task Execute(string connection, string script, Action<DbCommand> manipulateCommand)
+    {
+        return Execute(() => New(connection), new List<string> {script}, manipulateCommand);
+    }
+
+    internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, IEnumerable<string> scripts, Action<DbCommand> manipulateCommand)
     {
         using (var connection = await connectionBuilder())
         {
             foreach (var script in scripts)
             {
+                //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
+                // throw and hint to add 'Allow User Variables=True' to connection string
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = script;
-                    manipulateParameters(command);
+                    manipulateCommand(command);
                     await command.ExecuteNonQueryEx();
                 }
             }

@@ -1,36 +1,44 @@
 using System.IO;
 using System.Text;
 using ApprovalTests;
-using NServiceBus.Persistence.Sql;
+using ApprovalTests.Namers;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
 public class TimeoutScriptBuilderTest
 {
     [Test]
-    public void BuildCreateScript()
+    [TestCase(SqlVarient.MsSqlServer)]
+    public void BuildCreateScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreateScript(writer);
+            TimeoutScriptBuilder.BuildCreateScript(writer, sqlVarient);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
-        Approvals.Verify(script);
+        using (ApprovalResults.ForScenario(sqlVarient))
+        {
+            Approvals.Verify(script);
+        }
     }
 
     [Test]
-    public void BuildDropScript()
+    [TestCase(SqlVarient.MsSqlServer)]
+    public void BuildDropScript(SqlVarient sqlVarient)
     {
-
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDropScript(writer);
+            TimeoutScriptBuilder.BuildDropScript(writer, sqlVarient);
         }
         var script = builder.ToString();
         SqlValidator.Validate(script);
-        Approvals.Verify(script);
+        using (ApprovalResults.ForScenario(sqlVarient))
+        {
+            Approvals.Verify(script);
+        }
     }
 }

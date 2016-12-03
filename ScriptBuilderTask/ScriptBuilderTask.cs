@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 namespace NServiceBus.Persistence.Sql
 {
@@ -55,13 +56,13 @@ namespace NServiceBus.Persistence.Sql
         {
             if (!File.Exists(AssemblyPath))
             {
-                logger.LogError($"AssemblyPath \"{AssemblyPath}\" does not exist.");
+                logger.LogError($"AssemblyPath '{AssemblyPath}' does not exist.");
                 return false;
             }
 
             if (!Directory.Exists(IntermediateDirectory))
             {
-                logger.LogError($"IntermediateDirectory \"{IntermediateDirectory}\" does not exist.");
+                logger.LogError($"IntermediateDirectory '{IntermediateDirectory}' does not exist.");
                 return false;
             }
             return true;
@@ -69,17 +70,33 @@ namespace NServiceBus.Persistence.Sql
 
         void Inner()
         {
-            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql");
-            Directory.CreateDirectory(scriptPath);
-            WriteSagaScripts(scriptPath);
-            WriteTimeoutScript(scriptPath);
-            WriteSubscriptionScript(scriptPath);
-            WriteOutboxScript(scriptPath);
+            var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
+            var sqlVarient = SqlVarientReader.Read(moduleDefinition);
+
+            if (sqlVarient != null)
+            {
+                Write(moduleDefinition, sqlVarient.Value);
+                return;
+            }
+
+            foreach (SqlVarient varient in Enum.GetValues(typeof(SqlVarient)))
+            {
+                Write(moduleDefinition, varient);
+            }
         }
 
-        void WriteSagaScripts(string scriptPath)
+        void Write(ModuleDefinition moduleDefinition, SqlVarient sqlVarient)
         {
-            var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath);
+            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVarient.ToString());
+            Directory.CreateDirectory(scriptPath);
+            WriteSagaScripts(scriptPath, moduleDefinition, sqlVarient);
+            WriteTimeoutScript(scriptPath, sqlVarient);
+            WriteSubscriptionScript(scriptPath, sqlVarient);
+            WriteOutboxScript(scriptPath, sqlVarient);
+        }
+
+        void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, SqlVarient sqlVarient)
+        {
             var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
             Directory.CreateDirectory(sagasScriptPath);
@@ -100,63 +117,63 @@ namespace NServiceBus.Persistence.Sql
                 File.Delete(createPath);
                 using (var writer = File.CreateText(createPath))
                 {
-                    SagaScriptBuilder.BuildCreateScript(saga, writer);
+                    SagaScriptBuilder.BuildCreateScript(saga, sqlVarient, writer);
                 }
 
                 var dropPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Drop.sql");
                 File.Delete(dropPath);
                 using (var writer = File.CreateText(dropPath))
                 {
-                    SagaScriptBuilder.BuildDropScript(saga, writer);
+                    SagaScriptBuilder.BuildDropScript(saga, sqlVarient, writer);
                 }
             }
         }
 
-        static void WriteTimeoutScript(string scriptPath)
+        static void WriteTimeoutScript(string scriptPath, SqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Timeout_Create.sql");
             File.Delete(createPath);
             using (var writer = File.CreateText(createPath))
             {
-                TimeoutScriptBuilder.BuildCreateScript(writer);
+                TimeoutScriptBuilder.BuildCreateScript(writer, sqlVarient);
             }
             var dropPath = Path.Combine(scriptPath, "Timeout_Drop.sql");
             File.Delete(dropPath);
             using (var writer = File.CreateText(dropPath))
             {
-                TimeoutScriptBuilder.BuildDropScript(writer);
+                TimeoutScriptBuilder.BuildDropScript(writer, sqlVarient);
             }
         }
 
-        static void WriteOutboxScript(string scriptPath)
+        static void WriteOutboxScript(string scriptPath, SqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
             File.Delete(createPath);
             using (var writer = File.CreateText(createPath))
             {
-                OutboxScriptBuilder.BuildCreateScript(writer);
+                OutboxScriptBuilder.BuildCreateScript(writer, sqlVarient);
             }
             var dropPath = Path.Combine(scriptPath, "Outbox_Drop.sql");
             File.Delete(dropPath);
             using (var writer = File.CreateText(dropPath))
             {
-                OutboxScriptBuilder.BuildDropScript(writer);
+                OutboxScriptBuilder.BuildDropScript(writer, sqlVarient);
             }
         }
 
-        static void WriteSubscriptionScript(string scriptPath)
+        static void WriteSubscriptionScript(string scriptPath, SqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Subscription_Create.sql");
             File.Delete(createPath);
             using (var writer = File.CreateText(createPath))
             {
-                SubscriptionScriptBuilder.BuildCreateScript(writer);
+                SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVarient);
             }
             var dropPath = Path.Combine(scriptPath, "Subscription_Drop.sql");
             File.Delete(dropPath);
             using (var writer = File.CreateText(dropPath))
             {
-                SubscriptionScriptBuilder.BuildCreateScript(writer);
+                SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVarient);
             }
         }
 

@@ -1,27 +1,31 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
 using NUnit.Framework;
+using SqlVarient = NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient;
 
 [TestFixture]
 public class SagaConsistencyTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 
     [SetUp]
     [TearDown]
-    public async Task Setup()
+    public void Setup()
     {
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = new SqlConnection(connectionString))
         {
-            await SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
+            connection.Open();
+            SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
         }
     }
 
@@ -82,7 +86,11 @@ public class SagaConsistencyTests
                 type: CorrelationPropertyType.Guid
             )
         );
-        await DbBuilder.ReCreate(connectionString, endpointName, sagaDefinition);
+
+        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, SqlVarient.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildDropScript(SqlVarient.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, SqlVarient.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildCreateScript(SqlVarient.MsSqlServer));
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SagaConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
@@ -96,7 +104,7 @@ public class SagaConsistencyTests
         {
             message = c.Error;
             ManualResetEvent.Set();
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         });
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
         endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");
@@ -121,6 +129,22 @@ public class SagaConsistencyTests
         Assert.AreEqual("Success", message);
     }
 
+
+    void Execute(string script)
+    {
+        using (var sqlConnection = new SqlConnection(connectionString))
+        {
+            sqlConnection.Open();
+            using (var command = sqlConnection.CreateCommand())
+            {
+                command.CommandText = script;
+                command.AddParameter("schema", "dbo");
+                command.AddParameter("endpointName", $"{endpointName}.");
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
     class FailureTrigger : Behavior<IIncomingLogicalMessageContext>
     {
         public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
@@ -130,8 +154,6 @@ public class SagaConsistencyTests
             {
                 throw new Exception("Boom!");
             }
-
-
         }
     }
 
@@ -163,7 +185,7 @@ public class SagaConsistencyTests
     [SqlSaga(
          correlationProperty: nameof(SagaData.CorrelationId)
      )]
-    public class Saga1 : Saga<Saga1.SagaData>,
+    public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleMessages<FailingMessage>,
         IHandleMessages<CheckMessage>
@@ -176,25 +198,22 @@ public class SagaConsistencyTests
             public bool PersistedFailingMessageResult { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
-            mapper.ConfigureMapping<StartSagaMessage>(m => m.SagaId)
-                .ToSaga(data => data.CorrelationId);
-            mapper.ConfigureMapping<FailingMessage>(m => m.SagaId)
-                .ToSaga(data => data.CorrelationId);
-            mapper.ConfigureMapping<CheckMessage>(m => m.SagaId)
-                .ToSaga(data => data.CorrelationId);
+            mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
+            mapper.MapMessage<FailingMessage>(m => m.SagaId);
+            mapper.MapMessage<CheckMessage>(m => m.SagaId);
         }
 
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             Data.PersistedFailingMessageResult = true;
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public Task Handle(CheckMessage message, IMessageHandlerContext context)
@@ -207,7 +226,7 @@ public class SagaConsistencyTests
             {
                 CriticalError.Raise("Success", new Exception());
             }
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }
