@@ -120,7 +120,7 @@ END";
         {
             message = c.Error;
             manualResetEvent.Set();
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         });
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
         endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");

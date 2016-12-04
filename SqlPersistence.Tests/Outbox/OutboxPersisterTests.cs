@@ -23,7 +23,7 @@ public class OutboxPersisterTests
             {
                 DbConnection connection = new SqlConnection(connectionString);
                 connection.Open();
-                return Task.FromResult(connection);
+                return connection.ToTask();
             },
             schema: "dbo",
             endpointName: "Endpoint",

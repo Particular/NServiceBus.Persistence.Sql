@@ -6,4 +6,9 @@ public static class TaskEx
     {
         task.GetAwaiter().GetResult();
     }
+
+    public static Task<T> ToTask<T>(this T target)
+    {
+        return Task.FromResult(target);
+    }
 }

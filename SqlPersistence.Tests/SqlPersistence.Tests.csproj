@@ -103,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="SagaTableRebuilder.cs" />
+    <Compile Include="DataEx.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
     <Compile Include="Integration\EndpointConfigurationExtensions.cs" />

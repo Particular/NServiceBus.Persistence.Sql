@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -23,7 +22,7 @@ public class SubscriptionPersisterTests
             {
                 DbConnection connection = new SqlConnection(connectionString);
                 connection.Open();
-                return Task.FromResult(connection);
+                return connection.ToTask();
             },
             schema: "dbo",
             endpointName: "Endpoint"
