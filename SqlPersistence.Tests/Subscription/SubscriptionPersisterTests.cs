@@ -9,14 +9,17 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class SubscriptionPersisterTests
+public class SubscriptionPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     SubscriptionPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    DbConnection dbConnection;
 
     public SubscriptionPersisterTests()
     {
+        dbConnection = new SqlConnection(connectionString);
+        dbConnection.Open();
         persister = new SubscriptionPersister(
             connectionBuilder: () =>
             {
@@ -25,15 +28,21 @@ public class SubscriptionPersisterTests
                 return connection.ToTask();
             },
             schema: "dbo",
-            tablePrefix: "Endpoint"
+            tablePrefix: $"{nameof(SubscriptionPersisterTests)}."
             );
     }
 
     [SetUp]
     public void Setup()
     {
-        Execute(SubscriptionScriptBuilder.BuildDropScript(sqlVarient));
-        Execute(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient));
+        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
+        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient), nameof(SubscriptionPersisterTests));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
     }
 
     [Test]
@@ -93,19 +102,8 @@ public class SubscriptionPersisterTests
         ObjectApprover.VerifyWithJson(result);
     }
 
-    void Execute(string script)
+    public void Dispose()
     {
-        using (var connection = new SqlConnection(connectionString))
-        {
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = script;
-                command.AddParameter("schema", "dbo");
-                command.AddParameter("tablePrefix", "Endpoint");
-                command.ExecuteNonQuery();
-            }
-        }
+        dbConnection?.Dispose();
     }
-
 }

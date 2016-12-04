@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -10,14 +11,17 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class OutboxPersisterTests
+public class OutboxPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     OutboxPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    DbConnection dbConnection;
 
     public OutboxPersisterTests()
     {
+        dbConnection = new SqlConnection(connectionString);
+        dbConnection.Open();
         persister = new OutboxPersister(
             connectionBuilder: () =>
             {
@@ -26,7 +30,7 @@ public class OutboxPersisterTests
                 return connection.ToTask();
             },
             schema: "dbo",
-            tablePrefix: "Endpoint",
+            tablePrefix: $"{nameof(OutboxPersisterTests)}.",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>
@@ -36,12 +40,20 @@ public class OutboxPersisterTests
             });
     }
 
+
     [SetUp]
     public void Setup()
     {
-        Execute(OutboxScriptBuilder.BuildDropScript(sqlVarient));
-        Execute(OutboxScriptBuilder.BuildCreateScript(sqlVarient));
+        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVarient), nameof(OutboxPersisterTests));
     }
+
+    [TearDown]
+    public void TearDown()
+    {
+        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+    }
+
 
     [Test]
     public void StoreDispatchAndGet()
@@ -69,13 +81,12 @@ public class OutboxPersisterTests
                         "HeaderKey1", "HeaderValue1"
                     }
                 }
-                )
+            )
         };
         var messageId = "a";
-        using (var connection = await SqlHelpers.New(connectionString))
-        using (var transaction = connection.BeginTransaction())
+        using (var transaction = dbConnection.BeginTransaction())
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, dbConnection);
             transaction.Commit();
         }
         await persister.SetAsDispatched(messageId, null);
@@ -108,31 +119,20 @@ public class OutboxPersisterTests
                         "HeaderKey1", "HeaderValue1"
                     }
                 }
-                )
+            )
         };
 
         var messageId = "a";
-        using (var connection = await SqlHelpers.New(connectionString))
-        using (var transaction = connection.BeginTransaction())
+        using (var transaction = dbConnection.BeginTransaction())
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, dbConnection);
             transaction.Commit();
         }
         return await persister.Get(messageId, null);
     }
-    
-    void Execute(string script)
+
+    public void Dispose()
     {
-        using (var connection = new SqlConnection(connectionString))
-        {
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = script;
-                command.AddParameter("schema", "dbo");
-                command.AddParameter("tablePrefix", "Endpoint");
-                command.ExecuteNonQuery();
-            }
-        }
+        dbConnection.Dispose();
     }
 }

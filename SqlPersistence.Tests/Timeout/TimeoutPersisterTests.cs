@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
@@ -11,25 +10,26 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class TimeoutPersisterTests
+public class TimeoutPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     TimeoutPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    DbConnection dbConnection;
 
-    Func<Task<DbConnection>> connectionBuilder;
     public TimeoutPersisterTests()
     {
-        connectionBuilder = async () =>
-        {
-            DbConnection connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-            return connection;
-        };
+        dbConnection = new SqlConnection(connectionString);
+        dbConnection.Open();
         persister = new TimeoutPersister(
-            connectionBuilder: connectionBuilder, 
-            schema: "dbo", 
-            tablePrefix: "Endpoint",
+            connectionBuilder: async () =>
+            {
+                DbConnection connection1 = new SqlConnection(connectionString);
+                await connection1.OpenAsync();
+                return connection1;
+            }, 
+            schema: "dbo",
+            tablePrefix: $"{nameof(TimeoutPersisterTests)}.",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>
@@ -40,10 +40,16 @@ public class TimeoutPersisterTests
     }
 
     [SetUp]
-    public async Task Setup()
+    public void Setup()
     {
-        await Execute(TimeoutScriptBuilder.BuildDropScript(sqlVarient));
-        await Execute(TimeoutScriptBuilder.BuildCreateScript(sqlVarient));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(TimeoutPersisterTests));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
     }
 
     [Test]
@@ -130,15 +136,8 @@ public class TimeoutPersisterTests
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
     }
 
-    async Task Execute(string script)
+    public void Dispose()
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
-        {
-            command.CommandText = script;
-            command.AddParameter("schema", "dbo");
-            command.AddParameter("tablePrefix", "Endpoint");
-            await command.ExecuteNonQueryAsync();
-        }
+        dbConnection?.Dispose();
     }
 }
