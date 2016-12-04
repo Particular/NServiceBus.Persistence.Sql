@@ -1,20 +1,20 @@
 ﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
 
-IF NOT EXISTS (
-    SELECT * FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName)
+if not exists (
+    select * from sys.objects
+    where
+        object_id = object_id(@tableName)
         AND type in (N'U')
 )
-BEGIN
-DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    CREATE TABLE ' + @tableName + '(
-        [MessageId] [nvarchar](1024) NOT NULL PRIMARY KEY,
-        [Dispatched] [bit] NOT NULL DEFAULT 0,
+begin
+declare @createTable nvarchar(max);
+set @createTable = N'
+    create table ' + @tableName + '(
+        [MessageId] [nvarchar](1024)not null primary key,
+        [Dispatched] [bit]not null DEFAULT 0,
         [DispatchedAt] [datetime],
-        [Operations] [nvarchar](max) NOT NULL
+        [Operations] [nvarchar](max)not null
     )
 ';
 exec(@createTable);
-END
+end

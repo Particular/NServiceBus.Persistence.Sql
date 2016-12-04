@@ -1,129 +1,129 @@
 ﻿
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'theSaga]';
 
-IF NOT EXISTS
+if not exists
 (
-    SELECT *
-    FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName) AND
+    select *
+    from sys.objects
+    where
+        object_id = object_id(@tableName) and
         type in ('U')
 )
-BEGIN
-DECLARE @createTable nvarchar(max);
-SET @createTable = '
-    CREATE TABLE ' + @tableName + '(
-        [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+begin
+declare @createTable nvarchar(max);
+set @createTable = '
+    create table ' + @tableName + '(
+        [Id] [uniqueidentifier] not null primary key,
         [Originator] [nvarchar](255),
         [OriginalMessageId] [nvarchar](255),
-        [Data] [nvarchar](max) NOT NULL,
-        [PersistenceVersion] [nvarchar](23) NOT NULL,
-        [SagaTypeVersion] [nvarchar](23) NOT NULL
+        [Data] [nvarchar](max) not null,
+        [PersistenceVersion] [nvarchar](23) not null,
+        [SagaTypeVersion] [nvarchar](23) not null
     )
 ';
 exec(@createTable);
-END
+end
 
-IF NOT EXISTS
+if not exists
 (
-  SELECT * FROM sys.columns
-  WHERE
-    name = 'Correlation_CorrelationProperty' AND
-    object_id = OBJECT_ID(@tableName)
+  select * from sys.columns
+  where
+    name = 'Correlation_CorrelationProperty' and
+    object_id = object_id(@tableName)
 )
-BEGIN
-  DECLARE @createColumn_CorrelationProperty nvarchar(max);
-  SET @createColumn_CorrelationProperty = '
-  ALTER TABLE ' + @tableName  + '
-    ADD Correlation_CorrelationProperty nvarchar(450);
+begin
+  declare @createColumn_CorrelationProperty nvarchar(max);
+  set @createColumn_CorrelationProperty = '
+  alter table ' + @tableName  + '
+    add Correlation_CorrelationProperty nvarchar(450);
   ';
   exec(@createColumn_CorrelationProperty);
-END
+end
 
-DECLARE @dataType_CorrelationProperty nvarchar(max);
-SET @dataType_CorrelationProperty = (
-  SELECT DATA_TYPE
-  FROM INFORMATION_SCHEMA.COLUMNS
-  WHERE
-    TABLE_NAME = ' + @tableName  + ' AND
-    COLUMN_NAME = 'Correlation_CorrelationProperty'
+declare @dataType_CorrelationProperty nvarchar(max);
+set @dataType_CorrelationProperty = (
+  select data_type
+  from information_schema.columns
+  where
+    table_name = ' + @tableName  + ' and
+    column_name = 'Correlation_CorrelationProperty'
 );
-IF (@dataType_CorrelationProperty <> 'nvarchar(450)')
-  THROW 50000, 'Incorrect data type for nvarchar(450)', 0
+if (@dataType_CorrelationProperty <> 'nvarchar(450)')
+  throw 50000, 'Incorrect data type for nvarchar(450)', 0
 
-IF NOT EXISTS
+if not exists
 (
-    SELECT *
-    FROM sys.indexes
-    WHERE
-        name = 'Index_Correlation_CorrelationProperty' AND
-        object_id = OBJECT_ID(@tableName)
+    select *
+    from sys.indexes
+    where
+        name = 'Index_Correlation_CorrelationProperty' and
+        object_id = object_id(@tableName)
 )
-BEGIN
-  DECLARE @createIndex_CorrelationProperty nvarchar(max);
-  SET @createIndex_CorrelationProperty = '
-  CREATE UNIQUE NONCLUSTERED INDEX Index_Correlation_CorrelationProperty
-  ON ' + @tableName  + '(Correlation_CorrelationProperty)
-  WHERE Correlation_CorrelationProperty IS NOT NULL;
+begin
+  declare @createIndex_CorrelationProperty nvarchar(max);
+  set @createIndex_CorrelationProperty = '
+  create unique nonclustered index Index_Correlation_CorrelationProperty
+  on ' + @tableName  + '(Correlation_CorrelationProperty)
+  where Correlation_CorrelationProperty is not null;
 ';
   exec(@createIndex_CorrelationProperty);
-END
+end
 
-IF NOT EXISTS
+if not exists
 (
-  SELECT * FROM sys.columns
-  WHERE
-    name = 'Correlation_TransitionalProperty' AND
-    object_id = OBJECT_ID(@tableName)
+  select * from sys.columns
+  where
+    name = 'Correlation_TransitionalProperty' and
+    object_id = object_id(@tableName)
 )
-BEGIN
-  DECLARE @createColumn_TransitionalProperty nvarchar(max);
-  SET @createColumn_TransitionalProperty = '
-  ALTER TABLE ' + @tableName  + '
-    ADD Correlation_TransitionalProperty nvarchar(450);
+begin
+  declare @createColumn_TransitionalProperty nvarchar(max);
+  set @createColumn_TransitionalProperty = '
+  alter table ' + @tableName  + '
+    add Correlation_TransitionalProperty nvarchar(450);
   ';
   exec(@createColumn_TransitionalProperty);
-END
+end
 
-DECLARE @dataType_TransitionalProperty nvarchar(max);
-SET @dataType_TransitionalProperty = (
-  SELECT DATA_TYPE
-  FROM INFORMATION_SCHEMA.COLUMNS
-  WHERE
-    TABLE_NAME = ' + @tableName  + ' AND
-    COLUMN_NAME = 'Correlation_TransitionalProperty'
+declare @dataType_TransitionalProperty nvarchar(max);
+set @dataType_TransitionalProperty = (
+  select data_type
+  from information_schema.columns
+  where
+    table_name = ' + @tableName  + ' and
+    column_name = 'Correlation_TransitionalProperty'
 );
-IF (@dataType_TransitionalProperty <> 'nvarchar(450)')
-  THROW 50000, 'Incorrect data type for nvarchar(450)', 0
+if (@dataType_TransitionalProperty <> 'nvarchar(450)')
+  throw 50000, 'Incorrect data type for nvarchar(450)', 0
 
-IF NOT EXISTS
+if not exists
 (
-    SELECT *
-    FROM sys.indexes
-    WHERE
-        name = 'Index_Correlation_TransitionalProperty' AND
-        object_id = OBJECT_ID(@tableName)
+    select *
+    from sys.indexes
+    where
+        name = 'Index_Correlation_TransitionalProperty' and
+        object_id = object_id(@tableName)
 )
-BEGIN
-  DECLARE @createIndex_TransitionalProperty nvarchar(max);
-  SET @createIndex_TransitionalProperty = '
-  CREATE UNIQUE NONCLUSTERED INDEX Index_Correlation_TransitionalProperty
-  ON ' + @tableName  + '(Correlation_TransitionalProperty)
-  WHERE Correlation_TransitionalProperty IS NOT NULL;
+begin
+  declare @createIndex_TransitionalProperty nvarchar(max);
+  set @createIndex_TransitionalProperty = '
+  create unique nonclustered index Index_Correlation_TransitionalProperty
+  on ' + @tableName  + '(Correlation_TransitionalProperty)
+  where Correlation_TransitionalProperty is not null;
 ';
   exec(@createIndex_TransitionalProperty);
-END
+end
 
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
 (
-    SELECT 'DROP INDEX ' + ix.name + ' ON ' + @tableName + '; '
-    FROM sysindexes ix
-    WHERE
-        ix.Id = (select object_id from sys.objects where name = @tableName) AND
-        ix.Name IS NOT null AND
-        ix.Name LIKE 'Index_Correlation_%' AND
-        ix.Name <> 'Index_Correlation_CorrelationProperty' AND
+    select 'drop index ' + ix.name + ' on ' + @tableName + '; '
+    from sysindexes ix
+    where
+        ix.Id = (select object_id from sys.objects where name = @tableName) and
+        ix.Name is not null and
+        ix.Name like 'Index_Correlation_%' and
+        ix.Name <> 'Index_Correlation_CorrelationProperty' and
         ix.Name <> 'Index_Correlation_TransitionalProperty'
 );
 exec sp_executesql @dropIndexQuery
@@ -131,12 +131,12 @@ exec sp_executesql @dropIndexQuery
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
-    SELECT 'ALTER TABLE ' + @tableName  + ' DROP COLUMN ' + col.COLUMN_NAME '; '
-    FROM INFORMATION_SCHEMA.COLUMNS col
-    WHERE
-        col.TABLE_NAME = ' + @tableName  + ' AND
-        col.COLUMN_NAME LIKE 'Correlation_%' AND
-        col.COLUMN_NAME <> 'Correlation_CorrelationProperty' AND
+    select 'ALTER TABLE ' + @tableName  + ' drop column ' + col.COLUMN_NAME '; '
+    from information_schema.columns col
+    where
+        col.table_name = ' + @tableName  + ' and
+        col.COLUMN_NAME like 'Correlation_%' and
+        col.COLUMN_NAME <> 'Correlation_CorrelationProperty' and
         col.COLUMN_NAME <> 'Correlation_TransitionalProperty'
 );
 exec sp_executesql @dropPropertiesQuery

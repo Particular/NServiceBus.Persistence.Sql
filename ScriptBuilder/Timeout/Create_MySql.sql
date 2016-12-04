@@ -1,15 +1,15 @@
-﻿SET @tableName = CONCAT('[', @schema, '].[', @endpointName, 'TimeoutData]');
+﻿set @tableName = concat('[', @schema, '].[', @endpointName, 'TimeoutData]');
 
-SET @createTable = CONCAT('
-    CREATE TABLE IF NOT EXISTS ' + @tableName + '(
-        [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+set @createTable = concat('
+    create table if not exists ' + @tableName + '(
+        [Id] [uniqueidentifier]not null primary key,
         [Destination] [nvarchar](1024),
         [SagaId] [uniqueidentifier],
         [State] [varbinary](max),
         [Time] [datetime],
-        [Headers] [nvarchar](max) NOT NULL,
-        [PersistenceVersion] [nvarchar](23) NOT NULL
+        [Headers] [nvarchar](max) not null,
+        [PersistenceVersion] [nvarchar](23)not null
     )
 ');
-PREPARE stmt FROM @createTable;
-EXECUTE stmt;
+prepare stmt from @createTable;
+execute stmt;

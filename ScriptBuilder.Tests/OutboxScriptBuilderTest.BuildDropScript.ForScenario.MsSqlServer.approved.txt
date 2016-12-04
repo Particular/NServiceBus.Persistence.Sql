@@ -1,17 +1,17 @@
 ﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
 
-IF EXISTS
+if exists
 (
-    SELECT *
-    FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName) AND
+    select *
+    from sys.objects
+    where
+        object_id = object_id(@tableName) and
         type in (N'U')
 )
-BEGIN
-DECLARE @dropTable nvarchar(max);
-SET @dropTable = N'
-    DROP TABLE ' + @tableName + '
+begin
+declare @dropTable nvarchar(max);
+set @dropTable = N'
+    drop table ' + @tableName + '
 ';
 exec(@dropTable);
-END
+end

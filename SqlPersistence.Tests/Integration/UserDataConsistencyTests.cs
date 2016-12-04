@@ -18,13 +18,13 @@ public class UserDataConsistencyTests
 
     string createUserDataTableText = @"
 IF NOT  EXISTS (
-    SELECT * FROM sys.objects
-    WHERE object_id = OBJECT_ID(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]')
-    AND type in (N'U')
+    select * from sys.objects
+    where object_id = object_id(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]')
+    and type in (N'U')
 )
-BEGIN
-    CREATE TABLE [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
-        [Id] [uniqueidentifier] NOT NULL
+begin
+    create table [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
+        [Id] [uniqueidentifier] not null
     ) ON [PRIMARY];
 END";
 
@@ -172,7 +172,7 @@ END";
         public async Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            var commandText = "INSERT INTO [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
+            var commandText = "insert into[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
             using (var command = session.Connection.CreateCommand())
             {
                 command.Transaction = session.Transaction;
@@ -186,7 +186,7 @@ END";
         {
             int count;
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            var commandText = "SELECT COUNT(*) FROM [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] WHERE Id = @Id";
+            var commandText = "SELECT COUNT(*) from [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] where Id = @Id";
             using (var command = session.Connection.CreateCommand())
             {
                 command.Transaction = session.Transaction;

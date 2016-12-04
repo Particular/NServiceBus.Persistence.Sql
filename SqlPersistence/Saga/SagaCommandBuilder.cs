@@ -28,7 +28,7 @@ class SagaCommandBuilder
         }
 
         return $@"
-INSERT INTO [{schema}].[{endpointName}{tableSuffx}]
+insert into[{schema}].[{endpointName}{tableSuffx}]
 (
     Id,
     Originator,
@@ -60,7 +60,7 @@ VALUES
         }
 
         return $@"
-UPDATE [{schema}].[{endpointName}{tableSuffx}]
+update [{schema}].[{endpointName}{tableSuffx}]
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
@@ -82,7 +82,7 @@ SELECT
     Data,
     SagaTypeVersion
 FROM  [{schema}].[{endpointName}{tableSuffx}]
-WHERE Id = @Id
+where Id = @Id
 ";
     }
 
@@ -96,7 +96,7 @@ SELECT
     Data,
     SagaTypeVersion
 FROM  [{schema}].[{endpointName}{tableSuffx}]
-WHERE Correlation_{propertyName} = @propertyValue
+where Correlation_{propertyName} = @propertyValue
 ";
     }
 
@@ -104,7 +104,7 @@ WHERE Correlation_{propertyName} = @propertyValue
     {
         return $@"
 DELETE FROM  [{schema}].[{endpointName}{tableSuffx}]
-WHERE Id = @Id
+where Id = @Id
 ";
     }
 }

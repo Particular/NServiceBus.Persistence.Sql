@@ -1,26 +1,26 @@
 ﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
-IF NOT EXISTS
+if not exists
 (
-    SELECT *
-    FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName) AND
+    select *
+    from sys.objects
+    where
+        object_id = object_id(@tableName) and
         type in (N'U')
 )
-BEGIN
-DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    CREATE TABLE ' + @tableName + '(
-        [Subscriber] [varchar](450) NOT NULL,
-        [Endpoint] [varchar](450) NULL,
-        [MessageType] [varchar](450) NOT NULL,
-        [PersistenceVersion] [nvarchar](23) NOT NULL,
-        PRIMARY KEY CLUSTERED
+begin
+declare @createTable nvarchar(max);
+set @createTable = N'
+    create table ' + @tableName + '(
+        [Subscriber] [varchar](450) not null,
+        [Endpoint] [varchar](450) null,
+        [MessageType] [varchar](450) not null,
+        [PersistenceVersion] [nvarchar](23) not null,
+        primary key clustered
         (
-            [Subscriber] ASC,
-            [MessageType] ASC
+            [Subscriber] asc,
+            [MessageType] asc
         )
     )
 ';
 exec(@createTable);
-END
+end

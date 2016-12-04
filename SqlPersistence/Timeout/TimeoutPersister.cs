@@ -33,7 +33,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         this.writerCreator = writerCreator;
 
         insertCommandText = $@"
-INSERT INTO [{schema}].[{endpointName}TimeoutData]
+insert into[{schema}].[{endpointName}TimeoutData]
 (
     Id,
     Destination,
@@ -55,13 +55,13 @@ VALUES
 )";
 
         removeByIdCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}TimeoutData]
+DELETE from [{schema}].[{endpointName}TimeoutData]
 OUTPUT deleted.SagaId
-WHERE Id = @Id";
+where Id = @Id";
 
         removeBySagaIdCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}TimeoutData]
-WHERE SagaId = @SagaId";
+DELETE from [{schema}].[{endpointName}TimeoutData]
+where SagaId = @SagaId";
 
         selectByIdCommandText = $@"
 SELECT
@@ -70,17 +70,17 @@ SELECT
     State,
     Time,
     Headers
-FROM [{schema}].[{endpointName}TimeoutData]
-WHERE Id = @Id";
+from [{schema}].[{endpointName}TimeoutData]
+where Id = @Id";
 
         rangeComandText = $@"
 SELECT Id, Time
-FROM [{schema}].[{endpointName}TimeoutData]
-WHERE time BETWEEN @StartTime AND @EndTime";
+from [{schema}].[{endpointName}TimeoutData]
+where time BETWEEN @StartTime AND @EndTime";
 
         nextCommandText = $@"
-SELECT TOP 1 Time FROM [{schema}].[{endpointName}TimeoutData]
-WHERE Time > @EndTime
+SELECT TOP 1 Time from [{schema}].[{endpointName}TimeoutData]
+where Time > @EndTime
 ORDER BY TIME";
     }
 

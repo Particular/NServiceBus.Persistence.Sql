@@ -1,16 +1,16 @@
 ﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'TimeoutData]';
 
 IF NOT EXISTS (
-    SELECT * FROM sys.objects
+    SELECT * from sys.objects
     WHERE
-        object_id = OBJECT_ID(@tableName)
+        object_id = object_id(@tableName)
         AND type in (N'U')
 )
 BEGIN
 DECLARE @createTable nvarchar(max);
 SET @createTable = N'
     CREATE TABLE ' + @tableName + '(
-        [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+        [Id] [uniqueidentifier] NOT NULLprimary key,
         [Destination] [nvarchar](1024),
         [SagaId] [uniqueidentifier],
         [State] [varbinary](max),

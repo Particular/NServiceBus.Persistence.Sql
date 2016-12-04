@@ -1,16 +1,16 @@
 ﻿
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'theSaga]';
 
-IF EXISTS
+if exists
 (
-    SELECT *
-    FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName)
-        AND type in ('U')
+    select *
+    from sys.objects
+    where
+        object_id = object_id(@tableName)
+        and type in ('U')
 )
-BEGIN
-    DECLARE @createTable nvarchar(max);
-    SET @createTable = 'DROP TABLE ' + @tableName;
+begin
+    declare @createTable nvarchar(max);
+    set @createTable = 'drop table ' + @tableName;
     exec(@createTable);
-END
+end

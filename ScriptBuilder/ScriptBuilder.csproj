@@ -65,7 +65,6 @@
     <Compile Include="Saga\CorrelationPropertyTypeConverter.cs" />
     <Compile Include="Saga\ISagaScriptWriter.cs" />
     <Compile Include="Saga\Writers\MySqlSagaScriptWriter.cs" />
-    <Compile Include="Saga\Writers\PostgreSqlSagaScriptWriter.cs" />
     <Compile Include="Saga\SagaDefinition.cs" />
     <Compile Include="Saga\SagaDefinitionReader.cs" />
     <Compile Include="Saga\SagaDefinitionValidator.cs" />
@@ -85,12 +84,6 @@
     <EmbeddedResource Include="Subscription\Create_MySql.sql" />
     <EmbeddedResource Include="Outbox\Create_MySql.sql" />
     <EmbeddedResource Include="Outbox\Drop_MySql.sql" />
-    <EmbeddedResource Include="Timeout\Drop_PostgreSql.sql" />
-    <EmbeddedResource Include="Timeout\Create_PostgreSql.sql" />
-    <EmbeddedResource Include="Subscription\Drop_PostgreSql.sql" />
-    <EmbeddedResource Include="Subscription\Create_PostgreSql.sql" />
-    <EmbeddedResource Include="Outbox\Create_PostgreSql.sql" />
-    <EmbeddedResource Include="Outbox\Drop_PostgreSql.sql" />
     <EmbeddedResource Include="Outbox\Drop_MsSqlServer.sql" />
     <EmbeddedResource Include="Outbox\Create_MsSqlServer.sql" />
     <EmbeddedResource Include="Subscription\Create_MsSqlServer.sql" />

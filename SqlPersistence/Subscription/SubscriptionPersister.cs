@@ -23,11 +23,11 @@ class SubscriptionPersister : ISubscriptionStorage
         this.endpointName = endpointName;
 
         subscribeCommandText = $@"
-DECLARE @dummy int; MERGE [{schema}].[{endpointName}SubscriptionData] WITH (HOLDLOCK) AS target
+declare @dummy int; MERGE [{schema}].[{endpointName}SubscriptionData] WITH (HOLDLOCK) AS target
 USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
 ON target.Endpoint = source.Endpoint AND target.Subscriber = source.Subscriber AND target.MessageType = source.MessageType
 WHEN MATCHED THEN
-    UPDATE SET @dummy = 0
+    UPDATE set @dummy = 0
 WHEN NOT MATCHED THEN
 INSERT
 (
@@ -45,7 +45,7 @@ VALUES
 );";
 
         unsubscribeCommandText = $@"
-DELETE FROM [{schema}].[{endpointName}SubscriptionData]
+DELETE from [{schema}].[{endpointName}SubscriptionData]
 WHERE
     Subscriber = @Subscriber AND
     MessageType = @MessageType";
@@ -99,8 +99,8 @@ WHERE
 
         builder.Append($@"
 SELECT DISTINCT Subscriber, Endpoint
-FROM [{schema}].[{endpointName}SubscriptionData]
-WHERE MessageType IN (");
+from [{schema}].[{endpointName}SubscriptionData]
+where MessageType IN (");
 
         var types = messageTypes.ToList();
 

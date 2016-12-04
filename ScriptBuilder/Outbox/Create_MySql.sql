@@ -1,12 +1,12 @@
-﻿SET @tableName = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
+﻿set @tableName = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
 
-SET @createTable =  CONCAT('
-    CREATE TABLE IF NOT EXISTS ', @tableName, '(
-        [MessageId] [nvarchar](1024) NOT NULL PRIMARY KEY,
-        [Dispatched] [bit] NOT NULL DEFAULT 0,
+set @createTable =  concat('
+    create table if not exists ', @tableName, '(
+        [MessageId] [nvarchar](1024)not null primary key,
+        [Dispatched] [bit]not null DEFAULT 0,
         [DispatchedAt] [datetime],
-        [Operations] [nvarchar](max) NOT NULL
+        [Operations] [nvarchar](max)not null
     )
 ');
-PREPARE stmt FROM @createTable;
-EXECUTE stmt;
+prepare stmt from @createTable;
+execute stmt;

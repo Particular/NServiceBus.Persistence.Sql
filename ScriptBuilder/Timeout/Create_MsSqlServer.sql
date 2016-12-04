@@ -1,23 +1,23 @@
 ﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'TimeoutData]';
 
-IF NOT EXISTS (
-    SELECT * FROM sys.objects
-    WHERE
-        object_id = OBJECT_ID(@tableName)
+if not exists (
+    select * from sys.objects
+    where
+        object_id = object_id(@tableName)
         AND type in (N'U')
 )
-BEGIN
-DECLARE @createTable nvarchar(max);
-SET @createTable = N'
-    CREATE TABLE ' + @tableName + '(
-        [Id] [uniqueidentifier] NOT NULL PRIMARY KEY,
+begin
+declare @createTable nvarchar(max);
+set @createTable = N'
+    create table ' + @tableName + '(
+        [Id] [uniqueidentifier]not null primary key,
         [Destination] [nvarchar](1024),
         [SagaId] [uniqueidentifier],
         [State] [varbinary](max),
         [Time] [datetime],
-        [Headers] [nvarchar](max) NOT NULL,
-        [PersistenceVersion] [nvarchar](23) NOT NULL
+        [Headers] [nvarchar](max) not null,
+        [PersistenceVersion] [nvarchar](23)not null
     )
 ';
 exec(@createTable);
-END
+end

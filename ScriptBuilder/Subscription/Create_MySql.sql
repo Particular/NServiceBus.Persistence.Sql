@@ -1,16 +1,16 @@
-﻿SET @tableName = CONCAT('[', @schema, '].[', @endpointName, 'SubscriptionData]');
-SET @createTable =  CONCAT('
-    CREATE TABLE IF NOT EXISTS ', @tableName, '(
-        [Subscriber] [varchar](450) NOT NULL,
-        [Endpoint] [varchar](450) NULL,
-        [MessageType] [varchar](450) NOT NULL,
-        [PersistenceVersion] [nvarchar](23) NOT NULL,
-        PRIMARY KEY CLUSTERED
+﻿set @tableName = concat('[', @schema, '].[', @endpointName, 'SubscriptionData]');
+set @createTable = concat('
+    create table if not exists ', @tableName, '(
+        [Subscriber] [varchar](450) not null,
+        [Endpoint] [varchar](450) null,
+        [MessageType] [varchar](450) not null,
+        [PersistenceVersion] [nvarchar](23) not null,
+        primary key clustered
         (
-            [Subscriber] ASC,
-            [MessageType] ASC
+            [Subscriber] asc,
+            [MessageType] asc
         )
     )
 ');
-PREPARE stmt FROM @createTable;
-EXECUTE stmt;
+prepare stmt from @createTable;
+execute stmt;

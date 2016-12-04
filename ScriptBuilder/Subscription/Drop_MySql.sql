@@ -1,15 +1,15 @@
 ﻿SET  @tableName = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
-IF EXISTS 
+if exists
 (
-    SELECT * 
-    FROM sys.objects 
-    WHERE 
-        object_id = OBJECT_ID(@tableName) AND 
+    select * 
+    from sys.objects 
+    where 
+        object_id = object_id(@tableName) and 
         type in (N'U')
 )
-BEGIN
-SET @dropTable = N'
-    DROP TABLE ' + @tableName + '
+begin
+set @dropTable = N'
+    drop table ' + @tableName + '
 ';
 exec(@dropTable);
-END
+end

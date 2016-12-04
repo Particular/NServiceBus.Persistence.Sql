@@ -37,12 +37,12 @@ class OutboxPersister : IOutboxStorage
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         storeCommandText = $@"
-INSERT INTO [{schema}].[{endpointName}OutboxData]
+insert into[{schema}].[{endpointName}OutboxData]
 (
     MessageId,
     Operations
 )
-VALUES
+values
 (
     @MessageId,
     @Operations
@@ -52,18 +52,18 @@ VALUES
 delete from [{schema}].[{endpointName}OutboxData] where Dispatched = true And DispatchedAt < @Date";
 
         getCommandText = $@"
-SELECT
+select
     Dispatched,
     Operations
-FROM [{schema}].[{endpointName}OutboxData]
-WHERE MessageId = @MessageId";
+from [{schema}].[{endpointName}OutboxData]
+where MessageId = @MessageId";
 
         setAsDispatchedCommandText = $@"
-UPDATE [{schema}].[{endpointName}OutboxData]
-SET
+update [{schema}].[{endpointName}OutboxData]
+set
     Dispatched = 1,
     DispatchedAt = @DispatchedAt
-WHERE MessageId = @MessageId";
+where MessageId = @MessageId";
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
