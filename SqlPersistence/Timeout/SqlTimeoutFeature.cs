@@ -21,7 +21,7 @@ class SqlTimeoutFeature : Feature
         var readerCreator = settings.GetReaderCreator<StorageType.Timeouts>();
         var writerCreator = settings.GetWriterCreator<StorageType.Timeouts>();
 
-        var endpointName = settings.GetEndpointNamePrefix<StorageType.Timeouts>();
+        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Timeouts>();
         var persister = new TimeoutPersister(connectionBuilder, schema, endpointName, serializer, readerCreator, writerCreator);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);

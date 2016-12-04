@@ -25,7 +25,7 @@ class OutboxInstaller : INeedToInstallSomething
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
 
         var sqlVarient = settings.GetSqlVarient();
-        var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
+        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Outbox>();
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
@@ -33,7 +33,7 @@ class OutboxInstaller : INeedToInstallSomething
             manipulateCommand: command =>
             {
                 command.AddParameter("schema", settings.GetSchema<StorageType.Outbox>());
-                command.AddParameter("endpointName", endpointName);
+                command.AddParameter("tablePrefix", endpointName);
             });
     }
 

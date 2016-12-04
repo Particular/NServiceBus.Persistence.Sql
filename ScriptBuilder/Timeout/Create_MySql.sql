@@ -1,4 +1,4 @@
-﻿set @tableName = concat('[', @schema, '].[', @endpointName, 'TimeoutData]');
+﻿set @tableName = concat('[', @schema, '].[', @tablePrefix, 'TimeoutData]');
 
 set @createTable = concat('
     create table if not exists ' + @tableName + '(

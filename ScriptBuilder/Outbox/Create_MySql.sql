@@ -1,4 +1,4 @@
-﻿set @tableName = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
+﻿set @tableName = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
 
 set @createTable =  concat('
     create table if not exists ', @tableName, '(

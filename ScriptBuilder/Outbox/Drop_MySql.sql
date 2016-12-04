@@ -1,4 +1,4 @@
-﻿set @tableName = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
+﻿set @tableName = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
 
 if exists
 (

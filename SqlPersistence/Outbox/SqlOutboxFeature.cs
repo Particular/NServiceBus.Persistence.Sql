@@ -20,7 +20,7 @@ class SqlOutboxFeature : Feature
         var readerCreator = settings.GetReaderCreator<StorageType.Outbox>();
         var writerCreator = settings.GetWriterCreator<StorageType.Outbox>();
 
-        var endpointName = settings.GetEndpointNamePrefix<StorageType.Outbox>();
+        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Outbox>();
         var outboxPersister = new OutboxPersister(connectionBuilder, schema, endpointName, jsonSerializer, readerCreator, writerCreator);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
     }

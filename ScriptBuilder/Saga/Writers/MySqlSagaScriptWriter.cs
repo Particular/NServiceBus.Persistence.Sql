@@ -16,7 +16,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.Write(@"
-set @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]';
+set @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + '{0}]';
 ", saga.TableSuffix);
     }
 

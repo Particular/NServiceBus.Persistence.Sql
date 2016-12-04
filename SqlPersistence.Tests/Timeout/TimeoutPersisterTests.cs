@@ -137,7 +137,7 @@ public class TimeoutPersisterTests
         {
             command.CommandText = script;
             command.AddParameter("schema", "dbo");
-            command.AddParameter("endpointName", "Endpoint");
+            command.AddParameter("tablePrefix", "Endpoint");
             await command.ExecuteNonQueryAsync();
         }
     }

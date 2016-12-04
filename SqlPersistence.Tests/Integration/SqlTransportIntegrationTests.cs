@@ -75,7 +75,7 @@ public class SqlTransportIntegrationTests
             {
                 command.CommandText = script;
                 command.AddParameter("schema", "dbo");
-                command.AddParameter("endpointName", $"{endpointName}.");
+                command.AddParameter("tablePrefix", $"{endpointName}.");
                 command.ExecuteNonQuery();
             }
         }

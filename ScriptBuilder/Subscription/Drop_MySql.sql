@@ -1,4 +1,4 @@
-﻿SET  @tableName = '[' + @schema + '].[' + @endpointName + 'SubscriptionData]';
+﻿SET  @tableName = '[' + @schema + '].[' + @tablePrefix + 'SubscriptionData]';
 if exists
 (
     select * 

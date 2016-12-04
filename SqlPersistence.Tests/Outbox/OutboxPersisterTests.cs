@@ -130,7 +130,7 @@ public class OutboxPersisterTests
             {
                 command.CommandText = script;
                 command.AddParameter("schema", "dbo");
-                command.AddParameter("endpointName", "Endpoint");
+                command.AddParameter("tablePrefix", "Endpoint");
                 command.ExecuteNonQuery();
             }
         }

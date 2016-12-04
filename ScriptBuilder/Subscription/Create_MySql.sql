@@ -1,4 +1,4 @@
-﻿set @tableName = concat('[', @schema, '].[', @endpointName, 'SubscriptionData]');
+﻿set @tableName = concat('[', @schema, '].[', @tablePrefix, 'SubscriptionData]');
 set @createTable = concat('
     create table if not exists ', @tableName, '(
         [Subscriber] [varchar](450) not null,

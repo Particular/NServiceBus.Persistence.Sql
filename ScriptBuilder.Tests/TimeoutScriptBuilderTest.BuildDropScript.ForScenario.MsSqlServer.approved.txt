@@ -1,4 +1,4 @@
-﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'TimeoutData]';
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'TimeoutData]';
 
 if exists
 (

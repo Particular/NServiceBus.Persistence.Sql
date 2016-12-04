@@ -158,7 +158,7 @@ namespace NServiceBus
             return settings.GetValue<bool, TStorageType>("UseEndpointName", () => true);
         }
 
-        internal static string GetEndpointNamePrefix<T>(this ReadOnlySettings settings) where T : StorageType
+        internal static string GetTablePrefixForEndpoint<T>(this ReadOnlySettings settings) where T : StorageType
         {
             if (settings.ShouldUseEndpointName<T>())
             {

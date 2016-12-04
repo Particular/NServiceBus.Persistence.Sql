@@ -1,4 +1,4 @@
-﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'OutboxData]';
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
 
 if exists
 (

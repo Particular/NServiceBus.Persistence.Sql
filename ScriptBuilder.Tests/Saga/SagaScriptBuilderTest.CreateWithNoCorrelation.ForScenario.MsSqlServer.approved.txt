@@ -1,5 +1,5 @@
 ﻿
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + 'theSaga]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'theSaga]';
 
 if not exists
 (

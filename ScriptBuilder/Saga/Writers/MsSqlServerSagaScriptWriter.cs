@@ -16,7 +16,7 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.Write(@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @endpointName + '{0}]';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + '{0}]';
 ", saga.TableSuffix);
     }
 
