@@ -39,10 +39,10 @@ exec sp_executesql @dropIndexQuery
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
-    select 'ALTER TABLE ' + @tableName  + ' drop column ' + col.COLUMN_NAME '; '
+    select 'alter table ' + @tableName  + ' drop column ' + col.column_name '; '
     from information_schema.columns col
     where
         col.table_name = ' + @tableName  + ' and
-        col.COLUMN_NAME like 'Correlation_%'
+        col.column_name like 'Correlation_%'
 );
 exec sp_executesql @dropPropertiesQuery

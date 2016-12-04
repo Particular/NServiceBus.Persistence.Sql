@@ -86,20 +86,20 @@ end
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        col.COLUMN_NAME <> 'Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and\r\n        col.column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        col.COLUMN_NAME <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and\r\n        col.column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
         writer.Write($@"
 select @dropPropertiesQuery =
 (
-    select 'ALTER TABLE ' + @tableName  + ' drop column ' + col.COLUMN_NAME '; '
+    select 'alter table ' + @tableName  + ' drop column ' + col.column_name '; '
     from information_schema.columns col
     where
         col.table_name = ' + @tableName  + ' and
-        col.COLUMN_NAME like 'Correlation_%'{builder}
+        col.column_name like 'Correlation_%'{builder}
 );
 exec sp_executesql @dropPropertiesQuery
 ");

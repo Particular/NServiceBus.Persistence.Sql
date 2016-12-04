@@ -3,7 +3,7 @@
 set @createTable =  concat('
     create table if not exists ', @tableName, '(
         [MessageId] [nvarchar](1024)not null primary key,
-        [Dispatched] [bit]not null DEFAULT 0,
+        [Dispatched] [bit]not null default 0,
         [DispatchedAt] [datetime],
         [Operations] [nvarchar](max)not null
     )

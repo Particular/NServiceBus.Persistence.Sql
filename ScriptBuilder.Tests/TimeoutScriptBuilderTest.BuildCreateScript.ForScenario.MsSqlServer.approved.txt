@@ -4,7 +4,7 @@ if not exists (
     select * from sys.objects
     where
         object_id = object_id(@tableName)
-        AND type in (N'U')
+        and type in (N'U')
 )
 begin
 declare @createTable nvarchar(max);
