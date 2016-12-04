@@ -29,7 +29,7 @@ public class TimeoutPersisterTests
         persister = new TimeoutPersister(
             connectionBuilder: connectionBuilder, 
             schema: "dbo", 
-            endpointName: "Endpoint",
+            tablePrefix: "Endpoint",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>

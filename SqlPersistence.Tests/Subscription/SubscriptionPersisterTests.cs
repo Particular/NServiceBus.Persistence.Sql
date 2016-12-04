@@ -25,7 +25,7 @@ public class SubscriptionPersisterTests
                 return connection.ToTask();
             },
             schema: "dbo",
-            endpointName: "Endpoint"
+            tablePrefix: "Endpoint"
             );
     }
 

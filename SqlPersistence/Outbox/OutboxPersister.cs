@@ -27,7 +27,7 @@ class OutboxPersister : IOutboxStorage
     public OutboxPersister(
         Func<Task<DbConnection>> connectionBuilder, 
         string schema, 
-        string endpointName,
+        string tablePrefix,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<StringBuilder, JsonWriter> writerCreator)
@@ -37,7 +37,7 @@ class OutboxPersister : IOutboxStorage
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         storeCommandText = $@"
-insert into [{schema}].[{endpointName}OutboxData]
+insert into [{schema}].[{tablePrefix}OutboxData]
 (
     MessageId,
     Operations
@@ -49,17 +49,17 @@ values
 )";
 
         cleanupCommandText = $@"
-delete from [{schema}].[{endpointName}OutboxData] where Dispatched = true And DispatchedAt < @Date";
+delete from [{schema}].[{tablePrefix}OutboxData] where Dispatched = true And DispatchedAt < @Date";
 
         getCommandText = $@"
 select
     Dispatched,
     Operations
-from [{schema}].[{endpointName}OutboxData]
+from [{schema}].[{tablePrefix}OutboxData]
 where MessageId = @MessageId";
 
         setAsDispatchedCommandText = $@"
-update [{schema}].[{endpointName}OutboxData]
+update [{schema}].[{tablePrefix}OutboxData]
 set
     Dispatched = 1,
     DispatchedAt = @DispatchedAt

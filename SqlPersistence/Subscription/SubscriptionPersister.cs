@@ -12,18 +12,21 @@ class SubscriptionPersister : ISubscriptionStorage
 {
     Func<Task<DbConnection>> connectionBuilder;
     string schema;
-    string endpointName;
+    string tablePrefix;
     string subscribeCommandText;
     string unsubscribeCommandText;
 
-    public SubscriptionPersister(Func<Task<DbConnection>> connectionBuilder, string schema, string endpointName)
+    public SubscriptionPersister(
+        Func<Task<DbConnection>> connectionBuilder, 
+        string schema, 
+        string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
         this.schema = schema;
-        this.endpointName = endpointName;
+        this.tablePrefix = tablePrefix;
 
         subscribeCommandText = $@"
-declare @dummy int; MERGE [{schema}].[{endpointName}SubscriptionData] WITH (HOLDLOCK) AS target
+declare @dummy int; MERGE [{schema}].[{tablePrefix}SubscriptionData] WITH (HOLDLOCK) AS target
 USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
 ON target.Endpoint = source.Endpoint AND target.Subscriber = source.Subscriber AND target.MessageType = source.MessageType
 WHEN MATCHED THEN
@@ -45,7 +48,7 @@ VALUES
 );";
 
         unsubscribeCommandText = $@"
-DELETE from [{schema}].[{endpointName}SubscriptionData]
+DELETE from [{schema}].[{tablePrefix}SubscriptionData]
 WHERE
     Subscriber = @Subscriber AND
     MessageType = @MessageType";
@@ -99,7 +102,7 @@ WHERE
 
         builder.Append($@"
 SELECT DISTINCT Subscriber, Endpoint
-from [{schema}].[{endpointName}SubscriptionData]
+from [{schema}].[{tablePrefix}SubscriptionData]
 where MessageType IN (");
 
         var types = messageTypes.ToList();

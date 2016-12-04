@@ -22,7 +22,10 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     string rangeComandText;
     string nextCommandText;
 
-    public TimeoutPersister(Func<Task<DbConnection>> connectionBuilder, string schema, string endpointName,
+    public TimeoutPersister(
+        Func<Task<DbConnection>> connectionBuilder, 
+        string schema, 
+        string tablePrefix,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<StringBuilder, JsonWriter> writerCreator)
@@ -33,7 +36,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         this.writerCreator = writerCreator;
 
         insertCommandText = $@"
-insert into [{schema}].[{endpointName}TimeoutData]
+insert into [{schema}].[{tablePrefix}TimeoutData]
 (
     Id,
     Destination,
@@ -55,12 +58,12 @@ VALUES
 )";
 
         removeByIdCommandText = $@"
-DELETE from [{schema}].[{endpointName}TimeoutData]
+DELETE from [{schema}].[{tablePrefix}TimeoutData]
 OUTPUT deleted.SagaId
 where Id = @Id";
 
         removeBySagaIdCommandText = $@"
-DELETE from [{schema}].[{endpointName}TimeoutData]
+DELETE from [{schema}].[{tablePrefix}TimeoutData]
 where SagaId = @SagaId";
 
         selectByIdCommandText = $@"
@@ -70,16 +73,16 @@ SELECT
     State,
     Time,
     Headers
-from [{schema}].[{endpointName}TimeoutData]
+from [{schema}].[{tablePrefix}TimeoutData]
 where Id = @Id";
 
         rangeComandText = $@"
 SELECT Id, Time
-from [{schema}].[{endpointName}TimeoutData]
+from [{schema}].[{tablePrefix}TimeoutData]
 where time BETWEEN @StartTime AND @EndTime";
 
         nextCommandText = $@"
-SELECT TOP 1 Time from [{schema}].[{endpointName}TimeoutData]
+SELECT TOP 1 Time from [{schema}].[{tablePrefix}TimeoutData]
 where Time > @EndTime
 ORDER BY TIME";
     }

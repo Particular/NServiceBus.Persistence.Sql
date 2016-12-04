@@ -26,7 +26,7 @@ public class OutboxPersisterTests
                 return connection.ToTask();
             },
             schema: "dbo",
-            endpointName: "Endpoint",
+            tablePrefix: "Endpoint",
             jsonSerializer: JsonSerializer.CreateDefault(),
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: builder =>

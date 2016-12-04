@@ -3,12 +3,12 @@
 class SagaCommandBuilder
 {
     string schema;
-    string endpointName;
+    string tablePrefix;
 
-    public SagaCommandBuilder(string schema, string endpointName)
+    public SagaCommandBuilder(string schema, string tablePrefix)
     {
         this.schema = schema;
-        this.endpointName = endpointName;
+        this.tablePrefix = tablePrefix;
     }
 
     public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty)
@@ -28,7 +28,7 @@ class SagaCommandBuilder
         }
 
         return $@"
-insert into [{schema}].[{endpointName}{tableSuffx}]
+insert into [{schema}].[{tablePrefix}{tableSuffx}]
 (
     Id,
     Originator,
@@ -60,7 +60,7 @@ VALUES
         }
 
         return $@"
-update [{schema}].[{endpointName}{tableSuffx}]
+update [{schema}].[{tablePrefix}{tableSuffx}]
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
@@ -81,7 +81,7 @@ SELECT
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}{tableSuffx}]
+FROM  [{schema}].[{tablePrefix}{tableSuffx}]
 where Id = @Id
 ";
     }
@@ -95,7 +95,7 @@ SELECT
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{endpointName}{tableSuffx}]
+FROM  [{schema}].[{tablePrefix}{tableSuffx}]
 where Correlation_{propertyName} = @propertyValue
 ";
     }
@@ -103,7 +103,7 @@ where Correlation_{propertyName} = @propertyValue
     public string BuildCompleteCommand(string tableSuffx)
     {
         return $@"
-DELETE FROM  [{schema}].[{endpointName}{tableSuffx}]
+DELETE FROM  [{schema}].[{tablePrefix}{tableSuffx}]
 where Id = @Id
 ";
     }
