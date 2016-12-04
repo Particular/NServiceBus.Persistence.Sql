@@ -91,7 +91,6 @@
     <Compile Include="Saga\SqlSagaAttributeData.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SqlPersistenceSettingsAttribute.cs" />
-    <Compile Include="SqlVarients.cs" />
     <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
@@ -130,6 +129,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{0B7E5D14-432A-4A20-8059-06F04C5524D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />

@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
-using SqlVarient = NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient;
 
 static class SagaDbBuilder
 {

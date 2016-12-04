@@ -6,20 +6,45 @@ using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
-using SqlVarient = NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient;
 
 [TestFixture]
-public class MsmqTransportIntegrationTests
+public class MsmqTransportIntegrationTests : IDisposable
 {
     static string connection = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "MsmqTransportIntegration";
+    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    SqlConnection dbConnection;
+    SagaDefinition sagaDefinition;
+
+    public MsmqTransportIntegrationTests()
+    {
+        dbConnection = new SqlConnection(connection);
+        dbConnection.Open();
+        sagaDefinition = new SagaDefinition(
+            tableSuffix: nameof(Saga1),
+            name: nameof(Saga1),
+            correlationProperty: new CorrelationProperty
+            (
+                name: nameof(Saga1.SagaData.StartId),
+                type: CorrelationPropertyType.Guid
+            )
+        );
+    }
 
     [SetUp]
-    [TearDown]
     public void Setup()
     {
         MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
     }
 
     [Test]
@@ -29,19 +54,7 @@ public class MsmqTransportIntegrationTests
     [TestCase(TransportTransactionMode.None)]
     public async Task Write(TransportTransactionMode transactionMode)
     {
-        var sagaDefinition = new SagaDefinition(
-            tableSuffix: nameof(Saga1),
-            name: nameof(Saga1),
-            correlationProperty: new  CorrelationProperty
-            (
-                name: nameof(Saga1.SagaData.StartId),
-                type: CorrelationPropertyType.Guid
-            )
-        );
-
-        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, SqlVarient.MsSqlServer));
-        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, SqlVarient.MsSqlServer));
-        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MsmqTransportIntegrationTests));
         var typesToScan = TypeScanner.NestedTypes<MsmqTransportIntegrationTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<MsmqTransport>();
@@ -58,21 +71,6 @@ public class MsmqTransportIntegrationTests
         await endpoint.SendLocal(startSagaMessage);
         ManualResetEvent.WaitOne();
         await endpoint.Stop();
-    }
-
-    void Execute(string script)
-    {
-        using (var sqlConnection = new SqlConnection(connection))
-        {
-            sqlConnection.Open();
-            using (var command = sqlConnection.CreateCommand())
-            {
-                command.CommandText = script;
-                command.AddParameter("schema", "dbo");
-                command.AddParameter("tablePrefix", $"{endpointName}.");
-                command.ExecuteNonQuery();
-            }
-        }
     }
 
     public class StartSagaMessage : IMessage
@@ -119,4 +117,8 @@ public class MsmqTransportIntegrationTests
     {
     }
 
+    public void Dispose()
+    {
+        dbConnection?.Dispose();
+    }
 }

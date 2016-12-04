@@ -109,6 +109,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{0B7E5D14-432A-4A20-8059-06F04C5524D2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
       <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
       <Name>ScriptBuilder</Name>

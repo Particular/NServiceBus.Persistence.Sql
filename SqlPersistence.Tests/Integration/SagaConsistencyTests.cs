@@ -9,7 +9,6 @@ using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
 using NUnit.Framework;
-using SqlVarient = NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient;
 
 [TestFixture]
 public class SagaConsistencyTests

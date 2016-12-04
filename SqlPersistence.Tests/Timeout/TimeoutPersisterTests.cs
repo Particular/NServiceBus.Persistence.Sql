@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using Newtonsoft.Json;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;

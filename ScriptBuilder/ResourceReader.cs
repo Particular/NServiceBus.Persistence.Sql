@@ -1,4 +1,4 @@
-﻿using NServiceBus.Persistence.Sql.ScriptBuilder;
+﻿using NServiceBus.Persistence.Sql;
 using Resourcer;
 
 static class ResourceReader

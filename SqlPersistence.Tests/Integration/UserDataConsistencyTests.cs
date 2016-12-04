@@ -103,8 +103,8 @@ END";
         manualResetEvent.Reset();
         string message = null;
 
-        Execute(endpointName, OutboxScriptBuilder.BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient.MsSqlServer));
-        Execute(endpointName, OutboxScriptBuilder.BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SqlVarient.MsSqlServer));
+        Execute(endpointName, OutboxScriptBuilder.BuildDropScript(SqlVarient.MsSqlServer));
+        Execute(endpointName, OutboxScriptBuilder.BuildCreateScript(SqlVarient.MsSqlServer));
         Execute(createUserDataTableText);
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);

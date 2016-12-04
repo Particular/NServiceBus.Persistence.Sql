@@ -2,9 +2,8 @@
 {
     public enum SqlVarient
     {
-        All,
         MsSqlServer,
         MySql,
-        //PostgreSql
+        All
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus.Outbox;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
