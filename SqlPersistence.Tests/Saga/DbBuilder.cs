@@ -1,16 +1,16 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class SagaDbBuilder
 {
-    public static void ReCreate(string connection, string endpointName, params SagaDefinition[] sagaDefinitions)
+    public static void ReCreate(DbConnection connection, string endpointName, params SagaDefinition[] sagaDefinitions)
     {
         Drop(connection, endpointName, sagaDefinitions);
         Create(connection, endpointName, sagaDefinitions);
     }
 
-    static void Create(string connection, string endpointName, params SagaDefinition[] sagaDefinitions)
+    static void Create(DbConnection connection, string endpointName, params SagaDefinition[] sagaDefinitions)
     {
         foreach (var sagaDefinition in sagaDefinitions)
         {
@@ -18,7 +18,7 @@ static class SagaDbBuilder
         }
     }
 
-    static void Drop(string connection, string endpointName, params SagaDefinition[] sagaDefinitions)
+    static void Drop(DbConnection connection, string endpointName, params SagaDefinition[] sagaDefinitions)
     {
         foreach (var sagaDefinition in sagaDefinitions)
         {
@@ -26,18 +26,14 @@ static class SagaDbBuilder
         }
     }
 
-    static void Execute(string connection, string endpointName, string script)
+    static void Execute(DbConnection connection, string endpointName, string script)
     {
-        using (var sqlConnection = new SqlConnection(connection))
+        using (var command = connection.CreateCommand())
         {
-            sqlConnection.Open();
-            using (var command = sqlConnection.CreateCommand())
-            {
-                command.CommandText = script;
-                command.AddParameter("schema", "dbo");
-                command.AddParameter("tablePrefix", $"{endpointName}.");
-                command.ExecuteNonQuery();
-            }
+            command.CommandText = script;
+            command.AddParameter("schema", "dbo");
+            command.AddParameter("tablePrefix", $"{endpointName}.");
+            command.ExecuteNonQuery();
         }
     }
 }

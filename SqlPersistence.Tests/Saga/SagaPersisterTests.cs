@@ -1,4 +1,6 @@
 using System;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -18,6 +20,17 @@ public class SagaPersisterTests
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
     static string endpointName = "Endpoint";
     SagaPersister persister;
+    Func<DbConnection> dbConnection;
+
+    public SagaPersisterTests()
+    {
+        dbConnection = () =>
+        {
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            return connection;
+        };
+    }
 
     [SetUp]
     public void SetUp()
@@ -40,7 +53,7 @@ public class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
-        SagaDbBuilder.ReCreate(connectionString, endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
+        SagaDbBuilder.ReCreate(dbConnection(), endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null, 
@@ -68,7 +81,7 @@ public class SagaPersisterTests
             TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
         };
 
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -96,7 +109,7 @@ public class SagaPersisterTests
             SimpleProperty = "PropertyValue",
         };
 
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -136,7 +149,7 @@ public class SagaPersisterTests
             TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
         };
 
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -166,7 +179,7 @@ public class SagaPersisterTests
             TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
         };
 
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -213,7 +226,7 @@ public class SagaPersisterTests
             TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
             SimpleProperty = "theSimpleProperty"
         };
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -234,7 +247,7 @@ public class SagaPersisterTests
             TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
             SimpleProperty = "theSimpleProperty"
         };
-        using (var connection = await SqlHelpers.New(connectionString))
+        using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
@@ -256,4 +269,5 @@ public class SagaPersisterTests
             Assert.IsTrue(throwsAsync.InnerException.Message.Contains("Cannot insert duplicate key row in object "));
         }
     }
+    
 }

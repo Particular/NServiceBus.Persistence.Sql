@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 class SqlHelpers
 {
 
+    //TODO: remove
     public static async Task<DbConnection> New(string connectionString)
     {
         var connection = new SqlConnection(connectionString);
