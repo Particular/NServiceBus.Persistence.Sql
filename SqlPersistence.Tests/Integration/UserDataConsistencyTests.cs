@@ -172,7 +172,7 @@ END";
         public async Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            var commandText = "insert into[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
+            var commandText = "insert into [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
             using (var command = session.Connection.CreateCommand())
             {
                 command.Transaction = session.Transaction;

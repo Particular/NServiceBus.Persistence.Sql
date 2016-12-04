@@ -33,7 +33,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         this.writerCreator = writerCreator;
 
         insertCommandText = $@"
-insert into[{schema}].[{endpointName}TimeoutData]
+insert into [{schema}].[{endpointName}TimeoutData]
 (
     Id,
     Destination,

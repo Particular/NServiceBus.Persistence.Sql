@@ -37,7 +37,7 @@ class OutboxPersister : IOutboxStorage
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         storeCommandText = $@"
-insert into[{schema}].[{endpointName}OutboxData]
+insert into [{schema}].[{endpointName}OutboxData]
 (
     MessageId,
     Operations

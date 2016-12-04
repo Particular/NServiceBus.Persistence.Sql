@@ -28,7 +28,7 @@ class SagaCommandBuilder
         }
 
         return $@"
-insert into[{schema}].[{endpointName}{tableSuffx}]
+insert into [{schema}].[{endpointName}{tableSuffx}]
 (
     Id,
     Originator,
