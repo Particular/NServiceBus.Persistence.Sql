@@ -29,12 +29,10 @@ class OutboxInstaller : INeedToInstallSomething
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
-        return SqlHelpers.Execute(connectionBuilder, File.ReadAllText(createScript),
-            manipulateCommand: command =>
-            {
-                command.AddParameter("schema", settings.GetSchema<StorageType.Outbox>());
-                command.AddParameter("tablePrefix", tablePrefix);
-            });
+        return connectionBuilder.ExecuteTableCommand(
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix,
+            schema: settings.GetSchema<StorageType.Outbox>());
     }
 
 }

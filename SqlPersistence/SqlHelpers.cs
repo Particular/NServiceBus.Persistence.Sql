@@ -1,47 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-class SqlHelpers
+static class SqlHelpers
 {
 
-    //TODO: remove
-    public static async Task<DbConnection> New(string connectionString)
-    {
-        var connection = new SqlConnection(connectionString);
-        await connection.OpenAsync();
-        return connection;
-    }
-
-    internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, string script, Action<DbCommand> manipulateCommand)
+    internal static async Task ExecuteTableCommand(this Func<Task<DbConnection>> connectionBuilder, string script, string schema, string tablePrefix)
     {
         using (var connection = await connectionBuilder())
         {
-            await Execute(manipulateCommand, connection, script);
+            await connection.ExecuteTableCommand(script, schema, tablePrefix);
         }
     }
 
-    internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, IEnumerable<string> scripts, Action<DbCommand> manipulateCommand)
+    internal static async Task ExecuteTableCommand(this Func<Task<DbConnection>> connectionBuilder, IEnumerable<string> scripts, string schema, string tablePrefix)
     {
         using (var connection = await connectionBuilder())
         {
             foreach (var script in scripts)
             {
-                await Execute(manipulateCommand, connection, script);
+                await connection.ExecuteTableCommand(script, schema, tablePrefix);
             }
         }
     }
 
-    static async Task Execute(Action<DbCommand> manipulateCommand, DbConnection connection, string script)
+    static async Task ExecuteTableCommand(this DbConnection connection, string script, string schema, string tablePrefix)
     {
         //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
         // throw and hint to add 'Allow User Variables=True' to connection string
         using (var command = connection.CreateCommand())
         {
             command.CommandText = script;
-            manipulateCommand(command);
+            command.AddParameter("schema", schema);
+            command.AddParameter("tablePrefix", tablePrefix);
             await command.ExecuteNonQueryEx();
         }
     }

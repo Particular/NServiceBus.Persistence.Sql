@@ -24,8 +24,8 @@ class SagaInstaller : INeedToInstallSomething
         {
             return Task.FromResult(0);
         }
-        var connectionString = settings.GetConnectionBuilder<StorageType.Sagas>();
-        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Sagas>();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
+        var tablePrefix = settings.GetTablePrefixForEndpoint<StorageType.Sagas>();
 
         var sqlVarient = settings.GetSqlVarient();
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Sagas");
@@ -39,13 +39,10 @@ class SagaInstaller : INeedToInstallSomething
 {string.Join(Environment.NewLine, scriptFiles)}");
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
-
-        return SqlHelpers.Execute(connectionString, sagaScripts,
-            manipulateCommand: dbCommand =>
-            {
-                dbCommand.AddParameter("schema", settings.GetSchema<StorageType.Sagas>());
-                dbCommand.AddParameter("tablePrefix", endpointName);
-            });
+        return connectionBuilder.ExecuteTableCommand(
+            scripts: sagaScripts,
+            tablePrefix: tablePrefix,
+            schema: settings.GetSchema<StorageType.Outbox>());
     }
 
 }
