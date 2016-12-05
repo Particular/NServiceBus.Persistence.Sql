@@ -15,14 +15,12 @@ class SqlHelpers
         return connection;
     }
 
-    internal static Task Execute(Func<Task<DbConnection>> connectionBuilder, string script, Action<DbCommand> manipulateCommand)
+    internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, string script, Action<DbCommand> manipulateCommand)
     {
-        return Execute(connectionBuilder, new List<string> {script}, manipulateCommand);
-    }
-
-    internal static Task Execute(string connection, string script, Action<DbCommand> manipulateCommand)
-    {
-        return Execute(() => New(connection), new List<string> {script}, manipulateCommand);
+        using (var connection = await connectionBuilder())
+        {
+            await Execute(manipulateCommand, connection, script);
+        }
     }
 
     internal static async Task Execute(Func<Task<DbConnection>> connectionBuilder, IEnumerable<string> scripts, Action<DbCommand> manipulateCommand)
@@ -31,15 +29,20 @@ class SqlHelpers
         {
             foreach (var script in scripts)
             {
-                //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
-                // throw and hint to add 'Allow User Variables=True' to connection string
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = script;
-                    manipulateCommand(command);
-                    await command.ExecuteNonQueryEx();
-                }
+                await Execute(manipulateCommand, connection, script);
             }
+        }
+    }
+
+    static async Task Execute(Action<DbCommand> manipulateCommand, DbConnection connection, string script)
+    {
+        //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
+        // throw and hint to add 'Allow User Variables=True' to connection string
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = script;
+            manipulateCommand(command);
+            await command.ExecuteNonQueryEx();
         }
     }
 }

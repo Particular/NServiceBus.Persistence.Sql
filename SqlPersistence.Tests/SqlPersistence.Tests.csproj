@@ -116,7 +116,6 @@
     <Compile Include="Integration\TypeScanner.cs" />
     <Compile Include="Outbox\OperationConverterTests.cs" />
     <Compile Include="Outbox\OutboxPersisterTests.cs" />
-    <Compile Include="Saga\DbBuilder.cs" />
     <Compile Include="Saga\MessagePropertyMapperTests.cs" />
     <Compile Include="Saga\SagaPersisterTests.cs" />
     <Compile Include="Saga\SqlSagaTests.cs" />

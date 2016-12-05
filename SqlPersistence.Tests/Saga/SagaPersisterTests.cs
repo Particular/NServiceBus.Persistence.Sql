@@ -35,25 +35,6 @@ public class SagaPersisterTests
     [SetUp]
     public void SetUp()
     {
-        var sagaWithCorrelation = new SagaDefinition(
-            tableSuffix: "SagaWithCorrelation",
-            name: "SagaWithCorrelation",
-            correlationProperty: new CorrelationProperty
-            (
-                name: "CorrelationProperty",
-                type: CorrelationPropertyType.String
-            ),
-            transitionalCorrelationProperty: new CorrelationProperty
-            (
-                name: "TransitionalCorrelationProperty",
-                type: CorrelationPropertyType.String
-            )
-        );
-        var sagaWithNoCorrelation = new SagaDefinition(
-            tableSuffix: "SagaWithNoCorrelation",
-            name: "SagaWithNoCorrelation"
-        );
-        SagaDbBuilder.ReCreate(dbConnection(), endpointName, sagaWithCorrelation, sagaWithNoCorrelation);
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null, 
@@ -71,6 +52,25 @@ public class SagaPersisterTests
     [Test]
     public async Task Complete()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var id = Guid.NewGuid();
         var sagaData = new SagaWithCorrelation.SagaData
         {
@@ -89,14 +89,32 @@ public class SagaPersisterTests
             await persister.Complete(sagaData, storageSession, typeof(SagaWithCorrelation));
             Assert.IsNull(await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)));
         }
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
     }
 
     [Test]
     public void SaveWithNoCorrelation()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
     }
 
     async Task<SagaWithNoCorrelation.SagaData> SaveWithNoCorrelationAsync(Guid id)
@@ -132,9 +150,32 @@ public class SagaPersisterTests
     [Test]
     public void Save()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var id = Guid.NewGuid();
         var result = SaveAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
     }
 
     async Task<SagaWithCorrelation.SagaData> SaveAsync(Guid id)
@@ -162,9 +203,32 @@ public class SagaPersisterTests
     [Test]
     public void GetById()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
     }
 
     async Task<SagaWithCorrelation.SagaData> GetByIdAsync(Guid id)
@@ -210,9 +274,32 @@ public class SagaPersisterTests
     [Test]
     public void GetByMapping()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var id = Guid.NewGuid();
         var result = GetByMappingAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
     }
 
     async Task<SagaWithCorrelation.SagaData> GetByMappingAsync(Guid id)
@@ -238,6 +325,25 @@ public class SagaPersisterTests
     [Test]
     public async Task SaveDuplicateShouldThrow()
     {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection1 = dbConnection())
+        {
+            connection1.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+        }
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
             Id = Guid.NewGuid(),
@@ -267,6 +373,10 @@ public class SagaPersisterTests
                 await storageSession.CompleteAsync();
             });
             Assert.IsTrue(throwsAsync.InnerException.Message.Contains("Cannot insert duplicate key row in object "));
+        }
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
         }
     }
     

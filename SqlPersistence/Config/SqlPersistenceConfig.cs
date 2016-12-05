@@ -88,26 +88,14 @@ namespace NServiceBus
                 .Set(key, connectionBuilder);
         }
 
-        public static void ConnectionString(this PersistenceExtensions<SqlPersistence> configuration, string connectionString)
-        {
-            var value = new Func<Task<DbConnection>>(() => SqlHelpers.New(connectionString));
-            configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionBuilder", value);
-        }
-
-        public static void ConnectionString<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, string connectionString)
-            where TStorageType : StorageType
-        {
-            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionBuilder";
-            var value = new Func<Task<DbConnection>>(() => SqlHelpers.New(connectionString));
-            configuration.GetSettings()
-                .Set(key, value);
-        }
-
         internal static Func<Task<DbConnection>> GetConnectionBuilder<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetValue<Func<Task<DbConnection>>, TStorageType>("ConnectionBuilder", () => { throw new Exception("ConnectionString or ConnectionBuilder must be defined."); });
+            return settings.GetValue<Func<Task<DbConnection>>, TStorageType>("ConnectionBuilder",
+                defaultValue: () =>
+                {
+                    throw new Exception("ConnectionBuilder must be defined.");
+                });
         }
 
 

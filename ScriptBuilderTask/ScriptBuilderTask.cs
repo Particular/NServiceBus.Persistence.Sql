@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
@@ -73,13 +74,16 @@ namespace NServiceBus.Persistence.Sql
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
             var sqlVarient = SqlVarientReader.Read(moduleDefinition);
 
-            if (sqlVarient != null)
+            if (sqlVarient != SqlVarient.All)
             {
-                Write(moduleDefinition, sqlVarient.Value);
+                Write(moduleDefinition, sqlVarient);
                 return;
             }
 
-            foreach (SqlVarient varient in Enum.GetValues(typeof(SqlVarient)))
+
+            foreach (var varient in Enum.GetValues(typeof(SqlVarient))
+                .Cast<SqlVarient>()
+                .Where(x => x != SqlVarient.All))
             {
                 Write(moduleDefinition, varient);
             }

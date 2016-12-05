@@ -53,6 +53,9 @@
     <Persistence>$(SolutionDir)SqlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.dll</Persistence>
     <PersistencePdb>$(SolutionDir)SqlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.pdb</PersistencePdb>
     <PersistenceXml>$(SolutionDir)SqlPersistence\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.xml</PersistenceXml>
+    <Common>$(SolutionDir)Common\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Common.dll</Common>
+    <CommonPdb>$(SolutionDir)Common\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Common.pdb</CommonPdb>
+    <CommonXml>$(SolutionDir)Common\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.Common.xml</CommonXml>
     <Targets>$(ProjectDir)NServiceBus.Persistence.Sql.targets</Targets>
   </PropertyGroup>
   <PropertyGroup>
@@ -66,7 +69,7 @@
   <Target Name="NuGetBuild" DependsOnTargets="Clean">
     <MakeDir Directories="$(NugetBuild)" />
     <Copy SourceFiles="$(TargetDir)NServiceBus.Persistence.Sql.nuspec" DestinationFolder="$(NugetBuild)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTask)&quot; &quot;$(Common)&quot; &quot;$(ScriptBuilder)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
     <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuild)build\net452" />
     <Copy SourceFiles="$(Persistence)" DestinationFolder="$(NugetBuild)lib\net452" />
     <Copy SourceFiles="$(PersistencePdb)" DestinationFolder="$(NugetBuild)lib\net452" />
@@ -74,6 +77,8 @@
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuild)" MetadataAssembly="$(Persistence)" />
 
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(Common)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(CommonPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(Persistence)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(PersistencePdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build\net452" />
