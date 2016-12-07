@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using NServiceBus.Settings;
@@ -13,9 +14,9 @@ namespace NServiceBus.Persistence.Sql
             settings.Set("SqlPersistence.Saga.WriterCreator", writerCreator);
         }
 
-        internal static Func<StringBuilder, JsonWriter> GetWriterCreator(ReadOnlySettings settings)
+        internal static Func<TextWriter, JsonWriter> GetWriterCreator(ReadOnlySettings settings)
         {
-            return settings.GetOrDefault<Func<StringBuilder, JsonWriter>>("SqlPersistence.Saga.WriterCreator");
+            return settings.GetOrDefault<Func<TextWriter, JsonWriter>>("SqlPersistence.Saga.WriterCreator");
         }
 
     }

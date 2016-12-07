@@ -14,7 +14,7 @@ class RuntimeSagaInfo
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
     NewtonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
-    Func<StringBuilder, JsonWriter> writerCreator;
+    Func<TextWriter, JsonWriter> writerCreator;
     ConcurrentDictionary<Version, NewtonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
@@ -35,7 +35,7 @@ class RuntimeSagaInfo
         Type sagaType,
         NewtonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
-        Func<StringBuilder, JsonWriter> writerCreator)
+        Func<TextWriter, JsonWriter> writerCreator)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -73,7 +73,8 @@ class RuntimeSagaInfo
     public string ToJson(IContainSagaData sagaData)
     {
         var builder = new StringBuilder();
-        using (var writer = writerCreator(builder))
+        using (var stringWriter = new StringWriter(builder))
+        using (var writer = writerCreator(stringWriter))
         {
             jsonSerializer.Serialize(writer, sagaData);
         }

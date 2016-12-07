@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql;
 
@@ -12,13 +11,13 @@ class SagaInfoCache
     ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
-    Func<StringBuilder, JsonWriter> writerCreator;
+    Func<TextWriter, JsonWriter> writerCreator;
 
     public SagaInfoCache(
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
-        Func<StringBuilder, JsonWriter> writerCreator,
+        Func<TextWriter, JsonWriter> writerCreator,
         SagaCommandBuilder commandBuilder)
     {
         this.versionSpecificSettings = versionSpecificSettings;

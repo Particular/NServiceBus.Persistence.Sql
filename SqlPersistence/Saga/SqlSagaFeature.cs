@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
@@ -41,11 +40,7 @@ class SqlSagaFeature : Feature
         var writerCreator = SagaSettings.GetWriterCreator(settings);
         if (writerCreator == null)
         {
-            writerCreator = builder =>
-            {
-                var writer = new StringWriter(builder);
-                return new JsonTextWriter(writer);
-            };
+            writerCreator = writer => new JsonTextWriter(writer);
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder);

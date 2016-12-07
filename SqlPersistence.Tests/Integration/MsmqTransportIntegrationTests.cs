@@ -38,6 +38,8 @@ public class MsmqTransportIntegrationTests : IDisposable
         MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
     }
 
     [TearDown]
@@ -45,6 +47,7 @@ public class MsmqTransportIntegrationTests : IDisposable
     {
         MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
     }
 
     [Test]

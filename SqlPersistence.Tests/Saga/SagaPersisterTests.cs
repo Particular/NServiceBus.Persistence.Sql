@@ -1,7 +1,6 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
@@ -41,11 +40,7 @@ public class SagaPersisterTests
             jsonSerializer: JsonSerializer.CreateDefault(), 
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
-            writerCreator: builder =>
-            {
-                var writer = new StringWriter(builder);
-                return new JsonTextWriter(writer);
-            });
+            writerCreator: writer => new JsonTextWriter(writer));
         persister = new SagaPersister(infoCache);
     }
 
