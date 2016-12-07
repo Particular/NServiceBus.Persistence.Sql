@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-using Newtonsoft.Json;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -16,9 +13,6 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<Task<DbConnection>> connectionBuilder;
-    JsonSerializer jsonSerializer;
-    Func<TextReader, JsonReader> readerCreator;
-    Func<StringBuilder, JsonWriter> writerCreator;
     string storeCommandText;
     string getCommandText;
     string setAsDispatchedCommandText;
@@ -27,15 +21,9 @@ class OutboxPersister : IOutboxStorage
     public OutboxPersister(
         Func<Task<DbConnection>> connectionBuilder, 
         string schema, 
-        string tablePrefix,
-        JsonSerializer jsonSerializer,
-        Func<TextReader, JsonReader> readerCreator,
-        Func<StringBuilder, JsonWriter> writerCreator)
+        string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-        this.jsonSerializer = jsonSerializer;
-        this.readerCreator = readerCreator;
-        this.writerCreator = writerCreator;
         storeCommandText = $@"
 insert into [{schema}].[{tablePrefix}OutboxData]
 (
@@ -112,9 +100,8 @@ where MessageId = @MessageId";
                     else
                     {
                         using (var textReader = dataReader.GetTextReader(1))
-                        using (var jsonReader = readerCreator(textReader))
                         {
-                            var transportOperations = jsonSerializer.Deserialize<IEnumerable<SerializableOperation>>(jsonReader)
+                            var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
                                 .FromSerializable()
                                 .ToArray();
                             result = new OutboxMessage(messageId, transportOperations);
@@ -142,19 +129,9 @@ where MessageId = @MessageId";
             command.CommandText = storeCommandText;
             command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
-            command.AddParameter("Operations", OperationsToString(message.TransportOperations));
+            command.AddParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
             await command.ExecuteNonQueryEx();
         }
-    }
-
-    string OperationsToString(TransportOperation[] operations)
-    {
-        var stringBuilder = new StringBuilder();
-        using (var jsonWriter = writerCreator(stringBuilder))
-        {
-            jsonSerializer.Serialize(jsonWriter, operations.ToSerializable());
-        }
-        return stringBuilder.ToString();
     }
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)

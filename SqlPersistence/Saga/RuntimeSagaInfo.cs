@@ -34,8 +34,8 @@ class RuntimeSagaInfo
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
         NewtonSerializer jsonSerializer,
-            Func<TextReader, JsonReader> readerCreator,
-            Func<StringBuilder, JsonWriter> writerCreator)
+        Func<TextReader, JsonReader> readerCreator,
+        Func<StringBuilder, JsonWriter> writerCreator)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -103,7 +103,7 @@ class RuntimeSagaInfo
             var settings = versionSpecificSettings(sagaDataType, storedSagaTypeVersion);
             if (settings != null)
             {
-                return JsonSerializer.Create(settings); 
+                return JsonSerializer.Create(settings);
             }
             return jsonSerializer;
         });

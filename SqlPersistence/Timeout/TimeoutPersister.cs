@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.IO;
-using System.Text;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NServiceBus.Extensibility;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
     Func<Task<DbConnection>> connectionBuilder;
-    JsonSerializer jsonSerializer;
-    Func<TextReader, JsonReader> readerCreator;
-    Func<StringBuilder, JsonWriter> writerCreator;
     string insertCommandText;
     string removeByIdCommandText;
     string removeBySagaIdCommandText;
@@ -25,15 +19,9 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public TimeoutPersister(
         Func<Task<DbConnection>> connectionBuilder, 
         string schema, 
-        string tablePrefix,
-        JsonSerializer jsonSerializer,
-        Func<TextReader, JsonReader> readerCreator,
-        Func<StringBuilder, JsonWriter> writerCreator)
+        string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-        this.jsonSerializer = jsonSerializer;
-        this.readerCreator = readerCreator;
-        this.writerCreator = writerCreator;
 
         insertCommandText = $@"
 insert into [{schema}].[{tablePrefix}TimeoutData]
@@ -113,15 +101,13 @@ ORDER BY TIME";
                 };
             }
         }
-
     }
 
     Dictionary<string, string> ReadHeaders(DbDataReader reader)
     {
         using (var textReader = reader.GetTextReader(4))
-        using (var jsonReader = readerCreator(textReader))
         {
-            return jsonSerializer.Deserialize<Dictionary<string, string>>(jsonReader);
+            return Serializer.Deserialize<Dictionary<string, string>>(textReader);
         }
     }
 
@@ -138,20 +124,10 @@ ORDER BY TIME";
             command.AddParameter("SagaId", timeout.SagaId);
             command.AddParameter("State", timeout.State);
             command.AddParameter("Time", timeout.Time);
-            command.AddParameter("Headers", HeadersToString(timeout.Headers));
+            command.AddParameter("Headers", Serializer.Serialize(timeout.Headers));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
-    }
-
-    string HeadersToString(Dictionary<string, string> headers)
-    {
-        var stringBuilder = new StringBuilder();
-        using (var jsonWriter = writerCreator(stringBuilder))
-        {
-            jsonSerializer.Serialize(jsonWriter, headers);
-        }
-        return stringBuilder.ToString();
     }
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)

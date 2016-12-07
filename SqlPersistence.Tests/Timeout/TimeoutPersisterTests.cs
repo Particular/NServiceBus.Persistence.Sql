@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.IO;
-using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
@@ -30,14 +28,7 @@ public class TimeoutPersisterTests : IDisposable
                 return connection1;
             }, 
             schema: "dbo",
-            tablePrefix: $"{nameof(TimeoutPersisterTests)}.",
-            jsonSerializer: JsonSerializer.CreateDefault(),
-            readerCreator: reader => new JsonTextReader(reader),
-            writerCreator: builder =>
-            {
-                var writer = new StringWriter(builder);
-                return new JsonTextWriter(writer);
-            });
+            tablePrefix: $"{nameof(TimeoutPersisterTests)}.");
     }
 
     [SetUp]

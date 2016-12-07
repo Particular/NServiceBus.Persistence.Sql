@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -31,14 +29,7 @@ public class OutboxPersisterTests : IDisposable
                 return connection.ToTask();
             },
             schema: "dbo",
-            tablePrefix: $"{nameof(OutboxPersisterTests)}.",
-            jsonSerializer: JsonSerializer.CreateDefault(),
-            readerCreator: reader => new JsonTextReader(reader),
-            writerCreator: builder =>
-            {
-                var writer = new StringWriter(builder);
-                return new JsonTextWriter(writer);
-            });
+            tablePrefix: $"{nameof(OutboxPersisterTests)}.");
     }
 
 
