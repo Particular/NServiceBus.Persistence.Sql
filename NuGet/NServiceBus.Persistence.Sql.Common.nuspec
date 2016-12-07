@@ -1,20 +1,17 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>NServiceBus.Persistence.Sql.ScriptBuilder</id>
+    <id>NServiceBus.Persistence.Sql.Common</id>
     <version>$version$</version>
-    <title>NServiceBus.Persistence.Sql.ScriptBuilder</title>
+    <title>NServiceBus.Persistence.Sql.Common</title>
     <authors>Simon Cropp, Szymon Pobiega</authors>
     <owners>Simon Cropp, Szymon Pobiega</owners>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
     <projectUrl>https://github.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/NsbSqlPersistence/</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <iconUrl>https://github.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/master/Icons/package_icon.png</iconUrl>
-    <description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package.</description>
+    <description>Common package used by all other NServiceBus.Persistence.Sql.* packages.</description>
     <language>en-AU</language>
     <tags>NServiceBus, Sql</tags>
-    <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql.Common" version="$version$" />
-    </dependencies>
   </metadata>
 </package>
