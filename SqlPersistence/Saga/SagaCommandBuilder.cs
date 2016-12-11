@@ -103,7 +103,7 @@ where Correlation_{propertyName} = @propertyValue
     public string BuildCompleteCommand(string tableSuffx)
     {
         return $@"
-DELETE FROM  [{schema}].[{tablePrefix}{tableSuffx}]
+DELETE FROM [{schema}].[{tablePrefix}{tableSuffx}]
 where Id = @Id
 ";
     }

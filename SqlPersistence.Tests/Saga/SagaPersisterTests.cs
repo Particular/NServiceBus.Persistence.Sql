@@ -9,7 +9,6 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-
 [TestFixture]
 #if (!DEBUG)
 [Explicit]
@@ -37,7 +36,7 @@ public class SagaPersisterTests
         var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null, 
-            jsonSerializer: JsonSerializer.CreateDefault(), 
+            jsonSerializer: Serializer.JsonSerializer, 
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer));

@@ -23,15 +23,7 @@ class SqlSagaFeature : Feature
         var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Sagas>();
         var commandBuilder = new SagaCommandBuilder(schema, endpointName);
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
-        JsonSerializer jsonSerializer;
-        if (jsonSerializerSettings == null)
-        {
-            jsonSerializer = new JsonSerializer();
-        }
-        else
-        {
-            jsonSerializer = JsonSerializer.Create(jsonSerializerSettings);
-        }
+        var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
         if (readerCreator == null)
         {
@@ -47,4 +39,14 @@ class SqlSagaFeature : Feature
         var sagaPersister = new SagaPersister(infoCache);
         context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }
+
+     static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
+    {
+        if (jsonSerializerSettings == null)
+        {
+            return Serializer.JsonSerializer;
+        }
+        return JsonSerializer.Create(jsonSerializerSettings);
+    }
+
 }

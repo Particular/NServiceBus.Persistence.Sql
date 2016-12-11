@@ -4,16 +4,24 @@ using Newtonsoft.Json;
 
 static class Serializer
 {
-    static JsonSerializer jsonSerializer;
+    public static JsonSerializer JsonSerializer;
+    static JsonSerializerSettings settings;
+
     static Serializer()
     {
-        jsonSerializer = JsonSerializer.CreateDefault();
+        settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
+        JsonSerializer = JsonSerializer.Create(settings);
     }
+
     public static T Deserialize<T>(TextReader textReader)
     {
         using (var jsonReader = new JsonTextReader(textReader))
         {
-            return jsonSerializer.Deserialize<T>(jsonReader);
+            return JsonSerializer.Deserialize<T>(jsonReader);
         }
     }
 
@@ -23,7 +31,7 @@ static class Serializer
         var stringWriter = new StringWriter(stringBuilder);
         using (var jsonWriter = new JsonTextWriter(stringWriter))
         {
-            jsonSerializer.Serialize(jsonWriter, target);
+            JsonSerializer.Serialize(jsonWriter, target);
         }
         return stringBuilder.ToString();
     }

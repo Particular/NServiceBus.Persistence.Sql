@@ -72,13 +72,28 @@ class RuntimeSagaInfo
 
     public string ToJson(IContainSagaData sagaData)
     {
-        var builder = new StringBuilder();
-        using (var stringWriter = new StringWriter(builder))
-        using (var writer = writerCreator(stringWriter))
+        var originalMessageId = sagaData.OriginalMessageId;
+        var originator = sagaData.Originator;
+        var id = sagaData.Id;
+        sagaData.OriginalMessageId = null;
+        sagaData.Originator = null;
+        sagaData.Id = Guid.Empty;
+        try
         {
-            jsonSerializer.Serialize(writer, sagaData);
+            var builder = new StringBuilder();
+            using (var stringWriter = new StringWriter(builder))
+            using (var writer = writerCreator(stringWriter))
+            {
+                jsonSerializer.Serialize(writer, sagaData);
+            }
+            return builder.ToString();
         }
-        return builder.ToString();
+        finally
+        {
+            sagaData.OriginalMessageId = originalMessageId;
+            sagaData.Originator = originator;
+            sagaData.Id = id;
+        }
     }
 
 
