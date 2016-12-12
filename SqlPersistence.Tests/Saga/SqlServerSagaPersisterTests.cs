@@ -22,4 +22,9 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
             return connection;
         };
     }
+
+    protected override bool IsConcurrencyException(Exception innerException)
+    {
+        return innerException.Message.Contains("Cannot insert duplicate key row in object ");
+    }
 }

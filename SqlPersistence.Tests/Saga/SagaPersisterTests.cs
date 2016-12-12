@@ -364,12 +364,14 @@ public abstract class SagaPersisterTests
                 await persister.Save(sagaData2, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
                 await storageSession.CompleteAsync();
             });
-            Assert.IsTrue(throwsAsync.InnerException.Message.Contains("Cannot insert duplicate key row in object "));
+            var innerException = throwsAsync.InnerException;
+            Assert.IsTrue(IsConcurrencyException(innerException));
         }
         using (var connection = dbConnection())
         {
             connection.ExecuteCommand(dropScript, endpointName);
         }
     }
-    
+
+    protected abstract bool IsConcurrencyException(Exception innerException);
 }

@@ -18,20 +18,11 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public TimeoutPersister(
         Func<Task<DbConnection>> connectionBuilder, 
-        string schema, 
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
 
-        string tableName;
-        if (schema == null)
-        {
-            tableName = $@"{tablePrefix}TimeoutData";
-        }
-        else
-        {
-            tableName = $@"{schema}.{tablePrefix}TimeoutData";
-        }
+        var tableName = $@"{tablePrefix}TimeoutData";
         insertCommandText = $@"
 insert into {tableName}
 (

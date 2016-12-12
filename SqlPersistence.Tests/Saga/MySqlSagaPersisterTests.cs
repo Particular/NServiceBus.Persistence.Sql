@@ -22,4 +22,8 @@ public class MySqlSagaPersisterTests: SagaPersisterTests
             return connection;
         };
     }
+    protected override bool IsConcurrencyException(Exception innerException)
+    {
+        return innerException.Message.Contains("Duplicate entry ");
+    }
 }
