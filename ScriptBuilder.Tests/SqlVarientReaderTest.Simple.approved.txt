@@ -1,1 +1,3 @@
-﻿MsSqlServer
+﻿[
+  "MsSqlServer"
+]

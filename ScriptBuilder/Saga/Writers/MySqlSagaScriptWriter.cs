@@ -189,7 +189,7 @@ deallocate prepare statment;
     public void WriteDropTable()
     {
         writer.Write(@"
-set @createTable = concat('drop table ', @tableName);
+set @dropTable = concat('drop table if exists ', @tableName);
 prepare statment from @dropTable;
 execute statment;
 deallocate prepare statment;

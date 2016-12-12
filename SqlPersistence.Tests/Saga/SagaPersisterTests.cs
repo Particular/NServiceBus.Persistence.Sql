@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
@@ -9,25 +8,18 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 
-[TestFixture]
-#if (!DEBUG)
-[Explicit]
-#endif
-public class SagaPersisterTests
+public abstract class SagaPersisterTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
+    BuildSqlVarient sqlVarient;
     static string endpointName = "Endpoint";
     SagaPersister persister;
     Func<DbConnection> dbConnection;
+    protected abstract Func<DbConnection> GetConnection();
 
-    public SagaPersisterTests()
+    public SagaPersisterTests(BuildSqlVarient sqlVarient)
     {
-        dbConnection = () =>
-        {
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            return connection;
-        };
+        this.sqlVarient = sqlVarient;
+        dbConnection = GetConnection();
     }
 
     [SetUp]
@@ -60,10 +52,11 @@ public class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var sagaData = new SagaWithCorrelation.SagaData
@@ -85,7 +78,7 @@ public class SagaPersisterTests
         }
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 
@@ -96,10 +89,11 @@ public class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id).GetAwaiter().GetResult();
@@ -107,7 +101,7 @@ public class SagaPersisterTests
 
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 
@@ -158,17 +152,18 @@ public class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 
@@ -211,17 +206,18 @@ public class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 
@@ -282,17 +278,18 @@ public class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByMappingAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 
@@ -333,10 +330,11 @@ public class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
+        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection1 = dbConnection())
         {
-            connection1.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
-            connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection1.ExecuteCommand(dropScript, endpointName);
+            connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
@@ -370,7 +368,7 @@ public class SagaPersisterTests
         }
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
     
