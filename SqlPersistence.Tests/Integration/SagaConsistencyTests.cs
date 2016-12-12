@@ -143,7 +143,7 @@ public class SagaConsistencyTests
             {
                 command.CommandText = script;
                 command.AddParameter("schema", "dbo");
-                command.AddParameter("tablePrefix", $"{endpointName}.");
+                command.AddParameter("tablePrefix", $"{endpointName}_");
                 command.ExecuteNonQuery();
             }
         }

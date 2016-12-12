@@ -28,7 +28,7 @@ public class OutboxPersisterTests : IDisposable
                 return connection.ToTask();
             },
             schema: "dbo",
-            tablePrefix: $"{nameof(OutboxPersisterTests)}.");
+            tablePrefix: $"{nameof(OutboxPersisterTests)}_");
     }
 
 

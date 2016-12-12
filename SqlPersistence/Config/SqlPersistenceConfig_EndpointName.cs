@@ -33,7 +33,7 @@ namespace NServiceBus
         {
             if (settings.ShouldUseEndpointName<T>())
             {
-                return $"{settings.EndpointName()}.";
+                return $"{settings.EndpointName()}_";
             }
             return "";
         }

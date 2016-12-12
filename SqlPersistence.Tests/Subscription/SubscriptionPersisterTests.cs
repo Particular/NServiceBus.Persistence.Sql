@@ -28,7 +28,7 @@ public class SubscriptionPersisterTests : IDisposable
                 return connection.ToTask();
             },
             schema: "dbo",
-            tablePrefix: $"{nameof(SubscriptionPersisterTests)}."
+            tablePrefix: $"{nameof(SubscriptionPersisterTests)}_"
             );
     }
 

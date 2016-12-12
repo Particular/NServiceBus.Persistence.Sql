@@ -27,7 +27,7 @@ public class TimeoutPersisterTests : IDisposable
                 return connection1;
             }, 
             schema: "dbo",
-            tablePrefix: $"{nameof(TimeoutPersisterTests)}.");
+            tablePrefix: $"{nameof(TimeoutPersisterTests)}_");
     }
 
     [SetUp]

@@ -25,7 +25,7 @@ public abstract class SagaPersisterTests
     [SetUp]
     public void SetUp()
     {
-        var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}.");
+        var commandBuilder = new SagaCommandBuilder("dbo", $"{endpointName}_");
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null, 
             jsonSerializer: Serializer.JsonSerializer, 
