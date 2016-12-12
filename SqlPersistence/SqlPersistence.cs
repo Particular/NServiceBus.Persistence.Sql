@@ -4,6 +4,7 @@ namespace NServiceBus.Persistence.Sql
 {
     public class SqlPersistence : PersistenceDefinition
     {
+        //TODO: throw for schema in mysql
         public SqlPersistence()
         {
             Defaults(s =>

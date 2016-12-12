@@ -42,7 +42,7 @@ class SagaInstaller : INeedToInstallSomething
         return connectionBuilder.ExecuteTableCommand(
             scripts: sagaScripts,
             tablePrefix: tablePrefix,
-            schema: settings.GetSchema<StorageType.Outbox>());
+            schema: settings.GetSchema<StorageType.Sagas>());
     }
 
 }
