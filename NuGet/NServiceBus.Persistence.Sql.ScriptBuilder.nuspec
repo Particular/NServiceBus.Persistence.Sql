@@ -13,8 +13,5 @@
     <description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package.</description>
     <language>en-AU</language>
     <tags>NServiceBus, Sql</tags>
-    <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql.Common" version="$version$" />
-    </dependencies>
   </metadata>
 </package>

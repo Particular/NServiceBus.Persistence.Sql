@@ -2,7 +2,6 @@ using System.IO;
 using System.Text;
 using ApprovalTests;
 using ApprovalTests.Namers;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -10,9 +9,9 @@ using NUnit.Framework;
 public class OutboxScriptBuilderTest
 {
     [Test]
-    [TestCase(SqlVarient.MsSqlServer)]
-    [TestCase(SqlVarient.MySql)]
-    public void BuildCreateScript(SqlVarient sqlVarient)
+    [TestCase(BuildSqlVarient.MsSqlServer)]
+    [TestCase(BuildSqlVarient.MySql)]
+    public void BuildCreateScript(BuildSqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -20,7 +19,7 @@ public class OutboxScriptBuilderTest
             OutboxScriptBuilder.BuildCreateScript(writer,sqlVarient);
         }
         var script = builder.ToString();
-        if (sqlVarient == SqlVarient.MsSqlServer)
+        if (sqlVarient == BuildSqlVarient.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
@@ -31,9 +30,9 @@ public class OutboxScriptBuilderTest
     }
 
     [Test]
-    [TestCase(SqlVarient.MsSqlServer)]
-    [TestCase(SqlVarient.MySql)]
-    public void BuildDropScript(SqlVarient sqlVarient)
+    [TestCase(BuildSqlVarient.MsSqlServer)]
+    [TestCase(BuildSqlVarient.MySql)]
+    public void BuildDropScript(BuildSqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -41,7 +40,7 @@ public class OutboxScriptBuilderTest
             OutboxScriptBuilder.BuildDropScript(writer, sqlVarient);
         }
         var script = builder.ToString();
-        if (sqlVarient == SqlVarient.MsSqlServer)
+        if (sqlVarient == BuildSqlVarient.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }

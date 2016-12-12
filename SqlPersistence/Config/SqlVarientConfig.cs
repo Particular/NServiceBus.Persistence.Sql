@@ -1,4 +1,3 @@
-using System;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
@@ -9,10 +8,6 @@ namespace NServiceBus
     {
         public static void SqlVarient(this PersistenceExtensions<SqlPersistence> configuration, SqlVarient sqlVarient)
         {
-            if (sqlVarient == Persistence.Sql.SqlVarient.All)
-            {
-                throw new ArgumentException("SqlVarient.All is not allowed.");
-            }
             var settings = configuration.GetSettings();
             settings.Set("SqlPersistence.SqlVarient", sqlVarient);
         }

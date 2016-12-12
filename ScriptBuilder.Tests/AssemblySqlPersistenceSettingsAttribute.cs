@@ -1,3 +1,3 @@
 ﻿using NServiceBus.Persistence.Sql;
 
-[assembly: SqlPersistenceSettings(sqlVarient: SqlVarient.MsSqlServer)]
+[assembly: SqlPersistenceSettings(msSqlServerScripts: true)]

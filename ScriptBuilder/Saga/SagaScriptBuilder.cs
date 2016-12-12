@@ -7,7 +7,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     public static class SagaScriptBuilder
     {
 
-        public static string BuildCreateScript(SagaDefinition saga, SqlVarient sqlVarient)
+        public static string BuildCreateScript(SagaDefinition saga, BuildSqlVarient sqlVarient)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
@@ -17,7 +17,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             return stringBuilder.ToString();
         }
 
-        public static void BuildCreateScript(SagaDefinition saga, SqlVarient sqlVarient, TextWriter writer)
+        public static void BuildCreateScript(SagaDefinition saga, BuildSqlVarient sqlVarient, TextWriter writer)
         {
             Guard.AgainstNull(nameof(saga), saga);
             Guard.AgainstNull(nameof(writer), writer);
@@ -70,17 +70,13 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 /* {text} */ ");
         }
 
-        static ISagaScriptWriter GetSqlVarientWriter(SqlVarient sqlVarient, TextWriter textWriter, SagaDefinition saga)
+        static ISagaScriptWriter GetSqlVarientWriter(BuildSqlVarient sqlVarient, TextWriter textWriter, SagaDefinition saga)
         {
-            if (sqlVarient == SqlVarient.MsSqlServer)
+            if (sqlVarient == BuildSqlVarient.MsSqlServer)
             {
                 return new MsSqlServerSagaScriptWriter(textWriter, saga);
             }
-            //if (sqlVarient == SqlVarient.PostgreSql)
-            //{
-            //    return new PostgreSqlSagaScriptWriter(textWriter, saga);
-            //}
-            if (sqlVarient == SqlVarient.MySql)
+            if (sqlVarient == BuildSqlVarient.MySql)
             {
                 return new MySqlSagaScriptWriter(textWriter, saga);
             }
@@ -88,7 +84,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             throw new Exception($"Unknown SqlVarient {sqlVarient}.");
         }
 
-        public static void BuildDropScript(SagaDefinition saga, SqlVarient sqlVarient, TextWriter writer)
+        public static void BuildDropScript(SagaDefinition saga, BuildSqlVarient sqlVarient, TextWriter writer)
         {
             var sqlVarientWriter = GetSqlVarientWriter(sqlVarient, writer, saga);
 
@@ -100,7 +96,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         }
 
 
-        public static string BuildDropScript(SagaDefinition saga, SqlVarient sqlVarient)
+        public static string BuildDropScript(SagaDefinition saga, BuildSqlVarient sqlVarient)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))

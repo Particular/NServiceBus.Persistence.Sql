@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
@@ -72,24 +71,13 @@ namespace NServiceBus.Persistence.Sql
         void Inner()
         {
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
-            var sqlVarient = SqlVarientReader.Read(moduleDefinition);
-
-            if (sqlVarient != SqlVarient.All)
-            {
-                Write(moduleDefinition, sqlVarient);
-                return;
-            }
-
-
-            foreach (var varient in Enum.GetValues(typeof(SqlVarient))
-                .Cast<SqlVarient>()
-                .Where(x => x != SqlVarient.All))
+            foreach (var varient in SqlVarientReader.Read(moduleDefinition))
             {
                 Write(moduleDefinition, varient);
             }
         }
 
-        void Write(ModuleDefinition moduleDefinition, SqlVarient sqlVarient)
+        void Write(ModuleDefinition moduleDefinition, BuildSqlVarient sqlVarient)
         {
             var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVarient.ToString());
             Directory.CreateDirectory(scriptPath);
@@ -99,7 +87,7 @@ namespace NServiceBus.Persistence.Sql
             WriteOutboxScript(scriptPath, sqlVarient);
         }
 
-        void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, SqlVarient sqlVarient)
+        void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlVarient sqlVarient)
         {
             var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
             var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
@@ -133,7 +121,7 @@ namespace NServiceBus.Persistence.Sql
             }
         }
 
-        static void WriteTimeoutScript(string scriptPath, SqlVarient sqlVarient)
+        static void WriteTimeoutScript(string scriptPath, BuildSqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Timeout_Create.sql");
             File.Delete(createPath);
@@ -149,7 +137,7 @@ namespace NServiceBus.Persistence.Sql
             }
         }
 
-        static void WriteOutboxScript(string scriptPath, SqlVarient sqlVarient)
+        static void WriteOutboxScript(string scriptPath, BuildSqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
             File.Delete(createPath);
@@ -165,7 +153,7 @@ namespace NServiceBus.Persistence.Sql
             }
         }
 
-        static void WriteSubscriptionScript(string scriptPath, SqlVarient sqlVarient)
+        static void WriteSubscriptionScript(string scriptPath, BuildSqlVarient sqlVarient)
         {
             var createPath = Path.Combine(scriptPath, "Subscription_Create.sql");
             File.Delete(createPath);

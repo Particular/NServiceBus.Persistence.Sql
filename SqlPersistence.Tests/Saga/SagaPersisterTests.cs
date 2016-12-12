@@ -62,8 +62,8 @@ public class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var id = Guid.NewGuid();
         var sagaData = new SagaWithCorrelation.SagaData
@@ -85,7 +85,7 @@ public class SagaPersisterTests
         }
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
 
@@ -98,8 +98,8 @@ public class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id).GetAwaiter().GetResult();
@@ -107,7 +107,7 @@ public class SagaPersisterTests
 
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
 
@@ -160,15 +160,15 @@ public class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
 
@@ -213,15 +213,15 @@ public class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
 
@@ -284,15 +284,15 @@ public class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByMappingAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
 
@@ -335,8 +335,8 @@ public class SagaPersisterTests
         );
         using (var connection1 = dbConnection())
         {
-            connection1.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
-            connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection1.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
+            connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
@@ -370,7 +370,7 @@ public class SagaPersisterTests
         }
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, SqlVarient.MsSqlServer), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, BuildSqlVarient.MsSqlServer), endpointName);
         }
     }
     

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
@@ -13,7 +12,7 @@ public class TimeoutPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     TimeoutPersister persister;
-    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
     DbConnection dbConnection;
 
     public TimeoutPersisterTests()

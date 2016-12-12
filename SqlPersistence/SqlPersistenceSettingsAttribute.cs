@@ -5,11 +5,16 @@ namespace NServiceBus.Persistence.Sql
     [AttributeUsage(AttributeTargets.Assembly)]
     public class SqlPersistenceSettingsAttribute : Attribute
     {
-        public SqlVarient SqlVarient { get; }
+        public readonly bool MsSqlServerScripts;
+        public readonly bool MySqlScripts;
 
-        public SqlPersistenceSettingsAttribute(SqlVarient sqlVarient = SqlVarient.All)
+        public SqlPersistenceSettingsAttribute(
+            bool msSqlServerScripts = false,
+            bool mySqlScripts = false
+            )
         {
-            SqlVarient = sqlVarient;
+            MySqlScripts = mySqlScripts;
+            MsSqlServerScripts = msSqlServerScripts;
         }
     }
 }

@@ -12,7 +12,7 @@ public class SqlTransportIntegrationTests:IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
-    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 

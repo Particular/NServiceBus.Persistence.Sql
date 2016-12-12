@@ -15,7 +15,6 @@
     <tags>NServiceBus, Sql</tags>
     <dependencies>
       <dependency id="NServiceBus.Persistence.Sql" version="$version$" />
-      <dependency id="NServiceBus.Persistence.Sql.Common" version="$version$" />
     </dependencies>
   </metadata>
 </package>

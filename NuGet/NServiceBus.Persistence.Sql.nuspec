@@ -16,7 +16,6 @@
     <dependencies>
       <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
       <dependency id="Newtonsoft.Json" version="[9.0.0, 10.0.0)" />
-      <dependency id="NServiceBus.Persistence.Sql.Common" version="$version$" />
     </dependencies>
   </metadata>
 </package>

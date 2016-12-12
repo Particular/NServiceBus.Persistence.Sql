@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -14,7 +13,7 @@ public class SubscriptionPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     SubscriptionPersister persister;
-    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
     DbConnection dbConnection;
 
     public SubscriptionPersisterTests()

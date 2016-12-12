@@ -6,12 +6,12 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     public static class TimeoutScriptBuilder
     {
 
-        public static void BuildCreateScript(TextWriter writer, SqlVarient sqlVarient)
+        public static void BuildCreateScript(TextWriter writer, BuildSqlVarient sqlVarient)
         {
             writer.Write(ResourceReader.ReadResource(sqlVarient, "Timeout.Create"));
         }
 
-        public static string BuildCreateScript(SqlVarient sqlVarient)
+        public static string BuildCreateScript(BuildSqlVarient sqlVarient)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
@@ -21,12 +21,12 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             return stringBuilder.ToString();
         }
 
-        public static void BuildDropScript(TextWriter writer, SqlVarient sqlVarient)
+        public static void BuildDropScript(TextWriter writer, BuildSqlVarient sqlVarient)
         {
             writer.Write(ResourceReader.ReadResource(sqlVarient, "Timeout.Drop"));
         }
 
-        public static string BuildDropScript(SqlVarient sqlVarient)
+        public static string BuildDropScript(BuildSqlVarient sqlVarient)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))

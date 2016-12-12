@@ -86,10 +86,10 @@ public class SagaConsistencyTests
             )
         );
 
-        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, SqlVarient.MsSqlServer));
-        Execute(OutboxScriptBuilder.BuildDropScript(SqlVarient.MsSqlServer));
-        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, SqlVarient.MsSqlServer));
-        Execute(OutboxScriptBuilder.BuildCreateScript(SqlVarient.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, BuildSqlVarient.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildDropScript(BuildSqlVarient.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, BuildSqlVarient.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildCreateScript(BuildSqlVarient.MsSqlServer));
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SagaConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);

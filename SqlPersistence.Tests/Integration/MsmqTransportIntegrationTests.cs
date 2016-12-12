@@ -13,7 +13,7 @@ public class MsmqTransportIntegrationTests : IDisposable
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "MsmqTransportIntegration";
-    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 

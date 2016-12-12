@@ -1,8 +1,9 @@
 ﻿using System.IO;
-using ApprovalTests;
+using System.Linq;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using ObjectApproval;
 
 [TestFixture]
 public class SqlVarientReaderTest
@@ -19,7 +20,7 @@ public class SqlVarientReaderTest
             AssemblyResolver = assemblyResolver
         };
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        Approvals.Verify(SqlVarientReader.Read(module));
+        ObjectApprover.VerifyWithJson(SqlVarientReader.Read(module).ToList());
     }
 
 }

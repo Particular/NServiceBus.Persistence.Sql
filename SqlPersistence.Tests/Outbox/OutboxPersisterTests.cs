@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
@@ -14,7 +13,7 @@ public class OutboxPersisterTests : IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     OutboxPersister persister;
-    SqlVarient sqlVarient = SqlVarient.MsSqlServer;
+    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
     DbConnection dbConnection;
 
     public OutboxPersisterTests()
