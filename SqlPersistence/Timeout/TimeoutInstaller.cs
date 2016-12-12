@@ -31,8 +31,7 @@ class TimeoutInstaller : INeedToInstallSomething
         log.Info($"Executing '{createScript}'");
         return connectionBuilder.ExecuteTableCommand(
             script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix,
-            schema: settings.GetSchema<StorageType.Timeouts>());
+            tablePrefix: tablePrefix);
     }
 
 }

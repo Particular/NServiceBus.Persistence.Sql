@@ -11,29 +11,18 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 class SubscriptionPersister : ISubscriptionStorage
 {
     Func<Task<DbConnection>> connectionBuilder;
-    string schema;
     string tablePrefix;
     string subscribeCommandText;
     string unsubscribeCommandText;
 
     public SubscriptionPersister(
         Func<Task<DbConnection>> connectionBuilder, 
-        string schema, 
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-        this.schema = schema;
         this.tablePrefix = tablePrefix;
 
-        string tableName;
-        if (schema == null)
-        {
-            tableName = $@"{tablePrefix}SubscriptionData";
-        }
-        else
-        {
-            tableName = $@"{schema}.{tablePrefix}SubscriptionData";
-        }
+        var tableName = $@"{tablePrefix}SubscriptionData";
         subscribeCommandText = $@"
 declare @dummy int; MERGE {tableName} WITH (HOLDLOCK) AS target
 USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
@@ -113,7 +102,7 @@ where
 
         builder.Append($@"
 SELECT DISTINCT Subscriber, Endpoint
-from {schema}.{tablePrefix}SubscriptionData
+from {tablePrefix}SubscriptionData
 where MessageType IN (");
 
         var types = messageTypes.ToList();

@@ -18,7 +18,6 @@ class MySqlSagaScriptWriter : ISagaScriptWriter
     {
         writer.WriteLine($@"
 set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
-set @fullTableName = concat(@schema, '.', @tableName);
 ");
     }
 

@@ -2,7 +2,6 @@
 /* TableNameVariable */ 
 
 set @tableName = concat(@tablePrefix, 'theSaga');
-set @fullTableName = concat(@schema, '.', @tableName);
 
 
 /* DropTable */ 

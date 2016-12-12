@@ -41,8 +41,7 @@ class SagaInstaller : INeedToInstallSomething
             .Select(File.ReadAllText);
         return connectionBuilder.ExecuteTableCommand(
             scripts: sagaScripts,
-            tablePrefix: tablePrefix,
-            schema: settings.GetSchema<StorageType.Sagas>());
+            tablePrefix: tablePrefix);
     }
 
 }

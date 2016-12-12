@@ -8,6 +8,7 @@ namespace NServiceBus
 
     public static partial class SqlPersistenceConfig
     {
+        //TODO: allow full control of prefix so schema can be controlled
 
         public static void UseEndpointName(this PersistenceExtensions<SqlPersistence> configuration, bool useEndpointName)
         {

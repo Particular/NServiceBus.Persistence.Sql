@@ -1,6 +1,6 @@
-﻿set @fullTableName = concat(@schema, '.', @tablePrefix, 'OutboxData');
+﻿set @tableName = concat(@tablePrefix, 'OutboxData');
 set @createTable =  concat('
-    create table if not exists ', @fullTableName, '(
+    create table if not exists ', @tableName, '(
         MessageId varchar(1024) not null,
         Dispatched bit not null default 0,
         DispatchedAt datetime,

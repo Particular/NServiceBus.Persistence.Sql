@@ -1,6 +1,6 @@
-﻿set @fullTableName = concat(@schema, '.', @tablePrefix, 'SubscriptionData');
+﻿set @tableName = concat(@tablePrefix, 'SubscriptionData');
 set @createTable = concat('
-    create table if not exists ', @fullTableName, '(
+    create table if not exists ', @tableName, '(
         Subscriber varchar(450) not null,
         Endpoint varchar(450) null,
         MessageType varchar(450) not null,

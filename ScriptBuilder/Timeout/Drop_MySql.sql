@@ -1,5 +1,5 @@
-﻿set @fullTableName = concat(@schema, '.', @tablePrefix, 'TimeoutData');
-set @dropTable = concat('drop table if exists ', @fullTableName, '');
+﻿set @tableName = concat(@tablePrefix, 'TimeoutData');
+set @dropTable = concat('drop table if exists ', @tableName, '');
 prepare statment from @dropTable;
 execute statment;
 deallocate prepare statment;

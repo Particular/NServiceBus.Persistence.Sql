@@ -1,5 +1,4 @@
-﻿
-declare @tableName nvarchar(max) = @schema + '.' + @tablePrefix + 'SubscriptionData';
+﻿declare @tableName nvarchar(max) = @tablePrefix + 'SubscriptionData';
 if exists
 (
     select * 

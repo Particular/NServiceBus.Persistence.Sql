@@ -142,7 +142,6 @@ public class SagaConsistencyTests
             using (var command = sqlConnection.CreateCommand())
             {
                 command.CommandText = script;
-                command.AddParameter("schema", "dbo");
                 command.AddParameter("tablePrefix", $"{endpointName}_");
                 command.ExecuteNonQuery();
             }

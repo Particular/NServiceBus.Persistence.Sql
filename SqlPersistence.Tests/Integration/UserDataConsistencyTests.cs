@@ -19,11 +19,11 @@ public class UserDataConsistencyTests
     string createUserDataTableText = @"
 IF NOT  EXISTS (
     select * from sys.objects
-    where object_id = object_id(N'[dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data]')
+    where object_id = object_id(N'[dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data]')
     and type in (N'U')
 )
 begin
-    create table [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
+    create table [dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data](
         [Id] [uniqueidentifier] not null
     ) ON [PRIMARY];
 end";
@@ -80,7 +80,6 @@ end";
             using (var command = sqlConnection.CreateCommand())
             {
                 command.CommandText = script;
-                command.AddParameter("schema", "dbo");
                 command.AddParameter("tablePrefix", $"{endpointName}_");
                 command.ExecuteNonQuery();
             }
@@ -177,7 +176,7 @@ end";
         public async Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            var commandText = "insert into [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] (Id) VALUES (@Id)";
+            var commandText = "insert into [dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data] (Id) VALUES (@Id)";
             using (var command = session.Connection.CreateCommand())
             {
                 command.Transaction = session.Transaction;
@@ -191,7 +190,7 @@ end";
         {
             int count;
             var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-            var commandText = "SELECT COUNT(*) from [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data] where Id = @Id";
+            var commandText = "SELECT COUNT(*) from [dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data] where Id = @Id";
             using (var command = session.Connection.CreateCommand())
             {
                 command.Transaction = session.Transaction;

@@ -17,7 +17,7 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-declare @tableName nvarchar(max) = @schema + '.' + @tablePrefix + '{saga.TableSuffix}';");
+declare @tableName nvarchar(max) = @tablePrefix + '{saga.TableSuffix}';");
     }
 
     public void AddProperty(CorrelationProperty correlationProperty)

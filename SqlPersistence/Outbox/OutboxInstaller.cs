@@ -31,8 +31,7 @@ class OutboxInstaller : INeedToInstallSomething
         log.Info($"Executing '{createScript}'");
         return connectionBuilder.ExecuteTableCommand(
             script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix,
-            schema: settings.GetSchema<StorageType.Outbox>());
+            tablePrefix: tablePrefix);
     }
 
 }

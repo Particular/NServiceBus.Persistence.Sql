@@ -20,19 +20,10 @@ class OutboxPersister : IOutboxStorage
 
     public OutboxPersister(
         Func<Task<DbConnection>> connectionBuilder,
-        string schema,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-        string tableName;
-        if (schema == null)
-        {
-            tableName = $@"{tablePrefix}OutboxData";
-        }
-        else
-        {
-            tableName = $@"{schema}.{tablePrefix}OutboxData";
-        }
+        var tableName = $@"{tablePrefix}OutboxData";
         storeCommandText = $@"
 insert into {tableName}
 (

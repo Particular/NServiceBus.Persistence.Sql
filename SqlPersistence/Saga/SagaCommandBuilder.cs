@@ -2,12 +2,10 @@
 
 class SagaCommandBuilder
 {
-    string schema;
     string tablePrefix;
 
-    public SagaCommandBuilder(string schema, string tablePrefix)
+    public SagaCommandBuilder(string tablePrefix)
     {
-        this.schema = schema;
         this.tablePrefix = tablePrefix;
     }
 
@@ -28,7 +26,7 @@ class SagaCommandBuilder
         }
 
         return $@"
-insert into {GetTableName(tableSuffx)}
+insert into {tablePrefix}{tableSuffx}
 (
     Id,
     Originator,
@@ -60,7 +58,7 @@ VALUES
         }
 
         return $@"
-update {GetTableName(tableSuffx)}
+update {tablePrefix}{tableSuffx}
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
@@ -81,7 +79,7 @@ select
     OriginalMessageId,
     Data,
     SagaTypeVersion
-from {GetTableName(tableSuffx)}
+from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
     }
@@ -95,7 +93,7 @@ select
     OriginalMessageId,
     Data,
     SagaTypeVersion
-from {GetTableName(tableSuffx)}
+from {tablePrefix}{tableSuffx}
 where Correlation_{propertyName} = @propertyValue
 ";
     }
@@ -103,17 +101,8 @@ where Correlation_{propertyName} = @propertyValue
     public string BuildCompleteCommand(string tableSuffx)
     {
         return $@"
-delete from {GetTableName(tableSuffx)}
+delete from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
-    }
-
-    string GetTableName(string tableSuffx)
-    {
-        if (schema == null)
-        {
-            return $@"{tablePrefix}{tableSuffx}";
-        }
-        return $@"{schema}.{tablePrefix}{tableSuffx}";
     }
 }

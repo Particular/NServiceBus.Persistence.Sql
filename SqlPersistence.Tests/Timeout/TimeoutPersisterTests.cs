@@ -26,7 +26,6 @@ public class TimeoutPersisterTests : IDisposable
                 await connection1.OpenAsync();
                 return connection1;
             }, 
-            schema: "dbo",
             tablePrefix: $"{nameof(TimeoutPersisterTests)}_");
     }
 

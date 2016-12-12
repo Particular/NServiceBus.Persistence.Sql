@@ -7,7 +7,6 @@ public static class DataEx
         using (var command = connection.CreateCommand())
         {
             command.CommandText = script;
-            command.AddParameter("schema", "dbo");
             command.AddParameter("tablePrefix", $"{endpointName}_");
             command.ExecuteNonQuery();
         }

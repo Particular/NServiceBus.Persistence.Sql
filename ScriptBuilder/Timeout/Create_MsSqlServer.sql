@@ -1,4 +1,4 @@
-﻿declare @tableName nvarchar(max) = @schema + '.' + @tablePrefix + 'TimeoutData';
+﻿declare @tableName nvarchar(max) = @tablePrefix + 'TimeoutData';
 
 if not exists (
     select * from sys.objects
