@@ -1,15 +1,16 @@
-﻿set @tableName = concat('[', @schema, '].[', @tablePrefix, 'TimeoutData]');
-
+﻿set @fullTableName = concat(@schema, '.', @tablePrefix, 'TimeoutData');
 set @createTable = concat('
-    create table if not exists ' + @tableName + '(
-        [Id] [uniqueidentifier]not null primary key,
-        [Destination] [nvarchar](1024),
-        [SagaId] [uniqueidentifier],
-        [State] [varbinary](max),
-        [Time] [datetime],
-        [Headers] [nvarchar](max) not null,
-        [PersistenceVersion] [nvarchar](23)not null
-    )
+    create table if not exists ', @fullTableName, '(
+        Id varchar(38) not null,
+        Destination varchar(1024),
+        SagaId varchar(38),
+        State longblob,
+        Time datetime,
+        Headers longtext not null,
+        PersistenceVersion varchar(23) not null,
+        primary key (`Id`)
+    ) DEFAULT CHARSET=utf8;
 ');
-prepare stmt from @createTable;
-execute stmt;
+prepare statment from @createTable;
+execute statment;
+deallocate prepare statment;

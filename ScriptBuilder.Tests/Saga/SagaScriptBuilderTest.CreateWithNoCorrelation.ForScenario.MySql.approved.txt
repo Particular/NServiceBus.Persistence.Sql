@@ -1,0 +1,65 @@
+﻿
+/* TableNameVariable */ 
+
+set @tableName = concat(@tablePrefix, 'theSaga');
+set @fullTableName = concat(@schema, '.', @tableName);
+
+
+/* CreateTable */ 
+
+set @createTable = concat('
+    create table if not exists ', @tableName, '(
+        Id varchar(38) not null,
+        Originator varchar(255),
+        OriginalMessageId varchar(255),
+        Data longtext not null,
+        PersistenceVersion varchar(23) not null,
+        SagaTypeVersion varchar(23) not null,
+        primary key (`Id`)
+    ) DEFAULT CHARSET=utf8;
+');
+prepare statment from @createTable;
+execute statment;
+deallocate prepare statment;
+
+/* PurgeObsoleteIndex */ 
+
+select @dropIndexQuery =
+(
+    select concat('drop index ', index_name, ' on ', @tableName, ';')
+    from information_schema.statistics
+    where
+        table_name = @tableName and
+        index_name like 'Index_Correlation_%' and
+        table_schema = database()
+);
+select if (
+    @dropIndexQuery is not null,
+    @dropIndexQuery,
+    'select ''no index to delete'';')
+    into @dropIndexQuery;
+
+prepare statment from @dropIndexQuery;
+execute statment;
+deallocate prepare statment;
+
+/* PurgeObsoleteProperties */ 
+
+select @dropPropertiesQuery =
+(
+    select concat('alter table ', @tableName, ' drop column ', col.column_name, ';')
+    from information_schema.columns col
+    where
+        col.table_name = @tableName and
+        col.column_name like 'Correlation_%'
+);
+
+select if (
+    @dropPropertiesQuery is not null,
+    @dropPropertiesQuery,
+    'select ''no property to delete'';')
+    into @dropPropertiesQuery;
+
+prepare statment from @dropPropertiesQuery;
+execute statment;
+deallocate prepare statment;

@@ -13,7 +13,7 @@ using NUnit.Framework;
 [TestFixture]
 public class SagaConsistencyTests
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 

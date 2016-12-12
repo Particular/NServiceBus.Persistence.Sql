@@ -12,7 +12,7 @@ using ObjectApproval;
 [TestFixture]
 public class SubscriptionPersisterTests : IDisposable
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     SubscriptionPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
     DbConnection dbConnection;

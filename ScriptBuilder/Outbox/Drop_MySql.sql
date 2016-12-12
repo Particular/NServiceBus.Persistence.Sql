@@ -1,16 +1,5 @@
-﻿set @tableName = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
-
-if exists
-(
-    select *
-    from sys.objects
-    where
-        object_id = object_id(@tableName) and
-        type in (N'U')
-)
-begin
-set @dropTable = N'
-    drop table ' + @tableName + '
-';
-exec(@dropTable);
-end
+﻿set @fullTableName = concat(@schema, '.', @tablePrefix, 'OutboxData');
+set @dropTable = concat('drop table if exists ', @fullTableName);
+prepare statment from @dropTable;
+execute statment;	   
+deallocate prepare statment;

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -15,70 +16,71 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
 
     public void WriteTableNameVariable()
     {
-        writer.Write(@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + '{0}]';
-", saga.TableSuffix);
+        writer.WriteLine($@"
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + '{saga.TableSuffix}]';");
     }
 
     public void AddProperty(CorrelationProperty correlationProperty)
     {
-        var columnType = CorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        var columnType = GetColumnType(correlationProperty.Type);
+        var name = correlationProperty.Name;
         writer.Write($@"
 if not exists
 (
   select * from sys.columns
   where
-    name = 'Correlation_{correlationProperty.Name}' and
+    name = 'Correlation_{name}' and
     object_id = object_id(@tableName)
 )
 begin
-  declare @createColumn_{correlationProperty.Name} nvarchar(max);
-  set @createColumn_{correlationProperty.Name} = '
-  alter table ' + @tableName  + '
-    add Correlation_{correlationProperty.Name} {columnType};
+  declare @createColumn_{name} nvarchar(max);
+  set @createColumn_{name} = '
+  alter table ' + @tableName + '
+    add Correlation_{name} {columnType};
   ';
-  exec(@createColumn_{correlationProperty.Name});
+  exec(@createColumn_{name});
 end
 ");
     }
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = CorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
-        var correlationPropertyName = correlationProperty.Name;
+        var columnType = GetColumnType(correlationProperty.Type);
+        var name = correlationProperty.Name;
         writer.Write($@"
-declare @dataType_{correlationPropertyName} nvarchar(max);
-set @dataType_{correlationPropertyName} = (
+declare @dataType_{name} nvarchar(max);
+set @dataType_{name} = (
   select data_type
   from information_schema.columns
   where
-    table_name = ' + @tableName  + ' and
-    column_name = 'Correlation_{correlationPropertyName}'
+    table_name = ' + @tableName + ' and
+    column_name = 'Correlation_{name}'
 );
-if (@dataType_{correlationPropertyName} <> '{columnType}')
-  throw 50000, 'Incorrect data type for {columnType}', 0
+if (@dataType_{name} <> '{columnType}')
+  throw 50000, 'Incorrect data type for Correlation_{name}', 0
 ");
     }
 
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
+        var name = correlationProperty.Name;
         writer.Write($@"
 if not exists
 (
     select *
     from sys.indexes
     where
-        name = 'Index_Correlation_{correlationProperty.Name}' and
+        name = 'Index_Correlation_{name}' and
         object_id = object_id(@tableName)
 )
 begin
-  declare @createIndex_{correlationProperty.Name} nvarchar(max);
-  set @createIndex_{correlationProperty.Name} = '
-  create unique nonclustered index Index_Correlation_{correlationProperty.Name}
-  on ' + @tableName  + '(Correlation_{correlationProperty.Name})
-  where Correlation_{correlationProperty.Name} is not null;
+  declare @createIndex_{name} nvarchar(max);
+  set @createIndex_{name} = '
+  create unique index Index_Correlation_{name}
+  on ' + @tableName + '(Correlation_{name})
+  where Correlation_{name} is not null;
 ';
-  exec(@createIndex_{correlationProperty.Name});
+  exec(@createIndex_{name});
 end
 ");
     }
@@ -99,10 +101,10 @@ end
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
-    select 'alter table ' + @tableName  + ' drop column ' + col.column_name '; '
+    select 'alter table ' + @tableName + ' drop column ' + col.column_name ';'
     from information_schema.columns col
     where
-        col.table_name = ' + @tableName  + ' and
+        col.table_name = @tableName and
         col.column_name like 'Correlation_%'{builder}
 );
 exec sp_executesql @dropPropertiesQuery
@@ -115,23 +117,23 @@ exec sp_executesql @dropPropertiesQuery
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        ix.Name <> 'Index_Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and\r\n        Name <> 'Index_Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        ix.Name <> 'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and\r\n        Name <> 'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
 
         writer.Write($@"
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
 (
-    select 'drop index ' + ix.name + ' on ' + @tableName + '; '
-    from sysindexes ix
+    select 'drop index ' + name + ' on ' + @tableName + ';'
+    from sysindexes
     where
-        ix.Id = (select object_id from sys.objects where name = @tableName) and
-        ix.Name is not null and
-        ix.Name like 'Index_Correlation_%'{builder}
+        Id = (select object_id from sys.objects where name = @tableName) and
+        Name is not null and
+        Name like 'Index_Correlation_%'{builder}
 );
 exec sp_executesql @dropIndexQuery
 ");
@@ -156,8 +158,8 @@ set @createTable = '
         [Originator] [nvarchar](255),
         [OriginalMessageId] [nvarchar](255),
         [Data] [nvarchar](max) not null,
-        [PersistenceVersion] [nvarchar](23) not null,
-        [SagaTypeVersion] [nvarchar](23) not null
+        [PersistenceVersion] [varchar](23) not null,
+        [SagaTypeVersion] [varchar](23) not null
     )
 ';
 exec(@createTable);
@@ -180,9 +182,28 @@ if exists
 )
 begin
     declare @createTable nvarchar(max);
-    set @createTable = 'drop table ' + @tableName;
+    set @createTable = 'drop table  if exists ' + @tableName;
     exec(@createTable);
 end
 ");
+    }
+
+
+    static string GetColumnType(CorrelationPropertyType propertyType)
+    {
+        switch (propertyType)
+        {
+            case CorrelationPropertyType.DateTime:
+                return "datetime";
+            case CorrelationPropertyType.DateTimeOffset:
+                return "datetimeoffset";
+            case CorrelationPropertyType.String:
+                return "nvarchar(450)";
+            case CorrelationPropertyType.Int:
+                return "bigint";
+            case CorrelationPropertyType.Guid:
+                return "uniqueidentifier";
+        }
+        throw new Exception($"Could not convert {propertyType}.");
     }
 }

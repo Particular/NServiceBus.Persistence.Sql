@@ -11,6 +11,7 @@ public class SagaScriptBuilderTest
 {
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void CreateWithCorrelation(SqlVarient sqlVarient)
     {
         var saga = new SagaDefinition(
@@ -30,7 +31,10 @@ public class SagaScriptBuilderTest
         }
         var script = builder.ToString();
 
-        SqlValidator.Validate(script);
+        if (sqlVarient != SqlVarient.MySql)
+        {
+            SqlValidator.Validate(script);
+        }
         using (ApprovalResults.ForScenario(sqlVarient))
         {
             Approvals.Verify(script);
@@ -39,6 +43,7 @@ public class SagaScriptBuilderTest
 
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void CreateWithNoCorrelation(SqlVarient sqlVarient)
     {
         var saga = new SagaDefinition(
@@ -53,7 +58,10 @@ public class SagaScriptBuilderTest
         }
         var script = builder.ToString();
 
-        SqlValidator.Validate(script);
+        if (sqlVarient != SqlVarient.MySql)
+        {
+            SqlValidator.Validate(script);
+        }
 
         using (ApprovalResults.ForScenario(sqlVarient))
         {
@@ -63,6 +71,7 @@ public class SagaScriptBuilderTest
 
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void CreateWithCorrelationAndTransitional(SqlVarient sqlVarient)
     {
         var saga = new SagaDefinition(
@@ -87,7 +96,10 @@ public class SagaScriptBuilderTest
         }
         var script = builder.ToString();
 
-        SqlValidator.Validate(script);
+        if (sqlVarient != SqlVarient.MySql)
+        {
+            SqlValidator.Validate(script);
+        }
 
         using (ApprovalResults.ForScenario(sqlVarient))
         {
@@ -97,6 +109,7 @@ public class SagaScriptBuilderTest
 
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void BuildDropScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
@@ -109,7 +122,10 @@ public class SagaScriptBuilderTest
             SagaScriptBuilder.BuildDropScript(saga, sqlVarient, writer);
         }
         var script = builder.ToString();
-        SqlValidator.Validate(script);
+        if (sqlVarient == SqlVarient.MsSqlServer)
+        {
+            SqlValidator.Validate(script);
+        }
 
         using (ApprovalResults.ForScenario(sqlVarient))
         {

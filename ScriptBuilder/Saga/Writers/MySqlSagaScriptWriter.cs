@@ -1,13 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class PostgreSqlSagaScriptWriter : ISagaScriptWriter
+class MySqlSagaScriptWriter : ISagaScriptWriter
 {
     TextWriter writer;
     SagaDefinition saga;
 
-    public PostgreSqlSagaScriptWriter(TextWriter textWriter, SagaDefinition saga)
+    public MySqlSagaScriptWriter(TextWriter textWriter, SagaDefinition saga)
     {
         writer = textWriter;
         this.saga = saga;
@@ -15,68 +16,116 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void WriteTableNameVariable()
     {
-        writer.Write(@"
-set @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + '{0}]';
-", saga.TableSuffix);
+        writer.WriteLine($@"
+set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
+set @fullTableName = concat(@schema, '.', @tableName);
+");
     }
 
     public void AddProperty(CorrelationProperty correlationProperty)
     {
-        var columnType = CorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        var columnType = GetColumnType(correlationProperty.Type);
+        var name = correlationProperty.Name;
         writer.Write($@"
-if not exists
-(
-  select * from sys.columns
-  where
-    name = 'Correlation_{correlationProperty.Name}' and
-    object_id = object_id(@tableName)
-)
-begin
-  set @createColumn_{correlationProperty.Name} = '
-  alter table ' + @tableName  + '
-    add Correlation_{correlationProperty.Name} {columnType};
-  ';
-  exec(@createColumn_{correlationProperty.Name});
-END
+select count(*)
+into @exist
+from information_schema.columns 
+where table_schema = database()
+      and column_name = 'Correlation_{name}'
+      and table_name = @tableName;
+
+set @query = IF(
+    @exist <= 0, 
+    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'), 
+    'select \'Column Exists\' status');
+
+prepare statment from @query;
+execute statment;
+deallocate prepare statment;
 ");
     }
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = CorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
-        var correlationPropertyName = correlationProperty.Name;
+        var columnType = GetColumnType(correlationProperty.Type);
+        var name = correlationProperty.Name;
         writer.Write($@"
-set @dataType_{correlationPropertyName} = (
-  select data_type
+set @column_type_{name} = (
+  select column_type
   from information_schema.columns
   where
-    table_name = ' + @tableName  + ' and
-    column_name = 'Correlation_{correlationPropertyName}'
+    table_schema = database() and 
+    table_name = @tableName and
+    column_name = 'Correlation_{name}'
 );
-if (@dataType_{correlationPropertyName} <> '{columnType}')
-  throw 50000, 'Incorrect data type for {columnType}', 0
+
+set @query = IF(
+    @column_type_{name} <> '{columnType}', 
+    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_{name}\'', 
+    'select \'Column Type OK\' status');
+
+prepare statment from @query;
+execute statment;
+deallocate prepare statment;
 ");
     }
 
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
+        var name = correlationProperty.Name;
         writer.Write($@"
-if not exists
+select count(*)
+into @exist
+from information_schema.statistics 
+where 
+    table_schema = database() and 
+    index_name = 'Index_Correlation_{name}' and 
+    table_name = @tableName;
+
+set @query = IF(
+    @exist <= 0, 
+    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'), 
+    'select \'Index Exists\' status');
+
+prepare statment from @query;
+execute statment;
+deallocate prepare statment;
+");
+    }
+    public void WritePurgeObsoleteIndex()
+    {
+        var builder = new StringBuilder();
+
+        var correlation = saga.CorrelationProperty;
+        if (correlation != null)
+        {
+            builder.Append($" and\r\n        index_name <> 'Index_Correlation_{correlation.Name}'");
+        }
+        var transitional = saga.TransitionalCorrelationProperty;
+        if (transitional != null)
+        {
+            builder.Append($" and\r\n        index_name <> 'Index_Correlation_{transitional.Name}'");
+        }
+
+        writer.Write($@"
+select @dropIndexQuery =
 (
-    select *
-    from sys.indexes
+    select concat('drop index ', index_name, ' on ', @tableName, ';')
+    from information_schema.statistics
     where
-        name = 'Index_Correlation_{correlationProperty.Name}' and
-        object_id = object_id(@tableName)
-)
-begin
-  set @createIndex_{correlationProperty.Name} = '
-  create unique nonclustered indexIndex_Correlation_{correlationProperty.Name}
-  on ' + @tableName  + '(Correlation_{correlationProperty.Name})
-  where Correlation_{correlationProperty.Name} is not null;
-';
-  exec(@createIndex_{correlationProperty.Name});
-end
+        table_name = @tableName and
+        index_name like 'Index_Correlation_%'{builder} and
+        table_schema = database()
+);
+select if (
+    @dropIndexQuery is not null,
+    @dropIndexQuery,
+    'select ''no index to delete'';')
+    into @dropIndexQuery;
+
+prepare statment from @dropIndexQuery;
+execute statment;
+deallocate prepare statment;
 ");
     }
 
@@ -84,96 +133,85 @@ end
     {
         var builder = new StringBuilder();
 
-        if (saga.CorrelationProperty != null)
+        var correlation = saga.CorrelationProperty;
+        if (correlation != null)
         {
-            builder.Append($" and\r\n        col.column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and\r\n        col.column_name <> 'Correlation_{correlation.Name}'");
         }
-        if (saga.TransitionalCorrelationProperty != null)
+        var transitional = saga.TransitionalCorrelationProperty;
+        if (transitional != null)
         {
-            builder.Append($" and\r\n        col.column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and\r\n        col.column_name <> 'Correlation_{transitional.Name}'");
         }
         writer.Write($@"
 select @dropPropertiesQuery =
 (
-    select 'alter table ' + @tableName  + ' drop column ' + col.column_name '; '
+    select concat('alter table ', @tableName, ' drop column ', col.column_name, ';')
     from information_schema.columns col
     where
-        col.table_name = ' + @tableName  + ' and
+        col.table_name = @tableName and
         col.column_name like 'Correlation_%'{builder}
 );
-exec sp_executesql @dropPropertiesQuery
+
+select if (
+    @dropPropertiesQuery is not null,
+    @dropPropertiesQuery,
+    'select ''no property to delete'';')
+    into @dropPropertiesQuery;
+
+prepare statment from @dropPropertiesQuery;
+execute statment;
+deallocate prepare statment;
 ");
     }
 
-    public void WritePurgeObsoleteIndex()
-    {
-        var builder = new StringBuilder();
-
-        if (saga.CorrelationProperty != null)
-        {
-            builder.Append($" and\r\n        ix.Name <> 'Index_Correlation_{saga.CorrelationProperty.Name}'");
-        }
-        if (saga.TransitionalCorrelationProperty != null)
-        {
-            builder.Append($" and\r\n        ix.Name <> 'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
-        }
-
-        writer.Write($@"
-select @dropIndexQuery =
-(
-    select 'drop index ' + ix.name + ' on ' + @tableName + '; '
-    from sysindexes ix
-    where
-        ix.Id = (select object_id from sys.objects where name = @tableName) AND
-        ix.Name is not null AND
-        ix.Name like 'Index_Correlation_%'{builder}
-);
-exec sp_executesql @dropIndexQuery
-");
-    }
 
     public void WriteCreateTable()
     {
         writer.Write(@"
-if not exists
-(
-    select *
-    from sys.objects
-    where
-        object_id = object_id(@tableName) AND
-        type in ('U')
-)
-begin
-set @createTable = '
-    create table if not exists ' + @tableName + '(
-        [Id] [uniqueidentifier] not null primary key,
-        [Originator] [nvarchar](255),
-        [OriginalMessageId] [nvarchar](255),
-        [Data] [nvarchar](max) not null,
-        [PersistenceVersion] [nvarchar](23) not null,
-        [SagaTypeVersion] [nvarchar](23) not null
-    )
-';
-exec(@createTable);
-end
+set @createTable = concat('
+    create table if not exists ', @tableName, '(
+        Id varchar(38) not null,
+        Originator varchar(255),
+        OriginalMessageId varchar(255),
+        Data longtext not null,
+        PersistenceVersion varchar(23) not null,
+        SagaTypeVersion varchar(23) not null,
+        primary key (`Id`)
+    ) DEFAULT CHARSET=utf8;
+');
+prepare statment from @createTable;
+execute statment;
+deallocate prepare statment;
 ");
     }
 
     public void WriteDropTable()
     {
         writer.Write(@"
-if exists
-(
-    select *
-    from sys.objects
-    where
-        object_id = object_id(@tableName)
-        and type in ('U')
-)
-begin
-    set @createTable = 'drop table ' + @tableName;
-    exec(@createTable);
-end
+set @createTable = concat('drop table ', @tableName);
+prepare statment from @dropTable;
+execute statment;
+deallocate prepare statment;
 ");
     }
+
+    static string GetColumnType(CorrelationPropertyType propertyType)
+    {
+        switch (propertyType)
+        {
+            case CorrelationPropertyType.DateTime:
+                return "datetime";
+            case CorrelationPropertyType.DateTimeOffset:
+                return "datetimeoffset";
+            case CorrelationPropertyType.String:
+                return "varchar(450)";
+            case CorrelationPropertyType.Int:
+                return "bigint";
+            case CorrelationPropertyType.Guid:
+                return "varchar(38)";
+        }
+        throw new Exception($"Could not convert {propertyType}.");
+    }
+
 }

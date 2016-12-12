@@ -8,14 +8,14 @@ using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+
 [TestFixture]
 #if (!DEBUG)
 [Explicit]
 #endif
 public class SagaPersisterTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static string endpointName = "Endpoint";
     SagaPersister persister;
     Func<DbConnection> dbConnection;

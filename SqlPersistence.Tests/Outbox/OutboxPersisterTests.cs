@@ -12,7 +12,7 @@ using ObjectApproval;
 [TestFixture]
 public class OutboxPersisterTests : IDisposable
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     OutboxPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
     DbConnection dbConnection;

@@ -10,7 +10,7 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlTransportIntegrationTests:IDisposable
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
     SqlConnection dbConnection;

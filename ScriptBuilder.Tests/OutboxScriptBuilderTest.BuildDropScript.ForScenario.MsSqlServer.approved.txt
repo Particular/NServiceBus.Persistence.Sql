@@ -10,8 +10,6 @@ if exists
 )
 begin
 declare @dropTable nvarchar(max);
-set @dropTable = N'
-    drop table ' + @tableName + '
-';
+set @dropTable = N'drop table ' + @tableName;
 exec(@dropTable);
 end

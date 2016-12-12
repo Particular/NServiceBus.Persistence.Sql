@@ -11,14 +11,14 @@ begin
 declare @createTable nvarchar(max);
 set @createTable = N'
     create table ' + @tableName + '(
-        [Subscriber] [varchar](450) not null,
-        [Endpoint] [varchar](450) null,
-        [MessageType] [varchar](450) not null,
-        [PersistenceVersion] [nvarchar](23) not null,
+        [Subscriber] [nvarchar](450) not null,
+        [Endpoint] [nvarchar](450) null,
+        [MessageType] [nvarchar](450) not null,
+        [PersistenceVersion] [varchar](23) not null,
         primary key clustered
         (
-            [Subscriber] asc,
-            [MessageType] asc
+            [Subscriber],
+            [MessageType]
         )
     )
 ';

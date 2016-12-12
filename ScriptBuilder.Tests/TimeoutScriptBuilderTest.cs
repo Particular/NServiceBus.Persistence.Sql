@@ -11,6 +11,7 @@ public class TimeoutScriptBuilderTest
 {
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void BuildCreateScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
@@ -19,7 +20,10 @@ public class TimeoutScriptBuilderTest
             TimeoutScriptBuilder.BuildCreateScript(writer, sqlVarient);
         }
         var script = builder.ToString();
-        SqlValidator.Validate(script);
+        if (sqlVarient != SqlVarient.MySql)
+        {
+            SqlValidator.Validate(script);
+        }
         using (ApprovalResults.ForScenario(sqlVarient))
         {
             Approvals.Verify(script);
@@ -28,6 +32,7 @@ public class TimeoutScriptBuilderTest
 
     [Test]
     [TestCase(SqlVarient.MsSqlServer)]
+    [TestCase(SqlVarient.MySql)]
     public void BuildDropScript(SqlVarient sqlVarient)
     {
         var builder = new StringBuilder();
@@ -36,7 +41,10 @@ public class TimeoutScriptBuilderTest
             TimeoutScriptBuilder.BuildDropScript(writer, sqlVarient);
         }
         var script = builder.ToString();
-        SqlValidator.Validate(script);
+        if (sqlVarient != SqlVarient.MySql)
+        {
+            SqlValidator.Validate(script);
+        }
         using (ApprovalResults.ForScenario(sqlVarient))
         {
             Approvals.Verify(script);

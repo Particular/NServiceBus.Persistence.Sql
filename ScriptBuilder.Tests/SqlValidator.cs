@@ -8,7 +8,7 @@ public static class SqlValidator
 {
     public static void Validate(string sql)
     {
-        var parser = new TSql120Parser(false);
+        var parser = new TSql140Parser(false);
         IList<ParseError> errors;
         using (var reader = new StringReader(sql))
         {

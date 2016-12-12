@@ -28,12 +28,14 @@ class OutboxPersister : IOutboxStorage
 insert into [{schema}].[{tablePrefix}OutboxData]
 (
     MessageId,
-    Operations
+    Operations,
+    PersistenceVersion
 )
 values
 (
     @MessageId,
-    @Operations
+    @Operations,
+    @PersistenceVersion
 )";
 
         cleanupCommandText = $@"
@@ -70,6 +72,7 @@ where MessageId = @MessageId";
             command.CommandText = setAsDispatchedCommandText;
             command.AddParameter("MessageId", messageId);
             command.AddParameter("DispatchedAt", DateTime.UtcNow);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
     }
@@ -129,6 +132,7 @@ where MessageId = @MessageId";
             command.CommandText = storeCommandText;
             command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
             await command.ExecuteNonQueryEx();
         }

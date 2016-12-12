@@ -12,7 +12,7 @@ using NUnit.Framework;
 [TestFixture]
 public class UserDataConsistencyTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 
@@ -26,7 +26,7 @@ begin
     create table [dbo].[SqlTransportIntegration.UserDataConsistencyTests.Data](
         [Id] [uniqueidentifier] not null
     ) ON [PRIMARY];
-END";
+end";
 
     [SetUp]
     [TearDown]

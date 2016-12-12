@@ -30,22 +30,44 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 
             var sqlVarientWriter = GetSqlVarientWriter(sqlVarient, writer, saga);
 
+            WriteComment(writer, "TableNameVariable");
             sqlVarientWriter.WriteTableNameVariable();
+
+            WriteComment(writer, "CreateTable");
             sqlVarientWriter.WriteCreateTable();
             if (saga.CorrelationProperty != null)
             {
+                WriteComment(writer, "AddProperty " + saga.CorrelationProperty.Name);
                 sqlVarientWriter.AddProperty(saga.CorrelationProperty);
+
+                WriteComment(writer, "VerifyColumnType " + saga.CorrelationProperty.Type);
                 sqlVarientWriter.VerifyColumnType(saga.CorrelationProperty);
+
+                WriteComment(writer, "WriteCreateIndex " + saga.CorrelationProperty.Name);
                 sqlVarientWriter.WriteCreateIndex(saga.CorrelationProperty);
             }
             if (saga.TransitionalCorrelationProperty != null)
             {
+                WriteComment(writer, "AddProperty " + saga.TransitionalCorrelationProperty.Name);
                 sqlVarientWriter.AddProperty(saga.TransitionalCorrelationProperty);
+
+                WriteComment(writer, "VerifyColumnType " + saga.TransitionalCorrelationProperty.Type);
                 sqlVarientWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
+
+                WriteComment(writer, "CreateIndex " + saga.TransitionalCorrelationProperty.Name);
                 sqlVarientWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
             }
+            WriteComment(writer, "PurgeObsoleteIndex");
             sqlVarientWriter.WritePurgeObsoleteIndex();
+
+            WriteComment(writer, "PurgeObsoleteProperties");
             sqlVarientWriter.WritePurgeObsoleteProperties();
+        }
+
+        static void WriteComment(TextWriter writer, string text)
+        {
+            writer.WriteLine($@"
+/* {text} */ ");
         }
 
         static ISagaScriptWriter GetSqlVarientWriter(SqlVarient sqlVarient, TextWriter textWriter, SagaDefinition saga)
@@ -60,7 +82,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             //}
             if (sqlVarient == SqlVarient.MySql)
             {
-                return new PostgreSqlSagaScriptWriter(textWriter, saga);
+                return new MySqlSagaScriptWriter(textWriter, saga);
             }
 
             throw new Exception($"Unknown SqlVarient {sqlVarient}.");
@@ -69,7 +91,11 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static void BuildDropScript(SagaDefinition saga, SqlVarient sqlVarient, TextWriter writer)
         {
             var sqlVarientWriter = GetSqlVarientWriter(sqlVarient, writer, saga);
+
+            WriteComment(writer, "TableNameVariable");
             sqlVarientWriter.WriteTableNameVariable();
+
+            WriteComment(writer, "DropTable");
             sqlVarientWriter.WriteDropTable();
         }
 

@@ -1,5 +1,9 @@
 ﻿
+/* TableNameVariable */ 
+
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'theSaga]';
+
+/* DropTable */ 
 
 if exists
 (
@@ -11,6 +15,6 @@ if exists
 )
 begin
     declare @createTable nvarchar(max);
-    set @createTable = 'drop table ' + @tableName;
+    set @createTable = 'drop table  if exists ' + @tableName;
     exec(@createTable);
 end

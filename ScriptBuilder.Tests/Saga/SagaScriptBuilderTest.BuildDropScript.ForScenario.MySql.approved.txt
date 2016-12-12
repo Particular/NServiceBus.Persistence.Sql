@@ -1,0 +1,13 @@
+﻿
+/* TableNameVariable */ 
+
+set @tableName = concat(@tablePrefix, 'theSaga');
+set @fullTableName = concat(@schema, '.', @tableName);
+
+
+/* DropTable */ 
+
+set @createTable = concat('drop table ', @tableName);
+prepare statment from @dropTable;
+execute statment;
+deallocate prepare statment;

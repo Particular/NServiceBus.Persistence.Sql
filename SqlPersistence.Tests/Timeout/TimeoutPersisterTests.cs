@@ -11,7 +11,7 @@ using ObjectApproval;
 [TestFixture]
 public class TimeoutPersisterTests : IDisposable
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=SqlPersistenceTests;Integrated Security=True";
+    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     TimeoutPersister persister;
     SqlVarient sqlVarient = SqlVarient.MsSqlServer;
     DbConnection dbConnection;
