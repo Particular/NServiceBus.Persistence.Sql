@@ -28,7 +28,7 @@ class SagaCommandBuilder
         }
 
         return $@"
-insert into [{schema}].[{tablePrefix}{tableSuffx}]
+insert into {GetTableName(tableSuffx)}
 (
     Id,
     Originator,
@@ -60,7 +60,7 @@ VALUES
         }
 
         return $@"
-update [{schema}].[{tablePrefix}{tableSuffx}]
+update {GetTableName(tableSuffx)}
 SET
     Originator = @Originator,
     OriginalMessageId = @OriginalMessageId,
@@ -75,13 +75,13 @@ WHERE
     public string BuildGetBySagaIdCommand(string tableSuffx)
     {
         return $@"
-SELECT
+select
     Id,
     Originator,
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{tablePrefix}{tableSuffx}]
+from {GetTableName(tableSuffx)}
 where Id = @Id
 ";
     }
@@ -89,13 +89,13 @@ where Id = @Id
     public string BuildGetByPropertyCommand(string tableSuffx, string propertyName)
     {
         return $@"
-SELECT
+select
     Id,
     Originator,
     OriginalMessageId,
     Data,
     SagaTypeVersion
-FROM  [{schema}].[{tablePrefix}{tableSuffx}]
+from {GetTableName(tableSuffx)}
 where Correlation_{propertyName} = @propertyValue
 ";
     }
@@ -103,8 +103,17 @@ where Correlation_{propertyName} = @propertyValue
     public string BuildCompleteCommand(string tableSuffx)
     {
         return $@"
-DELETE FROM [{schema}].[{tablePrefix}{tableSuffx}]
+delete from {GetTableName(tableSuffx)}
 where Id = @Id
 ";
+    }
+
+    string GetTableName(string tableSuffx)
+    {
+        if (schema == null)
+        {
+            return $@"{tablePrefix}{tableSuffx}";
+        }
+        return $@"{schema}.{tablePrefix}{tableSuffx}";
     }
 }

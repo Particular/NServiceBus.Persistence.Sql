@@ -25,21 +25,32 @@ class SubscriptionPersister : ISubscriptionStorage
         this.schema = schema;
         this.tablePrefix = tablePrefix;
 
+        string tableName;
+        if (schema == null)
+        {
+            tableName = $@"{tablePrefix}SubscriptionData";
+        }
+        else
+        {
+            tableName = $@"{schema}.{tablePrefix}SubscriptionData";
+        }
         subscribeCommandText = $@"
-declare @dummy int; MERGE [{schema}].[{tablePrefix}SubscriptionData] WITH (HOLDLOCK) AS target
+declare @dummy int; MERGE {tableName} WITH (HOLDLOCK) AS target
 USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
-ON target.Endpoint = source.Endpoint AND target.Subscriber = source.Subscriber AND target.MessageType = source.MessageType
-WHEN MATCHED THEN
+ON target.Endpoint = source.Endpoint and 
+   target.Subscriber = source.Subscriber and
+   target.MessageType = source.MessageType
+when matched then
     UPDATE set @dummy = 0
-WHEN NOT MATCHED THEN
-INSERT
+when not matched then
+insert
 (
     Endpoint,
     Subscriber,
     MessageType,
     PersistenceVersion
 )
-VALUES
+values
 (
     @Endpoint,
     @Subscriber,
@@ -48,9 +59,9 @@ VALUES
 );";
 
         unsubscribeCommandText = $@"
-DELETE from [{schema}].[{tablePrefix}SubscriptionData]
-WHERE
-    Subscriber = @Subscriber AND
+delete from {tableName}
+where
+    Subscriber = @Subscriber and
     MessageType = @MessageType";
     }
 
@@ -102,7 +113,7 @@ WHERE
 
         builder.Append($@"
 SELECT DISTINCT Subscriber, Endpoint
-from [{schema}].[{tablePrefix}SubscriptionData]
+from {schema}.{tablePrefix}SubscriptionData
 where MessageType IN (");
 
         var types = messageTypes.ToList();

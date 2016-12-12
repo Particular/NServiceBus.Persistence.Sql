@@ -32,7 +32,10 @@ static class SqlHelpers
         using (var command = connection.CreateCommand())
         {
             command.CommandText = script;
-            command.AddParameter("schema", schema);
+            if (schema != null)
+            {
+                command.AddParameter("schema", schema);
+            }
             command.AddParameter("tablePrefix", tablePrefix);
             await command.ExecuteNonQueryEx();
         }

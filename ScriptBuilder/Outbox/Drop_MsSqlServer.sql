@@ -1,4 +1,4 @@
-﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
+﻿declare @tableName nvarchar(max) = @schema + '.' + @tablePrefix + 'OutboxData';
 
 if exists
 (

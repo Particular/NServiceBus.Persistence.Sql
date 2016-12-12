@@ -25,7 +25,7 @@ namespace NServiceBus
 
         internal static string GetSchema<TStorageType>(this ReadOnlySettings settings) where TStorageType : StorageType
         {
-            return settings.GetValue<string, TStorageType>("Schema", () => "dbo");
+            return settings.GetValue<string, TStorageType>("Schema", () => null);
         }
 
     }

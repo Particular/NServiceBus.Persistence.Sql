@@ -19,13 +19,22 @@ class OutboxPersister : IOutboxStorage
     string cleanupCommandText;
 
     public OutboxPersister(
-        Func<Task<DbConnection>> connectionBuilder, 
-        string schema, 
+        Func<Task<DbConnection>> connectionBuilder,
+        string schema,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
+        string tableName;
+        if (schema == null)
+        {
+            tableName = $@"{tablePrefix}OutboxData";
+        }
+        else
+        {
+            tableName = $@"{schema}.{tablePrefix}OutboxData";
+        }
         storeCommandText = $@"
-insert into [{schema}].[{tablePrefix}OutboxData]
+insert into {tableName}
 (
     MessageId,
     Operations,
@@ -39,17 +48,17 @@ values
 )";
 
         cleanupCommandText = $@"
-delete from [{schema}].[{tablePrefix}OutboxData] where Dispatched = true And DispatchedAt < @Date";
+delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
 
         getCommandText = $@"
 select
     Dispatched,
     Operations
-from [{schema}].[{tablePrefix}OutboxData]
+from {tableName}
 where MessageId = @MessageId";
 
         setAsDispatchedCommandText = $@"
-update [{schema}].[{tablePrefix}OutboxData]
+update {tableName}
 set
     Dispatched = 1,
     DispatchedAt = @DispatchedAt

@@ -23,8 +23,17 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         this.connectionBuilder = connectionBuilder;
 
+        string tableName;
+        if (schema == null)
+        {
+            tableName = $@"{tablePrefix}TimeoutData";
+        }
+        else
+        {
+            tableName = $@"{schema}.{tablePrefix}TimeoutData";
+        }
         insertCommandText = $@"
-insert into [{schema}].[{tablePrefix}TimeoutData]
+insert into {tableName}
 (
     Id,
     Destination,
@@ -34,7 +43,7 @@ insert into [{schema}].[{tablePrefix}TimeoutData]
     Headers,
     PersistenceVersion
 )
-VALUES
+values
 (
     @Id,
     @Destination,
@@ -46,33 +55,33 @@ VALUES
 )";
 
         removeByIdCommandText = $@"
-DELETE from [{schema}].[{tablePrefix}TimeoutData]
-OUTPUT deleted.SagaId
+delete from {tableName}
+output deleted.SagaId
 where Id = @Id";
 
         removeBySagaIdCommandText = $@"
-DELETE from [{schema}].[{tablePrefix}TimeoutData]
+delete from {tableName}
 where SagaId = @SagaId";
 
         selectByIdCommandText = $@"
-SELECT
+select
     Destination,
     SagaId,
     State,
     Time,
     Headers
-from [{schema}].[{tablePrefix}TimeoutData]
+from {tableName}
 where Id = @Id";
 
         rangeComandText = $@"
-SELECT Id, Time
-from [{schema}].[{tablePrefix}TimeoutData]
-where time BETWEEN @StartTime AND @EndTime";
+select Id, Time
+from {tableName}
+where Time between @StartTime and @EndTime";
 
         nextCommandText = $@"
-SELECT TOP 1 Time from [{schema}].[{tablePrefix}TimeoutData]
+select top 1 Time from {tableName}
 where Time > @EndTime
-ORDER BY TIME";
+order by Time";
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
