@@ -8,37 +8,32 @@ namespace NServiceBus
 
     public static partial class SqlPersistenceConfig
     {
-        //TODO: allow full control of prefix so schema can be controlled
-
-        public static void UseEndpointName(this PersistenceExtensions<SqlPersistence> configuration, bool useEndpointName)
+        public static void TablePrefix(this PersistenceExtensions<SqlPersistence> configuration, string tablePrefix)
         {
             configuration.GetSettings()
-                .Set("SqlPersistence.UseEndpointName", useEndpointName);
+                .Set("SqlPersistence.TablePrefix", tablePrefix);
         }
 
-        public static void UseEndpointName<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, bool useEndpointName)
+        public static void TablePrefix<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, string tablePrefix)
             where TStorageType : StorageType
         {
-            var key = $"SqlPersistence.{typeof(TStorageType).Name}.UseEndpointName";
+            var key = $"SqlPersistence.{typeof(TStorageType).Name}.TablePrefix";
             configuration.GetSettings()
-                .Set(key, useEndpointName);
+                .Set(key, tablePrefix);
         }
 
-        static bool ShouldUseEndpointName<TStorageType>(this ReadOnlySettings settings)
-            where TStorageType : StorageType
+       
+        internal static string GetTablePrefix<T>(this ReadOnlySettings settings) where T : StorageType
         {
-            return settings.GetValue<bool, TStorageType>("UseEndpointName", () => true);
-        }
-
-        internal static string GetTablePrefixForEndpoint<T>(this ReadOnlySettings settings) where T : StorageType
-        {
-            if (settings.ShouldUseEndpointName<T>())
+            var value = settings.GetValue<string, T>("TablePrefix", () => null);
+            if (value == null)
             {
-                return $"{settings.EndpointName()}_";
+                var endpointName = settings.EndpointName();
+                var clean = TableNameCleaner.Clean(endpointName);
+                return $"{clean}_";
             }
-            return "";
+            return value;
         }
 
     }
-
 }

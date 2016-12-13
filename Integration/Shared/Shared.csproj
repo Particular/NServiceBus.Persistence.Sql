@@ -56,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompleteSagaMessage.cs" />
-    <Compile Include="ConfigErrorQueue.cs" />
     <Compile Include="DeferHandler.cs" />
     <Compile Include="DeferMessage.cs" />
     <Compile Include="EndpointStarter.cs" />

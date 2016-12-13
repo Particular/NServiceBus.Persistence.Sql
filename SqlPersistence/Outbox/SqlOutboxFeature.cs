@@ -14,7 +14,7 @@ class SqlOutboxFeature : Feature
         context.Settings.EnableFeature<StorageType.Outbox>();
         var settings = context.Settings;
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
-        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Outbox>();
+        var endpointName = settings.GetTablePrefix<StorageType.Outbox>();
         var outboxPersister = new OutboxPersister(connectionBuilder, endpointName);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
     }

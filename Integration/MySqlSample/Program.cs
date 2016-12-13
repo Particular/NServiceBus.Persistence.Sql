@@ -14,10 +14,11 @@ class Program
     {
         return EndpointStarter.Start("SqlPersistence.Sample.MySql", persistence =>
         {
+            var connectionString = "server=localhost;user=root;database=sqlpersistencesample;port=3306;password=Password1;Allow User Variables=True";
             persistence.SqlVarient(SqlVarient.MySql);
+            persistence.TablePrefix("MySql");
             persistence.ConnectionBuilder(async () =>
             {
-                var connectionString = "server=localhost;user=root;database=sqlpersistencesample;port=3306;password=Password1;Allow User Variables=True";
                 var connection = new MySqlConnection(connectionString);
                 await connection.OpenAsync();
                 return connection;

@@ -11,6 +11,7 @@ public static class EndpointStarter
         endpointConfiguration.UseSerialization<JsonSerializer>();
         endpointConfiguration.EnableInstallers();
         endpointConfiguration.EnableOutbox();
+        endpointConfiguration.SendFailedMessagesTo("Error");
 
         var sagaPersistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         configurePersistence(sagaPersistence);

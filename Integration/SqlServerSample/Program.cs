@@ -14,10 +14,12 @@ class Program
     {
         return EndpointStarter.Start("SqlPersistence.Sample.MsSqlServer", persistence =>
         {
-            persistence.SqlVarient(SqlVarient.MsSqlServer);
+            var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
+            persistence.SqlVarient(SqlVarient.MsSqlServer); 
+            persistence.TablePrefix("AcceptanceTests");  
             persistence.ConnectionBuilder(async () =>
             {
-                var connection = new SqlConnection(@"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True");
+                var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
                 return connection;
             });

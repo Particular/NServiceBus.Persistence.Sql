@@ -15,7 +15,7 @@ public class ConfigureEndpointSqlPersistence : EndpointConfigurer
             await sqlConnection.OpenAsync();
             return sqlConnection;
         });
-        persistence.UseEndpointName(false);
+        persistence.TablePrefix("AcceptanceTests");
 
         return Task.FromResult(0);
     }

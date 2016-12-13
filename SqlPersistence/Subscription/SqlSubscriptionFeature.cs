@@ -16,7 +16,7 @@ class SqlSubscriptionFeature : Feature
         settings.EnableFeature<StorageType.Subscriptions>();
 
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
-        var endpointName = settings.GetTablePrefixForEndpoint<StorageType.Subscriptions>();
+        var endpointName = settings.GetTablePrefix<StorageType.Subscriptions>();
         var persister = new SubscriptionPersister(connectionBuilder, endpointName);
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }

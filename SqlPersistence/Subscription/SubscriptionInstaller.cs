@@ -25,7 +25,7 @@ class SubscriptionInstaller : INeedToInstallSomething
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
         var sqlVarient = settings.GetSqlVarient();
 
-        var tablePrefix = settings.GetTablePrefixForEndpoint<StorageType.Subscriptions>();
+        var tablePrefix = settings.GetTablePrefix<StorageType.Subscriptions>();
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Subscription_Create.sql");
         log.Info($"Executing '{createScript}'");
         return connectionBuilder.ExecuteTableCommand(

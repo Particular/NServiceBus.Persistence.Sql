@@ -25,7 +25,7 @@ class SagaInstaller : INeedToInstallSomething
             return Task.FromResult(0);
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
-        var tablePrefix = settings.GetTablePrefixForEndpoint<StorageType.Sagas>();
+        var tablePrefix = settings.GetTablePrefix<StorageType.Sagas>();
 
         var sqlVarient = settings.GetSqlVarient();
         var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Sagas");
