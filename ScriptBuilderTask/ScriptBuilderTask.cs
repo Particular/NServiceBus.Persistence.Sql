@@ -78,7 +78,7 @@ namespace NServiceBus.Persistence.Sql
             var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVarient.ToString());
             if (Directory.Exists(scriptPath))
             {
-                Directory.Delete(scriptPath);
+                Directory.Delete(scriptPath, true);
             }
             Directory.CreateDirectory(scriptPath);
             WriteSagaScripts(scriptPath, moduleDefinition, sqlVarient);
