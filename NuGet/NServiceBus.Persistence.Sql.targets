@@ -21,17 +21,24 @@
     <ScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"/>
+  </Target>
+  <Target
+      BeforeTargets="GetCopyToOutputDirectoryItems"
+      Name="AddScriptsToGetCopyToOutputDirectoryItems">
+
     <ItemGroup>
-      <Scripts Include="$(ScriptDirectory)\**\*.sql" />
+      <Scripts Include="$(ScriptDirectory)**\*.sql" />
     </ItemGroup>
 
     <Message Text="@(Scripts)"/>
-    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=Always;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
       <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
+    </CreateItem>
+    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include" ItemName="AllItemsFullPathWithTargetPath" />
     </CreateItem>
 
   </Target>
-
 
   <!--Support for ncrunch-->
   <ItemGroup  Condition="'$(NCrunch)' == '1'">
