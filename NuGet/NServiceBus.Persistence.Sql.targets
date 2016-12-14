@@ -9,35 +9,26 @@
       AssemblyFile="$(MSBuildThisFileDirectory)..\..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
 
   <Target
-      AfterTargets="BeforeBuild"
-      Name="SqlPersistenceScriptCleaner">
-   <RemoveDir Directories="$(ScriptDirectory)" />
-  </Target>
-
-  <Target
       AfterTargets="AfterCompile"
       Name="SqlPersistenceScriptBuilder">
-
     <ScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"/>
   </Target>
+  
   <Target
       BeforeTargets="GetCopyToOutputDirectoryItems"
       Name="AddScriptsToGetCopyToOutputDirectoryItems">
-
     <ItemGroup>
       <Scripts Include="$(ScriptDirectory)**\*.sql" />
     </ItemGroup>
-
-    <Message Text="@(Scripts)"/>
+    <!--<Message Text="SqlScripts: @(Scripts)"/>-->
     <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
       <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
     </CreateItem>
     <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
       <Output TaskParameter="Include" ItemName="AllItemsFullPathWithTargetPath" />
     </CreateItem>
-
   </Target>
 
   <!--Support for ncrunch-->

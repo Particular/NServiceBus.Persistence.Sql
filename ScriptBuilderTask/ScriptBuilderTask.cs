@@ -8,17 +8,13 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 namespace NServiceBus.Persistence.Sql
 {
-    public class ScriptBuilderTask:
-#if (DEBUG)
-        AppDomainIsolatedTask
-#else
-        Task
-#endif
+    public class ScriptBuilderTask : Task
     {
         BuildLogger logger;
 
         [Required]
         public string AssemblyPath { get; set; }
+
         [Required]
         public string IntermediateDirectory { get; set; }
 
@@ -80,6 +76,10 @@ namespace NServiceBus.Persistence.Sql
         void Write(ModuleDefinition moduleDefinition, BuildSqlVarient sqlVarient)
         {
             var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVarient.ToString());
+            if (Directory.Exists(scriptPath))
+            {
+                Directory.Delete(scriptPath);
+            }
             Directory.CreateDirectory(scriptPath);
             WriteSagaScripts(scriptPath, moduleDefinition, sqlVarient);
             WriteTimeoutScript(scriptPath, sqlVarient);
