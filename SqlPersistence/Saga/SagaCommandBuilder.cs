@@ -33,7 +33,8 @@ insert into {tablePrefix}{tableSuffx}
     OriginalMessageId,
     Data,
     PersistenceVersion,
-    SagaTypeVersion{insertBuilder}
+    SagaTypeVersion,
+    SagaVersion{insertBuilder}
 )
 VALUES
 (
@@ -42,7 +43,8 @@ VALUES
     @OriginalMessageId,
     @Data,
     @PersistenceVersion,
-    @SagaTypeVersion{valuesBuilder}
+    @SagaTypeVersion,
+    1{valuesBuilder}
 )";
     }
 
@@ -54,7 +56,7 @@ VALUES
         var correlationSet = "";
         if (transitionalCorrelationProperty != null)
         {
-            correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty}";
+            correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
         }
 
         return $@"
@@ -64,9 +66,10 @@ SET
     OriginalMessageId = @OriginalMessageId,
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
-    SagaTypeVersion = @SagaTypeVersion{correlationSet}
+    SagaTypeVersion = @SagaTypeVersion,
+    SagaVersion = @SagaVersion + 1{correlationSet}
 WHERE
-    Id = @Id
+    Id = @Id AND SagaVersion = @SagaVersion
 ";
     }
 
@@ -78,7 +81,8 @@ select
     Originator,
     OriginalMessageId,
     Data,
-    SagaTypeVersion
+    SagaTypeVersion,
+    SagaVersion
 from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
@@ -92,7 +96,8 @@ select
     Originator,
     OriginalMessageId,
     Data,
-    SagaTypeVersion
+    SagaTypeVersion,
+    SagaVersion
 from {tablePrefix}{tableSuffx}
 where Correlation_{propertyName} = @propertyValue
 ";
@@ -102,7 +107,7 @@ where Correlation_{propertyName} = @propertyValue
     {
         return $@"
 delete from {tablePrefix}{tableSuffx}
-where Id = @Id
+where Id = @Id AND SagaVersion = @SagaVersion
 ";
     }
 }
