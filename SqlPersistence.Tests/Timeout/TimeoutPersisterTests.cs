@@ -20,12 +20,7 @@ public class TimeoutPersisterTests : IDisposable
         dbConnection = new SqlConnection(connectionString);
         dbConnection.Open();
         persister = new TimeoutPersister(
-            connectionBuilder: async () =>
-            {
-                DbConnection connection1 = new SqlConnection(connectionString);
-                await connection1.OpenAsync();
-                return connection1;
-            }, 
+            connectionBuilder: () => new SqlConnection(connectionString), 
             tablePrefix: $"{nameof(TimeoutPersisterTests)}_");
     }
 

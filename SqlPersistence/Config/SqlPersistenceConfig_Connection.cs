@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
@@ -11,13 +10,13 @@ namespace NServiceBus
     
     public static partial class SqlPersistenceConfig
     {
-        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<Task<DbConnection>> connectionBuilder)
+        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
         {
             configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }
 
-        public static void ConnectionBuilder<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, Func<Task<DbConnection>> connectionBuilder)
+        public static void ConnectionBuilder<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, Func<DbConnection> connectionBuilder)
             where TStorageType : StorageType
         {
             var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionBuilder";
@@ -25,10 +24,10 @@ namespace NServiceBus
                 .Set(key, connectionBuilder);
         }
 
-        internal static Func<Task<DbConnection>> GetConnectionBuilder<TStorageType>(this ReadOnlySettings settings)
+        internal static Func<DbConnection> GetConnectionBuilder<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetValue<Func<Task<DbConnection>>, TStorageType>("ConnectionBuilder",
+            return settings.GetValue<Func<DbConnection>, TStorageType>("ConnectionBuilder",
                 defaultValue: () =>
                 {
                     throw new Exception("ConnectionBuilder must be defined.");

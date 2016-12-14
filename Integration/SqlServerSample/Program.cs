@@ -17,12 +17,7 @@ class Program
             var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
             persistence.SqlVarient(SqlVarient.MsSqlServer); 
             persistence.TablePrefix("AcceptanceTests");  
-            persistence.ConnectionBuilder(async () =>
-            {
-                var connection = new SqlConnection(connectionString);
-                await connection.OpenAsync();
-                return connection;
-            });
+            persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
         });
     }
 }

@@ -9,12 +9,7 @@ public class ConfigureEndpointSqlPersistence : EndpointConfigurer
     public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
     {
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(async () =>
-        {
-            var sqlConnection = new SqlConnection(ConnectionString);
-            await sqlConnection.OpenAsync();
-            return sqlConnection;
-        });
+        persistence.ConnectionBuilder(() => new SqlConnection(ConnectionString));
         persistence.TablePrefix("AcceptanceTests");
 
         return Task.FromResult(0);

@@ -85,7 +85,7 @@
     <Compile Include="Config\SqlPersistenceConfig_Connection.cs" />
     <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
-    <Compile Include="Config\SqlPersistenceConfig_EndpointName.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
     <Compile Include="Config\SqlVarientConfig.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />

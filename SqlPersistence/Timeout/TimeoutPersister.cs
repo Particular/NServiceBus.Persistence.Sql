@@ -8,7 +8,7 @@ using NServiceBus.Extensibility;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
-    Func<Task<DbConnection>> connectionBuilder;
+    Func<DbConnection> connectionBuilder;
     string insertCommandText;
     string removeByIdCommandText;
     string removeBySagaIdCommandText;
@@ -17,7 +17,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     string nextCommandText;
 
     public TimeoutPersister(
-        Func<Task<DbConnection>> connectionBuilder, 
+        Func<DbConnection> connectionBuilder,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
@@ -77,28 +77,31 @@ order by Time";
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = selectByIdCommandText;
-            command.AddParameter("Id", timeoutId);
-            using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
             {
-                if (!await reader.ReadAsync())
+                command.CommandText = selectByIdCommandText;
+                command.AddParameter("Id", timeoutId);
+                using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
-                    return null;
-                }
+                    if (!await reader.ReadAsync())
+                    {
+                        return null;
+                    }
 
-                var headers = ReadHeaders(reader);
-                return new TimeoutData
-                {
-                    Id = timeoutId,
-                    Destination = reader.GetString(0),
-                    SagaId = reader.GetGuid(1),
-                    State = (byte[]) reader.GetValue(2),
-                    Time = reader.GetDateTime(3),
-                    Headers = headers,
-                };
+                    var headers = ReadHeaders(reader);
+                    return new TimeoutData
+                    {
+                        Id = timeoutId,
+                        Destination = reader.GetString(0),
+                        SagaId = reader.GetGuid(1),
+                        State = (byte[]) reader.GetValue(2),
+                        Time = reader.GetDateTime(3),
+                        Headers = headers,
+                    };
+                }
             }
         }
     }
@@ -113,47 +116,55 @@ order by Time";
 
     public async Task Add(TimeoutData timeout, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = insertCommandText;
-            var id = Guid.NewGuid();
-            timeout.Id = id.ToString();
-            command.AddParameter("Id", id);
-            command.AddParameter("Destination", timeout.Destination);
-            command.AddParameter("SagaId", timeout.SagaId);
-            command.AddParameter("State", timeout.State);
-            command.AddParameter("Time", timeout.Time);
-            command.AddParameter("Headers", Serializer.Serialize(timeout.Headers));
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx();
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = insertCommandText;
+                var id = Guid.NewGuid();
+                timeout.Id = id.ToString();
+                command.AddParameter("Id", id);
+                command.AddParameter("Destination", timeout.Destination);
+                command.AddParameter("SagaId", timeout.SagaId);
+                command.AddParameter("State", timeout.State);
+                command.AddParameter("Time", timeout.Time);
+                command.AddParameter("Headers", Serializer.Serialize(timeout.Headers));
+                command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+                await command.ExecuteNonQueryEx();
+            }
         }
     }
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = removeByIdCommandText;
-            command.AddParameter("Id", timeoutId);
-            using (var reader = await command.ExecuteReaderAsync())
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
             {
-                if (!reader.HasRows)
+                command.CommandText = removeByIdCommandText;
+                command.AddParameter("Id", timeoutId);
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    return false;
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
                 }
             }
         }
         return true;
     }
+
     public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
     {
         var list = new List<TimeoutsChunk.Timeout>();
         var now = DateTime.UtcNow;
         DateTime nextTimeToRunQuery;
-        using (var connection = await connectionBuilder())
+        using (var connection = connectionBuilder())
         {
+            await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = rangeComandText;
@@ -180,7 +191,7 @@ order by Time";
                 }
                 else
                 {
-                    nextTimeToRunQuery = (DateTime)executeScalar;
+                    nextTimeToRunQuery = (DateTime) executeScalar;
                 }
             }
         }
@@ -189,12 +200,15 @@ order by Time";
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = removeBySagaIdCommandText;
-            command.AddParameter("SagaId", sagaId);
-            await command.ExecuteNonQueryEx();
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = removeBySagaIdCommandText;
+                command.AddParameter("SagaId", sagaId);
+                await command.ExecuteNonQueryEx();
+            }
         }
     }
 

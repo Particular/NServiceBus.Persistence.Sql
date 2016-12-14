@@ -59,12 +59,7 @@ public class SqlTransportIntegrationTests:IDisposable
         transport.Transactions(transactionMode);
         transport.ConnectionString(connectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(async () =>
-        {
-            var sqlConnection = new SqlConnection(connectionString);
-            await sqlConnection.OpenAsync();
-            return sqlConnection;
-        });
+        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
         persistence.DisableInstaller();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);

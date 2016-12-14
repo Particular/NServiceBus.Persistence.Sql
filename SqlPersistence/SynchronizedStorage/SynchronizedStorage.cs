@@ -6,16 +6,17 @@ using NServiceBus.Persistence;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
-    Func<Task<DbConnection>> connectionBuilder;
+    Func<DbConnection> connectionBuilder;
 
-    public SynchronizedStorage(Func<Task<DbConnection>> connectionBuilder)
+    public SynchronizedStorage(Func<DbConnection> connectionBuilder)
     {
         this.connectionBuilder = connectionBuilder;
     }
 
     public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
     {
-        var connection = await connectionBuilder();
+        var connection = connectionBuilder();
+        await connection.OpenAsync().ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         return new StorageSession(connection, transaction,true);
     }

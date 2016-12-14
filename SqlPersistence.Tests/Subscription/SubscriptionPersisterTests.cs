@@ -21,12 +21,7 @@ public class SubscriptionPersisterTests : IDisposable
         dbConnection = new SqlConnection(connectionString);
         dbConnection.Open();
         persister = new SubscriptionPersister(
-            connectionBuilder: () =>
-            {
-                DbConnection connection = new SqlConnection(connectionString);
-                connection.Open();
-                return connection.ToTask();
-            },
+            connectionBuilder: () => new SqlConnection(connectionString),
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_"
             );
     }

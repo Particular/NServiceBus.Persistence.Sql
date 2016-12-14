@@ -113,12 +113,7 @@ end";
         testCase(endpointConfiguration);
         transport.ConnectionString(connectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(async () =>
-        {
-            var sqlConnection = new SqlConnection(connectionString);
-            await sqlConnection.OpenAsync();
-            return sqlConnection;
-        });
+        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {

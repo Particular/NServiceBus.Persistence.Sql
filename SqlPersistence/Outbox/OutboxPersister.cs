@@ -12,14 +12,14 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    Func<Task<DbConnection>> connectionBuilder;
+    Func<DbConnection> connectionBuilder;
     string storeCommandText;
     string getCommandText;
     string setAsDispatchedCommandText;
     string cleanupCommandText;
 
     public OutboxPersister(
-        Func<Task<DbConnection>> connectionBuilder,
+        Func<DbConnection> connectionBuilder,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
@@ -58,7 +58,8 @@ where MessageId = @MessageId";
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var connection = await connectionBuilder();
+        var connection = connectionBuilder();
+        await connection.OpenAsync().ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         return new SqlOutboxTransaction(transaction, connection);
     }
@@ -66,54 +67,60 @@ where MessageId = @MessageId";
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = setAsDispatchedCommandText;
-            command.AddParameter("MessageId", messageId);
-            command.AddParameter("DispatchedAt", DateTime.UtcNow);
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx();
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = setAsDispatchedCommandText;
+                command.AddParameter("MessageId", messageId);
+                command.AddParameter("DispatchedAt", DateTime.UtcNow);
+                command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+                await command.ExecuteNonQueryEx();
+            }
         }
     }
 
     public async Task<OutboxMessage> Get(string messageId, ContextBag context)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionBuilder())
-        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+        using (var connection = connectionBuilder())
         {
-            OutboxMessage result;
-            using (var command = connection.CreateCommand())
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                command.CommandText = getCommandText;
-                command.Transaction = transaction;
-                command.AddParameter("MessageId", messageId);
-                using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+                OutboxMessage result;
+                using (var command = connection.CreateCommand())
                 {
-                    if (!await dataReader.ReadAsync())
+                    command.CommandText = getCommandText;
+                    command.Transaction = transaction;
+                    command.AddParameter("MessageId", messageId);
+                    using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                     {
-                        return null;
-                    }
-                    var dispatched = dataReader.GetBoolean(0);
-                    if (dispatched)
-                    {
-                        result = new OutboxMessage(messageId, new TransportOperation[0]);
-                    }
-                    else
-                    {
-                        using (var textReader = dataReader.GetTextReader(1))
+                        if (!await dataReader.ReadAsync())
                         {
-                            var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
-                                .FromSerializable()
-                                .ToArray();
-                            result = new OutboxMessage(messageId, transportOperations);
+                            return null;
+                        }
+                        var dispatched = dataReader.GetBoolean(0);
+                        if (dispatched)
+                        {
+                            result = new OutboxMessage(messageId, new TransportOperation[0]);
+                        }
+                        else
+                        {
+                            using (var textReader = dataReader.GetTextReader(1))
+                            {
+                                var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
+                                    .FromSerializable()
+                                    .ToArray();
+                                result = new OutboxMessage(messageId, transportOperations);
+                            }
                         }
                     }
                 }
+                transaction.Commit();
+                return result;
             }
-            transaction.Commit();
-            return result;
         }
     }
 
@@ -141,14 +148,17 @@ where MessageId = @MessageId";
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress))
-        using (var connection = await connectionBuilder())
-        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            command.CommandText = cleanupCommandText;
-            command.Transaction = transaction;
-            command.AddParameter("Date", dateTime);
-            await command.ExecuteNonQueryEx(cancellationToken);
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = cleanupCommandText;
+                command.Transaction = transaction;
+                command.AddParameter("Date", dateTime);
+                await command.ExecuteNonQueryEx(cancellationToken);
+            }
         }
     }
 }

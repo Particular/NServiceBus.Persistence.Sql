@@ -18,11 +18,11 @@ class SagaInstaller : INeedToInstallSomething
         this.settings = settings;
     }
 
-    public Task Install(string identity)
+    public async Task Install(string identity)
     {
         if (!settings.ShouldInstall<StorageType.Sagas>())
         {
-            return Task.FromResult(0);
+            return;
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
         var tablePrefix = settings.GetTablePrefix<StorageType.Sagas>();
@@ -32,16 +32,20 @@ class SagaInstaller : INeedToInstallSomething
         if (!Directory.Exists(sagasDirectory))
         {
             log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
-            return Task.FromResult(0);
+            return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
         log.Info($@"Executing saga creation scripts:
 {string.Join(Environment.NewLine, scriptFiles)}");
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
-        return connectionBuilder.ExecuteTableCommand(
-            scripts: sagaScripts,
-            tablePrefix: tablePrefix);
+        using (var connection = connectionBuilder())
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.ExecuteTableCommand(
+                scripts: sagaScripts,
+                tablePrefix: tablePrefix);
+        }
     }
 
 }

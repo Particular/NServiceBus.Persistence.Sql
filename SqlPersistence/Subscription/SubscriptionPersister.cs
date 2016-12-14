@@ -10,13 +10,13 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    Func<Task<DbConnection>> connectionBuilder;
+    Func<DbConnection> connectionBuilder;
     string tablePrefix;
     string subscribeCommandText;
     string unsubscribeCommandText;
 
     public SubscriptionPersister(
-        Func<Task<DbConnection>> connectionBuilder, 
+        Func<DbConnection> connectionBuilder,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
@@ -57,8 +57,9 @@ where
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
+        using (var connection = connectionBuilder())
         {
+            await connection.OpenAsync().ConfigureAwait(false);
             await Subscribe(subscriber, connection, messageType);
         }
     }
@@ -79,8 +80,9 @@ where
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder())
+        using (var connection = connectionBuilder())
         {
+            await connection.OpenAsync().ConfigureAwait(false);
             await Unsubscribe(subscriber, connection, messageType);
         }
     }
@@ -107,32 +109,35 @@ where MessageType IN (");
 
         var types = messageTypes.ToList();
 
-        using (var connection = await connectionBuilder())
-        using (var command = connection.CreateCommand())
+        using (var connection = connectionBuilder())
         {
-            for (var i = 0; i < types.Count; i++)
+            await connection.OpenAsync().ConfigureAwait(false);
+            using (var command = connection.CreateCommand())
             {
-                var messageType = types[i];
-                var paramName = "@type" + i;
-                builder.Append(paramName);
-                if (i < types.Count - 1)
+                for (var i = 0; i < types.Count; i++)
                 {
-                    builder.Append(", ");
+                    var messageType = types[i];
+                    var paramName = "@type" + i;
+                    builder.Append(paramName);
+                    if (i < types.Count - 1)
+                    {
+                        builder.Append(", ");
+                    }
+                    command.AddParameter(paramName, messageType.TypeName);
                 }
-                command.AddParameter(paramName, messageType.TypeName);
-            }
-            builder.Append(")");
-            command.CommandText = builder.ToString();
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                var subscribers = new List<Subscriber>();
-                while (await reader.ReadAsync())
+                builder.Append(")");
+                command.CommandText = builder.ToString();
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    var address = reader.GetString(0);
-                    var endpoint = await reader.IsDBNullAsync(1) ? null : reader.GetString(1);
-                    subscribers.Add(new Subscriber(address, endpoint));
+                    var subscribers = new List<Subscriber>();
+                    while (await reader.ReadAsync())
+                    {
+                        var address = reader.GetString(0);
+                        var endpoint = await reader.IsDBNullAsync(1) ? null : reader.GetString(1);
+                        subscribers.Add(new Subscriber(address, endpoint));
+                    }
+                    return subscribers;
                 }
-                return subscribers;
             }
         }
     }

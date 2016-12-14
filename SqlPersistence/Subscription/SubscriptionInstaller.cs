@@ -16,11 +16,11 @@ class SubscriptionInstaller : INeedToInstallSomething
         this.settings = settings;
     }
 
-    public Task Install(string identity)
+    public async Task Install(string identity)
     {
         if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
-            return Task.FromResult(0);
+            return;
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
         var sqlVarient = settings.GetSqlVarient();
@@ -28,10 +28,14 @@ class SubscriptionInstaller : INeedToInstallSomething
         var tablePrefix = settings.GetTablePrefix<StorageType.Subscriptions>();
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Subscription_Create.sql");
         log.Info($"Executing '{createScript}'");
-        return connectionBuilder.ExecuteTableCommand(
-            script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix
-        );
+        using (var connection = connectionBuilder())
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.ExecuteTableCommand(
+                script: File.ReadAllText(createScript),
+                tablePrefix: tablePrefix
+            );
+        }
     }
 
 }
