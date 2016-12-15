@@ -1,42 +1,49 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 using NUnit.Framework;
 using ObjectApproval;
 
-[TestFixture]
-public class SubscriptionPersisterTests : IDisposable
+public abstract class SubscriptionPersisterTests
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
-    SubscriptionPersister persister;
-    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
-    DbConnection dbConnection;
 
-    public SubscriptionPersisterTests()
+    BuildSqlVarient sqlVarient;
+    Func<DbConnection> dbConnection;
+    protected abstract Func<DbConnection> GetConnection();
+    SubscriptionPersister persister;
+
+    public SubscriptionPersisterTests(BuildSqlVarient sqlVarient)
     {
-        dbConnection = new SqlConnection(connectionString);
-        dbConnection.Open();
+        this.sqlVarient = sqlVarient;
+        dbConnection = GetConnection();
         persister = new SubscriptionPersister(
-            connectionBuilder: () => new SqlConnection(connectionString),
+            connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_"
-            );
+        );
     }
 
     [SetUp]
     public void Setup()
     {
-        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
-        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient), nameof(SubscriptionPersisterTests));
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient), nameof(SubscriptionPersisterTests));
+        }
     }
 
     [TearDown]
     public void TearDown()
     {
-        dbConnection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
+        }
     }
 
     [Test]
@@ -96,8 +103,4 @@ public class SubscriptionPersisterTests : IDisposable
         ObjectApprover.VerifyWithJson(result);
     }
 
-    public void Dispose()
-    {
-        dbConnection?.Dispose();
-    }
 }

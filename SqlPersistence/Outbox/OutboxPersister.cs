@@ -59,7 +59,7 @@ where MessageId = @MessageId";
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
         var connection = connectionBuilder();
-        await connection.OpenAsync().ConfigureAwait(false);
+        await connection.OpenAsync();
         var transaction = connection.BeginTransaction();
         return new SqlOutboxTransaction(transaction, connection);
     }
@@ -69,7 +69,7 @@ where MessageId = @MessageId";
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = setAsDispatchedCommandText;
@@ -86,7 +86,7 @@ where MessageId = @MessageId";
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 OutboxMessage result;
@@ -150,7 +150,7 @@ where MessageId = @MessageId";
         using (new TransactionScope(TransactionScopeOption.Suppress))
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync(cancellationToken);
             using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             using (var command = connection.CreateCommand())
             {

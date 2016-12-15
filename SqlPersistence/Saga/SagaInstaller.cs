@@ -41,7 +41,7 @@ class SagaInstaller : INeedToInstallSomething
             .Select(File.ReadAllText);
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             await connection.ExecuteTableCommand(
                 scripts: sagaScripts,
                 tablePrefix: tablePrefix);

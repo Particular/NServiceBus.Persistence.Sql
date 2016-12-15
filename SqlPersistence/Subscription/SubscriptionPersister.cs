@@ -24,13 +24,14 @@ class SubscriptionPersister : ISubscriptionStorage
 
         var tableName = $@"{tablePrefix}SubscriptionData";
         subscribeCommandText = $@"
-declare @dummy int; MERGE {tableName} WITH (HOLDLOCK) AS target
-USING(SELECT @Endpoint AS Endpoint, @Subscriber AS Subscriber, @MessageType AS MessageType) AS source
-ON target.Endpoint = source.Endpoint and 
+declare @dummy int; 
+merge {tableName} with (holdlock) as target
+using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
+on target.Endpoint = source.Endpoint and 
    target.Subscriber = source.Subscriber and
    target.MessageType = source.MessageType
 when matched then
-    UPDATE set @dummy = 0
+    update set @dummy = 0
 when not matched then
 insert
 (
@@ -59,7 +60,7 @@ where
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             await Subscribe(subscriber, connection, messageType);
         }
     }
@@ -82,7 +83,7 @@ where
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             await Unsubscribe(subscriber, connection, messageType);
         }
     }
@@ -103,21 +104,21 @@ where
         var builder = new StringBuilder();
 
         builder.Append($@"
-SELECT DISTINCT Subscriber, Endpoint
+select distinct Subscriber, Endpoint
 from {tablePrefix}SubscriptionData
-where MessageType IN (");
+where MessageType in (");
 
         var types = messageTypes.ToList();
 
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 for (var i = 0; i < types.Count; i++)
                 {
                     var messageType = types[i];
-                    var paramName = "@type" + i;
+                    var paramName = $"@type{i}";
                     builder.Append(paramName);
                     if (i < types.Count - 1)
                     {
@@ -133,7 +134,15 @@ where MessageType IN (");
                     while (await reader.ReadAsync())
                     {
                         var address = reader.GetString(0);
-                        var endpoint = await reader.IsDBNullAsync(1) ? null : reader.GetString(1);
+                        string endpoint;
+                        if (await reader.IsDBNullAsync(1))
+                        {
+                            endpoint = null;
+                        }
+                        else
+                        {
+                            endpoint = reader.GetString(1);
+                        }
                         subscribers.Add(new Subscriber(address, endpoint));
                     }
                     return subscribers;

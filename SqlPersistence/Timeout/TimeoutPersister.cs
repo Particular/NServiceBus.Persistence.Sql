@@ -24,7 +24,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.SelectById;
@@ -63,7 +63,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.Insert;
@@ -85,20 +85,18 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.RemoveById;
                 command.AddParameter("Id", timeoutId);
-                using (var reader = await command.ExecuteReaderAsync()
-                    .ConfigureAwait(false))
+                using (var reader = await command.ExecuteReaderAsync())
                 {
                     if (!reader.HasRows)
                     {
                         return false;
                     }
-                    await reader.ReadAsync()
-                        .ConfigureAwait(false);
+                    await reader.ReadAsync();
                     var value = reader.GetValue(0);
                     return value != DBNull.Value;
                 }
@@ -113,7 +111,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         DateTime nextTimeToRunQuery;
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.Range;
@@ -151,7 +149,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.RemoveBySagaId;

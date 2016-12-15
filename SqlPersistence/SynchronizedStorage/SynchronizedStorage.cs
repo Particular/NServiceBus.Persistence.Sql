@@ -16,7 +16,7 @@ class SynchronizedStorage : ISynchronizedStorage
     public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
     {
         var connection = connectionBuilder();
-        await connection.OpenAsync().ConfigureAwait(false);
+        await connection.OpenAsync();
         var transaction = connection.BeginTransaction();
         return new StorageSession(connection, transaction,true);
     }

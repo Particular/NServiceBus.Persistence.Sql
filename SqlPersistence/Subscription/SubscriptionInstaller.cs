@@ -30,7 +30,7 @@ class SubscriptionInstaller : INeedToInstallSomething
         log.Info($"Executing '{createScript}'");
         using (var connection = connectionBuilder())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             await connection.ExecuteTableCommand(
                 script: File.ReadAllText(createScript),
                 tablePrefix: tablePrefix

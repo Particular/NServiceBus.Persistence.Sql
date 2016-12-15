@@ -126,6 +126,8 @@
     <Compile Include="Saga\MySqlSagaPersisterTests.cs" />
     <Compile Include="Saga\SqlServerSagaPersisterTests.cs" />
     <Compile Include="Saga\SqlSagaTests.cs" />
+    <Compile Include="Subscription\MySqlServerSubscriptionPersisterTests.cs" />
+    <Compile Include="Subscription\SqlServerSubscriptionPersisterTests.cs" />
     <Compile Include="TaskEx.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />

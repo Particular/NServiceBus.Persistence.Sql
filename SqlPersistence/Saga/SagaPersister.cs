@@ -109,7 +109,7 @@ class SagaPersister : ISagaPersister
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(sagaId, session, sagaType).ConfigureAwait(false);
+        var result = await Get<TSagaData>(sagaId, session, sagaType);
         return SetSagaVersion(result, context);
     }
 
@@ -133,7 +133,7 @@ class SagaPersister : ISagaPersister
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType).ConfigureAwait(false);
+        var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType);
         return SetSagaVersion(result, context);
     }
 
