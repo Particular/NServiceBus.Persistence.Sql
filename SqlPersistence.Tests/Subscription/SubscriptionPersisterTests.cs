@@ -21,7 +21,8 @@ public abstract class SubscriptionPersisterTests
         dbConnection = GetConnection();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(SubscriptionPersisterTests)}_"
+            tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
+            sqlVarient: sqlVarient.Convert()
         );
     }
 

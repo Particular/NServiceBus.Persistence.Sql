@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
@@ -17,17 +18,21 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public SubscriptionPersister(
         Func<DbConnection> connectionBuilder,
-        string tablePrefix)
+        string tablePrefix, SqlVarient sqlVarient)
     {
         this.connectionBuilder = connectionBuilder;
         this.tablePrefix = tablePrefix;
 
         var tableName = $@"{tablePrefix}SubscriptionData";
-        subscribeCommandText = $@"
-declare @dummy int; 
+
+        switch (sqlVarient)
+        {
+            case SqlVarient.MsSqlServer:
+                subscribeCommandText = $@"
+declare @dummy int;
 merge {tableName} with (holdlock) as target
 using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
-on target.Endpoint = source.Endpoint and 
+on target.Endpoint = source.Endpoint and
    target.Subscriber = source.Subscriber and
    target.MessageType = source.MessageType
 when matched then
@@ -35,18 +40,45 @@ when matched then
 when not matched then
 insert
 (
-    Endpoint,
     Subscriber,
     MessageType,
+    Endpoint,
     PersistenceVersion
 )
 values
 (
-    @Endpoint,
     @Subscriber,
     @MessageType,
+    @Endpoint,
     @PersistenceVersion
 );";
+                break;
+
+            case SqlVarient.MySql:
+                subscribeCommandText = $@"
+insert into {tableName}
+(
+    Subscriber,
+    MessageType,
+    Endpoint,
+    PersistenceVersion
+)
+values
+(
+    @Subscriber,
+    @MessageType,
+    @Endpoint,
+    @PersistenceVersion
+)
+on duplicate key update
+    Endpoint = @Endpoint,
+    PersistenceVersion = @PersistenceVersion
+";
+                break;
+
+            default:
+                throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+        }
 
         unsubscribeCommandText = $@"
 delete from {tableName}
