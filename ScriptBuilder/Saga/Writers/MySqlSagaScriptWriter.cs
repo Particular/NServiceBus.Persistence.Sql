@@ -176,6 +176,7 @@ set @createTable = concat('
         Data longtext not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,
+        SagaVersion int not null,
         primary key (`Id`)
     ) DEFAULT CHARSET=utf8;
 ');

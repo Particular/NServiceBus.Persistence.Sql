@@ -159,7 +159,8 @@ set @createTable = '
         OriginalMessageId nvarchar(255),
         Data nvarchar(max) not null,
         PersistenceVersion varchar(23) not null,
-        SagaTypeVersion varchar(23) not null
+        SagaTypeVersion varchar(23) not null,
+        SagaVersion int not null
     )
 ';
 exec(@createTable);
@@ -181,9 +182,9 @@ if exists
         and type in ('U')
 )
 begin
-    declare @createTable nvarchar(max);
-    set @createTable = 'drop table  if exists ' + @tableName;
-    exec(@createTable);
+    declare @dropTable nvarchar(max);
+    set @dropTable = 'drop table ' + @tableName;
+    exec(@dropTable);
 end
 ");
     }
