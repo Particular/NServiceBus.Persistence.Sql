@@ -9,7 +9,7 @@ set @createTable = concat('
         Headers longtext not null,
         PersistenceVersion varchar(23) not null,
         primary key (`Id`)
-    ) DEFAULT CHARSET=utf8;
+    ) default charset=utf8;
 ');
 prepare statment from @createTable;
 execute statment;

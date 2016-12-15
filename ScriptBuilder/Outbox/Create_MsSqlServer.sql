@@ -13,7 +13,7 @@ set @createTable = N'
         MessageId nvarchar(1024) not null primary key,
         Dispatched bit not null default 0,
         DispatchedAt datetime,
-        PersistenceVersion nvarchar(23) not null,
+        PersistenceVersion varchar(23) not null,
         Operations nvarchar(max) not null
     )
 ';

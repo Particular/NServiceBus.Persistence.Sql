@@ -4,9 +4,10 @@ set @createTable =  concat('
         MessageId varchar(1024) not null,
         Dispatched bit not null default 0,
         DispatchedAt datetime,
+        PersistenceVersion varchar(23) not null,
         Operations longtext not null,
         primary key (`MessageId`)
-    ) DEFAULT CHARSET=utf8;
+    ) default charset=utf8;
 ');
 prepare statment from @createTable;
 execute statment;

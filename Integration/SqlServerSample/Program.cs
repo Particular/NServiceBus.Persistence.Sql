@@ -12,9 +12,9 @@ class Program
 
     static Task Start()
     {
+        var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
         return EndpointStarter.Start("SqlPersistence.Sample.MsSqlServer", persistence =>
         {
-            var connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
             persistence.SqlVarient(SqlVarient.MsSqlServer); 
             persistence.TablePrefix("AcceptanceTests");  
             persistence.ConnectionBuilder(() => new SqlConnection(connectionString));

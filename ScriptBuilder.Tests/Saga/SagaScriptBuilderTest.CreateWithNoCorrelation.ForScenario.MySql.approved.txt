@@ -11,12 +11,12 @@ set @createTable = concat('
         Id varchar(38) not null,
         Originator varchar(255),
         OriginalMessageId varchar(255),
-        Data longtext not null,
+        Data json not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,
         SagaVersion int not null,
         primary key (`Id`)
-    ) DEFAULT CHARSET=utf8;
+    ) default charset=utf8;
 ');
 prepare statment from @createTable;
 execute statment;
