@@ -14,7 +14,7 @@ if exists
         and type in ('U')
 )
 begin
-    declare @createTable nvarchar(max);
-    set @createTable = 'drop table  if exists ' + @tableName;
-    exec(@createTable);
+    declare @dropTable nvarchar(max);
+    set @dropTable = 'drop table ' + @tableName;
+    exec(@dropTable);
 end
