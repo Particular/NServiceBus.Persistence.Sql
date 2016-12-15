@@ -67,7 +67,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         static void WriteComment(TextWriter writer, string text)
         {
             writer.WriteLine($@"
-/* {text} */ ");
+/* {text} */");
         }
 
         static ISagaScriptWriter GetSqlVarientWriter(BuildSqlVarient sqlVarient, TextWriter textWriter, SagaDefinition saga)

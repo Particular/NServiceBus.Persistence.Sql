@@ -1,9 +1,9 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 declare @tableName nvarchar(max) = @tablePrefix + 'theSaga';
 
-/* CreateTable */ 
+/* CreateTable */
 
 if not exists
 (
@@ -28,7 +28,7 @@ set @createTable = '
 exec(@createTable);
 end
 
-/* PurgeObsoleteIndex */ 
+/* PurgeObsoleteIndex */
 
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
@@ -42,7 +42,7 @@ select @dropIndexQuery =
 );
 exec sp_executesql @dropIndexQuery
 
-/* PurgeObsoleteProperties */ 
+/* PurgeObsoleteProperties */
 
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =

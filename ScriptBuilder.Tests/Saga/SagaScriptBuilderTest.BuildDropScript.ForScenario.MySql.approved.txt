@@ -1,10 +1,10 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
-/* DropTable */ 
+/* DropTable */
 
 set @dropTable = concat('drop table if exists ', @tableName);
 prepare statment from @dropTable;

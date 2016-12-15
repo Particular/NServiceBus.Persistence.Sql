@@ -1,9 +1,9 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 declare @tableName nvarchar(max) = @tablePrefix + 'theSaga';
 
-/* CreateTable */ 
+/* CreateTable */
 
 if not exists
 (
@@ -28,7 +28,7 @@ set @createTable = '
 exec(@createTable);
 end
 
-/* AddProperty CorrelationProperty */ 
+/* AddProperty CorrelationProperty */
 
 if not exists
 (
@@ -46,7 +46,7 @@ begin
   exec(@createColumn_CorrelationProperty);
 end
 
-/* VerifyColumnType String */ 
+/* VerifyColumnType String */
 
 declare @dataType_CorrelationProperty nvarchar(max);
 set @dataType_CorrelationProperty = (
@@ -59,7 +59,7 @@ set @dataType_CorrelationProperty = (
 if (@dataType_CorrelationProperty <> 'nvarchar(450)')
   throw 50000, 'Incorrect data type for Correlation_CorrelationProperty', 0
 
-/* WriteCreateIndex CorrelationProperty */ 
+/* WriteCreateIndex CorrelationProperty */
 
 if not exists
 (
@@ -79,7 +79,7 @@ begin
   exec(@createIndex_CorrelationProperty);
 end
 
-/* AddProperty TransitionalProperty */ 
+/* AddProperty TransitionalProperty */
 
 if not exists
 (
@@ -97,7 +97,7 @@ begin
   exec(@createColumn_TransitionalProperty);
 end
 
-/* VerifyColumnType String */ 
+/* VerifyColumnType String */
 
 declare @dataType_TransitionalProperty nvarchar(max);
 set @dataType_TransitionalProperty = (
@@ -110,7 +110,7 @@ set @dataType_TransitionalProperty = (
 if (@dataType_TransitionalProperty <> 'nvarchar(450)')
   throw 50000, 'Incorrect data type for Correlation_TransitionalProperty', 0
 
-/* CreateIndex TransitionalProperty */ 
+/* CreateIndex TransitionalProperty */
 
 if not exists
 (
@@ -130,7 +130,7 @@ begin
   exec(@createIndex_TransitionalProperty);
 end
 
-/* PurgeObsoleteIndex */ 
+/* PurgeObsoleteIndex */
 
 declare @dropIndexQuery nvarchar(max);
 select @dropIndexQuery =
@@ -146,7 +146,7 @@ select @dropIndexQuery =
 );
 exec sp_executesql @dropIndexQuery
 
-/* PurgeObsoleteProperties */ 
+/* PurgeObsoleteProperties */
 
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =

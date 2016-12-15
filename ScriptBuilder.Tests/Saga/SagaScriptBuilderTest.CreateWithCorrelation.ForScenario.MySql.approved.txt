@@ -1,10 +1,10 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
-/* CreateTable */ 
+/* CreateTable */
 
 set @createTable = concat('
     create table if not exists ', @tableName, '(
@@ -21,7 +21,7 @@ prepare statment from @createTable;
 execute statment;
 deallocate prepare statment;
 
-/* AddProperty CorrelationProperty */ 
+/* AddProperty CorrelationProperty */
 
 select count(*)
 into @exist
@@ -39,7 +39,7 @@ prepare statment from @query;
 execute statment;
 deallocate prepare statment;
 
-/* VerifyColumnType String */ 
+/* VerifyColumnType String */
 
 set @column_type_CorrelationProperty = (
   select column_type
@@ -59,7 +59,7 @@ prepare statment from @query;
 execute statment;
 deallocate prepare statment;
 
-/* WriteCreateIndex CorrelationProperty */ 
+/* WriteCreateIndex CorrelationProperty */
 
 select count(*)
 into @exist
@@ -78,7 +78,7 @@ prepare statment from @query;
 execute statment;
 deallocate prepare statment;
 
-/* PurgeObsoleteIndex */ 
+/* PurgeObsoleteIndex */
 
 select @dropIndexQuery =
 (
@@ -100,7 +100,7 @@ prepare statment from @dropIndexQuery;
 execute statment;
 deallocate prepare statment;
 
-/* PurgeObsoleteProperties */ 
+/* PurgeObsoleteProperties */
 
 select @dropPropertiesQuery =
 (

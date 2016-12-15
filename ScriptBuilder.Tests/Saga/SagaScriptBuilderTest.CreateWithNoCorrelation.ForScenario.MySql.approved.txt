@@ -1,10 +1,10 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
-/* CreateTable */ 
+/* CreateTable */
 
 set @createTable = concat('
     create table if not exists ', @tableName, '(
@@ -21,7 +21,7 @@ prepare statment from @createTable;
 execute statment;
 deallocate prepare statment;
 
-/* PurgeObsoleteIndex */ 
+/* PurgeObsoleteIndex */
 
 select @dropIndexQuery =
 (
@@ -42,7 +42,7 @@ prepare statment from @dropIndexQuery;
 execute statment;
 deallocate prepare statment;
 
-/* PurgeObsoleteProperties */ 
+/* PurgeObsoleteProperties */
 
 select @dropPropertiesQuery =
 (

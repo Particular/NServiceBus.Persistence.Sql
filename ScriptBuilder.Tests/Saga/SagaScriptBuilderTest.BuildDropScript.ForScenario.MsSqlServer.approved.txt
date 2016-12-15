@@ -1,9 +1,9 @@
 ﻿
-/* TableNameVariable */ 
+/* TableNameVariable */
 
 declare @tableName nvarchar(max) = @tablePrefix + 'theSaga';
 
-/* DropTable */ 
+/* DropTable */
 
 if exists
 (
