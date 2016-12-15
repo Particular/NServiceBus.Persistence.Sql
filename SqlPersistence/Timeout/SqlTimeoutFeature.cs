@@ -15,9 +15,10 @@ class SqlTimeoutFeature : Feature
     {
         var settings = context.Settings;
         settings.EnableFeature<StorageType.Timeouts>();
+        var sqlVarient = settings.GetSqlVarient();
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Timeouts>();
         var endpointName = settings.GetTablePrefix<StorageType.Timeouts>();
-        var persister = new TimeoutPersister(connectionBuilder, endpointName);
+        var persister = new TimeoutPersister(connectionBuilder, endpointName, sqlVarient);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
     }

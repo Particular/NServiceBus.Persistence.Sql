@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
+    <Compile Include="SqlVarientConverter.cs" />
     <Compile Include="DataEx.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
@@ -128,6 +129,8 @@
     <Compile Include="TaskEx.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
+    <Compile Include="Timeout\MyServerTimeoutPersisterTests.cs" />
+    <Compile Include="Timeout\SqlServerTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\TimeoutPersisterTests.cs" />
   </ItemGroup>
   <ItemGroup>

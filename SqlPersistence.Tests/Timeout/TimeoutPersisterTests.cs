@@ -1,40 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
 using ObjectApproval;
 
-[TestFixture]
-public class TimeoutPersisterTests : IDisposable
+public abstract class TimeoutPersisterTests
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     TimeoutPersister persister;
-    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
-    DbConnection dbConnection;
+    BuildSqlVarient sqlVarient;
+    Func<DbConnection> dbConnection;
+    protected abstract Func<DbConnection> GetConnection();
 
-    public TimeoutPersisterTests()
+    public TimeoutPersisterTests(BuildSqlVarient sqlVarient)
     {
-        dbConnection = new SqlConnection(connectionString);
-        dbConnection.Open();
+        this.sqlVarient = sqlVarient;
+        dbConnection = GetConnection();
         persister = new TimeoutPersister(
-            connectionBuilder: () => new SqlConnection(connectionString), 
-            tablePrefix: $"{nameof(TimeoutPersisterTests)}_");
+            connectionBuilder: dbConnection,
+            tablePrefix: $"{nameof(TimeoutPersisterTests)}_",
+            sqlVarient:sqlVarient.Convert());
     }
 
     [SetUp]
     public void Setup()
     {
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(TimeoutPersisterTests));
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(TimeoutPersisterTests));
+        }
     }
 
     [TearDown]
     public void TearDown()
     {
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
+        //using (var connection = dbConnection())
+        //{
+        //    connection.Open();
+        //    connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
+        //}
     }
 
     [Test]
@@ -121,8 +128,4 @@ public class TimeoutPersisterTests : IDisposable
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
     }
 
-    public void Dispose()
-    {
-        dbConnection?.Dispose();
-    }
 }

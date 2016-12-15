@@ -65,11 +65,12 @@ class SagaDefinitionReader
     {
         foreach (var method in sagaType.Methods)
         {
+            var parameters = method.Parameters;
             if (method.Name == "ConfigureHowToFindSaga")
             {
-                if (method.Parameters.Count == 1)
+                if (parameters.Count == 1)
                 {
-                    var parameterType = method.Parameters[0].ParameterType;
+                    var parameterType = parameters[0].ParameterType;
                     var parameterTypeName = parameterType.Name;
                     if (parameterTypeName.StartsWith("SagaPropertyMapper"))
                     {
@@ -81,9 +82,9 @@ class SagaDefinitionReader
             }
             if (method.Name == "ConfigureMapping")
             {
-                if (method.Parameters.Count == 1)
+                if (parameters.Count == 1)
                 {
-                    var parameterType = method.Parameters[0].ParameterType;
+                    var parameterType = parameters[0].ParameterType;
                     var parameterTypeName = parameterType.Name;
                     if (parameterTypeName.StartsWith("MessagePropertyMapper"))
                     {

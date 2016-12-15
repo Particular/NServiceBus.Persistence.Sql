@@ -5,74 +5,19 @@ using System.Data.Common;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence.Sql;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
     Func<DbConnection> connectionBuilder;
-    string insertCommandText;
-    string removeByIdCommandText;
-    string removeBySagaIdCommandText;
-    string selectByIdCommandText;
-    string rangeComandText;
-    string nextCommandText;
+    TimeoutCommands timeoutCommands;
 
     public TimeoutPersister(
         Func<DbConnection> connectionBuilder,
-        string tablePrefix)
+        string tablePrefix, SqlVarient sqlVarient)
     {
         this.connectionBuilder = connectionBuilder;
-
-        var tableName = $@"{tablePrefix}TimeoutData";
-        insertCommandText = $@"
-insert into {tableName}
-(
-    Id,
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers,
-    PersistenceVersion
-)
-values
-(
-    @Id,
-    @Destination,
-    @SagaId,
-    @State,
-    @Time,
-    @Headers,
-    @PersistenceVersion
-)";
-
-        removeByIdCommandText = $@"
-delete from {tableName}
-output deleted.SagaId
-where Id = @Id";
-
-        removeBySagaIdCommandText = $@"
-delete from {tableName}
-where SagaId = @SagaId";
-
-        selectByIdCommandText = $@"
-select
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers
-from {tableName}
-where Id = @Id";
-
-        rangeComandText = $@"
-select Id, Time
-from {tableName}
-where Time between @StartTime and @EndTime";
-
-        nextCommandText = $@"
-select top 1 Time from {tableName}
-where Time > @EndTime
-order by Time";
+        timeoutCommands = TimeoutCommandBuilder.Build(sqlVarient, tablePrefix);
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
@@ -82,7 +27,7 @@ order by Time";
             await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = selectByIdCommandText;
+                command.CommandText = timeoutCommands.SelectById;
                 command.AddParameter("Id", timeoutId);
                 using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {
@@ -121,7 +66,7 @@ order by Time";
             await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = insertCommandText;
+                command.CommandText = timeoutCommands.Insert;
                 var id = Guid.NewGuid();
                 timeout.Id = id.ToString();
                 command.AddParameter("Id", id);
@@ -143,18 +88,22 @@ order by Time";
             await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = removeByIdCommandText;
+                command.CommandText = timeoutCommands.RemoveById;
                 command.AddParameter("Id", timeoutId);
-                using (var reader = await command.ExecuteReaderAsync())
+                using (var reader = await command.ExecuteReaderAsync()
+                    .ConfigureAwait(false))
                 {
                     if (!reader.HasRows)
                     {
                         return false;
                     }
+                    await reader.ReadAsync()
+                        .ConfigureAwait(false);
+                    var value = reader.GetValue(0);
+                    return value != DBNull.Value;
                 }
             }
         }
-        return true;
     }
 
     public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
@@ -167,7 +116,7 @@ order by Time";
             await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = rangeComandText;
+                command.CommandText = timeoutCommands.Range;
                 command.AddParameter("StartTime", startSlice);
                 command.AddParameter("EndTime", now);
                 using (var reader = await command.ExecuteReaderAsync())
@@ -182,7 +131,7 @@ order by Time";
 
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = nextCommandText;
+                command.CommandText = timeoutCommands.Next;
                 command.AddParameter("EndTime", now);
                 var executeScalar = await command.ExecuteScalarAsync();
                 if (executeScalar == null)
@@ -205,7 +154,7 @@ order by Time";
             await connection.OpenAsync().ConfigureAwait(false);
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = removeBySagaIdCommandText;
+                command.CommandText = timeoutCommands.RemoveBySagaId;
                 command.AddParameter("SagaId", sagaId);
                 await command.ExecuteNonQueryEx();
             }
