@@ -9,8 +9,7 @@ set @tableName = concat(@tablePrefix, 'theSaga');
 set @createTable = concat('
     create table if not exists ', @tableName, '(
         Id varchar(38) not null,
-        Originator varchar(255),
-        OriginalMessageId varchar(255),
+        Metadata json not null,
         Data json not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,

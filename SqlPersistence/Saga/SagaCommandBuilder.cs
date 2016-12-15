@@ -29,8 +29,7 @@ class SagaCommandBuilder
 insert into {tablePrefix}{tableSuffx}
 (
     Id,
-    Originator,
-    OriginalMessageId,
+    Metadata,
     Data,
     PersistenceVersion,
     SagaTypeVersion,
@@ -39,8 +38,7 @@ insert into {tablePrefix}{tableSuffx}
 VALUES
 (
     @Id,
-    @Originator,
-    @OriginalMessageId,
+    @Metadata,
     @Data,
     @PersistenceVersion,
     @SagaTypeVersion,
@@ -52,7 +50,6 @@ VALUES
     public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty)
     {
         // no need to set CorrelationProperty since it is immutable
-
         var correlationSet = "";
         if (transitionalCorrelationProperty != null)
         {
@@ -62,8 +59,6 @@ VALUES
         return $@"
 update {tablePrefix}{tableSuffx}
 SET
-    Originator = @Originator,
-    OriginalMessageId = @OriginalMessageId,
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,
@@ -78,8 +73,7 @@ WHERE
         return $@"
 select
     Id,
-    Originator,
-    OriginalMessageId,
+    Metadata,
     Data,
     SagaTypeVersion,
     SagaVersion
@@ -93,8 +87,7 @@ where Id = @Id
         return $@"
 select
     Id,
-    Originator,
-    OriginalMessageId,
+    Metadata,
     Data,
     SagaTypeVersion,
     SagaVersion

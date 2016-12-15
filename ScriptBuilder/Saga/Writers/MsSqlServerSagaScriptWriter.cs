@@ -155,8 +155,7 @@ declare @createTable nvarchar(max);
 set @createTable = '
     create table ' + @tableName + '(
         Id uniqueidentifier not null primary key,
-        Originator nvarchar(255),
-        OriginalMessageId nvarchar(255),
+        Metadata nvarchar(max) not null,
         Data nvarchar(max) not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,

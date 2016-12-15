@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
@@ -35,8 +36,16 @@ class SagaPersister : ISagaPersister
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
-            command.AddParameter("Originator", DBNullify(sagaData.Originator));
+            var metadata = new Dictionary<string,string>();
+            if (sagaData.OriginalMessageId != null)
+            {
+                metadata.Add("OriginalMessageId", sagaData.OriginalMessageId);
+            }
+            if (sagaData.Originator != null)
+            {
+                metadata.Add("Originator", sagaData.Originator);
+            }
+            command.AddParameter("Metadata", Serializer.Serialize(metadata));
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
@@ -65,19 +74,11 @@ class SagaPersister : ISagaPersister
         command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
-
-    static object DBNullify(object value)
-    {
-        return value ?? DBNull.Value;
-    }
-
-
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
         return Update(sagaData, session, sagaType, GetSagaVersion(context));
     }
-
 
     internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int sagaVersion)
     {
@@ -89,8 +90,6 @@ class SagaPersister : ISagaPersister
             command.CommandText = sagaInfo.UpdateCommand;
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("OriginalMessageId", DBNullify(sagaData.OriginalMessageId));
-            command.AddParameter("Originator", DBNullify(sagaData.Originator));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
@@ -193,11 +192,17 @@ class SagaPersister : ISagaPersister
                 return default(SagaVersion<TSagaData>);
             }
             var id = dataReader.GetGuid(0);
-            var originator = dataReader.GetString(1);
-            var originalMessageId = dataReader.GetString(2);
-            var sagaTypeVersion = Version.Parse(dataReader.GetString(4));
-            var sagaVersion = dataReader.GetInt32(5);
-            using (var textReader = dataReader.GetTextReader(3))
+            string originator;
+            string originalMessageId;
+            using (var textReader = dataReader.GetTextReader(1))
+            {
+                var metadata = Serializer.Deserialize<Dictionary<string,string>>(textReader);
+                metadata.TryGetValue("Originator", out originator);
+                metadata.TryGetValue("OriginalMessageId", out originalMessageId);
+            }
+            var sagaTypeVersion = Version.Parse(dataReader.GetString(3));
+            var sagaVersion = dataReader.GetInt32(4);
+            using (var textReader = dataReader.GetTextReader(2))
             {
                 var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                 sagaData.Id = id;
