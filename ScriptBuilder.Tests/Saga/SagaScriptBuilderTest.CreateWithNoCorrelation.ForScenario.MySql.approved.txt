@@ -15,7 +15,7 @@ set @createTable = concat('
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,
         SagaVersion int not null,
-        primary key (`Id`)
+        primary key (Id)
     ) default charset=utf8;
 ');
 prepare statment from @createTable;

@@ -6,9 +6,9 @@ set @createTable = concat('
         SagaId varchar(38),
         State longblob,
         Time datetime,
-        Headers longtext not null,
+        Headers json not null,
         PersistenceVersion varchar(23) not null,
-        primary key (`Id`)
+        primary key (Id)
     ) default charset=utf8;
 ');
 prepare statment from @createTable;

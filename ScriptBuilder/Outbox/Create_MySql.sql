@@ -5,7 +5,7 @@ set @createTable =  concat('
         Dispatched bit not null default 0,
         DispatchedAt datetime,
         PersistenceVersion varchar(23) not null,
-        Operations longtext not null,
+        Operations json not null,
         primary key (`MessageId`)
     ) default charset=utf8;
 ');
