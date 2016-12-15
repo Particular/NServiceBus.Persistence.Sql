@@ -1,27 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 
-[TestFixture]
-public class OutboxPersisterTests : IDisposable
+public abstract class OutboxPersisterTests
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     OutboxPersister persister;
-    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
-    DbConnection dbConnection;
+    BuildSqlVarient sqlVarient;
+    Func<DbConnection> dbConnection;
 
-    public OutboxPersisterTests()
+    protected abstract Func<DbConnection> GetConnection();
+
+    public OutboxPersisterTests(BuildSqlVarient sqlVarient)
     {
-        dbConnection = new SqlConnection(connectionString);
-        dbConnection.Open();
+        this.sqlVarient = sqlVarient;
+        dbConnection = GetConnection();
         persister = new OutboxPersister(
-            connectionBuilder: () => new SqlConnection(connectionString),
+            connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(OutboxPersisterTests)}_");
     }
 
@@ -29,14 +28,22 @@ public class OutboxPersisterTests : IDisposable
     [SetUp]
     public void Setup()
     {
-        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
-        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVarient), nameof(OutboxPersisterTests));
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVarient), nameof(OutboxPersisterTests));
+        }
     }
 
     [TearDown]
     public void TearDown()
     {
-        dbConnection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+        }
     }
 
 
@@ -69,10 +76,15 @@ public class OutboxPersisterTests : IDisposable
             )
         };
         var messageId = "a";
-        using (var transaction = dbConnection.BeginTransaction())
+
+        using (var connection = dbConnection())
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, dbConnection);
-            transaction.Commit();
+            await connection.OpenAsync();
+            using (var transaction = connection.BeginTransaction())
+            {
+                await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
+                transaction.Commit();
+            }
         }
         await persister.SetAsDispatched(messageId, null);
         return await persister.Get(messageId, null);
@@ -108,16 +120,16 @@ public class OutboxPersisterTests : IDisposable
         };
 
         var messageId = "a";
-        using (var transaction = dbConnection.BeginTransaction())
+        using (var connection = dbConnection())
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, dbConnection);
-            transaction.Commit();
+            await connection.OpenAsync();
+            using (var transaction = connection.BeginTransaction())
+            {
+                await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+                transaction.Commit();
+            }
         }
         return await persister.Get(messageId, null);
     }
 
-    public void Dispose()
-    {
-        dbConnection.Dispose();
-    }
 }

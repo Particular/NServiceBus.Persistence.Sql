@@ -1,0 +1,20 @@
+using System;
+using System.Data.Common;
+using MySql.Data.MySqlClient;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NUnit.Framework;
+
+[TestFixture]
+public class MySqlOutboxPersisterTests : OutboxPersisterTests
+{
+    static string connectionString = "server=localhost;user=root;database=sqlpersistencetests;port=3306;password=Password1;Allow User Variables=True";
+
+    public MySqlOutboxPersisterTests() : base(BuildSqlVarient.MySql)
+    {
+    }
+
+    protected override Func<DbConnection> GetConnection()
+    {
+        return () => new MySqlConnection(connectionString);
+    }
+}
