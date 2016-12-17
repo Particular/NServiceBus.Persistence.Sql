@@ -14,7 +14,7 @@
     <language>en-AU</language>
     <tags>NServiceBus, Sql</tags>
     <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql" version="$version$" />
+      <dependency id="NServiceBus.Persistence.Sql" />
     </dependencies>
   </metadata>
 </package>
