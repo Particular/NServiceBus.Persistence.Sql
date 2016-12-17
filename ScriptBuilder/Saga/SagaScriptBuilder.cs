@@ -37,24 +37,24 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             sqlVarientWriter.WriteCreateTable();
             if (saga.CorrelationProperty != null)
             {
-                WriteComment(writer, "AddProperty " + saga.CorrelationProperty.Name);
+                WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
                 sqlVarientWriter.AddProperty(saga.CorrelationProperty);
 
-                WriteComment(writer, "VerifyColumnType " + saga.CorrelationProperty.Type);
+                WriteComment(writer, $"VerifyColumnType {saga.CorrelationProperty.Type}");
                 sqlVarientWriter.VerifyColumnType(saga.CorrelationProperty);
 
-                WriteComment(writer, "WriteCreateIndex " + saga.CorrelationProperty.Name);
+                WriteComment(writer, $"WriteCreateIndex {saga.CorrelationProperty.Name}");
                 sqlVarientWriter.WriteCreateIndex(saga.CorrelationProperty);
             }
             if (saga.TransitionalCorrelationProperty != null)
             {
-                WriteComment(writer, "AddProperty " + saga.TransitionalCorrelationProperty.Name);
+                WriteComment(writer, $"AddProperty {saga.TransitionalCorrelationProperty.Name}");
                 sqlVarientWriter.AddProperty(saga.TransitionalCorrelationProperty);
 
-                WriteComment(writer, "VerifyColumnType " + saga.TransitionalCorrelationProperty.Type);
+                WriteComment(writer, $"VerifyColumnType {saga.TransitionalCorrelationProperty.Type}");
                 sqlVarientWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
 
-                WriteComment(writer, "CreateIndex " + saga.TransitionalCorrelationProperty.Name);
+                WriteComment(writer, $"CreateIndex {saga.TransitionalCorrelationProperty.Name}");
                 sqlVarientWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
             }
             WriteComment(writer, "PurgeObsoleteIndex");

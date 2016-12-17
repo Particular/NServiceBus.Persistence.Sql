@@ -23,15 +23,14 @@ deallocate prepare statment;
 
 /* PurgeObsoleteIndex */
 
-select @dropIndexQuery =
-(
-    select concat('drop index ', index_name, ' on ', @tableName, ';')
-    from information_schema.statistics
-    where
-        table_name = @tableName and
-        index_name like 'Index_Correlation_%' and
-        table_schema = database()
-);
+select concat('drop index ', index_name, ' on ', @tableName, ';')
+from information_schema.statistics
+where
+    table_schema = database() and
+    table_name = @tableName and
+    index_name like 'Index_Correlation_%' and
+    table_schema = database()
+into @dropIndexQuery;
 select if (
     @dropIndexQuery is not null,
     @dropIndexQuery,
@@ -44,14 +43,13 @@ deallocate prepare statment;
 
 /* PurgeObsoleteProperties */
 
-select @dropPropertiesQuery =
-(
-    select concat('alter table ', @tableName, ' drop column ', col.column_name, ';')
-    from information_schema.columns col
-    where
-        col.table_name = @tableName and
-        col.column_name like 'Correlation_%'
-);
+select concat('alter table ', @tableName, ' drop column ', column_name, ';')
+from information_schema.columns
+where
+    table_schema = database() and
+    table_name = @tableName and
+    column_name like 'Correlation_%'
+into @dropPropertiesQuery;
 
 select if (
     @dropPropertiesQuery is not null,

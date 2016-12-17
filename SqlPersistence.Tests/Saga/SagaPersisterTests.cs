@@ -27,12 +27,26 @@ public abstract class SagaPersisterTests
     {
         var commandBuilder = new SagaCommandBuilder($"{endpointName}_");
         var infoCache = new SagaInfoCache(
-            versionSpecificSettings: null, 
-            jsonSerializer: Serializer.JsonSerializer, 
+            versionSpecificSettings: null,
+            jsonSerializer: Serializer.JsonSerializer,
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer));
         persister = new SagaPersister(infoCache);
+
+        var withCorrelation = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation"
+        );
+        var withNoCorrelation = new SagaDefinition(
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(withCorrelation, sqlVarient), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(withNoCorrelation, sqlVarient), endpointName);
+        }
     }
 
     [Test]
@@ -52,10 +66,8 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
@@ -76,10 +88,6 @@ public abstract class SagaPersisterTests
             await persister.Complete(sagaData, storageSession, typeof(SagaWithCorrelation), 1);
             Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data);
         }
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     [Test]
@@ -89,20 +97,13 @@ public abstract class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
-
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     async Task<SagaWithNoCorrelation.SagaData> SaveWithNoCorrelationAsync(Guid id)
@@ -123,6 +124,7 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation))).Data;
         }
     }
+
     [SqlSaga]
     public class SagaWithNoCorrelation : Saga<SagaWithNoCorrelation.SagaData>
     {
@@ -135,6 +137,7 @@ public abstract class SagaPersisterTests
         {
         }
     }
+
     [Test]
     public void Save()
     {
@@ -152,19 +155,13 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = SaveAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     async Task<SagaWithCorrelation.SagaData> SaveAsync(Guid id)
@@ -205,10 +202,8 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
@@ -248,15 +243,10 @@ public abstract class SagaPersisterTests
             ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.AreEqual(2, sagaData.Version);
         }
-
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     [Test]
-    public void UpdateWithWrongVersion()
+    public async Task UpdateWithWrongVersion()
     {
         var wrongVersion = 666;
 
@@ -274,10 +264,8 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
@@ -295,19 +283,19 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty").GetAwaiter().GetResult();
-            storageSession.CompleteAsync().GetAwaiter().GetResult();
+            await persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty");
+            await storageSession.CompleteAsync();
         }
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)).GetAwaiter().GetResult();
+            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation));
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            Assert.That(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), wrongVersion).GetAwaiter().GetResult(),
-                Throws.Exception.Message.Contains("Optimistic concurrency violation"));
+            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), wrongVersion));
+            Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
     }
 
@@ -329,19 +317,13 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     async Task<SagaWithCorrelation.SagaData> GetByIdAsync(Guid id)
@@ -385,6 +367,52 @@ public abstract class SagaPersisterTests
 
 
     [Test]
+    public void TransitionId()
+    {
+        var definition1 = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "Property1",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlVarient), endpointName);
+
+            var definition2 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.Guid
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlVarient), endpointName);
+
+            var definition3 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.Guid
+                )
+            );
+            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlVarient);
+            connection.ExecuteCommand(buildCreateScript, endpointName);
+        }
+    }
+
+    [Test]
     public void GetByMapping()
     {
         var definition = new SagaDefinition(
@@ -401,19 +429,13 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(dropScript, endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var id = Guid.NewGuid();
         var result = GetByMappingAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
-        }
     }
 
     async Task<SagaWithCorrelation.SagaData> GetByMappingAsync(Guid id)
@@ -453,10 +475,8 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        var dropScript = SagaScriptBuilder.BuildDropScript(definition, sqlVarient);
         using (var connection1 = dbConnection())
         {
-            connection1.ExecuteCommand(dropScript, endpointName);
             connection1.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
         }
         var sagaData1 = new SagaWithCorrelation.SagaData
@@ -489,10 +509,6 @@ public abstract class SagaPersisterTests
             });
             var innerException = throwsAsync.InnerException;
             Assert.IsTrue(IsConcurrencyException(innerException));
-        }
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(dropScript, endpointName);
         }
     }
 

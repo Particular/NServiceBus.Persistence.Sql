@@ -25,14 +25,14 @@ deallocate prepare statment;
 
 select count(*)
 into @exist
-from information_schema.columns 
-where table_schema = database()
-      and column_name = 'Correlation_CorrelationProperty'
-      and table_name = @tableName;
+from information_schema.columns
+where table_schema = database() and
+      column_name = 'Correlation_CorrelationProperty' and
+      table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('alter table ', @tableName, ' add column Correlation_CorrelationProperty varchar(450)'), 
+    @exist <= 0,
+    concat('alter table ', @tableName, ' add column Correlation_CorrelationProperty varchar(450)'),
     'select \'Column Exists\' status');
 
 prepare statment from @query;
@@ -45,14 +45,14 @@ set @column_type_CorrelationProperty = (
   select column_type
   from information_schema.columns
   where
-    table_schema = database() and 
+    table_schema = database() and
     table_name = @tableName and
     column_name = 'Correlation_CorrelationProperty'
 );
 
 set @query = IF(
-    @column_type_CorrelationProperty <> 'varchar(450)', 
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_CorrelationProperty\'', 
+    @column_type_CorrelationProperty <> 'varchar(450)',
+    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_CorrelationProperty\'',
     'select \'Column Type OK\' status');
 
 prepare statment from @query;
@@ -63,15 +63,15 @@ deallocate prepare statment;
 
 select count(*)
 into @exist
-from information_schema.statistics 
-where 
-    table_schema = database() and 
-    index_name = 'Index_Correlation_CorrelationProperty' and 
+from information_schema.statistics
+where
+    table_schema = database() and
+    index_name = 'Index_Correlation_CorrelationProperty' and
     table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('create unique index Index_Correlation_CorrelationProperty on ', @tableName, '(Correlation_CorrelationProperty)'), 
+    @exist <= 0,
+    concat('create unique index Index_Correlation_CorrelationProperty on ', @tableName, '(Correlation_CorrelationProperty)'),
     'select \'Index Exists\' status');
 
 prepare statment from @query;
@@ -82,14 +82,14 @@ deallocate prepare statment;
 
 select count(*)
 into @exist
-from information_schema.columns 
-where table_schema = database()
-      and column_name = 'Correlation_TransitionalProperty'
-      and table_name = @tableName;
+from information_schema.columns
+where table_schema = database() and
+      column_name = 'Correlation_TransitionalProperty' and
+      table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('alter table ', @tableName, ' add column Correlation_TransitionalProperty varchar(450)'), 
+    @exist <= 0,
+    concat('alter table ', @tableName, ' add column Correlation_TransitionalProperty varchar(450)'),
     'select \'Column Exists\' status');
 
 prepare statment from @query;
@@ -102,14 +102,14 @@ set @column_type_TransitionalProperty = (
   select column_type
   from information_schema.columns
   where
-    table_schema = database() and 
+    table_schema = database() and
     table_name = @tableName and
     column_name = 'Correlation_TransitionalProperty'
 );
 
 set @query = IF(
-    @column_type_TransitionalProperty <> 'varchar(450)', 
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_TransitionalProperty\'', 
+    @column_type_TransitionalProperty <> 'varchar(450)',
+    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_TransitionalProperty\'',
     'select \'Column Type OK\' status');
 
 prepare statment from @query;
@@ -120,15 +120,15 @@ deallocate prepare statment;
 
 select count(*)
 into @exist
-from information_schema.statistics 
-where 
-    table_schema = database() and 
-    index_name = 'Index_Correlation_TransitionalProperty' and 
+from information_schema.statistics
+where
+    table_schema = database() and
+    index_name = 'Index_Correlation_TransitionalProperty' and
     table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('create unique index Index_Correlation_TransitionalProperty on ', @tableName, '(Correlation_TransitionalProperty)'), 
+    @exist <= 0,
+    concat('create unique index Index_Correlation_TransitionalProperty on ', @tableName, '(Correlation_TransitionalProperty)'),
     'select \'Index Exists\' status');
 
 prepare statment from @query;
@@ -137,17 +137,16 @@ deallocate prepare statment;
 
 /* PurgeObsoleteIndex */
 
-select @dropIndexQuery =
-(
-    select concat('drop index ', index_name, ' on ', @tableName, ';')
-    from information_schema.statistics
-    where
-        table_name = @tableName and
-        index_name like 'Index_Correlation_%' and
-        index_name <> 'Index_Correlation_CorrelationProperty' and
-        index_name <> 'Index_Correlation_TransitionalProperty' and
-        table_schema = database()
-);
+select concat('drop index ', index_name, ' on ', @tableName, ';')
+from information_schema.statistics
+where
+    table_schema = database() and
+    table_name = @tableName and
+    index_name like 'Index_Correlation_%' and
+    index_name <> 'Index_Correlation_CorrelationProperty' and
+    index_name <> 'Index_Correlation_TransitionalProperty' and
+    table_schema = database()
+into @dropIndexQuery;
 select if (
     @dropIndexQuery is not null,
     @dropIndexQuery,
@@ -160,16 +159,15 @@ deallocate prepare statment;
 
 /* PurgeObsoleteProperties */
 
-select @dropPropertiesQuery =
-(
-    select concat('alter table ', @tableName, ' drop column ', col.column_name, ';')
-    from information_schema.columns col
-    where
-        col.table_name = @tableName and
-        col.column_name like 'Correlation_%' and
-        col.column_name <> 'Correlation_CorrelationProperty' and
-        col.column_name <> 'Correlation_TransitionalProperty'
-);
+select concat('alter table ', @tableName, ' drop column ', column_name, ';')
+from information_schema.columns
+where
+    table_schema = database() and
+    table_name = @tableName and
+    column_name like 'Correlation_%' and
+        column_name <> 'Correlation_CorrelationProperty' and
+        column_name <> 'Correlation_TransitionalProperty'
+into @dropPropertiesQuery;
 
 select if (
     @dropPropertiesQuery is not null,

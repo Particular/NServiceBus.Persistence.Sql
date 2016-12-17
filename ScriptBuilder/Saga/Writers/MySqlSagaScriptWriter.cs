@@ -28,14 +28,14 @@ set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
         writer.Write($@"
 select count(*)
 into @exist
-from information_schema.columns 
-where table_schema = database()
-      and column_name = 'Correlation_{name}'
-      and table_name = @tableName;
+from information_schema.columns
+where table_schema = database() and
+      column_name = 'Correlation_{name}' and
+      table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'), 
+    @exist <= 0,
+    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'),
     'select \'Column Exists\' status');
 
 prepare statment from @query;
@@ -53,14 +53,14 @@ set @column_type_{name} = (
   select column_type
   from information_schema.columns
   where
-    table_schema = database() and 
+    table_schema = database() and
     table_name = @tableName and
     column_name = 'Correlation_{name}'
 );
 
 set @query = IF(
-    @column_type_{name} <> '{columnType}', 
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_{name}\'', 
+    @column_type_{name} <> '{columnType}',
+    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_{name}\'',
     'select \'Column Type OK\' status');
 
 prepare statment from @query;
@@ -75,15 +75,15 @@ deallocate prepare statment;
         writer.Write($@"
 select count(*)
 into @exist
-from information_schema.statistics 
-where 
-    table_schema = database() and 
-    index_name = 'Index_Correlation_{name}' and 
+from information_schema.statistics
+where
+    table_schema = database() and
+    index_name = 'Index_Correlation_{name}' and
     table_name = @tableName;
 
 set @query = IF(
-    @exist <= 0, 
-    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'), 
+    @exist <= 0,
+    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'),
     'select \'Index Exists\' status');
 
 prepare statment from @query;
@@ -98,24 +98,23 @@ deallocate prepare statment;
         var correlation = saga.CorrelationProperty;
         if (correlation != null)
         {
-            builder.Append($" and\r\n        index_name <> 'Index_Correlation_{correlation.Name}'");
+            builder.Append($" and\r\n    index_name <> 'Index_Correlation_{correlation.Name}'");
         }
         var transitional = saga.TransitionalCorrelationProperty;
         if (transitional != null)
         {
-            builder.Append($" and\r\n        index_name <> 'Index_Correlation_{transitional.Name}'");
+            builder.Append($" and\r\n    index_name <> 'Index_Correlation_{transitional.Name}'");
         }
 
         writer.Write($@"
-select @dropIndexQuery =
-(
-    select concat('drop index ', index_name, ' on ', @tableName, ';')
-    from information_schema.statistics
-    where
-        table_name = @tableName and
-        index_name like 'Index_Correlation_%'{builder} and
-        table_schema = database()
-);
+select concat('drop index ', index_name, ' on ', @tableName, ';')
+from information_schema.statistics
+where
+    table_schema = database() and
+    table_name = @tableName and
+    index_name like 'Index_Correlation_%'{builder} and
+    table_schema = database()
+into @dropIndexQuery;
 select if (
     @dropIndexQuery is not null,
     @dropIndexQuery,
@@ -135,22 +134,21 @@ deallocate prepare statment;
         var correlation = saga.CorrelationProperty;
         if (correlation != null)
         {
-            builder.Append($" and\r\n        col.column_name <> 'Correlation_{correlation.Name}'");
+            builder.Append($" and\r\n        column_name <> 'Correlation_{correlation.Name}'");
         }
         var transitional = saga.TransitionalCorrelationProperty;
         if (transitional != null)
         {
-            builder.Append($" and\r\n        col.column_name <> 'Correlation_{transitional.Name}'");
+            builder.Append($" and\r\n        column_name <> 'Correlation_{transitional.Name}'");
         }
         writer.Write($@"
-select @dropPropertiesQuery =
-(
-    select concat('alter table ', @tableName, ' drop column ', col.column_name, ';')
-    from information_schema.columns col
-    where
-        col.table_name = @tableName and
-        col.column_name like 'Correlation_%'{builder}
-);
+select concat('alter table ', @tableName, ' drop column ', column_name, ';')
+from information_schema.columns
+where
+    table_schema = database() and
+    table_name = @tableName and
+    column_name like 'Correlation_%'{builder}
+into @dropPropertiesQuery;
 
 select if (
     @dropPropertiesQuery is not null,
