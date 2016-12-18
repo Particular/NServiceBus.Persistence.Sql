@@ -36,8 +36,7 @@ begin
   declare @createColumn_{name} nvarchar(max);
   set @createColumn_{name} = '
   alter table ' + @tableName + '
-    add Correlation_{name} {columnType};
-  ';
+    add Correlation_{name} {columnType};';
   exec(@createColumn_{name});
 end
 ");
@@ -78,8 +77,7 @@ begin
   set @createIndex_{name} = '
   create unique index Index_Correlation_{name}
   on ' + @tableName + '(Correlation_{name})
-  where Correlation_{name} is not null;
-';
+  where Correlation_{name} is not null;';
   exec(@createIndex_{name});
 end
 ");

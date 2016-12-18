@@ -32,8 +32,7 @@ where table_schema = database() and
 
 set @query = IF(
     @exist <= 0,
-    concat('alter table ', @tableName, ' add column Correlation_CorrelationProperty varchar(450)'),
-    'select \'Column Exists\' status');
+    concat('alter table ', @tableName, ' add column Correlation_CorrelationProperty varchar(450)'), 'select \'Column Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -71,8 +70,7 @@ where
 
 set @query = IF(
     @exist <= 0,
-    concat('create unique index Index_Correlation_CorrelationProperty on ', @tableName, '(Correlation_CorrelationProperty)'),
-    'select \'Index Exists\' status');
+    concat('create unique index Index_Correlation_CorrelationProperty on ', @tableName, '(Correlation_CorrelationProperty)'), 'select \'Index Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -89,8 +87,7 @@ where table_schema = database() and
 
 set @query = IF(
     @exist <= 0,
-    concat('alter table ', @tableName, ' add column Correlation_TransitionalProperty varchar(450)'),
-    'select \'Column Exists\' status');
+    concat('alter table ', @tableName, ' add column Correlation_TransitionalProperty varchar(450)'), 'select \'Column Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -128,8 +125,7 @@ where
 
 set @query = IF(
     @exist <= 0,
-    concat('create unique index Index_Correlation_TransitionalProperty on ', @tableName, '(Correlation_TransitionalProperty)'),
-    'select \'Index Exists\' status');
+    concat('create unique index Index_Correlation_TransitionalProperty on ', @tableName, '(Correlation_TransitionalProperty)'), 'select \'Index Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -165,8 +161,8 @@ where
     table_schema = database() and
     table_name = @tableName and
     column_name like 'Correlation_%' and
-        column_name <> 'Correlation_CorrelationProperty' and
-        column_name <> 'Correlation_TransitionalProperty'
+    column_name <> 'Correlation_CorrelationProperty' and
+    column_name <> 'Correlation_TransitionalProperty'
 into @dropPropertiesQuery;
 
 select if (

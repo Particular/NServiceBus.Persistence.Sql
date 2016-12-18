@@ -27,7 +27,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = timeoutCommands.SelectById;
+                command.CommandText = timeoutCommands.Peek;
                 command.AddParameter("Id", timeoutId);
                 using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
                 {

@@ -35,8 +35,7 @@ where table_schema = database() and
 
 set @query = IF(
     @exist <= 0,
-    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'),
-    'select \'Column Exists\' status');
+    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'), 'select \'Column Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -83,8 +82,7 @@ where
 
 set @query = IF(
     @exist <= 0,
-    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'),
-    'select \'Index Exists\' status');
+    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'), 'select \'Index Exists\' status');
 
 prepare statment from @query;
 execute statment;
@@ -134,12 +132,12 @@ deallocate prepare statment;
         var correlation = saga.CorrelationProperty;
         if (correlation != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{correlation.Name}'");
+            builder.Append($" and\r\n    column_name <> 'Correlation_{correlation.Name}'");
         }
         var transitional = saga.TransitionalCorrelationProperty;
         if (transitional != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{transitional.Name}'");
+            builder.Append($" and\r\n    column_name <> 'Correlation_{transitional.Name}'");
         }
         writer.Write($@"
 select concat('alter table ', @tableName, ' drop column ', column_name, ';')

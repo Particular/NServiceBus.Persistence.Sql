@@ -18,13 +18,13 @@ namespace NServiceBus.Persistence.Sql
 
             if (correlationProperty != null)
             {
-                insertBuilder.Append($",\r\nCorrelation_{correlationProperty}");
-                valuesBuilder.Append(",\r\n@CorrelationId");
+                insertBuilder.Append($",\r\n    Correlation_{correlationProperty}");
+                valuesBuilder.Append(",\r\n    @CorrelationId");
             }
             if (transitionalCorrelationProperty != null)
             {
-                insertBuilder.Append($",\r\nCorrelation_{transitionalCorrelationProperty}");
-                valuesBuilder.Append(",\r\n@TransitionalCorrelationId");
+                insertBuilder.Append($",\r\n    Correlation_{transitionalCorrelationProperty}");
+                valuesBuilder.Append(",\r\n    @TransitionalCorrelationId");
             }
 
             return $@"
@@ -55,7 +55,7 @@ values
             var correlationSet = "";
             if (transitionalCorrelationProperty != null)
             {
-                correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
+                correlationSet = $",\r\n    Correlation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
             }
 
             return $@"

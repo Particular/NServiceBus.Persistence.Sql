@@ -78,7 +78,7 @@ limit 1";
             (
                 next: nextCommandText,
                 range: rangeComandText,
-                selectById: selectByIdCommandText,
+                peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
                 add: insertCommandText
@@ -143,7 +143,7 @@ order by Time";
             (
                 next: nextCommandText,
                 range: rangeComandText,
-                selectById: selectByIdCommandText,
+                peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
                 add: insertCommandText

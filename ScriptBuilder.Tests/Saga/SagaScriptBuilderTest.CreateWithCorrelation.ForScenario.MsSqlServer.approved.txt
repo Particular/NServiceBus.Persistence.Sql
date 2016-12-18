@@ -41,8 +41,7 @@ begin
   declare @createColumn_CorrelationProperty nvarchar(max);
   set @createColumn_CorrelationProperty = '
   alter table ' + @tableName + '
-    add Correlation_CorrelationProperty nvarchar(450);
-  ';
+    add Correlation_CorrelationProperty nvarchar(450);';
   exec(@createColumn_CorrelationProperty);
 end
 
@@ -74,8 +73,7 @@ begin
   set @createIndex_CorrelationProperty = '
   create unique index Index_Correlation_CorrelationProperty
   on ' + @tableName + '(Correlation_CorrelationProperty)
-  where Correlation_CorrelationProperty is not null;
-';
+  where Correlation_CorrelationProperty is not null;';
   exec(@createIndex_CorrelationProperty);
 end
 
