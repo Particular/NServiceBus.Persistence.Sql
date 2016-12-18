@@ -77,6 +77,10 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
     <Compile Include="Config\SqlVarient.cs" />
+    <Compile Include="Outbox\OutboxCommands.cs" />
+    <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Subscription\SubscriptionCommands.cs" />
+    <Compile Include="Subscription\SubscriptionCommandBuilder.cs" />
     <Compile Include="TableNameCleaner.cs" />
     <Compile Include="Saga\Config\SagaSettings_SettingsForVersion.cs" />
     <Compile Include="Saga\Config\SagaSettings_JsonSerializerSettings.cs" />

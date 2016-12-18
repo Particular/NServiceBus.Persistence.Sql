@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql;
@@ -13,78 +12,16 @@ class SubscriptionPersister : ISubscriptionStorage
 {
     Func<DbConnection> connectionBuilder;
     string tablePrefix;
-    string subscribeCommandText;
-    string unsubscribeCommandText;
+    SqlVarient sqlVarient;
+    SubscriptionCommands subscriptionCommands;
 
-    public SubscriptionPersister(
-        Func<DbConnection> connectionBuilder,
-        string tablePrefix, SqlVarient sqlVarient)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder,string tablePrefix, SqlVarient sqlVarient)
     {
         this.connectionBuilder = connectionBuilder;
         this.tablePrefix = tablePrefix;
+        this.sqlVarient = sqlVarient;
 
-        var tableName = $@"{tablePrefix}SubscriptionData";
-
-        switch (sqlVarient)
-        {
-            case SqlVarient.MsSqlServer:
-                subscribeCommandText = $@"
-declare @dummy int;
-merge {tableName} with (holdlock) as target
-using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
-on target.Endpoint = source.Endpoint and
-   target.Subscriber = source.Subscriber and
-   target.MessageType = source.MessageType
-when matched then
-    update set @dummy = 0
-when not matched then
-insert
-(
-    Subscriber,
-    MessageType,
-    Endpoint,
-    PersistenceVersion
-)
-values
-(
-    @Subscriber,
-    @MessageType,
-    @Endpoint,
-    @PersistenceVersion
-);";
-                break;
-
-            case SqlVarient.MySql:
-                subscribeCommandText = $@"
-insert into {tableName}
-(
-    Subscriber,
-    MessageType,
-    Endpoint,
-    PersistenceVersion
-)
-values
-(
-    @Subscriber,
-    @MessageType,
-    @Endpoint,
-    @PersistenceVersion
-)
-on duplicate key update
-    Endpoint = @Endpoint,
-    PersistenceVersion = @PersistenceVersion
-";
-                break;
-
-            default:
-                throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
-        }
-
-        unsubscribeCommandText = $@"
-delete from {tableName}
-where
-    Subscriber = @Subscriber and
-    MessageType = @MessageType";
+        subscriptionCommands = SubscriptionCommandBuilder.Build(tablePrefix, sqlVarient);
     }
 
 
@@ -101,7 +38,7 @@ where
     {
         using (var command = connection.CreateCommand())
         {
-            command.CommandText = subscribeCommandText;
+            command.CommandText = subscriptionCommands.Subscribe;
             command.AddParameter("MessageType", messageType.TypeName);
             command.AddParameter("Subscriber", subscriber.TransportAddress);
             command.AddParameter("Endpoint", subscriber.Endpoint);
@@ -124,7 +61,7 @@ where
     {
         using (var command = connection.CreateCommand())
         {
-            command.CommandText = unsubscribeCommandText;
+            command.CommandText = subscriptionCommands.Unsubscribe;
             command.AddParameter("MessageType", messageType.TypeName);
             command.AddParameter("Subscriber", subscriber.TransportAddress);
             await command.ExecuteNonQueryEx();
@@ -133,15 +70,9 @@ where
 
     public async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
     {
-        var builder = new StringBuilder();
-
-        builder.Append($@"
-select distinct Subscriber, Endpoint
-from {tablePrefix}SubscriptionData
-where MessageType in (");
-
         var types = messageTypes.ToList();
 
+        var getSubscribersCommand = subscriptionCommands.GetSubscribers(types);
         using (var connection = connectionBuilder())
         {
             await connection.OpenAsync();
@@ -151,15 +82,9 @@ where MessageType in (");
                 {
                     var messageType = types[i];
                     var paramName = $"@type{i}";
-                    builder.Append(paramName);
-                    if (i < types.Count - 1)
-                    {
-                        builder.Append(", ");
-                    }
                     command.AddParameter(paramName, messageType.TypeName);
                 }
-                builder.Append(")");
-                command.CommandText = builder.ToString();
+                command.CommandText = getSubscribersCommand;
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     var subscribers = new List<Subscriber>();
@@ -182,4 +107,5 @@ where MessageType in (");
             }
         }
     }
+
 }

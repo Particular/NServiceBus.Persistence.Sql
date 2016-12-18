@@ -8,52 +8,21 @@ using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
+using NServiceBus.Persistence.Sql;
 using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
-    string storeCommandText;
-    string getCommandText;
-    string setAsDispatchedCommandText;
-    string cleanupCommandText;
+    OutboxCommands outboxCommands;
 
     public OutboxPersister(
         Func<DbConnection> connectionBuilder,
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-        var tableName = $@"{tablePrefix}OutboxData";
-        storeCommandText = $@"
-insert into {tableName}
-(
-    MessageId,
-    Operations,
-    PersistenceVersion
-)
-values
-(
-    @MessageId,
-    @Operations,
-    @PersistenceVersion
-)";
 
-        cleanupCommandText = $@"
-delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
-
-        getCommandText = $@"
-select
-    Dispatched,
-    Operations
-from {tableName}
-where MessageId = @MessageId";
-
-        setAsDispatchedCommandText = $@"
-update {tableName}
-set
-    Dispatched = 1,
-    DispatchedAt = @DispatchedAt
-where MessageId = @MessageId";
+        outboxCommands = OutboxCommandBuilder.Build(tablePrefix);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
@@ -72,7 +41,7 @@ where MessageId = @MessageId";
             await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = setAsDispatchedCommandText;
+                command.CommandText = outboxCommands.SetAsDispatched;
                 command.AddParameter("MessageId", messageId);
                 command.AddParameter("DispatchedAt", DateTime.UtcNow);
                 command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
@@ -92,7 +61,7 @@ where MessageId = @MessageId";
                 OutboxMessage result;
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = getCommandText;
+                    command.CommandText = outboxCommands.Get;
                     command.Transaction = transaction;
                     command.AddParameter("MessageId", messageId);
                     using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
@@ -136,7 +105,7 @@ where MessageId = @MessageId";
     {
         using (var command = connection.CreateCommand())
         {
-            command.CommandText = storeCommandText;
+            command.CommandText = outboxCommands.Store;
             command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
@@ -154,7 +123,7 @@ where MessageId = @MessageId";
             using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = cleanupCommandText;
+                command.CommandText = outboxCommands.Cleanup;
                 command.Transaction = transaction;
                 command.AddParameter("Date", dateTime);
                 await command.ExecuteNonQueryEx(cancellationToken);

@@ -1,31 +1,33 @@
 ﻿using System.Text;
 
-class SagaCommandBuilder
+namespace NServiceBus.Persistence.Sql
 {
-    string tablePrefix;
-
-    public SagaCommandBuilder(string tablePrefix)
+    public class SagaCommandBuilder
     {
-        this.tablePrefix = tablePrefix;
-    }
+        string tablePrefix;
 
-    public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty)
-    {
-        var valuesBuilder = new StringBuilder();
-        var insertBuilder = new StringBuilder();
-
-        if (correlationProperty != null)
+        public SagaCommandBuilder(string tablePrefix)
         {
-            insertBuilder.Append($",\r\nCorrelation_{correlationProperty}");
-            valuesBuilder.Append(",\r\n@CorrelationId");
-        }
-        if (transitionalCorrelationProperty != null)
-        {
-            insertBuilder.Append($",\r\nCorrelation_{transitionalCorrelationProperty}");
-            valuesBuilder.Append(",\r\n@TransitionalCorrelationId");
+            this.tablePrefix = tablePrefix;
         }
 
-        return $@"
+        public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty)
+        {
+            var valuesBuilder = new StringBuilder();
+            var insertBuilder = new StringBuilder();
+
+            if (correlationProperty != null)
+            {
+                insertBuilder.Append($",\r\nCorrelation_{correlationProperty}");
+                valuesBuilder.Append(",\r\n@CorrelationId");
+            }
+            if (transitionalCorrelationProperty != null)
+            {
+                insertBuilder.Append($",\r\nCorrelation_{transitionalCorrelationProperty}");
+                valuesBuilder.Append(",\r\n@TransitionalCorrelationId");
+            }
+
+            return $@"
 insert into {tablePrefix}{tableSuffx}
 (
     Id,
@@ -35,7 +37,7 @@ insert into {tablePrefix}{tableSuffx}
     SagaTypeVersion,
     SagaVersion{insertBuilder}
 )
-VALUES
+values
 (
     @Id,
     @Metadata,
@@ -44,33 +46,33 @@ VALUES
     @SagaTypeVersion,
     1{valuesBuilder}
 )";
-    }
-
-
-    public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty)
-    {
-        // no need to set CorrelationProperty since it is immutable
-        var correlationSet = "";
-        if (transitionalCorrelationProperty != null)
-        {
-            correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
         }
 
-        return $@"
+
+        public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty)
+        {
+            // no need to set CorrelationProperty since it is immutable
+            var correlationSet = "";
+            if (transitionalCorrelationProperty != null)
+            {
+                correlationSet = $",\r\nCorrelation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
+            }
+
+            return $@"
 update {tablePrefix}{tableSuffx}
-SET
+set
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,
     SagaVersion = @SagaVersion + 1{correlationSet}
-WHERE
+where
     Id = @Id AND SagaVersion = @SagaVersion
 ";
-    }
+        }
 
-    public string BuildGetBySagaIdCommand(string tableSuffx)
-    {
-        return $@"
+        public string BuildGetBySagaIdCommand(string tableSuffx)
+        {
+            return $@"
 select
     Id,
     Metadata,
@@ -80,11 +82,11 @@ select
 from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
-    }
+        }
 
-    public string BuildGetByPropertyCommand(string tableSuffx, string propertyName)
-    {
-        return $@"
+        public string BuildGetByPropertyCommand(string tableSuffx, string propertyName)
+        {
+            return $@"
 select
     Id,
     Metadata,
@@ -94,13 +96,14 @@ select
 from {tablePrefix}{tableSuffx}
 where Correlation_{propertyName} = @propertyValue
 ";
-    }
+        }
 
-    public string BuildCompleteCommand(string tableSuffx)
-    {
-        return $@"
+        public string BuildCompleteCommand(string tableSuffx)
+        {
+            return $@"
 delete from {tablePrefix}{tableSuffx}
 where Id = @Id AND SagaVersion = @SagaVersion
 ";
+        }
     }
 }

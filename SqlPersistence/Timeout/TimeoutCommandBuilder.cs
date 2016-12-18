@@ -1,26 +1,27 @@
 ﻿using System;
-using NServiceBus.Persistence.Sql;
 
-class TimeoutCommandBuilder
+namespace NServiceBus.Persistence.Sql
 {
-
-    public static TimeoutCommands Build(SqlVarient sqlVarient, string tablePrefix)
+    public static class TimeoutCommandBuilder
     {
-        var tableName = $@"{tablePrefix}TimeoutData";
-        switch (sqlVarient)
+
+        public static TimeoutCommands Build(SqlVarient sqlVarient, string tablePrefix)
         {
-            case SqlVarient.MsSqlServer:
-                return BuildSqlServerCommands(tableName);
-            case SqlVarient.MySql:
-                return BuildMySqlCommands(tableName);
-            default:
-                throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+            var tableName = $@"{tablePrefix}TimeoutData";
+            switch (sqlVarient)
+            {
+                case SqlVarient.MsSqlServer:
+                    return BuildSqlServerCommands(tableName);
+                case SqlVarient.MySql:
+                    return BuildMySqlCommands(tableName);
+                default:
+                    throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+            }
         }
-    }
 
-    static TimeoutCommands BuildMySqlCommands(string tableName)
-    {
-        string insertCommandText = $@"
+        static TimeoutCommands BuildMySqlCommands(string tableName)
+        {
+            string insertCommandText = $@"
 insert into {tableName}
 (
     Id,
@@ -42,18 +43,18 @@ values
     @PersistenceVersion
 )";
 
-        string removeByIdCommandText = $@"
+            string removeByIdCommandText = $@"
 set @sagaId := (select SagaId from {tableName} where Id = @Id);
 delete from {tableName}
 where Id = @Id;
 select @sagaId;";
 
 
-        string removeBySagaIdCommandText = $@"
+            string removeBySagaIdCommandText = $@"
 delete from {tableName}
 where SagaId = @SagaId";
 
-        string selectByIdCommandText = $@"
+            string selectByIdCommandText = $@"
 select
     Destination,
     SagaId,
@@ -63,30 +64,30 @@ select
 from {tableName}
 where Id = @Id";
 
-        string rangeComandText = $@"
+            string rangeComandText = $@"
 select Id, Time
 from {tableName}
 where Time between @StartTime and @EndTime";
 
-        string nextCommandText = $@"
+            string nextCommandText = $@"
 select Time from {tableName}
 where Time > @EndTime
 order by Time
 limit 1";
-        return new TimeoutCommands
-        {
-            Next = nextCommandText,
-            Range = rangeComandText,
-            SelectById = selectByIdCommandText,
-            RemoveBySagaId = removeBySagaIdCommandText,
-            RemoveById = removeByIdCommandText,
-            Insert = insertCommandText,
-        };
-    }
+            return new TimeoutCommands
+            (
+                next: nextCommandText,
+                range: rangeComandText,
+                selectById: selectByIdCommandText,
+                removeBySagaId: removeBySagaIdCommandText,
+                removeById: removeByIdCommandText,
+                insert: insertCommandText
+            );
+        }
 
-    static TimeoutCommands BuildSqlServerCommands(string tableName)
-    {
-        string insertCommandText = $@"
+        static TimeoutCommands BuildSqlServerCommands(string tableName)
+        {
+            string insertCommandText = $@"
 insert into {tableName}
 (
     Id,
@@ -108,17 +109,17 @@ values
     @PersistenceVersion
 )";
 
-        string removeByIdCommandText = $@"
+            string removeByIdCommandText = $@"
 delete from {tableName}
 output deleted.SagaId
 where Id = @Id";
 
 
-        string removeBySagaIdCommandText = $@"
+            string removeBySagaIdCommandText = $@"
 delete from {tableName}
 where SagaId = @SagaId";
 
-        string selectByIdCommandText = $@"
+            string selectByIdCommandText = $@"
 select
     Destination,
     SagaId,
@@ -128,24 +129,25 @@ select
 from {tableName}
 where Id = @Id";
 
-        string rangeComandText = $@"
+            string rangeComandText = $@"
 select Id, Time
 from {tableName}
 where Time between @StartTime and @EndTime";
 
-        string nextCommandText = $@"
+            string nextCommandText = $@"
 select top 1 Time from {tableName}
 where Time > @EndTime
 order by Time";
 
-        return new TimeoutCommands
-        {
-            Next = nextCommandText,
-            Range = rangeComandText,
-            SelectById = selectByIdCommandText,
-            RemoveBySagaId = removeBySagaIdCommandText,
-            RemoveById = removeByIdCommandText,
-            Insert = insertCommandText,
-        };
+            return new TimeoutCommands
+            (
+                next: nextCommandText,
+                range: rangeComandText,
+                selectById: selectByIdCommandText,
+                removeBySagaId: removeBySagaIdCommandText,
+                removeById: removeByIdCommandText,
+                insert: insertCommandText
+            );
+        }
     }
 }
