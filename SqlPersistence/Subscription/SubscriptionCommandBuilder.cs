@@ -6,7 +6,7 @@ namespace NServiceBus.Persistence.Sql
     public static class SubscriptionCommandBuilder
     {
 
-        public static SubscriptionCommands Build(string tablePrefix, SqlVarient sqlVarient)
+        public static SubscriptionCommands Build(SqlVarient sqlVarient, string tablePrefix)
         {
             var tableName = $@"{tablePrefix}SubscriptionData";
 

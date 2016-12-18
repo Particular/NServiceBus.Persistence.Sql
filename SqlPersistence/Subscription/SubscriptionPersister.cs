@@ -21,7 +21,7 @@ class SubscriptionPersister : ISubscriptionStorage
         this.tablePrefix = tablePrefix;
         this.sqlVarient = sqlVarient;
 
-        subscriptionCommands = SubscriptionCommandBuilder.Build(tablePrefix, sqlVarient);
+        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVarient, tablePrefix);
     }
 
 

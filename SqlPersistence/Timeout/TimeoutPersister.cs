@@ -66,7 +66,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             await connection.OpenAsync();
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = timeoutCommands.Insert;
+                command.CommandText = timeoutCommands.Add;
                 var id = Guid.NewGuid();
                 timeout.Id = id.ToString();
                 command.AddParameter("Id", id);

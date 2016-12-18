@@ -6,7 +6,7 @@ namespace NServiceBus.Persistence.Sql
     {
         string tablePrefix;
 
-        public SagaCommandBuilder(string tablePrefix)
+        public SagaCommandBuilder(SqlVarient sqlVarient, string tablePrefix)
         {
             this.tablePrefix = tablePrefix;
         }

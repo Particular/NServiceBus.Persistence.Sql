@@ -81,7 +81,7 @@ limit 1";
                 selectById: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
-                insert: insertCommandText
+                add: insertCommandText
             );
         }
 
@@ -146,7 +146,7 @@ order by Time";
                 selectById: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
-                insert: insertCommandText
+                add: insertCommandText
             );
         }
     }

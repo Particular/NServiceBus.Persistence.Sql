@@ -19,7 +19,7 @@ public abstract class OutboxPersisterTests
     {
         this.sqlVarient = sqlVarient;
         dbConnection = GetConnection();
-        persister = new OutboxPersister(
+        persister = new OutboxPersister(sqlVarient.Convert(),
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(OutboxPersisterTests)}_");
     }

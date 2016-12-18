@@ -19,7 +19,8 @@ class SqlSagaFeature : Feature
 
         var settings = context.Settings;
         var endpointName = settings.GetTablePrefix<StorageType.Sagas>();
-        var commandBuilder = new SagaCommandBuilder(endpointName);
+        var sqlVarient = settings.GetSqlVarient();
+        var commandBuilder = new SagaCommandBuilder(sqlVarient,endpointName);
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
