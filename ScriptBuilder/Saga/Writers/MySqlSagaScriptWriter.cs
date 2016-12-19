@@ -198,7 +198,7 @@ deallocate prepare statment;
             case CorrelationPropertyType.DateTime:
                 return "datetime";
             case CorrelationPropertyType.DateTimeOffset:
-                return "datetimeoffset";
+                throw new Exception("DateTimeOffset is not supported by MySql.");
             case CorrelationPropertyType.String:
                 return "varchar(450)";
             case CorrelationPropertyType.Int:
