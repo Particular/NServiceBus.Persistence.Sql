@@ -5,11 +5,11 @@ if not exists
     from sys.objects
     where
         object_id = object_id(@tableName) and
-        type in (N'U')
+        type in ('U')
 )
 begin
 declare @createTable nvarchar(max);
-set @createTable = N'
+set @createTable = '
     create table ' + @tableName + '(
         Subscriber nvarchar(450) not null,
         Endpoint nvarchar(450) null,

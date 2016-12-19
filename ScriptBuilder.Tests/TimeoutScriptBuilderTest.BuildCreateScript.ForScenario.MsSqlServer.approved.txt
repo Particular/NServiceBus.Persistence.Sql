@@ -4,11 +4,11 @@ if not exists (
     select * from sys.objects
     where
         object_id = object_id(@tableName)
-        and type in (N'U')
+        and type in ('U')
 )
 begin
 declare @createTable nvarchar(max);
-set @createTable = N'
+set @createTable = '
     create table ' + @tableName + '(
         Id uniqueidentifier not null primary key,
         Destination nvarchar(1024),

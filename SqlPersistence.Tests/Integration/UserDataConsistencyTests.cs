@@ -19,8 +19,8 @@ public class UserDataConsistencyTests
     string createUserDataTableText = @"
 IF NOT  EXISTS (
     select * from sys.objects
-    where object_id = object_id(N'[dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data]')
-    and type in (N'U')
+    where object_id = object_id('[dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data]')
+    and type in ('U')
 )
 begin
     create table [dbo].[SqlTransportIntegration_UserDataConsistencyTests_Data](

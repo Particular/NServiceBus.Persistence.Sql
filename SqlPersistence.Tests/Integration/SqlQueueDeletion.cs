@@ -6,7 +6,7 @@ static class SqlQueueDeletion
     static void DeleteQueue(DbConnection connection, string schema, string queueName)
     {
         var deleteScript = $@"
-                    if exists (SELECT * from sys.objects where object_id = object_id(N'{schema}.{queueName}') and type in (N'U'))
+                    if exists (SELECT * from sys.objects where object_id = object_id(N'{schema}.{queueName}') and type in ('U'))
                     drop table [{schema}].[{queueName}]";
         using (var command = connection.CreateCommand())
         {
