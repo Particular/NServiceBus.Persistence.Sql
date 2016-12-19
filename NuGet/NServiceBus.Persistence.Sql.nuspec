@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NServiceBus.Persistence.Sql</id>
-    <version>$version$-beta0009</version>
+    <version>$version$-beta0010</version>
     <title>NServiceBus.Persistence.Sql</title>
     <authors>Simon Cropp, Szymon Pobiega</authors>
     <owners>Simon Cropp, Szymon Pobiega</owners>

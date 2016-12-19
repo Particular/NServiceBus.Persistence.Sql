@@ -6,7 +6,7 @@
 
   <UsingTask
       TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
-      AssemblyFile="$(MSBuildThisFileDirectory)..\..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
+      AssemblyFile="$(MSBuildThisFileDirectory)..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
 
   <Target
       AfterTargets="AfterCompile"
@@ -33,7 +33,7 @@
 
   <!--Support for ncrunch-->
   <ItemGroup  Condition="'$(NCrunch)' == '1'">
-    <None Include="$(MSBuildThisFileDirectory)..\..\*.*" />
+    <None Include="$(MSBuildThisFileDirectory)..\*.*" />
   </ItemGroup>
 
 </Project>

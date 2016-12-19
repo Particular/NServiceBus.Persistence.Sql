@@ -28,7 +28,7 @@
     <None Include="NServiceBus.Persistence.Sql.MsBuild.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="NServiceBus.Persistence.Sql.targets">
+    <None Include="NServiceBus.Persistence.Sql.MsBuild.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -70,7 +70,7 @@
     <!-- MsBuild variables -->
     <NugetBuildMsBuild>$(SolutionDir)NuGetBuild\NugetBuildMsBuild\</NugetBuildMsBuild>
     <ScriptBuilderTaskDll>$(SolutionDir)ScriptBuilderTask\bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskDll>
-    <Targets>$(ProjectDir)NServiceBus.Persistence.Sql.targets</Targets>
+    <MsBuildTargets>$(ProjectDir)NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
   </PropertyGroup>
   <Target Name="NuGetBuild" DependsOnTargets="Clean">
     <MakeDir Directories="$(NugetBuild)" />
@@ -92,13 +92,13 @@
     <MakeDir Directories="$(NugetBuildMsBuild)" />
     <Copy SourceFiles="$(TargetDir)NServiceBus.Persistence.Sql.MsBuild.nuspec" DestinationFolder="$(NugetBuildMsBuild)" />
     <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuildMsBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
-    <Copy SourceFiles="$(Targets)" DestinationFolder="$(NugetBuildMsBuild)build\net452" />
+    <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(NugetBuildMsBuild)build" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuildMsBuild)" MetadataAssembly="$(ScriptBuilderTaskDll)" />
     <!-- ForIntegration -->
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(PersistenceDll)" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(PersistencePdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build\net452" />
+    <Copy SourceFiles="$(Targets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
     <Copy SourceFiles="$(NugetBuildMsBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" DestinationFolder="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(NugetBuildMsBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>
