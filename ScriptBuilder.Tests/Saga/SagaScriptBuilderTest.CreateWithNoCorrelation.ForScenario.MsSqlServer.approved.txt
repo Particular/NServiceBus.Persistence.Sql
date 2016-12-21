@@ -1,7 +1,7 @@
 ﻿
 /* TableNameVariable */
 
-declare @tableName nvarchar(max) = @tablePrefix + 'theSaga';
+declare @tableName nvarchar(max) = @tablePrefix + N'theSaga';
 
 /* CreateTable */
 
@@ -47,7 +47,7 @@ exec sp_executesql @dropIndexQuery
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
-    select 'alter table ' + @tableName + ' drop column ' + column_name ';'
+    select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
     from information_schema.columns
     where
         table_name = @tableName and

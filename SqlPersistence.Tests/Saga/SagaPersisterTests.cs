@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Common;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -42,8 +42,13 @@ public abstract class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
+        var withWeirdCharactersಠ_ಠ = new SagaDefinition(
+            tableSuffix: "SagaWithWeirdCharactersಠ_ಠ",
+            name: "SagaWithWeirdCharactersಠ_ಠ"
+        );
         using (var connection = dbConnection())
         {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(withWeirdCharactersಠ_ಠ, sqlVarient), endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(withCorrelation, sqlVarient), endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(withNoCorrelation, sqlVarient), endpointName);
         }
@@ -138,6 +143,20 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [SqlSaga]
+    public class SagaWithWeirdCharactersಠ_ಠ : Saga<SagaWithWeirdCharactersಠ_ಠ.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string SimplePropertyಠ_ಠ { get; set; }
+            public string Contentಠ_ಠ { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
     [Test]
     public void Save()
     {
@@ -163,7 +182,6 @@ public abstract class SagaPersisterTests
         var result = SaveAsync(id).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
-
     async Task<SagaWithCorrelation.SagaData> SaveAsync(Guid id)
     {
         var sagaData = new SagaWithCorrelation.SagaData
@@ -182,6 +200,46 @@ public abstract class SagaPersisterTests
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
+        }
+    }
+    [Test]
+    public void SaveWithWeirdCharacters()
+    {
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithWeirdCharactersಠ_ಠ",
+            name: "SagaWithWeirdCharactersಠ_ಠ",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "SimplePropertyಠ_ಠ",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVarient), endpointName);
+        }
+        var id = Guid.NewGuid();
+        var result = SaveWeirdAsync(id).GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+    }
+
+    async Task<SagaWithWeirdCharactersಠ_ಠ.SagaData> SaveWeirdAsync(Guid id)
+    {
+        var sagaData = new SagaWithWeirdCharactersಠ_ಠ.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageIdಠ_ಠ",
+            Originator = "theOriginatorಠ_ಠ",
+            SimplePropertyಠ_ಠ = "PropertyValueಠ_ಠ",
+            Contentಠ_ಠ = "♟⛺"
+        };
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true))
+        {
+            await persister.Save(sagaData, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), "thePropertyಠ_ಠ");
+            return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ))).Data;
         }
     }
 
@@ -297,6 +355,7 @@ public abstract class SagaPersisterTests
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), wrongVersion));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
+
     }
 
 

@@ -17,7 +17,7 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-declare @tableName nvarchar(max) = @tablePrefix + '{saga.TableSuffix}';");
+declare @tableName nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';");
     }
 
     public void AddProperty(CorrelationProperty correlationProperty)
@@ -29,13 +29,13 @@ if not exists
 (
   select * from sys.columns
   where
-    name = 'Correlation_{name}' and
+    name = N'Correlation_{name}' and
     object_id = object_id(@tableName)
 )
 begin
   declare @createColumn_{name} nvarchar(max);
   set @createColumn_{name} = '
-  alter table ' + @tableName + '
+  alter table ' + @tableName + N'
     add Correlation_{name} {columnType};';
   exec(@createColumn_{name});
 end
@@ -52,11 +52,11 @@ set @dataType_{name} = (
   select data_type
   from information_schema.columns
   where
-    table_name = ' + @tableName + ' and
+    table_name = ' + @tableName + N' and
     column_name = 'Correlation_{name}'
 );
 if (@dataType_{name} <> '{columnType}')
-  throw 50000, 'Incorrect data type for Correlation_{name}', 0
+  throw 50000, N'Incorrect data type for Correlation_{name}', 0
 ");
     }
 
@@ -69,14 +69,14 @@ if not exists
     select *
     from sys.indexes
     where
-        name = 'Index_Correlation_{name}' and
+        name = N'Index_Correlation_{name}' and
         object_id = object_id(@tableName)
 )
 begin
   declare @createIndex_{name} nvarchar(max);
-  set @createIndex_{name} = '
+  set @createIndex_{name} = N'
   create unique index Index_Correlation_{name}
-  on ' + @tableName + '(Correlation_{name})
+  on ' + @tableName + N'(Correlation_{name})
   where Correlation_{name} is not null;';
   exec(@createIndex_{name});
 end
@@ -89,17 +89,17 @@ end
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and\r\n        column_name <> N'Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and\r\n        column_name <> N'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
         writer.Write($@"
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
-    select 'alter table ' + @tableName + ' drop column ' + column_name ';'
+    select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
     from information_schema.columns
     where
         table_name = @tableName and
@@ -115,11 +115,11 @@ exec sp_executesql @dropPropertiesQuery
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        Name <> 'Index_Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and\r\n        Name <> N'Index_Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        Name <> 'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and\r\n        Name <> N'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
 
         writer.Write($@"
