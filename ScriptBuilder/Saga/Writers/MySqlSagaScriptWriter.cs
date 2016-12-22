@@ -171,7 +171,7 @@ set @createTable = concat('
         Data json not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,
-        SagaVersion int not null,
+        Concurrency int not null,
         primary key (Id)
     ) default charset=utf8;
 ');

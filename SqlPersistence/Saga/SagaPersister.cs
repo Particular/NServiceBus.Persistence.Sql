@@ -77,10 +77,10 @@ class SagaPersister : ISagaPersister
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
-        return Update(sagaData, session, sagaType, GetSagaVersion(context));
+        return Update(sagaData, session, sagaType, GetConcurrency(context));
     }
 
-    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int sagaVersion)
+    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int concurrency)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
@@ -93,12 +93,12 @@ class SagaPersister : ISagaPersister
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
-            command.AddParameter("SagaVersion", sagaVersion);
+            command.AddParameter("Concurrency", concurrency);
             AddTransitionalParameter(sagaData, sagaInfo, command);
             var affected = await command.ExecuteNonQueryAsync();
             if (affected != 1)
             {
-                throw new Exception($"Optimistic concurrency violation when trying to save saga {sagaType.FullName} {sagaData.Id}. Expected version {sagaVersion}.");
+                throw new Exception($"Optimistic concurrency violation when trying to save saga {sagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");
             }
         }
     }
@@ -109,11 +109,11 @@ class SagaPersister : ISagaPersister
     {
         var sagaType = context.GetSagaType();
         var result = await Get<TSagaData>(sagaId, session, sagaType);
-        return SetSagaVersion(result, context);
+        return SetConcurrency(result, context);
     }
 
 
-    internal async Task<SagaVersion<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
+    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
@@ -133,30 +133,31 @@ class SagaPersister : ISagaPersister
     {
         var sagaType = context.GetSagaType();
         var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType);
-        return SetSagaVersion(result, context);
+        return SetConcurrency(result, context);
     }
 
-    static TSagaData SetSagaVersion<TSagaData>(SagaVersion<TSagaData> result, ContextBag context) where TSagaData : IContainSagaData
+    static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
+        where TSagaData : IContainSagaData
     {
         if (result.Data == null)
         {
             return default(TSagaData);
         }
-        context.Set("NServiceBus.Persistence.Sql.SagaVersion", result.Version);
+        context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
         return result.Data;
     }
 
-    static int GetSagaVersion(ContextBag context)
+    static int GetConcurrency(ContextBag context)
     {
-        int sagaVersion;
-        if (!context.TryGet("NServiceBus.Persistence.Sql.SagaVersion", out sagaVersion))
+        int concurrency;
+        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
         {
             throw new Exception("Cannot save saga because optimistic concurrency version is missing in the context.");
         }
-        return sagaVersion;
+        return concurrency;
     }
 
-    internal async Task<SagaVersion<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) 
+    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) 
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
@@ -182,14 +183,14 @@ class SagaPersister : ISagaPersister
     }
 
 
-    static async Task<SagaVersion<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
+    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
         using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
         {
             if (!await dataReader.ReadAsync())
             {
-                return default(SagaVersion<TSagaData>);
+                return default(Concurrency<TSagaData>);
             }
             var id = dataReader.GetGuid(0);
             string originator;
@@ -201,14 +202,14 @@ class SagaPersister : ISagaPersister
                 metadata.TryGetValue("OriginalMessageId", out originalMessageId);
             }
             var sagaTypeVersion = Version.Parse(dataReader.GetString(3));
-            var sagaVersion = dataReader.GetInt32(4);
+            var concurrency = dataReader.GetInt32(4);
             using (var textReader = dataReader.GetTextReader(2))
             {
                 var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;
                 sagaData.OriginalMessageId = originalMessageId;
-                return new SagaVersion<TSagaData>(sagaData, sagaVersion);
+                return new Concurrency<TSagaData>(sagaData, concurrency);
             }
         }
     }
@@ -217,10 +218,10 @@ class SagaPersister : ISagaPersister
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         var sagaType = context.GetSagaType();
-        return Complete(sagaData, session, sagaType, GetSagaVersion(context));
+        return Complete(sagaData, session, sagaType, GetConcurrency(context));
     }
 
-    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int sagaVersion)
+    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int concurrency)
     {
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
         var sqlSession = session.SqlPersistenceSession();
@@ -230,18 +231,18 @@ class SagaPersister : ISagaPersister
             command.CommandText = sagaInfo.CompleteCommand;
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("SagaVersion", sagaVersion);
+            command.AddParameter("Concurrency", concurrency);
             await command.ExecuteNonQueryAsync();
         }
     }
 
-    internal struct SagaVersion<TSagaData>
+    internal struct Concurrency<TSagaData>
         where TSagaData : IContainSagaData
     {
         public TSagaData Data { get; }
         public int Version { get; }
 
-        public SagaVersion(TSagaData data, int version)
+        public Concurrency(TSagaData data, int version)
         {
             Data = data;
             Version = version;

@@ -35,7 +35,7 @@ insert into {tablePrefix}{tableSuffx}
     Data,
     PersistenceVersion,
     SagaTypeVersion,
-    SagaVersion{insertBuilder}
+    Concurrency{insertBuilder}
 )
 values
 (
@@ -64,9 +64,9 @@ set
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,
-    SagaVersion = @SagaVersion + 1{correlationSet}
+    Concurrency = @Concurrency + 1{correlationSet}
 where
-    Id = @Id AND SagaVersion = @SagaVersion
+    Id = @Id AND Concurrency = @Concurrency
 ";
         }
 
@@ -78,7 +78,7 @@ select
     Metadata,
     Data,
     SagaTypeVersion,
-    SagaVersion
+    Concurrency
 from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
@@ -92,7 +92,7 @@ select
     Metadata,
     Data,
     SagaTypeVersion,
-    SagaVersion
+    Concurrency
 from {tablePrefix}{tableSuffx}
 where Correlation_{propertyName} = @propertyValue
 ";
@@ -102,7 +102,7 @@ where Correlation_{propertyName} = @propertyValue
         {
             return $@"
 delete from {tablePrefix}{tableSuffx}
-where Id = @Id AND SagaVersion = @SagaVersion
+where Id = @Id AND Concurrency = @Concurrency
 ";
         }
     }

@@ -157,7 +157,7 @@ set @createTable = '
         Data nvarchar(max) not null,
         PersistenceVersion varchar(23) not null,
         SagaTypeVersion varchar(23) not null,
-        SagaVersion int not null
+        Concurrency int not null
     )
 ';
 exec(@createTable);
