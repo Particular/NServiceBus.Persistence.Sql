@@ -37,9 +37,9 @@ set @query = IF(
     @exist <= 0,
     concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'), 'select \'Column Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 ");
     }
 
@@ -62,9 +62,9 @@ set @query = IF(
     'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_{name}\'',
     'select \'Column Type OK\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 ");
     }
 
@@ -84,9 +84,9 @@ set @query = IF(
     @exist <= 0,
     concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'), 'select \'Index Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 ");
     }
     public void WritePurgeObsoleteIndex()
@@ -119,9 +119,9 @@ select if (
     'select ''no index to delete'';')
     into @dropIndexQuery;
 
-prepare statment from @dropIndexQuery;
-execute statment;
-deallocate prepare statment;
+prepare script from @dropIndexQuery;
+execute script;
+deallocate prepare script;
 ");
     }
 
@@ -154,9 +154,9 @@ select if (
     'select ''no property to delete'';')
     into @dropPropertiesQuery;
 
-prepare statment from @dropPropertiesQuery;
-execute statment;
-deallocate prepare statment;
+prepare script from @dropPropertiesQuery;
+execute script;
+deallocate prepare script;
 ");
     }
 
@@ -175,9 +175,9 @@ set @createTable = concat('
         primary key (Id)
     ) default charset=utf8;
 ');
-prepare statment from @createTable;
-execute statment;
-deallocate prepare statment;
+prepare script from @createTable;
+execute script;
+deallocate prepare script;
 ");
     }
 
@@ -185,9 +185,9 @@ deallocate prepare statment;
     {
         writer.Write(@"
 set @dropTable = concat('drop table if exists ', @tableName);
-prepare statment from @dropTable;
-execute statment;
-deallocate prepare statment;
+prepare script from @dropTable;
+execute script;
+deallocate prepare script;
 ");
     }
 

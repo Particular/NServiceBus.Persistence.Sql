@@ -11,6 +11,6 @@ set @createTable = concat('
         primary key (Id)
     ) default charset=utf8;
 ');
-prepare statment from @createTable;
-execute statment;
-deallocate prepare statment;
+prepare script from @createTable;
+execute script;
+deallocate prepare script;

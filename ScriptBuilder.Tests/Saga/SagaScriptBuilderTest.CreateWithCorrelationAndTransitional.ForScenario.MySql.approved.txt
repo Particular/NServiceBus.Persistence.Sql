@@ -17,9 +17,9 @@ set @createTable = concat('
         primary key (Id)
     ) default charset=utf8;
 ');
-prepare statment from @createTable;
-execute statment;
-deallocate prepare statment;
+prepare script from @createTable;
+execute script;
+deallocate prepare script;
 
 /* AddProperty CorrelationProperty */
 
@@ -34,9 +34,9 @@ set @query = IF(
     @exist <= 0,
     concat('alter table ', @tableName, ' add column Correlation_CorrelationProperty varchar(450)'), 'select \'Column Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* VerifyColumnType String */
 
@@ -54,9 +54,9 @@ set @query = IF(
     'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_CorrelationProperty\'',
     'select \'Column Type OK\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* WriteCreateIndex CorrelationProperty */
 
@@ -72,9 +72,9 @@ set @query = IF(
     @exist <= 0,
     concat('create unique index Index_Correlation_CorrelationProperty on ', @tableName, '(Correlation_CorrelationProperty)'), 'select \'Index Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* AddProperty TransitionalProperty */
 
@@ -89,9 +89,9 @@ set @query = IF(
     @exist <= 0,
     concat('alter table ', @tableName, ' add column Correlation_TransitionalProperty varchar(450)'), 'select \'Column Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* VerifyColumnType String */
 
@@ -109,9 +109,9 @@ set @query = IF(
     'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_TransitionalProperty\'',
     'select \'Column Type OK\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* CreateIndex TransitionalProperty */
 
@@ -127,9 +127,9 @@ set @query = IF(
     @exist <= 0,
     concat('create unique index Index_Correlation_TransitionalProperty on ', @tableName, '(Correlation_TransitionalProperty)'), 'select \'Index Exists\' status');
 
-prepare statment from @query;
-execute statment;
-deallocate prepare statment;
+prepare script from @query;
+execute script;
+deallocate prepare script;
 
 /* PurgeObsoleteIndex */
 
@@ -149,9 +149,9 @@ select if (
     'select ''no index to delete'';')
     into @dropIndexQuery;
 
-prepare statment from @dropIndexQuery;
-execute statment;
-deallocate prepare statment;
+prepare script from @dropIndexQuery;
+execute script;
+deallocate prepare script;
 
 /* PurgeObsoleteProperties */
 
@@ -171,6 +171,6 @@ select if (
     'select ''no property to delete'';')
     into @dropPropertiesQuery;
 
-prepare statment from @dropPropertiesQuery;
-execute statment;
-deallocate prepare statment;
+prepare script from @dropPropertiesQuery;
+execute script;
+deallocate prepare script;
