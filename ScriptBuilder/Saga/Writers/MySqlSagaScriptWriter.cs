@@ -216,7 +216,7 @@ deallocate prepare script;
             case CorrelationPropertyType.String:
                 return "varchar(450)";
             case CorrelationPropertyType.Int:
-                return "bigint";
+                return "bigint(20)";
             case CorrelationPropertyType.Guid:
                 return "varchar(38)";
         }
