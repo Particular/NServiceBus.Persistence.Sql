@@ -33,6 +33,9 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             WriteComment(writer, "TableNameVariable");
             sqlVarientWriter.WriteTableNameVariable();
 
+            WriteComment(writer, "Initialise");
+            sqlVarientWriter.Initialise();
+
             WriteComment(writer, "CreateTable");
             sqlVarientWriter.WriteCreateTable();
             if (saga.CorrelationProperty != null)

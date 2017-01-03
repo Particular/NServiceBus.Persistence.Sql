@@ -3,6 +3,8 @@
 
 declare @tableName nvarchar(max) = @tablePrefix + N'theSaga';
 
+/* Initialise */
+
 /* CreateTable */
 
 if not exists
@@ -56,7 +58,10 @@ set @dataType_CorrelationProperty = (
     column_name = 'Correlation_CorrelationProperty'
 );
 if (@dataType_CorrelationProperty <> 'nvarchar(450)')
-  throw 50000, N'Incorrect data type for Correlation_CorrelationProperty', 0
+  begin
+    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar(450) got ' + @dataType_CorrelationProperty + '.';
+    throw 50000, @error_CorrelationProperty, 0
+  end
 
 /* WriteCreateIndex CorrelationProperty */
 
@@ -105,7 +110,10 @@ set @dataType_TransitionalProperty = (
     column_name = 'Correlation_TransitionalProperty'
 );
 if (@dataType_TransitionalProperty <> 'nvarchar(450)')
-  throw 50000, N'Incorrect data type for Correlation_TransitionalProperty', 0
+  begin
+    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar(450) got ' + @dataType_TransitionalProperty + '.';
+    throw 50000, @error_TransitionalProperty, 0
+  end
 
 /* CreateIndex TransitionalProperty */
 

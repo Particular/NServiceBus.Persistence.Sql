@@ -4,6 +4,18 @@
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
+/* Initialise */
+
+DROP PROCEDURE IF EXISTS sqlpersistence_raiseerror;
+CREATE PROCEDURE sqlpersistence_raiseerror(message VARCHAR(256))
+BEGIN
+SIGNAL SQLSTATE
+    'ERROR'
+SET
+    MESSAGE_TEXT = message,
+    MYSQL_ERRNO = '45000';
+END;
+
 /* CreateTable */
 
 set @createTable = concat('
@@ -51,7 +63,7 @@ set @column_type_CorrelationProperty = (
 
 set @query = IF(
     @column_type_CorrelationProperty <> 'varchar(450)',
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_CorrelationProperty\'',
+    'call sqlpersistence_raiseerror(concat(\'Incorrect data type for Correlation_CorrelationProperty. Expected varchar(450) got \', @column_type_CorrelationProperty, \'.\'));',
     'select \'Column Type OK\' status');
 
 prepare script from @query;
@@ -106,7 +118,7 @@ set @column_type_TransitionalProperty = (
 
 set @query = IF(
     @column_type_TransitionalProperty <> 'varchar(450)',
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_TransitionalProperty\'',
+    'call sqlpersistence_raiseerror(concat(\'Incorrect data type for Correlation_TransitionalProperty. Expected varchar(450) got \', @column_type_TransitionalProperty, \'.\'));',
     'select \'Column Type OK\' status');
 
 prepare script from @query;

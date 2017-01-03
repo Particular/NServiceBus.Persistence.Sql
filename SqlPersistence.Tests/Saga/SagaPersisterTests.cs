@@ -466,7 +466,7 @@ public abstract class SagaPersisterTests
                 name: "SagaWithCorrelation",
                 correlationProperty: new CorrelationProperty
                 (
-                    name: "CorrelationProperty",
+                    name: "TransitionalCorrelationProperty",
                     type: CorrelationPropertyType.Guid
                 )
             );

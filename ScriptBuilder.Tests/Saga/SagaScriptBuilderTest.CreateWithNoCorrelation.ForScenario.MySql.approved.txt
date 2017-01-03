@@ -4,6 +4,18 @@
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
+/* Initialise */
+
+DROP PROCEDURE IF EXISTS sqlpersistence_raiseerror;
+CREATE PROCEDURE sqlpersistence_raiseerror(message VARCHAR(256))
+BEGIN
+SIGNAL SQLSTATE
+    'ERROR'
+SET
+    MESSAGE_TEXT = message,
+    MYSQL_ERRNO = '45000';
+END;
+
 /* CreateTable */
 
 set @createTable = concat('

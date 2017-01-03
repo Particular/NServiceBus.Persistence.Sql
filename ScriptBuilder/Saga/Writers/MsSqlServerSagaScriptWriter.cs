@@ -14,6 +14,10 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
         this.saga = saga;
     }
 
+    public void Initialise()
+    {
+    }
+
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
@@ -56,7 +60,10 @@ set @dataType_{name} = (
     column_name = 'Correlation_{name}'
 );
 if (@dataType_{name} <> '{columnType}')
-  throw 50000, N'Incorrect data type for Correlation_{name}', 0
+  begin
+    declare @error_{name} nvarchar(max) = N'Incorrect data type for Correlation_{name}. Expected {columnType} got ' + @dataType_{name} + '.';
+    throw 50000, @error_{name}, 0
+  end
 ");
     }
 
@@ -204,4 +211,5 @@ end
         }
         throw new Exception($"Could not convert {propertyType}.");
     }
+
 }

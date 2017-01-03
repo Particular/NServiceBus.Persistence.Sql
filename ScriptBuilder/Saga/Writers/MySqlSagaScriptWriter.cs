@@ -14,6 +14,20 @@ class MySqlSagaScriptWriter : ISagaScriptWriter
         this.saga = saga;
     }
 
+    public void Initialise()
+    {
+        writer.WriteLine(@"
+DROP PROCEDURE IF EXISTS sqlpersistence_raiseerror;
+CREATE PROCEDURE sqlpersistence_raiseerror(message VARCHAR(256))
+BEGIN
+SIGNAL SQLSTATE
+    'ERROR'
+SET
+    MESSAGE_TEXT = message,
+    MYSQL_ERRNO = '45000';
+END;");
+    }
+
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
@@ -59,7 +73,7 @@ set @column_type_{name} = (
 
 set @query = IF(
     @column_type_{name} <> '{columnType}',
-    'SIGNAL SQLSTATE \'45000\' SET MESSAGE_TEXT = \'Incorrect data type for Correlation_{name}\'',
+    'call sqlpersistence_raiseerror(concat(\'Incorrect data type for Correlation_{name}. Expected {columnType} got \', @column_type_{name}, \'.\'));',
     'select \'Column Type OK\' status');
 
 prepare script from @query;
