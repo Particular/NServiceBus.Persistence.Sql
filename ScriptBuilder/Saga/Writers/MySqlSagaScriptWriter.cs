@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -37,7 +36,7 @@ set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
 
     public void AddProperty(CorrelationProperty correlationProperty)
     {
-        var columnType = GetColumnType(correlationProperty.Type);
+        var columnType = MySqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = correlationProperty.Name;
         writer.Write($@"
 select count(*)
@@ -59,7 +58,7 @@ deallocate prepare script;
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = GetColumnType(correlationProperty.Type);
+        var columnType = MySqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = correlationProperty.Name;
         writer.Write($@"
 set @column_type_{name} = (
@@ -204,23 +203,4 @@ execute script;
 deallocate prepare script;
 ");
     }
-
-    static string GetColumnType(CorrelationPropertyType propertyType)
-    {
-        switch (propertyType)
-        {
-            case CorrelationPropertyType.DateTime:
-                return "datetime";
-            case CorrelationPropertyType.DateTimeOffset:
-                throw new Exception("DateTimeOffset is not supported by MySql.");
-            case CorrelationPropertyType.String:
-                return "varchar(450)";
-            case CorrelationPropertyType.Int:
-                return "bigint(20)";
-            case CorrelationPropertyType.Guid:
-                return "varchar(38)";
-        }
-        throw new Exception($"Could not convert {propertyType}.");
-    }
-
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -26,7 +25,7 @@ declare @tableName nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';");
 
     public void AddProperty(CorrelationProperty correlationProperty)
     {
-        var columnType = GetColumnType(correlationProperty.Type);
+        var columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = correlationProperty.Name;
         writer.Write($@"
 if not exists
@@ -48,7 +47,7 @@ end
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = GetColumnType(correlationProperty.Type);
+        var columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = correlationProperty.Name;
         writer.Write($@"
 declare @dataType_{name} nvarchar(max);
@@ -192,24 +191,4 @@ begin
 end
 ");
     }
-
-
-    static string GetColumnType(CorrelationPropertyType propertyType)
-    {
-        switch (propertyType)
-        {
-            case CorrelationPropertyType.DateTime:
-                return "datetime";
-            case CorrelationPropertyType.DateTimeOffset:
-                return "datetimeoffset";
-            case CorrelationPropertyType.String:
-                return "nvarchar(450)";
-            case CorrelationPropertyType.Int:
-                return "bigint";
-            case CorrelationPropertyType.Guid:
-                return "uniqueidentifier";
-        }
-        throw new Exception($"Could not convert {propertyType}.");
-    }
-
 }
