@@ -1,0 +1,17 @@
+version: 1.0.{build}
+services:
+- mssql2012sp1
+- mssql2008r2sp2
+- mssql2014
+- mssql2016
+- mysql
+- postgresql
+- msmq
+before_build:
+- ps: nuget restore
+build:
+  project: NSBSqlPersistence.sln
+  verbosity: minimal
+test: off
+artifacts:
+- path: NuGetBuild\**\*.nupkg
