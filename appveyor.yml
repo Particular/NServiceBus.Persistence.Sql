@@ -1,4 +1,6 @@
 version: 1.0.{build}
+environment:
+- NH_ACC_TEST_CONNSTR: 'Server=(local)\SQL2012SP1;Database=master;User ID=sa;Password=Password12!'
 services:
 - mssql2012sp1
 - mysql
@@ -6,8 +8,10 @@ services:
 before_build:
 - ps: nuget restore
 build_script:
-- msbuild /v:m NSBSqlPersistence.sln
+- msbuild /v:diag NSBSqlPersistence.sln
 - msbuild /v:m Integration\Integration.sln
-test: off
+test:
+  assemblies:
+    - Integration\AcceptanceTests\bin\$(configuration)\XmlPersistence.AcceptanceTests.dll
 artifacts:
 - path: NuGetBuild\**\*.nupkg
