@@ -5,7 +5,7 @@ services:
 - msmq
 before_build:
 - ps: nuget restore
-build_scropt:
+build_script:
 - msbuild /v:m NSBSqlPersistence.sln
 - msbuild /v:m Integration\Integration.sln
 test: off
