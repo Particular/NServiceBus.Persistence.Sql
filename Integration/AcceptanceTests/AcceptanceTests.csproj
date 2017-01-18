@@ -318,5 +318,5 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\..\ForIntegration\build\net452\NServiceBus.Persistence.Sql.targets" />
+  <Import Project="$(SolutionDir)\..\ForIntegration\build\NServiceBus.Persistence.Sql.MsBuild.targets" />
 </Project>
