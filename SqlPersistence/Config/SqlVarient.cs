@@ -1,6 +1,6 @@
 namespace NServiceBus.Persistence.Sql
 {
-    public enum SqlVarient
+    public enum SqlVariant
     {
         MsSqlServer,
         MySql

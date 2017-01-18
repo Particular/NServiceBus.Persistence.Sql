@@ -6,14 +6,14 @@ namespace NServiceBus.Persistence.Sql
     public static class SubscriptionCommandBuilder
     {
 
-        public static SubscriptionCommands Build(SqlVarient sqlVarient, string tablePrefix)
+        public static SubscriptionCommands Build(SqlVariant sqlVariant, string tablePrefix)
         {
             var tableName = $@"{tablePrefix}SubscriptionData";
 
             string subscribeCommandText;
-            switch (sqlVarient)
+            switch (sqlVariant)
             {
-                case SqlVarient.MsSqlServer:
+                case SqlVariant.MsSqlServer:
                     subscribeCommandText = $@"
 declare @dummy int;
 merge {tableName} with (holdlock) as target
@@ -40,7 +40,7 @@ values
 );";
                     break;
 
-                case SqlVarient.MySql:
+                case SqlVariant.MySql:
                     subscribeCommandText = $@"
 insert into {tableName}
 (
@@ -63,7 +63,7 @@ on duplicate key update
                     break;
 
                 default:
-                    throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
 
             string unsubscribeCommandText = $@"

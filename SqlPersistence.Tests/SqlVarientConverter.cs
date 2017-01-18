@@ -2,30 +2,30 @@ using System;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-public static class SqlVarientConverter
+public static class SqlVariantConverter
 {
-    public static BuildSqlVarient Convert(this SqlVarient sqlVarient)
+    public static BuildSqlVariant Convert(this SqlVariant sqlVariant)
     {
-        switch (sqlVarient)
+        switch (sqlVariant)
         {
-            case SqlVarient.MsSqlServer:
-                return BuildSqlVarient.MsSqlServer;
-            case SqlVarient.MySql:
-                return BuildSqlVarient.MySql;
+            case SqlVariant.MsSqlServer:
+                return BuildSqlVariant.MsSqlServer;
+            case SqlVariant.MySql:
+                return BuildSqlVariant.MySql;
             default:
-                throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }
     }
-    public static SqlVarient Convert(this BuildSqlVarient sqlVarient)
+    public static SqlVariant Convert(this BuildSqlVariant sqlVariant)
     {
-        switch (sqlVarient)
+        switch (sqlVariant)
         {
-            case BuildSqlVarient.MsSqlServer:
-                return SqlVarient.MsSqlServer;
-            case BuildSqlVarient.MySql:
-                return SqlVarient.MySql;
+            case BuildSqlVariant.MsSqlServer:
+                return SqlVariant.MsSqlServer;
+            case BuildSqlVariant.MySql:
+                return SqlVariant.MySql;
             default:
-                throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }
     }
 }

@@ -9,18 +9,18 @@ using ObjectApproval;
 public abstract class TimeoutPersisterTests
 {
     TimeoutPersister persister;
-    BuildSqlVarient sqlVarient;
+    BuildSqlVariant sqlVariant;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public TimeoutPersisterTests(BuildSqlVarient sqlVarient)
+    public TimeoutPersisterTests(BuildSqlVariant sqlVariant)
     {
-        this.sqlVarient = sqlVarient;
+        this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
         persister = new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(TimeoutPersisterTests)}_",
-            sqlVarient:sqlVarient.Convert());
+            sqlVariant:sqlVariant.Convert());
     }
 
     [SetUp]
@@ -29,8 +29,8 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(TimeoutPersisterTests));
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(TimeoutPersisterTests));
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(TimeoutPersisterTests));
         }
     }
 
@@ -40,7 +40,7 @@ public abstract class TimeoutPersisterTests
         //using (var connection = dbConnection())
         //{
         //    connection.Open();
-        //    connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(TimeoutPersisterTests));
+        //    connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(TimeoutPersisterTests));
         //}
     }
 

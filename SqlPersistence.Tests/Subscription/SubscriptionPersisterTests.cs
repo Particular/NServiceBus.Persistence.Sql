@@ -10,19 +10,19 @@ using ObjectApproval;
 public abstract class SubscriptionPersisterTests
 {
 
-    BuildSqlVarient sqlVarient;
+    BuildSqlVariant sqlVariant;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
     SubscriptionPersister persister;
 
-    public SubscriptionPersisterTests(BuildSqlVarient sqlVarient)
+    public SubscriptionPersisterTests(BuildSqlVariant sqlVariant)
     {
-        this.sqlVarient = sqlVarient;
+        this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
-            sqlVarient: sqlVarient.Convert()
+            sqlVariant: sqlVariant.Convert()
         );
     }
 
@@ -32,8 +32,8 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVarient), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests));
         }
     }
 
@@ -43,7 +43,7 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVarient), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
         }
     }
 

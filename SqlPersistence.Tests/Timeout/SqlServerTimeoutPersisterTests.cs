@@ -8,7 +8,7 @@ using NUnit.Framework;
 public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
-    public SqlServerTimeoutPersisterTests() : base(BuildSqlVarient.MsSqlServer)
+    public SqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MsSqlServer)
     {
     }
 

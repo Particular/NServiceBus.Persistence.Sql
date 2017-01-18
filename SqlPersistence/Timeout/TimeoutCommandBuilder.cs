@@ -5,17 +5,17 @@ namespace NServiceBus.Persistence.Sql
     public static class TimeoutCommandBuilder
     {
 
-        public static TimeoutCommands Build(SqlVarient sqlVarient, string tablePrefix)
+        public static TimeoutCommands Build(SqlVariant sqlVariant, string tablePrefix)
         {
             var tableName = $@"{tablePrefix}TimeoutData";
-            switch (sqlVarient)
+            switch (sqlVariant)
             {
-                case SqlVarient.MsSqlServer:
+                case SqlVariant.MsSqlServer:
                     return BuildSqlServerCommands(tableName);
-                case SqlVarient.MySql:
+                case SqlVariant.MySql:
                     return BuildMySqlCommands(tableName);
                 default:
-                    throw new Exception($"Unknown SqlVarient: {sqlVarient}.");
+                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
         }
 

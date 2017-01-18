@@ -13,7 +13,7 @@ public class MsmqTransportIntegrationTests : IDisposable
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "MsmqTransportIntegration";
-    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
+    BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 
@@ -36,18 +36,18 @@ public class MsmqTransportIntegrationTests : IDisposable
     public void Setup()
     {
         MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVariant), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(MsmqTransportIntegrationTests));
     }
 
     [TearDown]
     public void TearDown()
     {
         MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVarient), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MsmqTransportIntegrationTests));
     }
 
     [Test]

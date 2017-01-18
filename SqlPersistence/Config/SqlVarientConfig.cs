@@ -6,20 +6,20 @@ namespace NServiceBus
 {
     public static partial class SqlPersistenceConfig
     {
-        public static void SqlVarient(this PersistenceExtensions<SqlPersistence> configuration, SqlVarient sqlVarient)
+        public static void SqlVariant(this PersistenceExtensions<SqlPersistence> configuration, SqlVariant sqlVariant)
         {
             var settings = configuration.GetSettings();
-            settings.Set("SqlPersistence.SqlVarient", sqlVarient);
+            settings.Set("SqlPersistence.SqlVariant", sqlVariant);
         }
 
-        internal static SqlVarient GetSqlVarient(this ReadOnlySettings settings)
+        internal static SqlVariant GetSqlVariant(this ReadOnlySettings settings)
         {
-            SqlVarient value;
-            if (settings.TryGet("SqlPersistence.SqlVarient", out value))
+            SqlVariant value;
+            if (settings.TryGet("SqlPersistence.SqlVariant", out value))
             {
                 return value;
             }
-            return Persistence.Sql.SqlVarient.MsSqlServer;
+            return Persistence.Sql.SqlVariant.MsSqlServer;
         }
     }
 }

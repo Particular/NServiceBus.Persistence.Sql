@@ -12,16 +12,16 @@ class SubscriptionPersister : ISubscriptionStorage
 {
     Func<DbConnection> connectionBuilder;
     string tablePrefix;
-    SqlVarient sqlVarient;
+    SqlVariant sqlVariant;
     SubscriptionCommands subscriptionCommands;
 
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder,string tablePrefix, SqlVarient sqlVarient)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder,string tablePrefix, SqlVariant sqlVariant)
     {
         this.connectionBuilder = connectionBuilder;
         this.tablePrefix = tablePrefix;
-        this.sqlVarient = sqlVarient;
+        this.sqlVariant = sqlVariant;
 
-        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVarient, tablePrefix);
+        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix);
     }
 
 

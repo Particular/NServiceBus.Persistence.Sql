@@ -6,7 +6,7 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class SqlVarientReaderTest
+public class SqlVariantReaderTest
 {
 
     [Test]
@@ -20,7 +20,7 @@ public class SqlVarientReaderTest
             AssemblyResolver = assemblyResolver
         };
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        ObjectApprover.VerifyWithJson(SqlVarientReader.Read(module).ToList());
+        ObjectApprover.VerifyWithJson(SqlVariantReader.Read(module).ToList());
     }
 
 }

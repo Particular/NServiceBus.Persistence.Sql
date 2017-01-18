@@ -9,7 +9,7 @@ public class MySqlSagaPersisterTests: SagaPersisterTests
 {
     static string connectionString = "server=localhost;user=root;database=sqlpersistencetests;port=3306;password=Password1;Allow User Variables=True";
 
-    public MySqlSagaPersisterTests() : base(BuildSqlVarient.MySql)
+    public MySqlSagaPersisterTests() : base(BuildSqlVariant.MySql)
     {
     }
 
