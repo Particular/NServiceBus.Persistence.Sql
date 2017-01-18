@@ -9,42 +9,42 @@ using NUnit.Framework;
 public class TimeoutScriptBuilderTest
 {
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void BuildCreateScript(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void BuildCreateScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildCreateScript(writer, sqlVarient);
+            TimeoutScriptBuilder.BuildCreateScript(writer, sqlVariant);
         }
         var script = builder.ToString();
-        if (sqlVarient != BuildSqlVarient.MySql)
+        if (sqlVariant != BuildSqlVariant.MySql)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }
     }
 
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void BuildDropScript(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void BuildDropScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            TimeoutScriptBuilder.BuildDropScript(writer, sqlVarient);
+            TimeoutScriptBuilder.BuildDropScript(writer, sqlVariant);
         }
         var script = builder.ToString();
-        if (sqlVarient != BuildSqlVarient.MySql)
+        if (sqlVariant != BuildSqlVariant.MySql)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }

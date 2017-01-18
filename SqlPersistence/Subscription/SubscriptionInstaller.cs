@@ -23,10 +23,10 @@ class SubscriptionInstaller : INeedToInstallSomething
             return;
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
-        var sqlVarient = settings.GetSqlVarient();
+        var sqlVariant = settings.GetSqlVariant();
 
         var tablePrefix = settings.GetTablePrefix<StorageType.Subscriptions>();
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Subscription_Create.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVariant), "Subscription_Create.sql");
         log.Info($"Executing '{createScript}'");
         using (var connection = connectionBuilder())
         {

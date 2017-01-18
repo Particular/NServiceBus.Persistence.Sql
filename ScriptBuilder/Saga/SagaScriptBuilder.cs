@@ -7,17 +7,17 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     public static class SagaScriptBuilder
     {
 
-        public static string BuildCreateScript(SagaDefinition saga, BuildSqlVarient sqlVarient)
+        public static string BuildCreateScript(SagaDefinition saga, BuildSqlVariant sqlVariant)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildCreateScript(saga, sqlVarient, stringWriter);
+                BuildCreateScript(saga, sqlVariant, stringWriter);
             }
             return stringBuilder.ToString();
         }
 
-        public static void BuildCreateScript(SagaDefinition saga, BuildSqlVarient sqlVarient, TextWriter writer)
+        public static void BuildCreateScript(SagaDefinition saga, BuildSqlVariant sqlVariant, TextWriter writer)
         {
             Guard.AgainstNull(nameof(saga), saga);
             Guard.AgainstNull(nameof(writer), writer);
@@ -28,43 +28,43 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
                 tableSuffix: saga.TableSuffix,
                 transitionalProperty: saga.TransitionalCorrelationProperty?.Name);
 
-            var sqlVarientWriter = GetSqlVarientWriter(sqlVarient, writer, saga);
+            var sqlVariantWriter = GetSqlVariantWriter(sqlVariant, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
-            sqlVarientWriter.WriteTableNameVariable();
+            sqlVariantWriter.WriteTableNameVariable();
 
             WriteComment(writer, "Initialise");
-            sqlVarientWriter.Initialise();
+            sqlVariantWriter.Initialise();
 
             WriteComment(writer, "CreateTable");
-            sqlVarientWriter.WriteCreateTable();
+            sqlVariantWriter.WriteCreateTable();
             if (saga.CorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
-                sqlVarientWriter.AddProperty(saga.CorrelationProperty);
+                sqlVariantWriter.AddProperty(saga.CorrelationProperty);
 
                 WriteComment(writer, $"VerifyColumnType {saga.CorrelationProperty.Type}");
-                sqlVarientWriter.VerifyColumnType(saga.CorrelationProperty);
+                sqlVariantWriter.VerifyColumnType(saga.CorrelationProperty);
 
                 WriteComment(writer, $"WriteCreateIndex {saga.CorrelationProperty.Name}");
-                sqlVarientWriter.WriteCreateIndex(saga.CorrelationProperty);
+                sqlVariantWriter.WriteCreateIndex(saga.CorrelationProperty);
             }
             if (saga.TransitionalCorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.TransitionalCorrelationProperty.Name}");
-                sqlVarientWriter.AddProperty(saga.TransitionalCorrelationProperty);
+                sqlVariantWriter.AddProperty(saga.TransitionalCorrelationProperty);
 
                 WriteComment(writer, $"VerifyColumnType {saga.TransitionalCorrelationProperty.Type}");
-                sqlVarientWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
+                sqlVariantWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
 
                 WriteComment(writer, $"CreateIndex {saga.TransitionalCorrelationProperty.Name}");
-                sqlVarientWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
+                sqlVariantWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
             }
             WriteComment(writer, "PurgeObsoleteIndex");
-            sqlVarientWriter.WritePurgeObsoleteIndex();
+            sqlVariantWriter.WritePurgeObsoleteIndex();
 
             WriteComment(writer, "PurgeObsoleteProperties");
-            sqlVarientWriter.WritePurgeObsoleteProperties();
+            sqlVariantWriter.WritePurgeObsoleteProperties();
         }
 
         static void WriteComment(TextWriter writer, string text)
@@ -73,38 +73,38 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 /* {text} */");
         }
 
-        static ISagaScriptWriter GetSqlVarientWriter(BuildSqlVarient sqlVarient, TextWriter textWriter, SagaDefinition saga)
+        static ISagaScriptWriter GetSqlVariantWriter(BuildSqlVariant sqlVariant, TextWriter textWriter, SagaDefinition saga)
         {
-            if (sqlVarient == BuildSqlVarient.MsSqlServer)
+            if (sqlVariant == BuildSqlVariant.MsSqlServer)
             {
                 return new MsSqlServerSagaScriptWriter(textWriter, saga);
             }
-            if (sqlVarient == BuildSqlVarient.MySql)
+            if (sqlVariant == BuildSqlVariant.MySql)
             {
                 return new MySqlSagaScriptWriter(textWriter, saga);
             }
 
-            throw new Exception($"Unknown SqlVarient {sqlVarient}.");
+            throw new Exception($"Unknown SqlVariant {sqlVariant}.");
         }
 
-        public static void BuildDropScript(SagaDefinition saga, BuildSqlVarient sqlVarient, TextWriter writer)
+        public static void BuildDropScript(SagaDefinition saga, BuildSqlVariant sqlVariant, TextWriter writer)
         {
-            var sqlVarientWriter = GetSqlVarientWriter(sqlVarient, writer, saga);
+            var sqlVariantWriter = GetSqlVariantWriter(sqlVariant, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
-            sqlVarientWriter.WriteTableNameVariable();
+            sqlVariantWriter.WriteTableNameVariable();
 
             WriteComment(writer, "DropTable");
-            sqlVarientWriter.WriteDropTable();
+            sqlVariantWriter.WriteDropTable();
         }
 
 
-        public static string BuildDropScript(SagaDefinition saga, BuildSqlVarient sqlVarient)
+        public static string BuildDropScript(SagaDefinition saga, BuildSqlVariant sqlVariant)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildDropScript(saga, sqlVarient, stringWriter);
+                BuildDropScript(saga, sqlVariant, stringWriter);
             }
             return stringBuilder.ToString();
         }

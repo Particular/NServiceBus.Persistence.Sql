@@ -7,7 +7,7 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerOutboxPersisterTests : OutboxPersisterTests
 {
-    public SqlServerOutboxPersisterTests() : base(BuildSqlVarient.MsSqlServer)
+    public SqlServerOutboxPersisterTests() : base(BuildSqlVariant.MsSqlServer)
     {
     }
 

@@ -5,17 +5,17 @@ using Mono.Cecil;
 
 namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
-    static class SqlVarientReader
+    static class SqlVariantReader
     {
-        public static IEnumerable<BuildSqlVarient> Read(ModuleDefinition moduleDefinition)
+        public static IEnumerable<BuildSqlVariant> Read(ModuleDefinition moduleDefinition)
         {
             var assemblyCustomAttributes = moduleDefinition.Assembly.CustomAttributes;
             var customAttribute = assemblyCustomAttributes
                 .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
             if (customAttribute == null)
             {
-                yield return BuildSqlVarient.MsSqlServer;
-                yield return BuildSqlVarient.MySql;
+                yield return BuildSqlVariant.MsSqlServer;
+                yield return BuildSqlVariant.MySql;
                 yield break;
             }
             var arguments = customAttribute.ConstructorArguments;
@@ -23,11 +23,11 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             var mySqlScripts = (bool)arguments[1].Value;
             if (msSqlServerScripts)
             {
-                yield return BuildSqlVarient.MsSqlServer;
+                yield return BuildSqlVariant.MsSqlServer;
             }
             if (mySqlScripts)
             {
-                yield return BuildSqlVarient.MySql;
+                yield return BuildSqlVariant.MySql;
             }
             if (!msSqlServerScripts && !mySqlScripts)
             {

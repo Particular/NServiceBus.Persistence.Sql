@@ -10,16 +10,16 @@ using ObjectApproval;
 public abstract class OutboxPersisterTests
 {
     OutboxPersister persister;
-    BuildSqlVarient sqlVarient;
+    BuildSqlVariant sqlVariant;
     Func<DbConnection> dbConnection;
 
     protected abstract Func<DbConnection> GetConnection();
 
-    public OutboxPersisterTests(BuildSqlVarient sqlVarient)
+    public OutboxPersisterTests(BuildSqlVariant sqlVariant)
     {
-        this.sqlVarient = sqlVarient;
+        this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
-        persister = new OutboxPersister(sqlVarient.Convert(),
+        persister = new OutboxPersister(sqlVariant.Convert(),
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(OutboxPersisterTests)}_");
     }
@@ -31,8 +31,8 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVarient), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests));
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVarient), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
         }
     }
 

@@ -9,7 +9,7 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
 {
     static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
 
-    public SqlServerSagaPersisterTests() : base(BuildSqlVarient.MsSqlServer)
+    public SqlServerSagaPersisterTests() : base(BuildSqlVariant.MsSqlServer)
     {
     }
 

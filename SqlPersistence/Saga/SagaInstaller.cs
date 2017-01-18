@@ -27,8 +27,8 @@ class SagaInstaller : INeedToInstallSomething
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
         var tablePrefix = settings.GetTablePrefix<StorageType.Sagas>();
 
-        var sqlVarient = settings.GetSqlVarient();
-        var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Sagas");
+        var sqlVariant = settings.GetSqlVariant();
+        var sagasDirectory = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVariant), "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
             log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");

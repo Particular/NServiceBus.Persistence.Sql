@@ -3,8 +3,8 @@ using Resourcer;
 
 static class ResourceReader
 {
-    public static string ReadResource(BuildSqlVarient sqlVarient, string prefix)
+    public static string ReadResource(BuildSqlVariant sqlVariant, string prefix)
     {
-        return Resource.AsStringUnChecked($"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlVarient}.sql");
+        return Resource.AsStringUnChecked($"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlVariant}.sql");
     }
 }

@@ -9,7 +9,7 @@ public class MySqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
 {
     static string connectionString = "server=localhost;user=root;database=sqlpersistencetests;port=3306;password=Password1;Allow User Variables=True";
 
-    public MySqlServerSubscriptionPersisterTests() : base(BuildSqlVarient.MySql)
+    public MySqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MySql)
     {
     }
 

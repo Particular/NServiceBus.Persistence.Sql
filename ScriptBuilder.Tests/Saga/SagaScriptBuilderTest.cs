@@ -9,9 +9,9 @@ using NUnit.Framework;
 public class SagaScriptBuilderTest
 {
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void CreateWithCorrelation(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void CreateWithCorrelation(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
             name: "theSaga",
@@ -26,24 +26,24 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVarient, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
         }
         var script = builder.ToString();
 
-        if (sqlVarient != BuildSqlVarient.MySql)
+        if (sqlVariant != BuildSqlVariant.MySql)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }
     }
 
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void CreateWithNoCorrelation(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void CreateWithNoCorrelation(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
             tableSuffix: "theSaga",
@@ -53,25 +53,25 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVarient, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
         }
         var script = builder.ToString();
 
-        if (sqlVarient != BuildSqlVarient.MySql)
+        if (sqlVariant != BuildSqlVariant.MySql)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }
     }
 
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void CreateWithCorrelationAndTransitional(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void CreateWithCorrelationAndTransitional(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
             tableSuffix: "theSaga",
@@ -91,25 +91,25 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVarient, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
         }
         var script = builder.ToString();
 
-        if (sqlVarient != BuildSqlVarient.MySql)
+        if (sqlVariant != BuildSqlVariant.MySql)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }
     }
 
     [Test]
-    [TestCase(BuildSqlVarient.MsSqlServer)]
-    [TestCase(BuildSqlVarient.MySql)]
-    public void BuildDropScript(BuildSqlVarient sqlVarient)
+    [TestCase(BuildSqlVariant.MsSqlServer)]
+    [TestCase(BuildSqlVariant.MySql)]
+    public void BuildDropScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -118,15 +118,15 @@ public class SagaScriptBuilderTest
                 tableSuffix: "theSaga",
                 name: "theSaga"
             );
-            SagaScriptBuilder.BuildDropScript(saga, sqlVarient, writer);
+            SagaScriptBuilder.BuildDropScript(saga, sqlVariant, writer);
         }
         var script = builder.ToString();
-        if (sqlVarient == BuildSqlVarient.MsSqlServer)
+        if (sqlVariant == BuildSqlVariant.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVarient))
+        using (ApprovalResults.ForScenario(sqlVariant))
         {
             Approvals.Verify(script);
         }

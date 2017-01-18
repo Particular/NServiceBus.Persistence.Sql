@@ -24,10 +24,10 @@ class OutboxInstaller : INeedToInstallSomething
         }
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
 
-        var sqlVarient = settings.GetSqlVarient();
+        var sqlVariant = settings.GetSqlVariant();
         var tablePrefix = settings.GetTablePrefix<StorageType.Outbox>();
 
-        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVarient), "Outbox_Create.sql");
+        var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVariant), "Outbox_Create.sql");
         log.Info($"Executing '{createScript}'");
         using (var connection = connectionBuilder())
         {

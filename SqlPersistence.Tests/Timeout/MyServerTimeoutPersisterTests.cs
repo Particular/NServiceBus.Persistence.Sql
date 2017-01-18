@@ -9,7 +9,7 @@ public class MyServerTimeoutPersisterTests : TimeoutPersisterTests
 {
     static string connectionString = "server=localhost;user=root;database=sqlpersistencetests;port=3306;password=Password1;Allow User Variables=True";
 
-    public MyServerTimeoutPersisterTests() : base(BuildSqlVarient.MySql)
+    public MyServerTimeoutPersisterTests() : base(BuildSqlVariant.MySql)
     {
     }
 

@@ -12,7 +12,7 @@ public class SqlTransportIntegrationTests:IDisposable
 {
     string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
-    BuildSqlVarient sqlVarient = BuildSqlVarient.MsSqlServer;
+    BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 
@@ -35,14 +35,14 @@ public class SqlTransportIntegrationTests:IDisposable
     public void Setup()
     {
         SqlQueueDeletion.DeleteQueuesForEndpoint(dbConnection, "dbo", nameof(SqlTransportIntegrationTests));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(SqlTransportIntegrationTests));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVarient), nameof(SqlTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
     }
     [TearDown]
     public void TearDown()
     {
         SqlQueueDeletion.DeleteQueuesForEndpoint(dbConnection, "dbo", nameof(SqlTransportIntegrationTests));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVarient), nameof(SqlTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
     }
 
     [Test]

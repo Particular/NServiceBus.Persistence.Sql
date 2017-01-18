@@ -3,7 +3,7 @@
     public static class OutboxCommandBuilder
     {
 
-        public static OutboxCommands Build(SqlVarient sqlVarient, string tablePrefix)
+        public static OutboxCommands Build(SqlVariant sqlVariant, string tablePrefix)
         {
             var tableName = $@"{tablePrefix}OutboxData";
             string storeCommandText = $@"
