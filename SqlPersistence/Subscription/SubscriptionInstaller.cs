@@ -27,6 +27,7 @@ class SubscriptionInstaller : INeedToInstallSomething
 
         var tablePrefix = settings.GetTablePrefix<StorageType.Subscriptions>();
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVariant), "Subscription_Create.sql");
+        ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
         using (var connection = connectionBuilder())
         {

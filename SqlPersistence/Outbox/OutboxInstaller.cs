@@ -28,6 +28,7 @@ class OutboxInstaller : INeedToInstallSomething
         var tablePrefix = settings.GetTablePrefix<StorageType.Outbox>();
 
         var createScript = Path.Combine(ScriptLocation.FindScriptDirectory(sqlVariant), "Outbox_Create.sql");
+        ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
         using (var connection = connectionBuilder())
         {
