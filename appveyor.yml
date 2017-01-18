@@ -1,6 +1,6 @@
 version: 1.0.{build}
 environment:
-- NH_ACC_TEST_CONNSTR: 'Server=(local)\SQL2012SP1;Database=master;User ID=sa;Password=Password12!'
+  NH_ACC_TEST_CONNSTR: 'Server=(local)\SQL2012SP1;Database=master;User ID=sa;Password=Password12!'
 services:
 - mssql2012sp1
 - mysql
