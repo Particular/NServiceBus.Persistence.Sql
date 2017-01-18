@@ -9,7 +9,7 @@ before_build:
 - ps: nuget restore
 build_script:
 - msbuild /v:m NSBSqlPersistence.sln
-- ls -Recurse ForIntegration
+- ps: ls -Recurse ForIntegration
 - msbuild /v:m Integration\Integration.sln
 test:
   assemblies:
