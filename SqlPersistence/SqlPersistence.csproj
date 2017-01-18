@@ -76,7 +76,7 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
-    <Compile Include="Config\SqlVarient.cs" />
+    <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
     <Compile Include="Subscription\SubscriptionCommands.cs" />
@@ -90,7 +90,7 @@
     <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
     <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
-    <Compile Include="Config\SqlVarientConfig.cs" />
+    <Compile Include="Config\SqlVariantConfig.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />

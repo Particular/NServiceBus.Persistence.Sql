@@ -109,7 +109,7 @@
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
-    <Compile Include="SqlVarientConverter.cs" />
+    <Compile Include="SqlVariantConverter.cs" />
     <Compile Include="DataEx.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
