@@ -7,6 +7,7 @@ services:
 - msmq
 before_build:
 - ps: nuget restore
+- ps: nuget restore Integration\Integration.sln
 build_script:
 - msbuild /v:m NSBSqlPersistence.sln
 - ps: ls -Recurse ForIntegration
