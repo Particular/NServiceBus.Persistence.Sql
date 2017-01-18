@@ -62,7 +62,7 @@
       <Link>Guard.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="BuildSqlVarient.cs" />
+    <Compile Include="BuildSqlVariant.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
     <Compile Include="ResourceReader.cs" />
@@ -78,7 +78,7 @@
     <Compile Include="Saga\SagaDefinitionValidator.cs" />
     <Compile Include="Saga\Writers\MsSqlServerSagaScriptWriter.cs" />
     <Compile Include="Saga\SagaScriptBuilder.cs" />
-    <Compile Include="SqlVarientReader.cs" />
+    <Compile Include="SqlVariantReader.cs" />
     <Compile Include="Subscription\SubscriptionScriptBuilder.cs" />
     <Compile Include="Outbox\OutboxScriptBuilder.cs" />
     <Compile Include="Timeout\TimeoutScriptBuilder.cs" />
