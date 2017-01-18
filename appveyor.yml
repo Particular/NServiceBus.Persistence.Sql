@@ -14,6 +14,6 @@ build_script:
 - msbuild /v:m Integration\Integration.sln
 test:
   assemblies:
-    - Integration\AcceptanceTests\bin\$(configuration)\XmlPersistence.AcceptanceTests.dll
+    - 'Integration\AcceptanceTests\bin\Debug\XmlPersistence.AcceptanceTests.dll'
 artifacts:
 - path: NuGetBuild\**\*.nupkg
