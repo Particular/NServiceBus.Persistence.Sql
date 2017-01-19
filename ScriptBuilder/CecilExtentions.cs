@@ -2,7 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 
-public static class CecilExtentions
+static class CecilExtentions
 {
 
     public static CustomAttribute GetSingleAttribute(this TypeDefinition type, string attributeName)

@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using Mono.Cecil;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using ObjectApproval;
 
