@@ -4,9 +4,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class MySqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
+public class MySqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
-    public MySqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MySql)
+    public MySqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MySql)
     {
     }
 

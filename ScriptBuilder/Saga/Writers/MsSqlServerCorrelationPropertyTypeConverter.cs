@@ -5,7 +5,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     /// <summary>
     /// Not for public use.
     /// </summary>
-    public class MsSqlServerCorrelationPropertyTypeConverter
+    public static class MsSqlServerCorrelationPropertyTypeConverter
     {
         public static string GetColumnType(CorrelationPropertyType propertyType)
         {
