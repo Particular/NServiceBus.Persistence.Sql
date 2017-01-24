@@ -1,0 +1,18 @@
+﻿{
+  "dependencies": {
+    "ApprovalTests": "3.*",
+    "ApprovalUtilities": "3.*",
+    "Microsoft.SqlServer.TransactSql.ScriptDom": "13.*",
+    "Mono.Cecil": "0.9.*",
+    "Newtonsoft.Json": "9.*",
+    "NServiceBus": "6.*",
+    "NUnit": "3.*",
+    "ObjectApproval": "1.*"
+  },
+  "frameworks": {
+    "net452": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

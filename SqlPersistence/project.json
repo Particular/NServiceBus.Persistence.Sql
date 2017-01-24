@@ -1,0 +1,16 @@
+﻿{
+  "dependencies": {
+    "ConfigureAwait.Fody": "1.*",
+    "Fielder.Fody": "1.*",
+    "Fody": "1.*",
+    "Janitor.Fody": "1.*",
+    "Newtonsoft.Json": "9.*",
+    "NServiceBus": "6.*"
+  },
+  "frameworks": {
+    "net452": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

@@ -1,0 +1,14 @@
+﻿{
+  "dependencies": {
+    "Fielder.Fody": "1.*",
+    "Fody": "1.*",
+    "Mono.Cecil": "0.9.*",
+    "Virtuosity.Fody": "1.*"
+  },
+  "frameworks": {
+    "net452": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}
