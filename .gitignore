@@ -11,6 +11,7 @@ _ReSharper.*
 _UpgradeReport.*
 *.csproj.user
 *.resharper.user
+*.lock.json
 *.resharper
 *.suo
 *.cache
