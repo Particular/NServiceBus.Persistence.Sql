@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
+    <Compile Include="MySqlConnectionBuilder.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
     <Compile Include="SqlVariantConverter.cs" />
@@ -133,7 +134,7 @@
     <Compile Include="TaskEx.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
-    <Compile Include="Timeout\MyServerTimeoutPersisterTests.cs" />
+    <Compile Include="Timeout\MySqlServerTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\SqlServerTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\TimeoutPersisterTests.cs" />
   </ItemGroup>
