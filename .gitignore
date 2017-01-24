@@ -12,6 +12,7 @@ _UpgradeReport.*
 *.csproj.user
 *.resharper.user
 *.lock.json
+*.nuget.targets
 *.resharper
 *.suo
 *.cache
