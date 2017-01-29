@@ -13,14 +13,12 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             {
                 case CorrelationPropertyType.DateTime:
                     return "datetime";
-                case CorrelationPropertyType.DateTimeOffset:
-                    throw new Exception("DateTimeOffset is not supported by MySql.");
                 case CorrelationPropertyType.String:
-                    return "varchar(450)";
+                    return "varchar(200) character set utf8mb4";
                 case CorrelationPropertyType.Int:
                     return "bigint(20)";
                 case CorrelationPropertyType.Guid:
-                    return "varchar(38)";
+                    return "varchar(38) character set ascii";
             }
             throw new Exception($"Could not convert {propertyType}.");
         }

@@ -16,15 +16,15 @@ class MySqlSagaScriptWriter : ISagaScriptWriter
     public void Initialise()
     {
         writer.WriteLine(@"
-DROP PROCEDURE IF EXISTS sqlpersistence_raiseerror;
-CREATE PROCEDURE sqlpersistence_raiseerror(message VARCHAR(256))
-BEGIN
-SIGNAL SQLSTATE
+drop procedure if exists sqlpersistence_raiseerror;
+create procedure sqlpersistence_raiseerror(message varchar(256))
+begin
+signal sqlstate
     'ERROR'
-SET
-    MESSAGE_TEXT = message,
-    MYSQL_ERRNO = '45000';
-END;");
+set
+    message_text = message,
+    mysql_errno = '45000';
+end;");
     }
 
     public void WriteTableNameVariable()
@@ -62,7 +62,7 @@ deallocate prepare script;
         var name = correlationProperty.Name;
         writer.Write($@"
 set @column_type_{name} = (
-  select column_type
+  select concat(column_type,' character set ', character_set_name)
   from information_schema.columns
   where
     table_schema = database() and
@@ -186,7 +186,7 @@ set @createTable = concat('
         SagaTypeVersion varchar(23) not null,
         Concurrency int not null,
         primary key (Id)
-    ) default charset=utf8;
+    ) default charset=ascii;
 ');
 prepare script from @createTable;
 execute script;

@@ -11,7 +11,7 @@ declare @createTable nvarchar(max);
 set @createTable = '
     create table ' + @tableName + '(
         Id uniqueidentifier not null primary key,
-        Destination nvarchar(1024),
+        Destination nvarchar(200),
         SagaId uniqueidentifier,
         State varbinary(max),
         Time datetime,

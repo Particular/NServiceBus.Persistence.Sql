@@ -16,7 +16,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
                 case CorrelationPropertyType.DateTimeOffset:
                     return "datetimeoffset";
                 case CorrelationPropertyType.String:
-                    return "nvarchar(450)";
+                    return "nvarchar(200)";
                 case CorrelationPropertyType.Int:
                     return "bigint";
                 case CorrelationPropertyType.Guid:
