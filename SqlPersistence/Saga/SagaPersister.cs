@@ -36,7 +36,7 @@ class SagaPersister : ISagaPersister
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
-            var metadata = new Dictionary<string,string>();
+            var metadata = new Dictionary<string, string>();
             if (sagaData.OriginalMessageId != null)
             {
                 metadata.Add("OriginalMessageId", sagaData.OriginalMessageId);
@@ -68,7 +68,7 @@ class SagaPersister : ISagaPersister
         var transitionalId = sagaInfo.TransitionalAccessor(sagaData);
         if (transitionalId == null)
         {
-            //TODO:  validate non default for value types
+            //TODO: validate non default for value types
             throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaDataType: {sagaData.GetType().FullName}.");
         }
         command.AddParameter("TransitionalCorrelationId", transitionalId);
@@ -157,7 +157,7 @@ class SagaPersister : ISagaPersister
         return concurrency;
     }
 
-    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType) 
+    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
@@ -193,21 +193,22 @@ class SagaPersister : ISagaPersister
             {
                 return default(Concurrency<TSagaData>);
             }
-            var id = await dataReader.GetFieldValueAsync<Guid>(0);
+
+            //TODO: MySql does not work for dataReader.GetFieldValueAsync<Guid>(0)
+            var id = dataReader.GetGuid(0);
+            var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
+            var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
+            var concurrency = await dataReader.GetFieldValueAsync<int>(2);
             string originator;
             string originalMessageId;
-            using (var stream = dataReader.GetStream(1))
+            using (var textReader = dataReader.GetTextReader(3))
             {
-                var metadata = Serializer.Deserialize<Dictionary<string,string>>(stream);
+                var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
                 metadata.TryGetValue("Originator", out originator);
                 metadata.TryGetValue("OriginalMessageId", out originalMessageId);
             }
-            using (var textReader = dataReader.GetStream(2))
+            using (var textReader = dataReader.GetTextReader(4))
             {
-                var input = await dataReader.GetFieldValueAsync<string>(3);
-                var sagaTypeVersion = Version.Parse(input);
-                var concurrency = await dataReader.GetFieldValueAsync<int>(4);
-
                 var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;

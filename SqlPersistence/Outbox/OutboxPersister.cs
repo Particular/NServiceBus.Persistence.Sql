@@ -22,7 +22,6 @@ class OutboxPersister : IOutboxStorage
         string tablePrefix)
     {
         this.connectionBuilder = connectionBuilder;
-
         outboxCommands = OutboxCommandBuilder.Build(sqlVariant, tablePrefix);
     }
 
@@ -73,7 +72,7 @@ class OutboxPersister : IOutboxStorage
                             return null;
                         }
                         var dispatched = await dataReader.GetFieldValueAsync<bool>(0);
-                        using (var stream = dataReader.GetStream(1))
+                        using (var textReader = dataReader.GetTextReader(1))
                         {
                             if (dispatched)
                             {
@@ -81,7 +80,7 @@ class OutboxPersister : IOutboxStorage
                             }
                             else
                             {
-                                var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(stream)
+                                var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
                                     .FromSerializable()
                                     .ToArray();
                                 result = new OutboxMessage(messageId, transportOperations);

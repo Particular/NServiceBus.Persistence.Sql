@@ -75,10 +75,10 @@ where
             return $@"
 select
     Id,
-    Metadata,
-    Data,
     SagaTypeVersion,
-    Concurrency
+    Concurrency,
+    Metadata,
+    Data
 from {tablePrefix}{tableSuffx}
 where Id = @Id
 ";
@@ -89,10 +89,10 @@ where Id = @Id
             return $@"
 select
     Id,
-    Metadata,
-    Data,
     SagaTypeVersion,
-    Concurrency
+    Concurrency,
+    Metadata,
+    Data
 from {tablePrefix}{tableSuffx}
 where Correlation_{propertyName} = @propertyValue
 ";
