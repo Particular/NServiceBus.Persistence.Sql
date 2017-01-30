@@ -97,10 +97,11 @@ class RuntimeSagaInfo
     }
 
 
-    public TSagaData FromString<TSagaData>(TextReader reader, Version storedSagaTypeVersion)
+    public TSagaData FromString<TSagaData>(Stream stream, Version storedSagaTypeVersion)
         where TSagaData : IContainSagaData
     {
         var serializer = GetDeserialize(storedSagaTypeVersion);
+        using(var reader = new StreamReader(stream))
         using (var jsonReader = readerCreator(reader))
         {
             return serializer.Deserialize<TSagaData>(jsonReader);

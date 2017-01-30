@@ -65,22 +65,23 @@ class OutboxPersister : IOutboxStorage
                     command.CommandText = outboxCommands.Get;
                     command.Transaction = transaction;
                     command.AddParameter("MessageId", messageId);
-                    using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+                    // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
+                    using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
                     {
                         if (!await dataReader.ReadAsync())
                         {
                             return null;
                         }
-                        var dispatched = dataReader.GetBoolean(0);
-                        if (dispatched)
+                        var dispatched = await dataReader.GetFieldValueAsync<bool>(0);
+                        using (var stream = dataReader.GetStream(1))
                         {
-                            result = new OutboxMessage(messageId, new TransportOperation[0]);
-                        }
-                        else
-                        {
-                            using (var textReader = dataReader.GetTextReader(1))
+                            if (dispatched)
                             {
-                                var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
+                                result = new OutboxMessage(messageId, new TransportOperation[0]);
+                            }
+                            else
+                            {
+                                var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(stream)
                                     .FromSerializable()
                                     .ToArray();
                                 result = new OutboxMessage(messageId, transportOperations);
