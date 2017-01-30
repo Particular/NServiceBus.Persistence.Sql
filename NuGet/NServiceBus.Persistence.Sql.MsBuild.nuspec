@@ -8,7 +8,7 @@
     <owners>Simon Cropp, Szymon Pobiega</owners>
     <developmentDependency>true</developmentDependency>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
-    <projectUrl>https://github.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/NsbSqlPersistence/</projectUrl>
+    <projectUrl>https://github.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <iconUrl>https://raw.githubusercontent.com/NServiceBusSqlPersistence/NServiceBus.SqlPersistence/master/Icons/package_icon.png</iconUrl>
     <description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package.</description>
