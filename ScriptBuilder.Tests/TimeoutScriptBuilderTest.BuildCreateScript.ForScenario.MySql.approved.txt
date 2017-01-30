@@ -2,14 +2,14 @@
 set @createTable = concat('
     create table if not exists ', @tableName, '(
         Id varchar(38) not null,
-        Destination varchar(1024),
+        Destination nvarchar(200),
         SagaId varchar(38),
         State longblob,
         Time datetime,
         Headers json not null,
         PersistenceVersion varchar(23) not null,
         primary key (Id)
-    ) default charset=utf8;
+    ) default charset=ascii;
 ');
 prepare script from @createTable;
 execute script;

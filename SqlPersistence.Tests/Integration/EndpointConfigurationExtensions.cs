@@ -5,10 +5,10 @@ using NServiceBus;
 
 static class EndpointConfigurationExtensions
 {
-    public static void SetTypesToScan(this EndpointConfiguration busConfiguration, IEnumerable<Type> typesToScan)
+    public static void SetTypesToScan(this EndpointConfiguration endpointConfiguration, IEnumerable<Type> typesToScan)
     {
         var methodInfo = typeof(EndpointConfiguration).GetMethod("TypesToScanInternal", BindingFlags.NonPublic | BindingFlags.Instance);
-        methodInfo.Invoke(busConfiguration, new object[]
+        methodInfo.Invoke(endpointConfiguration, new object[]
         {
             typesToScan
         });

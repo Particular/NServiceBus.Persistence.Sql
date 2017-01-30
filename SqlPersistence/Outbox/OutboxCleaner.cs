@@ -16,7 +16,7 @@ class OutboxCleaner : FeatureStartupTask
         this.outboxPersister = outboxPersister;
     }
 
-    protected override async Task OnStart(IMessageSession busSession)
+    protected override async Task OnStart(IMessageSession session)
     {
         await Task.Delay(TimeSpan.FromMinutes(1));
         while (true)
@@ -31,7 +31,7 @@ class OutboxCleaner : FeatureStartupTask
         }
     }
 
-    protected override Task OnStop(IMessageSession busSession)
+    protected override Task OnStop(IMessageSession session)
     {
         cancellationTokenSource.Cancel();
         return Task.FromResult(true);

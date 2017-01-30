@@ -43,7 +43,7 @@ begin
   declare @createColumn_CorrelationProperty nvarchar(max);
   set @createColumn_CorrelationProperty = '
   alter table ' + @tableName + N'
-    add Correlation_CorrelationProperty nvarchar(450);';
+    add Correlation_CorrelationProperty nvarchar(200);';
   exec(@createColumn_CorrelationProperty);
 end
 
@@ -57,9 +57,9 @@ set @dataType_CorrelationProperty = (
     table_name = ' + @tableName + N' and
     column_name = 'Correlation_CorrelationProperty'
 );
-if (@dataType_CorrelationProperty <> 'nvarchar(450)')
+if (@dataType_CorrelationProperty <> 'nvarchar(200)')
   begin
-    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar(450) got ' + @dataType_CorrelationProperty + '.';
+    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar(200) got ' + @dataType_CorrelationProperty + '.';
     throw 50000, @error_CorrelationProperty, 0
   end
 
@@ -95,7 +95,7 @@ begin
   declare @createColumn_TransitionalProperty nvarchar(max);
   set @createColumn_TransitionalProperty = '
   alter table ' + @tableName + N'
-    add Correlation_TransitionalProperty nvarchar(450);';
+    add Correlation_TransitionalProperty nvarchar(200);';
   exec(@createColumn_TransitionalProperty);
 end
 
@@ -109,9 +109,9 @@ set @dataType_TransitionalProperty = (
     table_name = ' + @tableName + N' and
     column_name = 'Correlation_TransitionalProperty'
 );
-if (@dataType_TransitionalProperty <> 'nvarchar(450)')
+if (@dataType_TransitionalProperty <> 'nvarchar(200)')
   begin
-    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar(450) got ' + @dataType_TransitionalProperty + '.';
+    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar(200) got ' + @dataType_TransitionalProperty + '.';
     throw 50000, @error_TransitionalProperty, 0
   end
 
