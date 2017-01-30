@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
+using System.IO;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
@@ -29,21 +31,27 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             {
                 command.CommandText = timeoutCommands.Peek;
                 command.AddParameter("Id", timeoutId);
-                using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+                // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
+                using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
                 {
                     if (!await reader.ReadAsync())
                     {
                         return null;
                     }
 
+                    var destination = await reader.GetFieldValueAsync<string>(0);
+                    var sagaId = await reader.GetFieldValueAsync<Guid>(1);
+                    var value = await GetBody(reader, 2);
+                    var dateTime = await reader.GetFieldValueAsync<DateTime>(3);
                     var headers = ReadHeaders(reader);
+
                     return new TimeoutData
                     {
                         Id = timeoutId,
-                        Destination = reader.GetString(0),
-                        SagaId = reader.GetGuid(1),
-                        State = (byte[]) reader.GetValue(2),
-                        Time = reader.GetDateTime(3),
+                        Destination = destination,
+                        SagaId = sagaId,
+                        State = value,
+                        Time = dateTime,
                         Headers = headers,
                     };
                 }
@@ -51,11 +59,22 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         }
     }
 
-    Dictionary<string, string> ReadHeaders(DbDataReader reader)
+    static async Task<byte[]> GetBody(DbDataReader dataReader, int bodyIndex)
     {
-        using (var textReader = reader.GetTextReader(4))
+        // Null values will be returned as an empty (zero bytes) Stream.
+        using (var outStream = new MemoryStream())
+        using (var stream = dataReader.GetStream(bodyIndex))
         {
-            return Serializer.Deserialize<Dictionary<string, string>>(textReader);
+            await stream.CopyToAsync(outStream).ConfigureAwait(false);
+            return outStream.ToArray();
+        }
+    }
+
+    static Dictionary<string, string> ReadHeaders(DbDataReader reader)
+    {
+        using (var stream = reader.GetStream(4))
+        {
+            return Serializer.Deserialize<Dictionary<string, string>>(stream);
         }
     }
 

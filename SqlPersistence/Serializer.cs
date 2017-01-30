@@ -17,9 +17,10 @@ static class Serializer
         JsonSerializer = JsonSerializer.Create(settings);
     }
 
-    public static T Deserialize<T>(TextReader textReader)
+    public static T Deserialize<T>(Stream stream)
     {
-        using (var jsonReader = new JsonTextReader(textReader))
+        using(var reader = new StreamReader(stream))
+        using (var jsonReader = new JsonTextReader(reader))
         {
             return JsonSerializer.Deserialize<T>(jsonReader);
         }

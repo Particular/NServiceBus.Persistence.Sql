@@ -186,25 +186,28 @@ class SagaPersister : ISagaPersister
     static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
     {
-        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow))
+        // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
+        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
         {
             if (!await dataReader.ReadAsync())
             {
                 return default(Concurrency<TSagaData>);
             }
-            var id = dataReader.GetGuid(0);
+            var id = await dataReader.GetFieldValueAsync<Guid>(0);
             string originator;
             string originalMessageId;
-            using (var textReader = dataReader.GetTextReader(1))
+            using (var stream = dataReader.GetStream(1))
             {
-                var metadata = Serializer.Deserialize<Dictionary<string,string>>(textReader);
+                var metadata = Serializer.Deserialize<Dictionary<string,string>>(stream);
                 metadata.TryGetValue("Originator", out originator);
                 metadata.TryGetValue("OriginalMessageId", out originalMessageId);
             }
-            var sagaTypeVersion = Version.Parse(dataReader.GetString(3));
-            var concurrency = dataReader.GetInt32(4);
-            using (var textReader = dataReader.GetTextReader(2))
+            using (var textReader = dataReader.GetStream(2))
             {
+                var input = await dataReader.GetFieldValueAsync<string>(3);
+                var sagaTypeVersion = Version.Parse(input);
+                var concurrency = await dataReader.GetFieldValueAsync<int>(4);
+
                 var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                 sagaData.Id = id;
                 sagaData.Originator = originator;
