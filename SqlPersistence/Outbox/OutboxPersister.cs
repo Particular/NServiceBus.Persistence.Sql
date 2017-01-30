@@ -71,7 +71,7 @@ class OutboxPersister : IOutboxStorage
                         {
                             return null;
                         }
-                        var dispatched = await dataReader.GetFieldValueAsync<bool>(0);
+                        var dispatched = await dataReader.GetBoolAsync(0);
                         using (var textReader = dataReader.GetTextReader(1))
                         {
                             if (dispatched)

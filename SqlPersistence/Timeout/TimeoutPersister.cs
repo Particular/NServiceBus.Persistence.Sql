@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.IO;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
@@ -39,8 +38,8 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                     }
 
                     var destination = await reader.GetFieldValueAsync<string>(0);
-                    var sagaId = await reader.GetFieldValueAsync<Guid>(1);
-                    var value = await GetBody(reader, 2);
+                    var sagaId = await reader.GetGuidAsync(1);
+                    var value = await reader.GetFieldValueAsync<byte[]>(2);
                     var dateTime = await reader.GetFieldValueAsync<DateTime>(3);
                     var headers = ReadHeaders(reader);
 
@@ -55,17 +54,6 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                     };
                 }
             }
-        }
-    }
-
-    static async Task<byte[]> GetBody(DbDataReader dataReader, int bodyIndex)
-    {
-        // Null values will be returned as an empty (zero bytes) Stream.
-        using (var outStream = new MemoryStream())
-        using (var stream = dataReader.GetStream(bodyIndex))
-        {
-            await stream.CopyToAsync(outStream).ConfigureAwait(false);
-            return outStream.ToArray();
         }
     }
 

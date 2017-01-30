@@ -194,8 +194,7 @@ class SagaPersister : ISagaPersister
                 return default(Concurrency<TSagaData>);
             }
 
-            //TODO: MySql does not work for dataReader.GetFieldValueAsync<Guid>(0)
-            var id = dataReader.GetGuid(0);
+            var id = await dataReader.GetGuidAsync(0);
             var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
             var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
             var concurrency = await dataReader.GetFieldValueAsync<int>(2);

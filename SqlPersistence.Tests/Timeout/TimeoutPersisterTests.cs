@@ -5,7 +5,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
 using ObjectApproval;
-
+[TestFixture]
 public abstract class TimeoutPersisterTests
 {
     TimeoutPersister persister;

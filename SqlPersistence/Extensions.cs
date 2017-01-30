@@ -19,6 +19,28 @@ static class Extensions
         command.AddParameter(name, value.ToString());
     }
 
+    public static async Task<bool> GetBoolAsync(this DbDataReader reader, int position)
+    {
+        var type = reader.GetFieldType(position);
+        // MySql stores bools as ints
+        if (type == typeof(ulong))
+        {
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position));
+        }
+        return await reader.GetFieldValueAsync<bool>(position);
+    }
+
+    public static async Task<Guid> GetGuidAsync(this DbDataReader reader, int position)
+    {
+        var type = reader.GetFieldType(position);
+        // MySql stores Guids as strings
+        if (type == typeof(string))
+        {
+            return new Guid(await reader.GetFieldValueAsync<string>(position));
+        }
+        return await reader.GetFieldValueAsync<Guid>(position);
+    }
+
     internal static Func<T, object> GetPropertyAccessor<T>(this Type sagaDataType, string propertyName)
     {
         var propertyInfo = sagaDataType.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
