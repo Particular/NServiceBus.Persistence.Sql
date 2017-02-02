@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NServiceBus.Persistence.Sql.MsBuild</id>
-    <version>$version$-rc0003</version>
+    <version>$version$</version>
     <title>NServiceBus.Persistence.Sql.MsBuild</title>
     <authors>Simon Cropp, Szymon Pobiega</authors>
     <owners>Simon Cropp, Szymon Pobiega</owners>
@@ -15,7 +15,7 @@
     <language>en-AU</language>
     <tags>NServiceBus, Sql</tags>
     <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql" version="[1.0-rc, 2.0)"/>
+      <dependency id="NServiceBus.Persistence.Sql" version="[1.0, 2.0)"/>
     </dependencies>
   </metadata>
 </package>
