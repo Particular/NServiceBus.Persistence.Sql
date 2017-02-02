@@ -1,7 +1,6 @@
 using System;
 using System.Data.Common;
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
@@ -16,22 +15,14 @@ namespace NServiceBus
                 .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }
 
-        public static void ConnectionBuilder<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, Func<DbConnection> connectionBuilder)
-            where TStorageType : StorageType
+        internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings)
         {
-            var key = $"SqlPersistence.{typeof(TStorageType).Name}.ConnectionBuilder";
-            configuration.GetSettings()
-                .Set(key, connectionBuilder);
-        }
-
-        internal static Func<DbConnection> GetConnectionBuilder<TStorageType>(this ReadOnlySettings settings)
-            where TStorageType : StorageType
-        {
-            return settings.GetValue<Func<DbConnection>, TStorageType>("ConnectionBuilder",
-                defaultValue: () =>
-                {
-                    throw new Exception("ConnectionBuilder must be defined.");
-                });
+            Func<DbConnection> value;
+            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out value))
+            {
+                return value;
+            }
+            throw new Exception("ConnectionBuilder must be defined.");
         }
 
     }

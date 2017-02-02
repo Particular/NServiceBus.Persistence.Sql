@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NServiceBus.Persistence.Sql.ScriptBuilder</id>
-    <version>$version$-rc0002</version>
+    <version>$version$-rc0003</version>
     <title>NServiceBus.Persistence.Sql.ScriptBuilder</title>
     <authors>Simon Cropp, Szymon Pobiega</authors>
     <owners>Simon Cropp, Szymon Pobiega</owners>

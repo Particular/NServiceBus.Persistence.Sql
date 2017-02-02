@@ -1,5 +1,4 @@
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
@@ -14,25 +13,16 @@ namespace NServiceBus
                 .Set("SqlPersistence.TablePrefix", tablePrefix);
         }
 
-        public static void TablePrefix<TStorageType>(this PersistenceExtensions<SqlPersistence, TStorageType> configuration, string tablePrefix)
-            where TStorageType : StorageType
+        internal static string GetTablePrefix(this ReadOnlySettings settings)
         {
-            var key = $"SqlPersistence.{typeof(TStorageType).Name}.TablePrefix";
-            configuration.GetSettings()
-                .Set(key, tablePrefix);
-        }
-
-       
-        internal static string GetTablePrefix<T>(this ReadOnlySettings settings) where T : StorageType
-        {
-            var value = settings.GetValue<string, T>("TablePrefix", () => null);
-            if (value == null)
+            string tablePrefix;
+            if (settings.TryGet("SqlPersistence.TablePrefix", out tablePrefix))
             {
-                var endpointName = settings.EndpointName();
-                var clean = TableNameCleaner.Clean(endpointName);
-                return $"{clean}_";
+                return tablePrefix;
             }
-            return value;
+            var endpointName = settings.EndpointName();
+            var clean = TableNameCleaner.Clean(endpointName);
+            return $"{clean}_";
         }
 
     }
