@@ -1,9 +1,9 @@
 ﻿{
   "dependencies": {
-    "Fielder.Fody": "1.*",
-    "Fody": "1.*",
-    "Mono.Cecil": "0.9.*",
-    "Virtuosity.Fody": "1.*"
+    "Fielder.Fody": "1.0.12",
+    "Fody": "1.29.4",
+    "Mono.Cecil": "0.9.6.4",
+    "Virtuosity.Fody": "1.19.12"
   },
   "frameworks": {
     "net452": {}
