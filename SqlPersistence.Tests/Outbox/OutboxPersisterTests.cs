@@ -77,14 +77,11 @@ public abstract class OutboxPersisterTests
         };
         var messageId = "a";
 
-        using (var connection = dbConnection())
+        using (var connection = await dbConnection.OpenConnection())
+        using (var transaction = connection.BeginTransaction())
         {
-            await connection.OpenAsync();
-            using (var transaction = connection.BeginTransaction())
-            {
-                await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
-                transaction.Commit();
-            }
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
+            transaction.Commit();
         }
         await persister.SetAsDispatched(messageId, null);
         return await persister.Get(messageId, null);
@@ -120,14 +117,11 @@ public abstract class OutboxPersisterTests
         };
 
         var messageId = "a";
-        using (var connection = dbConnection())
+        using (var connection = await dbConnection.OpenConnection())
+        using (var transaction = connection.BeginTransaction())
         {
-            await connection.OpenAsync();
-            using (var transaction = connection.BeginTransaction())
-            {
-                await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
-                transaction.Commit();
-            }
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            transaction.Commit();
         }
         return await persister.Get(messageId, null);
     }

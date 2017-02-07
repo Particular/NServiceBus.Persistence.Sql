@@ -26,18 +26,15 @@ class Installer : INeedToInstallSomething
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlVariant);
         var tablePrefix = settings.GetTablePrefix();
 
-        using (var connection = connectionBuilder())
+        using (var connection = await connectionBuilder.OpenConnection())
+        using (var transaction = connection.BeginTransaction())
         {
-            await connection.OpenAsync();
-            using (var transaction = connection.BeginTransaction())
-            {
-                await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix);
-                await InstallSagas(scriptDirectory, connection, transaction, tablePrefix);
-                await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix);
-                await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix);
+            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix);
+            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix);
+            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix);
+            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix);
 
-                transaction.Commit();
-            }
+            transaction.Commit();
         }
     }
 

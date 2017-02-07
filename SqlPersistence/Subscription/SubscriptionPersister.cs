@@ -15,7 +15,7 @@ class SubscriptionPersister : ISubscriptionStorage
     SqlVariant sqlVariant;
     SubscriptionCommands subscriptionCommands;
 
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder,string tablePrefix, SqlVariant sqlVariant)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant)
     {
         this.connectionBuilder = connectionBuilder;
         this.tablePrefix = tablePrefix;
@@ -27,9 +27,8 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = connectionBuilder())
+        using (var connection = await connectionBuilder.OpenConnection())
         {
-            await connection.OpenAsync();
             await Subscribe(subscriber, connection, messageType);
         }
     }
@@ -50,9 +49,8 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = connectionBuilder())
+        using (var connection = await connectionBuilder.OpenConnection())
         {
-            await connection.OpenAsync();
             await Unsubscribe(subscriber, connection, messageType);
         }
     }
@@ -73,39 +71,35 @@ class SubscriptionPersister : ISubscriptionStorage
         var types = messageTypes.ToList();
 
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(types);
-        using (var connection = connectionBuilder())
+        using (var connection = await connectionBuilder.OpenConnection())
+        using (var command = connection.CreateCommand())
         {
-            await connection.OpenAsync();
-            using (var command = connection.CreateCommand())
+            for (var i = 0; i < types.Count; i++)
             {
-                for (var i = 0; i < types.Count; i++)
+                var messageType = types[i];
+                var paramName = $"@type{i}";
+                command.AddParameter(paramName, messageType.TypeName);
+            }
+            command.CommandText = getSubscribersCommand;
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                var subscribers = new List<Subscriber>();
+                while (await reader.ReadAsync())
                 {
-                    var messageType = types[i];
-                    var paramName = $"@type{i}";
-                    command.AddParameter(paramName, messageType.TypeName);
-                }
-                command.CommandText = getSubscribersCommand;
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    var subscribers = new List<Subscriber>();
-                    while (await reader.ReadAsync())
+                    var address = reader.GetString(0);
+                    string endpoint;
+                    if (await reader.IsDBNullAsync(1))
                     {
-                        var address = reader.GetString(0);
-                        string endpoint;
-                        if (await reader.IsDBNullAsync(1))
-                        {
-                            endpoint = null;
-                        }
-                        else
-                        {
-                            endpoint = reader.GetString(1);
-                        }
-                        subscribers.Add(new Subscriber(address, endpoint));
+                        endpoint = null;
                     }
-                    return subscribers;
+                    else
+                    {
+                        endpoint = reader.GetString(1);
+                    }
+                    subscribers.Add(new Subscriber(address, endpoint));
                 }
+                return subscribers;
             }
         }
     }
-
 }

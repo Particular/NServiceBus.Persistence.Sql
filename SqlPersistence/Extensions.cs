@@ -14,6 +14,13 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
+    public static async Task<DbConnection> OpenConnection(this Func<DbConnection> connectionBuilder)
+    {
+        var connection = connectionBuilder();
+        await connection.OpenAsync();
+        return connection;
+    }
+
     public static void AddParameter(this DbCommand command, string name, Version value)
     {
         command.AddParameter(name, value.ToString());
