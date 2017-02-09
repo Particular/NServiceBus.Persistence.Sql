@@ -10,12 +10,11 @@ begin
 declare @createTable nvarchar(max);
 set @createTable = '
     create table ' + @tableName + '(
-        MessageId nvarchar(200) not null primary key,
+        MessageId nvarchar(200) not null primary key nonclustered,
         Dispatched bit not null default 0,
         DispatchedAt datetime,
         PersistenceVersion varchar(23) not null,
         Operations nvarchar(max) not null,
-        unique nonclustered ([MessageId] asc)
     )
 ';
 exec(@createTable);
