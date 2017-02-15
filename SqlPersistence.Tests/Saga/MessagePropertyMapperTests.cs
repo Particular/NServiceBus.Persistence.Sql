@@ -11,7 +11,7 @@ using NUnit.Framework;
         [Test]
     public void StringCorrelationId()
     {
-        var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));;
+        var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));
         var instance = new SagaWithStringCorrelationId.SagaData
         {
             CorrelationProperty = "Foo"

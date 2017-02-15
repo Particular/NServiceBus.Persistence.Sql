@@ -5,11 +5,10 @@ using Newtonsoft.Json;
 static class Serializer
 {
     public static JsonSerializer JsonSerializer;
-    static JsonSerializerSettings settings;
 
     static Serializer()
     {
-        settings = new JsonSerializerSettings
+        var settings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
             DefaultValueHandling = DefaultValueHandling.Ignore

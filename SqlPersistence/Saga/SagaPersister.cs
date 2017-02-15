@@ -139,6 +139,8 @@ class SagaPersister : ISagaPersister
     static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
         where TSagaData : IContainSagaData
     {
+        // ReSharper disable once CompareNonConstrainedGenericWithNull
+        //TODO: remove diable when core adds a class constraint to TSagaData
         if (result.Data == null)
         {
             return default(TSagaData);

@@ -11,16 +11,11 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 class SubscriptionPersister : ISubscriptionStorage
 {
     Func<DbConnection> connectionBuilder;
-    string tablePrefix;
-    SqlVariant sqlVariant;
     SubscriptionCommands subscriptionCommands;
 
     public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant)
     {
         this.connectionBuilder = connectionBuilder;
-        this.tablePrefix = tablePrefix;
-        this.sqlVariant = sqlVariant;
-
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix);
     }
 
