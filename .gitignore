@@ -1,4 +1,6 @@
 nugets
+NugetBuild
+ForIntegration
 deploy
 build32
 binaries
