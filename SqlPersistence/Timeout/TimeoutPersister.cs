@@ -68,7 +68,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.Add;
-            var id = Guid.NewGuid();
+            var id = SequentialGuid.Next();
             timeout.Id = id.ToString();
             command.AddParameter("Id", id);
             command.AddParameter("Destination", timeout.Destination);

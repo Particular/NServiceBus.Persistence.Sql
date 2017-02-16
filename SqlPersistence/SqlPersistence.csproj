@@ -112,6 +112,7 @@
     <Compile Include="SqlPersistence.cs" />
     <Compile Include="Saga\SqlSagaFeature.cs" />
     <Compile Include="Subscription\SqlSubscriptionFeature.cs" />
+    <Compile Include="Timeout\SequentialGuid.cs" />
     <Compile Include="Timeout\TimeoutCommands.cs" />
     <Compile Include="Timeout\SqlTimeoutFeature.cs" />
     <Compile Include="Timeout\TimeoutCommandBuilder.cs" />
