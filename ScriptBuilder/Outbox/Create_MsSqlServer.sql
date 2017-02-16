@@ -14,7 +14,7 @@ set @createTable = '
         Dispatched bit not null default 0,
         DispatchedAt datetime,
         PersistenceVersion varchar(23) not null,
-        Operations nvarchar(max) not null,
+        Operations nvarchar(max) not null
     )
 ';
 exec(@createTable);
