@@ -1,0 +1,119 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"SqlPersistence.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
+namespace NServiceBus.Persistence.Sql
+{
+    public interface ISqlStorageSession
+    {
+        System.Data.Common.DbConnection Connection { get; }
+        System.Data.Common.DbTransaction Transaction { get; }
+    }
+    public class MessagePropertyMapper<TSagaData>
+        where TSagaData : NServiceBus.IContainSagaData, new ()
+    {
+        public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
+    }
+    public class static OutboxCommandBuilder
+    {
+        public static NServiceBus.Persistence.Sql.OutboxCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+    }
+    public class OutboxCommands
+    {
+        public OutboxCommands(string store, string get, string setAsDispatched, string cleanup) { }
+        public string Cleanup { get; set; }
+        public string Get { get; set; }
+        public string SetAsDispatched { get; set; }
+        public string Store { get; set; }
+    }
+    public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
+    public class SagaCommandBuilder
+    {
+        public SagaCommandBuilder(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+        public string BuildCompleteCommand(string tableSuffx) { }
+        public string BuildGetByPropertyCommand(string tableSuffx, string propertyName) { }
+        public string BuildGetBySagaIdCommand(string tableSuffx) { }
+        public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty) { }
+        public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty) { }
+    }
+    public class SagaSettings
+    {
+        public void JsonSettings(Newtonsoft.Json.JsonSerializerSettings jsonSerializerSettings) { }
+        public void JsonSettingsForVersion(NServiceBus.Persistence.Sql.RetrieveVersionSpecificJsonSettings builder) { }
+        public void ReaderCreator(System.Func<System.IO.TextReader, Newtonsoft.Json.JsonReader> readerCreator) { }
+        public void WriterCreator(System.Func<System.Text.StringBuilder, Newtonsoft.Json.JsonWriter> writerCreator) { }
+    }
+    public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
+    {
+        public SqlPersistence() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
+    public class SqlPersistenceSettingsAttribute : System.Attribute
+    {
+        public SqlPersistenceSettingsAttribute(bool msSqlServerScripts = False, bool mySqlScripts = False) { }
+        public bool MsSqlServerScripts { get; }
+        public bool MySqlScripts { get; }
+    }
+    public abstract class SqlSaga<TSagaData> : NServiceBus.Saga<TSagaData>
+        where TSagaData : NServiceBus.IContainSagaData, new ()
+    {
+        protected SqlSaga() { }
+        protected override void ConfigureHowToFindSaga(NServiceBus.SagaPropertyMapper<TSagaData> mapper) { }
+        protected virtual void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper) { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    public class SqlSagaAttribute : System.Attribute
+    {
+        public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
+        public string CorrelationProperty { get; set; }
+        public string TableSuffix { get; set; }
+        public string TransitionalCorrelationProperty { get; set; }
+    }
+    public enum SqlVariant
+    {
+        MsSqlServer = 0,
+        MySql = 1,
+    }
+    public class static SubscriptionCommandBuilder
+    {
+        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+    }
+    public class SubscriptionCommands
+    {
+        public SubscriptionCommands(string subscribe, string unsubscribe, System.Func<System.Collections.Generic.List<NServiceBus.Unicast.Subscriptions.MessageType>, string> getSubscribers) { }
+        public System.Func<System.Collections.Generic.List<NServiceBus.Unicast.Subscriptions.MessageType>, string> GetSubscribers { get; }
+        public string Subscribe { get; }
+        public string Unsubscribe { get; }
+    }
+    public class static TimeoutCommandBuilder
+    {
+        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+    }
+    public class TimeoutCommands
+    {
+        public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range) { }
+        public string Add { get; }
+        public string Next { get; }
+        public string Peek { get; }
+        public string Range { get; }
+        public string RemoveById { get; }
+        public string RemoveBySagaId { get; }
+    }
+}
+namespace NServiceBus
+{
+    public class static SqlPersistenceConfig
+    {
+        public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+        public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
+        public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
+    }
+    public class static SqlPersistenceStorageSessionExtensions
+    {
+        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+    }
+}
+public class static SagaPropertyFilter
+{
+    public static System.Collections.Generic.List<Newtonsoft.Json.Serialization.JsonProperty> FilterProperties(System.Collections.Generic.IList<Newtonsoft.Json.Serialization.JsonProperty> properties) { }
+}

@@ -93,6 +93,8 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIApprovals.cs" />
+    <Compile Include="App_Packages\PublicApiGenerator.6.0.0\ApiGenerator.cs" />
     <Compile Include="AssemblySqlPersistenceSettingsAttribute.cs" />
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="Extensions.cs" />

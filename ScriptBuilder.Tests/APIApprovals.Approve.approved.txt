@@ -1,0 +1,77 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"NServiceBus.Persistence.Sql.ScriptBuilderTask, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"ScriptBuilder.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
+namespace NServiceBus.Persistence.Sql
+{
+    public class ErrorsException : System.Exception
+    {
+        public ErrorsException(string message) { }
+        public string FileName { get; set; }
+    }
+}
+namespace NServiceBus.Persistence.Sql.ScriptBuilder
+{
+    public enum BuildSqlVariant
+    {
+        MsSqlServer = 0,
+        MySql = 1,
+    }
+    public class CorrelationProperty
+    {
+        public CorrelationProperty(string name, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType type) { }
+        public string Name { get; }
+        public NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType Type { get; }
+    }
+    public enum CorrelationPropertyType
+    {
+        String = 0,
+        DateTime = 1,
+        DateTimeOffset = 2,
+        Int = 3,
+        Guid = 4,
+    }
+    public class static MsSqlServerCorrelationPropertyTypeConverter
+    {
+        public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
+    }
+    public class static MySqlCorrelationPropertyTypeConverter
+    {
+        public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
+    }
+    public class static OutboxScriptBuilder
+    {
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+    }
+    public class SagaDefinition
+    {
+        public SagaDefinition(string tableSuffix, string name, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty correlationProperty = null, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty transitionalCorrelationProperty = null) { }
+        public NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty CorrelationProperty { get; }
+        public string Name { get; }
+        public string TableSuffix { get; }
+        public NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty TransitionalCorrelationProperty { get; }
+    }
+    public class static SagaScriptBuilder
+    {
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant, System.IO.TextWriter writer) { }
+        public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant, System.IO.TextWriter writer) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+    }
+    public class static SubscriptionScriptBuilder
+    {
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+    }
+    public class static TimeoutScriptBuilder
+    {
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+    }
+}

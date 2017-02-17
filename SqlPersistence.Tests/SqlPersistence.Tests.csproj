@@ -107,6 +107,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovalTestConfig.cs" />
+    <Compile Include="App_Packages\PublicApiGenerator.6.0.0\ApiGenerator.cs" />
+    <Compile Include="APIApprovals.cs" />
     <Compile Include="MySqlConnectionBuilder.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
