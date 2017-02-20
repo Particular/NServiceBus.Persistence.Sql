@@ -81,93 +81,10 @@ namespace NServiceBus.Persistence.Sql
                 Directory.Delete(scriptPath, true);
             }
             Directory.CreateDirectory(scriptPath);
-            WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant);
-            WriteTimeoutScript(scriptPath, sqlVariant);
-            WriteSubscriptionScript(scriptPath, sqlVariant);
-            WriteOutboxScript(scriptPath, sqlVariant);
+            SagaWriter.WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant, logger);
+            TimeoutWriter.WriteTimeoutScript(scriptPath, sqlVariant);
+            SubscriptionWriter.WriteSubscriptionScript(scriptPath, sqlVariant);
+            OutboxWriter.WriteOutboxScript(scriptPath, sqlVariant);
         }
-
-        void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant)
-        {
-            var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
-            var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
-            Directory.CreateDirectory(sagasScriptPath);
-            var index = 0;
-            foreach (var saga in metaDataReader.GetSagas((exception, type) =>
-            {
-                logger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
-            }))
-            {
-                var sagaFileName = saga.TableSuffix;
-                var maximumNameLength = 244 - sagasScriptPath.Length;
-                if (sagaFileName.Length > maximumNameLength)
-                {
-                    sagaFileName = $"{sagaFileName.Substring(0, maximumNameLength)}_{index}";
-                    index++;
-                }
-                var createPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Create.sql");
-                File.Delete(createPath);
-                using (var writer = File.CreateText(createPath))
-                {
-                    SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
-                }
-
-                var dropPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Drop.sql");
-                File.Delete(dropPath);
-                using (var writer = File.CreateText(dropPath))
-                {
-                    SagaScriptBuilder.BuildDropScript(saga, sqlVariant, writer);
-                }
-            }
-        }
-
-        static void WriteTimeoutScript(string scriptPath, BuildSqlVariant sqlVariant)
-        {
-            var createPath = Path.Combine(scriptPath, "Timeout_Create.sql");
-            File.Delete(createPath);
-            using (var writer = File.CreateText(createPath))
-            {
-                TimeoutScriptBuilder.BuildCreateScript(writer, sqlVariant);
-            }
-            var dropPath = Path.Combine(scriptPath, "Timeout_Drop.sql");
-            File.Delete(dropPath);
-            using (var writer = File.CreateText(dropPath))
-            {
-                TimeoutScriptBuilder.BuildDropScript(writer, sqlVariant);
-            }
-        }
-
-        static void WriteOutboxScript(string scriptPath, BuildSqlVariant sqlVariant)
-        {
-            var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
-            File.Delete(createPath);
-            using (var writer = File.CreateText(createPath))
-            {
-                OutboxScriptBuilder.BuildCreateScript(writer, sqlVariant);
-            }
-            var dropPath = Path.Combine(scriptPath, "Outbox_Drop.sql");
-            File.Delete(dropPath);
-            using (var writer = File.CreateText(dropPath))
-            {
-                OutboxScriptBuilder.BuildDropScript(writer, sqlVariant);
-            }
-        }
-
-        static void WriteSubscriptionScript(string scriptPath, BuildSqlVariant sqlVariant)
-        {
-            var createPath = Path.Combine(scriptPath, "Subscription_Create.sql");
-            File.Delete(createPath);
-            using (var writer = File.CreateText(createPath))
-            {
-                SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVariant);
-            }
-            var dropPath = Path.Combine(scriptPath, "Subscription_Drop.sql");
-            File.Delete(dropPath);
-            using (var writer = File.CreateText(dropPath))
-            {
-                SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVariant);
-            }
-        }
-
     }
 }

@@ -73,7 +73,11 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BuildLogger.cs" />
     <Compile Include="ExceptionExtensions.cs" />
+    <Compile Include="Writers\OutboxWriter.cs" />
+    <Compile Include="Writers\SagaWriter.cs" />
     <Compile Include="ScriptBuilderTask.cs" />
+    <Compile Include="Writers\SubscriptionWriter.cs" />
+    <Compile Include="Writers\TimeoutWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
