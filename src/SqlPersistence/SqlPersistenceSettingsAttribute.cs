@@ -5,8 +5,8 @@ namespace NServiceBus.Persistence.Sql
     [AttributeUsage(AttributeTargets.Assembly)]
     public class SqlPersistenceSettingsAttribute : Attribute
     {
-        public readonly bool MsSqlServerScripts;
-        public readonly bool MySqlScripts;
+        public bool MsSqlServerScripts { get; }
+        public bool MySqlScripts { get; }
 
         public SqlPersistenceSettingsAttribute(
             bool msSqlServerScripts = false,
