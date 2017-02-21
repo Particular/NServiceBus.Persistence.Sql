@@ -101,7 +101,7 @@ public class MsmqTransportIntegrationTests : IDisposable
         {
             MarkAsComplete();
             ManualResetEvent.Set();
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         public class SagaData : ContainSagaData

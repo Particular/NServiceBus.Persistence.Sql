@@ -103,7 +103,7 @@ public class SagaConsistencyTests
         {
             message = c.Error;
             ManualResetEvent.Set();
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         });
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
         endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");
@@ -205,13 +205,13 @@ public class SagaConsistencyTests
 
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         public Task Handle(FailingMessage message, IMessageHandlerContext context)
         {
             Data.PersistedFailingMessageResult = true;
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         public Task Handle(CheckMessage message, IMessageHandlerContext context)
@@ -224,7 +224,7 @@ public class SagaConsistencyTests
             {
                 CriticalError.Raise("Success", new Exception());
             }
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
     }
 }
