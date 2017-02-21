@@ -5,17 +5,11 @@ public static class MySqlConnectionBuilder
 {
     public static MySqlConnection Build()
     {
-        var password = Environment.GetEnvironmentVariable("MySqlPassword");
-        if (string.IsNullOrWhiteSpace(password))
+        var connection = Environment.GetEnvironmentVariable("MySQLConnectionString");
+        if (string.IsNullOrWhiteSpace("MySQLConnectionString"))
         {
-            throw new Exception("Could not extra 'MySqlPassword' from Environment variables.");
+            throw new Exception("MySQLConnectionString environment variable is empty");
         }
-        var username = Environment.GetEnvironmentVariable("MySqlUserName");
-        if (string.IsNullOrWhiteSpace(username))
-        {
-            throw new Exception("Could not extra 'MySqlUserName' from Environment variables.");
-        }
-        var connection = $"server=localhost;user={username};database=sqlpersistencetests;port=3306;password={password};AllowUserVariables=True;AutoEnlist=false";
         return new MySqlConnection(connection);
     }
 }
