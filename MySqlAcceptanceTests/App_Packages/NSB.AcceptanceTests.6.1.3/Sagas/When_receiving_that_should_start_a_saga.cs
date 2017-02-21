@@ -22,6 +22,7 @@
                 EndpointSetup<DefaultServer>(b => b.ExecuteTheseHandlersFirst(typeof(InterceptingHandler)));
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(TestSagaData03.SomeId))]
             public class TestSaga03 : Saga<TestSaga03.TestSagaData03>, IAmStartedByMessages<StartSagaMessage>
             {
                 public SagaEndpointContext Context { get; set; }

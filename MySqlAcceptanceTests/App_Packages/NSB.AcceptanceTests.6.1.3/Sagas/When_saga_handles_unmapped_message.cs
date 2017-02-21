@@ -49,6 +49,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(UnmappedMsgSagaData.SomeId))]
             public class UnmappedMsgSaga : Saga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<MappedEchoMessage>,

@@ -42,6 +42,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaIdChangedSagaData.DataId))]
             public class SagaIdChangedSaga : Saga<SagaIdChangedSaga.SagaIdChangedSagaData>,
                 IAmStartedByMessages<StartSaga>
             {

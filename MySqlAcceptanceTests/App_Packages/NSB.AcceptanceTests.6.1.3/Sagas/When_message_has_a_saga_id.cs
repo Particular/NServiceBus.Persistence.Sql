@@ -51,6 +51,7 @@
                 EndpointSetup<DefaultServer>(c => c.EnableFeature<TimeoutManager>());
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MessageWithSagaIdSagaData.DataId))]
             public class MessageWithSagaIdSaga : Saga<MessageWithSagaIdSaga.MessageWithSagaIdSagaData>,
                 IAmStartedByMessages<MessageWithSagaId>,
                 IHandleTimeouts<MessageWithSagaId>,

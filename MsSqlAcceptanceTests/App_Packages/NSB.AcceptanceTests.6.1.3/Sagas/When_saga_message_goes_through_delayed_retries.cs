@@ -47,6 +47,7 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(DelayedRetryTestingSagaData.SomeId))]
             public class DelayedRetryTestingSaga : Saga<DelayedRetryTestingSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>

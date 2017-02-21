@@ -76,6 +76,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(CorrelationTestSagaData.RunId))]
             public class CorrelationTestSaga : Saga<CorrelationTestSaga.CorrelationTestSagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleMessages<DoSomethingResponse>

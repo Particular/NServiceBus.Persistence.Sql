@@ -36,6 +36,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(TestSagaData11.SomeId))]
             public class TestSaga11 : Saga<TestSagaData11>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<OtherMessage>

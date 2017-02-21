@@ -56,6 +56,7 @@
                 EndpointSetup<DefaultServer>(c => c.EnableFeature<TimeoutManager>());
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(NotFoundHandlerSaga1Data.ContextId))]
             public class NotFoundHandlerSaga1 : Saga<NotFoundHandlerSaga1.NotFoundHandlerSaga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga1 message, IMessageHandlerContext context)

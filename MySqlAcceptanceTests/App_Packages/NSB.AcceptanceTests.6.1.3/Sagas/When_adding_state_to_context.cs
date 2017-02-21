@@ -12,6 +12,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using Persistence;
 
     [TestFixture]
+    [Explicit]
     public class When_adding_state_to_context : NServiceBusAcceptanceTest
     {
         [Test]
@@ -54,7 +55,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(default(TestSaga07.SagaData07));
                 }
             }
-
+            
             public class TestSaga07 : Saga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }

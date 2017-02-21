@@ -54,6 +54,7 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ConcurrentlyStartedSagaData.OrderId))]
             public class ConcurrentlyStartedSaga : Saga<ConcurrentlyStartedSagaData>,
                 IAmStartedByMessages<StartMessageTwo>,
                 IAmStartedByMessages<StartMessageOne>

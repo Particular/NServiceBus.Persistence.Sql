@@ -76,6 +76,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(CantBeFoundSaga1Data.MessageId))]
             public class CantBeFoundSaga1 : Saga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -101,6 +102,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(CantBeFoundSaga2Data.MessageId))]
             public class CantBeFoundSaga2 : Saga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -175,6 +177,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ReceiverWithOrderedSagasSaga1Data.MessageId))]
             public class ReceiverWithOrderedSagasSaga1 : Saga<ReceiverWithOrderedSagasSaga1.ReceiverWithOrderedSagasSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -200,6 +203,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ReceiverWithOrderedSagasSaga2Data.MessageId))]
             public class ReceiverWithOrderedSagasSaga2 : Saga<ReceiverWithOrderedSagasSaga2.ReceiverWithOrderedSagasSaga2Data>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
             {
                 public Context Context { get; set; }

@@ -1,7 +1,7 @@
 using System;
 using MySql.Data.MySqlClient;
 
-static class MySqlConnectionBuilder
+public static class MySqlConnectionBuilder
 {
     public static MySqlConnection Build()
     {

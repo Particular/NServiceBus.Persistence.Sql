@@ -22,6 +22,7 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(RequestResponseRequestingSagaData.CorrIdForResponse))]
             public class RequestResponseRequestingSaga : Saga<RequestResponseRequestingSaga.RequestResponseRequestingSagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
@@ -57,6 +58,7 @@
                 }
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(RequestResponseRespondingSagaData.CorrIdForRequest))]
             public class RequestResponseRespondingSaga : Saga<RequestResponseRespondingSaga.RequestResponseRespondingSagaData>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
                 IHandleTimeouts<RequestResponseRespondingSaga.DelayReply>,

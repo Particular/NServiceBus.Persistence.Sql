@@ -47,6 +47,7 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId))]
             public class MultiTimeoutsSaga1 : Saga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>,

@@ -71,6 +71,7 @@
                 });
             }
 
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ReplyToPubMsgSagaData.DataId))]
             public class ReplyToPubMsgSaga : Saga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
                 public Context Context { get; set; }

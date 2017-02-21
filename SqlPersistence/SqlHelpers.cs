@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 static class SqlHelpers
 {
 
-    internal static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, IEnumerable<string> scripts, string tablePrefix)
+    public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, IEnumerable<string> scripts, string tablePrefix)
     {
         foreach (var script in scripts)
         {
@@ -13,7 +13,7 @@ static class SqlHelpers
         }
     }
 
-    internal static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
+    public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
     {
         //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
         // throw and hint to add 'Allow User Variables=True' to connection string
