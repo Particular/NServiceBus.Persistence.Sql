@@ -29,6 +29,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     public Task Cleanup()
     {
         endpointHelper.Cleanup();
-        return Task.CompletedTask;
+        return Task.FromResult(0);
     }
 }

@@ -52,6 +52,6 @@ public class ConfigureEndpointHelper
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
         }
-        return Task.CompletedTask;
+        return Task.FromResult(0);
     }
 }
