@@ -12,8 +12,9 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
+        var tablePrefix = TableNameCleaner.Clean(endpointName);
         var connectionString = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
-        endpointHelper = new ConfigureEndpointHelper(configuration, endpointName, () => new SqlConnection(connectionString), BuildSqlVariant.MsSqlServer, FilterTableExists);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, () => new SqlConnection(connectionString), BuildSqlVariant.MsSqlServer, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
         persistence.DisableInstaller();
