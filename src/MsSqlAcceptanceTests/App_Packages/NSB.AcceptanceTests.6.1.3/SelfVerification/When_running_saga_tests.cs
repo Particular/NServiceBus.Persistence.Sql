@@ -41,6 +41,7 @@
         }
 
         [Test]
+        [Explicit]
         public void All_sagas_and_entities_should_have_unique_names()
         {
             var allTypes = Assembly.GetExecutingAssembly().GetTypes();
