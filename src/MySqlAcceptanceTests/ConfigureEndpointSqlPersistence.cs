@@ -21,11 +21,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         return Task.FromResult(0);
     }
 
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("Cannot drop the table");
-    }
-
     public Task Cleanup()
     {
         endpointHelper.Cleanup();
