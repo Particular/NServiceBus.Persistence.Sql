@@ -81,6 +81,7 @@
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationProperty.cs" />
     <Compile Include="Saga\CorrelationPropertyType.cs" />
+    <Compile Include="Saga\CorrelationPropertyTypeReader.cs" />
     <Compile Include="Saga\ISagaScriptWriter.cs" />
     <Compile Include="Saga\Writers\MsSqlServerCorrelationPropertyTypeConverter.cs" />
     <Compile Include="Saga\Writers\MySqlCorrelationPropertyTypeConverter.cs" />
