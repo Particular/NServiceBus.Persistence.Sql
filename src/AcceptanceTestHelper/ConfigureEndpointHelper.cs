@@ -4,6 +4,8 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Configuration.AdvanceExtensibility;
+using NServiceBus.Features;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 public class ConfigureEndpointHelper
@@ -13,6 +15,7 @@ public class ConfigureEndpointHelper
     Func<Exception, bool> exceptionFilter;
     string tablePrefix;
     List<SagaDefinition> sagaDefinitions;
+    bool timeoutManagerEnabled;
 
     public ConfigureEndpointHelper(EndpointConfiguration configuration, string tablePrefix, Func<DbConnection> connectionBuilder, BuildSqlVariant sqlVariant, Func<Exception, bool> exceptionFilter = null)
     {
@@ -20,7 +23,6 @@ public class ConfigureEndpointHelper
         this.connectionBuilder = connectionBuilder;
         this.sqlVariant = sqlVariant;
         this.exceptionFilter = exceptionFilter;
-
         sagaDefinitions = RuntimeSagaDefintionReader.GetSagaDefintions(configuration).ToList();
         using (var connection = connectionBuilder())
         {
@@ -30,8 +32,12 @@ public class ConfigureEndpointHelper
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), tablePrefix, exceptionFilter);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), tablePrefix);
             }
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
+            timeoutManagerEnabled = configuration.GetSettings().IsFeatureEnabled(typeof(TimeoutManager));
+            if (timeoutManagerEnabled)
+            {
+                connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
+                connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
+            }
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
@@ -48,7 +54,10 @@ public class ConfigureEndpointHelper
             {
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), tablePrefix, exceptionFilter);
             }
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
+            if (timeoutManagerEnabled)
+            {
+                connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
+            }
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
         }

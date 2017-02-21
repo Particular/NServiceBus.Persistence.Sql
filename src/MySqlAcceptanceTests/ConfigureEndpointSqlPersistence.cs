@@ -11,6 +11,10 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
+        if (configuration.IsSendOnly())
+        {
+            return Task.FromResult(0);
+        }
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 35));
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlVariant.MySql);
         var persistence = configuration.UsePersistence<SqlPersistence>();
@@ -23,7 +27,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Cleanup()
     {
-        endpointHelper.Cleanup();
+        endpointHelper?.Cleanup();
         return Task.FromResult(0);
     }
 }

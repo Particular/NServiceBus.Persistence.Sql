@@ -12,6 +12,10 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
+        if (configuration.IsSendOnly())
+        {
+            return Task.FromResult(0);
+        }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
         var connectionString = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, () => new SqlConnection(connectionString), BuildSqlVariant.MsSqlServer, FilterTableExists);
@@ -28,7 +32,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Cleanup()
     {
-        endpointHelper.Cleanup();
+        endpointHelper?.Cleanup();
         return Task.FromResult(0);
     }
 }
