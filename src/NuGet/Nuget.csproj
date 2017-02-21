@@ -54,6 +54,7 @@
   <Target Name="ReBuild" DependsOnTargets="NuGetBuild" />
   <PropertyGroup>
     <NugetBuild>$(SolutionDir)NuGetBuild\</NugetBuild>
+    <IlMerge>&quot;$(SolutionDir)..\Tools\ilmerge.exe&quot;</IlMerge>
     <!-- ScriptBuilder variables -->
     <NugetBuildScriptBuilder>$(SolutionDir)NuGetBuild\NugetBuildScriptBuilder\</NugetBuildScriptBuilder>
     <ScriptBuilderNuspec>$(TargetDir)NServiceBus.Persistence.Sql.ScriptBuilder.nuspec</ScriptBuilderNuspec>
@@ -78,7 +79,7 @@
     <MakeDir Directories="$(NugetBuildScriptBuilder)" />
     <Copy SourceFiles="$(ScriptBuilderNuspec)" DestinationFolder="$(NugetBuildScriptBuilder)" />
     <Copy SourceFiles="$(ScriptBuilderXml)" DestinationFolder="$(NugetBuildScriptBuilder)lib\net452" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuildScriptBuilder)lib\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(IlMerge) /out:&quot;$(NugetBuildScriptBuilder)lib\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuildScriptBuilder)" MetadataAssembly="$(ScriptBuilderDll)" />
     <!-- Main Package -->
     <MakeDir Directories="$(NugetBuildMain)" />
@@ -91,7 +92,7 @@
     <!-- MsBuild Package -->
     <MakeDir Directories="$(NugetBuildMsBuild)" />
     <Copy SourceFiles="$(TargetDir)NServiceBus.Persistence.Sql.MsBuild.nuspec" DestinationFolder="$(NugetBuildMsBuild)" />
-    <Exec Command="&quot;$(SolutionDir)Tools\ilmerge.exe&quot; /out:&quot;$(NugetBuildMsBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(IlMerge) /out:&quot;$(NugetBuildMsBuild)NServiceBus.Persistence.Sql.ScriptBuilderTask.dll&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
     <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(NugetBuildMsBuild)build" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(NugetBuildMsBuild)" MetadataAssembly="$(ScriptBuilderTaskDll)" />
     <!-- ForIntegration -->
