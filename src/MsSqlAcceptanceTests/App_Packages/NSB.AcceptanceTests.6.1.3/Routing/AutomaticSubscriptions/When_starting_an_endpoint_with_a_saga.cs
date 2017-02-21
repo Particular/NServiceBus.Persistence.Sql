@@ -81,8 +81,8 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SuperClassEventSagaData.SomeId))]
-            public class MySagaThatReactsOnASuperClassEvent : Saga<MySagaThatReactsOnASuperClassEvent.SuperClassEventSagaData>,
+            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.SomeId))]
+            public class SagaThatReactsToSuperEvent : Saga<SagaThatReactsToSuperEvent.SagaData>,
                 IAmStartedByMessages<MyEventBase>
             {
                 public Task Handle(MyEventBase message, IMessageHandlerContext context)
@@ -90,12 +90,12 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SuperClassEventSagaData> mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
                 {
                     mapper.ConfigureMapping<MyEventBase>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
                 }
 
-                public class SuperClassEventSagaData : ContainSagaData
+                public class SagaData : ContainSagaData
                 {
                     public virtual string SomeId { get; set; }
                 }
