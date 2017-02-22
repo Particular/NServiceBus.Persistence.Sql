@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
@@ -17,10 +16,9 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.FromResult(0);
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
-        var connectionString = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, () => new SqlConnection(connectionString), BuildSqlVariant.MsSqlServer, FilterTableExists);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlVariant.MsSqlServer, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         return Task.FromResult(0);
     }

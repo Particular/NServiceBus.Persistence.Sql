@@ -324,6 +324,10 @@
       <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
       <Name>SqlPersistence</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj">
+      <Project>{9545ECAB-396F-4ECB-AB79-4C3AFD48BA93}</Project>
+      <Name>TestHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
