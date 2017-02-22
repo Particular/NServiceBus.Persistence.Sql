@@ -10,7 +10,7 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlTransportIntegrationTests:IDisposable
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
+
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
     SqlConnection dbConnection;
@@ -18,7 +18,7 @@ public class SqlTransportIntegrationTests:IDisposable
 
     public SqlTransportIntegrationTests()
     {
-        dbConnection = new SqlConnection(connectionString);
+        dbConnection = MsSqlConnectionBuilder.Build();
         dbConnection.Open();
         sagaDefinition = new SagaDefinition(
             tableSuffix: "Saga1",
@@ -57,9 +57,9 @@ public class SqlTransportIntegrationTests:IDisposable
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         transport.Transactions(transactionMode);
-        transport.ConnectionString(connectionString);
+        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -12,7 +11,6 @@ using NUnit.Framework;
 [TestFixture]
 public class UserDataConsistencyTests
 {
-    static string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 
@@ -32,7 +30,7 @@ end";
     [TearDown]
     public void Setup()
     {
-        using (var connection = new SqlConnection(connectionString))
+        using (var connection = MsSqlConnectionBuilder.Build())
         {
             connection.Open();
             SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
@@ -56,7 +54,7 @@ end";
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-            transport.ConnectionString(connectionString);
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         });
     }
 
@@ -74,7 +72,7 @@ end";
 
     void Execute(string endpointName, string script)
     {
-        using (var sqlConnection = new SqlConnection(connectionString))
+        using (var sqlConnection = MsSqlConnectionBuilder.Build())
         {
             sqlConnection.Open();
             using (var command = sqlConnection.CreateCommand())
@@ -87,7 +85,7 @@ end";
     }
     void Execute(string script)
     {
-        using (var sqlConnection = new SqlConnection(connectionString))
+        using (var sqlConnection = MsSqlConnectionBuilder.Build())
         {
             sqlConnection.Open();
             using (var command = sqlConnection.CreateCommand())
@@ -111,9 +109,9 @@ end";
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
-        transport.ConnectionString(connectionString);
+        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
