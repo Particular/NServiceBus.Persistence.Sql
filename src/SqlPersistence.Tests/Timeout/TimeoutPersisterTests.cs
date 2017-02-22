@@ -5,10 +5,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
 using ObjectApproval;
-[TestFixture]
+
 public abstract class TimeoutPersisterTests
 {
-    TimeoutPersister persister;
     BuildSqlVariant sqlVariant;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
@@ -17,31 +16,31 @@ public abstract class TimeoutPersisterTests
     {
         this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
-        persister = new TimeoutPersister(
-            connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(TimeoutPersisterTests)}_",
-            sqlVariant:sqlVariant.Convert());
     }
-
-    [SetUp]
-    public void Setup()
+    
+    TimeoutPersister Setup()
     {
+        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(TimeoutPersisterTests));
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(TimeoutPersisterTests));
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name);
         }
+        return new TimeoutPersister(
+            connectionBuilder: dbConnection,
+            tablePrefix: $"{name}_",
+            sqlVariant:sqlVariant.Convert());
     }
 
-    [TearDown]
     public void TearDown()
     {
-        //using (var connection = dbConnection())
-        //{
-        //    connection.Open();
-        //    connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(TimeoutPersisterTests));
-        //}
+        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
+        }
     }
 
     [Test]
@@ -58,6 +57,7 @@ public abstract class TimeoutPersisterTests
                 {"HeaderKey", "HeaderValue"}
             }
         };
+        var persister = Setup();
         persister.Add(timeout, null).Await();
         Assert.IsTrue(persister.TryRemove(timeout.Id, null).Result);
         Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
@@ -78,6 +78,7 @@ public abstract class TimeoutPersisterTests
                 {"HeaderKey", "HeaderValue"}
             }
         };
+        var persister = Setup();
         persister.Add(timeout, null).Await();
         persister.RemoveTimeoutBy(sagaId, null).Await();
         Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
@@ -95,6 +96,7 @@ public abstract class TimeoutPersisterTests
             Time = timeout1Time,
             Headers = new Dictionary<string, string>()
         };
+        var persister = Setup();
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.Peek(timeout1.Id, null).Result;
         ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
@@ -121,6 +123,7 @@ public abstract class TimeoutPersisterTests
             Time = timeout2Time,
             Headers = new Dictionary<string, string>()
         };
+        var persister = Setup();
         persister.Add(timeout1, null).Await();
         persister.Add(timeout2, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
