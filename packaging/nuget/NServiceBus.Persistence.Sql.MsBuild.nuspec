@@ -19,7 +19,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="lib\net452" />
+    <file src="..\..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="" />
     <file src="..\..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets" target="build" />
   </files>
 </package>
