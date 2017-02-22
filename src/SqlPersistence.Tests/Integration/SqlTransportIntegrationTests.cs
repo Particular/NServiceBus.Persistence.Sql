@@ -8,7 +8,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class SqlTransportIntegrationTests:IDisposable
+public class SqlTransportIntegrationTests : IDisposable
 {
 
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
@@ -37,12 +37,17 @@ public class SqlTransportIntegrationTests:IDisposable
         SqlQueueDeletion.DeleteQueuesForEndpoint(dbConnection, "dbo", nameof(SqlTransportIntegrationTests));
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
+
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(SqlTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(SqlTransportIntegrationTests));
     }
+
     [TearDown]
     public void TearDown()
     {
         SqlQueueDeletion.DeleteQueuesForEndpoint(dbConnection, "dbo", nameof(SqlTransportIntegrationTests));
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(SqlTransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(SqlTransportIntegrationTests));
     }
 
     [Test]
@@ -83,8 +88,8 @@ public class SqlTransportIntegrationTests:IDisposable
     }
 
     [SqlSaga(
-         correlationProperty: nameof(SagaData.StartId)
-     )]
+        correlationProperty: nameof(SagaData.StartId)
+    )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
