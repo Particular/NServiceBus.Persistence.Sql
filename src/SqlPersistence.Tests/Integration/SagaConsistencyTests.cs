@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -13,7 +12,6 @@ using NUnit.Framework;
 [TestFixture]
 public class SagaConsistencyTests
 {
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     string endpointName = "SqlTransportIntegration";
 
@@ -21,7 +19,7 @@ public class SagaConsistencyTests
     [TearDown]
     public void Setup()
     {
-        using (var connection = new SqlConnection(connectionString))
+        using (var connection = MsSqlConnectionBuilder.Build())
         {
             connection.Open();
             SqlQueueDeletion.DeleteQueuesForEndpoint(connection, "dbo", endpointName);
@@ -45,7 +43,7 @@ public class SagaConsistencyTests
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.TransactionScope);
-            transport.ConnectionString(connectionString);
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
             e.Pipeline.Register(new EscalationChecker(), "EscalationChecker");
         });
     }
@@ -57,7 +55,7 @@ public class SagaConsistencyTests
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-            transport.ConnectionString(connectionString);
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         });
     }
 
@@ -95,9 +93,9 @@ public class SagaConsistencyTests
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
-        transport.ConnectionString(connectionString);
+        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(() => new SqlConnection(connectionString));
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
@@ -131,7 +129,7 @@ public class SagaConsistencyTests
 
     void Execute(string script)
     {
-        using (var sqlConnection = new SqlConnection(connectionString))
+        using (var sqlConnection = MsSqlConnectionBuilder.Build())
         {
             sqlConnection.Open();
             using (var command = sqlConnection.CreateCommand())

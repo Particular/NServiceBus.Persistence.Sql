@@ -23,4 +23,11 @@ public class MySqlSagaPersisterTests: SagaPersisterTests
     {
         return innerException.Message.Contains("Duplicate entry ");
     }
+
+    // So this test can be excluded if a target server install does not support unicode
+    [Category("MySqlUnicode")]
+    public override void SaveWithWeirdCharacters()
+    {
+        base.SaveWithWeirdCharacters();
+    }
 }

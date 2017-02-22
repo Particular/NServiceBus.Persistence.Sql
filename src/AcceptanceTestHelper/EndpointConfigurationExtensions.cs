@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NServiceBus;
+using NServiceBus.Configuration.AdvanceExtensibility;
 
 public static class EndpointConfigurationExtensions
 {
@@ -12,6 +13,11 @@ public static class EndpointConfigurationExtensions
         var field = typeof(EndpointConfiguration)
             .GetField("scannedTypes", BindingFlags.Instance | BindingFlags.NonPublic);
         return (List<Type>)field.GetValue(configuration);
+    }
+
+    public static bool IsSendOnly(this EndpointConfiguration configuration)
+    {
+        return configuration.GetSettings().Get<bool>("Endpoint.SendOnly");
     }
 
 

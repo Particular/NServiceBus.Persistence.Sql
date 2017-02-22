@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MsSqlConnectionBuilder.cs" />
     <Compile Include="MySqlConnectionBuilder.cs" />
     <Compile Include="SqlHelpers.cs" />
   </ItemGroup>

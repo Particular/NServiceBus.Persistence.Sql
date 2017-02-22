@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -11,9 +10,8 @@ public class SqlServerOutboxPersisterTests : OutboxPersisterTests
     {
     }
 
-    string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencetests;Integrated Security=True";
     protected override Func<DbConnection> GetConnection()
     {
-        return () => new SqlConnection(connectionString);
+        return MsSqlConnectionBuilder.Build;
     }
 }
