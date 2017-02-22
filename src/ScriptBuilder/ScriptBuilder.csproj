@@ -127,7 +127,7 @@
   </Target>
   <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
   <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
-  <Target Name="ILMergeTarget" BeforeTargets="BuildPackages">
+  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <PropertyGroup>
       <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
       <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>

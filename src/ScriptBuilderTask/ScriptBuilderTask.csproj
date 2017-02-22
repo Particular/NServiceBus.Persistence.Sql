@@ -101,15 +101,21 @@
   </Target>
   <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
   <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
-  <Target Name="ILMergeTarget" BeforeTargets="BuildPackages">
+  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <PropertyGroup>
       <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
       <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
       <ScriptBuilderTaskDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskDll>
       <Cecil>$(ProjectDir)bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
-      <MergeOutput>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutput>
+      <MergeOutputDll>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputDll>
+      <MergeOutputPdb>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputPdb>
+      <MsBuildTargets>$(SolutionDir)..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutput)&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutputDll)&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <MakeDir Directories="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergeOutputDll)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergeOutputPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
   </Target>
 </Project>
