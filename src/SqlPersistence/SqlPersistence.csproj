@@ -155,6 +155,7 @@
   </Target>
   <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
   <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
+  <Target Name="CopyToBinaries" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>
       <Files Include="$(TargetDir)$(TargetName).*"/>
