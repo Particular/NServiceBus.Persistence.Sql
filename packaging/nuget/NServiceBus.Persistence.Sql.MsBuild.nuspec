@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NServiceBus.Persistence.Sql.MsBuild</id>
+    <version>$version$</version>
+    <title>NServiceBus.Persistence.Sql.MsBuild</title>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <developmentDependency>true</developmentDependency>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <iconUrl>$iconUrl$</iconUrl>
+    <description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package.</description>
+    <copyright>$copyright$</copyright>
+    <tags>$tags$</tags>
+    <dependencies>
+      <dependency id="NServiceBus.Persistence.Sql" version="[1.0, 2.0)"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="lib\net452" />
+    <file src="..\..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets" target="build" />
+  </files>
+</package>

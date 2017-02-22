@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NServiceBus.Persistence.Sql</id>
+    <version>$version$</version>
+    <title>NServiceBus.Persistence.Sql</title>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <iconUrl>$iconUrl$</iconUrl>
+    <description>Sql Server persistence for NServiceBus.</description>
+    <tags>$tags$</tags>
+    <dependencies>
+      <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
+      <dependency id="Newtonsoft.Json" version="[9.0.0, 10.0.0)" />
+    </dependencies>
+  </metadata>
+  <files>
+     <file src="..\..\src\SqlPersistence\bin\Release\NServiceBus.Persistence.Sql.???" target="lib\net452" />
+  </files>
+</package>

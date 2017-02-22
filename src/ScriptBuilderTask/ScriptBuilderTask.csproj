@@ -11,6 +11,7 @@
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuSpecFileName>NServiceBus.Persistence.Sql.MsBuild</NuSpecFileName>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
@@ -95,5 +96,20 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets'))" />
+  </Target>
+  <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
+  <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
+  <Target Name="ILMergeTarget" BeforeTargets="BuildPackages">
+    <PropertyGroup>
+      <IlMerge>&quot;$(SolutionDir)..\Tools\ilmerge.exe&quot;</IlMerge>
+      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
+      <ScriptBuilderTaskDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskDll>
+      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
+      <MergeOutput>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutput>
+    </PropertyGroup>
+    <MakeDir Directories="$(SolutionDir)..\binaries"/>
+    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutput)&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
   </Target>
 </Project>

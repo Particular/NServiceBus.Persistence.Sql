@@ -15,11 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilder.Tests", "ScriptBuilder.Tests\ScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuget", "NuGet\Nuget.csproj", "{66DDADC1-1631-4EC7-8CB2-DD8080188234}"
-	ProjectSection(ProjectDependencies) = postProject
-		{438D76FC-8BB8-4B40-80A5-F846A450FBD1} = {438D76FC-8BB8-4B40-80A5-F846A450FBD1}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSqlAcceptanceTests", "MsSqlAcceptanceTests\MsSqlAcceptanceTests.csproj", "{D7439DC8-6400-4740-855B-BF68AA7C6B05}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{8E942C0C-AAAB-4962-87F6-3D0F584003F2}"
@@ -60,10 +55,6 @@ Global
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66DDADC1-1631-4EC7-8CB2-DD8080188234}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D7439DC8-6400-4740-855B-BF68AA7C6B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7439DC8-6400-4740-855B-BF68AA7C6B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7439DC8-6400-4740-855B-BF68AA7C6B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
