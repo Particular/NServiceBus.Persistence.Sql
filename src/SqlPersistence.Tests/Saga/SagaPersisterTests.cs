@@ -20,7 +20,7 @@ public abstract class SagaPersisterTests
         dbConnection = GetConnection();
     }
 
-    
+
     SagaPersister SetUp(string endpointName)
     {
         var commandBuilder = new SagaCommandBuilder(sqlVariant.Convert(), $"{endpointName}_");
@@ -170,6 +170,7 @@ public abstract class SagaPersisterTests
         var result = SaveAsync(id, endpointName).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
+
     async Task<SagaWithCorrelation.SagaData> SaveAsync(Guid id, string endpointName)
     {
         var sagaData = new SagaWithCorrelation.SagaData
@@ -191,8 +192,9 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
         }
     }
+
     [Test]
-    public void SaveWithWeirdCharacters()
+    public virtual void SaveWithWeirdCharacters()
     {
         var endpointName = nameof(SaveWithWeirdCharacters);
         var definition = new SagaDefinition(
@@ -408,9 +410,9 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-         correlationProperty: nameof(SagaData.CorrelationProperty),
-         transitionalCorrelationProperty: nameof(SagaData.TransitionalCorrelationProperty)
-     )]
+        correlationProperty: nameof(SagaData.CorrelationProperty),
+        transitionalCorrelationProperty: nameof(SagaData.TransitionalCorrelationProperty)
+    )]
     public class SagaWithCorrelation : Saga<SagaWithCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -499,11 +501,11 @@ public abstract class SagaPersisterTests
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
         }
         var id = Guid.NewGuid();
-        var result = GetByMappingAsync(id,endpointName).GetAwaiter().GetResult();
+        var result = GetByMappingAsync(id, endpointName).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<SagaWithCorrelation.SagaData> GetByMappingAsync(Guid id,string endpointName)
+    async Task<SagaWithCorrelation.SagaData> GetByMappingAsync(Guid id, string endpointName)
     {
         var sagaData = new SagaWithCorrelation.SagaData
         {
