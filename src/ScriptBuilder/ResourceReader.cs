@@ -5,6 +5,6 @@ static class ResourceReader
 {
     public static string ReadResource(BuildSqlVariant sqlVariant, string prefix)
     {
-        return Resource.AsStringUnChecked($"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlVariant}.sql");
+        return Resource.AsStringUnChecked($"NServiceBus.Persistence.Sql.{prefix}_{sqlVariant}.sql");
     }
 }

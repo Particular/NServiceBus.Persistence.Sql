@@ -7,10 +7,11 @@
     <ProjectGuid>{63784399-65AF-424A-B2AD-0C94AE326823}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilderTask</RootNamespace>
+    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuSpecFileName>NServiceBus.Persistence.Sql.MsBuild</NuSpecFileName>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
@@ -95,5 +96,26 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets'))" />
+  </Target>
+  <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
+  <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
+  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+    <PropertyGroup>
+      <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
+      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
+      <ScriptBuilderTaskDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskDll>
+      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
+      <MergeOutputDll>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputDll>
+      <MergeOutputPdb>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputPdb>
+      <MsBuildTargets>$(SolutionDir)..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
+    </PropertyGroup>
+    <MakeDir Directories="$(SolutionDir)..\binaries" />
+    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutputDll)&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <MakeDir Directories="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergeOutputDll)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergeOutputPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
   </Target>
 </Project>
