@@ -91,6 +91,7 @@ public class SagaConsistencyTests
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SagaConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
+        endpointConfiguration.DisableFeature<NServiceBus.Features.TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
