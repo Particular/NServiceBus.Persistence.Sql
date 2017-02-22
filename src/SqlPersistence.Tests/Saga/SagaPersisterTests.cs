@@ -20,7 +20,6 @@ public abstract class SagaPersisterTests
         dbConnection = GetConnection();
     }
 
-    
     SagaPersister SetUp(string endpointName)
     {
         var commandBuilder = new SagaCommandBuilder(sqlVariant.Convert(), $"{endpointName}_");
@@ -240,18 +239,8 @@ public abstract class SagaPersisterTests
     {
         var endpointName = nameof(UpdateWithCorrectVersion);
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithCorrelation",
-            name: "SagaWithCorrelation",
-            correlationProperty: new CorrelationProperty
-            (
-                name: "CorrelationProperty",
-                type: CorrelationPropertyType.String
-            ),
-            transitionalCorrelationProperty: new CorrelationProperty
-            (
-                name: "TransitionalCorrelationProperty",
-                type: CorrelationPropertyType.String
-            )
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
         );
         using (var connection = dbConnection())
         {
@@ -259,14 +248,12 @@ public abstract class SagaPersisterTests
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
         }
         var id = Guid.NewGuid();
-        var sagaData1 = new SagaWithCorrelation.SagaData
+        var sagaData1 = new SagaWithNoCorrelation.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            SimpleProperty = "PropertyValue",
-            CorrelationProperty = "theCorrelationProperty",
-            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
+            SimpleProperty = "PropertyValue"
         };
 
         var persister = SetUp(endpointName);
@@ -274,7 +261,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty").GetAwaiter().GetResult();
+            persister.Save(sagaData1, storageSession, typeof(SagaWithNoCorrelation), "theProperty").GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -282,9 +269,9 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)).GetAwaiter().GetResult();
+            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation)).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
-            persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), sagaData.Version).GetAwaiter().GetResult();
+            persister.Update(sagaData.Data, storageSession, typeof(SagaWithNoCorrelation), sagaData.Version).GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -292,7 +279,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)).GetAwaiter().GetResult();
+            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation)).GetAwaiter().GetResult();
             ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.AreEqual(2, sagaData.Version);
         }
@@ -305,18 +292,8 @@ public abstract class SagaPersisterTests
         var endpointName = nameof(UpdateWithWrongVersion);
 
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithCorrelation",
-            name: "SagaWithCorrelation",
-            correlationProperty: new CorrelationProperty
-            (
-                name: "CorrelationProperty",
-                type: CorrelationPropertyType.String
-            ),
-            transitionalCorrelationProperty: new CorrelationProperty
-            (
-                name: "TransitionalCorrelationProperty",
-                type: CorrelationPropertyType.String
-            )
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
         );
         using (var connection = dbConnection())
         {
@@ -324,14 +301,12 @@ public abstract class SagaPersisterTests
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
         }
         var id = Guid.NewGuid();
-        var sagaData1 = new SagaWithCorrelation.SagaData
+        var sagaData1 = new SagaWithNoCorrelation.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
             SimpleProperty = "PropertyValue",
-            CorrelationProperty = "theCorrelationProperty",
-            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty"
         };
 
         var persister = SetUp(endpointName);
@@ -339,7 +314,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty");
+            await persister.Save(sagaData1, storageSession, typeof(SagaWithNoCorrelation), "theProperty");
             await storageSession.CompleteAsync();
         }
 
@@ -347,10 +322,10 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation));
+            var sagaData = await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation));
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), wrongVersion));
+            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithNoCorrelation), wrongVersion));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
 
@@ -427,6 +402,7 @@ public abstract class SagaPersisterTests
 
 
     [Test]
+    [Explicit("Need to verify result")]
     public void TransitionId()
     {
         var endpointName = nameof(TransitionId);
@@ -444,33 +420,40 @@ public abstract class SagaPersisterTests
         {
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlVariant), endpointName);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlVariant), endpointName);
+        }
 
-            var definition2 = new SagaDefinition(
-                tableSuffix: "SagaWithCorrelation",
-                name: "SagaWithCorrelation",
-                correlationProperty: new CorrelationProperty
-                (
-                    name: "CorrelationProperty",
-                    type: CorrelationPropertyType.String
-                ),
-                transitionalCorrelationProperty: new CorrelationProperty
-                (
-                    name: "TransitionalCorrelationProperty",
-                    type: CorrelationPropertyType.Guid
-                )
-            );
+        var definition2 = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.Guid
+            )
+        );
+        using (var connection = dbConnection())
+        {
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlVariant), endpointName);
+        }
 
-            var definition3 = new SagaDefinition(
-                tableSuffix: "SagaWithCorrelation",
-                name: "SagaWithCorrelation",
-                correlationProperty: new CorrelationProperty
-                (
-                    name: "TransitionalCorrelationProperty",
-                    type: CorrelationPropertyType.Guid
-                )
-            );
+        var definition3 = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.Guid
+            )
+        );
+        using (var connection = dbConnection())
+        {
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlVariant);
+            Console.WriteLine(buildCreateScript);
             connection.ExecuteCommand(buildCreateScript, endpointName);
         }
     }

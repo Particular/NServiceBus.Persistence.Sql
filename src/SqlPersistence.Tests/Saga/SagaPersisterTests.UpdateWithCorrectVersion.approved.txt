@@ -1,7 +1,5 @@
 ﻿{
   "Data": {
-    "CorrelationProperty": "theCorrelationProperty",
-    "TransitionalCorrelationProperty": "theTransitionalCorrelationProperty",
     "SimpleProperty": "UpdatedValue",
     "Id": "theSagaId",
     "Originator": "theOriginator",
