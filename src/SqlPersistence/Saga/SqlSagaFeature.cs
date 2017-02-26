@@ -20,7 +20,9 @@ class SqlSagaFeature : Feature
         var settings = context.Settings;
         var endpointName = settings.GetTablePrefix();
         var sqlVariant = settings.GetSqlVariant();
+#pragma warning disable 618
         var commandBuilder = new SagaCommandBuilder(sqlVariant,endpointName);
+#pragma warning restore 618
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
         var readerCreator = SagaSettings.GetReaderCreator(settings);

@@ -7,6 +7,7 @@ using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
+#pragma warning disable 618
 
 class SubscriptionPersister : ISubscriptionStorage
 {

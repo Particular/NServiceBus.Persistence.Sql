@@ -10,6 +10,7 @@ using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql;
 using IsolationLevel = System.Data.IsolationLevel;
+#pragma warning disable 618
 
 class OutboxPersister : IOutboxStorage
 {
@@ -31,8 +32,6 @@ class OutboxPersister : IOutboxStorage
         var transaction = connection.BeginTransaction();
         return new SqlOutboxTransaction(transaction, connection);
     }
-
-
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {

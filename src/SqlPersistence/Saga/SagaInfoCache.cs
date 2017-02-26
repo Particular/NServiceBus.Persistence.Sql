@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql;
+#pragma warning disable 618
 
 class SagaInfoCache
 {

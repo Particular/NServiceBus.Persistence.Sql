@@ -3,6 +3,10 @@ using System.Text;
 
 namespace NServiceBus.Persistence.Sql
 {
+    /// <summary>
+    /// Not for public use.
+    /// </summary>
+    [Obsolete("Not for public use")]
     public static class SubscriptionCommandBuilder
     {
 

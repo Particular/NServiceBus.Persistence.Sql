@@ -5,7 +5,7 @@ using System.Reflection;
 namespace NServiceBus.Persistence.Sql
 {
     /// <summary>
-    /// For automapping saga correlation propertiess by using a <see cref="SqlSagaAttribute"/>. Used by <see cref="SqlSaga{TSagaData}"/>.
+    /// For automapping saga correlation properties by using a <see cref="SqlSagaAttribute"/>. Used by <see cref="SqlSaga{TSagaData}"/>.
     /// </summary>
     public class MessagePropertyMapper<TSagaData> where TSagaData : IContainSagaData, new()
     {

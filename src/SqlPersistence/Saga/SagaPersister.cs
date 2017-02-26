@@ -140,7 +140,7 @@ class SagaPersister : ISagaPersister
         where TSagaData : IContainSagaData
     {
         // ReSharper disable once CompareNonConstrainedGenericWithNull
-        //TODO: remove diable when core adds a class constraint to TSagaData
+        //TODO: remove when core adds a class constraint to TSagaData
         if (result.Data == null)
         {
             return default(TSagaData);

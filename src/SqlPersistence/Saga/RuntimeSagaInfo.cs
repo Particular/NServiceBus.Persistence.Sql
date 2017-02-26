@@ -7,6 +7,7 @@ using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using NewtonSerializer = Newtonsoft.Json.JsonSerializer;
+#pragma warning disable 618
 
 class RuntimeSagaInfo
 {

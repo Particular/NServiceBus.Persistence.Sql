@@ -10,10 +10,12 @@
     {
         public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
     {
         public static NServiceBus.Persistence.Sql.OutboxCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class OutboxCommands
     {
         public OutboxCommands(string store, string get, string setAsDispatched, string cleanup) { }
@@ -23,14 +25,15 @@
         public string Store { get; set; }
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
+    [System.ObsoleteAttribute("Not for public use")]
     public class SagaCommandBuilder
     {
         public SagaCommandBuilder(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
-        public string BuildCompleteCommand(string tableSuffx) { }
-        public string BuildGetByPropertyCommand(string tableSuffx, string propertyName) { }
-        public string BuildGetBySagaIdCommand(string tableSuffx) { }
-        public string BuildSaveCommand(string tableSuffx, string correlationProperty, string transitionalCorrelationProperty) { }
-        public string BuildUpdateCommand(string tableSuffx, string transitionalCorrelationProperty) { }
+        public string BuildCompleteCommand(string tableSuffix) { }
+        public string BuildGetByPropertyCommand(string tableSuffix, string propertyName) { }
+        public string BuildGetBySagaIdCommand(string tableSuffix) { }
+        public string BuildSaveCommand(string tableSuffix, string correlationProperty, string transitionalCorrelationProperty) { }
+        public string BuildUpdateCommand(string tableSuffix, string transitionalCorrelationProperty) { }
     }
     public class SagaSettings
     {
@@ -70,10 +73,12 @@
         MsSqlServer = 0,
         MySql = 1,
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class static SubscriptionCommandBuilder
     {
         public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class SubscriptionCommands
     {
         public SubscriptionCommands(string subscribe, string unsubscribe, System.Func<System.Collections.Generic.List<NServiceBus.Unicast.Subscriptions.MessageType>, string> getSubscribers) { }
@@ -81,10 +86,12 @@
         public string Subscribe { get; }
         public string Unsubscribe { get; }
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class static TimeoutCommandBuilder
     {
         public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
     }
+    [System.ObsoleteAttribute("Not for public use")]
     public class TimeoutCommands
     {
         public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range) { }
