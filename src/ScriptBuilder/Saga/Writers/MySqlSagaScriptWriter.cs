@@ -13,7 +13,7 @@ class MySqlSagaScriptWriter : ISagaScriptWriter
         this.saga = saga;
     }
 
-    public void Initialise()
+    public void Initialize()
     {
         writer.WriteLine(@"
 drop procedure if exists sqlpersistence_raiseerror;

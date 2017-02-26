@@ -33,8 +33,8 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             WriteComment(writer, "TableNameVariable");
             sqlVariantWriter.WriteTableNameVariable();
 
-            WriteComment(writer, "Initialise");
-            sqlVariantWriter.Initialise();
+            WriteComment(writer, "Initialize");
+            sqlVariantWriter.Initialize();
 
             WriteComment(writer, "CreateTable");
             sqlVariantWriter.WriteCreateTable();

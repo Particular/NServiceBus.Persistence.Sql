@@ -13,7 +13,7 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
         this.saga = saga;
     }
 
-    public void Initialise()
+    public void Initialize()
     {
     }
 

@@ -23,7 +23,7 @@ public class ConfigureEndpointHelper
         this.connectionBuilder = connectionBuilder;
         this.sqlVariant = sqlVariant;
         this.exceptionFilter = exceptionFilter;
-        sagaDefinitions = RuntimeSagaDefintionReader.GetSagaDefintions(configuration).ToList();
+        sagaDefinitions = RuntimeSagaDefinitionReader.GetSagaDefinitions(configuration).ToList();
         using (var connection = connectionBuilder())
         {
             connection.Open();

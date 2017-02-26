@@ -2,7 +2,7 @@
 
 interface ISagaScriptWriter
 {
-    void Initialise();
+    void Initialize();
     void WriteTableNameVariable();
     void WriteDropTable();
     void WritePurgeObsoleteProperties();

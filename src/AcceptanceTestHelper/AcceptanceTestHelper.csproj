@@ -73,7 +73,7 @@
     <Compile Include="ConfigureEndpointHelper.cs" />
     <Compile Include="ConfigureHowToFindSagaWithMessage.cs" />
     <Compile Include="EndpointConfigurationExtensions.cs" />
-    <Compile Include="RuntimeSagaDefintionReader.cs" />
+    <Compile Include="RuntimeSagaDefinitionReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">

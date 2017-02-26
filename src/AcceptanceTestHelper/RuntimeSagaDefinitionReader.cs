@@ -6,11 +6,11 @@ using System.Runtime.Serialization;
 using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-public static class RuntimeSagaDefintionReader
+public static class RuntimeSagaDefinitionReader
 {
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
 
-    public static IEnumerable<SagaDefinition> GetSagaDefintions(EndpointConfiguration endpointConfiguration)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration)
     {
         return endpointConfiguration.GetScannedSagaTypes().Select(GetSagaDefinition);
     }
