@@ -40,7 +40,8 @@ where MessageId = @MessageId";
 update {tableName}
 set
     Dispatched = 1,
-    DispatchedAt = @DispatchedAt
+    DispatchedAt = @DispatchedAt,
+    Operations = '[]'
 where MessageId = @MessageId";
             return new OutboxCommands(
                 store: storeCommandText,
