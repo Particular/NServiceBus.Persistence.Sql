@@ -3,7 +3,7 @@
 
 declare @tableName nvarchar(max) = @tablePrefix + N'theSaga';
 
-/* Initialise */
+/* Initialize */
 
 /* CreateTable */
 

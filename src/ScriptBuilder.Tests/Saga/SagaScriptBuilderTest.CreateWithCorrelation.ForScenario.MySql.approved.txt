@@ -4,7 +4,7 @@
 set @tableName = concat(@tablePrefix, 'theSaga');
 
 
-/* Initialise */
+/* Initialize */
 
 drop procedure if exists sqlpersistence_raiseerror;
 create procedure sqlpersistence_raiseerror(message varchar(256))
