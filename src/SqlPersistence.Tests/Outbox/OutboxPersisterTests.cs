@@ -52,6 +52,28 @@ public abstract class OutboxPersisterTests
     {
         var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result);
+        VerifyOperationsAreEmpty(result);
+    }
+
+    void VerifyOperationsAreEmpty(OutboxMessage result)
+    {
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = $@"
+select Operations
+from {nameof(OutboxPersisterTests)}_OutboxData
+where MessageId = '{result.MessageId}'";
+                using (var reader = command.ExecuteReader())
+                {
+                    reader.Read();
+                    var operations = reader.GetString(0);
+                    Assert.AreEqual("[]", operations);
+                }
+            }
+        }
     }
 
     async Task<OutboxMessage> StoreDispatchAndGetAsync()
