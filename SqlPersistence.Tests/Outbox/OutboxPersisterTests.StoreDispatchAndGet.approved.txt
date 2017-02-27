@@ -1,4 +1,0 @@
-﻿{
-  "MessageId": "a",
-  "TransportOperations": []
-}

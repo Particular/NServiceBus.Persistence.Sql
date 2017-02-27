@@ -1,0 +1,9 @@
+﻿{
+  "Data": {
+    "SimpleProperty": "UpdatedValue",
+    "Id": "theSagaId",
+    "Originator": "theOriginator",
+    "OriginalMessageId": "theOriginalMessageId"
+  },
+  "Version": 2
+}

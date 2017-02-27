@@ -1,0 +1,166 @@
+﻿
+/* TableNameVariable */
+
+declare @tableName nvarchar(max) = @tablePrefix + N'theSaga';
+
+/* Initialize */
+
+/* CreateTable */
+
+if not exists
+(
+    select *
+    from sys.objects
+    where
+        object_id = object_id(@tableName) and
+        type in ('U')
+)
+begin
+declare @createTable nvarchar(max);
+set @createTable = '
+    create table ' + @tableName + '(
+        Id uniqueidentifier not null primary key,
+        Metadata nvarchar(max) not null,
+        Data nvarchar(max) not null,
+        PersistenceVersion varchar(23) not null,
+        SagaTypeVersion varchar(23) not null,
+        Concurrency int not null
+    )
+';
+exec(@createTable);
+end
+
+/* AddProperty CorrelationProperty */
+
+if not exists
+(
+  select * from sys.columns
+  where
+    name = N'Correlation_CorrelationProperty' and
+    object_id = object_id(@tableName)
+)
+begin
+  declare @createColumn_CorrelationProperty nvarchar(max);
+  set @createColumn_CorrelationProperty = '
+  alter table ' + @tableName + N'
+    add Correlation_CorrelationProperty nvarchar(200);';
+  exec(@createColumn_CorrelationProperty);
+end
+
+/* VerifyColumnType String */
+
+declare @dataType_CorrelationProperty nvarchar(max);
+set @dataType_CorrelationProperty = (
+  select data_type
+  from information_schema.columns
+  where
+    table_name = ' + @tableName + N' and
+    column_name = 'Correlation_CorrelationProperty'
+);
+if (@dataType_CorrelationProperty <> 'nvarchar(200)')
+  begin
+    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar(200) got ' + @dataType_CorrelationProperty + '.';
+    throw 50000, @error_CorrelationProperty, 0
+  end
+
+/* WriteCreateIndex CorrelationProperty */
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = N'Index_Correlation_CorrelationProperty' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createIndex_CorrelationProperty nvarchar(max);
+  set @createIndex_CorrelationProperty = N'
+  create unique index Index_Correlation_CorrelationProperty
+  on ' + @tableName + N'(Correlation_CorrelationProperty)
+  where Correlation_CorrelationProperty is not null;';
+  exec(@createIndex_CorrelationProperty);
+end
+
+/* AddProperty TransitionalProperty */
+
+if not exists
+(
+  select * from sys.columns
+  where
+    name = N'Correlation_TransitionalProperty' and
+    object_id = object_id(@tableName)
+)
+begin
+  declare @createColumn_TransitionalProperty nvarchar(max);
+  set @createColumn_TransitionalProperty = '
+  alter table ' + @tableName + N'
+    add Correlation_TransitionalProperty nvarchar(200);';
+  exec(@createColumn_TransitionalProperty);
+end
+
+/* VerifyColumnType String */
+
+declare @dataType_TransitionalProperty nvarchar(max);
+set @dataType_TransitionalProperty = (
+  select data_type
+  from information_schema.columns
+  where
+    table_name = ' + @tableName + N' and
+    column_name = 'Correlation_TransitionalProperty'
+);
+if (@dataType_TransitionalProperty <> 'nvarchar(200)')
+  begin
+    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar(200) got ' + @dataType_TransitionalProperty + '.';
+    throw 50000, @error_TransitionalProperty, 0
+  end
+
+/* CreateIndex TransitionalProperty */
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = N'Index_Correlation_TransitionalProperty' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createIndex_TransitionalProperty nvarchar(max);
+  set @createIndex_TransitionalProperty = N'
+  create unique index Index_Correlation_TransitionalProperty
+  on ' + @tableName + N'(Correlation_TransitionalProperty)
+  where Correlation_TransitionalProperty is not null;';
+  exec(@createIndex_TransitionalProperty);
+end
+
+/* PurgeObsoleteIndex */
+
+declare @dropIndexQuery nvarchar(max);
+select @dropIndexQuery =
+(
+    select 'drop index ' + name + ' on ' + @tableName + ';'
+    from sysindexes
+    where
+        Id = (select object_id from sys.objects where name = @tableName) and
+        Name is not null and
+        Name like 'Index_Correlation_%' and
+        Name <> N'Index_Correlation_CorrelationProperty' and
+        Name <> N'Index_Correlation_TransitionalProperty'
+);
+exec sp_executesql @dropIndexQuery
+
+/* PurgeObsoleteProperties */
+
+declare @dropPropertiesQuery nvarchar(max);
+select @dropPropertiesQuery =
+(
+    select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
+    from information_schema.columns
+    where
+        table_name = @tableName and
+        column_name like 'Correlation_%' and
+        column_name <> N'Correlation_CorrelationProperty' and
+        column_name <> N'Correlation_TransitionalProperty'
+);
+exec sp_executesql @dropPropertiesQuery

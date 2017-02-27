@@ -1,0 +1,7 @@
+﻿{
+  "SimplePropertyಠ_ಠ": "PropertyValueಠ_ಠ",
+  "Contentಠ_ಠ": "♟⛺",
+  "Id": "theSagaId",
+  "Originator": "theOriginatorಠ_ಠ",
+  "OriginalMessageId": "theOriginalMessageIdಠ_ಠ"
+}

@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
+    <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuSpecFileName>NServiceBus.Persistence.Sql</NuSpecFileName>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>bin\Debug\NServiceBus.Persistence.Sql.xml</DocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>bin\Release\NServiceBus.Persistence.Sql.xml</DocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ConfigureAwait, Version=1.0.0.0, Culture=neutral, PublicKeyToken=233850a516558a98, processorArchitecture=MSIL">
+      <HintPath>..\packages\ConfigureAwait.Fody.1.0.0\lib\portable-net45+wp8+win+wpa81\ConfigureAwait.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Janitor, Version=1.2.2.0, Culture=neutral, PublicKeyToken=d34c7d3bba3746e6, processorArchitecture=MSIL">
+      <HintPath>..\packages\Janitor.Fody.1.2.2.0\lib\dotnet\Janitor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.6.1.3\lib\net452\NServiceBus.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Guard.cs">
+      <Link>Guard.cs</Link>
+    </Compile>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
+    <Compile Include="Config\SqlVariant.cs" />
+    <Compile Include="Outbox\OutboxCommands.cs" />
+    <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Subscription\SubscriptionCommands.cs" />
+    <Compile Include="Subscription\SubscriptionCommandBuilder.cs" />
+    <Compile Include="TableNameCleaner.cs" />
+    <Compile Include="Saga\Config\SagaSettings_SettingsForVersion.cs" />
+    <Compile Include="Saga\Config\SagaSettings_JsonSerializerSettings.cs" />
+    <Compile Include="Saga\Config\SagaSettings_Writer.cs" />
+    <Compile Include="Saga\Config\SagaSettings_Reader.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_Connection.cs" />
+    <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
+    <Compile Include="Config\SqlVariantConfig.cs" />
+    <Compile Include="EnabledStorageFeatures.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="LogManager.cs" />
+    <Compile Include="Outbox\OperationConverter.cs" />
+    <Compile Include="Outbox\OutboxCleaner.cs" />
+    <Compile Include="Outbox\SerializableOperation.cs" />
+    <Compile Include="Outbox\SqlOutboxFeature.cs" />
+    <Compile Include="Installer.cs" />
+    <Compile Include="Outbox\OutboxPersister.cs" />
+    <Compile Include="Outbox\SqlOutboxTransaction.cs" />
+    <Compile Include="Saga\ContextBagExtentions.cs" />
+    <Compile Include="Saga\Config\SagaSettings.cs" />
+    <Compile Include="Saga\Serialization\SagaPropertyFilter.cs" />
+    <Compile Include="Saga\SqlSagaAttributeData.cs" />
+    <Compile Include="Serializer.cs" />
+    <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
+    <Compile Include="SqlPersistenceSettingsAttribute.cs" />
+    <Compile Include="SynchronizedStorage\ISqlStorageSession.cs" />
+    <Compile Include="SynchronizedStorage\StorageSessionFeature.cs" />
+    <Compile Include="SynchronizedStorage\StorageSession.cs" />
+    <Compile Include="SynchronizedStorage\StorageAdapter.cs" />
+    <Compile Include="Saga\SqlSagaAttribute.cs" />
+    <Compile Include="Saga\MessagePropertyMapper.cs" />
+    <Compile Include="Saga\Serialization\RetrieveVersionSpecificJsonSettings.cs" />
+    <Compile Include="Saga\SagaCommandBuilder.cs" />
+    <Compile Include="Saga\RuntimeSagaInfo.cs" />
+    <Compile Include="Saga\SagaInfoCache.cs" />
+    <Compile Include="Saga\SqlSagaAttributeReader.cs" />
+    <Compile Include="Saga\SqlSaga.cs" />
+    <Compile Include="ScriptLocation.cs" />
+    <Compile Include="StaticVersions.cs" />
+    <Compile Include="SynchronizedStorage\SynchronizedStorage.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="SqlHelpers.cs" />
+    <Compile Include="SqlPersistence.cs" />
+    <Compile Include="Saga\SqlSagaFeature.cs" />
+    <Compile Include="Subscription\SqlSubscriptionFeature.cs" />
+    <Compile Include="Timeout\SequentialGuid.cs" />
+    <Compile Include="Timeout\TimeoutCommands.cs" />
+    <Compile Include="Timeout\SqlTimeoutFeature.cs" />
+    <Compile Include="Timeout\TimeoutCommandBuilder.cs" />
+    <Compile Include="Timeout\TimeoutPersister.cs" />
+    <Compile Include="Saga\SagaPersister.cs" />
+    <Compile Include="Subscription\SubscriptionPersister.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets'))" />
+  </Target>
+  <Import Project="..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.5\build\dotnet\GitVersionTask.targets')" />
+  <Import Project="..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.1\build\NuGetPackager.targets')" />
+  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+    <MakeDir Directories="$(SolutionDir)..\binaries" />
+    <ItemGroup>
+      <Files Include="$(TargetDir)$(TargetName).*"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries"/>
+    <MakeDir Directories="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
+  </Target>
+</Project>

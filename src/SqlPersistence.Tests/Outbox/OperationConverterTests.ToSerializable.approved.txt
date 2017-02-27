@@ -1,0 +1,12 @@
+﻿[
+  {
+    "Body": "ICE=",
+    "Headers": {
+      "HeaderKey1": "HeaderValue1"
+    },
+    "MessageId": "Id1",
+    "Options": {
+      "OptionKey1": "OptionValue1"
+    }
+  }
+]

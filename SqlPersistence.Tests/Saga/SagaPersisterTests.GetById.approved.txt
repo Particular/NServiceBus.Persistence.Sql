@@ -1,8 +1,0 @@
-﻿{
-  "CorrelationProperty": "theCorrelationProperty",
-  "TransitionalCorrelationProperty": "theTransitionalCorrelationProperty",
-  "SimpleProperty": "theSimpleProperty",
-  "Id": "theSagaId",
-  "Originator": "theOriginator",
-  "OriginalMessageId": "theOriginalMessageId"
-}
