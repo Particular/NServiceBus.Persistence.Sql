@@ -67,6 +67,11 @@ namespace NServiceBus.Persistence.Sql
         void Inner()
         {
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
+            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql");
+            if (Directory.Exists(scriptPath))
+            {
+                Directory.Delete(scriptPath, true);
+            }
             foreach (var variant in SqlVariantReader.Read(moduleDefinition))
             {
                 Write(moduleDefinition, variant);
@@ -76,10 +81,6 @@ namespace NServiceBus.Persistence.Sql
         void Write(ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant)
         {
             var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVariant.ToString());
-            if (Directory.Exists(scriptPath))
-            {
-                Directory.Delete(scriptPath, true);
-            }
             Directory.CreateDirectory(scriptPath);
             SagaWriter.WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant, logger);
             TimeoutWriter.WriteTimeoutScript(scriptPath, sqlVariant);
