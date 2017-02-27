@@ -15,6 +15,7 @@
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
           ProjectDirectory="$(ProjectDir)"
+          SolutionDirectory="$(SolutionDir)"/>
   </Target>
   
   <Target
