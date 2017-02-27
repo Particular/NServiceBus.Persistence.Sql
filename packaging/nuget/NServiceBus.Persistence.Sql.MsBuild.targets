@@ -14,8 +14,7 @@
     <ScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
-		  ProjectDirectory="$(ProjectDir)"
-		  SolutionDirectory="$(SolutionDir)/>
+          ProjectDirectory="$(ProjectDir)"
   </Target>
   
   <Target
