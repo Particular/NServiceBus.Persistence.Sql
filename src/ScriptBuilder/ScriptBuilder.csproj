@@ -78,6 +78,7 @@
     <Compile Include="BuildSqlVariant.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="OutputPathReader.cs" />
     <Compile Include="ResourceReader.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationProperty.cs" />
