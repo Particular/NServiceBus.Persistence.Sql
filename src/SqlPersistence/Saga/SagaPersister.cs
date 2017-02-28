@@ -104,16 +104,15 @@ class SagaPersister : ISagaPersister
     }
 
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+    public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(sagaId, session, sagaType);
-        return SetConcurrency(result, context);
+        return Get<TSagaData>(sagaId, session, sagaType, context);
     }
 
 
-    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
+    internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
@@ -123,33 +122,24 @@ class SagaPersister : ISagaPersister
             command.CommandText = sagaInfo.GetBySagaIdCommand;
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaId);
-            return await GetSagaData<TSagaData>(command, sagaInfo);
+            return await GetSagaData<TSagaData>(command, sagaInfo, context);
         }
     }
 
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
+    public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType);
-        return SetConcurrency(result, context);
+        return Get<TSagaData>(propertyName, propertyValue, session, sagaType, context);
     }
 
-    static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
-        where TSagaData : IContainSagaData
+    static void SetConcurrency(ContextBag context, int concurrency)
     {
-        // ReSharper disable once CompareNonConstrainedGenericWithNull
-        //TODO: remove when core adds a class constraint to TSagaData
-        if (result.Data == null)
-        {
-            return default(TSagaData);
-        }
-        context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
-        return result.Data;
+        context.Set("NServiceBus.Persistence.Sql.Concurrency", concurrency);
     }
 
-    static int GetConcurrency(ContextBag context)
+    internal static int GetConcurrency(ContextBag context)
     {
         int concurrency;
         if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
@@ -159,7 +149,7 @@ class SagaPersister : ISagaPersister
         return concurrency;
     }
 
-    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
+    internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
@@ -180,12 +170,12 @@ class SagaPersister : ISagaPersister
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("propertyValue", propertyValue.ToString());
-            return await GetSagaData<TSagaData>(command, sagaInfo);
+            return await GetSagaData<TSagaData>(command, sagaInfo, context);
         }
     }
 
 
-    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
+    static async Task<TSagaData> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo, ContextBag context)
         where TSagaData : IContainSagaData
     {
         // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
@@ -193,7 +183,7 @@ class SagaPersister : ISagaPersister
         {
             if (!await dataReader.ReadAsync())
             {
-                return default(Concurrency<TSagaData>);
+                return default(TSagaData);
             }
 
             var id = await dataReader.GetGuidAsync(0);
@@ -214,7 +204,8 @@ class SagaPersister : ISagaPersister
                 sagaData.Id = id;
                 sagaData.Originator = originator;
                 sagaData.OriginalMessageId = originalMessageId;
-                return new Concurrency<TSagaData>(sagaData, concurrency);
+                SetConcurrency(context, concurrency);
+                return sagaData;
             }
         }
     }
@@ -241,16 +232,4 @@ class SagaPersister : ISagaPersister
         }
     }
 
-    internal struct Concurrency<TSagaData>
-        where TSagaData : IContainSagaData
-    {
-        public TSagaData Data { get; }
-        public int Version { get; }
-
-        public Concurrency(TSagaData data, int version)
-        {
-            Data = data;
-            Version = version;
-        }
-    }
 }

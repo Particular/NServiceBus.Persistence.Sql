@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
+using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
@@ -79,7 +80,7 @@ public abstract class SagaPersisterTests
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
             await persister.Complete(sagaData, storageSession, typeof(SagaWithCorrelation), 1);
-            Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data);
+            Assert.IsNull(await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation), new ContextBag()));
         }
     }
 
@@ -117,7 +118,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithNoCorrelation), null);
-            return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation))).Data;
+            return await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag());
         }
     }
 
@@ -194,7 +195,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
+            return await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation), new ContextBag());
         }
     }
 
@@ -238,7 +239,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), "thePropertyಠ_ಠ");
-            return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ))).Data;
+            return await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), new ContextBag());
         }
     }
 
@@ -277,9 +278,9 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation)).GetAwaiter().GetResult();
-            sagaData.Data.SimpleProperty = "UpdatedValue";
-            persister.Update(sagaData.Data, storageSession, typeof(SagaWithNoCorrelation), sagaData.Version).GetAwaiter().GetResult();
+            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag()).GetAwaiter().GetResult();
+            sagaData.SimpleProperty = "UpdatedValue";
+            persister.Update(sagaData, storageSession, typeof(SagaWithNoCorrelation), 1).GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -287,9 +288,10 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation)).GetAwaiter().GetResult();
+            var contextBag = new ContextBag();
+            var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), contextBag).GetAwaiter().GetResult();
             ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
-            Assert.AreEqual(2, sagaData.Version);
+            Assert.AreEqual(2, SagaPersister.GetConcurrency(contextBag));
         }
     }
 
@@ -330,10 +332,10 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            var sagaData = await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation));
-            sagaData.Data.SimpleProperty = "UpdatedValue";
+            var sagaData = await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag());
+            sagaData.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithNoCorrelation), wrongVersion));
+            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData, storageSession, typeof(SagaWithNoCorrelation), wrongVersion));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
 
@@ -386,7 +388,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
+            return await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation), new ContextBag());
         }
     }
 
@@ -504,7 +506,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithCorrelation))).Data;
+            return await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithCorrelation), new ContextBag());
         }
     }
 
