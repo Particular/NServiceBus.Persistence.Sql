@@ -49,10 +49,10 @@
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
     public class SqlPersistenceSettingsAttribute : System.Attribute
     {
-        public SqlPersistenceSettingsAttribute(bool msSqlServerScripts = False, bool mySqlScripts = False, string outputPath = "") { }
+        public SqlPersistenceSettingsAttribute(bool msSqlServerScripts = False, bool mySqlScripts = False, string scriptPromotionPath = null) { }
         public bool MsSqlServerScripts { get; }
         public bool MySqlScripts { get; }
-        public string OutputPath { get; }
+        public string ScriptPromotionPath { get; }
     }
     public abstract class SqlSaga<TSagaData> : NServiceBus.Saga<TSagaData>
         where TSagaData : NServiceBus.IContainSagaData, new ()

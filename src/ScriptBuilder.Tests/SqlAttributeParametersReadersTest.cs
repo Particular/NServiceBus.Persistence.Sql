@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using Mono.Cecil;
 using NUnit.Framework;
 using ObjectApproval;
@@ -10,8 +11,7 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void Variant()
     {
-
-        var path = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
+        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         var assemblyResolver = new DefaultAssemblyResolver();
         assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
         var readerParameters = new ReaderParameters(ReadingMode.Deferred)
@@ -23,9 +23,9 @@ public class SqlAttributeParametersReadersTest
     }
 
     [Test]
-    public void Path()
+    public void ScriptPromotionPath()
     {
-        var path = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
+        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         var assemblyResolver = new DefaultAssemblyResolver();
         assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
         var readerParameters = new ReaderParameters(ReadingMode.Deferred)
@@ -33,7 +33,8 @@ public class SqlAttributeParametersReadersTest
             AssemblyResolver = assemblyResolver
         };
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        var buildSqlVariants = OutputPathReader.Read(module);
-        ObjectApprover.VerifyWithJson(buildSqlVariants);
+        var tryRead = ScriptPromotionPathReader.TryRead(module, out path);
+        Assert.IsTrue(tryRead);
+        ObjectApprover.VerifyWithJson(path);
     }
 }

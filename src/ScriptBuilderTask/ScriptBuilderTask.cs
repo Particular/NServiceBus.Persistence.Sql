@@ -67,6 +67,18 @@ namespace NServiceBus.Persistence.Sql
                 logger.LogError($"IntermediateDirectory '{IntermediateDirectory}' does not exist.");
                 return false;
             }
+
+            if (!Directory.Exists(ProjectDirectory))
+            {
+                logger.LogError($"ProjectDirectory '{ProjectDirectory}' does not exist.");
+                return false;
+            }
+
+            if (!Directory.Exists(SolutionDirectory))
+            {
+                logger.LogError($"SolutionDirectory '{SolutionDirectory}' does not exist.");
+                return false;
+            }
             return true;
         }
 
@@ -83,14 +95,40 @@ namespace NServiceBus.Persistence.Sql
                 Write(moduleDefinition, variant, scriptPath);
             }
 
-            var customPath = OutputPathReader.Read(moduleDefinition);
-            if (string.IsNullOrEmpty(customPath) == false)
-            { 
-                foreach (var variant in SqlVariantReader.Read(moduleDefinition))
-                {
-                    var outputPath = Path.Combine(customPath.Replace("$ProjectDir", ProjectDirectory).Replace("$SolutionDir", SolutionDirectory), variant.ToString());
-                    Write(moduleDefinition, variant, outputPath);
-                }
+            PromoteFiles(moduleDefinition, scriptPath);
+        }
+
+        void PromoteFiles(ModuleDefinition moduleDefinition, string scriptPath)
+        {
+            string customPath;
+            if (!ScriptPromotionPathReader.TryRead(moduleDefinition, out customPath))
+            {
+                return;
+            }
+                var replicationPath = customPath
+                    .Replace("$ProjectDir", ProjectDirectory)
+                    .Replace("$SolutionDir", SolutionDirectory);
+            try
+            {
+                Directory.Delete(replicationPath, true);
+                DuplicateDirectory(scriptPath, replicationPath);
+            }
+            catch (Exception exception)
+            {
+                throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
+            }
+        }
+
+        void DuplicateDirectory(string source, string destination)
+        {
+            foreach (var dirPath in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(dirPath.Replace(source, destination));
+            }
+
+            foreach (var newPath in Directory.GetFiles(source, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(newPath, newPath.Replace(source, destination), true);
             }
         }
 

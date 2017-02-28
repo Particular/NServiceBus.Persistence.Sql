@@ -7,17 +7,17 @@ namespace NServiceBus.Persistence.Sql
     {
         public bool MsSqlServerScripts { get; }
         public bool MySqlScripts { get; }
-        public string OutputPath { get; }
+        public string ScriptPromotionPath { get; }
 
         public SqlPersistenceSettingsAttribute(
             bool msSqlServerScripts = false,
             bool mySqlScripts = false,
-            string outputPath = ""
+            string scriptPromotionPath = null
             )
         {
             MySqlScripts = mySqlScripts;
             MsSqlServerScripts = msSqlServerScripts;
-            OutputPath = outputPath;
+            ScriptPromotionPath = scriptPromotionPath;
         }
     }
 }
