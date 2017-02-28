@@ -13,19 +13,22 @@ class SagaInfoCache
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    string tablePrefix;
 
     public SagaInfoCache(
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
-        SagaCommandBuilder commandBuilder)
+        SagaCommandBuilder commandBuilder,
+        string tablePrefix)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
         this.readerCreator = readerCreator;
         this.jsonSerializer = jsonSerializer;
         this.commandBuilder = commandBuilder;
+        this.tablePrefix = tablePrefix;
     }
     
 
@@ -44,6 +47,7 @@ class SagaInfoCache
             sagaType: sagaType,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
-            writerCreator: writerCreator);
+            writerCreator: writerCreator,
+            tablePrefix: tablePrefix);
     }
 }

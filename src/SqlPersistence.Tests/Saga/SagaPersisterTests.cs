@@ -26,14 +26,15 @@ public abstract class SagaPersisterTests
     SagaPersister SetUp(string endpointName)
     {
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(sqlVariant.Convert(), $"{endpointName}_");
+        var commandBuilder = new SagaCommandBuilder();
 #pragma warning restore 618
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
             jsonSerializer: Serializer.JsonSerializer,
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
-            writerCreator: writer => new JsonTextWriter(writer));
+            writerCreator: writer => new JsonTextWriter(writer),
+            tablePrefix: $"{endpointName}_");
         return new SagaPersister(infoCache);
     }
 
