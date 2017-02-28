@@ -1,0 +1,6 @@
+﻿{
+  "CorrelationProperty": 10,
+  "Id": "theSagaId",
+  "Originator": "theOriginator",
+  "OriginalMessageId": "theOriginalMessageId"
+}
