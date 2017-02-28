@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
 class SagaPersister : ISagaPersister
@@ -111,22 +112,6 @@ class SagaPersister : ISagaPersister
         return Get<TSagaData>(sagaId, session, sagaType, context);
     }
 
-
-    internal async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType, ContextBag context)
-        where TSagaData : IContainSagaData
-    {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
-        var sqlSession = session.SqlPersistenceSession();
-        using (var command = sqlSession.Connection.CreateCommand())
-        {
-            command.CommandText = sagaInfo.GetBySagaIdCommand;
-            command.Transaction = sqlSession.Transaction;
-            command.AddParameter("Id", sagaId);
-            return await GetSagaData<TSagaData>(command, sagaInfo, context);
-        }
-    }
-
-
     public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
@@ -134,78 +119,70 @@ class SagaPersister : ISagaPersister
         return Get<TSagaData>(propertyName, propertyValue, session, sagaType, context);
     }
 
-    static void SetConcurrency(ContextBag context, int concurrency)
-    {
-        context.Set("NServiceBus.Persistence.Sql.Concurrency", concurrency);
-    }
 
-    internal static int GetConcurrency(ContextBag context)
-    {
-        int concurrency;
-        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
-        {
-            throw new Exception("Cannot save saga because optimistic concurrency version is missing in the context.");
-        }
-        return concurrency;
-    }
-
-    internal async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType, ContextBag context)
+    internal Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType, ContextBag context)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
-
-        if (!sagaInfo.HasCorrelationProperty)
-        {
-            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. The saga has no correlation property.");
-        }
-        if (propertyName != sagaInfo.CorrelationProperty)
-        {
-            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
-        }
-        var commandText = sagaInfo.GetByCorrelationPropertyCommand;
         var sqlSession = session.SqlPersistenceSession();
-
-        using (var command = sqlSession.Connection.CreateCommand())
+        return GetSagaData<TSagaData>(sagaInfo, context, sqlSession, command =>
         {
-            command.CommandText = commandText;
-            command.Transaction = sqlSession.Transaction;
-            command.AddParameter("propertyValue", propertyValue.ToString());
-            return await GetSagaData<TSagaData>(command, sagaInfo, context);
-        }
+            command.CommandText = sagaInfo.GetBySagaIdCommand;
+            command.AddParameter("Id", sagaId);
+        });
+    }
+
+    internal Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType, ContextBag context)
+        where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
+        var sqlSession = session.SqlPersistenceSession();
+        return GetSagaData<TSagaData>(sagaInfo, context, sqlSession,
+            command =>
+            {
+                command.CommandText = sagaInfo.GetByCorrelationPropertyCommand;
+                command.AddParameter("propertyValue", propertyValue.ToString());
+            });
     }
 
 
-    static async Task<TSagaData> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo, ContextBag context)
+    static async Task<TSagaData> GetSagaData<TSagaData>(RuntimeSagaInfo sagaInfo, ContextBag context, ISqlStorageSession sqlSession, Action<DbCommand> tweakCommand)
         where TSagaData : IContainSagaData
     {
-        // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+        using (var command = sqlSession.Connection.CreateCommand())
         {
-            if (!await dataReader.ReadAsync())
+            tweakCommand(command);
+            command.Transaction = sqlSession.Transaction;
+            // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
+            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
             {
-                return default(TSagaData);
-            }
+                if (!await dataReader.ReadAsync())
+                {
+                    return default(TSagaData);
+                }
 
-            var id = await dataReader.GetGuidAsync(0);
-            var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
-            var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
-            var concurrency = await dataReader.GetFieldValueAsync<int>(2);
-            string originator;
-            string originalMessageId;
-            using (var textReader = dataReader.GetTextReader(3))
-            {
-                var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
-                metadata.TryGetValue("Originator", out originator);
-                metadata.TryGetValue("OriginalMessageId", out originalMessageId);
-            }
-            using (var textReader = dataReader.GetTextReader(4))
-            {
-                var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
-                sagaData.Id = id;
-                sagaData.Originator = originator;
-                sagaData.OriginalMessageId = originalMessageId;
-                SetConcurrency(context, concurrency);
-                return sagaData;
+                var id = await dataReader.GetGuidAsync(0);
+                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
+                var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
+                var concurrency = await dataReader.GetFieldValueAsync<int>(2);
+                string originator;
+                string originalMessageId;
+                using (var textReader = dataReader.GetTextReader(3))
+                {
+                    var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
+                    metadata.TryGetValue("Originator", out originator);
+                    metadata.TryGetValue("OriginalMessageId", out originalMessageId);
+                }
+                using (var textReader = dataReader.GetTextReader(4))
+                {
+                    var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
+                    sagaData.Id = id;
+                    sagaData.Originator = originator;
+                    sagaData.OriginalMessageId = originalMessageId;
+                    SetConcurrency(context, concurrency);
+                    return sagaData;
+                }
             }
         }
     }
@@ -229,6 +206,33 @@ class SagaPersister : ISagaPersister
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("Concurrency", concurrency);
             await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    static void SetConcurrency(ContextBag context, int concurrency)
+    {
+        context.Set("NServiceBus.Persistence.Sql.Concurrency", concurrency);
+    }
+
+    internal static int GetConcurrency(ContextBag context)
+    {
+        int concurrency;
+        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
+        {
+            throw new Exception("Cannot save saga because optimistic concurrency version is missing in the context.");
+        }
+        return concurrency;
+    }
+
+    static void ValidatePropertyName<TSagaData>(string propertyName, RuntimeSagaInfo sagaInfo) where TSagaData : IContainSagaData
+    {
+        if (!sagaInfo.HasCorrelationProperty)
+        {
+            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. The saga has no correlation property.");
+        }
+        if (propertyName != sagaInfo.CorrelationProperty)
+        {
+            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
         }
     }
 
