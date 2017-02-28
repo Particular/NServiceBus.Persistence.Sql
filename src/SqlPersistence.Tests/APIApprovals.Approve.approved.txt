@@ -28,12 +28,12 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class SagaCommandBuilder
     {
-        public SagaCommandBuilder(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
-        public string BuildCompleteCommand(string tableSuffix) { }
-        public string BuildGetByPropertyCommand(string tableSuffix, string propertyName) { }
-        public string BuildGetBySagaIdCommand(string tableSuffix) { }
-        public string BuildSaveCommand(string tableSuffix, string correlationProperty, string transitionalCorrelationProperty) { }
-        public string BuildUpdateCommand(string tableSuffix, string transitionalCorrelationProperty) { }
+        public SagaCommandBuilder() { }
+        public string BuildCompleteCommand(string tableName) { }
+        public string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+        public string BuildGetBySagaIdCommand(string tableName) { }
+        public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+        public string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
     }
     public class SagaSettings
     {

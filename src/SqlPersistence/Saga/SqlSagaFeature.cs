@@ -18,10 +18,8 @@ class SqlSagaFeature : Feature
         context.Settings.EnableFeature<StorageType.Sagas>();
 
         var settings = context.Settings;
-        var endpointName = settings.GetTablePrefix();
-        var sqlVariant = settings.GetSqlVariant();
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(sqlVariant,endpointName);
+        var commandBuilder = new SagaCommandBuilder();
 #pragma warning restore 618
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
@@ -36,7 +34,8 @@ class SqlSagaFeature : Feature
             writerCreator = writer => new JsonTextWriter(writer);
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
-        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder);
+        var tablePrefix = settings.GetTablePrefix();
+        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder, tablePrefix);
         var sagaPersister = new SagaPersister(infoCache);
         context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }

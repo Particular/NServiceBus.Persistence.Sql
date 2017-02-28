@@ -10,14 +10,7 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class SagaCommandBuilder
     {
-        string tablePrefix;
-
-        public SagaCommandBuilder(SqlVariant sqlVariant, string tablePrefix)
-        {
-            this.tablePrefix = tablePrefix;
-        }
-
-        public string BuildSaveCommand(string tableSuffix, string correlationProperty, string transitionalCorrelationProperty)
+        public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
         {
             var valuesBuilder = new StringBuilder();
             var insertBuilder = new StringBuilder();
@@ -34,7 +27,7 @@ namespace NServiceBus.Persistence.Sql
             }
 
             return $@"
-insert into {tablePrefix}{tableSuffix}
+insert into {tableName}
 (
     Id,
     Metadata,
@@ -55,7 +48,7 @@ values
         }
 
 
-        public string BuildUpdateCommand(string tableSuffix, string transitionalCorrelationProperty)
+        public string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
         {
             // no need to set CorrelationProperty since it is immutable
             var correlationSet = "";
@@ -65,7 +58,7 @@ values
             }
 
             return $@"
-update {tablePrefix}{tableSuffix}
+update {tableName}
 set
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
@@ -76,7 +69,7 @@ where
 ";
         }
 
-        public string BuildGetBySagaIdCommand(string tableSuffix)
+        public string BuildGetBySagaIdCommand(string tableName)
         {
             return $@"
 select
@@ -85,12 +78,12 @@ select
     Concurrency,
     Metadata,
     Data
-from {tablePrefix}{tableSuffix}
+from {tableName}
 where Id = @Id
 ";
         }
 
-        public string BuildGetByPropertyCommand(string tableSuffix, string propertyName)
+        public string BuildGetByPropertyCommand(string propertyName, string tableName)
         {
             return $@"
 select
@@ -99,15 +92,15 @@ select
     Concurrency,
     Metadata,
     Data
-from {tablePrefix}{tableSuffix}
+from {tableName}
 where Correlation_{propertyName} = @propertyValue
 ";
         }
 
-        public string BuildCompleteCommand(string tableSuffix)
+        public string BuildCompleteCommand(string tableName)
         {
             return $@"
-delete from {tablePrefix}{tableSuffix}
+delete from {tableName}
 where Id = @Id AND Concurrency = @Concurrency
 ";
         }
