@@ -73,22 +73,24 @@ namespace NServiceBus.Persistence.Sql
         void Inner()
         {
             var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
-           
+            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql");
+            if (Directory.Exists(scriptPath))
+            {
+                Directory.Delete(scriptPath, true);
+            }
             foreach (var variant in SqlVariantReader.Read(moduleDefinition))
             {
-                var customPath = OutputPathReader.Read(moduleDefinition);
-                var scriptPath =
-                    string.IsNullOrEmpty(customPath)
-                    ? Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", variant.ToString())
-                    : Path.Combine(customPath.Replace("$ProjectDir", ProjectDirectory).Replace("$SolutionDir", SolutionDirectory), variant.ToString());
-
-                if (Directory.Exists(scriptPath))
-                {
-                    Directory.Delete(scriptPath, true);
-                }
-
                 Write(moduleDefinition, variant, scriptPath);
+            }
 
+            var customPath = OutputPathReader.Read(moduleDefinition);
+            if (string.IsNullOrEmpty(customPath) == false)
+            { 
+                foreach (var variant in SqlVariantReader.Read(moduleDefinition))
+                {
+                    var outputPath = Path.Combine(customPath.Replace("$ProjectDir", ProjectDirectory).Replace("$SolutionDir", SolutionDirectory), variant.ToString());
+                    Write(moduleDefinition, variant, outputPath);
+                }
             }
         }
 
