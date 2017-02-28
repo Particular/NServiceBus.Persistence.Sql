@@ -551,8 +551,8 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithNonStringCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithNonStringCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, typeof(SagaWithNonStringCorrelation), 666);
+            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
         }
     }
     [SqlSaga(
