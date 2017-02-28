@@ -179,7 +179,7 @@ class SagaPersister : ISagaPersister
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            command.AddParameter("propertyValue", propertyValue.ToString());
+            command.AddParameter("propertyValue", propertyValue);
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }

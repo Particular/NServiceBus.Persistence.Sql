@@ -459,20 +459,15 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
-    public void GetByMapping()
+    public void GetByStringMapping()
     {
-        var endpointName = nameof(GetByMapping);
+        var endpointName = nameof(GetByStringMapping);
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithCorrelation",
-            name: "SagaWithCorrelation",
+            tableSuffix: "SagaWithStringCorrelation",
+            name: "SagaWithStringCorrelation",
             correlationProperty: new CorrelationProperty
             (
                 name: "CorrelationProperty",
-                type: CorrelationPropertyType.String
-            ),
-            transitionalCorrelationProperty: new CorrelationProperty
-            (
-                name: "TransitionalCorrelationProperty",
                 type: CorrelationPropertyType.String
             )
         );
@@ -482,28 +477,96 @@ public abstract class SagaPersisterTests
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
         }
         var id = Guid.NewGuid();
-        var result = GetByMappingAsync(id, endpointName).GetAwaiter().GetResult();
+        var result = GetByStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<SagaWithCorrelation.SagaData> GetByMappingAsync(Guid id, string endpointName)
+    async Task<SagaWithStringCorrelation.SagaData> GetByStringMappingAsync(Guid id, string endpointName)
     {
-        var sagaData = new SagaWithCorrelation.SagaData
+        var sagaData = new SagaWithStringCorrelation.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            CorrelationProperty = "theCorrelationProperty",
-            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
-            SimpleProperty = "theSimpleProperty"
+            CorrelationProperty = "theCorrelationProperty"
         };
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, typeof(SagaWithStringCorrelation), "theCorrelationProperty");
+            return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithStringCorrelation))).Data;
+        }
+    }
+    [SqlSaga(
+        correlationProperty: nameof(SagaData.CorrelationProperty)
+    )]
+    public class SagaWithStringCorrelation : Saga<SagaWithStringCorrelation.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string CorrelationProperty { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void GetByNonStringMapping()
+    {
+        var endpointName = nameof(GetByNonStringMapping);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithNonStringCorrelation",
+            name: "SagaWithNonStringCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.Int
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
+        }
+        var id = Guid.NewGuid();
+        var result = GetByNonStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+    }
+
+    async Task<SagaWithNonStringCorrelation.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
+    {
+        var sagaData = new SagaWithNonStringCorrelation.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            CorrelationProperty = 10
+        };
+        var persister = SetUp(endpointName);
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true))
+        {
+            await persister.Save(sagaData, storageSession, typeof(SagaWithNonStringCorrelation), 666);
+            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
+        }
+    }
+    [SqlSaga(
+        correlationProperty: nameof(SagaData.CorrelationProperty)
+    )]
+    public class SagaWithNonStringCorrelation : Saga<SagaWithNonStringCorrelation.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public int CorrelationProperty { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
         }
     }
 
