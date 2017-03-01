@@ -1,10 +1,11 @@
+using System;
 using System.IO;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class SagaWriter
 {
-    public static void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant, BuildLogger buildLogger)
+    public static void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant, Action<string, string> logError)
     {
         var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
         var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
@@ -12,7 +13,7 @@ class SagaWriter
         var index = 0;
         foreach (var saga in metaDataReader.GetSagas((exception, type) =>
         {
-            buildLogger.LogError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
+            logError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
         }))
         {
             var sagaFileName = saga.TableSuffix;

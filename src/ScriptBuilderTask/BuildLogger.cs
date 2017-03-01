@@ -20,16 +20,11 @@ class BuildLogger
         return $"SqlPersistenceTask: {message}";
     }
 
-    public void LogError(string message, string file)
+    public void LogError(string message, string file = null)
     {
         ErrorOccurred = true;
         buildEngine.LogErrorEvent(new BuildErrorEventArgs("", "", file, 0, 0, 0, 0, PrependMessage(message), "", "SqlPersistenceTask"));
     }
 
     public bool ErrorOccurred;
-
-    public void LogError(string message)
-    {
-        LogError(message, null);
-    }
 }
