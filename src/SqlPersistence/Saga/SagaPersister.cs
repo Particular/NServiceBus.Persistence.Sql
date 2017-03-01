@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
 class SagaPersister : ISagaPersister
@@ -124,7 +123,7 @@ class SagaPersister : ISagaPersister
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
-        var sqlSession = session.SqlPersistenceSession();
+        var sqlSession = session.GetSqlStorageSession();
         return GetSagaData<TSagaData>(sagaInfo, context, sqlSession, command =>
         {
             command.CommandText = sagaInfo.GetBySagaIdCommand;
@@ -137,7 +136,7 @@ class SagaPersister : ISagaPersister
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
-        var sqlSession = session.SqlPersistenceSession();
+        var sqlSession = session.GetSqlStorageSession();
         return GetSagaData<TSagaData>(sagaInfo, context, sqlSession,
             command =>
             {
@@ -147,12 +146,12 @@ class SagaPersister : ISagaPersister
     }
 
 
-    static async Task<TSagaData> GetSagaData<TSagaData>(RuntimeSagaInfo sagaInfo, ContextBag context, ISqlStorageSession sqlSession, Action<DbCommand> tweakCommand)
+    internal static async Task<TSagaData> GetSagaData<TSagaData>(RuntimeSagaInfo sagaInfo, ContextBag context, StorageSession sqlSession, Action<DbCommand> manipulateCommand)
         where TSagaData : IContainSagaData
     {
         using (var command = sqlSession.Connection.CreateCommand())
         {
-            tweakCommand(command);
+            manipulateCommand(command);
             command.Transaction = sqlSession.Transaction;
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))

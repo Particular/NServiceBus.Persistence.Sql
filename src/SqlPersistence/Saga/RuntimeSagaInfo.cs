@@ -19,6 +19,7 @@ class RuntimeSagaInfo
     ConcurrentDictionary<Version, NewtonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
+    public readonly string SelectFromCommand;
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
@@ -53,6 +54,7 @@ class RuntimeSagaInfo
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
         TableName = $"{tablePrefix}{tableSuffix}";
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
+        SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
         SaveCommand = commandBuilder.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
         UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);

@@ -158,9 +158,9 @@
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*"/>
+      <Files Include="$(TargetDir)$(TargetName).*" />
     </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries"/>
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>

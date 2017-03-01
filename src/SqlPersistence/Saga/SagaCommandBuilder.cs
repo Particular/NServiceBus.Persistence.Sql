@@ -83,6 +83,21 @@ where Id = @Id
 ";
         }
 
+
+        public string BuildSelectFromCommand(string tableName)
+        {
+            return $@"
+select
+    Id,
+    SagaTypeVersion,
+    Concurrency,
+    Metadata,
+    Data
+from {tableName}
+";
+        }
+
+
         public string BuildGetByPropertyCommand(string propertyName, string tableName)
         {
             return $@"

@@ -76,7 +76,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
             await persister.Complete(sagaData, storageSession, typeof(SagaWithCorrelation), 1);
@@ -115,7 +115,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithNoCorrelation), null);
             return await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag());
@@ -192,7 +192,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
             return await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation), new ContextBag());
@@ -236,7 +236,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), "thePropertyಠ_ಠ");
             return await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), new ContextBag());
@@ -268,7 +268,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             persister.Save(sagaData1, storageSession, typeof(SagaWithNoCorrelation), "theProperty").GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
@@ -276,7 +276,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag()).GetAwaiter().GetResult();
             sagaData.SimpleProperty = "UpdatedValue";
@@ -286,7 +286,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var contextBag = new ContextBag();
             var sagaData = persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), contextBag).GetAwaiter().GetResult();
@@ -322,7 +322,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData1, storageSession, typeof(SagaWithNoCorrelation), "theProperty");
             await storageSession.CompleteAsync();
@@ -330,7 +330,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation), new ContextBag());
             sagaData.SimpleProperty = "UpdatedValue";
@@ -385,7 +385,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
             return await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation), new ContextBag());
@@ -503,7 +503,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
             return await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithCorrelation), new ContextBag());
@@ -546,7 +546,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
             var sagaData2 = new SagaWithCorrelation.SagaData

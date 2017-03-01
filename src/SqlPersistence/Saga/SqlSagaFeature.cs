@@ -4,6 +4,7 @@ using NServiceBus.Features;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
+using NServiceBus.Settings;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class SqlSagaFeature : Feature
@@ -17,7 +18,7 @@ class SqlSagaFeature : Feature
     {
         context.Settings.EnableFeature<StorageType.Sagas>();
 
-        var settings = context.Settings;
+        var settings = (SettingsHolder)context.Settings;
 #pragma warning disable 618
         var commandBuilder = new SagaCommandBuilder();
 #pragma warning restore 618
@@ -37,6 +38,7 @@ class SqlSagaFeature : Feature
         var tablePrefix = settings.GetTablePrefix();
         var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder, tablePrefix);
         var sagaPersister = new SagaPersister(infoCache);
+        context.Container.ConfigureComponent(() => infoCache, DependencyLifecycle.SingleInstance);
         context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }
 
