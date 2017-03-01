@@ -13,7 +13,9 @@
       Name="SqlPersistenceScriptBuilder">
     <ScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
-          IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"/>
+          IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
+          ProjectDirectory="$(ProjectDir)"
+          SolutionDirectory="$(SolutionDir)"/>
   </Target>
   
   <Target

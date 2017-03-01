@@ -1,0 +1,18 @@
+﻿[
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Outbox_Create.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Outbox_Drop.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Subscription_Create.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Subscription_Drop.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Timeout_Create.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Timeout_Drop.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Sagas\\OrderSaga_Create.sql",
+  "temp\\IntermediatePath\\NServiceBus.Persistence.Sql\\Sagas\\OrderSaga_Drop.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Outbox_Create.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Outbox_Drop.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Subscription_Create.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Subscription_Drop.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Timeout_Create.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Timeout_Drop.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Sagas\\OrderSaga_Create.sql",
+  "temp\\PromotePathTheProjectDirPostfix\\Sagas\\OrderSaga_Drop.sql"
+]

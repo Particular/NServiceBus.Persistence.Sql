@@ -73,7 +73,9 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BuildLogger.cs" />
+    <Compile Include="DirectoryExtentions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
+    <Compile Include="InnerTask.cs" />
     <Compile Include="Writers\OutboxWriter.cs" />
     <Compile Include="Writers\SagaWriter.cs" />
     <Compile Include="ScriptBuilderTask.cs" />

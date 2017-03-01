@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}</ProjectGuid>
+    <ProjectGuid>{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScriptBuilder.Tests</RootNamespace>
-    <AssemblyName>ScriptBuilder.Tests</AssemblyName>
+    <RootNamespace>ScriptBuilderTask.Tests</RootNamespace>
+    <AssemblyName>ScriptBuilderTask.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -23,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +31,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -50,32 +47,8 @@
       <HintPath>..\packages\ApprovalUtilities.3.0.13\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=13.100.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.TransactSql.ScriptDom.13.0.1700.77\lib\net40\Microsoft.SqlServer.TransactSql.ScriptDom.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.1.3\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -83,7 +56,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ObjectApproval, Version=1.5.0.0, Culture=neutral, PublicKeyToken=c7a34512ecd69090, processorArchitecture=MSIL">
-      <HintPath>..\packages\ObjectApproval.1.5.0\lib\NET40\ObjectApproval.dll</HintPath>
+      <HintPath>..\packages\ObjectApproval.1.5.0\Lib\NET40\ObjectApproval.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -93,32 +66,20 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APIApprovals.cs" />
-    <Compile Include="App_Packages\PublicApiGenerator.6.0.0\ApiGenerator.cs" />
-    <Compile Include="AssemblySqlPersistenceSettingsAttribute.cs" />
-    <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="SqlAttributeParametersReadersTest.cs" />
-    <Compile Include="Saga\SagaDefinitionReaderTest.cs" />
-    <Compile Include="Saga\SagaDefinitionValidatorTest.cs" />
-    <Compile Include="Saga\SagaScriptBuilderTest.cs" />
-    <Compile Include="SubscriptionScriptBuilderTest.cs" />
-    <Compile Include="SqlValidator.cs" />
-    <Compile Include="OutboxScriptBuilderTest.cs" />
-    <Compile Include="TimeoutScriptBuilderTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
-      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
-      <Name>ScriptBuilder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj">
-      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
-      <Name>SqlPersistence</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilderTask.Tests.Target\ScriptBuilderTask.Tests.Target.csproj">
+      <Project>{d6836f7b-0d9f-45b2-acb5-851978b7c234}</Project>
+      <Name>ScriptBuilderTask.Tests.Target</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj">
+      <Project>{63784399-65af-424a-b2ad-0c94ae326823}</Project>
+      <Name>ScriptBuilderTask</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="InnerTaskTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
