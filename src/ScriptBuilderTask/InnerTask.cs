@@ -28,7 +28,8 @@ class InnerTask
         DirectoryExtentions.Delete(scriptPath);
         foreach (var variant in SqlVariantReader.Read(moduleDefinition))
         {
-            Write(moduleDefinition, variant, scriptPath);
+            var variantPath = Path.Combine(scriptPath, variant.ToString());
+            Write(moduleDefinition, variant, variantPath);
         }
 
         PromoteFiles(moduleDefinition, scriptPath);
