@@ -28,9 +28,9 @@ public class SagaDefinitionReaderTest
     }
 
     [SqlSaga(
-         correlationProperty: nameof(SagaData.Correlation),
-         transitionalCorrelationProperty: nameof(SagaData.Transitional)
-     )]
+        correlationProperty : nameof(SagaData.Correlation),
+        transitionalCorrelationProperty : nameof(SagaData.Transitional)
+    )]
     public class SimpleSaga : Saga<SimpleSaga.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -43,6 +43,7 @@ public class SagaDefinitionReaderTest
         {
         }
     }
+
     [Test]
     public void SqlSaga()
     {
@@ -53,9 +54,9 @@ public class SagaDefinitionReaderTest
     }
 
     [SqlSaga(
-         correlationProperty: nameof(SagaData.Correlation),
-         transitionalCorrelationProperty: nameof(SagaData.Transitional)
-     )]
+        correlationProperty: nameof(SagaData.Correlation),
+        transitionalCorrelationProperty: nameof(SagaData.Transitional)
+    )]
     public class SimpleSqlSaga : SqlSaga<SimpleSqlSaga.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -111,4 +112,28 @@ public class SagaDefinitionReaderTest
         }
     }
 
+    [Test]
+    public void WithTableSuffix()
+    {
+        var dataType = module.GetTypeDefinition<TableSuffixSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [SqlSaga(
+        correlationProperty: nameof(SagaData.Correlation),
+        tableSuffix: "TheTableSuffix"
+    )]
+    public class TableSuffixSaga : Saga<TableSuffixSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
 }
