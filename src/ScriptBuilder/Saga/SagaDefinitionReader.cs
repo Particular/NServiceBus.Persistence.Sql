@@ -100,11 +100,11 @@ class SagaDefinitionReader
     static TypeDefinition ToTypeDefinition(TypeDefinition sagaType, TypeReference argument)
     {
         var sagaDataType = argument as TypeDefinition;
-        if (sagaDataType == null)
+        if (sagaDataType != null)
         {
-            throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type not defined in the same assembly.");
+            return sagaDataType;
         }
-        return sagaDataType;
+        throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type not defined in the same assembly.");
     }
 
     static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataTypeDefinition, string propertyName)
@@ -115,13 +115,13 @@ class SagaDefinitionReader
         }
         var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
 
-        if (propertyDefinition == null)
+        if (propertyDefinition != null)
         {
-            throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
+            return BuildConstraintProperty(propertyDefinition);
         }
+        throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
 
         //todo: verify not readonly
-        return BuildConstraintProperty(propertyDefinition);
     }
 
     static CorrelationProperty BuildConstraintProperty(PropertyDefinition member)
@@ -133,5 +133,5 @@ class SagaDefinitionReader
             type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(propertyType)
         );
     }
-    
+
 }
