@@ -26,7 +26,7 @@ namespace NServiceBus
             var storageSession = session as StorageSession;
             if (storageSession == null)
             {
-                throw new InvalidOperationException("Shared session has not been configured for SqlPersistence.");
+                throw new InvalidOperationException("The endpoint has not been configured to use SQL persistence.");
             }
             return storageSession;
         }
