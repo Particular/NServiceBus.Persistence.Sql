@@ -6,7 +6,7 @@ namespace NServiceBus
 {
 
     /// <summary>
-    /// Shared session extensions for NHibernate persistence.
+    /// Shared session extensions for SqlPersistence.
     /// </summary>
     public static class SqlPersistenceStorageSessionExtensions
     {
