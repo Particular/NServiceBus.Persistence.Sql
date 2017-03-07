@@ -33,6 +33,7 @@
         public string BuildGetByPropertyCommand(string propertyName, string tableName) { }
         public string BuildGetBySagaIdCommand(string tableName) { }
         public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+        public string BuildSelectFromCommand(string tableName) { }
         public string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
     }
     public class SagaSettings
@@ -116,6 +117,8 @@ namespace NServiceBus
     }
     public class static SqlPersistenceStorageSessionExtensions
     {
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag readOnlyContextBag, string whereClause, ParameterAppender appendParameters)
+            where TSagaData : NServiceBus.IContainSagaData { }
         public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
