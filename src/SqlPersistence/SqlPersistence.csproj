@@ -80,6 +80,10 @@
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\SagaPersister_Save.cs" />
+    <Compile Include="Saga\SagaPersister_Update.cs" />
+    <Compile Include="Saga\SagaPersister_Complete.cs" />
+    <Compile Include="Saga\SagaPersister_Get.cs" />
     <Compile Include="Subscription\SubscriptionCommands.cs" />
     <Compile Include="Subscription\SubscriptionCommandBuilder.cs" />
     <Compile Include="TableNameCleaner.cs" />
@@ -158,9 +162,9 @@
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*"/>
+      <Files Include="$(TargetDir)$(TargetName).*" />
     </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries"/>
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>
