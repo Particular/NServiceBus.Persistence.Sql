@@ -9,12 +9,23 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+
+    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(sagaId, session, sagaType);
+        var result = await GetByWhereClause<TSagaData>(whereClause, session, sagaType, appendParameters, sagaInfoCache);
         return SetConcurrency(result, context);
+    }
+
+    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, Type sagaType, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+        where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        var commandText = $@"
+{sagaInfo.SelectFromCommand}
+where {whereClause}";
+        return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters);
     }
 
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
@@ -33,13 +44,21 @@ partial class SagaPersister
         ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
         return GetSagaData<TSagaData>(session, commandText, sagaInfo,
-            appendParameters: (parameterBuilder, parameterCollection) =>
+            appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
                 parameter.ParameterName = "propertyValue";
                 parameter.Value = propertyValue;
-                parameterCollection.Add(parameter);
+                append(parameter);
             });
+    }
+
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+        where TSagaData : IContainSagaData
+    {
+        var sagaType = context.GetSagaType();
+        var result = await Get<TSagaData>(sagaId, session, sagaType);
+        return SetConcurrency(result, context);
     }
 
     internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
@@ -47,12 +66,12 @@ partial class SagaPersister
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         return GetSagaData<TSagaData>(session, sagaInfo.GetBySagaIdCommand, sagaInfo,
-            appendParameters: (parameterBuilder, parameterCollection) =>
+            appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
                 parameter.ParameterName = "Id";
                 parameter.Value = sagaId;
-                parameterCollection.Add(parameter);
+                append(parameter);
             });
     }
 
@@ -65,7 +84,7 @@ partial class SagaPersister
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            appendParameters(command.CreateParameter, command.Parameters);
+            appendParameters(command.CreateParameter, parameter => command.Parameters.Add(parameter));
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
             {

@@ -28,12 +28,13 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class SagaCommandBuilder
     {
-        public SagaCommandBuilder(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
-        public string BuildCompleteCommand(string tableSuffix) { }
-        public string BuildGetByPropertyCommand(string tableSuffix, string propertyName) { }
-        public string BuildGetBySagaIdCommand(string tableSuffix) { }
-        public string BuildSaveCommand(string tableSuffix, string correlationProperty, string transitionalCorrelationProperty) { }
-        public string BuildUpdateCommand(string tableSuffix, string transitionalCorrelationProperty) { }
+        public SagaCommandBuilder() { }
+        public string BuildCompleteCommand(string tableName) { }
+        public string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+        public string BuildGetBySagaIdCommand(string tableName) { }
+        public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+        public string BuildSelectFromCommand(string tableName) { }
+        public string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
     }
     public class SagaSettings
     {
@@ -116,10 +117,12 @@ namespace NServiceBus
     }
     public class static SqlPersistenceStorageSessionExtensions
     {
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag readOnlyContextBag, string whereClause, ParameterAppender appendParameters)
+            where TSagaData : NServiceBus.IContainSagaData { }
         public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
-public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Data.Common.DbParameterCollection parameterCollection);
+public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);
 public class static SagaPropertyFilter
 {
     public static System.Collections.Generic.List<Newtonsoft.Json.Serialization.JsonProperty> FilterProperties(System.Collections.Generic.IList<Newtonsoft.Json.Serialization.JsonProperty> properties) { }
