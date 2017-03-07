@@ -58,12 +58,12 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 return session.GetSagaData<TestSaga.SagaData>(
                     readOnlyContextBag: context,
                     whereClause: "json_extract(Data,'$.Property') = @propertyValue",
-                    appendParameters: (builder, collection) =>
+                    appendParameters: (builder, append) =>
                     {
                         var parameter = builder();
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
-                        collection.Add(parameter);
+                        append(parameter);
                     });
             }
         }

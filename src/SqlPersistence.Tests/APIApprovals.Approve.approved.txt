@@ -122,7 +122,7 @@ namespace NServiceBus
         public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
-public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Data.Common.DbParameterCollection parameterCollection);
+public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);
 public class static SagaPropertyFilter
 {
     public static System.Collections.Generic.List<Newtonsoft.Json.Serialization.JsonProperty> FilterProperties(System.Collections.Generic.IList<Newtonsoft.Json.Serialization.JsonProperty> properties) { }

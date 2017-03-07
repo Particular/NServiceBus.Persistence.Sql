@@ -44,12 +44,12 @@ where {whereClause}";
         ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
         return GetSagaData<TSagaData>(session, commandText, sagaInfo,
-            appendParameters: (parameterBuilder, parameterCollection) =>
+            appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
                 parameter.ParameterName = "propertyValue";
                 parameter.Value = propertyValue;
-                parameterCollection.Add(parameter);
+                append(parameter);
             });
     }
 
@@ -66,12 +66,12 @@ where {whereClause}";
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
         return GetSagaData<TSagaData>(session, sagaInfo.GetBySagaIdCommand, sagaInfo,
-            appendParameters: (parameterBuilder, parameterCollection) =>
+            appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
                 parameter.ParameterName = "Id";
                 parameter.Value = sagaId;
-                parameterCollection.Add(parameter);
+                append(parameter);
             });
     }
 
@@ -84,7 +84,7 @@ where {whereClause}";
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            appendParameters(command.CreateParameter, command.Parameters);
+            appendParameters(command.CreateParameter, parameter => command.Parameters.Add(parameter));
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
             {

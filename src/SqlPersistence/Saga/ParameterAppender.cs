@@ -5,5 +5,5 @@ using System.Data.Common;
 /// Appends <see cref="DbParameter"/>s to a <see cref="DbParameterCollection"/>.
 /// </summary>
 /// <param name="parameterBuilder">Provides access to <see cref="DbCommand.CreateParameter"/>.</param>
-/// <param name="parameterCollection">The <see cref="DbParameterCollection"/> to append to.</param>
-public delegate void ParameterAppender(Func<DbParameter> parameterBuilder, DbParameterCollection parameterCollection);
+/// <param name="append">Append a <see cref="DbParameter"/> using <see cref="DbParameterCollection.Add"/> to append to.</param>
+public delegate void ParameterAppender(Func<DbParameter> parameterBuilder, Action<DbParameter> append);
