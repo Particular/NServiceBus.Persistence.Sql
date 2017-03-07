@@ -16,6 +16,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
     [Test]
     public async Task Should_use_existing_saga()
     {
+        if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
+        {
+            return;
+        }
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
