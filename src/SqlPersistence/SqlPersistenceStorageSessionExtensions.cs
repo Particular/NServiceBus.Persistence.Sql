@@ -27,7 +27,7 @@ namespace NServiceBus
             {
                 return storageSession;
             }
-            throw new InvalidOperationException("The endpoint has not been configured to use SQL persistence.");
+            throw new Exception("The endpoint has not been configured to use SQL persistence.");
         }
 
         public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag readOnlyContextBag, string whereClause, ParameterAppender appendParameters)
