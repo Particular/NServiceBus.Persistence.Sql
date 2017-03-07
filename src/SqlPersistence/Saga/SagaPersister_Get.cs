@@ -66,41 +66,40 @@ partial class SagaPersister
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
             appendParameters(command.CreateParameter, command.Parameters);
-            return await GetSagaData<TSagaData>(command, sagaInfo);
+            // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
+            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+            {
+                if (!await dataReader.ReadAsync())
+                {
+                    return default(Concurrency<TSagaData>);
+                }
+
+                var id = await dataReader.GetGuidAsync(0);
+                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
+                var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
+                var concurrency = await dataReader.GetFieldValueAsync<int>(2);
+                string originator;
+                string originalMessageId;
+                ReadMetadata(dataReader, out originator, out originalMessageId);
+                using (var textReader = dataReader.GetTextReader(4))
+                {
+                    var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
+                    sagaData.Id = id;
+                    sagaData.Originator = originator;
+                    sagaData.OriginalMessageId = originalMessageId;
+                    return new Concurrency<TSagaData>(sagaData, concurrency);
+                }
+            }
         }
     }
 
-    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
-        where TSagaData : IContainSagaData
+    static void ReadMetadata(DbDataReader dataReader, out string originator, out string originalMessageId)
     {
-        // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-        using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+        using (var textReader = dataReader.GetTextReader(3))
         {
-            if (!await dataReader.ReadAsync())
-            {
-                return default(Concurrency<TSagaData>);
-            }
-
-            var id = await dataReader.GetGuidAsync(0);
-            var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
-            var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
-            var concurrency = await dataReader.GetFieldValueAsync<int>(2);
-            string originator;
-            string originalMessageId;
-            using (var textReader = dataReader.GetTextReader(3))
-            {
-                var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
-                metadata.TryGetValue("Originator", out originator);
-                metadata.TryGetValue("OriginalMessageId", out originalMessageId);
-            }
-            using (var textReader = dataReader.GetTextReader(4))
-            {
-                var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
-                sagaData.Id = id;
-                sagaData.Originator = originator;
-                sagaData.OriginalMessageId = originalMessageId;
-                return new Concurrency<TSagaData>(sagaData, concurrency);
-            }
+            var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
+            metadata.TryGetValue("Originator", out originator);
+            metadata.TryGetValue("OriginalMessageId", out originalMessageId);
         }
     }
 
