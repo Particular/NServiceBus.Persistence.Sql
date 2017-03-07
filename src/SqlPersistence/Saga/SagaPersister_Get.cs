@@ -40,19 +40,13 @@ partial class SagaPersister
         var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType);
         return SetConcurrency(result, context);
     }
+
     internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
 
-        if (!sagaInfo.HasCorrelationProperty)
-        {
-            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. The saga has no correlation property.");
-        }
-        if (propertyName != sagaInfo.CorrelationProperty)
-        {
-            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
-        }
+        ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
         var sqlSession = session.SqlPersistenceSession();
 
@@ -100,4 +94,15 @@ partial class SagaPersister
         }
     }
 
+    static void ValidatePropertyName<TSagaData>(string propertyName, RuntimeSagaInfo sagaInfo) where TSagaData : IContainSagaData
+    {
+        if (!sagaInfo.HasCorrelationProperty)
+        {
+            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. The saga has no correlation property.");
+        }
+        if (propertyName != sagaInfo.CorrelationProperty)
+        {
+            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
+        }
+    }
 }
