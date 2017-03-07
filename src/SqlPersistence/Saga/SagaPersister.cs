@@ -28,20 +28,6 @@ partial class SagaPersister : ISagaPersister
         command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
-
-    static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
-        where TSagaData : IContainSagaData
-    {
-        // ReSharper disable once CompareNonConstrainedGenericWithNull
-        //TODO: remove when core adds a class constraint to TSagaData
-        if (result.Data == null)
-        {
-            return default(TSagaData);
-        }
-        context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
-        return result.Data;
-    }
-
     static int GetConcurrency(ContextBag context)
     {
         int concurrency;
@@ -51,7 +37,6 @@ partial class SagaPersister : ISagaPersister
         }
         return concurrency;
     }
-
 
     internal struct Concurrency<TSagaData>
         where TSagaData : IContainSagaData

@@ -80,6 +80,7 @@
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\ParameterAppender.cs" />
     <Compile Include="Saga\SagaPersister_Save.cs" />
     <Compile Include="Saga\SagaPersister_Update.cs" />
     <Compile Include="Saga\SagaPersister_Complete.cs" />

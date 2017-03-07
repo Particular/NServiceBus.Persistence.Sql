@@ -17,22 +17,6 @@ partial class SagaPersister
         return SetConcurrency(result, context);
     }
 
-
-    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
-        where TSagaData : IContainSagaData
-    {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
-        var sqlSession = session.SqlPersistenceSession();
-        using (var command = sqlSession.Connection.CreateCommand())
-        {
-            command.CommandText = sagaInfo.GetBySagaIdCommand;
-            command.Transaction = sqlSession.Transaction;
-            command.AddParameter("Id", sagaId);
-            return await GetSagaData<TSagaData>(command, sagaInfo);
-        }
-    }
-
-
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
@@ -41,24 +25,50 @@ partial class SagaPersister
         return SetConcurrency(result, context);
     }
 
-    internal async Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
         where TSagaData : IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
 
         ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
+        return GetSagaData<TSagaData>(session, commandText, sagaInfo,
+            appendParameters: (parameterBuilder, parameterCollection) =>
+            {
+                var parameter = parameterBuilder();
+                parameter.ParameterName = "propertyValue";
+                parameter.Value = propertyValue;
+                parameterCollection.Add(parameter);
+            });
+    }
+
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
+        where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        return GetSagaData<TSagaData>(session, sagaInfo.GetBySagaIdCommand, sagaInfo,
+            appendParameters: (parameterBuilder, parameterCollection) =>
+            {
+                var parameter = parameterBuilder();
+                parameter.ParameterName = "Id";
+                parameter.Value = sagaId;
+                parameterCollection.Add(parameter);
+            });
+    }
+
+    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters)
+        where TSagaData : IContainSagaData
+    {
         var sqlSession = session.SqlPersistenceSession();
 
         using (var command = sqlSession.Connection.CreateCommand())
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            command.AddParameter("propertyValue", propertyValue);
+            appendParameters(command.CreateParameter, command.Parameters);
             return await GetSagaData<TSagaData>(command, sagaInfo);
         }
     }
-
 
     static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(DbCommand command, RuntimeSagaInfo sagaInfo)
         where TSagaData : IContainSagaData
@@ -104,5 +114,18 @@ partial class SagaPersister
         {
             throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
         }
+    }
+
+    static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
+        where TSagaData : IContainSagaData
+    {
+        // ReSharper disable once CompareNonConstrainedGenericWithNull
+        //TODO: remove when core adds a class constraint to TSagaData
+        if (result.Data == null)
+        {
+            return default(TSagaData);
+        }
+        context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
+        return result.Data;
     }
 }
