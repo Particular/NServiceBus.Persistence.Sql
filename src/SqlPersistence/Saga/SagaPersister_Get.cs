@@ -9,12 +9,23 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+
+    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
         var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(sagaId, session, sagaType);
+        var result = await GetByWhereClause<TSagaData>(whereClause, session, sagaType, appendParameters, sagaInfoCache);
         return SetConcurrency(result, context);
+    }
+
+    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, Type sagaType, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+        where TSagaData : IContainSagaData
+    {
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        var commandText = $@"
+{sagaInfo.SelectFromCommand}
+where {whereClause}";
+        return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters);
     }
 
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
@@ -40,6 +51,14 @@ partial class SagaPersister
                 parameter.Value = propertyValue;
                 parameterCollection.Add(parameter);
             });
+    }
+
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+        where TSagaData : IContainSagaData
+    {
+        var sagaType = context.GetSagaType();
+        var result = await Get<TSagaData>(sagaId, session, sagaType);
+        return SetConcurrency(result, context);
     }
 
     internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)

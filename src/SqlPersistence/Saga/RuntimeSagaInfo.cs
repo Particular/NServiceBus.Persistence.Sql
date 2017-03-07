@@ -19,6 +19,7 @@ class RuntimeSagaInfo
     ConcurrentDictionary<Version, NewtonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
+    public readonly string SelectFromCommand;
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
@@ -28,6 +29,7 @@ class RuntimeSagaInfo
     public readonly string CorrelationProperty;
     public readonly string TransitionalCorrelationProperty;
     public readonly string GetByCorrelationPropertyCommand;
+    public readonly string TableName;
 
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
@@ -36,7 +38,8 @@ class RuntimeSagaInfo
         Type sagaType,
         NewtonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
-        Func<TextWriter, JsonWriter> writerCreator)
+        Func<TextWriter, JsonWriter> writerCreator,
+        string tablePrefix)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -50,16 +53,18 @@ class RuntimeSagaInfo
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
-        CompleteCommand = commandBuilder.BuildCompleteCommand(tableSuffix);
-        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(tableSuffix);
-        SaveCommand = commandBuilder.BuildSaveCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(tableSuffix, sqlSagaAttributeData.TransitionalCorrelationProperty);
+        TableName = $"{tablePrefix}{tableSuffix}";
+        CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
+        SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
+        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
+        SaveCommand = commandBuilder.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
         CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
         HasCorrelationProperty = CorrelationProperty != null;
         if (HasCorrelationProperty)
         {
-            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(tableSuffix, sqlSagaAttributeData.CorrelationProperty);
+            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
         }
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;

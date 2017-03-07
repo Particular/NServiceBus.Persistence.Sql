@@ -9,15 +9,17 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
 
-    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction)
+    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
     {
         Guard.AgainstNull(nameof(connection), connection);
         Guard.AgainstNull(nameof(transaction), transaction);
         Connection = connection;
         this.ownsTransaction = ownsTransaction;
+        InfoCache = infoCache;
         Transaction = transaction;
     }
 
+    internal SagaInfoCache InfoCache;
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }
 
