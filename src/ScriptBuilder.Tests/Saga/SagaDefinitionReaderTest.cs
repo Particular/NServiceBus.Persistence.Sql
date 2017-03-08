@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using ApprovalTests;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -19,17 +20,59 @@ public class SagaDefinitionReaderTest
     }
 
     [Test]
+    public void SqlSagaWithNoAttribute()
+    {
+        var sagaType = module.GetTypeDefinition<WithNoAttributeSaga>();
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinition definition;
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    public class WithNoAttributeSaga : Saga<WithNoAttributeSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void SagaWithNoAttribute()
+    {
+        var sagaType = module.GetTypeDefinition<WithNoAttributeSqlSaga>();
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinition definition;
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    public class WithNoAttributeSqlSaga : SqlSaga<WithNoAttributeSqlSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+    }
+
+    [Test]
     public void Simple()
     {
-        var dataType = module.GetTypeDefinition<SimpleSaga>();
+        var sagaType = module.GetTypeDefinition<SimpleSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
     [SqlSaga(
-        correlationProperty : nameof(SagaData.Correlation),
-        transitionalCorrelationProperty : nameof(SagaData.Transitional)
+        correlationProperty: nameof(SagaData.Correlation),
+        transitionalCorrelationProperty: nameof(SagaData.Transitional)
     )]
     public class SimpleSaga : Saga<SimpleSaga.SagaData>
     {
@@ -47,9 +90,9 @@ public class SagaDefinitionReaderTest
     [Test]
     public void SqlSaga()
     {
-        var dataType = module.GetTypeDefinition<SimpleSqlSaga>();
+        var sagaType = module.GetTypeDefinition<SimpleSqlSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -73,9 +116,9 @@ public class SagaDefinitionReaderTest
     [Test]
     public void WithNoCorrelation()
     {
-        var dataType = module.GetTypeDefinition<WithNoCorrelationSaga>();
+        var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -94,9 +137,9 @@ public class SagaDefinitionReaderTest
     [Test]
     public void WithNoTransitionalCorrelation()
     {
-        var dataType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
+        var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -115,9 +158,9 @@ public class SagaDefinitionReaderTest
     [Test]
     public void WithTableSuffix()
     {
-        var dataType = module.GetTypeDefinition<TableSuffixSaga>();
+        var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
