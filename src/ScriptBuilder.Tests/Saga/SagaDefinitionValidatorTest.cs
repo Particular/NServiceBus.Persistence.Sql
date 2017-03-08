@@ -34,6 +34,13 @@ public class SagaDefinitionValidatorTest
     }
 
     [Test]
+    public void WithInvalidSuffixTick()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table`Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
+
+    [Test]
     public void WithNoCorrelation()
     {
         SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", null, "tableSuffix");
