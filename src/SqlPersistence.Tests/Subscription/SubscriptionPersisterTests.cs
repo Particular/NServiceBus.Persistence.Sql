@@ -15,14 +15,15 @@ public abstract class SubscriptionPersisterTests
     protected abstract Func<DbConnection> GetConnection();
     SubscriptionPersister persister;
 
-    public SubscriptionPersisterTests(BuildSqlVariant sqlVariant)
+    public SubscriptionPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
-            sqlVariant: sqlVariant.Convert()
+            sqlVariant: sqlVariant.Convert(),
+            schema: schema
         );
     }
 

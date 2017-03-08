@@ -14,6 +14,8 @@ class SagaInfoCache
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
     string tablePrefix;
+    string schema;
+    SqlVariant sqlVariant;
 
     public SagaInfoCache(
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
@@ -21,7 +23,9 @@ class SagaInfoCache
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         SagaCommandBuilder commandBuilder,
-        string tablePrefix)
+        string tablePrefix,
+        string schema,
+        SqlVariant sqlVariant)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
@@ -29,8 +33,9 @@ class SagaInfoCache
         this.jsonSerializer = jsonSerializer;
         this.commandBuilder = commandBuilder;
         this.tablePrefix = tablePrefix;
+        this.schema = schema;
+        this.sqlVariant = sqlVariant;
     }
-    
 
     public RuntimeSagaInfo GetInfo(Type sagaDataType, Type sagaType)
     {
@@ -48,6 +53,8 @@ class SagaInfoCache
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
             writerCreator: writerCreator,
-            tablePrefix: tablePrefix);
+            tablePrefix: tablePrefix,
+            schema: schema,
+            sqlVariant: sqlVariant);
     }
 }

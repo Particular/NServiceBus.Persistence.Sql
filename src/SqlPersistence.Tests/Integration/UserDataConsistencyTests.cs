@@ -79,6 +79,7 @@ end";
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{endpointName}_");
+                command.AddParameter("schema", "dbo");
                 command.ExecuteNonQuery();
             }
         }

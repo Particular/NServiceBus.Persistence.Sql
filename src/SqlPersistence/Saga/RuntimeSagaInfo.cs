@@ -39,7 +39,9 @@ class RuntimeSagaInfo
         NewtonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
-        string tablePrefix)
+        string tablePrefix,
+        string schema,
+        SqlVariant sqlVariant)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -53,7 +55,19 @@ class RuntimeSagaInfo
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
-        TableName = $"{tablePrefix}{tableSuffix}";
+
+        switch (sqlVariant)
+        {
+            case SqlVariant.MsSqlServer:
+                TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
+                break;
+            case SqlVariant.MySql:
+                TableName = $"`{tablePrefix}{tableSuffix}`";
+                break;
+            default:
+                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+        }
+
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
         SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);

@@ -17,13 +17,10 @@ class OutboxPersister : IOutboxStorage
     Func<DbConnection> connectionBuilder;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(
-        SqlVariant sqlVariant,
-        Func<DbConnection> connectionBuilder,
-        string tablePrefix)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
         this.connectionBuilder = connectionBuilder;
-        outboxCommands = OutboxCommandBuilder.Build(sqlVariant, tablePrefix);
+        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)

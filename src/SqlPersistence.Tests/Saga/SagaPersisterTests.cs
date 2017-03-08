@@ -13,12 +13,14 @@ using ObjectApproval;
 public abstract class SagaPersisterTests
 {
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public SagaPersisterTests(BuildSqlVariant sqlVariant)
+    public SagaPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
     }
 
@@ -34,7 +36,9 @@ public abstract class SagaPersisterTests
             commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
-            tablePrefix: $"{endpointName}_");
+            tablePrefix: $"{endpointName}_",
+            schema: schema,
+            sqlVariant: sqlVariant.Convert());
         return new SagaPersister(infoCache);
     }
 

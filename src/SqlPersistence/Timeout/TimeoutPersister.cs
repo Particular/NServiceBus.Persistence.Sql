@@ -13,12 +13,10 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     Func<DbConnection> connectionBuilder;
     TimeoutCommands timeoutCommands;
 
-    public TimeoutPersister(
-        Func<DbConnection> connectionBuilder,
-        string tablePrefix, SqlVariant sqlVariant)
+    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema)
     {
         this.connectionBuilder = connectionBuilder;
-        timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix);
+        timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix, schema);
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)

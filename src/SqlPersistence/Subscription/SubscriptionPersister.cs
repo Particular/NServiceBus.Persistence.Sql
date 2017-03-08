@@ -14,10 +14,10 @@ class SubscriptionPersister : ISubscriptionStorage
     Func<DbConnection> connectionBuilder;
     SubscriptionCommands subscriptionCommands;
 
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema)
     {
         this.connectionBuilder = connectionBuilder;
-        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix);
+        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
     }
 
 

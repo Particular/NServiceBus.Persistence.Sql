@@ -35,7 +35,9 @@ class SqlSagaFeature : Feature
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix();
-        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder, tablePrefix);
+        var schema = settings.GetSchema();
+        var sqlVariant = settings.GetSqlVariant();
+        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder, tablePrefix, schema, sqlVariant);
         var sagaPersister = new SagaPersister(infoCache);
         var container = context.Container;
         container.ConfigureComponent(() => infoCache, DependencyLifecycle.SingleInstance);

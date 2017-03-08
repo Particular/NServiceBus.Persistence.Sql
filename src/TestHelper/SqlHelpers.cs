@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using System.Data.SqlClient;
 
 public static class SqlHelpers
 {
@@ -12,6 +13,10 @@ public static class SqlHelpers
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{tablePrefix}_");
+                if (connection is SqlConnection)
+                {
+                    command.AddParameter("schema", "dbo");
+                }
                 command.ExecuteNonQuery();
             }
         }

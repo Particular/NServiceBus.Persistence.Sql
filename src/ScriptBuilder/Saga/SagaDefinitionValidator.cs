@@ -28,6 +28,10 @@ static class SagaDefinitionValidator
             {
                 throw new ErrorsException($"The Saga '{sagaName}' has a tableSuffix that contains a '['. Delimiters are automatically and are not required in configuration.");
             }
+            if (tableSuffix.Contains("`"))
+            {
+                throw new ErrorsException($"The Saga '{sagaName}' has a tableSuffix that contains a '`'. Delimiters are automatically and are not required in configuration.");
+            }
         }
 
         if (correlationProperty != null && correlationProperty == transitionalProperty)
