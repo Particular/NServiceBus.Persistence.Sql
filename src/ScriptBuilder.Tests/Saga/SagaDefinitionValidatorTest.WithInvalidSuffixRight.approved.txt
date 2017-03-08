@@ -1,1 +1,1 @@
-﻿The Saga 'saga1' has a tableSuffix that contains a ']'. Delimiters are automatically added and are not required in configuration.
+﻿The Saga 'saga1' has a tableSuffix that contains a ']', '[' or '`'. Names automatically quoted.
