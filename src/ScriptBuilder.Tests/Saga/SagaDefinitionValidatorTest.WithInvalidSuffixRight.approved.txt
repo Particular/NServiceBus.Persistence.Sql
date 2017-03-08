@@ -1,0 +1,1 @@
+﻿The Saga 'saga1' has a tableSuffix that contains a ']'. Delimiters are automatically added and are not required in configuration.

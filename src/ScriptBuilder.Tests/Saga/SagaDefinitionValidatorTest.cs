@@ -9,9 +9,8 @@ public class SagaDefinitionValidatorTest
     [Test]
     public void Simple()
     {
-        SagaDefinitionValidator.ValidateSagaDefinition("Correlation","saga1", "Transitional","tableSuffix");
+        SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "tableSuffix");
     }
-
 
     [Test]
     public void WithMatchingIds()
@@ -20,13 +19,25 @@ public class SagaDefinitionValidatorTest
         Approvals.Verify(errorsException.Message);
     }
 
+    [Test]
+    public void WithInvalidSuffixLeft()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table[Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
+
+    [Test]
+    public void WithInvalidSuffixRight()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table]Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
 
     [Test]
     public void WithNoCorrelation()
     {
         SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", null, "tableSuffix");
     }
-
 
     [Test]
     public void WithNoTransitionalCorrelation()

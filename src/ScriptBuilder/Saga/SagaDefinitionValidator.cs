@@ -14,9 +14,20 @@ static class SagaDefinitionValidator
             throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for TransitionalCorrelationProperty.");
         }
 
-        if (tableSuffix != null && string.IsNullOrWhiteSpace(tableSuffix))
+        if (tableSuffix != null)
         {
-            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for to TableSuffix.");
+            if (string.IsNullOrWhiteSpace(tableSuffix))
+            {
+                throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for to TableSuffix.");
+            }
+            if (tableSuffix.Contains("]"))
+            {
+                throw new ErrorsException($"The Saga '{sagaName}' has a tableSuffix that contains a ']'. Delimiters are automatically added and are not required in configuration.");
+            }
+            if (tableSuffix.Contains("["))
+            {
+                throw new ErrorsException($"The Saga '{sagaName}' has a tableSuffix that contains a '['. Delimiters are automatically and are not required in configuration.");
+            }
         }
 
         if (correlationProperty != null && correlationProperty == transitionalProperty)
