@@ -20,6 +20,62 @@ public class SagaDefinitionReaderTest
     }
 
     [Test]
+    public void WithGeneric()
+    {
+        var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinition definition;
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    [SqlSaga(
+        correlationProperty: nameof(SagaData.Correlation)
+    )]
+    public class WithGenericSaga<T> : Saga<WithGenericSaga<T>.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+
+    [Test]
+    public void Abstract()
+    {
+        var sagaType = module.GetTypeDefinition<AbstractSaga>();
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinition definition;
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    [SqlSaga(
+        correlationProperty: nameof(SagaData.Correlation)
+    )]
+    abstract class AbstractSaga : Saga<AbstractSaga.SagaData>
+    {
+
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
     public void SqlSagaWithNoAttribute()
     {
         var sagaType = module.GetTypeDefinition<WithNoAttributeSaga>();
