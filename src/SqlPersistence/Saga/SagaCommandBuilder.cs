@@ -66,7 +66,7 @@ set
     SagaTypeVersion = @SagaTypeVersion,
     Concurrency = @Concurrency + 1{correlationSet}
 where
-    Id = @Id AND Concurrency = @Concurrency
+    Id = @Id and Concurrency = @Concurrency
 ";
         }
 
@@ -102,7 +102,7 @@ where Correlation_{propertyName} = @propertyValue
         {
             return $@"
 delete from {tableName}
-where Id = @Id AND Concurrency = @Concurrency
+where Id = @Id and Concurrency = @Concurrency
 ";
         }
 
