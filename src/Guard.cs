@@ -22,17 +22,9 @@ static class Guard
 
     public static void AgainstSqlDelimiters(string argumentName, string value)
     {
-        if (value.Contains("]"))
+        if (value.Contains("]") || value.Contains("[") || value.Contains("`"))
         {
-            throw new ArgumentException($"The argument '{value}' contians a ']' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
-        }
-        if (value.Contains("["))
-        {
-            throw new ArgumentException($"The argument '{value}' contians a ']' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
-        }
-        if (value.Contains("`"))
-        {
-            throw new ArgumentException($"The argument '{value}' contians a '`' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
+            throw new ArgumentException($"The argument '{value}' has a tableSuffix that contains a ']', '[' or '`'. Names automatically quoted.");
         }
     }
 
