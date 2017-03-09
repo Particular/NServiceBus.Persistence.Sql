@@ -20,6 +20,22 @@ static class Guard
         }
     }
 
+    public static void AgainstSqlDelimiters(string argumentName, string value)
+    {
+        if (value.Contains("]"))
+        {
+            throw new ArgumentException($"The argument '{value}' contians a ']' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
+        }
+        if (value.Contains("["))
+        {
+            throw new ArgumentException($"The argument '{value}' contians a ']' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
+        }
+        if (value.Contains("`"))
+        {
+            throw new ArgumentException($"The argument '{value}' contians a '`' SQL Delimiters which is not supported. Delimiters are automatically added and are not required in configuration.", argumentName);
+        }
+    }
+
     public static void AgainstEmpty(string argumentName, string value)
     {
         if (value !=null && string.IsNullOrWhiteSpace(value))

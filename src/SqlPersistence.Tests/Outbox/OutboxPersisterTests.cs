@@ -15,13 +15,14 @@ public abstract class OutboxPersisterTests
 
     protected abstract Func<DbConnection> GetConnection();
 
-    public OutboxPersisterTests(BuildSqlVariant sqlVariant)
+    public OutboxPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
-        persister = new OutboxPersister(sqlVariant.Convert(),
-            connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(OutboxPersisterTests)}_");
+        persister = new OutboxPersister(connectionBuilder: dbConnection,
+            tablePrefix: $"{nameof(OutboxPersisterTests)}_",
+            schema: schema,
+            sqlVariant: sqlVariant.Convert());
     }
 
 

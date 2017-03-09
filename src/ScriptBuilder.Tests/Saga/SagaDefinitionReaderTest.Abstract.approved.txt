@@ -1,0 +1,1 @@
+﻿The type 'SagaDefinitionReaderTest/AbstractSaga' has a [SqlSagaAttribute] but has is abstract.

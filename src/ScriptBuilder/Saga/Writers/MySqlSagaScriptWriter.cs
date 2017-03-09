@@ -30,7 +30,7 @@ end;");
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
+set @tableName = concat('`', @tablePrefix, '{saga.TableSuffix}`');
 ");
     }
 

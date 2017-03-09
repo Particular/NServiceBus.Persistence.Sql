@@ -9,12 +9,14 @@ using ObjectApproval;
 public abstract class TimeoutPersisterTests
 {
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public TimeoutPersisterTests(BuildSqlVariant sqlVariant)
+    public TimeoutPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
     }
 
@@ -30,7 +32,8 @@ public abstract class TimeoutPersisterTests
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
-            sqlVariant: sqlVariant.Convert());
+            sqlVariant: sqlVariant.Convert(),
+            schema: schema);
     }
 
     [TearDown]

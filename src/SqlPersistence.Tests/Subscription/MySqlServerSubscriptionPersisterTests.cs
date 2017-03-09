@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class MySqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
 {
-    public MySqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MySql)
+    public MySqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MySql, null)
     {
     }
 

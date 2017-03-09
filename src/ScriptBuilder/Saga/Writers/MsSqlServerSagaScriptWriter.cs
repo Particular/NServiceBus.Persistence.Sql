@@ -20,7 +20,7 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-declare @tableName nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';");
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'{saga.TableSuffix}]';");
     }
 
     public void AddProperty(CorrelationProperty correlationProperty)

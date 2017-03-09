@@ -10,15 +10,62 @@ namespace NServiceBus.Persistence.Sql
     public static class SubscriptionCommandBuilder
     {
 
-        public static SubscriptionCommands Build(SqlVariant sqlVariant, string tablePrefix)
+        public static SubscriptionCommands Build(SqlVariant sqlVariant, string tablePrefix, string schema)
         {
-            var tableName = $@"{tablePrefix}SubscriptionData";
+            string tableName;
 
-            string subscribeCommandText;
             switch (sqlVariant)
             {
                 case SqlVariant.MsSqlServer:
-                    subscribeCommandText = $@"
+                    tableName = $"[{schema}].[{tablePrefix}SubscriptionData]";
+                    break;
+
+                case SqlVariant.MySql:
+                    tableName = $"`{tablePrefix}SubscriptionData`";
+                    break;
+
+                default:
+                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            }
+            var subscribeCommand = GetSubscribeCommand(sqlVariant, tableName);
+
+            var unsubscribeCommand = $@"
+delete from {tableName}
+where
+    Subscriber = @Subscriber and
+    MessageType = @MessageType";
+
+            var getSubscribersPrefix = $@"
+select distinct Subscriber, Endpoint
+from {tablePrefix}SubscriptionData
+where MessageType in (";
+
+            return new SubscriptionCommands(
+                subscribe: subscribeCommand,
+                unsubscribe: unsubscribeCommand,
+                getSubscribers: messageTypes =>
+                {
+                    var builder = new StringBuilder(getSubscribersPrefix);
+                    for (var i = 0; i < messageTypes.Count; i++)
+                    {
+                        var paramName = $"@type{i}";
+                        builder.Append(paramName);
+                        if (i < messageTypes.Count - 1)
+                        {
+                            builder.Append(", ");
+                        }
+                    }
+                    builder.Append(")");
+                    return builder.ToString();
+                });
+        }
+
+        static string GetSubscribeCommand(SqlVariant sqlVariant, string tableName)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.MsSqlServer:
+                    return $@"
 declare @dummy int;
 merge {tableName} with (holdlock) as target
 using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
@@ -42,10 +89,9 @@ values
     @Endpoint,
     @PersistenceVersion
 );";
-                    break;
 
                 case SqlVariant.MySql:
-                    subscribeCommandText = $@"
+                    return $@"
 insert into {tableName}
 (
     Subscriber,
@@ -64,42 +110,10 @@ on duplicate key update
     Endpoint = @Endpoint,
     PersistenceVersion = @PersistenceVersion
 ";
-                    break;
 
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
-
-            string unsubscribeCommandText = $@"
-delete from {tableName}
-where
-    Subscriber = @Subscriber and
-    MessageType = @MessageType";
-
-            var getSubscribersPrefix = $@"
-select distinct Subscriber, Endpoint
-from {tablePrefix}SubscriptionData
-where MessageType in (";
-
-            return new SubscriptionCommands(
-                subscribe: subscribeCommandText,
-                unsubscribe: unsubscribeCommandText, 
-                getSubscribers: messageTypes =>
-                {
-                    var builder = new StringBuilder(getSubscribersPrefix);
-                    for (var i = 0; i < messageTypes.Count; i++)
-                    {
-                        var paramName = $"@type{i}";
-                        builder.Append(paramName);
-                        if (i < messageTypes.Count - 1)
-                        {
-                            builder.Append(", ");
-                        }
-                    }
-                    builder.Append(")");
-                    return builder.ToString();
-                });
         }
-
     }
 }

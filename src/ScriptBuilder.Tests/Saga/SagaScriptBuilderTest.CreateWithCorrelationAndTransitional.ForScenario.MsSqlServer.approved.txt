@@ -1,7 +1,7 @@
 ﻿
 /* TableNameVariable */
 
-declare @tableName nvarchar(max) = @tablePrefix + N'theSaga';
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'theSaga]';
 
 /* Initialize */
 

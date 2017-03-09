@@ -9,10 +9,22 @@
     public static class OutboxCommandBuilder
     {
 
-        public static OutboxCommands Build(SqlVariant sqlVariant, string tablePrefix)
+        public static OutboxCommands Build(string tablePrefix, string schema, SqlVariant sqlVariant)
         {
-            var tableName = $@"{tablePrefix}OutboxData";
-            string storeCommandText = $@"
+            string tableName;
+            switch (sqlVariant)
+            {
+                case SqlVariant.MsSqlServer:
+                    tableName = $"[{schema}].[{tablePrefix}OutboxData]";
+                    break;
+                case SqlVariant.MySql:
+                    tableName = $"`{tablePrefix}OutboxData`";
+                    break;
+                default: 
+                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            }
+
+            var storeCommandText = $@"
 insert into {tableName}
 (
     MessageId,
@@ -26,17 +38,17 @@ values
     @PersistenceVersion
 )";
 
-            string cleanupCommandText = $@"
+            var cleanupCommand = $@"
 delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
 
-            string getCommandText = $@"
+            var getCommandText = $@"
 select
     Dispatched,
     Operations
 from {tableName}
 where MessageId = @MessageId";
 
-            string setAsDispatchedCommandText = $@"
+            var setAsDispatchedCommand = $@"
 update {tableName}
 set
     Dispatched = 1,
@@ -46,8 +58,8 @@ where MessageId = @MessageId";
             return new OutboxCommands(
                 store: storeCommandText,
                 get: getCommandText,
-                setAsDispatched: setAsDispatchedCommandText,
-                cleanup: cleanupCommandText);
+                setAsDispatched: setAsDispatchedCommand,
+                cleanup: cleanupCommand);
         }
 
     }

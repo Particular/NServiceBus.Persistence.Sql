@@ -7,7 +7,12 @@ public static class Extensions
 
     public static TypeDefinition GetTypeDefinition<T>(this ModuleDefinition moduleDefinition)
     {
-        return moduleDefinition.GetAllTypes().First(x => x.FullName == typeof(T).FullName.Replace("+","/"));
+        var replace = typeof(T).FullName.Replace("+", "/")
+            //trim trailing generic info
+            .Split('[')
+            .First();
+        return moduleDefinition.GetAllTypes()
+            .First(x => x.FullName == replace);
     }
 
     public static string DisplayName(this TypeReference typeReference)

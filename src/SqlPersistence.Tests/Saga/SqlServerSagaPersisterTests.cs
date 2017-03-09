@@ -7,7 +7,7 @@ using NUnit.Framework;
 public class SqlServerSagaPersisterTests: SagaPersisterTests
 {
 
-    public SqlServerSagaPersisterTests() : base(BuildSqlVariant.MsSqlServer)
+    public SqlServerSagaPersisterTests() : base(BuildSqlVariant.MsSqlServer, "dbo")
     {
     }
 

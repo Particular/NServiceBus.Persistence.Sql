@@ -7,7 +7,7 @@ using NUnit.Framework;
 public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
 
-    public SqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MsSqlServer)
+    public SqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MsSqlServer, "dbo")
     {
     }
 

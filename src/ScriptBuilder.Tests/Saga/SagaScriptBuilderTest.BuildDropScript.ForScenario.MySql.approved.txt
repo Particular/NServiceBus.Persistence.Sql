@@ -1,7 +1,7 @@
 ﻿
 /* TableNameVariable */
 
-set @tableName = concat(@tablePrefix, 'theSaga');
+set @tableName = concat('`', @tablePrefix, 'theSaga`');
 
 
 /* DropTable */

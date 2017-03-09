@@ -1,4 +1,4 @@
-﻿set @tableName = concat(@tablePrefix, 'TimeoutData');
+﻿set @tableName = concat('`', @tablePrefix, 'TimeoutData`');
 set @createTable = concat('
     create table if not exists ', @tableName, '(
         Id varchar(38) not null,

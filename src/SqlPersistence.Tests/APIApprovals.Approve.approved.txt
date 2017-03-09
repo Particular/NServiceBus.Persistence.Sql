@@ -13,7 +13,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.OutboxCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.OutboxCommands Build(string tablePrefix, string schema, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class OutboxCommands
@@ -78,7 +78,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static SubscriptionCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix, string schema) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class SubscriptionCommands
@@ -91,7 +91,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static TimeoutCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.Persistence.Sql.SqlVariant sqlVariant, string tablePrefix, string schema) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class TimeoutCommands
@@ -112,6 +112,7 @@ namespace NServiceBus
         public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
     }
