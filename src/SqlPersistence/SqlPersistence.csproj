@@ -76,7 +76,7 @@
       <Link>Guard.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
+    <Compile Include="Config\ReadOnlySettingsExtensions.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Schema.cs" />
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
@@ -97,7 +97,7 @@
     <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
     <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
-    <Compile Include="Config\SqlVariantConfig.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_SqlVariant.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />
