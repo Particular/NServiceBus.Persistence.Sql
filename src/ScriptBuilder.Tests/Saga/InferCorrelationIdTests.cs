@@ -42,6 +42,28 @@ public class InferCorrelationIdTests
     }
 
     [Test]
+    public void SingleMappingValueType()
+    {
+        var dataType = module.GetTypeDefinition<SingleMappingValueTypeSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    public class SingleMappingValueTypeSaga : Saga<SingleMappingValueTypeSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public int Correlation { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
+        }
+    }
+
+    [Test]
     public void DualMapping()
     {
         var dataType = module.GetTypeDefinition<DualMappingSaga>();
