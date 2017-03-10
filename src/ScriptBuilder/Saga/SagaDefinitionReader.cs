@@ -9,16 +9,23 @@ class SagaDefinitionReader
     public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
         var typeFullName = type.FullName;
+
+
+        if (!type.IsAbstract && type.BaseType != null)
+        {
+            var baseTypeFullName = type.BaseType.FullName;
+            if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
+            {
+                throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.");
+            }
+        }
+
         var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
         if (attribute == null)
         {
             if (!type.IsAbstract && type.BaseType != null)
             {
                 var baseTypeFullName = type.BaseType.FullName;
-                if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
-                {
-                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Saga but is missing a [SqlSagaAttribute].");
-                }
                 if (baseTypeFullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga"))
                 {
                     throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Persistence.Sql.SqlSaga but is missing a [SqlSagaAttribute].");

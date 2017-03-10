@@ -87,21 +87,21 @@ public class SagaDefinitionReaderTest
         Approvals.Verify(exception.Message);
     }
 
-    public class WithNoAttributeSaga : Saga<WithNoAttributeSaga.SagaData>
+    public class WithNoAttributeSaga : SqlSaga<WithNoAttributeSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
 
     [Test]
-    public void SagaWithNoAttribute()
+    public void NonSqlSaga()
     {
-        var sagaType = module.GetTypeDefinition<WithNoAttributeSqlSaga>();
+        var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
             SagaDefinition definition;
@@ -110,13 +110,13 @@ public class SagaDefinitionReaderTest
         Approvals.Verify(exception.Message);
     }
 
-    public class WithNoAttributeSqlSaga : SqlSaga<WithNoAttributeSqlSaga.SagaData>
+    public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
         }
     }
