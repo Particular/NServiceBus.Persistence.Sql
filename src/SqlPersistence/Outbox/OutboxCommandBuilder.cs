@@ -67,12 +67,9 @@ where MessageId = @MessageId";
             {
                 case SqlVariant.MsSqlServer:
                     return $@"
-delete from {tableName}
-where MessageId
-    in (select top (@BatchSize) MessageId
-        from {tableName}
-        where Dispatched = 1
-            and DispatchedAt < @Date)";
+delete top (@BatchSize) from {tableName}
+where Dispatched = 1
+    and DispatchedAt < @Date";
                 case SqlVariant.MySql:
                     return $@"
 delete from {tableName}
