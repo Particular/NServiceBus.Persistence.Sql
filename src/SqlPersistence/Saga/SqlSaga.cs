@@ -21,7 +21,7 @@ namespace NServiceBus.Persistence.Sql
             var methodInfo = type.GetMethod("ConfigureHowToFindSaga", bindingFlags);
             if (methodInfo != null)
             {
-                throw new Exception($"SqlSaga should only have ConfigureMapping(PropertyMapper) overriden and not ConfigureHowToFindSaga(SagaPropertyMapper). Saga: {type.FullName}.");
+                throw new Exception($"SqlSaga should only have ConfigureMapping(IMessagePropertyMapper) overriden and not ConfigureHowToFindSaga(SagaPropertyMapper). Saga: {type.FullName}.");
             }
             verified = true;
         }
