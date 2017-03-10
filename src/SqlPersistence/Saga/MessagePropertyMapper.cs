@@ -2,7 +2,7 @@
 {
     using System;
 
-    [Obsolete("Use IMessagePropertyMapper instead.")]
+    [Obsolete("Use IMessagePropertyMapper instead.", true)]
     public class MessagePropertyMapper<TSagaData>
     {
     }
