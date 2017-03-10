@@ -34,14 +34,14 @@ public class SagaDefinitionReaderTest
     [SqlSaga(
         correlationProperty: nameof(SagaData.Correlation)
     )]
-    public class WithGenericSaga<T> : Saga<WithGenericSaga<T>.SagaData>
+    public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -62,7 +62,7 @@ public class SagaDefinitionReaderTest
     [SqlSaga(
         correlationProperty: nameof(SagaData.Correlation)
     )]
-    abstract class AbstractSaga : Saga<AbstractSaga.SagaData>
+    abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
     {
 
         public class SagaData : ContainSagaData
@@ -134,7 +134,7 @@ public class SagaDefinitionReaderTest
         correlationProperty: nameof(SagaData.Correlation),
         transitionalCorrelationProperty: nameof(SagaData.Transitional)
     )]
-    public class SimpleSaga : Saga<SimpleSaga.SagaData>
+    public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
@@ -142,7 +142,7 @@ public class SagaDefinitionReaderTest
             public string Transitional { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -183,13 +183,13 @@ public class SagaDefinitionReaderTest
     }
 
     [SqlSaga]
-    public class WithNoCorrelationSaga : Saga<WithNoCorrelationSaga.SagaData>
+    public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -204,13 +204,13 @@ public class SagaDefinitionReaderTest
     }
 
     [SqlSaga]
-    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
+    public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -228,14 +228,14 @@ public class SagaDefinitionReaderTest
         correlationProperty: nameof(SagaData.Correlation),
         tableSuffix: "TheTableSuffix"
     )]
-    public class TableSuffixSaga : Saga<TableSuffixSaga.SagaData>
+    public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }

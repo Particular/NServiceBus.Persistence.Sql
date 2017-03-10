@@ -72,20 +72,6 @@ class SagaDefinitionReader
         foreach (var method in sagaType.Methods)
         {
             var parameters = method.Parameters;
-            if (method.Name == "ConfigureHowToFindSaga")
-            {
-                if (parameters.Count == 1)
-                {
-                    var parameterType = parameters[0].ParameterType;
-                    var parameterTypeName = parameterType.Name;
-                    if (parameterTypeName.StartsWith("SagaPropertyMapper"))
-                    {
-                        var genericInstanceType = (GenericInstanceType)parameterType;
-                        var argument = genericInstanceType.GenericArguments.Single();
-                        return ToTypeDefinition(sagaType, argument);
-                    }
-                }
-            }
             if (method.Name == "ConfigureMapping")
             {
                 if (parameters.Count == 1)
@@ -101,7 +87,7 @@ class SagaDefinitionReader
                 }
             }
         }
-        throw new ErrorsException($"The type '{sagaType.FullName}' needs to override Saga.ConfigureHowToFindSaga(SagaPropertyMapper) or SqlSaga.ConfigureHowToFindSaga(MessagePropertyMapper).");
+        throw new ErrorsException($"The type '{sagaType.FullName}' needs to override SqlSaga.ConfigureHowToFindSaga(MessagePropertyMapper).");
     }
 
     static TypeDefinition ToTypeDefinition(TypeDefinition sagaType, TypeReference argument)
