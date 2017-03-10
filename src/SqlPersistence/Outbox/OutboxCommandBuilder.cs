@@ -41,9 +41,9 @@ values
             var cleanupCommand = $@"
 delete from {tableName}
 where MessageId
-    in (select top @BatchSize MessageId
+    in (select top (@BatchSize) MessageId
         from {tableName}
-        where Dispatched = true
+        where Dispatched = 1
             and DispatchedAt < @Date)";
 
             var getCommandText = $@"

@@ -15,11 +15,13 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
+    int cleanupBatchCount;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchCount = 10000)
     {
         this.connectionBuilder = connectionBuilder;
+        this.cleanupBatchCount = cleanupBatchCount;
         outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
     }
 
@@ -105,24 +107,21 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
+
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        const int cleanupBatchCount = 10000;
         using (var connection = await connectionBuilder.OpenConnection())
         {
             var continuePurging = true;
             while (continuePurging && !cancellationToken.IsCancellationRequested)
             {
-                using (new TransactionScope(TransactionScopeOption.Suppress))
-                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = outboxCommands.Cleanup;
-                    command.Transaction = transaction;
                     command.AddParameter("Date", dateTime);
                     command.AddParameter("BatchSize", cleanupBatchCount);
                     var rowCount = await command.ExecuteNonQueryEx(cancellationToken);
-                    continuePurging = rowCount == cleanupBatchCount;
+                    continuePurging = rowCount != 0;
                 }
             }
         }
