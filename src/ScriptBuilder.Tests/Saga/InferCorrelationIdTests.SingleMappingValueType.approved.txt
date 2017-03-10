@@ -1,0 +1,9 @@
+﻿{
+  "TableSuffix": "SingleMappingValueTypeSaga",
+  "CorrelationProperty": {
+    "Type": "Int",
+    "Name": "Correlation"
+  },
+  "TransitionalCorrelationProperty": null,
+  "Name": "InferCorrelationIdTests/SingleMappingValueTypeSaga"
+}
