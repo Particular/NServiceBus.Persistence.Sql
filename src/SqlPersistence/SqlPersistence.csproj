@@ -81,6 +81,8 @@
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\IMessagePropertyMapper.cs" />
+    <Compile Include="Saga\MessagePropertyMapper.cs" />
     <Compile Include="Saga\ParameterAppender.cs" />
     <Compile Include="Saga\SagaPersister_Save.cs" />
     <Compile Include="Saga\SagaPersister_Update.cs" />
@@ -120,7 +122,7 @@
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageAdapter.cs" />
     <Compile Include="Saga\SqlSagaAttribute.cs" />
-    <Compile Include="Saga\MessagePropertyMapper.cs" />
+    <Compile Include="Saga\PropertyMapper.cs" />
     <Compile Include="Saga\Serialization\RetrieveVersionSpecificJsonSettings.cs" />
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />

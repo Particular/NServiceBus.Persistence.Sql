@@ -14,7 +14,7 @@ public class MySaga : SqlSaga<MySaga.SagaData>,
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
-    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+    protected override void ConfigureMapping(IMessagePropertyMapper mapper)
     {
         mapper.MapMessage<StartSagaMessage>(m => m.MySagaId);
         mapper.MapMessage<CompleteSagaMessage>(m => m.MySagaId);

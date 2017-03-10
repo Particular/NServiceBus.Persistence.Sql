@@ -1,14 +1,18 @@
 ﻿namespace NServiceBus.Persistence.Sql
 {
+    public interface IMessagePropertyMapper
+    {
+        void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty);
+    }
     public interface ISqlStorageSession
     {
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
     }
+    [System.ObsoleteAttribute("Use IMessagePropertyMapper instead.", true)]
     public class MessagePropertyMapper<TSagaData>
-        where TSagaData : NServiceBus.IContainSagaData, new ()
     {
-        public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
+        public MessagePropertyMapper() { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
@@ -60,7 +64,7 @@
     {
         protected SqlSaga() { }
         protected override void ConfigureHowToFindSaga(NServiceBus.SagaPropertyMapper<TSagaData> mapper) { }
-        protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper);
+        protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
     public class SqlSagaAttribute : System.Attribute

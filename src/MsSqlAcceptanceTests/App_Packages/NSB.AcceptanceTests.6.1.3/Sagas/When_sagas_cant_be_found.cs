@@ -91,7 +91,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -117,7 +117,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -192,7 +192,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -222,7 +222,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);

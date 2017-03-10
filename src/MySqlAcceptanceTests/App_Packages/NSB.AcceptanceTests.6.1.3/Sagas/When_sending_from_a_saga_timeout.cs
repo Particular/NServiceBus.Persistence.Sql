@@ -59,7 +59,7 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SendFromTimeoutSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga1>(m => m.DataId);
                 }
@@ -82,7 +82,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SendFromTimeoutSaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga2>(m => m.DataId);
                 }

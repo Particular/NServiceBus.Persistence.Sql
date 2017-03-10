@@ -85,7 +85,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<TimeoutHitsNotFoundSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.DataId);
                     mapper.MapMessage<SomeOtherMessage>(m => m.DataId);
