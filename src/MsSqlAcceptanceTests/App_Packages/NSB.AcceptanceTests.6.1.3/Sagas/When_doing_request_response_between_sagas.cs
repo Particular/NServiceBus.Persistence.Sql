@@ -47,7 +47,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<InitiateRequestingSaga>(m => m.Id);
                     mapper.MapMessage<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
@@ -98,7 +98,7 @@
                     return SendReply(context);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                     //this line is just needed so we can test the non initiating handler case

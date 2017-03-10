@@ -111,7 +111,7 @@ public class SqlTransportIntegrationTests : IDisposable
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
             mapper.MapMessage<StartSagaMessage>(m => m.StartId);
         }

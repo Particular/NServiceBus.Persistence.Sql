@@ -108,7 +108,7 @@ public class MsmqTransportIntegrationTests : IDisposable
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
             mapper.MapMessage<StartSagaMessage>(message => message.StartId);
         }

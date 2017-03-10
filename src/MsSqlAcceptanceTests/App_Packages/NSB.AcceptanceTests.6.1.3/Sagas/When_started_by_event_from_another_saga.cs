@@ -83,7 +83,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.DataId);
                 }
@@ -132,7 +132,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<SomethingHappenedEvent>(m => m.DataId);
                 }

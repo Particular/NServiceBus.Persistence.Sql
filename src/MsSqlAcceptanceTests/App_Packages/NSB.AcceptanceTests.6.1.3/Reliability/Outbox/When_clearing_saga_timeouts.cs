@@ -70,7 +70,7 @@
                     return context.SendLocal(new SignalDone());
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<PlaceOrderSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<PlaceOrder>(m => m.DataId);
                 }

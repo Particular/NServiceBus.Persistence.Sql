@@ -104,7 +104,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MySaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
                     mapper.MapMessage<CompleteSaga1Now>(m => m.DataId);
@@ -140,7 +140,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MySaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga2>(m => m.DataId);
                     mapper.MapMessage<GroupPendingEvent>(m => m.DataId);

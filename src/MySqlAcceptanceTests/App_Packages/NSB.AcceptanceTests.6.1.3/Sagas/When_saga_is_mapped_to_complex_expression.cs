@@ -64,7 +64,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData02> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.Key);
                     mapper.MapMessage<OtherMessage>(m => m.Part1 + "_" + m.Part2);

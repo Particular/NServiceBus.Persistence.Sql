@@ -100,7 +100,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<CorrelationTestSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.RunId);
                     mapper.MapMessage<DoSomethingResponse>(m => m.RunId);

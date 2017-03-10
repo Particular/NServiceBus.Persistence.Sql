@@ -60,7 +60,7 @@
                     });
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<NullCorrPropertySagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }

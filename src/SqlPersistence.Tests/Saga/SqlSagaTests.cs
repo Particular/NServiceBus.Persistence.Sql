@@ -20,7 +20,7 @@ public class SqlSagaTests
         {
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
 
@@ -42,7 +42,7 @@ public class SqlSagaTests
         {
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
