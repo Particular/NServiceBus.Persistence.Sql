@@ -63,7 +63,7 @@
                     return context.SendLocal(sagaMessage);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<BaseClassIsMappedSagaData> mapper)
                 {
                     mapper.MapMessage<SagaMessageBase>(m => m.SomeId);
                 }

@@ -66,7 +66,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData07> mapper)
                 {
                     // custom finder used
                 }

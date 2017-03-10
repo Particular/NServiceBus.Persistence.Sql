@@ -65,7 +65,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<BaseClassStartsSagaData> mapper)
                 {
                     mapper.MapMessage<StartSagaMessageBase>(m => m.SomeId);
                 }

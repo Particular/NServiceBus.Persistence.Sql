@@ -94,7 +94,7 @@ using NUnit.Framework;
                 return Task.FromResult(0);
             }
 
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+            protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
             {
                 mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
             }

@@ -125,7 +125,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData10> mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                     mapper.MapMessage<CompleteSagaMessage>(m => m.SomeId);

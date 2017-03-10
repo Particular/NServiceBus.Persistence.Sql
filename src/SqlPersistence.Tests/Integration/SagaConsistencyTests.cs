@@ -196,7 +196,7 @@ public class SagaConsistencyTests
             public bool PersistedFailingMessageResult { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
             mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
             mapper.MapMessage<FailingMessage>(m => m.SagaId);

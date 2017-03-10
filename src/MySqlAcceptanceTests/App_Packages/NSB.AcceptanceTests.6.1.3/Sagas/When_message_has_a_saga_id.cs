@@ -78,7 +78,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MessageWithSagaIdSagaData> mapper)
                 {
                     mapper.MapMessage<MessageWithSagaId>(m => m.DataId);
                 }

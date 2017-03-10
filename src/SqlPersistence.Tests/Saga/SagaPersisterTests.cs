@@ -133,7 +133,7 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -147,7 +147,7 @@ public abstract class SagaPersisterTests
             public string Contentಠ_ಠ { get; set; }
         }
         
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -407,7 +407,7 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -514,7 +514,7 @@ public abstract class SagaPersisterTests
             public string CorrelationProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -570,7 +570,7 @@ public abstract class SagaPersisterTests
             public int CorrelationProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }

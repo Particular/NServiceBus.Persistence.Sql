@@ -63,7 +63,7 @@
                 }
 
                 Context testContext;
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData11> mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                     mapper.MapMessage<OtherMessage>(m => m.SomeId);

@@ -11,7 +11,7 @@ using NUnit.Framework;
         [Test]
     public void StringCorrelationId()
     {
-        var expression = PropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));
+        var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));
         var instance = new SagaWithStringCorrelationId.SagaData
         {
             CorrelationProperty = "Foo"
@@ -33,7 +33,7 @@ using NUnit.Framework;
     [Test]
     public void IntCorrelationId()
     {
-        var expression = PropertyMapper<SagaWithIntCorrelationId.SagaData>.GetExpression(typeof(SagaWithIntCorrelationId));
+        var expression = MessagePropertyMapper<SagaWithIntCorrelationId.SagaData>.GetExpression(typeof(SagaWithIntCorrelationId));
         var instance = new SagaWithIntCorrelationId.SagaData
         {
             CorrelationProperty = 10
@@ -54,7 +54,7 @@ using NUnit.Framework;
     [Test]
     public void GuidCorrelationId()
     {
-        var expression = PropertyMapper<SagaWithGuidCorrelationId.SagaData>.GetExpression(typeof(SagaWithGuidCorrelationId));
+        var expression = MessagePropertyMapper<SagaWithGuidCorrelationId.SagaData>.GetExpression(typeof(SagaWithGuidCorrelationId));
         var guid = Guid.NewGuid();
         var instance = new SagaWithGuidCorrelationId.SagaData
         {

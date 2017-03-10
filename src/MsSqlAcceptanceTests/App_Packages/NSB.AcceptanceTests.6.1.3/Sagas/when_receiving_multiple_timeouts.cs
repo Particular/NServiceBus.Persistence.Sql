@@ -103,7 +103,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MultiTimeoutsSaga1Data> mapper)
                 {
                     mapper.MapMessage<StartSaga1>(m => m.ContextId);
                 }

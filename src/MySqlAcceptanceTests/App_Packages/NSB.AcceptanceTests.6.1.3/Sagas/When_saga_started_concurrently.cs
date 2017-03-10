@@ -94,7 +94,7 @@
                     Context.SagaCompleted = true;
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<ConcurrentlyStartedSagaData> mapper)
                 {
                     mapper.MapMessage<StartMessageOne>(msg => msg.SomeId);
                     mapper.MapMessage<StartMessageTwo>(msg => msg.SomeId);

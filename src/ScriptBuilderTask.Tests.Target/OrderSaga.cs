@@ -13,7 +13,7 @@ public class OrderSaga :
 {
     static ILog log = LogManager.GetLogger<OrderSaga>();
 
-    protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
     {
     }
 

@@ -58,7 +58,7 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<RequestingSagaData> mapper)
                 {
                     mapper.MapMessage<InitiateRequestingSaga>(m => m.SomeCorrelationId);
                     mapper.MapMessage<AnotherRequest>(m => m.SomeCorrelationId);

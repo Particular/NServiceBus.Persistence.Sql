@@ -93,7 +93,7 @@ public class SagaDefinitionReaderTest
         {
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -168,7 +168,7 @@ public class SagaDefinitionReaderTest
             public string Transitional { get; set; }
         }
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
     }

@@ -78,7 +78,7 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData08> mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
                     // Mapping not required for SomeOtherMessage because CustomFinder used
