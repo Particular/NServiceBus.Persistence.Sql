@@ -7,19 +7,17 @@ using NServiceBus.Persistence.Sql;
 [SqlSaga(
      correlationProperty: nameof(SagaData.MySagaId)
  )]
-public class MySaga : Saga<MySaga.SagaData>,
+public class MySaga : SqlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>,
     IHandleTimeouts<SagaTimoutMessage>
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
-    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
     {
-        mapper.ConfigureMapping<StartSagaMessage>(m => m.MySagaId)
-            .ToSaga(data => data.MySagaId);
-        mapper.ConfigureMapping<CompleteSagaMessage>(m => m.MySagaId)
-            .ToSaga(data => data.MySagaId);
+        mapper.MapMessage<StartSagaMessage>(m => m.MySagaId);
+        mapper.MapMessage<CompleteSagaMessage>(m => m.MySagaId);
     }
 
     public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -49,6 +47,8 @@ public class MySaga : Saga<MySaga.SagaData>,
         MarkAsComplete();
         return Task.FromResult(0);
     }
+
+
     public class SagaData : ContainSagaData
     {
         public Guid MySagaId { get; set; }
