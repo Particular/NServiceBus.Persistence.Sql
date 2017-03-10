@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     // Repro for issue  https://github.com/NServiceBus/NServiceBus/issues/1277 to test the fix
     // making sure that the saga correlation still works.
@@ -76,8 +77,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(CorrelationTestSagaData.RunId))]
-            public class CorrelationTestSaga : Saga<CorrelationTestSaga.CorrelationTestSagaData>,
+            [SqlSaga(correlationProperty: nameof(CorrelationTestSagaData.RunId))]
+            public class CorrelationTestSaga : SqlSaga<CorrelationTestSaga.CorrelationTestSagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleMessages<DoSomethingResponse>
             {
@@ -99,10 +100,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CorrelationTestSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<CorrelationTestSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.RunId).ToSaga(s => s.RunId);
-                    mapper.ConfigureMapping<DoSomethingResponse>(m => m.RunId).ToSaga(s => s.RunId);
+                    mapper.MapMessage<StartSaga>(m => m.RunId);
+                    mapper.MapMessage<DoSomethingResponse>(m => m.RunId);
                 }
 
                 public class CorrelationTestSagaData : ContainSagaData

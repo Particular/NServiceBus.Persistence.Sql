@@ -11,9 +11,9 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTest
-{
-    [Test]
+    public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTest
+    {
+        [Test]
     public async Task Should_use_existing_saga()
     {
         if (!MsSqlConnectionBuilder.IsSql2016OrHigher())

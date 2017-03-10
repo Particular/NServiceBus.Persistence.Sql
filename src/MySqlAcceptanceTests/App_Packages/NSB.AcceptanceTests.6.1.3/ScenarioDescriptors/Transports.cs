@@ -73,7 +73,7 @@
         static Dictionary<string, string> DefaultConnectionStrings = new Dictionary<string, string>
         {
             {"RabbitMQTransport", "host=localhost"},
-            {"SqlServerTransport", MsSqlConnectionBuilder.ConnectionString},
+            {"SqlServerTransport", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"},
             {"MsmqTransport", "cacheSendConnection=false;journal=false;"}
         };
     }

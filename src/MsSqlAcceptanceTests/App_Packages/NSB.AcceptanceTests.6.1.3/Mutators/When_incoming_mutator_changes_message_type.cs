@@ -5,6 +5,7 @@
     using EndpointTemplates;
     using MessageMutator;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_incoming_mutator_changes_message_type : NServiceBusAcceptanceTest
     {
@@ -82,8 +83,8 @@
                 Context TestContext;
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.SomeId))]
-            public class Saga : Saga<SagaData>, IAmStartedByMessages<OriginalMessage>, IAmStartedByMessages<NewMessage>
+            [SqlSaga(correlationProperty: nameof(SagaData.SomeId))]
+            public class Saga : SqlSaga<SagaData>, IAmStartedByMessages<OriginalMessage>, IAmStartedByMessages<NewMessage>
             {
                 public Saga(Context testContext)
                 {
@@ -102,10 +103,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
                 {
-                    mapper.ConfigureMapping<OriginalMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
-                    mapper.ConfigureMapping<NewMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
+                    mapper.MapMessage<OriginalMessage>(msg => msg.SomeId);
+                    mapper.MapMessage<NewMessage>(msg => msg.SomeId);
                 }
 
                 Context TestContext;

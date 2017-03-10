@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_using_ReplyToOriginator : NServiceBusAcceptanceTest
     {
@@ -36,8 +37,8 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(RequestingSagaData.CorrIdForResponse))]
-            public class RequestingSaga : Saga<RequestingSaga.RequestingSagaData>,
+            [SqlSaga(correlationProperty: nameof(RequestingSagaData.CorrIdForResponse))]
+            public class RequestingSaga : SqlSaga<RequestingSaga.RequestingSagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<AnotherRequest>
             {
@@ -57,12 +58,10 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<RequestingSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<RequestingSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.SomeCorrelationId)
-                        .ToSaga(s => s.CorrIdForResponse);
-                    mapper.ConfigureMapping<AnotherRequest>(m => m.SomeCorrelationId)
-                        .ToSaga(s => s.CorrIdForResponse);
+                    mapper.MapMessage<InitiateRequestingSaga>(m => m.SomeCorrelationId);
+                    mapper.MapMessage<AnotherRequest>(m => m.SomeCorrelationId);
                 }
 
                 public class RequestingSagaData : ContainSagaData

@@ -9,6 +9,7 @@
     using NServiceBus.Sagas;
     using NUnit.Framework;
     using Persistence;
+    using Persistence.Sql;
 
     [TestFixture]
     public class When_finder_returns_existing_saga : NServiceBusAcceptanceTest
@@ -56,8 +57,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData08.Property))]
-            public class TestSaga08 : Saga<TestSaga08.SagaData08>,
+            [SqlSaga(correlationProperty: nameof(SagaData08.Property))]
+            public class TestSaga08 : SqlSaga<TestSaga08.SagaData08>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SomeOtherMessage>
             {
@@ -77,9 +78,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData08> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData08> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property).ToSaga(saga => saga.Property);
+                    mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
                     // Mapping not required for SomeOtherMessage because CustomFinder used
                 }
 

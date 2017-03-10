@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using EndpointTemplates;
+    using Persistence.Sql;
 
     public class When_receiving_that_should_start_a_saga : NServiceBusAcceptanceTest
     {
@@ -22,8 +23,8 @@
                 EndpointSetup<DefaultServer>(b => b.ExecuteTheseHandlersFirst(typeof(InterceptingHandler)));
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(TestSagaData03.SomeId))]
-            public class TestSaga03 : Saga<TestSaga03.TestSagaData03>, IAmStartedByMessages<StartSagaMessage>
+            [SqlSaga(correlationProperty: nameof(TestSagaData03.SomeId))]
+            public class TestSaga03 : SqlSaga<TestSaga03.TestSagaData03>, IAmStartedByMessages<StartSagaMessage>
             {
                 public SagaEndpointContext Context { get; set; }
 
@@ -34,10 +35,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData03> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData03> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }
 
                 public class TestSagaData03 : ContainSagaData

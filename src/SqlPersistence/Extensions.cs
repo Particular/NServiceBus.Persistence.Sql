@@ -75,4 +75,25 @@ static class Extensions
             throw new Exception(message, exception);
         }
     }
+    public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic)
+    {
+        while (toCheck != null && toCheck != typeof(object))
+        {
+            Type current;
+            if (toCheck.IsGenericType)
+            {
+                current = toCheck.GetGenericTypeDefinition();
+            }
+            else
+            {
+                current = toCheck;
+            }
+            if (generic == current)
+            {
+                return true;
+            }
+            toCheck = toCheck.BaseType;
+        }
+        return false;
+    }
 }

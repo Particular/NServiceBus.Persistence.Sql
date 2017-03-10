@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
     using ScenarioDescriptors;
 
@@ -71,8 +72,8 @@
                 });
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ReplyToPubMsgSagaData.DataId))]
-            public class ReplyToPubMsgSaga : Saga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
+            [SqlSaga(correlationProperty: nameof(ReplyToPubMsgSagaData.DataId))]
+            public class ReplyToPubMsgSaga : SqlSaga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
                 public Context Context { get; set; }
 
@@ -92,9 +93,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReplyToPubMsgSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<ReplyToPubMsgSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<StartSaga>(m => m.DataId);
                 }
 
                 public class ReplyToPubMsgSagaData : ContainSagaData

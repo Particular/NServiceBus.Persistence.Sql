@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using Features;
+    using Persistence.Sql;
 
     public class When_doing_request_response_between_sagas : NServiceBusAcceptanceTest
     {
@@ -22,8 +23,8 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.CorrIdForResponse))]
-            public class RequestingSaga : Saga<RequestingSaga.SagaData>,
+            [SqlSaga(correlationProperty: nameof(SagaData.CorrIdForResponse))]
+            public class RequestingSaga : SqlSaga<RequestingSaga.SagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -46,10 +47,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
                 {
-                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id).ToSaga(s => s.CorrIdForResponse);
-                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId).ToSaga(s => s.CorrIdForResponse);
+                    mapper.MapMessage<InitiateRequestingSaga>(m => m.Id);
+                    mapper.MapMessage<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
                 public class SagaData : ContainSagaData
@@ -58,8 +59,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.CorrIdForRequest))]
-            public class RespondingSaga : Saga<RespondingSaga.SagaData>,
+            [SqlSaga(correlationProperty: nameof(SagaData.CorrIdForRequest))]
+            public class RespondingSaga : SqlSaga<RespondingSaga.SagaData>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
                 IHandleTimeouts<RespondingSaga.DelayReply>,
                 IHandleMessages<SendReplyFromNonInitiatingHandler>
@@ -97,11 +98,11 @@
                     return SendReply(context);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
                 {
-                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs).ToSaga(s => s.CorrIdForRequest);
+                    mapper.MapMessage<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                     //this line is just needed so we can test the non initiating handler case
-                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate).ToSaga(s => s.CorrIdForRequest);
+                    mapper.MapMessage<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
                 }
 
                 Task SendReply(IMessageHandlerContext context)

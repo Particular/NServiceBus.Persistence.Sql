@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
     using ScenarioDescriptors;
 
@@ -66,8 +67,8 @@
                 metdata => metdata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaStartedByBaseEventSagaData.DataId))]
-            public class SagaStartedByBaseEvent : Saga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
+            [SqlSaga(correlationProperty: nameof(SagaStartedByBaseEventSagaData.DataId))]
+            public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }
 
@@ -79,9 +80,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaStartedByBaseEventSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaStartedByBaseEventSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<BaseEvent>(m => m.DataId);
                 }
 
                 public class SagaStartedByBaseEventSagaData : ContainSagaData

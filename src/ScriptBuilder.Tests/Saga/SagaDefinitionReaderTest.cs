@@ -115,6 +115,10 @@ public class SagaDefinitionReaderTest
         public class SagaData : ContainSagaData
         {
         }
+
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        {
+        }
     }
 
     [Test]

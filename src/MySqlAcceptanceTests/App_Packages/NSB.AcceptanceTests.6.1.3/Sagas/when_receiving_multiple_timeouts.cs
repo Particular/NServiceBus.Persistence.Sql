@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_receiving_multiple_timeouts : NServiceBusAcceptanceTest
     {
@@ -47,8 +48,8 @@
                 });
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId))]
-            public class MultiTimeoutsSaga1 : Saga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
+            [SqlSaga(correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId))]
+            public class MultiTimeoutsSaga1 : SqlSaga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>,
                 IHandleTimeouts<Saga2Timeout>
@@ -102,10 +103,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MultiTimeoutsSaga1Data> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MultiTimeoutsSaga1Data> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga1>(m => m.ContextId)
-                        .ToSaga(s => s.ContextId);
+                    mapper.MapMessage<StartSaga1>(m => m.ContextId);
                 }
 
                 public class MultiTimeoutsSaga1Data : ContainSagaData

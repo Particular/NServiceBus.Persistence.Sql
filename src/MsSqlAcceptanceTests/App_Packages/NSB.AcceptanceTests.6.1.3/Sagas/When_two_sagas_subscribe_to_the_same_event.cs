@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
     using ScenarioDescriptors;
 
@@ -77,8 +78,8 @@
                     .AddMapping<OpenGroupCommand>(typeof(Publisher));
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MySaga1Data.DataId))]
-            public class Saga1 : Saga<Saga1.MySaga1Data>,
+            [SqlSaga(correlationProperty: nameof(MySaga1Data.DataId))]
+            public class Saga1 : SqlSaga<Saga1.MySaga1Data>,
                 IAmStartedByMessages<GroupPendingEvent>,
                 IHandleMessages<CompleteSaga1Now>
             {
@@ -103,10 +104,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySaga1Data> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MySaga1Data> mapper)
                 {
-                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId).ToSaga(s => s.DataId);
-                    mapper.ConfigureMapping<CompleteSaga1Now>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
+                    mapper.MapMessage<CompleteSaga1Now>(m => m.DataId);
                 }
 
                 public class MySaga1Data : ContainSagaData
@@ -115,8 +116,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MySaga2Data.DataId))]
-            public class Saga2 : Saga<Saga2.MySaga2Data>,
+            [SqlSaga(correlationProperty: nameof(MySaga2Data.DataId))]
+            public class Saga2 : SqlSaga<Saga2.MySaga2Data>,
                 IAmStartedByMessages<StartSaga2>,
                 IHandleMessages<GroupPendingEvent>
             {
@@ -139,10 +140,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySaga2Data> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MySaga2Data> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId).ToSaga(s => s.DataId);
-                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<StartSaga2>(m => m.DataId);
+                    mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
                 }
 
                 public class MySaga2Data : ContainSagaData

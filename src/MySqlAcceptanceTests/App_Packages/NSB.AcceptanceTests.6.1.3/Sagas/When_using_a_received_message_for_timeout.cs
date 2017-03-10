@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_using_a_received_message_for_timeout : NServiceBusAcceptanceTest
     {
@@ -37,8 +38,8 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(TestSagaData01.SomeId))]
-            public class TestSaga01 : Saga<TestSagaData01>, IAmStartedByMessages<StartSagaMessage>, IHandleTimeouts<StartSagaMessage>
+            [SqlSaga(correlationProperty: nameof(TestSagaData01.SomeId))]
+            public class TestSaga01 : SqlSaga<TestSagaData01>, IAmStartedByMessages<StartSagaMessage>, IHandleTimeouts<StartSagaMessage>
             {
                 public Context TestContext { get; set; }
 
@@ -55,10 +56,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData01> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData01> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }
             }
 

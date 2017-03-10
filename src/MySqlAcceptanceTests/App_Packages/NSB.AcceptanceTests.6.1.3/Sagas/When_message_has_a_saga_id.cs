@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_message_has_a_saga_id : NServiceBusAcceptanceTest
     {
@@ -51,8 +52,8 @@
                 EndpointSetup<DefaultServer>(c => c.EnableFeature<TimeoutManager>());
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(MessageWithSagaIdSagaData.DataId))]
-            public class MessageWithSagaIdSaga : Saga<MessageWithSagaIdSaga.MessageWithSagaIdSagaData>,
+            [SqlSaga(correlationProperty: nameof(MessageWithSagaIdSagaData.DataId))]
+            public class MessageWithSagaIdSaga : SqlSaga<MessageWithSagaIdSaga.MessageWithSagaIdSagaData>,
                 IAmStartedByMessages<MessageWithSagaId>,
                 IHandleTimeouts<MessageWithSagaId>,
                 IHandleSagaNotFound
@@ -77,10 +78,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MessageWithSagaIdSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<MessageWithSagaIdSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<MessageWithSagaId>(m => m.DataId)
-                        .ToSaga(s => s.DataId);
+                    mapper.MapMessage<MessageWithSagaId>(m => m.DataId);
                 }
 
                 public class MessageWithSagaIdSagaData : ContainSagaData

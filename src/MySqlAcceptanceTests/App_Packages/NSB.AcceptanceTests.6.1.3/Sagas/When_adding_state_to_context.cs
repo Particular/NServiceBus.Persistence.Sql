@@ -10,6 +10,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NServiceBus.Sagas;
     using NUnit.Framework;
     using Persistence;
+    using Persistence.Sql;
 
     [TestFixture]
     [Explicit]
@@ -56,7 +57,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
             
-            public class TestSaga07 : Saga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
+            public class TestSaga07 : SqlSaga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }
 
@@ -65,7 +66,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData07> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData07> mapper)
                 {
                     // custom finder used
                 }

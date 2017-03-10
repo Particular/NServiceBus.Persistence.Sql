@@ -7,6 +7,7 @@
     using AcceptanceTesting.Support;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_updating_existing_correlation_property : NServiceBusAcceptanceTest
     {
@@ -41,8 +42,8 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(ChangeCorrPropertySagaData.SomeId))]
-            public class ChangeCorrPropertySaga : Saga<ChangeCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
+            [SqlSaga(correlationProperty: nameof(ChangeCorrPropertySagaData.SomeId))]
+            public class ChangeCorrPropertySaga : SqlSaga<ChangeCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context TestContext { get; set; }
 
@@ -62,10 +63,9 @@
                     });
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ChangeCorrPropertySagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<ChangeCorrPropertySagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }
             }
 

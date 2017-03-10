@@ -6,6 +6,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_saga_handles_unmapped_message : NServiceBusAcceptanceTest
     {
@@ -49,20 +50,13 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(UnmappedMsgSagaData.SomeId))]
-            public class UnmappedMsgSaga : Saga<UnmappedMsgSagaData>,
+            [SqlSaga(correlationProperty: nameof(UnmappedMsgSagaData.SomeId))]
+            public class UnmappedMsgSaga : SqlSaga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<MappedEchoMessage>,
                 IHandleMessages<EchoMessage>
             {
                 public Context Context { get; set; }
-
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<UnmappedMsgSagaData> mapper)
-                {
-                    mapper.ConfigureMapping<StartSagaMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
-                    mapper.ConfigureMapping<MappedEchoMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
-                    // No mapping for EchoMessage, so saga can't possibly be found
-                }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
                 {
@@ -80,6 +74,13 @@
                 {
                     Context.EchoReceived = true;
                     return Task.FromResult(0);
+                }
+
+                protected override void ConfigureMapping(MessagePropertyMapper<UnmappedMsgSagaData> mapper)
+                {
+                    mapper.MapMessage<StartSagaMessage>(msg => msg.SomeId);
+                    mapper.MapMessage<MappedEchoMessage>(msg => msg.SomeId);
+                    // No mapping for EchoMessage, so saga can't possibly be found
                 }
             }
 

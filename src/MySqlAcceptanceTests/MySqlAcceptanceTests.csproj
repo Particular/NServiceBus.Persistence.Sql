@@ -79,9 +79,9 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_extending_behavior_context.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_handling_current_message_later.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_handling_message_with_several_messagehandlers.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_receiving_unobtrusive_message_without_handler.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_multiple_mappings_exists.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_no_content_type.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_receiving_unobtrusive_message_without_handler.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_receiving_with_catch_all_handlers_registered.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_registering_handlers_explicitly.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Basic\When_sending_from_a_send_only.cs" />

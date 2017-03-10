@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using ScenarioDescriptors;
 
     //repro for issue: https://github.com/NServiceBus/NServiceBus/issues/1020
@@ -47,8 +48,8 @@
                 });
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(DelayedRetryTestingSagaData.SomeId))]
-            public class DelayedRetryTestingSaga : Saga<DelayedRetryTestingSagaData>,
+            [SqlSaga(correlationProperty: nameof(DelayedRetryTestingSagaData.SomeId))]
+            public class DelayedRetryTestingSaga : SqlSaga<DelayedRetryTestingSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>
             {
@@ -78,12 +79,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DelayedRetryTestingSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<DelayedRetryTestingSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<SecondSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
+                    mapper.MapMessage<SecondSagaMessage>(m => m.SomeId);
                 }
             }
 

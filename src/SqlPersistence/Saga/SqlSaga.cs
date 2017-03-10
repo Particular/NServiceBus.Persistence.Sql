@@ -32,9 +32,7 @@ namespace NServiceBus.Persistence.Sql
             ConfigureMapping(messagePropertyMapper);
         }
 
-        protected virtual void ConfigureMapping(MessagePropertyMapper<TSagaData> mapper)
-        {
-        }
+        protected abstract void ConfigureMapping(MessagePropertyMapper<TSagaData> mapper);
 
     }
 }

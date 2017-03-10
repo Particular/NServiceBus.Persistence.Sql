@@ -53,6 +53,7 @@ class RuntimeSagaInfo
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
+        ValidateIsSqlSaga(sagaType);
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
 
@@ -86,6 +87,14 @@ class RuntimeSagaInfo
         if (HasTransitionalCorrelationProperty)
         {
             TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(TransitionalCorrelationProperty);
+        }
+    }
+
+    void ValidateIsSqlSaga(Type sagaType)
+    {
+        if (!sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
+        {
+            throw new Exception($"Type '{sagaType.FullName}' does not inherit from SqlSaga<T>. Change the type to inherit from SqlSaga<T>.");
         }
     }
 

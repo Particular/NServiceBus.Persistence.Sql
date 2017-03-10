@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_sagas_cant_be_found : NServiceBusAcceptanceTest
     {
@@ -76,8 +77,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
-            public class NotFoundSaga1 : Saga<NotFoundSaga1.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            [SqlSaga(correlationProperty: nameof(CantBeFoundSaga1Data.MessageId))]
+            public class CantBeFoundSaga1 : SqlSaga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
@@ -90,20 +91,20 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga1Data> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.MapMessage<StartSaga>(m => m.Id);
+                    mapper.MapMessage<MessageToSaga>(m => m.Id);
                 }
 
-                public class SagaData : ContainSagaData
+                public class CantBeFoundSaga1Data : ContainSagaData
                 {
                     public virtual Guid MessageId { get; set; }
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
-            public class NotFoundSaga2 : Saga<NotFoundSaga2.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            [SqlSaga(correlationProperty: nameof(CantBeFoundSaga2Data.MessageId))]
+            public class CantBeFoundSaga2 : SqlSaga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
@@ -116,13 +117,13 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga2Data> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.MapMessage<StartSaga>(m => m.Id);
+                    mapper.MapMessage<MessageToSaga>(m => m.Id);
                 }
 
-                public class SagaData : ContainSagaData
+                public class CantBeFoundSaga2Data : ContainSagaData
                 {
                     public virtual Guid MessageId { get; set; }
                 }
@@ -177,8 +178,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
-            public class Saga1 : Saga<Saga1.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            [SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
+            public class Saga1 : SqlSaga<Saga1.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
@@ -191,10 +192,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.MapMessage<StartSaga>(m => m.Id);
+                    mapper.MapMessage<MessageToSaga>(m => m.Id);
                 }
 
                 public class SagaData : ContainSagaData
@@ -203,8 +204,8 @@
                 }
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
-            public class Saga2 : Saga<Saga2.SagaData>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
+            [SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
+            public class Saga2 : SqlSaga<Saga2.SagaData>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
             {
                 public Context Context { get; set; }
 
@@ -221,10 +222,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.MapMessage<StartSaga>(m => m.Id);
+                    mapper.MapMessage<MessageToSaga>(m => m.Id);
                 }
 
                 public class SagaData : ContainSagaData

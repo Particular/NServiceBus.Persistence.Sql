@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     [TestFixture]
     public class When_a_base_class_mapped_is_handled_by_a_saga : NServiceBusAcceptanceTest
@@ -40,8 +41,8 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(BaseClassIsMappedSagaData.SomeId))]
-            public class BaseClassIsMappedSaga : Saga<BaseClassIsMappedSaga.BaseClassIsMappedSagaData>,
+            [SqlSaga(correlationProperty: nameof(BaseClassIsMappedSagaData.SomeId))]
+            public class BaseClassIsMappedSaga : SqlSaga<BaseClassIsMappedSaga.BaseClassIsMappedSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<SecondSagaMessage>
             {
@@ -62,10 +63,9 @@
                     return context.SendLocal(sagaMessage);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<BaseClassIsMappedSagaData> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<BaseClassIsMappedSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<SagaMessageBase>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.MapMessage<SagaMessageBase>(m => m.SomeId);
                 }
 
                 public class BaseClassIsMappedSagaData : ContainSagaData

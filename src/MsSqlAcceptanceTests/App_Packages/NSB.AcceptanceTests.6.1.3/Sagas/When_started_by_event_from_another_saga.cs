@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
     using ScenarioDescriptors;
 
@@ -57,8 +58,8 @@
                 });
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(EventFromOtherSaga1Data.DataId))]
-            public class EventFromOtherSaga1 : Saga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
+            [SqlSaga(correlationProperty: nameof(EventFromOtherSaga1Data.DataId))]
+            public class EventFromOtherSaga1 : SqlSaga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<EventFromOtherSaga1.Timeout1>
             {
@@ -82,9 +83,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<EventFromOtherSaga1Data> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga1Data> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<StartSaga>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga1Data : ContainSagaData
@@ -110,8 +111,8 @@
                 metadata => metadata.RegisterPublisherFor<SomethingHappenedEvent>(typeof(SagaThatPublishesAnEvent)));
             }
 
-            [NServiceBus.Persistence.Sql.SqlSaga(correlationProperty: nameof(EventFromOtherSaga2Data.DataId))]
-            public class EventFromOtherSaga2 : Saga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
+            [SqlSaga(correlationProperty: nameof(EventFromOtherSaga2Data.DataId))]
+            public class EventFromOtherSaga2 : SqlSaga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
                 IAmStartedByMessages<SomethingHappenedEvent>,
                 IHandleTimeouts<EventFromOtherSaga2.Saga2Timeout>
             {
@@ -131,9 +132,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<EventFromOtherSaga2Data> mapper)
+                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga2Data> mapper)
                 {
-                    mapper.ConfigureMapping<SomethingHappenedEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.MapMessage<SomethingHappenedEvent>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga2Data : ContainSagaData

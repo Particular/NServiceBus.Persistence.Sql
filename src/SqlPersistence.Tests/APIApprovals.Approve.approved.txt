@@ -60,7 +60,7 @@
     {
         protected SqlSaga() { }
         protected override void ConfigureHowToFindSaga(NServiceBus.SagaPropertyMapper<TSagaData> mapper) { }
-        protected virtual void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper) { }
+        protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
     public class SqlSagaAttribute : System.Attribute
