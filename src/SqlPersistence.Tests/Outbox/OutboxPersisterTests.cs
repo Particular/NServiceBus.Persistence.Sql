@@ -154,19 +154,23 @@ where MessageId = '{result.MessageId}'";
     [Test]
     public async Task StoreAndCleanup()
     {
-        DateTime dateTime;
         using (var connection = await dbConnection.OpenConnection())
         {
             for (var i = 0; i < 13; i++)
             {
                 await Store(i, connection);
             }
-            dateTime = DateTime.Now;
-            await Task.Delay(100);
+        }
+        
+        await Task.Delay(1000);
+        var dateTime = DateTime.UtcNow;
+        await Task.Delay(1000);
+        using (var connection = await dbConnection.OpenConnection())
+        {
             await Store(13, connection);
         }
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
+            await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
         Assert.IsNull(await persister.Get("MessageId1", null));
         Assert.IsNull(await persister.Get("MessageId12", null));
         Assert.IsNotNull(await persister.Get("MessageId13", null));
