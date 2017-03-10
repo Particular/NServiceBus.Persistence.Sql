@@ -39,7 +39,12 @@ values
 )";
 
             var cleanupCommand = $@"
-delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
+delete from {tableName}
+where MessageId
+    in (select top @BatchSize MessageId
+        from {tableName}
+        where Dispatched = true
+            and DispatchedAt < @Date)";
 
             var getCommandText = $@"
 select

@@ -107,15 +107,24 @@ class OutboxPersister : IOutboxStorage
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        using (new TransactionScope(TransactionScopeOption.Suppress))
+        const int cleanupBatchCount = 10000;
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-        using (var command = connection.CreateCommand())
         {
-            command.CommandText = outboxCommands.Cleanup;
-            command.Transaction = transaction;
-            command.AddParameter("Date", dateTime);
-            await command.ExecuteNonQueryEx(cancellationToken);
+            var continuePurging = true;
+            while (continuePurging && !cancellationToken.IsCancellationRequested)
+            {
+                using (new TransactionScope(TransactionScopeOption.Suppress))
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = outboxCommands.Cleanup;
+                    command.Transaction = transaction;
+                    command.AddParameter("Date", dateTime);
+                    command.AddParameter("BatchSize", cleanupBatchCount);
+                    var rowCount = await command.ExecuteNonQueryEx(cancellationToken);
+                    continuePurging = rowCount == cleanupBatchCount;
+                }
+            }
         }
     }
 }
