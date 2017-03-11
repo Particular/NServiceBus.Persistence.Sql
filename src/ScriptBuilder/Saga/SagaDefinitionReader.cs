@@ -54,6 +54,10 @@ static class SagaDefinitionReader
     static SagaDefinition GetCorrelationSagaDefinition(TypeDefinition type, CustomAttribute correlationAttribute)
     {
         var correlation = correlationAttribute.GetArgument(0);
+        if (string.IsNullOrWhiteSpace(correlation))
+        {
+            throw new ErrorsException($"The type '{type.FullName}' has a [CorrelatedSagaAttribute] with an empty or null correlationProperty parameter.");
+        }
         var transitional = correlationAttribute.GetProperty("TransitionalCorrelationProperty");
         var tableSuffix = correlationAttribute.GetProperty("TableSuffix");
         SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional);
