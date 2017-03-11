@@ -2,7 +2,7 @@
 
 namespace NServiceBus.Persistence.Sql
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [Obsolete("Replaced by " + nameof(CorrelatedSagaAttribute),true)]
     public class SqlSagaAttribute : Attribute
     {
         public string CorrelationProperty { get; }

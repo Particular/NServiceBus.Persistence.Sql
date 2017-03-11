@@ -8,5 +8,6 @@
     "Type": "String",
     "Name": "Transitional"
   },
-  "Name": "SagaDefinitionReaderTest/SimpleSqlSaga"
+  "Name": "SagaDefinitionReaderTest/SimpleSqlSaga",
+  "IsAlwaysStartNew": false
 }

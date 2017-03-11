@@ -91,7 +91,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(TestSagaData10.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(TestSagaData10.SomeId))]
             public class TestSaga10 : SqlSaga<TestSagaData10>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<CompleteSagaMessage>,

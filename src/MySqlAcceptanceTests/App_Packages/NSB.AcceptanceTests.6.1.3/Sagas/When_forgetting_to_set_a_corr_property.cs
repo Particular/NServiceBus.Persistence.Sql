@@ -38,7 +38,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(correlationProperty: nameof(NullCorrPropertySagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(NullCorrPropertySagaData.SomeId))]
             public class NullCorrPropertySaga : SqlSaga<NullCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }

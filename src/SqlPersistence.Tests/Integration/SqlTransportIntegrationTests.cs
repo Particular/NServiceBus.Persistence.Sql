@@ -87,7 +87,7 @@ public class SqlTransportIntegrationTests : IDisposable
     {
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.StartId)
     )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,

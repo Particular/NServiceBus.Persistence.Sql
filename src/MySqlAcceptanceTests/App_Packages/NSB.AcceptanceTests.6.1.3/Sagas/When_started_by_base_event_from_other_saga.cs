@@ -67,7 +67,7 @@
                 metdata => metdata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaStartedByBaseEventSagaData.DataId))]
+            [CorrelatedSaga(correlationProperty: nameof(SagaStartedByBaseEventSagaData.DataId))]
             public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }

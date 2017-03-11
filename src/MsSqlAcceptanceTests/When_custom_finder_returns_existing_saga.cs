@@ -72,7 +72,7 @@ using NUnit.Framework;
             }
         }
 
-        [SqlSaga(correlationProperty: nameof(SagaData.Property))]
+        [CorrelatedSaga(correlationProperty: nameof(SagaData.Property))]
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>

@@ -1,7 +1,7 @@
 ﻿{
-  "TableSuffix": "WithNoCorrelationSaga",
+  "TableSuffix": "AlwaysStartSaga",
   "CorrelationProperty": null,
   "TransitionalCorrelationProperty": null,
-  "Name": "SagaDefinitionReaderTest/WithNoCorrelationSaga",
+  "Name": "SagaDefinitionReaderTest/AlwaysStartSaga",
   "IsAlwaysStartNew": true
 }

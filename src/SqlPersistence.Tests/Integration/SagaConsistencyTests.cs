@@ -180,7 +180,7 @@ public class SagaConsistencyTests
         public Guid SagaId { get; set; }
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
          correlationProperty: nameof(SagaData.CorrelationId)
      )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,

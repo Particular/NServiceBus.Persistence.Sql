@@ -20,7 +20,7 @@ using NUnit.Framework;
         Assert.AreEqual("Foo", property);
     }
 
-    [SqlSaga("CorrelationProperty")]
+    [CorrelatedSaga("CorrelationProperty")]
     public class SagaWithStringCorrelationId
     {
 
@@ -42,7 +42,7 @@ using NUnit.Framework;
         Assert.AreEqual(10, property);
     }
 
-    [SqlSaga("CorrelationProperty")]
+    [CorrelatedSaga("CorrelationProperty")]
     public class SagaWithIntCorrelationId
     {
         public class SagaData : ContainSagaData
@@ -64,7 +64,7 @@ using NUnit.Framework;
         Assert.AreEqual(guid, property);
     }
 
-    [SqlSaga("CorrelationProperty")]
+    [CorrelatedSaga("CorrelationProperty")]
     public class SagaWithGuidCorrelationId
     {
         public class SagaData : ContainSagaData

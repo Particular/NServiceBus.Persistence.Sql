@@ -23,7 +23,7 @@
                 EndpointSetup<DefaultServer>(b => b.ExecuteTheseHandlersFirst(typeof(InterceptingHandler)));
             }
 
-            [SqlSaga(correlationProperty: nameof(TestSagaData03.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(TestSagaData03.SomeId))]
             public class TestSaga03 : SqlSaga<TestSaga03.TestSagaData03>, IAmStartedByMessages<StartSagaMessage>
             {
                 public SagaEndpointContext Context { get; set; }

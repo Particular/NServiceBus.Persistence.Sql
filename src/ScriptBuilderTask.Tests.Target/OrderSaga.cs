@@ -4,7 +4,7 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 
-[SqlSaga(
+[CorrelatedSaga(
     correlationProperty: nameof(SagaData.OrderId)
 )]
 public class OrderSaga :

@@ -3,52 +3,62 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SagaDefinitionReader
+static class SagaDefinitionReader
 {
 
     public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
-        var typeFullName = type.FullName;
+        ValidateIsNotDirectSaga(type);
 
-
-        if (!type.IsAbstract && type.BaseType != null)
+        var correlationAttribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.CorrelatedSagaAttribute");
+        var alwaysStartAttribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.AlwaysStartNewSagaAttribute");
+        if (correlationAttribute == null && alwaysStartAttribute == null)
         {
-            var baseTypeFullName = type.BaseType.FullName;
-            if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
-            {
-                throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.");
-            }
-        }
-
-        var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
-        if (attribute == null)
-        {
-            if (!type.IsAbstract && type.BaseType != null)
-            {
-                var baseTypeFullName = type.BaseType.FullName;
-                if (baseTypeFullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga"))
-                {
-                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Persistence.Sql.SqlSaga but is missing a [SqlSagaAttribute].");
-                }
-            }
+            ValidateDoesNotInheritFromSqlSaga(type);
             definition = null;
             return false;
         }
-        if (type.HasGenericParameters)
+
+        CheckIsValidSaga(type);
+
+        if (correlationAttribute != null && alwaysStartAttribute != null)
         {
-            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has generic parameters.");
+            throw new ErrorsException($"The type '{type.FullName}' contains both a [CorrelatedSagaAttribute] and [AlwaysStartNewSagaAttribute].");
         }
-        if (type.IsAbstract)
+        if (correlationAttribute != null)
         {
-            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has is abstract.");
+            definition = GetCorrelationSagaDefinition(type, correlationAttribute);
+            return true;
+        }
+        definition = GetAlwaysStartSagaDefinition(type, alwaysStartAttribute, type.FullName);
+        return true;
+    }
+
+    static SagaDefinition GetAlwaysStartSagaDefinition(TypeDefinition type, CustomAttribute alwaysStartAttribute, string typeFullName)
+    {
+        var tableSuffix = alwaysStartAttribute.GetProperty("TableSuffix");
+        SagaDefinitionValidator.ValidateTableSuffix(typeFullName, tableSuffix);
+
+        if (tableSuffix == null)
+        {
+            tableSuffix = type.Name;
         }
 
-        var arguments = attribute.ConstructorArguments;
-        var correlation = (string)arguments[0].Value;
-        var transitional = (string)arguments[1].Value;
-        var tableSuffix = (string)arguments[2].Value;
-        SagaDefinitionValidator.ValidateSagaDefinition(correlation, typeFullName, transitional, tableSuffix);
-        
+        return new SagaDefinition
+        (
+            tableSuffix: tableSuffix,
+            name: type.FullName
+        );
+    }
+
+    static SagaDefinition GetCorrelationSagaDefinition(TypeDefinition type, CustomAttribute correlationAttribute)
+    {
+        var correlation = correlationAttribute.GetArgument(0);
+        var transitional = correlationAttribute.GetProperty("TransitionalCorrelationProperty");
+        var tableSuffix = correlationAttribute.GetProperty("TableSuffix");
+        SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional);
+        SagaDefinitionValidator.ValidateTableSuffix(type.FullName, tableSuffix);
+
         if (tableSuffix == null)
         {
             tableSuffix = type.Name;
@@ -56,17 +66,64 @@ class SagaDefinitionReader
 
         var sagaDataType = GetSagaDataTypeFromSagaType(type);
 
-        definition = new SagaDefinition
+        return new SagaDefinition
         (
             correlationProperty: BuildConstraintProperty(sagaDataType, correlation),
             transitionalCorrelationProperty: BuildConstraintProperty(sagaDataType, transitional),
             tableSuffix: tableSuffix,
             name: type.FullName
         );
-        return true;
     }
 
-   
+    static void ValidateDoesNotInheritFromSqlSaga(TypeDefinition type)
+    {
+        if (type.IsAbstract || type.BaseType == null)
+        {
+            return;
+        }
+        var baseTypeFullName = type.BaseType.FullName;
+        if (baseTypeFullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga"))
+        {
+            throw new ErrorsException($"The type '{type.FullName}' inherits from NServiceBus.Persistence.Sql.SqlSaga but does not contain a [CorrelatedSagaAttribute] or [AlwaysStartNewSagaAttribute].");
+        }
+    }
+
+    static void ValidateIsNotDirectSaga(TypeDefinition type)
+    {
+        if (type.BaseType != null)
+        {
+            var baseTypeFullName = type.BaseType.FullName;
+            if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
+            {
+                throw new ErrorsException($"The type '{type.FullName}' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.");
+            }
+        }
+    }
+
+    static void CheckIsValidSaga(TypeDefinition type)
+    {
+        if (type.HasGenericParameters)
+        {
+            throw new ErrorsException($"The type '{type.FullName}' has a [CorrelatedSagaAttribute] or [AlwaysStartNewSagaAttribute] but has generic parameters.");
+        }
+        if (type.IsAbstract)
+        {
+            throw new ErrorsException($"The type '{type.FullName}' has a [CorrelatedSagaAttribute] or [AlwaysStartNewSagaAttribute] but has is abstract.");
+        }
+    }
+
+    static string GetProperty(this CustomAttribute attribute, string name)
+    {
+        return (string)attribute.Properties
+            .SingleOrDefault(argument => argument.Name == name)
+            .Argument.Value;
+    }
+
+    static string GetArgument(this CustomAttribute attribute, int index)
+    {
+        return (string) attribute.ConstructorArguments[index].Value;
+    }
+
     static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
     {
         foreach (var method in sagaType.Methods)
@@ -100,19 +157,19 @@ class SagaDefinitionReader
         throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type not defined in the same assembly.");
     }
 
-    static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataTypeDefinition, string propertyName)
+    static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataType, string propertyName)
     {
         if (propertyName == null)
         {
             return null;
         }
-        var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
+        var property = sagaDataType.Properties.SingleOrDefault(x => x.Name == propertyName);
 
-        if (propertyDefinition != null)
+        if (property != null)
         {
-            return BuildConstraintProperty(propertyDefinition);
+            return BuildConstraintProperty(property);
         }
-        throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
+        throw new ErrorsException($"Expected type '{sagaDataType.FullName}' to contain a property named '{propertyName}'.");
 
         //todo: verify not readonly
     }

@@ -5,10 +5,9 @@ using System.Reflection;
 namespace NServiceBus.Persistence.Sql
 {
     /// <summary>
-    /// For automapping saga correlation properties by using a <see cref="SqlSagaAttribute"/>. Used by <see cref="SqlSaga{TSagaData}"/>.
+    /// For automapping saga correlation properties by using a <see cref="CorrelatedSagaAttribute"/>. Used by <see cref="SqlSaga{TSagaData}"/>.
     /// </summary>
-    public class MessagePropertyMapper<TSagaData>
-        where TSagaData : IContainSagaData, new()
+    public class MessagePropertyMapper<TSagaData> where TSagaData : IContainSagaData, new()
     {
         SagaPropertyMapper<TSagaData> sagaPropertyMapper;
         Expression<Func<TSagaData, object>> correlationExpression;
@@ -22,22 +21,26 @@ namespace NServiceBus.Persistence.Sql
         internal static Expression<Func<TSagaData, object>>  GetExpression(Type sagaType)
         {
             var sagaDataType = typeof (TSagaData);
-            var sqlSagaAttribute = sagaType.GetCustomAttribute<SqlSagaAttribute>();
-            if (sqlSagaAttribute == null)
+            if (sagaType.GetCustomAttribute<AlwaysStartNewSagaAttribute>() != null)
             {
-                var message = $"Implementations of SqlSaga require a [{nameof(SqlSagaAttribute)}] to be applied.";
+                return null;
+            }
+            var sagaAttribute = sagaType.GetCustomAttribute<CorrelatedSagaAttribute>();
+            if (sagaAttribute == null)
+            {
+                var message = $"Implementations of SqlSaga require a [{nameof(CorrelatedSagaAttribute)}] to be applied.";
                 throw new Exception(message);
             }
-            if (sqlSagaAttribute.CorrelationProperty == null)
+            if (sagaAttribute.CorrelationProperty == null)
             {
-                var message = $"When implementing a SqlSaga it is necessary to provide a CorrelationProperty via a [{nameof(SqlSagaAttribute)}]. Either provide a CorrelationProperty or inherit from {nameof(Saga)} instead.";
+                var message = $"When implementing a SqlSaga it is necessary to provide a CorrelationProperty via a [{nameof(CorrelatedSagaAttribute)}]. Either provide a CorrelationProperty or inherit from {nameof(Saga)} instead.";
                 throw new Exception(message);
             }
             var correlationProperty = sagaDataType
-                .GetProperty(sqlSagaAttribute.CorrelationProperty, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
+                .GetProperty(sagaAttribute.CorrelationProperty, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
             if (correlationProperty == null)
             {
-                var message = $"Expected to fing a property named {sqlSagaAttribute.CorrelationProperty} on  [{sagaDataType.FullName}].";
+                var message = $"Expected to find a property named {sagaAttribute.CorrelationProperty} on  [{sagaDataType.FullName}].";
                 throw new Exception(message);
             }
             var parameterExpression = Expression.Parameter(typeof (TSagaData), "s");
@@ -58,11 +61,9 @@ namespace NServiceBus.Persistence.Sql
         /// <param name="messageProperty">An <see cref="Expression"/> that represents the message property to map to.</param>
         public void MapMessage<TMessage>(Expression<Func<TMessage, object>> messageProperty)
         {
-            Guard.AgainstNull(nameof(messageProperty), messageProperty);
             if (correlationExpression == null)
             {
-                var message = $"You are attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Add a [{nameof(SqlSagaAttribute)}] to the saga.";
-                throw new Exception(message);
+                return;
             }
             var configureMapping = sagaPropertyMapper.ConfigureMapping(messageProperty);
             configureMapping.ToSaga(correlationExpression);

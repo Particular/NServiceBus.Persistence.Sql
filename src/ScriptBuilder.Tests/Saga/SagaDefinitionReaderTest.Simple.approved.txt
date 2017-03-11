@@ -8,5 +8,6 @@
     "Type": "String",
     "Name": "Transitional"
   },
-  "Name": "SagaDefinitionReaderTest/SimpleSaga"
+  "Name": "SagaDefinitionReaderTest/SimpleSaga",
+  "IsAlwaysStartNew": false
 }

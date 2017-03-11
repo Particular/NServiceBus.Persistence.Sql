@@ -83,7 +83,7 @@
                 Context TestContext;
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(SagaData.SomeId))]
             public class Saga : SqlSaga<SagaData>, IAmStartedByMessages<OriginalMessage>, IAmStartedByMessages<NewMessage>
             {
                 public Saga(Context testContext)

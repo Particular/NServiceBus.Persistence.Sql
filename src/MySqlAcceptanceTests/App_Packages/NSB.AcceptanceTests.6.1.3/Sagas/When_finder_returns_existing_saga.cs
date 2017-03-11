@@ -57,7 +57,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaData08.Property))]
+            [CorrelatedSaga(correlationProperty: nameof(SagaData08.Property))]
             public class TestSaga08 : SqlSaga<TestSaga08.SagaData08>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SomeOtherMessage>

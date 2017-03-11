@@ -125,7 +125,7 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga]
+    [AlwaysStartNewSaga]
     public class SagaWithNoCorrelation : SqlSaga<SagaWithNoCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -138,7 +138,7 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga]
+    [AlwaysStartNewSaga]
     public class SagaWithWeirdCharactersಠ_ಠ : SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -394,9 +394,9 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.CorrelationProperty),
-        transitionalCorrelationProperty: nameof(SagaData.TransitionalCorrelationProperty)
+        TransitionalCorrelationProperty= nameof(SagaData.TransitionalCorrelationProperty)
     )]
     public class SagaWithCorrelation : SqlSaga<SagaWithCorrelation.SagaData>
     {
@@ -504,7 +504,7 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithStringCorrelation))).Data;
         }
     }
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithStringCorrelation : SqlSaga<SagaWithStringCorrelation.SagaData>
@@ -560,7 +560,7 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
         }
     }
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithNonStringCorrelation : SqlSaga<SagaWithNonStringCorrelation.SagaData>

@@ -50,7 +50,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(correlationProperty: nameof(UnmappedMsgSagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(UnmappedMsgSagaData.SomeId))]
             public class UnmappedMsgSaga : SqlSaga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<MappedEchoMessage>,

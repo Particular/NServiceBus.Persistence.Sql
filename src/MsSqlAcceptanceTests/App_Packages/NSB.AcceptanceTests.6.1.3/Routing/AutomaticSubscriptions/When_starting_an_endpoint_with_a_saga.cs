@@ -63,7 +63,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 Context testContext;
             }
 
-            [SqlSaga(correlationProperty: nameof(AutoSubscriptionSagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(AutoSubscriptionSagaData.SomeId))]
             public class AutoSubscriptionSaga : SqlSaga<AutoSubscriptionSaga.AutoSubscriptionSagaData>, IAmStartedByMessages<MyEvent>
             {
                 public Task Handle(MyEvent message, IMessageHandlerContext context)
@@ -82,7 +82,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(SagaData.SomeId))]
             public class SagaThatReactsToSuperEvent : SqlSaga<SagaThatReactsToSuperEvent.SagaData>,
                 IAmStartedByMessages<MyEventBase>
             {

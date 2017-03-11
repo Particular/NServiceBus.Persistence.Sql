@@ -48,7 +48,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId))]
+            [CorrelatedSaga(correlationProperty: nameof(MultiTimeoutsSaga1Data.ContextId))]
             public class MultiTimeoutsSaga1 : SqlSaga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>,

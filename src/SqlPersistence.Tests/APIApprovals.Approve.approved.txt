@@ -1,5 +1,19 @@
 ﻿namespace NServiceBus.Persistence.Sql
 {
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    public class AlwaysStartNewSagaAttribute : System.Attribute
+    {
+        public AlwaysStartNewSagaAttribute() { }
+        public string TableSuffix { get; set; }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    public class CorrelatedSagaAttribute : System.Attribute
+    {
+        public CorrelatedSagaAttribute(string correlationProperty) { }
+        public string CorrelationProperty { get; }
+        public string TableSuffix { get; set; }
+        public string TransitionalCorrelationProperty { get; set; }
+    }
     public interface ISqlStorageSession
     {
         System.Data.Common.DbConnection Connection { get; }
@@ -62,7 +76,7 @@
         protected override void ConfigureHowToFindSaga(NServiceBus.SagaPropertyMapper<TSagaData> mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper);
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    [System.ObsoleteAttribute("Replaced by CorrelatedSagaAttribute", true)]
     public class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }

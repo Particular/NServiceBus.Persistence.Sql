@@ -22,11 +22,16 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             Guard.AgainstNull(nameof(saga), saga);
             Guard.AgainstNull(nameof(writer), writer);
 
-            SagaDefinitionValidator.ValidateSagaDefinition(
-                correlationProperty: saga.CorrelationProperty?.Name,
+            SagaDefinitionValidator.ValidateTableSuffix(
                 sagaName: saga.Name,
-                tableSuffix: saga.TableSuffix,
-                transitionalProperty: saga.TransitionalCorrelationProperty?.Name);
+                tableSuffix: saga.TableSuffix);
+            if (!saga.IsAlwaysStartNew)
+            {
+                SagaDefinitionValidator.ValidateSagaDefinition(
+                    correlationProperty: saga.CorrelationProperty?.Name,
+                    sagaName: saga.Name,
+                    transitionalProperty: saga.TransitionalCorrelationProperty?.Name);
+            }
 
             var sqlVariantWriter = GetSqlVariantWriter(sqlVariant, writer, saga);
 

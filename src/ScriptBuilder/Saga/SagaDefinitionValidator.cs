@@ -2,17 +2,8 @@ using NServiceBus.Persistence.Sql;
 
 static class SagaDefinitionValidator
 {
-    internal static void ValidateSagaDefinition(string correlationProperty, string sagaName, string transitionalProperty, string tableSuffix)
+    internal static void ValidateTableSuffix(string sagaName, string tableSuffix)
     {
-        if (correlationProperty != null && string.IsNullOrWhiteSpace(correlationProperty))
-        {
-            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for CorrelationProperty.");
-        }
-
-        if (transitionalProperty != null && string.IsNullOrWhiteSpace(transitionalProperty))
-        {
-            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for TransitionalCorrelationProperty.");
-        }
 
         if (tableSuffix != null)
         {
@@ -24,6 +15,19 @@ static class SagaDefinitionValidator
             {
                 throw new ErrorsException($"The Saga '{sagaName}' has a tableSuffix that contains a ']', '[' or '`'. Names automatically quoted.");
             }
+        }
+
+    }
+    internal static void ValidateSagaDefinition(string correlationProperty, string sagaName, string transitionalProperty)
+    {
+        if (correlationProperty != null && string.IsNullOrWhiteSpace(correlationProperty))
+        {
+            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for CorrelationProperty.");
+        }
+
+        if (transitionalProperty != null && string.IsNullOrWhiteSpace(transitionalProperty))
+        {
+            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for TransitionalCorrelationProperty.");
         }
 
         if (correlationProperty != null && correlationProperty == transitionalProperty)

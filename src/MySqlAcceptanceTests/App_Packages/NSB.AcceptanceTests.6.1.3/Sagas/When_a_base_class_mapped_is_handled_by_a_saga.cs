@@ -41,7 +41,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(correlationProperty: nameof(BaseClassIsMappedSagaData.SomeId))]
+            [CorrelatedSaga(correlationProperty: nameof(BaseClassIsMappedSagaData.SomeId))]
             public class BaseClassIsMappedSaga : SqlSaga<BaseClassIsMappedSaga.BaseClassIsMappedSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<SecondSagaMessage>

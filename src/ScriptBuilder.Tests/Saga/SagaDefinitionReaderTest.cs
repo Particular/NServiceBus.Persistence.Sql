@@ -31,10 +31,32 @@ public class SagaDefinitionReaderTest
         Approvals.Verify(exception.Message);
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.Correlation)
     )]
     public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void AlwaysStart()
+    {
+        var sagaType = module.GetTypeDefinition<AlwaysStartSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [AlwaysStartNewSaga]
+    public class AlwaysStartSaga : SqlSaga<AlwaysStartSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
@@ -59,7 +81,7 @@ public class SagaDefinitionReaderTest
         Approvals.Verify(exception.Message);
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.Correlation)
     )]
     abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
@@ -130,9 +152,9 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.Correlation),
-        transitionalCorrelationProperty: nameof(SagaData.Transitional)
+        TransitionalCorrelationProperty= nameof(SagaData.Transitional)
     )]
     public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
     {
@@ -156,9 +178,9 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.Correlation),
-        transitionalCorrelationProperty: nameof(SagaData.Transitional)
+        TransitionalCorrelationProperty= nameof(SagaData.Transitional)
     )]
     public class SimpleSqlSaga : SqlSaga<SimpleSqlSaga.SagaData>
     {
@@ -182,7 +204,7 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga]
+    [AlwaysStartNewSaga]
     public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -203,11 +225,12 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga]
+    [CorrelatedSaga(nameof(SagaData.Correlation))]
     public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
+            public string Correlation { get; set; }
         }
 
         protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
@@ -224,9 +247,9 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
+    [CorrelatedSaga(
         correlationProperty: nameof(SagaData.Correlation),
-        tableSuffix: "TheTableSuffix"
+        TableSuffix= "TheTableSuffix"
     )]
     public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
     {

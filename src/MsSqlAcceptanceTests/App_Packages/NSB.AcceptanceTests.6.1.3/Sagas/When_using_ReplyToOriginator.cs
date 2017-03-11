@@ -37,7 +37,7 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(correlationProperty: nameof(RequestingSagaData.CorrIdForResponse))]
+            [CorrelatedSaga(correlationProperty: nameof(RequestingSagaData.CorrIdForResponse))]
             public class RequestingSaga : SqlSaga<RequestingSaga.RequestingSagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<AnotherRequest>
