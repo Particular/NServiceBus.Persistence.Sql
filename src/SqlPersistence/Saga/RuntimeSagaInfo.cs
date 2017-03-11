@@ -6,17 +6,16 @@ using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using NewtonSerializer = Newtonsoft.Json.JsonSerializer;
 #pragma warning disable 618
 
 class RuntimeSagaInfo
 {
     Type sagaDataType;
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
-    NewtonSerializer jsonSerializer;
+    JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
-    ConcurrentDictionary<Version, NewtonSerializer> deserializers;
+    ConcurrentDictionary<Version, JsonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string SelectFromCommand;
@@ -36,7 +35,7 @@ class RuntimeSagaInfo
         Type sagaDataType,
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
-        NewtonSerializer jsonSerializer,
+        JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
@@ -46,7 +45,7 @@ class RuntimeSagaInfo
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
         {
-            deserializers = new ConcurrentDictionary<Version, NewtonSerializer>();
+            deserializers = new ConcurrentDictionary<Version, JsonSerializer>();
         }
         this.versionSpecificSettings = versionSpecificSettings;
         this.jsonSerializer = jsonSerializer;
@@ -136,8 +135,7 @@ class RuntimeSagaInfo
         }
     }
 
-
-    NewtonSerializer GetDeserialize(Version storedSagaTypeVersion)
+    JsonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionSpecificSettings == null)
         {
@@ -146,11 +144,11 @@ class RuntimeSagaInfo
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
             var settings = versionSpecificSettings(sagaDataType, storedSagaTypeVersion);
-            if (settings != null)
+            if (settings == null)
             {
-                return JsonSerializer.Create(settings);
+                return jsonSerializer;
             }
-            return jsonSerializer;
+            return JsonSerializer.Create(settings);
         });
     }
 
