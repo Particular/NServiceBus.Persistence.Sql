@@ -15,11 +15,13 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
+    int cleanupBatchSize;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
+        this.cleanupBatchSize = cleanupBatchSize;
         outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
     }
 
@@ -105,17 +107,23 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
+
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        using (new TransactionScope(TransactionScopeOption.Suppress))
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
-        using (var command = connection.CreateCommand())
         {
-            command.CommandText = outboxCommands.Cleanup;
-            command.Transaction = transaction;
-            command.AddParameter("Date", dateTime);
-            await command.ExecuteNonQueryEx(cancellationToken);
+            var continuePurging = true;
+            while (continuePurging && !cancellationToken.IsCancellationRequested)
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = outboxCommands.Cleanup;
+                    command.AddParameter("Date", dateTime);
+                    command.AddParameter("BatchSize", cleanupBatchSize);
+                    var rowCount = await command.ExecuteNonQueryEx(cancellationToken);
+                    continuePurging = rowCount != 0;
+                }
+            }
         }
     }
 }

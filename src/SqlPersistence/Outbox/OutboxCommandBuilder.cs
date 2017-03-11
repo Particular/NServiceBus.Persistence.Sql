@@ -20,7 +20,7 @@
                 case SqlVariant.MySql:
                     tableName = $"`{tablePrefix}OutboxData`";
                     break;
-                default: 
+                default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
 
@@ -38,8 +38,7 @@ values
     @PersistenceVersion
 )";
 
-            var cleanupCommand = $@"
-delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
+            var cleanupCommand = GetCleanupCommand(sqlVariant, tableName);
 
             var getCommandText = $@"
 select
@@ -62,5 +61,24 @@ where MessageId = @MessageId";
                 cleanup: cleanupCommand);
         }
 
+        static string GetCleanupCommand(SqlVariant sqlVariant, string tableName)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.MsSqlServer:
+                    return $@"
+delete top (@BatchSize) from {tableName}
+where Dispatched = 'true'
+    and DispatchedAt < @Date";
+                case SqlVariant.MySql:
+                    return $@"
+delete from {tableName}
+where Dispatched = true
+    and DispatchedAt < @Date
+limit @BatchSize";
+                default:
+                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            }
+        }
     }
 }
