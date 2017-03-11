@@ -5,17 +5,18 @@ using NServiceBus.Settings;
 
 namespace NServiceBus
 {
-    
+
     public static partial class SqlPersistenceConfig
     {
 
         public static void DisableInstaller(this PersistenceExtensions<SqlPersistence> configuration)
         {
+            Guard.AgainstNull(nameof(configuration), configuration);
             configuration.GetSettings()
                 .Set("SqlPersistence.DisableInstaller", true);
         }
 
-        internal static bool GetDisableInstaller(this ReadOnlySettings settings)
+        static bool GetDisableInstaller(this ReadOnlySettings settings)
         {
             bool value;
             if (settings.TryGet("SqlPersistence.DisableInstaller", out value))
@@ -31,7 +32,7 @@ namespace NServiceBus
             settingsHolder.Get<EnabledStorageFeatures>().Enable<TStorageType>();
         }
 
-        internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
+        static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
             return settings.GetOrDefault<EnabledStorageFeatures>()?.IsEnabled<TStorageType>() ?? false;

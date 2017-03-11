@@ -8,6 +8,7 @@ namespace NServiceBus
     {
         public static void SqlVariant(this PersistenceExtensions<SqlPersistence> configuration, SqlVariant sqlVariant)
         {
+            Guard.AgainstNull(nameof(configuration), configuration);
             var settings = configuration.GetSettings();
             settings.Set("SqlPersistence.SqlVariant", sqlVariant);
         }

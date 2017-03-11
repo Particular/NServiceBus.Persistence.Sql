@@ -6,11 +6,13 @@ using NServiceBus.Settings;
 
 namespace NServiceBus
 {
-    
     public static partial class SqlPersistenceConfig
     {
+
         public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
         {
+            Guard.AgainstNull(nameof(configuration), configuration);
+            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
             configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }

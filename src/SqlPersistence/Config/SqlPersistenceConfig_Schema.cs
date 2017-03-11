@@ -10,6 +10,7 @@ namespace NServiceBus
 
         public static void Schema(this PersistenceExtensions<SqlPersistence> configuration, string schema)
         {
+            Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNullAndEmpty(nameof(schema), schema);
             Guard.AgainstSqlDelimiters(nameof(schema), schema);
             configuration.GetSettings()

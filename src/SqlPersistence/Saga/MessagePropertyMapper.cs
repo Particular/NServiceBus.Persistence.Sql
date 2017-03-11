@@ -7,7 +7,8 @@ namespace NServiceBus.Persistence.Sql
     /// <summary>
     /// For automapping saga correlation properties by using a <see cref="SqlSagaAttribute"/>. Used by <see cref="SqlSaga{TSagaData}"/>.
     /// </summary>
-    public class MessagePropertyMapper<TSagaData> where TSagaData : IContainSagaData, new()
+    public class MessagePropertyMapper<TSagaData>
+        where TSagaData : IContainSagaData, new()
     {
         SagaPropertyMapper<TSagaData> sagaPropertyMapper;
         Expression<Func<TSagaData, object>> correlationExpression;
@@ -57,6 +58,7 @@ namespace NServiceBus.Persistence.Sql
         /// <param name="messageProperty">An <see cref="Expression"/> that represents the message property to map to.</param>
         public void MapMessage<TMessage>(Expression<Func<TMessage, object>> messageProperty)
         {
+            Guard.AgainstNull(nameof(messageProperty), messageProperty);
             if (correlationExpression == null)
             {
                 var message = $"You are attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Add a [{nameof(SqlSagaAttribute)}] to the saga.";
