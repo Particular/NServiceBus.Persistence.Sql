@@ -68,12 +68,12 @@ where MessageId = @MessageId";
                 case SqlVariant.MsSqlServer:
                     return $@"
 delete top (@BatchSize) from {tableName}
-where Dispatched = 1
+where Dispatched = 'true'
     and DispatchedAt < @Date";
                 case SqlVariant.MySql:
                     return $@"
 delete from {tableName}
-where Dispatched = 1
+where Dispatched = true
     and DispatchedAt < @Date
 limit @BatchSize";
                 default:

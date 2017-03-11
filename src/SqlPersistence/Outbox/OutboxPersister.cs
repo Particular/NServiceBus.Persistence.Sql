@@ -15,13 +15,13 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
-    int cleanupBatchCount;
+    int cleanupBatchSize;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchCount = 10000)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
-        this.cleanupBatchCount = cleanupBatchCount;
+        this.cleanupBatchSize = cleanupBatchSize;
         outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
     }
 
@@ -119,7 +119,7 @@ class OutboxPersister : IOutboxStorage
                 {
                     command.CommandText = outboxCommands.Cleanup;
                     command.AddParameter("Date", dateTime);
-                    command.AddParameter("BatchSize", cleanupBatchCount);
+                    command.AddParameter("BatchSize", cleanupBatchSize);
                     var rowCount = await command.ExecuteNonQueryEx(cancellationToken);
                     continuePurging = rowCount != 0;
                 }

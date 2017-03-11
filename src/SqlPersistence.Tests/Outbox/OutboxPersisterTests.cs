@@ -24,7 +24,7 @@ public abstract class OutboxPersisterTests
             tablePrefix: $"{nameof(OutboxPersisterTests)}_",
             schema: schema,
             sqlVariant: sqlVariant.Convert(),
-            cleanupBatchCount: 5);
+            cleanupBatchSize: 5);
     }
 
 
@@ -161,7 +161,7 @@ where MessageId = '{result.MessageId}'";
                 await Store(i, connection);
             }
         }
-        
+
         await Task.Delay(1000);
         var dateTime = DateTime.UtcNow;
         await Task.Delay(1000);
@@ -170,7 +170,7 @@ where MessageId = '{result.MessageId}'";
             await Store(13, connection);
         }
 
-            await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
+        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
         Assert.IsNull(await persister.Get("MessageId1", null));
         Assert.IsNull(await persister.Get("MessageId12", null));
         Assert.IsNotNull(await persister.Get("MessageId13", null));
