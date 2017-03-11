@@ -53,8 +53,8 @@ class RuntimeSagaInfo
         this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga(sagaType);
-        var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
-        var tableSuffix = sqlSagaAttributeData.TableSuffix;
+        var attributeData = SagaAttributeReader.GetData(sagaType);
+        var tableSuffix = attributeData.TableSuffix;
 
         switch (sqlVariant)
         {
@@ -71,17 +71,17 @@ class RuntimeSagaInfo
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
         SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
-        SaveCommand = commandBuilder.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        SaveCommand = commandBuilder.BuildSaveCommand(attributeData.CorrelationProperty, attributeData.TransitionalCorrelationProperty, TableName);
+        UpdateCommand = commandBuilder.BuildUpdateCommand(attributeData.TransitionalCorrelationProperty, TableName);
 
-        CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
+        CorrelationProperty = attributeData.CorrelationProperty;
         HasCorrelationProperty = CorrelationProperty != null;
         if (HasCorrelationProperty)
         {
-            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(attributeData.CorrelationProperty, TableName);
         }
 
-        TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;
+        TransitionalCorrelationProperty = attributeData.TransitionalCorrelationProperty;
         HasTransitionalCorrelationProperty = TransitionalCorrelationProperty != null;
         if (HasTransitionalCorrelationProperty)
         {

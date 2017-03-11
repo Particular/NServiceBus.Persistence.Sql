@@ -1,4 +1,4 @@
-﻿class SqlSagaAttributeData
+﻿class SagaAttributeData
 {
     public bool AlwaysStartNew;
     public string TableSuffix;

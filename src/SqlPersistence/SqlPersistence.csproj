@@ -113,7 +113,7 @@
     <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\Config\SagaSettings.cs" />
     <Compile Include="Saga\Serialization\SagaPropertyFilter.cs" />
-    <Compile Include="Saga\Attributes\SqlSagaAttributeData.cs" />
+    <Compile Include="Saga\Attributes\SagaAttributeData.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SqlPersistenceSettingsAttribute.cs" />
@@ -127,7 +127,7 @@
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
-    <Compile Include="Saga\Attributes\SqlSagaAttributeReader.cs" />
+    <Compile Include="Saga\Attributes\SagaAttributeReader.cs" />
     <Compile Include="Saga\SqlSaga.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />

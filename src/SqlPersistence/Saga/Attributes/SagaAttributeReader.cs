@@ -2,9 +2,9 @@
 using System.Reflection;
 using NServiceBus.Persistence.Sql;
 
-static class SqlSagaAttributeReader
+static class SagaAttributeReader
 {
-    public static SqlSagaAttributeData GetSqlSagaAttributeData(Type sagaType)
+    public static SagaAttributeData GetData(Type sagaType)
     {
         var correlated = sagaType.GetCustomAttribute<CorrelatedSagaAttribute>(false);
         var alwaysNew = sagaType.GetCustomAttribute<AlwaysStartNewSagaAttribute>(false);
@@ -25,7 +25,7 @@ static class SqlSagaAttributeReader
             {
                 throw new Exception($"The type '{nameof(sagaType.FullName)}' contains a {nameof(CorrelatedSagaAttribute)} with an empty TransitionalCorrelationProperty property.");
             }
-            return new SqlSagaAttributeData
+            return new SagaAttributeData
             {
                 TableSuffix = tableName,
                 CorrelationProperty = correlated.CorrelationProperty,
@@ -35,7 +35,7 @@ static class SqlSagaAttributeReader
         if (alwaysNew != null)
         {
             var tableName = GetTableName(sagaType, alwaysNew.TableSuffix);
-            return new SqlSagaAttributeData
+            return new SagaAttributeData
             {
                 AlwaysStartNew = true,
                 TableSuffix = tableName,
