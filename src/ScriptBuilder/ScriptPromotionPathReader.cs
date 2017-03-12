@@ -6,17 +6,15 @@ static class ScriptPromotionPathReader
 {
     public static bool TryRead(ModuleDefinition moduleDefinition, out string target)
     {
-        var assemblyCustomAttributes = moduleDefinition.Assembly.CustomAttributes;
-        var customAttribute = assemblyCustomAttributes
+        var customAttribute = moduleDefinition.Assembly.CustomAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
         if (customAttribute == null)
         {
             target = null;
             return false;
         }
-
-        var arguments = customAttribute.ConstructorArguments;
-        target = (string) arguments[2].Value;
+        
+        target = customAttribute.GetStringProperty("ScriptPromotionPath");
         if (target == null)
         {
             return false;

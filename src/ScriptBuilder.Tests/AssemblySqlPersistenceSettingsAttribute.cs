@@ -1,3 +1,3 @@
 ﻿using NServiceBus.Persistence.Sql;
 
-[assembly: SqlPersistenceSettings(msSqlServerScripts: true, scriptPromotionPath: @"D:\scripts")]
+[assembly: SqlPersistenceSettings(MsSqlServerScripts= true, ScriptPromotionPath= @"D:\scripts")]

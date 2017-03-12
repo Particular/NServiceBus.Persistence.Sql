@@ -10,11 +10,19 @@ static class CecilExtentions
         return (string)attribute.ConstructorArguments[index].Value;
     }
 
-    public static string GetProperty(this CustomAttribute attribute, string name)
+    public static string GetStringProperty(this CustomAttribute attribute, string name)
     {
         return (string)attribute.Properties
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
+    }
+
+    public static bool GetBoolProperty(this CustomAttribute attribute, string name)
+    {
+        var value = attribute.Properties
+            .SingleOrDefault(argument => argument.Name == name)
+            .Argument.Value;
+        return value != null && (bool)value;
     }
 
     public static CustomAttribute GetSingleAttribute(this TypeDefinition type, string attributeName)
