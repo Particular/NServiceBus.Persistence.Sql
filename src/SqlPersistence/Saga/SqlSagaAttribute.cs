@@ -3,7 +3,7 @@
 namespace NServiceBus.Persistence.Sql
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class SqlSagaAttribute : Attribute
+    public sealed class SqlSagaAttribute : Attribute
     {
         public string CorrelationProperty { get; }
         public string TransitionalCorrelationProperty;

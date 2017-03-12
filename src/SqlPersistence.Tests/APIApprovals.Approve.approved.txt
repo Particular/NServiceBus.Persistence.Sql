@@ -48,12 +48,12 @@
         public SqlPersistence() { }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
-    public class SqlPersistenceSettingsAttribute : System.Attribute
+    public sealed class SqlPersistenceSettingsAttribute : System.Attribute
     {
-        public SqlPersistenceSettingsAttribute(bool msSqlServerScripts = False, bool mySqlScripts = False, string scriptPromotionPath = null) { }
-        public bool MsSqlServerScripts { get; }
-        public bool MySqlScripts { get; }
-        public string ScriptPromotionPath { get; }
+        public SqlPersistenceSettingsAttribute() { }
+        public bool MsSqlServerScripts { get; set; }
+        public bool MySqlScripts { get; set; }
+        public string ScriptPromotionPath { get; set; }
     }
     public abstract class SqlSaga<TSagaData> : NServiceBus.Saga<TSagaData>
         where TSagaData : NServiceBus.IContainSagaData, new ()
@@ -63,7 +63,7 @@
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
-    public class SqlSagaAttribute : System.Attribute
+    public sealed class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty) { }
         public string CorrelationProperty { get; }
