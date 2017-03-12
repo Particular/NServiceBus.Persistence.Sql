@@ -6,14 +6,12 @@ namespace NServiceBus.Persistence.Sql
     public class SqlSagaAttribute : Attribute
     {
         public string CorrelationProperty { get; }
-        public string TransitionalCorrelationProperty { get; }
-        public string TableSuffix { get; }
+        public string TransitionalCorrelationProperty;
+        public string TableSuffix;
 
-        public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null)
+        public SqlSagaAttribute(string correlationProperty)
         {
             CorrelationProperty = correlationProperty;
-            TransitionalCorrelationProperty = transitionalCorrelationProperty;
-            TableSuffix = tableSuffix;
         }
     }
 }

@@ -6,17 +6,16 @@ using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using NewtonSerializer = Newtonsoft.Json.JsonSerializer;
 #pragma warning disable 618
 
 class RuntimeSagaInfo
 {
     Type sagaDataType;
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
-    NewtonSerializer jsonSerializer;
+    JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
-    ConcurrentDictionary<Version, NewtonSerializer> deserializers;
+    ConcurrentDictionary<Version, JsonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string SelectFromCommand;
@@ -25,7 +24,6 @@ class RuntimeSagaInfo
     public readonly string UpdateCommand;
     public readonly Func<IContainSagaData, object> TransitionalAccessor;
     public readonly bool HasTransitionalCorrelationProperty;
-    public readonly bool HasCorrelationProperty;
     public readonly string CorrelationProperty;
     public readonly string TransitionalCorrelationProperty;
     public readonly string GetByCorrelationPropertyCommand;
@@ -36,7 +34,7 @@ class RuntimeSagaInfo
         Type sagaDataType,
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
-        NewtonSerializer jsonSerializer,
+        JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
@@ -46,7 +44,7 @@ class RuntimeSagaInfo
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
         {
-            deserializers = new ConcurrentDictionary<Version, NewtonSerializer>();
+            deserializers = new ConcurrentDictionary<Version, JsonSerializer>();
         }
         this.versionSpecificSettings = versionSpecificSettings;
         this.jsonSerializer = jsonSerializer;
@@ -76,11 +74,7 @@ class RuntimeSagaInfo
         UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
         CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
-        HasCorrelationProperty = CorrelationProperty != null;
-        if (HasCorrelationProperty)
-        {
-            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
-        }
+        GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;
         HasTransitionalCorrelationProperty = TransitionalCorrelationProperty != null;
@@ -137,7 +131,7 @@ class RuntimeSagaInfo
     }
 
 
-    NewtonSerializer GetDeserialize(Version storedSagaTypeVersion)
+    JsonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionSpecificSettings == null)
         {

@@ -65,10 +65,10 @@
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
     public class SqlSagaAttribute : System.Attribute
     {
-        public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
+        public SqlSagaAttribute(string correlationProperty) { }
         public string CorrelationProperty { get; }
-        public string TableSuffix { get; }
-        public string TransitionalCorrelationProperty { get; }
+        public string TableSuffix { get; set; }
+        public string TransitionalCorrelationProperty { get; set; }
     }
     public enum SqlVariant
     {

@@ -24,7 +24,7 @@ static class Guard
     {
         if (value.Contains("]") || value.Contains("[") || value.Contains("`"))
         {
-            throw new ArgumentException($"The argument '{value}' has a tableSuffix that contains a ']', '[' or '`'. Names automatically quoted.");
+            throw new ArgumentException($"The argument '{value}' contains a ']', '[' or '`'. Names and schemas automatically quoted.");
         }
     }
 

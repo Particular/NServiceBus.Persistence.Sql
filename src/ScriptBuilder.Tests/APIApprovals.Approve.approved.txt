@@ -44,7 +44,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     }
     public class SagaDefinition
     {
-        public SagaDefinition(string tableSuffix, string name, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty correlationProperty = null, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty transitionalCorrelationProperty = null) { }
+        public SagaDefinition(string tableSuffix, string name, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty correlationProperty, NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty transitionalCorrelationProperty = null) { }
         public NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationProperty CorrelationProperty { get; }
         public string Name { get; }
         public string TableSuffix { get; }

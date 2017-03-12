@@ -124,10 +124,6 @@ where {whereClause}";
 
     static void ValidatePropertyName<TSagaData>(string propertyName, RuntimeSagaInfo sagaInfo) where TSagaData : IContainSagaData
     {
-        if (!sagaInfo.HasCorrelationProperty)
-        {
-            throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. The saga has no correlation property.");
-        }
         if (propertyName != sagaInfo.CorrelationProperty)
         {
             throw new Exception($"Cannot retrieve a {typeof(TSagaData).FullName} using property \'{propertyName}\'. Can only be retrieve using the correlation property '{sagaInfo.CorrelationProperty}'");
