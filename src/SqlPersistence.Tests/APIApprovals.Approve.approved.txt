@@ -5,7 +5,7 @@
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
     }
-    public class MessagePropertyMapper<TSagaData>
+    public sealed class MessagePropertyMapper<TSagaData>
         where TSagaData : NServiceBus.IContainSagaData, new ()
     {
         public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }

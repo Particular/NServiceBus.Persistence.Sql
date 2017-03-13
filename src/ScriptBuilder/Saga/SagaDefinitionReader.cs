@@ -90,19 +90,16 @@ static class SagaDefinitionReader
         foreach (var method in sagaType.Methods)
         {
             var parameters = method.Parameters;
-            if (method.Name == "ConfigureMapping")
+            if (method.Name != "ConfigureMapping" || parameters.Count != 1)
             {
-                if (parameters.Count == 1)
-                {
-                    var parameterType = parameters[0].ParameterType;
-                    var parameterTypeName = parameterType.Name;
-                    if (parameterTypeName.StartsWith("MessagePropertyMapper"))
-                    {
-                        var genericInstanceType = (GenericInstanceType)parameterType;
-                        var argument = genericInstanceType.GenericArguments.Single();
-                        return ToTypeDefinition(sagaType, argument);
-                    }
-                }
+                continue;
+            }
+            var parameterType = parameters[0].ParameterType;
+            if (parameterType.FullName.StartsWith("NServiceBus.Persistence.Sql.MessagePropertyMapper"))
+            {
+                var genericInstanceType = (GenericInstanceType) parameterType;
+                var argument = genericInstanceType.GenericArguments.Single();
+                return ToTypeDefinition(sagaType, argument);
             }
         }
         throw new ErrorsException($"The type '{sagaType.FullName}' needs to override SqlSaga.ConfigureHowToFindSaga(MessagePropertyMapper).");
@@ -126,13 +123,15 @@ static class SagaDefinitionReader
         }
         var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
 
-        if (propertyDefinition != null)
+        if (propertyDefinition == null)
         {
-            return BuildConstraintProperty(propertyDefinition);
+            throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
         }
-        throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
-
-        //todo: verify not readonly
+        if (propertyDefinition.SetMethod == null)
+        {
+            throw new ErrorsException($"The type '{sagaDataTypeDefinition.FullName}' has a constraint property '{propertyName}' that is read-only.");
+        }
+        return BuildConstraintProperty(propertyDefinition);
     }
 
     static CorrelationProperty BuildConstraintProperty(PropertyDefinition member)

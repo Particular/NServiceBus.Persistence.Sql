@@ -23,9 +23,9 @@ public class SagaDefinitionReaderTest
     public void WithGeneric()
     {
         var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
+        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinition definition;
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
@@ -51,9 +51,9 @@ public class SagaDefinitionReaderTest
     public void Abstract()
     {
         var sagaType = module.GetTypeDefinition<AbstractSaga>();
+        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinition definition;
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
@@ -79,9 +79,9 @@ public class SagaDefinitionReaderTest
     public void SqlSagaWithNoAttribute()
     {
         var sagaType = module.GetTypeDefinition<WithNoAttributeSaga>();
+        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinition definition;
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
@@ -102,9 +102,9 @@ public class SagaDefinitionReaderTest
     public void NonSqlSaga()
     {
         var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
+        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinition definition;
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
@@ -132,7 +132,7 @@ public class SagaDefinitionReaderTest
 
     [SqlSaga(
         correlationProperty: nameof(SagaData.Correlation),
-        TransitionalCorrelationProperty= nameof(SagaData.Transitional)
+        TransitionalCorrelationProperty = nameof(SagaData.Transitional)
     )]
     public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
     {
@@ -148,24 +148,23 @@ public class SagaDefinitionReaderTest
     }
 
     [Test]
-    public void SqlSaga()
+    public void WithReadonlyProperty()
     {
-        var sagaType = module.GetTypeDefinition<SimpleSqlSaga>();
+        var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
-        ObjectApprover.VerifyWithJson(definition);
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
     }
 
-    [SqlSaga(
-        correlationProperty: nameof(SagaData.Correlation),
-        TransitionalCorrelationProperty= nameof(SagaData.Transitional)
-    )]
-    public class SimpleSqlSaga : SqlSaga<SimpleSqlSaga.SagaData>
+    [SqlSaga(correlationProperty: nameof(SagaData.Correlation))]
+    public class WithReadonlyPropertySaga : SqlSaga<WithReadonlyPropertySaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
-            public string Correlation { get; set; }
-            public string Transitional { get; set; }
+            public string Correlation { get; }
         }
 
         protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
@@ -206,7 +205,7 @@ public class SagaDefinitionReaderTest
 
     [SqlSaga(
         correlationProperty: nameof(SagaData.Correlation),
-        TableSuffix= "TheTableSuffix"
+        TableSuffix = "TheTableSuffix"
     )]
     public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
     {
