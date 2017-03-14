@@ -44,7 +44,7 @@
                 EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            [SqlSaga(correlationProperty: nameof(TestSagaData02.KeyValue))]
+            [SqlSaga(CorrelationProperty = nameof(TestSagaData02.KeyValue))]
             public class TestSaga02 : SqlSaga<TestSagaData02>,
                 IAmStartedByMessages<StartSagaMessage>, IAmStartedByMessages<OtherMessage>
             {

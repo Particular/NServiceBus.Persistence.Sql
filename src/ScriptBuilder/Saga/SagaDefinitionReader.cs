@@ -19,11 +19,7 @@ static class SagaDefinitionReader
         }
         CheckIsValidSaga(type);
 
-        var correlation = attribute.GetArgument(0);
-        if (string.IsNullOrWhiteSpace(correlation))
-        {
-            throw new ErrorsException($"The type '{type.FullName}' has a [CorrelatedSagaAttribute] with an empty or null correlationProperty parameter.");
-        }
+        var correlation = attribute.GetStringProperty("CorrelationProperty");
         var transitional = attribute.GetStringProperty("TransitionalCorrelationProperty");
         var tableSuffix = attribute.GetStringProperty("TableSuffix");
 

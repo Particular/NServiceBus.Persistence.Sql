@@ -78,7 +78,7 @@
                     .AddMapping<OpenGroupCommand>(typeof(Publisher));
             }
 
-            [SqlSaga(correlationProperty: nameof(MySaga1Data.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(MySaga1Data.DataId))]
             public class Saga1 : SqlSaga<Saga1.MySaga1Data>,
                 IAmStartedByMessages<GroupPendingEvent>,
                 IHandleMessages<CompleteSaga1Now>
@@ -116,7 +116,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(MySaga2Data.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(MySaga2Data.DataId))]
             public class Saga2 : SqlSaga<Saga2.MySaga2Data>,
                 IAmStartedByMessages<StartSaga2>,
                 IHandleMessages<GroupPendingEvent>

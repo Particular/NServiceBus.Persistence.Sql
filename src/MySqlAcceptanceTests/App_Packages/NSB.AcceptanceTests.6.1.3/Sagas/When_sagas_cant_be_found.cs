@@ -77,7 +77,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(CantBeFoundSaga1Data.MessageId))]
+            [SqlSaga(CorrelationProperty = nameof(CantBeFoundSaga1Data.MessageId))]
             public class CantBeFoundSaga1 : SqlSaga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -103,7 +103,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(CantBeFoundSaga2Data.MessageId))]
+            [SqlSaga(CorrelationProperty = nameof(CantBeFoundSaga2Data.MessageId))]
             public class CantBeFoundSaga2 : SqlSaga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -178,7 +178,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
+            [SqlSaga(CorrelationProperty = nameof(SagaData.MessageId))]
             public class Saga1 : SqlSaga<Saga1.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -204,7 +204,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(SagaData.MessageId))]
+            [SqlSaga(CorrelationProperty = nameof(SagaData.MessageId))]
             public class Saga2 : SqlSaga<Saga2.SagaData>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
             {
                 public Context Context { get; set; }

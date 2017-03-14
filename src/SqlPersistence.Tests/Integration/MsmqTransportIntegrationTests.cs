@@ -85,7 +85,7 @@ public class MsmqTransportIntegrationTests : IDisposable
     }
 
     [SqlSaga(
-         correlationProperty: nameof(SagaData.StartId)
+         CorrelationProperty = nameof(SagaData.StartId)
      )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,

@@ -55,7 +55,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(ConcurrentlyStartedSagaData.OrderId))]
+            [SqlSaga(CorrelationProperty = nameof(ConcurrentlyStartedSagaData.OrderId))]
             public class ConcurrentlyStartedSaga : SqlSaga<ConcurrentlyStartedSagaData>,
                 IAmStartedByMessages<StartMessageTwo>,
                 IAmStartedByMessages<StartMessageOne>

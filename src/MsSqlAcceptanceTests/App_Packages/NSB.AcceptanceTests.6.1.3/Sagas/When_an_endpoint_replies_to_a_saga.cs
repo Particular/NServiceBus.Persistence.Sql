@@ -77,7 +77,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(CorrelationTestSagaData.RunId))]
+            [SqlSaga(CorrelationProperty = nameof(CorrelationTestSagaData.RunId))]
             public class CorrelationTestSaga : SqlSaga<CorrelationTestSaga.CorrelationTestSagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleMessages<DoSomethingResponse>

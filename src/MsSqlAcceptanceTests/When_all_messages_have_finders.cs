@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -11,7 +10,7 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTest
+public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 {
     [Test]
     public async Task Should_use_existing_saga()
@@ -50,12 +49,12 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             EndpointSetup<DefaultServer>();
         }
 
-        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
+        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
             // ReSharper disable once MemberCanBePrivate.Global
             public Context Context { get; set; }
 
-            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
                 Context.FinderUsed = true;
 
@@ -72,23 +71,13 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        [SqlSaga(CorrelationProperty = nameof(SagaData.Property))]
+        [SqlSaga]
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
-            IAmStartedByMessages<StartSagaMessage>,
-            IHandleMessages<SomeOtherMessage>
+            IAmStartedByMessages<StartSagaMessage>
         {
             public Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
-            {
-                var otherMessage = new SomeOtherMessage
-                {
-                    SagaId = Data.Id
-                };
-                return context.SendLocal(otherMessage);
-            }
-
-            public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
             {
                 TestContext.HandledOtherMessage = true;
                 return Task.FromResult(0);
@@ -96,7 +85,6 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
             protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
             {
-                mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
             }
 
             public class SagaData : ContainSagaData
@@ -111,8 +99,4 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
         public string Property { get; set; }
     }
 
-    public class SomeOtherMessage : IMessage
-    {
-        public Guid SagaId { get; set; }
-    }
 }

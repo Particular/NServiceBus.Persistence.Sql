@@ -44,7 +44,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(correlationProperty: nameof(CorrIdChangedSagaData.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(CorrIdChangedSagaData.DataId))]
             public class CorrIdChangedSaga : SqlSaga<CorrIdChangedSaga.CorrIdChangedSagaData>,
                 IAmStartedByMessages<StartSaga>
             {

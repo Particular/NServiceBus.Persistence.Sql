@@ -19,7 +19,7 @@ namespace NServiceBus.Persistence.Sql
             correlationExpression = GetExpression(sagaType);
         }
 
-        internal static Expression<Func<TSagaData, object>>  GetExpression(Type sagaType)
+        internal static Expression<Func<TSagaData, object>> GetExpression(Type sagaType)
         {
             var sagaDataType = typeof (TSagaData);
             var sqlSagaAttribute = sagaType.GetCustomAttribute<SqlSagaAttribute>();
@@ -30,8 +30,7 @@ namespace NServiceBus.Persistence.Sql
             }
             if (sqlSagaAttribute.CorrelationProperty == null)
             {
-                var message = $"When implementing a SqlSaga it is necessary to provide a CorrelationProperty via a [{nameof(SqlSagaAttribute)}]. Either provide a CorrelationProperty or inherit from {nameof(Saga)} instead.";
-                throw new Exception(message);
+                return null;
             }
             var correlationProperty = sagaDataType
                 .GetProperty(sqlSagaAttribute.CorrelationProperty, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);

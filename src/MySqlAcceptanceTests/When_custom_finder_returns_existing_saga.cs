@@ -68,7 +68,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        [SqlSaga(correlationProperty: nameof(SagaData.Property))]
+        [SqlSaga(CorrelationProperty = nameof(SagaData.Property))]
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>

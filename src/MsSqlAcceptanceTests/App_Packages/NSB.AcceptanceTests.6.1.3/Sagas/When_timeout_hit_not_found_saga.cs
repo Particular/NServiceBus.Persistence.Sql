@@ -38,7 +38,7 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(correlationProperty: nameof(TimeoutHitsNotFoundSagaData.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(TimeoutHitsNotFoundSagaData.DataId))]
             public class TimeoutHitsNotFoundSaga : SqlSaga<TimeoutHitsNotFoundSaga.TimeoutHitsNotFoundSagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleSagaNotFound,

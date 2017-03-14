@@ -58,7 +58,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(EventFromOtherSaga1Data.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(EventFromOtherSaga1Data.DataId))]
             public class EventFromOtherSaga1 : SqlSaga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<EventFromOtherSaga1.Timeout1>
@@ -111,7 +111,7 @@
                 metadata => metadata.RegisterPublisherFor<SomethingHappenedEvent>(typeof(SagaThatPublishesAnEvent)));
             }
 
-            [SqlSaga(correlationProperty: nameof(EventFromOtherSaga2Data.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(EventFromOtherSaga2Data.DataId))]
             public class EventFromOtherSaga2 : SqlSaga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
                 IAmStartedByMessages<SomethingHappenedEvent>,
                 IHandleTimeouts<EventFromOtherSaga2.Saga2Timeout>

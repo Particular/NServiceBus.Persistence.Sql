@@ -37,7 +37,7 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(correlationProperty: nameof(TestSagaData11.SomeId))]
+            [SqlSaga(CorrelationProperty = nameof(TestSagaData11.SomeId))]
             public class TestSaga11 : SqlSaga<TestSagaData11>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<OtherMessage>

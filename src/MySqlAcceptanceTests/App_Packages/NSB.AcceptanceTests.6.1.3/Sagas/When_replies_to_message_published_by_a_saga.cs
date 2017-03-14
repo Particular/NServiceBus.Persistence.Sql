@@ -72,7 +72,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(ReplyToPubMsgSagaData.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(ReplyToPubMsgSagaData.DataId))]
             public class ReplyToPubMsgSaga : SqlSaga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
                 public Context Context { get; set; }

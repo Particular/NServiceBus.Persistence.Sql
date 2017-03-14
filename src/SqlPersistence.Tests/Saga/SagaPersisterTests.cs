@@ -86,7 +86,7 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga("SimplePropertyಠ_ಠ")]
+    [SqlSaga(CorrelationProperty = "SimplePropertyಠ_ಠ")]
     public class SagaWithWeirdCharactersಠ_ಠ : SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -342,7 +342,7 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-        correlationProperty: nameof(SagaData.CorrelationProperty),
+        CorrelationProperty= nameof(SagaData.CorrelationProperty),
         TransitionalCorrelationProperty = nameof(SagaData.TransitionalCorrelationProperty)
     )]
     public class SagaWithCorrelationAndTransitional : SqlSaga<SagaWithCorrelationAndTransitional.SagaData>
@@ -360,7 +360,7 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-        correlationProperty: nameof(SagaData.CorrelationProperty)
+        CorrelationProperty=  nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithCorrelation : SqlSaga<SagaWithCorrelation.SagaData>
     {
@@ -467,7 +467,7 @@ public abstract class SagaPersisterTests
         }
     }
     [SqlSaga(
-        correlationProperty: nameof(SagaData.CorrelationProperty)
+        CorrelationProperty = nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithStringCorrelation : SqlSaga<SagaWithStringCorrelation.SagaData>
     {
@@ -523,7 +523,7 @@ public abstract class SagaPersisterTests
         }
     }
     [SqlSaga(
-        correlationProperty: nameof(SagaData.CorrelationProperty)
+        CorrelationProperty = nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithNonStringCorrelation : SqlSaga<SagaWithNonStringCorrelation.SagaData>
     {
@@ -585,6 +585,58 @@ public abstract class SagaPersisterTests
             });
             var innerException = throwsAsync.InnerException;
             Assert.IsTrue(IsConcurrencyException(innerException));
+        }
+    }
+
+
+    [Test]
+    public void SaveWithNoCorrelation()
+    {
+        var endpointName = nameof(SaveWithNoCorrelation);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
+        }
+        var id = Guid.NewGuid();
+        var result = SaveWithNoCorrelationAsync(id, endpointName).GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+    }
+
+    async Task<SagaWithNoCorrelation.SagaData> SaveWithNoCorrelationAsync(Guid id, string endpointName)
+    {
+        var sagaData = new SagaWithNoCorrelation.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            SimpleProperty = "PropertyValue",
+        };
+
+        var persister = SetUp(endpointName);
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await persister.Save(sagaData, storageSession, typeof(SagaWithNoCorrelation), null);
+            return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation))).Data;
+        }
+    }
+
+    [SqlSaga]
+    public class SagaWithNoCorrelation : SqlSaga<SagaWithNoCorrelation.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string SimpleProperty { get; set; }
+        }
+
+        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        {
         }
     }
 

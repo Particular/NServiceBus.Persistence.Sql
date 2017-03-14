@@ -5,11 +5,6 @@ using Mono.Cecil;
 static class CecilExtentions
 {
 
-    public static string GetArgument(this CustomAttribute attribute, int index)
-    {
-        return (string)attribute.ConstructorArguments[index].Value;
-    }
-
     public static string GetStringProperty(this CustomAttribute attribute, string name)
     {
         return (string)attribute.Properties

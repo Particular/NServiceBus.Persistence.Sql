@@ -23,11 +23,16 @@ public static class RuntimeSagaDefinitionReader
         {
             mapper
         });
+        CorrelationProperty correlationProperty = null;
+        if (mapper.CorrelationType != null)
+        {
+            correlationProperty = new CorrelationProperty(
+                name: mapper.CorrelationProperty,
+                type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
+        }
         return new SagaDefinition(
             tableSuffix: sagaType.Name,
             name: sagaType.FullName,
-            correlationProperty: new CorrelationProperty(
-                name: mapper.CorrelationProperty,
-                type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType)));
+            correlationProperty: correlationProperty);
     }
 }

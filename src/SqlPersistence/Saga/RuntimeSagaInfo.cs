@@ -23,6 +23,7 @@ class RuntimeSagaInfo
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
     public readonly Func<IContainSagaData, object> TransitionalAccessor;
+    public readonly bool HasCorrelationProperty;
     public readonly bool HasTransitionalCorrelationProperty;
     public readonly string CorrelationProperty;
     public readonly string TransitionalCorrelationProperty;
@@ -74,7 +75,11 @@ class RuntimeSagaInfo
         UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
         CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
-        GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+        HasCorrelationProperty = CorrelationProperty != null;
+        if (HasCorrelationProperty)
+        {
+            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+        }
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;
         HasTransitionalCorrelationProperty = TransitionalCorrelationProperty != null;

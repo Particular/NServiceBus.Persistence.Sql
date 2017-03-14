@@ -61,7 +61,7 @@
                 }
             }
 
-            [SqlSaga(correlationProperty: nameof(PlaceOrderSagaData.DataId))]
+            [SqlSaga(CorrelationProperty = nameof(PlaceOrderSagaData.DataId))]
             public class PlaceOrderSaga : SqlSaga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)

@@ -48,7 +48,7 @@
                 });
             }
 
-            [SqlSaga(correlationProperty: nameof(DelayedRetryTestingSagaData.SomeId))]
+            [SqlSaga(CorrelationProperty = nameof(DelayedRetryTestingSagaData.SomeId))]
             public class DelayedRetryTestingSaga : SqlSaga<DelayedRetryTestingSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>
