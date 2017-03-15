@@ -55,11 +55,12 @@
         public bool MySqlScripts { get; set; }
         public string ScriptPromotionPath { get; set; }
     }
-    public abstract class SqlSaga<TSagaData> : NServiceBus.Saga<TSagaData>
+    public abstract class SqlSaga<TSagaData> : NServiceBus.Saga
         where TSagaData : NServiceBus.IContainSagaData, new ()
     {
         protected SqlSaga() { }
-        protected override void ConfigureHowToFindSaga(NServiceBus.SagaPropertyMapper<TSagaData> mapper) { }
+        public TSagaData Data { get; set; }
+        protected override void ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.MessagePropertyMapper<TSagaData> mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]

@@ -24,10 +24,9 @@ public class SqlSagaTests
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
         }
-
     }
 
     [Test]

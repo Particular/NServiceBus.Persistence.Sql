@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace NServiceBus.Persistence.Sql
 {
-    public abstract class SqlSaga<TSagaData> : Saga<TSagaData>
+    public abstract class SqlSaga<TSagaData> : Saga
         where TSagaData :
         IContainSagaData,
         new()
@@ -26,7 +26,20 @@ namespace NServiceBus.Persistence.Sql
             verified = true;
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
+        /// <summary>
+        /// The saga's strongly typed data. Wraps <see cref="Saga.Entity" />.
+        /// </summary>
+        public TSagaData Data
+        {
+            get { return (TSagaData)Entity; }
+            set
+            {
+                Guard.AgainstNull(nameof(value), value);
+                Entity = value;
+            }
+        }
+
+        protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
             var messagePropertyMapper = new MessagePropertyMapper<TSagaData>(mapper, GetType());
             ConfigureMapping(messagePropertyMapper);

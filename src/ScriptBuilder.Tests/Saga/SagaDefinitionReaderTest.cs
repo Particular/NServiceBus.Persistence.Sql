@@ -64,14 +64,9 @@ public class SagaDefinitionReaderTest
     )]
     abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
     {
-
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
         }
     }
 

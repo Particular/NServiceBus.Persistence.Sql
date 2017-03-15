@@ -10,12 +10,12 @@ namespace NServiceBus.Persistence.Sql
     public sealed class MessagePropertyMapper<TSagaData>
         where TSagaData : IContainSagaData, new()
     {
-        SagaPropertyMapper<TSagaData> sagaPropertyMapper;
+        IConfigureHowToFindSagaWithMessage findingConfiguration;
         Expression<Func<TSagaData, object>> correlationExpression;
 
-        internal MessagePropertyMapper(SagaPropertyMapper<TSagaData> sagaPropertyMapper, Type sagaType)
+        internal MessagePropertyMapper(IConfigureHowToFindSagaWithMessage findingConfiguration, Type sagaType)
         {
-            this.sagaPropertyMapper = sagaPropertyMapper;
+            this.findingConfiguration = findingConfiguration;
             correlationExpression = GetExpression(sagaType);
         }
 
@@ -63,8 +63,7 @@ namespace NServiceBus.Persistence.Sql
                 var message = $"Attempting to map a message property but no correlation property has been defined for '{typeof (TSagaData).FullName}'. Add a [{nameof(SqlSagaAttribute)}] to the saga.";
                 throw new Exception(message);
             }
-            var configureMapping = sagaPropertyMapper.ConfigureMapping(messageProperty);
-            configureMapping.ToSaga(correlationExpression);
+            findingConfiguration.ConfigureMapping(correlationExpression, messageProperty);
         }
     }
 }
