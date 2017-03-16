@@ -52,5 +52,3 @@ begin
   on ' + @tableName + '(Dispatched);';
   exec(@createDispatchedIndex);
 end
-
-
