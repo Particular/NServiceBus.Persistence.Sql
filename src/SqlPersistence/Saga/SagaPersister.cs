@@ -2,15 +2,18 @@
 using System.Data.Common;
 using NServiceBus;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
 partial class SagaPersister : ISagaPersister
 {
     SagaInfoCache sagaInfoCache;
+    CommandBuilder commandBuilder;
 
-    public SagaPersister(SagaInfoCache sagaInfoCache)
+    public SagaPersister(SagaInfoCache sagaInfoCache, SqlVariant sqlVariant)
     {
         this.sagaInfoCache = sagaInfoCache;
+        commandBuilder = new CommandBuilder(sqlVariant);
     }
 
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, DbCommand command)

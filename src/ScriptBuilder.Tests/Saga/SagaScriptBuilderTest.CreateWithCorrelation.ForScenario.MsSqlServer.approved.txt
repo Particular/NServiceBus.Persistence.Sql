@@ -110,3 +110,5 @@ select @dropPropertiesQuery =
         column_name <> N'Correlation_CorrelationProperty'
 );
 exec sp_executesql @dropPropertiesQuery
+
+/* CreateComplete */

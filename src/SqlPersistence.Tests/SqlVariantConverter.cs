@@ -12,6 +12,8 @@ public static class SqlVariantConverter
                 return BuildSqlVariant.MsSqlServer;
             case SqlVariant.MySql:
                 return BuildSqlVariant.MySql;
+            case SqlVariant.Oracle:
+                return BuildSqlVariant.Oracle;
             default:
                 throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }
@@ -24,6 +26,8 @@ public static class SqlVariantConverter
                 return SqlVariant.MsSqlServer;
             case BuildSqlVariant.MySql:
                 return SqlVariant.MySql;
+            case BuildSqlVariant.Oracle:
+                return SqlVariant.Oracle;
             default:
                 throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }

@@ -22,6 +22,9 @@ class SqlSubscriptionFeature : Feature
         var schema = settings.GetSchema();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema, cacheFor);
+
+        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }
 }

@@ -11,6 +11,7 @@ public class SubscriptionScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void BuildCreateScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
@@ -19,7 +20,7 @@ public class SubscriptionScriptBuilderTest
             SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVariant);
         }
         var script = builder.ToString();
-        if (sqlVariant != BuildSqlVariant.MySql)
+        if (sqlVariant == BuildSqlVariant.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
@@ -33,6 +34,7 @@ public class SubscriptionScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void BuildDropScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
@@ -41,7 +43,7 @@ public class SubscriptionScriptBuilderTest
             SubscriptionScriptBuilder.BuildDropScript(writer, sqlVariant);
         }
         var script = builder.ToString();
-        if (sqlVariant != BuildSqlVariant.MySql)
+        if (sqlVariant == BuildSqlVariant.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
