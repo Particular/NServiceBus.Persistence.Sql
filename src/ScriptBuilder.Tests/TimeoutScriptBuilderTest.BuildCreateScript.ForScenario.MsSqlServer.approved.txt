@@ -21,3 +21,35 @@ set @createTable = '
 ';
 exec(@createTable);
 end
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_SagaId' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createSagaIdIndex nvarchar(max);
+  set @createSagaIdIndex = N'
+  create index Index_SagaId
+  on ' + @tableName + '(SagaId);';
+  exec(@createSagaIdIndex);
+end
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_Time' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createTimeIndex nvarchar(max);
+  set @createTimeIndex = N'
+  create index Index_Time
+  on ' + @tableName + '(Time);';
+  exec(@createTimeIndex);
+end
