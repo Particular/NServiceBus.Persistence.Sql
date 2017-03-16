@@ -30,7 +30,7 @@ if not exists
 )
 begin
   declare @createDispatchedAtIndex nvarchar(max);
-  set @createDispatchedAtIndex = N'
+  set @createDispatchedAtIndex = '
   create index Index_DispatchedAt
   on ' + @tableName + '(DispatchedAt);';
   exec(@createDispatchedAtIndex);
@@ -47,7 +47,7 @@ if not exists
 )
 begin
   declare @createDispatchedIndex nvarchar(max);
-  set @createDispatchedIndex = N'
+  set @createDispatchedIndex = '
   create index Index_Dispatched
   on ' + @tableName + '(Dispatched);';
   exec(@createDispatchedIndex);

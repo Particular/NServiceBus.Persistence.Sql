@@ -32,7 +32,7 @@ if not exists
 )
 begin
   declare @createSagaIdIndex nvarchar(max);
-  set @createSagaIdIndex = N'
+  set @createSagaIdIndex = '
   create index Index_SagaId
   on ' + @tableName + '(SagaId);';
   exec(@createSagaIdIndex);
@@ -48,7 +48,7 @@ if not exists
 )
 begin
   declare @createTimeIndex nvarchar(max);
-  set @createTimeIndex = N'
+  set @createTimeIndex = '
   create index Index_Time
   on ' + @tableName + '(Time);';
   exec(@createTimeIndex);
