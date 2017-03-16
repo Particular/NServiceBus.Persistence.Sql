@@ -97,6 +97,10 @@
       <HintPath>..\packages\ObjectApproval.1.5.0\Lib\NET40\ObjectApproval.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.24160719\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
@@ -109,8 +113,10 @@
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="App_Packages\PublicApiGenerator.6.0.0\ApiGenerator.cs" />
     <Compile Include="APIApprovals.cs" />
+    <Compile Include="Outbox\OracleOutboxPersisterTests.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
+    <Compile Include="Saga\OracleSagaPersisterTests.cs" />
     <Compile Include="SqlVariantConverter.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
@@ -129,11 +135,13 @@
     <Compile Include="Saga\MySqlSagaPersisterTests.cs" />
     <Compile Include="Saga\SqlServerSagaPersisterTests.cs" />
     <Compile Include="Saga\SqlSagaTests.cs" />
+    <Compile Include="Subscription\OracleSubscriptionPersisterTests.cs" />
     <Compile Include="Subscription\MySqlServerSubscriptionPersisterTests.cs" />
     <Compile Include="Subscription\SqlServerSubscriptionPersisterTests.cs" />
     <Compile Include="TaskEx.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
+    <Compile Include="Timeout\OracleTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\MySqlServerTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\SqlServerTimeoutPersisterTests.cs" />
     <Compile Include="Timeout\TimeoutPersisterTests.cs" />
@@ -156,6 +164,7 @@
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
