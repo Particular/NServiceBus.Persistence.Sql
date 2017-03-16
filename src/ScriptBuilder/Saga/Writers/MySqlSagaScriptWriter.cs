@@ -35,6 +35,10 @@ set @tableNameNonQuoted = concat(@tablePrefix, '{saga.TableSuffix}');
 ");
     }
 
+    public void CreateComplete()
+    {
+    }
+
     public void AddProperty(CorrelationProperty correlationProperty)
     {
         var columnType = MySqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);

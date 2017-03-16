@@ -22,22 +22,22 @@ public abstract class OutboxPersisterTests
         this.sqlVariant = sqlVariant;
         this.schema = schema;
         dbConnection = GetConnection();
-        persister = new OutboxPersister(connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(OutboxPersisterTests)}_",
-            schema: schema,
-            sqlVariant: sqlVariant.Convert(),
-            cleanupBatchSize: 5);
     }
 
 
     [SetUp]
     public void Setup()
     {
+        persister = new OutboxPersister(connectionBuilder: dbConnection,
+            tablePrefix: $"{GetTablePrefix()}_",
+            schema: schema,
+            sqlVariant: sqlVariant.Convert(),
+            cleanupBatchSize: 5);
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
         }
     }
 
@@ -47,10 +47,19 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix(), schema: schema);
         }
     }
 
+    protected virtual string GetTablePrefix()
+    {
+        return nameof(OutboxPersisterTests);
+    }
+
+    protected virtual string GetTableSuffix()
+    {
+        return "_OutboxData";
+    }
 
     [Test]
     public void ExecuteCreateTwice()
@@ -76,11 +85,11 @@ public abstract class OutboxPersisterTests
         string tableName;
         if (string.IsNullOrEmpty(schema))
         {
-            tableName = $"{nameof(OutboxPersisterTests)}";
+            tableName = GetTablePrefix();
         }
         else
         {
-            tableName = $"{schema}.{nameof(OutboxPersisterTests)}";
+            tableName = $"{schema}.{GetTablePrefix()}";
         }
         using (var connection = dbConnection())
         {
@@ -89,7 +98,7 @@ public abstract class OutboxPersisterTests
             {
                 command.CommandText = $@"
 select Operations
-from {tableName}_OutboxData
+from {tableName}{GetTableSuffix()}
 where MessageId = '{result.MessageId}'";
                 using (var reader = command.ExecuteReader())
                 {

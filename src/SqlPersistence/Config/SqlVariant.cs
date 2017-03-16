@@ -13,6 +13,11 @@ namespace NServiceBus.Persistence.Sql
         /// <summary>
         /// MySQL.
         /// </summary>
-        MySql
+        MySql,
+
+        /// <summary>
+        /// Oracle.
+        /// </summary>
+        Oracle
     }
 }

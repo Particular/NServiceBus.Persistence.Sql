@@ -75,12 +75,17 @@
       <Link>Guard.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CommandBuilder.cs" />
+    <Compile Include="Config\ConfigValidation.cs" />
+    <Compile Include="ParameterFiller.cs" />
+    <Compile Include="CommandWrapper.cs" />
     <Compile Include="Config\ReadOnlySettingsExtensions.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Schema.cs" />
     <Compile Include="Config\SqlPersistenceConfig.cs" />
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\AsyncTimer.cs" />
     <Compile Include="Outbox\IAsyncTimer.cs" />
+    <Compile Include="OracleCommandWrapper.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
     <Compile Include="Saga\IMessagePropertyMapper.cs" />

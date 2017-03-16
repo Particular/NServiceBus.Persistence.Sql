@@ -32,8 +32,9 @@ public abstract class SagaPersisterTests
 
     SagaPersister SetUp(string endpointName)
     {
+        var runtimeSqlVariant = sqlVariant.Convert();
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder();
+        var commandBuilder = new SagaCommandBuilder(runtimeSqlVariant);
 #pragma warning restore 618
 
         var sagaMetadataCollection = new SagaMetadataCollection();
@@ -47,9 +48,9 @@ public abstract class SagaPersisterTests
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
             schema: schema,
-            sqlVariant: sqlVariant.Convert(),
+            sqlVariant: runtimeSqlVariant,
             metadataCollection: sagaMetadataCollection);
-        return new SagaPersister(infoCache);
+        return new SagaPersister(infoCache, runtimeSqlVariant);
     }
 
     IEnumerable<Type> GetSagasAndFinders()
@@ -226,10 +227,23 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
-        var id = Guid.NewGuid();
-        var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
-        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+
+        var execute = new TestDelegate(() =>
+        {
+            DropAndCreate(definition, endpointName);
+            var id = Guid.NewGuid();
+            var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
+            ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        });
+
+        if (SupportsUnicodeIdentifiers)
+        {
+            execute();
+        }
+        else
+        {
+            Assert.Throws<Exception>(execute);
+        }
     }
 
     async Task<SagaWithWeirdCharactersಠ_ಠ.SagaData> SaveWeirdAsync(Guid id, string endpointName)
@@ -724,4 +738,6 @@ public abstract class SagaPersisterTests
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);
+
+    protected virtual bool SupportsUnicodeIdentifiers { get; } = true;
 }

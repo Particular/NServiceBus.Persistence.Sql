@@ -1,0 +1,144 @@
+﻿
+/* TableNameVariable */
+
+/* Initialize */
+
+declare 
+  sqlStatement varchar2(500);
+  dataType varchar2(30);
+  n number(10);
+begin
+
+/* CreateTable */
+
+  select count(*) into n from user_tables where table_name = 'THESAGA';
+  if(n = 0)
+  then
+    
+    sqlStatement :=
+       'CREATE TABLE THESAGA 
+		(
+          ID VARCHAR2(38) NOT NULL 
+        , METADATA CLOB NOT NULL 
+        , DATA CLOB NOT NULL 
+        , PERSISTENCEVERSION VARCHAR2(23) NOT NULL 
+        , SAGATYPEVERSION VARCHAR2(23) NOT NULL 
+        , CONCURRENCY NUMBER(9) NOT NULL 
+        , CONSTRAINT THESAGA_PK PRIMARY KEY 
+          (
+            ID 
+          )
+          ENABLE 
+        )';
+    
+    execute immediate sqlStatement;
+    
+  end if;
+
+/* AddProperty CorrelationProperty */
+
+select count(*) into n from ALL_TAB_COLUMNS where TABLE_NAME = 'THESAGA' and COLUMN_NAME = 'CORR_CORRELATIONPROPERTY';
+if(n = 0)
+then
+  sqlStatement := 'alter table THESAGA add ( CORR_CORRELATIONPROPERTY NVARCHAR2(200) )';
+  
+  execute immediate sqlStatement;
+end if;
+
+/* VerifyColumnType String */
+
+select DATA_TYPE ||
+  case when CHAR_LENGTH > 0 then 
+    '(' || CHAR_LENGTH || ')' 
+  else
+    case when DATA_PRECISION is not null then
+      '(' || DATA_PRECISION ||
+        case when DATA_SCALE is not null and DATA_SCALE > 0 then
+          ',' || DATA_SCALE
+        end || ')'
+    end
+  end into dataType
+from ALL_TAB_COLUMNS 
+where TABLE_NAME = 'THESAGA' and COLUMN_NAME = 'CORR_CORRELATIONPROPERTY';
+
+if(dataType <> 'NVARCHAR2(200)')
+then
+  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+end if;
+
+/* WriteCreateIndex CorrelationProperty */
+
+select count(*) into n from user_indexes where index_name = 'THESAGA_CP';
+if(n = 0)
+then
+  sqlStatement := 'create unique index THESAGA_CP on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
+
+  execute immediate sqlStatement;
+end if;
+
+/* AddProperty TransitionalProperty */
+
+select count(*) into n from ALL_TAB_COLUMNS where TABLE_NAME = 'THESAGA' and COLUMN_NAME = 'CORR_TRANSITIONALPROPERTY';
+if(n = 0)
+then
+  sqlStatement := 'alter table THESAGA add ( CORR_TRANSITIONALPROPERTY NVARCHAR2(200) )';
+  
+  execute immediate sqlStatement;
+end if;
+
+/* VerifyColumnType String */
+
+select DATA_TYPE ||
+  case when CHAR_LENGTH > 0 then 
+    '(' || CHAR_LENGTH || ')' 
+  else
+    case when DATA_PRECISION is not null then
+      '(' || DATA_PRECISION ||
+        case when DATA_SCALE is not null and DATA_SCALE > 0 then
+          ',' || DATA_SCALE
+        end || ')'
+    end
+  end into dataType
+from ALL_TAB_COLUMNS 
+where TABLE_NAME = 'THESAGA' and COLUMN_NAME = 'CORR_TRANSITIONALPROPERTY';
+
+if(dataType <> 'NVARCHAR2(200)')
+then
+  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+end if;
+
+/* CreateIndex TransitionalProperty */
+
+select count(*) into n from user_indexes where index_name = 'THESAGA_TP';
+if(n = 0)
+then
+  sqlStatement := 'create unique index THESAGA_TP on THESAGA (CORR_TRANSITIONALPROPERTY ASC)';
+
+  execute immediate sqlStatement;
+end if;
+
+/* PurgeObsoleteIndex */
+
+/* PurgeObsoleteProperties */
+
+select count(*) into n
+from ALL_TAB_COLUMNS
+where TABLE_NAME = 'THESAGA' and COLUMN_NAME LIKE 'CORR_%' and
+        column_name <> 'CORR_CORRELATIONPROPERTY' and
+        column_name <> N'CORR_TRANSITIONALPROPERTY';
+  
+if(n > 0)
+then
+
+  select 'alter table THESAGA drop column ' || COLUMN_NAME into sqlStatement
+  from ALL_TAB_COLUMNS
+  where TABLE_NAME = 'THESAGA' and COLUMN_NAME LIKE 'CORR_%' and
+        column_name <> 'CORR_CORRELATIONPROPERTY' and
+        column_name <> N'CORR_TRANSITIONALPROPERTY';
+    
+  execute immediate sqlStatement;
+
+end if;
+
+/* CreateComplete */
+end;

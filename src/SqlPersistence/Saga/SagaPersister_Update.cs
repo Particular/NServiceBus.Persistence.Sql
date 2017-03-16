@@ -17,7 +17,7 @@ partial class SagaPersister
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
 
-        using (var command = sqlSession.Connection.CreateCommand())
+        using (var command = sagaInfo.CreateCommand(sqlSession.Connection))
         {
             command.CommandText = sagaInfo.UpdateCommand;
             command.Transaction = sqlSession.Transaction;
@@ -26,7 +26,7 @@ partial class SagaPersister
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             command.AddParameter("Concurrency", concurrency);
-            AddTransitionalParameter(sagaData, sagaInfo, command);
+            AddTransitionalParameter(sagaData, sagaInfo, command.InnerCommand);
             var affected = await command.ExecuteNonQueryAsync();
             if (affected != 1)
             {
