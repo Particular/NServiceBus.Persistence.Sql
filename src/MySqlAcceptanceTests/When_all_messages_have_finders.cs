@@ -59,7 +59,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 Context.FinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
-                    readOnlyContextBag: context,
+                    context: context,
                     whereClause: "json_extract(Data,'$.Property') = @propertyValue",
                     appendParameters: (builder, append) =>
                     {

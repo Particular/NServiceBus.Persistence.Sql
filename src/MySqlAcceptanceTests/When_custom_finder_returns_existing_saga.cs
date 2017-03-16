@@ -56,7 +56,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 Context.FinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
-                    readOnlyContextBag: context,
+                    context: context,
                     whereClause: "json_extract(Data,'$.Property') = @propertyValue",
                     appendParameters: (builder, append) =>
                     {

@@ -119,7 +119,7 @@ namespace NServiceBus
     }
     public class static SqlPersistenceStorageSessionExtensions
     {
-        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag readOnlyContextBag, string whereClause, ParameterAppender appendParameters)
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
             where TSagaData : NServiceBus.IContainSagaData { }
         public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }

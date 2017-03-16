@@ -38,24 +38,24 @@ namespace NServiceBus
         /// </summary>
         /// <typeparam name="TSagaData">The <see cref="IContainSagaData"/> type to return.</typeparam>
         /// <param name="session">Used to provide an extension point and access the current <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <param name="readOnlyContextBag">Used to append a concurrency value that can be verified when the SagaData is persisted.</param>
+        /// <param name="context">Used to append a concurrency value that can be verified when the SagaData is persisted.</param>
         /// <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
         /// <param name="appendParameters">Used to append <see cref="DbParameter"/>s used in the <paramref name="whereClause"/>.</param>
-        public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag readOnlyContextBag, string whereClause, ParameterAppender appendParameters)
+        public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
             where TSagaData : IContainSagaData
         {
             Guard.AgainstNull(nameof(session), session);
-            Guard.AgainstNull(nameof(readOnlyContextBag), readOnlyContextBag);
+            Guard.AgainstNull(nameof(context), context);
             Guard.AgainstNull(nameof(appendParameters), appendParameters);
             Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
-            var contextBag = (ContextBag)readOnlyContextBag;
+            var writableContextBag = (ContextBag)context;
             var sqlSession = session.GetSqlStorageSession();
             var sagaInfoCache = sqlSession.InfoCache;
             if (sagaInfoCache == null)
             {
                 throw new Exception($"{nameof(GetSagaData)} can only be executed when Sagas have been enabled on the endpoint.");
             }
-            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, contextBag, appendParameters, sagaInfoCache);
+            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sagaInfoCache);
         }
     }
 }
