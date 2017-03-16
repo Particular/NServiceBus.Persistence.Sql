@@ -11,6 +11,7 @@ public class OutboxScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void BuildCreateScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();
@@ -32,6 +33,7 @@ public class OutboxScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void BuildDropScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();

@@ -74,6 +74,8 @@
     <Compile Include="BuildSqlVariant.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="Saga\Writers\OracleCorrelationPropertyTypeConverter.cs" />
+    <Compile Include="Saga\Writers\OracleSagaScriptWriter.cs" />
     <Compile Include="ScriptPromotionPathReader.cs" />
     <Compile Include="ResourceReader.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
@@ -96,6 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="Outbox\Create_Oracle.sql" />
+    <EmbeddedResource Include="Outbox\Drop_Oracle.sql" />
+    <EmbeddedResource Include="Timeout\Drop_Oracle.sql" />
+    <EmbeddedResource Include="Timeout\Create_Oracle.sql" />
+    <EmbeddedResource Include="Subscription\Drop_Oracle.sql" />
+    <EmbeddedResource Include="Subscription\Create_Oracle.sql" />
     <EmbeddedResource Include="Timeout\Drop_MySql.sql" />
     <EmbeddedResource Include="Timeout\Create_MySql.sql" />
     <EmbeddedResource Include="Subscription\Drop_MySql.sql" />

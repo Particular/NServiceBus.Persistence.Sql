@@ -23,6 +23,10 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'{saga.TableSuffix}]';");
     }
 
+    public void CreateComplete()
+    {
+    }
+
     public void AddProperty(CorrelationProperty correlationProperty)
     {
         var columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);

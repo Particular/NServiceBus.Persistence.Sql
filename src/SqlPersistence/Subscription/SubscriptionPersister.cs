@@ -16,12 +16,14 @@ class SubscriptionPersister : ISubscriptionStorage
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;
     public ConcurrentDictionary<string, CacheItem> Cache;
+    CommandBuilder commandBuilder;
 
     public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
         this.cacheFor = cacheFor;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
+        commandBuilder = new CommandBuilder(sqlVariant);
         if (cacheFor != null)
         {
             Cache = new ConcurrentDictionary<string, CacheItem>();
@@ -31,7 +33,7 @@ class SubscriptionPersister : ISubscriptionStorage
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Subscribe;
             command.AddParameter("MessageType", messageType.TypeName);
@@ -46,7 +48,7 @@ class SubscriptionPersister : ISubscriptionStorage
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Unsubscribe;
             command.AddParameter("MessageType", messageType.TypeName);
@@ -121,12 +123,12 @@ class SubscriptionPersister : ISubscriptionStorage
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
             {
                 var messageType = messageHierarchy[i];
-                var paramName = $"@type{i}";
+                var paramName = $"type{i}";
                 command.AddParameter(paramName, messageType.TypeName);
             }
             command.CommandText = getSubscribersCommand;
