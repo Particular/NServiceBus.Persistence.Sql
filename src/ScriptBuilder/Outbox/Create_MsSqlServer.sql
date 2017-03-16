@@ -19,3 +19,38 @@ set @createTable = '
 ';
 exec(@createTable);
 end
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_DispatchedAt' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createDispatchedAtIndex nvarchar(max);
+  set @createDispatchedAtIndex = N'
+  create index Index_DispatchedAt
+  on ' + @tableName + '(DispatchedAt);';
+  exec(@createDispatchedAtIndex);
+end
+
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_Dispatched' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createDispatchedIndex nvarchar(max);
+  set @createDispatchedIndex = N'
+  create index Index_Dispatched
+  on ' + @tableName + '(Dispatched);';
+  exec(@createDispatchedIndex);
+end
+
+
