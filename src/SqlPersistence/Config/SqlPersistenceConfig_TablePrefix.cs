@@ -10,7 +10,7 @@ namespace NServiceBus
         public static void TablePrefix(this PersistenceExtensions<SqlPersistence> configuration, string tablePrefix)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNullAndEmpty(nameof(tablePrefix), tablePrefix);
+            Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
             Guard.AgainstSqlDelimiters(nameof(tablePrefix), tablePrefix);
             configuration.GetSettings()
                 .Set("SqlPersistence.TablePrefix", tablePrefix);
