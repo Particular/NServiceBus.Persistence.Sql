@@ -13,18 +13,25 @@ public abstract class SubscriptionPersisterTests
     BuildSqlVariant sqlVariant;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    string tablePrefix;
     SubscriptionPersister persister;
 
     public SubscriptionPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
         dbConnection = GetConnection();
+        tablePrefix = GetTablePrefix();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
+            tablePrefix: $"{tablePrefix}_",
             sqlVariant: sqlVariant.Convert(),
             schema: schema
         );
+    }
+
+    protected virtual string GetTablePrefix()
+    {
+        return nameof(SubscriptionPersisterTests);
     }
 
     [SetUp]
@@ -33,8 +40,8 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
         }
     }
 
@@ -44,7 +51,7 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix);
         }
     }
 

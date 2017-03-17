@@ -3,6 +3,9 @@ using System.Text;
 
 namespace NServiceBus.Persistence.Sql
 {
+    using System.Collections.Generic;
+    using Unicast.Subscriptions;
+
     /// <summary>
     /// Not for public use.
     /// </summary>
@@ -24,40 +27,21 @@ namespace NServiceBus.Persistence.Sql
                     tableName = $"`{tablePrefix}SubscriptionData`";
                     break;
 
+                case SqlVariant.Oracle:
+                    tableName = $"\"{tablePrefix}SS\"";
+                    break;
+
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
             var subscribeCommand = GetSubscribeCommand(sqlVariant, tableName);
-
-            var unsubscribeCommand = $@"
-delete from {tableName}
-where
-    Subscriber = @Subscriber and
-    MessageType = @MessageType";
-
-            var getSubscribersPrefix = $@"
-select distinct Subscriber, Endpoint
-from {tablePrefix}SubscriptionData
-where MessageType in (";
+            var unsubscribeCommand = GetUnsubscribeCommand(sqlVariant, tableName);
+            var getSubscribers = GetSubscribersFunc(sqlVariant, tablePrefix);
 
             return new SubscriptionCommands(
                 subscribe: subscribeCommand,
                 unsubscribe: unsubscribeCommand,
-                getSubscribers: messageTypes =>
-                {
-                    var builder = new StringBuilder(getSubscribersPrefix);
-                    for (var i = 0; i < messageTypes.Count; i++)
-                    {
-                        var paramName = $"@type{i}";
-                        builder.Append(paramName);
-                        if (i < messageTypes.Count - 1)
-                        {
-                            builder.Append(", ");
-                        }
-                    }
-                    builder.Append(")");
-                    return builder.ToString();
-                });
+                getSubscribers: getSubscribers);
         }
 
         static string GetSubscribeCommand(SqlVariant sqlVariant, string tableName)
@@ -111,8 +95,104 @@ on duplicate key update
     PersistenceVersion = @PersistenceVersion
 ";
 
+                case SqlVariant.Oracle:
+                    return $@"
+begin
+    insert into {tableName}
+    (
+        MessageType,
+        Subscriber,
+        Endpoint,
+        PersistenceVersion
+    )
+    values
+    (
+        :1,
+        :2,
+        :3,
+        :4
+    );
+    commit;
+exception
+    when DUP_VAL_ON_INDEX
+    then ROLLBACK;
+end;
+";
+
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            }
+        }
+
+        static string GetUnsubscribeCommand(SqlVariant sqlVariant, string tableName)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.Oracle:
+                    return $@"
+delete from {tableName}
+where
+    Subscriber = :1 and
+    MessageType = :2";
+
+                default:
+                    return $@"
+delete from {tableName}
+where
+    Subscriber = @Subscriber and
+    MessageType = @MessageType";
+            }
+        }
+
+        static Func<List<MessageType>, string> GetSubscribersFunc(SqlVariant sqlVariant, string tablePrefix)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.Oracle:
+
+                    var getSubscribersPrefixOracle = $@"
+select distinct Subscriber, Endpoint
+from {tablePrefix}SS
+where MessageType in (";
+
+                    return messageTypes =>
+                    {
+                        var builder = new StringBuilder(getSubscribersPrefixOracle);
+                        for (var i = 0; i < messageTypes.Count; i++)
+                        {
+                            var paramName = $":{i}";
+                            builder.Append(paramName);
+                            if (i < messageTypes.Count - 1)
+                            {
+                                builder.Append(", ");
+                            }
+                        }
+                        builder.Append(")");
+                        return builder.ToString();
+                    };
+
+                default:
+
+                    var getSubscribersPrefix = $@"
+select distinct Subscriber, Endpoint
+from {tablePrefix}SubscriptionData
+where MessageType in (";
+
+                    return messageTypes =>
+                    {
+                        var builder = new StringBuilder(getSubscribersPrefix);
+                        for (var i = 0; i < messageTypes.Count; i++)
+                        {
+                            var paramName = $"@type{i}";
+                            builder.Append(paramName);
+                            if (i < messageTypes.Count - 1)
+                            {
+                                builder.Append(", ");
+                            }
+                        }
+                        builder.Append(")");
+                        return builder.ToString();
+                    };
             }
         }
     }

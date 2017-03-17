@@ -14,4 +14,9 @@ public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
     {
         return OracleConnectionBuilder.Build;
     }
+
+    protected override string GetTablePrefix()
+    {
+        return "SUBSCRIPTIONPERSISTER";
+    }
 }
