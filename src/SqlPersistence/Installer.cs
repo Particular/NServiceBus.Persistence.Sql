@@ -53,7 +53,8 @@ class Installer : INeedToInstallSomething
             transaction: transaction,
             script: File.ReadAllText(createScript),
             tablePrefix: tablePrefix,
-            schema: schema);
+            schema: schema,
+            customization: command => command.AddParameter("inboxRowCount", 100));
     }
 
     Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema)

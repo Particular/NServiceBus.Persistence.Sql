@@ -64,14 +64,13 @@ class OutboxPersister : IOutboxStorage
                     {
                         return null;
                     }
-                    var dispatched = await dataReader.GetBoolAsync(0);
-                    using (var textReader = dataReader.GetTextReader(1))
+                    if (await dataReader.IsDBNullAsync(0))
                     {
-                        if (dispatched)
-                        {
-                            result = new OutboxMessage(messageId, new TransportOperation[0]);
-                        }
-                        else
+                        result = new OutboxMessage(messageId, new TransportOperation[0]);
+                    }
+                    else
+                    {
+                        using (var textReader = dataReader.GetTextReader(0))
                         {
                             var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
                                 .FromSerializable()
@@ -88,7 +87,7 @@ class OutboxPersister : IOutboxStorage
 
     public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context)
     {
-        var sqlOutboxTransaction = (SqlOutboxTransaction) outboxTransaction;
+        var sqlOutboxTransaction = (SqlOutboxTransaction)outboxTransaction;
         var transaction = sqlOutboxTransaction.Transaction;
         var connection = sqlOutboxTransaction.Connection;
         return Store(message, transaction, connection);
@@ -104,26 +103,6 @@ class OutboxPersister : IOutboxStorage
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
             await command.ExecuteNonQueryEx();
-        }
-    }
-
-
-    public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
-    {
-        using (var connection = await connectionBuilder.OpenConnection())
-        {
-            var continuePurging = true;
-            while (continuePurging && !cancellationToken.IsCancellationRequested)
-            {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = outboxCommands.Cleanup;
-                    command.AddParameter("Date", dateTime);
-                    command.AddParameter("BatchSize", cleanupBatchSize);
-                    var rowCount = await command.ExecuteNonQueryEx(cancellationToken);
-                    continuePurging = rowCount != 0;
-                }
-            }
         }
     }
 }
