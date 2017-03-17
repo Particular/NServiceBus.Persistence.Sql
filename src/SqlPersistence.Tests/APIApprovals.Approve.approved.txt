@@ -75,6 +75,7 @@
     {
         MsSqlServer = 0,
         MySql = 1,
+        Oracle = 2,
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class static SubscriptionCommandBuilder
