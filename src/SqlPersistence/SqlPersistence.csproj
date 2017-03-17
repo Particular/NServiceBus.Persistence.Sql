@@ -102,7 +102,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Outbox\OperationConverter.cs" />
-    <Compile Include="Outbox\OutboxCleaner.cs" />
     <Compile Include="Outbox\SerializableOperation.cs" />
     <Compile Include="Outbox\SqlOutboxFeature.cs" />
     <Compile Include="Installer.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -41,7 +42,22 @@ public class ConfigureEndpointHelper
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
+            ExecuteOutboxCreateCommand(connection, OutboxScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix, 10);
+        }
+    }
+
+    static void ExecuteOutboxCreateCommand(DbConnection connection, string script, string tablePrefix, int inboxRowCount)
+    {
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = script;
+            command.AddParameter("tablePrefix", $"{tablePrefix}_");
+            if (connection is SqlConnection)
+            {
+                command.AddParameter("schema", "dbo");
+            }
+            command.AddParameter("inboxRowCount", inboxRowCount);
+            command.ExecuteNonQuery();
         }
     }
 

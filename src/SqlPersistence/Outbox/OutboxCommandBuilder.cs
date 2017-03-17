@@ -11,21 +11,34 @@
 
         public static OutboxCommands Build(string tablePrefix, string schema, SqlVariant sqlVariant)
         {
-            string tableName;
+            string inboxTableName;
+            string outboxTableName;
+
             switch (sqlVariant)
             {
                 case SqlVariant.MsSqlServer:
-                    tableName = $"[{schema}].[{tablePrefix}OutboxData]";
+                    outboxTableName = $"[{schema}].[{tablePrefix}OutboxData]";
+                    inboxTableName = $"[{schema}].[{tablePrefix}InboxData]";
                     break;
                 case SqlVariant.MySql:
-                    tableName = $"`{tablePrefix}OutboxData`";
+                    outboxTableName = $"`{tablePrefix}OutboxData`";
+                    inboxTableName = $"`{tablePrefix}InboxData`";
                     break;
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
 
             var storeCommandText = $@"
-insert into {tableName}
+with InboxSlot as 
+    (select top(1) * from {inboxTableName} with (updlock, readpast, rowlock) order by [Version])
+update InboxSlot set MessageId = @MessageId;
+
+if @@ROWCOUNT = 0
+begin
+   throw 50000, 'Cannot claim inbox slot', 0
+end
+
+insert into {outboxTableName}
 (
     MessageId,
     Operations,
@@ -38,47 +51,19 @@ values
     @PersistenceVersion
 )";
 
-            var cleanupCommand = GetCleanupCommand(sqlVariant, tableName);
-
             var getCommandText = $@"
-select
-    Dispatched,
-    Operations
-from {tableName}
-where MessageId = @MessageId";
+select Operations from {outboxTableName} where MessageId = @MessageId
+union all
+select null from {inboxTableName} where MessageId = @MessageId";
 
             var setAsDispatchedCommand = $@"
-update {tableName}
-set
-    Dispatched = 1,
-    DispatchedAt = @DispatchedAt,
-    Operations = '[]'
+delete from {outboxTableName}
 where MessageId = @MessageId";
+
             return new OutboxCommands(
                 store: storeCommandText,
                 get: getCommandText,
-                setAsDispatched: setAsDispatchedCommand,
-                cleanup: cleanupCommand);
-        }
-
-        static string GetCleanupCommand(SqlVariant sqlVariant, string tableName)
-        {
-            switch (sqlVariant)
-            {
-                case SqlVariant.MsSqlServer:
-                    return $@"
-delete top (@BatchSize) from {tableName}
-where Dispatched = 'true'
-    and DispatchedAt < @Date";
-                case SqlVariant.MySql:
-                    return $@"
-delete from {tableName}
-where Dispatched = true
-    and DispatchedAt < @Date
-limit @BatchSize";
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
-            }
+                setAsDispatched: setAsDispatchedCommand);
         }
     }
 }

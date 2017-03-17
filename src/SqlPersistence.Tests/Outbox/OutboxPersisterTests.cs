@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Threading;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -35,7 +35,22 @@ public abstract class OutboxPersisterTests
         {
             connection.Open();
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests));
+            ExecuteOutboxCreateCommand(connection, OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), 10);
+        }
+    }
+
+    static void ExecuteOutboxCreateCommand(DbConnection connection, string script, string tablePrefix, int inboxRowCount)
+    {
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = script;
+            command.AddParameter("tablePrefix", $"{tablePrefix}_");
+            if (connection is SqlConnection)
+            {
+                command.AddParameter("schema", "dbo");
+            }
+            command.AddParameter("inboxRowCount", inboxRowCount);
+            command.ExecuteNonQuery();
         }
     }
 
@@ -55,10 +70,10 @@ public abstract class OutboxPersisterTests
     {
         var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();
         ObjectApprover.VerifyWithJson(result);
-        VerifyOperationsAreEmpty(result);
+        VerifyRowIsDeleted(result);
     }
 
-    void VerifyOperationsAreEmpty(OutboxMessage result)
+    void VerifyRowIsDeleted(OutboxMessage result)
     {
         using (var connection = dbConnection())
         {
@@ -66,15 +81,12 @@ public abstract class OutboxPersisterTests
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = $@"
-select Operations
+select count(*)
 from {nameof(OutboxPersisterTests)}_OutboxData
 where MessageId = '{result.MessageId}'";
-                using (var reader = command.ExecuteReader())
-                {
-                    reader.Read();
-                    var operations = reader.GetString(0);
-                    Assert.AreEqual("[]", operations);
-                }
+
+                var count = command.ExecuteScalar();
+                Assert.AreEqual(0, count);
             }
         }
     }
@@ -149,31 +161,6 @@ where MessageId = '{result.MessageId}'";
             transaction.Commit();
         }
         return await persister.Get(messageId, null);
-    }
-
-    [Test]
-    public async Task StoreAndCleanup()
-    {
-        using (var connection = await dbConnection.OpenConnection())
-        {
-            for (var i = 0; i < 13; i++)
-            {
-                await Store(i, connection);
-            }
-        }
-
-        await Task.Delay(1000);
-        var dateTime = DateTime.UtcNow;
-        await Task.Delay(1000);
-        using (var connection = await dbConnection.OpenConnection())
-        {
-            await Store(13, connection);
-        }
-
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
-        Assert.IsNull(await persister.Get("MessageId1", null));
-        Assert.IsNull(await persister.Get("MessageId12", null));
-        Assert.IsNotNull(await persister.Get("MessageId13", null));
     }
 
     async Task Store(int i, DbConnection connection)
