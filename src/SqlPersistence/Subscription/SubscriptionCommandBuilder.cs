@@ -37,7 +37,7 @@ where
 
             var getSubscribersPrefix = $@"
 select distinct Subscriber, Endpoint
-from {tablePrefix}SubscriptionData
+from {tableName}SubscriptionData
 where MessageType in (";
 
             return new SubscriptionCommands(

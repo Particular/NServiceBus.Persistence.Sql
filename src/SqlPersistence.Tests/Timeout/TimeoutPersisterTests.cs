@@ -26,8 +26,8 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
         }
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
@@ -43,7 +43,7 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
         }
     }
 

@@ -11,6 +11,7 @@ public abstract class SubscriptionPersisterTests
 {
 
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
     SubscriptionPersister persister;
@@ -18,6 +19,7 @@ public abstract class SubscriptionPersisterTests
     public SubscriptionPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
@@ -33,18 +35,18 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
         }
     }
 
-    [TearDown]
+    //[TearDown]
     public void TearDown()
     {
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests));
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
         }
     }
 

@@ -12,6 +12,7 @@ public abstract class OutboxPersisterTests
 {
     OutboxPersister persister;
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
 
     protected abstract Func<DbConnection> GetConnection();
@@ -19,6 +20,7 @@ public abstract class OutboxPersisterTests
     public OutboxPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
         persister = new OutboxPersister(connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(OutboxPersisterTests)}_",
@@ -34,8 +36,8 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
         }
     }
 
@@ -45,7 +47,7 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
         }
     }
 
@@ -60,6 +62,15 @@ public abstract class OutboxPersisterTests
 
     void VerifyOperationsAreEmpty(OutboxMessage result)
     {
+        string tableName;
+        if (string.IsNullOrEmpty(schema))
+        {
+            tableName = $"{nameof(OutboxPersisterTests)}";
+        }
+        else
+        {
+            tableName = $"{schema}.{nameof(OutboxPersisterTests)}";
+        }
         using (var connection = dbConnection())
         {
             connection.Open();
@@ -67,7 +78,7 @@ public abstract class OutboxPersisterTests
             {
                 command.CommandText = $@"
 select Operations
-from {nameof(OutboxPersisterTests)}_OutboxData
+from {tableName}_OutboxData
 where MessageId = '{result.MessageId}'";
                 using (var reader = command.ExecuteReader())
                 {

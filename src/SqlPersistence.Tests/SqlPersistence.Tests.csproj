@@ -111,6 +111,7 @@
     <Compile Include="APIApprovals.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
+    <Compile Include="SetUpFixture.cs" />
     <Compile Include="SqlVariantConverter.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
