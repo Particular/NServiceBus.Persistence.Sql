@@ -40,7 +40,7 @@ public abstract class SubscriptionPersisterTests
         }
     }
 
-    //[TearDown]
+    [TearDown]
     public void TearDown()
     {
         using (var connection = dbConnection())
