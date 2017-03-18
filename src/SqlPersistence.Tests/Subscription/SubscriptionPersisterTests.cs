@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -25,7 +28,8 @@ public abstract class SubscriptionPersisterTests
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
             sqlVariant: sqlVariant.Convert(),
-            schema: schema
+            schema: schema,
+            cacheFor:TimeSpan.FromSeconds(10)
         );
     }
 
@@ -66,6 +70,27 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
         var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
         ObjectApprover.VerifyWithJson(result);
+    }
+
+    [Test]
+    public async Task Should_be_cached()
+    {
+        var type = new MessageType("type1", new Version(0, 0, 0, 0));
+        var messageTypes = new List<MessageType>
+        {
+            type,
+        };
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type, null).Await();
+        var first = Stopwatch.StartNew();
+        var subscribersFirst = await persister.GetSubscriberAddressesForMessage(messageTypes, null)
+            .ConfigureAwait(false);
+        var firstTime = first.ElapsedMilliseconds;
+        var second = Stopwatch.StartNew();
+        var subscribersSecond = await persister.GetSubscriberAddressesForMessage(messageTypes, null)
+            .ConfigureAwait(false);
+        var secondTime = second.ElapsedMilliseconds;
+        Assert.IsTrue(secondTime * 1000 < firstTime);
+        Assert.AreEqual(subscribersFirst.Count(), subscribersSecond.Count());
     }
 
     [Test]
