@@ -22,7 +22,7 @@ public abstract class TimeoutPersisterTests
 
     TimeoutPersister Setup()
     {
-        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        var name = GetTablePrefix();
         using (var connection = dbConnection())
         {
             connection.Open();
@@ -39,12 +39,17 @@ public abstract class TimeoutPersisterTests
     [TearDown]
     public void TearDown()
     {
-        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        var name = GetTablePrefix();
         using (var connection = dbConnection())
         {
             connection.Open();
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
         }
+    }
+
+    protected virtual string GetTablePrefix()
+    {
+        return $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
     }
 
     [Test]

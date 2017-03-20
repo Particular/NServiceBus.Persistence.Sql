@@ -14,4 +14,14 @@ public class OracleTimeoutPersisterTests : TimeoutPersisterTests
     {
         return OracleConnectionBuilder.Build;
     }
+
+    protected override string GetTablePrefix()
+    {
+        var name = TestContext.CurrentContext.Test.Name;
+        if (name.Length > 24)
+        {
+            name = name.Substring(0, 24);
+        }
+        return name.ToUpper();
+    }
 }

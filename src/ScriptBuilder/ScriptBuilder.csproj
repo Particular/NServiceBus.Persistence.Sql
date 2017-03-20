@@ -100,6 +100,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="Timeout\Drop_Oracle.sql" />
+    <EmbeddedResource Include="Timeout\Create_Oracle.sql" />
     <EmbeddedResource Include="Subscription\Drop_Oracle.sql" />
     <EmbeddedResource Include="Subscription\Create_Oracle.sql" />
     <EmbeddedResource Include="Timeout\Drop_MySql.sql" />
