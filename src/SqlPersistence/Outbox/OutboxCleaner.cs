@@ -36,13 +36,13 @@ class OutboxCleaner : FeatureStartupTask
                 {
                     // noop
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    log.Error("Error cleaning outbox data", ex);
+                    log.Error("Error cleaning outbox data", exception);
                     cleanupFailures++;
                     if (cleanupFailures >= 10)
                     {
-                        criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with your database.", ex);
+                        criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
                         cleanupFailures = 0;
                     }
                 }
