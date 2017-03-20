@@ -78,6 +78,8 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
     <Compile Include="Config\SqlVariant.cs" />
+    <Compile Include="Outbox\AsyncTimer.cs" />
+    <Compile Include="Outbox\IAsyncTimer.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
     <Compile Include="Subscription\SubscriptionCommands.cs" />
@@ -158,9 +160,9 @@
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*"/>
+      <Files Include="$(TargetDir)$(TargetName).*" />
     </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries"/>
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>

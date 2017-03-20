@@ -109,7 +109,9 @@
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="App_Packages\PublicApiGenerator.6.0.0\ApiGenerator.cs" />
     <Compile Include="APIApprovals.cs" />
+    <Compile Include="Outbox\AsyncTimerTests.cs" />
     <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
+    <Compile Include="Outbox\OutboxCleanerTests.cs" />
     <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
     <Compile Include="SqlVariantConverter.cs" />
     <Compile Include="GlobalSuppressions.cs" />

@@ -3,41 +3,50 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Logging;
 
 class OutboxCleaner : FeatureStartupTask
 {
-    OutboxPersister outboxPersister;
-
-    public OutboxCleaner(OutboxPersister outboxPersister, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup)
+    public OutboxCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
     {
-        cancellationTokenSource = new CancellationTokenSource();
+        this.cleanup = cleanup;
         this.timeToKeepDeduplicationData = timeToKeepDeduplicationData;
         this.frequencyToRunCleanup = frequencyToRunCleanup;
-        this.outboxPersister = outboxPersister;
+        this.timer = timer;
+        this.criticalError = criticalError;
     }
 
-    protected override async Task OnStart(IMessageSession session)
+    protected override Task OnStart(IMessageSession session)
     {
-        await Task.Delay(TimeSpan.FromMinutes(1));
-        while (true)
+        var cleanupFailures = 0;
+        timer.Start(async (utcTime, token) =>
         {
-            await Task.Delay(frequencyToRunCleanup, cancellationTokenSource.Token);
-            if (cancellationTokenSource.IsCancellationRequested)
+            var dateTime = utcTime - timeToKeepDeduplicationData;
+            await cleanup(dateTime, token);
+            cleanupFailures = 0;
+        }, frequencyToRunCleanup, exception =>
+        {
+            log.Error("Error cleaning outbox data", exception);
+            cleanupFailures++;
+            if (cleanupFailures >= 10)
             {
-                break;
+                criticalError("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
+                cleanupFailures = 0;
             }
-            var dateTime = DateTime.UtcNow - timeToKeepDeduplicationData;
-            await outboxPersister.RemoveEntriesOlderThan(dateTime, cancellationTokenSource.Token);
-        }
+        }, Task.Delay);
+        return Task.FromResult(0);
     }
 
     protected override Task OnStop(IMessageSession session)
     {
-        cancellationTokenSource.Cancel();
-        return Task.FromResult(true);
+        return timer.Stop();
     }
 
+    IAsyncTimer timer;
+    Action<string, Exception> criticalError;
+    Func<DateTime, CancellationToken, Task> cleanup;
     TimeSpan timeToKeepDeduplicationData;
     TimeSpan frequencyToRunCleanup;
-    CancellationTokenSource cancellationTokenSource;
+
+    static ILog log = LogManager.GetLogger<OutboxCleaner>();
 }

@@ -27,7 +27,7 @@ values
 )";
 
             string cleanupCommandText = $@"
-delete from {tableName} where Dispatched = true And DispatchedAt < @Date";
+delete from {tableName} where Dispatched = 1 And DispatchedAt < @Date";
 
             string getCommandText = $@"
 select

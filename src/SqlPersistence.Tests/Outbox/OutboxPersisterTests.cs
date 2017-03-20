@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -148,4 +149,63 @@ where MessageId = '{result.MessageId}'";
         return await persister.Get(messageId, null);
     }
 
+    [Test]
+    public async Task StoreAndCleanup()
+    {
+        using (var connection = await dbConnection.OpenConnection())
+        {
+            for (var i = 0; i < 13; i++)
+            {
+                await Store(i, connection);
+            }
+        }
+
+        await Task.Delay(1000);
+        var dateTime = DateTime.UtcNow;
+        await Task.Delay(1000);
+        using (var connection = await dbConnection.OpenConnection())
+        {
+            await Store(13, connection);
+        }
+
+        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
+        Assert.IsNull(await persister.Get("MessageId1", null));
+        Assert.IsNull(await persister.Get("MessageId12", null));
+        Assert.IsNotNull(await persister.Get("MessageId13", null));
+    }
+
+    async Task Store(int i, DbConnection connection)
+    {
+        var operations = new[]
+        {
+            new TransportOperation(
+                messageId: "OperationId" + i,
+                options: new Dictionary<string, string>
+                {
+                    {
+                        "OptionKey1", "OptionValue1"
+                    }
+                },
+                body: new byte[]
+                {
+                    0x20
+                },
+                headers: new Dictionary<string, string>
+                {
+                    {
+                        "HeaderKey1", "HeaderValue1"
+                    }
+                }
+            )
+        };
+        var messageId = "MessageId" + i;
+        var outboxMessage = new OutboxMessage(messageId, operations);
+
+        using (var transaction = connection.BeginTransaction())
+        {
+            await persister.Store(outboxMessage, transaction, connection);
+            transaction.Commit();
+        }
+        await persister.SetAsDispatched(messageId, null);
+    }
 }
