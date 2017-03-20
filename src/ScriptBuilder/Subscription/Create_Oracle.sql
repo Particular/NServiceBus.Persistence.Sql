@@ -10,9 +10,9 @@ begin
     createTable :=
        'CREATE TABLE ' || tableName || ' 
         (
-          MESSAGETYPE NVARCHAR2(450) NOT NULL 
-        , SUBSCRIBER NVARCHAR2(450) NOT NULL 
-        , ENDPOINT VARCHAR2(450) NOT NULL 
+          MESSAGETYPE NVARCHAR2(200) NOT NULL 
+        , SUBSCRIBER NVARCHAR2(200) NOT NULL 
+        , ENDPOINT VARCHAR2(200) NOT NULL 
         , PERSISTENCEVERSION VARCHAR2(23) 
         , CONSTRAINT ' || tableName || '_PK PRIMARY KEY 
           (
