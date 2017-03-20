@@ -71,5 +71,5 @@ class OutboxCleaner : FeatureStartupTask
     Task task;
     CancellationTokenSource tokenSource;
 
-    static ILog log = NServiceBus.Logging.LogManager.GetLogger<OutboxCleaner>();
+    static ILog log = LogManager.GetLogger<OutboxCleaner>();
 }
