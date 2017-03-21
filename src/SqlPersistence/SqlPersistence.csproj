@@ -86,6 +86,9 @@
     <Compile Include="Saga\SagaPersister_Update.cs" />
     <Compile Include="Saga\SagaPersister_Complete.cs" />
     <Compile Include="Saga\SagaPersister_Get.cs" />
+    <Compile Include="Subscription\Config\SqlPersistenceConfig.cs" />
+    <Compile Include="Subscription\Config\SubscriptionSettings.cs" />
+    <Compile Include="Subscription\Config\SubscriptionSettings_CacheFor.cs" />
     <Compile Include="Subscription\SubscriptionCommands.cs" />
     <Compile Include="Subscription\SubscriptionCommandBuilder.cs" />
     <Compile Include="TableNameCleaner.cs" />
@@ -94,7 +97,7 @@
     <Compile Include="Saga\Config\SagaSettings_Writer.cs" />
     <Compile Include="Saga\Config\SagaSettings_Reader.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Connection.cs" />
-    <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
+    <Compile Include="Saga\Config\SqlPersistenceConfig.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
     <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
     <Compile Include="Config\SqlPersistenceConfig_SqlVariant.cs" />

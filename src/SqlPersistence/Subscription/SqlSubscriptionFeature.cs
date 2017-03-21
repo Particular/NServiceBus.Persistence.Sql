@@ -1,6 +1,7 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SqlSubscriptionFeature : Feature
@@ -19,7 +20,8 @@ class SqlSubscriptionFeature : Feature
         var tablePrefix = settings.GetTablePrefix();
         var sqlVariant = settings.GetSqlVariant();
         var schema = settings.GetSchema();
-        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema);
+        var cacheFor = SubscriptionSettings.GetCacheFor(settings);
+        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema, cacheFor);
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }
 }

@@ -3,13 +3,12 @@ using NServiceBus.Persistence.Sql;
 
 namespace NServiceBus
 {
-    
     public static partial class SqlPersistenceConfig
     {
 
-        public static SagaSettings SagaSettings(this PersistenceExtensions<SqlPersistence> configuration)
+        public static SubscriptionSettings SubscriptionSettings(this PersistenceExtensions<SqlPersistence> configuration)
         {
-            return new SagaSettings(configuration.GetSettings());
+            return new SubscriptionSettings(configuration.GetSettings());
         }
 
     }
