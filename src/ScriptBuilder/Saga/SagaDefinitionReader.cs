@@ -84,11 +84,13 @@ When all messages are mapped using finders then use the following: protected ove
 
     static bool IsSqlSaga(TypeDefinition type)
     {
-        if (type.BaseType == null)
+        var baseType = type.BaseType;
+        if (baseType == null)
         {
             return false;
         }
-        return type.BaseType.FullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga");
+        return baseType.Scope.Name.StartsWith("NServiceBus.Persistence.Sql") &&
+               baseType.FullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga");
     }
 
     static void ValidateIsNotDirectSaga(TypeDefinition type)
