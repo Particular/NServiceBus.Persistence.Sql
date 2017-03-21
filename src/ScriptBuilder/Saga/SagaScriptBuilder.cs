@@ -65,6 +65,9 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 
             WriteComment(writer, "PurgeObsoleteProperties");
             sqlVariantWriter.WritePurgeObsoleteProperties();
+
+            WriteComment(writer, "CreateComplete");
+            sqlVariantWriter.CreateComplete();
         }
 
         static void WriteComment(TextWriter writer, string text)
@@ -82,6 +85,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             if (sqlVariant == BuildSqlVariant.MySql)
             {
                 return new MySqlSagaScriptWriter(textWriter, saga);
+            }
+            if (sqlVariant == BuildSqlVariant.Oracle)
+            {
+                return new OracleSagaScriptWriter(textWriter, saga);
             }
 
             throw new Exception($"Unknown SqlVariant {sqlVariant}.");

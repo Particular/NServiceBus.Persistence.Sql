@@ -10,6 +10,12 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class SagaCommandBuilder
     {
+        readonly SqlVariant sqlVariant;
+
+        public SagaCommandBuilder(SqlVariant sqlVariant)
+        {
+            this.sqlVariant = sqlVariant;
+        }
 
         public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
         {
@@ -18,13 +24,13 @@ namespace NServiceBus.Persistence.Sql
 
             if (correlationProperty != null)
             {
-                insertBuilder.Append($",\r\n    Correlation_{correlationProperty}");
-                valuesBuilder.Append(",\r\n    @CorrelationId");
+                insertBuilder.Append($",\r\n    {CorrelationPropertyName(correlationProperty)}");
+                valuesBuilder.Append($",\r\n    {ParamName("CorrelationId")}");
             }
             if (transitionalCorrelationProperty != null)
             {
-                insertBuilder.Append($",\r\n    Correlation_{transitionalCorrelationProperty}");
-                valuesBuilder.Append(",\r\n    @TransitionalCorrelationId");
+                insertBuilder.Append($",\r\n    {CorrelationPropertyName(transitionalCorrelationProperty)}");
+                valuesBuilder.Append($",\r\n    {ParamName("TransitionalCorrelationId")}");
             }
 
             return $@"
@@ -39,11 +45,11 @@ insert into {tableName}
 )
 values
 (
-    @Id,
-    @Metadata,
-    @Data,
-    @PersistenceVersion,
-    @SagaTypeVersion,
+    {ParamName("Id")},
+    {ParamName("Metadata")},
+    {ParamName("Data")},
+    {ParamName("PersistenceVersion")},
+    {ParamName("SagaTypeVersion")},
     1{valuesBuilder}
 )";
         }
@@ -55,18 +61,18 @@ values
             var correlationSet = "";
             if (transitionalCorrelationProperty != null)
             {
-                correlationSet = $",\r\n    Correlation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
+                correlationSet = $",\r\n    {CorrelationPropertyName(transitionalCorrelationProperty)} = {ParamName("TransitionalCorrelationId")}";
             }
 
             return $@"
 update {tableName}
 set
-    Data = @Data,
-    PersistenceVersion = @PersistenceVersion,
-    SagaTypeVersion = @SagaTypeVersion,
-    Concurrency = @Concurrency + 1{correlationSet}
+    Data = {ParamName("Data")},
+    PersistenceVersion = {ParamName("PersistenceVersion")},
+    SagaTypeVersion = {ParamName("SagaTypeVersion")},
+    Concurrency = {ParamName("Concurrency")} + 1{correlationSet}
 where
-    Id = @Id and Concurrency = @Concurrency
+    Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
 ";
         }
 
@@ -80,7 +86,7 @@ select
     Metadata,
     Data
 from {tableName}
-where Id = @Id
+where Id = {ParamName("Id")}
 ";
         }
 
@@ -94,7 +100,7 @@ select
     Metadata,
     Data
 from {tableName}
-where Correlation_{propertyName} = @propertyValue
+where {CorrelationPropertyName(propertyName)} = {ParamName("propertyValue")}
 ";
         }
 
@@ -102,7 +108,7 @@ where Correlation_{propertyName} = @propertyValue
         {
             return $@"
 delete from {tableName}
-where Id = @Id and Concurrency = @Concurrency
+where Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
 ";
         }
 
@@ -117,6 +123,29 @@ select
     Data
 from {tableName}
 ";
+        }
+
+        string CorrelationPropertyName(string propertyName)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.Oracle:
+                    var oracleName = "CORR_" + propertyName.ToUpper();
+                    return oracleName.Length > 30 ? oracleName.Substring(0, 30) : oracleName;
+                default:
+                    return "Correlation_" + propertyName;
+            }
+        }
+
+        string ParamName(string name)
+        {
+            switch (sqlVariant)
+            {
+                case SqlVariant.Oracle:
+                    return ":" + name;
+                default:
+                    return "@" + name;
+            }
         }
     }
 }

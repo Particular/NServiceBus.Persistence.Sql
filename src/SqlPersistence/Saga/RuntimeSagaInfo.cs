@@ -64,6 +64,9 @@ class RuntimeSagaInfo
             case SqlVariant.MySql:
                 TableName = $"`{tablePrefix}{tableSuffix}`";
                 break;
+            case SqlVariant.Oracle:
+                TableName = tableSuffix.ToUpper();
+                break;
             default:
                 throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }

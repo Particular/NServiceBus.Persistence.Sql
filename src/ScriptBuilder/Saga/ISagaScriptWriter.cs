@@ -11,4 +11,5 @@ interface ISagaScriptWriter
     void VerifyColumnType(CorrelationProperty sagaCorrelationProperty);
     void WriteCreateIndex(CorrelationProperty sagaCorrelationProperty);
     void WritePurgeObsoleteIndex();
+    void CreateComplete();
 }

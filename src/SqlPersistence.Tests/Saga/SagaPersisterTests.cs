@@ -27,8 +27,9 @@ public abstract class SagaPersisterTests
 
     SagaPersister SetUp(string endpointName)
     {
+        var runtimeSqlVariant = sqlVariant.Convert();
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder();
+        var commandBuilder = new SagaCommandBuilder(runtimeSqlVariant);
 #pragma warning restore 618
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
@@ -38,8 +39,8 @@ public abstract class SagaPersisterTests
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
             schema: schema,
-            sqlVariant: sqlVariant.Convert());
-        return new SagaPersister(infoCache);
+            sqlVariant: runtimeSqlVariant);
+        return new SagaPersister(infoCache, runtimeSqlVariant);
     }
 
     [Test]

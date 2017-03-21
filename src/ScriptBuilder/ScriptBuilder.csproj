@@ -78,6 +78,8 @@
     <Compile Include="BuildSqlVariant.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="Saga\Writers\OracleCorrelationPropertyTypeConverter.cs" />
+    <Compile Include="Saga\Writers\OracleSagaScriptWriter.cs" />
     <Compile Include="ScriptPromotionPathReader.cs" />
     <Compile Include="ResourceReader.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />

@@ -140,4 +140,35 @@ public abstract class TimeoutPersisterTests
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
     }
 
+    [Test]
+    public void FractionalSeconds()
+    {
+        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, 42, DateTimeKind.Utc); // 42ms
+        var timeout1Time = startSlice.AddSeconds(1);
+        var timeout2Time = DateTime.UtcNow.AddSeconds(10);
+        var timeout1 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout1Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var timeout2 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout2Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var persister = Setup();
+        persister.Add(timeout1, null).Await();
+        persister.Add(timeout2, null).Await();
+        var nextChunk = persister.GetNextChunk(startSlice).Result;
+        Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
+        Assert.That(nextChunk.DueTimeouts.Length, Is.EqualTo(1));
+
+        // MSSQL stores 42ms as .043 because it doesn't have millisecond precision. MySQL/Oracle store to nearest second.
+        Assert.That(nextChunk.DueTimeouts[0].DueTime, Is.EqualTo(timeout1Time).Within(TimeSpan.FromMilliseconds(43)));
+    }
+
 }
