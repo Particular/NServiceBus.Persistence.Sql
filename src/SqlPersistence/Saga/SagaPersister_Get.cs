@@ -47,8 +47,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                parameter.ParameterName = "propertyValue";
-                parameter.Value = propertyValue;
+                sagaInfo.FillParameter(parameter, "propertyValue", propertyValue);
                 append(parameter);
             });
     }
@@ -69,8 +68,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                parameter.ParameterName = "Id";
-                parameter.Value = sagaId;
+                sagaInfo.FillParameter(parameter, "Id", sagaId);
                 append(parameter);
             });
     }
@@ -80,11 +78,11 @@ where {whereClause}";
     {
         var sqlSession = session.SqlPersistenceSession();
 
-        using (var command = sqlSession.Connection.CreateCommand())
+        using (var command = sagaInfo.CreateCommand(sqlSession.Connection))
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            appendParameters(command.CreateParameter, parameter => command.Parameters.Add(parameter));
+            appendParameters(command.InnerCommand.CreateParameter, parameter => command.InnerCommand.Parameters.Add(parameter));
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
             {

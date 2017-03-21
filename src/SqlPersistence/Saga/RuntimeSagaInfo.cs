@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Data.Common;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ class RuntimeSagaInfo
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
     ConcurrentDictionary<Version, JsonSerializer> deserializers;
+    CommandBuilder commandBuilder;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string SelectFromCommand;
@@ -29,6 +31,7 @@ class RuntimeSagaInfo
     public readonly string TransitionalCorrelationProperty;
     public readonly string GetByCorrelationPropertyCommand;
     public readonly string TableName;
+    public readonly Action<DbParameter, string, object> FillParameter;
 
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
@@ -51,6 +54,7 @@ class RuntimeSagaInfo
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
+        this.commandBuilder = new CommandBuilder(sqlVariant);
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga(sagaType);
         var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
@@ -60,12 +64,15 @@ class RuntimeSagaInfo
         {
             case SqlVariant.MsSqlServer:
                 TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
+                FillParameter = ParameterFiller.Fill;
                 break;
             case SqlVariant.MySql:
                 TableName = $"`{tablePrefix}{tableSuffix}`";
+                FillParameter = ParameterFiller.Fill;
                 break;
             case SqlVariant.Oracle:
                 TableName = tableSuffix.ToUpper();
+                FillParameter = ParameterFiller.OracleFill;
                 break;
             default:
                 throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
@@ -100,6 +107,10 @@ class RuntimeSagaInfo
         }
     }
 
+    public CommandWrapper CreateCommand(DbConnection connection)
+    {
+        return commandBuilder.CreateCommand(connection);
+    }
 
     public string ToJson(IContainSagaData sagaData)
     {
