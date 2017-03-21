@@ -137,7 +137,7 @@ end if;
 select count(*) into n from user_indexes where index_name = '{tableName}_TP';
 if(n > 0)
 then
-  sqlStatement := 'drop index {tableName}_TP;
+  sqlStatement := 'drop index {tableName}_TP';
 
   execute immediate sqlStatement;
 end if;
