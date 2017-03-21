@@ -49,10 +49,6 @@ static class SagaDefinitionReader
     static string GetCorrelationPropertyName(TypeDefinition type)
     {
         var instructions = type.Properties.Single(_ => _.Name == "CorrelationPropertyName").GetMethod.Body.Instructions;
-        if (instructions.Count == 0)
-        {
-            return null;
-        }
         if (instructions.Count == 2)
         {
             if (instructions[1].OpCode == OpCodes.Ret)
