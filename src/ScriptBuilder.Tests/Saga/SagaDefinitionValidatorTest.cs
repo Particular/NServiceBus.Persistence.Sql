@@ -52,15 +52,15 @@ public class SagaDefinitionValidatorTest
         SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", null, "tableSuffix");
     }
 
-    [SqlSaga(CorrelationProperty = "Correlation")]
-    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
+    public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }

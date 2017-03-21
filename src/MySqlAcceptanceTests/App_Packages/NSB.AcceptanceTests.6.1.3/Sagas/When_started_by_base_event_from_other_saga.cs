@@ -66,8 +66,7 @@
                 },
                 metdata => metdata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
-
-            [SqlSaga(CorrelationProperty = nameof(SagaStartedByBaseEventSagaData.DataId))]
+            
             public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }
@@ -80,7 +79,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaStartedByBaseEventSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaStartedByBaseEventSagaData.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<BaseEvent>(m => m.DataId);
                 }

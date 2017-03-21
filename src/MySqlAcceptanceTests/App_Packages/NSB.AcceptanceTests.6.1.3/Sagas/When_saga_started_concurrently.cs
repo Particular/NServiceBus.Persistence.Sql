@@ -55,7 +55,6 @@
                 });
             }
 
-            [SqlSaga(CorrelationProperty = nameof(ConcurrentlyStartedSagaData.OrderId))]
             public class ConcurrentlyStartedSaga : SqlSaga<ConcurrentlyStartedSagaData>,
                 IAmStartedByMessages<StartMessageTwo>,
                 IAmStartedByMessages<StartMessageOne>
@@ -94,7 +93,9 @@
                     Context.SagaCompleted = true;
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<ConcurrentlyStartedSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(ConcurrentlyStartedSagaData.OrderId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartMessageOne>(msg => msg.SomeId);
                     mapper.MapMessage<StartMessageTwo>(msg => msg.SomeId);

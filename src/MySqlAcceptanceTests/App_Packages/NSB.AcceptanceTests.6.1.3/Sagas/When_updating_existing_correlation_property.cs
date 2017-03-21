@@ -41,8 +41,7 @@
             {
                 EndpointSetup<DefaultServer>();
             }
-
-            [SqlSaga(CorrelationProperty = nameof(ChangeCorrPropertySagaData.SomeId))]
+            
             public class ChangeCorrPropertySaga : SqlSaga<ChangeCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context TestContext { get; set; }
@@ -63,7 +62,9 @@
                     });
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<ChangeCorrPropertySagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(ChangeCorrPropertySagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }

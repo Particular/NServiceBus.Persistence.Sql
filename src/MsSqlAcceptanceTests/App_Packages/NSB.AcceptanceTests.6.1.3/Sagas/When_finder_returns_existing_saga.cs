@@ -57,7 +57,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData08.Property))]
             public class TestSaga08 : SqlSaga<TestSaga08.SagaData08>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SomeOtherMessage>
@@ -78,7 +77,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData08> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData08.Property);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
                     // Mapping not required for SomeOtherMessage because CustomFinder used

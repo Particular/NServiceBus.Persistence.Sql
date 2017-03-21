@@ -83,7 +83,6 @@
                 Context TestContext;
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.SomeId))]
             public class Saga : SqlSaga<SagaData>, IAmStartedByMessages<OriginalMessage>, IAmStartedByMessages<NewMessage>
             {
                 public Saga(Context testContext)
@@ -103,7 +102,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<OriginalMessage>(msg => msg.SomeId);
                     mapper.MapMessage<NewMessage>(msg => msg.SomeId);

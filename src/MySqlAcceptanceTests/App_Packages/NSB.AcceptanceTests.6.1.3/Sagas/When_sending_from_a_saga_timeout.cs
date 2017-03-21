@@ -37,7 +37,6 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SendFromTimeoutSaga1Data.DataId))]
             public class SendFromTimeoutSaga1 : SqlSaga<SendFromTimeoutSaga1.SendFromTimeoutSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>
@@ -59,7 +58,9 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SendFromTimeoutSaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(SendFromTimeoutSaga1Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga1>(m => m.DataId);
                 }
@@ -69,8 +70,7 @@
                     public virtual Guid DataId { get; set; }
                 }
             }
-
-            [SqlSaga(CorrelationProperty = nameof(SendFromTimeoutSaga2Data.DataId))]
+            
             public class SendFromTimeoutSaga2 : SqlSaga<SendFromTimeoutSaga2.SendFromTimeoutSaga2Data>, IAmStartedByMessages<StartSaga2>
             {
                 public Context Context { get; set; }
@@ -82,7 +82,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SendFromTimeoutSaga2Data> mapper)
+                protected override string CorrelationPropertyName => nameof(SendFromTimeoutSaga2Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga2>(m => m.DataId);
                 }

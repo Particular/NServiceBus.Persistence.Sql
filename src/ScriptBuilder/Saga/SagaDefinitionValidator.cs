@@ -6,7 +6,7 @@ static class SagaDefinitionValidator
     {
         if (correlationProperty != null && string.IsNullOrWhiteSpace(correlationProperty))
         {
-            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for CorrelationProperty.");
+            throw new ErrorsException($"The Saga '{sagaName}' has an empty string defined for CorrelationPropertyName.");
         }
 
         if (transitionalProperty != null && string.IsNullOrWhiteSpace(transitionalProperty))

@@ -44,7 +44,6 @@
                 EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            [SqlSaga(CorrelationProperty = nameof(TestSagaData02.KeyValue))]
             public class TestSaga02 : SqlSaga<TestSagaData02>,
                 IAmStartedByMessages<StartSagaMessage>, IAmStartedByMessages<OtherMessage>
             {
@@ -64,7 +63,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData02> mapper)
+                protected override string CorrelationPropertyName => nameof(TestSagaData02.KeyValue);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.Key);
                     mapper.MapMessage<OtherMessage>(m => m.Part1 + "_" + m.Part2);

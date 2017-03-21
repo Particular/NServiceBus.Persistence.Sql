@@ -77,8 +77,7 @@
                     metadata => metadata.RegisterPublisherFor<GroupPendingEvent>(typeof(Publisher)))
                     .AddMapping<OpenGroupCommand>(typeof(Publisher));
             }
-
-            [SqlSaga(CorrelationProperty = nameof(MySaga1Data.DataId))]
+            
             public class Saga1 : SqlSaga<Saga1.MySaga1Data>,
                 IAmStartedByMessages<GroupPendingEvent>,
                 IHandleMessages<CompleteSaga1Now>
@@ -104,7 +103,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MySaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(MySaga1Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
                     mapper.MapMessage<CompleteSaga1Now>(m => m.DataId);
@@ -115,8 +116,7 @@
                     public virtual Guid DataId { get; set; }
                 }
             }
-
-            [SqlSaga(CorrelationProperty = nameof(MySaga2Data.DataId))]
+            
             public class Saga2 : SqlSaga<Saga2.MySaga2Data>,
                 IAmStartedByMessages<StartSaga2>,
                 IHandleMessages<GroupPendingEvent>
@@ -140,7 +140,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MySaga2Data> mapper)
+                protected override string CorrelationPropertyName => nameof(MySaga2Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga2>(m => m.DataId);
                     mapper.MapMessage<GroupPendingEvent>(m => m.DataId);

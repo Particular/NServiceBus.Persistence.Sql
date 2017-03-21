@@ -71,7 +71,6 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             }
         }
 
-        [SqlSaga]
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>
         {
@@ -83,7 +82,9 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 return Task.FromResult(0);
             }
 
-            protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+            protected override string CorrelationPropertyName { get; }
+
+            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
             }
 

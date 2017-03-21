@@ -10,7 +10,11 @@ public class SqlSagaTests
     [Test]
     public void WithBadOverride()
     {
-        var exception = Assert.Throws<Exception>(() => new SagaWithBadOverride());
+        var sagaWithBadOverride = new SagaWithBadOverride();
+        var exception = Assert.Throws<Exception>(() =>
+        {
+            sagaWithBadOverride.VerifyNoConfigureHowToFindSaga();
+        });
         Approvals.Verify(exception.Message);
     }
 
@@ -20,9 +24,11 @@ public class SqlSagaTests
         {
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
+
+        protected override string CorrelationPropertyName { get; }
 
         protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
@@ -32,7 +38,7 @@ public class SqlSagaTests
     [Test]
     public void WithGoodOverride()
     {
-        new SagaWithGoodOverride();
+        new SagaWithGoodOverride().VerifyNoConfigureHowToFindSaga();
     }
 
     public class SagaWithGoodOverride : SqlSaga<SagaWithGoodOverride.SagaData>
@@ -41,7 +47,9 @@ public class SqlSagaTests
         {
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName { get; }
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }

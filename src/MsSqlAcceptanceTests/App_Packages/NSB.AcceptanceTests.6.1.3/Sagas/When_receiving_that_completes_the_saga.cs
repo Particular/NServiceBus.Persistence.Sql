@@ -91,7 +91,6 @@
                 });
             }
 
-            [SqlSaga(CorrelationProperty = nameof(TestSagaData10.SomeId))]
             public class TestSaga10 : SqlSaga<TestSagaData10>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<CompleteSagaMessage>,
@@ -125,7 +124,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData10> mapper)
+                protected override string CorrelationPropertyName => nameof(TestSagaData10.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                     mapper.MapMessage<CompleteSagaMessage>(m => m.SomeId);

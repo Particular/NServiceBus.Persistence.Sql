@@ -77,7 +77,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(CantBeFoundSaga1Data.MessageId))]
             public class CantBeFoundSaga1 : SqlSaga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -91,7 +90,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(CantBeFoundSaga1Data.MessageId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -103,7 +104,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(CantBeFoundSaga2Data.MessageId))]
             public class CantBeFoundSaga2 : SqlSaga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -117,7 +117,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<CantBeFoundSaga2Data> mapper)
+                protected override string CorrelationPropertyName => nameof(CantBeFoundSaga2Data.MessageId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -178,7 +180,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.MessageId))]
             public class Saga1 : SqlSaga<Saga1.SagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -192,7 +193,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.MessageId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);
@@ -204,7 +207,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.MessageId))]
             public class Saga2 : SqlSaga<Saga2.SagaData>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
             {
                 public Context Context { get; set; }
@@ -222,7 +224,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.MessageId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.Id);
                     mapper.MapMessage<MessageToSaga>(m => m.Id);

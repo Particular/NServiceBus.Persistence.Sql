@@ -36,8 +36,7 @@
             {
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
-
-            [SqlSaga(CorrelationProperty = nameof(RequestingSagaData.CorrIdForResponse))]
+            
             public class RequestingSaga : SqlSaga<RequestingSaga.RequestingSagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<AnotherRequest>
@@ -58,7 +57,9 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<RequestingSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(RequestingSagaData.CorrIdForResponse);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<InitiateRequestingSaga>(m => m.SomeCorrelationId);
                     mapper.MapMessage<AnotherRequest>(m => m.SomeCorrelationId);

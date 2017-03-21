@@ -57,8 +57,7 @@
                     b.OnEndpointSubscribed<Context>((s, context) => { context.IsEventSubscriptionReceived = true; });
                 });
             }
-
-            [SqlSaga(CorrelationProperty = nameof(EventFromOtherSaga1Data.DataId))]
+            
             public class EventFromOtherSaga1 : SqlSaga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<EventFromOtherSaga1.Timeout1>
@@ -83,7 +82,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(EventFromOtherSaga1Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.DataId);
                 }
@@ -110,8 +111,7 @@
                 },
                 metadata => metadata.RegisterPublisherFor<SomethingHappenedEvent>(typeof(SagaThatPublishesAnEvent)));
             }
-
-            [SqlSaga(CorrelationProperty = nameof(EventFromOtherSaga2Data.DataId))]
+            
             public class EventFromOtherSaga2 : SqlSaga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
                 IAmStartedByMessages<SomethingHappenedEvent>,
                 IHandleTimeouts<EventFromOtherSaga2.Saga2Timeout>
@@ -132,7 +132,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<EventFromOtherSaga2Data> mapper)
+                protected override string CorrelationPropertyName => nameof(EventFromOtherSaga2Data.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<SomethingHappenedEvent>(m => m.DataId);
                 }

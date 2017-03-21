@@ -62,7 +62,7 @@ public abstract class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName,schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName, schema: schema);
         }
         var id = Guid.NewGuid();
@@ -86,7 +86,6 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga(CorrelationProperty = "SimplePropertyಠ_ಠ")]
     public class SagaWithWeirdCharactersಠ_ಠ : SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -94,8 +93,10 @@ public abstract class SagaPersisterTests
             public string SimplePropertyಠ_ಠ { get; set; }
             public string Contentಠ_ಠ { get; set; }
         }
-        
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+
+        protected override string CorrelationPropertyName => nameof(SagaData.SimplePropertyಠ_ಠ);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
@@ -342,7 +343,6 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-        CorrelationProperty= nameof(SagaData.CorrelationProperty),
         TransitionalCorrelationProperty = nameof(SagaData.TransitionalCorrelationProperty)
     )]
     public class SagaWithCorrelationAndTransitional : SqlSaga<SagaWithCorrelationAndTransitional.SagaData>
@@ -354,14 +354,13 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
 
-    [SqlSaga(
-        CorrelationProperty=  nameof(SagaData.CorrelationProperty)
-    )]
     public class SagaWithCorrelation : SqlSaga<SagaWithCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -370,7 +369,9 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
@@ -466,9 +467,7 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithStringCorrelation))).Data;
         }
     }
-    [SqlSaga(
-        CorrelationProperty = nameof(SagaData.CorrelationProperty)
-    )]
+
     public class SagaWithStringCorrelation : SqlSaga<SagaWithStringCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -476,7 +475,9 @@ public abstract class SagaPersisterTests
             public string CorrelationProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
@@ -522,9 +523,7 @@ public abstract class SagaPersisterTests
             return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
         }
     }
-    [SqlSaga(
-        CorrelationProperty = nameof(SagaData.CorrelationProperty)
-    )]
+
     public class SagaWithNonStringCorrelation : SqlSaga<SagaWithNonStringCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -532,7 +531,9 @@ public abstract class SagaPersisterTests
             public int CorrelationProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
@@ -627,7 +628,6 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga]
     public class SagaWithNoCorrelation : SqlSaga<SagaWithNoCorrelation.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -635,7 +635,9 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName { get; }
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }

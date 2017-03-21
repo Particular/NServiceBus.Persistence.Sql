@@ -4,9 +4,6 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 
-[SqlSaga(
-     CorrelationProperty = nameof(SagaData.MySagaId)
- )]
 public class MySaga : SqlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>,
@@ -14,7 +11,9 @@ public class MySaga : SqlSaga<MySaga.SagaData>,
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
-    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+    protected override string CorrelationPropertyName => nameof(SagaData.MySagaId);
+
+    protected override void ConfigureMapping(IMessagePropertyMapper mapper)
     {
         mapper.MapMessage<StartSagaMessage>(_ => _.MySagaId);
         mapper.MapMessage<CompleteSagaMessage>(_ => _.MySagaId);

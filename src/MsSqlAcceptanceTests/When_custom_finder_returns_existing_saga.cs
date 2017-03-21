@@ -72,7 +72,6 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        [SqlSaga(CorrelationProperty = nameof(SagaData.Property))]
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
@@ -94,7 +93,9 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 return Task.FromResult(0);
             }
 
-            protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+            protected override string CorrelationPropertyName => nameof(SagaData.Property);
+
+            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
                 mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
             }
