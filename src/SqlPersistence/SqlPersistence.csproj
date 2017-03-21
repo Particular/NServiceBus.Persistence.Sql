@@ -76,6 +76,8 @@
     <Compile Include="Config\ReadOnlySettingsExtensions.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Schema.cs" />
     <Compile Include="Config\SqlVariant.cs" />
+    <Compile Include="Outbox\AsyncTimer.cs" />
+    <Compile Include="Outbox\IAsyncTimer.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
     <Compile Include="Saga\ParameterAppender.cs" />
