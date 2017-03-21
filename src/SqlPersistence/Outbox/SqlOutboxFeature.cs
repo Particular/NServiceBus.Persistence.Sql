@@ -1,4 +1,5 @@
-﻿using NServiceBus;
+﻿using System;
+using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
 
@@ -18,5 +19,6 @@ class SqlOutboxFeature : Feature
         var endpointName = settings.GetTablePrefix();
         var outboxPersister = new OutboxPersister(sqlVariant, connectionBuilder, endpointName);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
+        context.RegisterStartupTask(b => new OutboxCleaner(outboxPersister, b.Build<CriticalError>(), TimeSpan.FromDays(7), TimeSpan.FromMinutes(1)));
     }
 }

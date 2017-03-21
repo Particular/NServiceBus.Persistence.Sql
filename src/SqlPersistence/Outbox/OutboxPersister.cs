@@ -110,13 +110,10 @@ class OutboxPersister : IOutboxStorage
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        using (new TransactionScope(TransactionScopeOption.Suppress))
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = outboxCommands.Cleanup;
-            command.Transaction = transaction;
             command.AddParameter("Date", dateTime);
             await command.ExecuteNonQueryEx(cancellationToken);
         }

@@ -3,41 +3,73 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Logging;
 
 class OutboxCleaner : FeatureStartupTask
 {
-    OutboxPersister outboxPersister;
-
-    public OutboxCleaner(OutboxPersister outboxPersister, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup)
+    public OutboxCleaner(OutboxPersister outboxPersister, CriticalError criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup)
     {
-        cancellationTokenSource = new CancellationTokenSource();
         this.timeToKeepDeduplicationData = timeToKeepDeduplicationData;
         this.frequencyToRunCleanup = frequencyToRunCleanup;
         this.outboxPersister = outboxPersister;
+        this.criticalError = criticalError;
     }
 
-    protected override async Task OnStart(IMessageSession session)
+    protected override Task OnStart(IMessageSession session)
     {
-        await Task.Delay(TimeSpan.FromMinutes(1));
-        while (true)
+        tokenSource = new CancellationTokenSource();
+        var token = tokenSource.Token;
+
+        task = Task.Run(async () =>
         {
-            await Task.Delay(frequencyToRunCleanup, cancellationTokenSource.Token);
-            if (cancellationTokenSource.IsCancellationRequested)
+            var cleanupFailures = 0;
+            while (!token.IsCancellationRequested)
             {
-                break;
+                try
+                {
+                    var dateTime = DateTime.UtcNow - timeToKeepDeduplicationData;
+                    await Task.Delay(frequencyToRunCleanup, token);
+                    await outboxPersister.RemoveEntriesOlderThan(dateTime, token);
+                    cleanupFailures = 0;
+                }
+                catch (OperationCanceledException)
+                {
+                    // noop
+                }
+                catch (Exception exception)
+                {
+                    log.Error("Error cleaning outbox data", exception);
+                    cleanupFailures++;
+                    if (cleanupFailures >= 10)
+                    {
+                        criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
+                        cleanupFailures = 0;
+                    }
+                }
             }
-            var dateTime = DateTime.UtcNow - timeToKeepDeduplicationData;
-            await outboxPersister.RemoveEntriesOlderThan(dateTime, cancellationTokenSource.Token);
-        }
+        }, CancellationToken.None);
+        return Task.FromResult(0);
     }
 
     protected override Task OnStop(IMessageSession session)
     {
-        cancellationTokenSource.Cancel();
-        return Task.FromResult(true);
+        if (tokenSource == null)
+        {
+            return Task.FromResult(0);
+        }
+
+        tokenSource.Cancel();
+        tokenSource.Dispose();
+
+        return task ?? Task.FromResult(0);
     }
 
+    OutboxPersister outboxPersister;
+    CriticalError criticalError;
     TimeSpan timeToKeepDeduplicationData;
     TimeSpan frequencyToRunCleanup;
-    CancellationTokenSource cancellationTokenSource;
+    Task task;
+    CancellationTokenSource tokenSource;
+
+    static ILog log = LogManager.GetLogger<OutboxCleaner>();
 }
