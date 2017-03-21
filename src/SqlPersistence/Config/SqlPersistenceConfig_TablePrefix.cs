@@ -7,6 +7,9 @@ namespace NServiceBus
 
     public static partial class SqlPersistenceConfig
     {
+        /// <summary>
+        /// Configures the table prefix to be prepended to all Saga, Timeout, Subscription and Outbox tables.
+        /// </summary>
         public static void TablePrefix(this PersistenceExtensions<SqlPersistence> configuration, string tablePrefix)
         {
             Guard.AgainstNull(nameof(configuration), configuration);

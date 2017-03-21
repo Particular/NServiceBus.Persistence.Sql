@@ -1,4 +1,5 @@
-﻿namespace NServiceBus.Persistence.Sql
+﻿#pragma warning disable 1591
+namespace NServiceBus.Persistence.Sql
 {
     using System;
 

@@ -2,6 +2,9 @@
 
 namespace NServiceBus.Persistence.Sql
 {
+    /// <summary>
+    /// Configuration options for Subscription persistence.
+    /// </summary>
     public partial class SubscriptionSettings
     {
 

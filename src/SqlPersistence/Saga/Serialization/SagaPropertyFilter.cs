@@ -3,7 +3,8 @@ using System.Linq;
 using Newtonsoft.Json.Serialization;
 using NServiceBus;
 
-public static class SagaPropertyFilter
+//TODO:
+static class SagaPropertyFilter
 {
     public static List<JsonProperty> FilterProperties(IList<JsonProperty> properties)
     {

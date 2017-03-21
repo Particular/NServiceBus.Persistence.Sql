@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System;
+#pragma warning disable 1591
 
 namespace NServiceBus.Persistence.Sql
 {

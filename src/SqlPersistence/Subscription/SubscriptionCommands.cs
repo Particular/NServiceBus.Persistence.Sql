@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NServiceBus.Unicast.Subscriptions;
+#pragma warning disable 1591
 
 namespace NServiceBus.Persistence.Sql
 {

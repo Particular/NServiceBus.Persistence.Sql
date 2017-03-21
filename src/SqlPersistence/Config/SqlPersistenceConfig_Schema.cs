@@ -5,9 +5,13 @@ using NServiceBus.Settings;
 namespace NServiceBus
 {
 
+    //TODO: throw for schema in mysql
     public static partial class SqlPersistenceConfig
     {
 
+        /// <summary>
+        /// Configures the database schema to be used.
+        /// </summary>
         public static void Schema(this PersistenceExtensions<SqlPersistence> configuration, string schema)
         {
             Guard.AgainstNull(nameof(configuration), configuration);

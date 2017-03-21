@@ -88,6 +88,10 @@
         public string Subscribe { get; }
         public string Unsubscribe { get; }
     }
+    public class SubscriptionSettings
+    {
+        public void CacheFor(System.TimeSpan timeSpan) { }
+    }
     [System.ObsoleteAttribute("Not for public use")]
     public class static TimeoutCommandBuilder
     {
@@ -114,6 +118,7 @@ namespace NServiceBus
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
+        public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
     }
     public class static SqlPersistenceStorageSessionExtensions
@@ -124,7 +129,3 @@ namespace NServiceBus
     }
 }
 public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);
-public class static SagaPropertyFilter
-{
-    public static System.Collections.Generic.List<Newtonsoft.Json.Serialization.JsonProperty> FilterProperties(System.Collections.Generic.IList<Newtonsoft.Json.Serialization.JsonProperty> properties) { }
-}

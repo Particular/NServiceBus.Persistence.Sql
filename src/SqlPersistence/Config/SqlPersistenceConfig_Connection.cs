@@ -8,7 +8,9 @@ namespace NServiceBus
 {
     public static partial class SqlPersistenceConfig
     {
-
+        /// <summary>
+        /// Configures how <see cref="DbConnection"/>s are constructed.
+        /// </summary>
         public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
         {
             Guard.AgainstNull(nameof(configuration), configuration);

@@ -5,6 +5,9 @@ namespace NServiceBus.Persistence.Sql
 {
     using System.Linq.Expressions;
 
+    /// <summary>
+    /// Base class for all sagas being stored by the SQL Persistence. Replaces <see cref="Saga{TSagaData}"/>.
+    /// </summary>
     public abstract class SqlSaga<TSagaData> : Saga
         where TSagaData :
         IContainSagaData,
@@ -50,6 +53,9 @@ namespace NServiceBus.Persistence.Sql
             }
         }
 
+        /// <summary>
+        /// <see cref="Saga.ConfigureHowToFindSaga"/>. Do not override this method.
+        /// </summary>
         protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
             VerifyNoConfigureHowToFindSaga();
@@ -58,8 +64,10 @@ namespace NServiceBus.Persistence.Sql
             ConfigureMapping(propertyMapper);
         }
 
+        /// <summary>
+        /// Allows messages to be mapped to <see cref="CorrelationPropertyName"/>.
+        /// </summary>
         protected abstract void ConfigureMapping(IMessagePropertyMapper mapper);
-
 
         internal Expression<Func<TSagaData, object>> GetExpression()
         {

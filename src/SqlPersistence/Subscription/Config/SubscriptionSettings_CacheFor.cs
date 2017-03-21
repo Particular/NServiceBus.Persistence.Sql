@@ -7,6 +7,9 @@ namespace NServiceBus.Persistence.Sql
     public partial class SubscriptionSettings
     {
 
+        /// <summary>
+        /// Cache subscriptions for a given <see cref="TimeSpan"/>.
+        /// </summary>
         public void CacheFor(TimeSpan timeSpan)
         {
             Guard.AgainstNegativeAndZero(nameof(timeSpan), timeSpan);

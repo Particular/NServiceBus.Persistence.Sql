@@ -26,7 +26,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>bin\Debug\NServiceBus.Persistence.Sql.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>CS0419</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +38,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>bin\Release\NServiceBus.Persistence.Sql.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>CS0419</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ConfigureAwait, Version=1.0.0.0, Culture=neutral, PublicKeyToken=233850a516558a98, processorArchitecture=MSIL">
@@ -75,6 +75,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Config\ReadOnlySettingsExtensions.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Schema.cs" />
+    <Compile Include="Config\SqlPersistenceConfig.cs" />
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\AsyncTimer.cs" />
     <Compile Include="Outbox\IAsyncTimer.cs" />
