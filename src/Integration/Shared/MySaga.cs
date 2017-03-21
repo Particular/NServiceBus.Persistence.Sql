@@ -5,7 +5,7 @@ using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 
 [SqlSaga(
-     correlationProperty: nameof(SagaData.MySagaId)
+     CorrelationProperty = nameof(SagaData.MySagaId)
  )]
 public class MySaga : SqlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
