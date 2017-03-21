@@ -95,7 +95,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
         cacheItem = new CacheItem
         {
-            Stored = DateTimeOffset.UtcNow,
+            Stored = DateTime.UtcNow,
             Subscribers = baseSubscribers.ToList()
         };
 
@@ -106,7 +106,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
     class CacheItem
     {
-        public DateTimeOffset Stored;
+        public DateTime Stored;
         public List<Subscriber> Subscribers;
     }
 
