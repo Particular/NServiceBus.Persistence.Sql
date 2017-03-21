@@ -41,7 +41,6 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(CorrelationProperty = nameof(BaseClassIsMappedSagaData.SomeId))]
             public class BaseClassIsMappedSaga : SqlSaga<BaseClassIsMappedSaga.BaseClassIsMappedSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<SecondSagaMessage>
@@ -63,7 +62,9 @@
                     return context.SendLocal(sagaMessage);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<BaseClassIsMappedSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(BaseClassIsMappedSagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<SagaMessageBase>(m => m.SomeId);
                 }

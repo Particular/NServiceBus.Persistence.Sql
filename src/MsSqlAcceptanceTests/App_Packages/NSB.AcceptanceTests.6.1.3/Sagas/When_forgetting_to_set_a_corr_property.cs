@@ -38,7 +38,6 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(CorrelationProperty = nameof(NullCorrPropertySagaData.SomeId))]
             public class NullCorrPropertySaga : SqlSaga<NullCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
                 public Context Context { get; set; }
@@ -60,7 +59,9 @@
                     });
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<NullCorrPropertySagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(NullCorrPropertySagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }

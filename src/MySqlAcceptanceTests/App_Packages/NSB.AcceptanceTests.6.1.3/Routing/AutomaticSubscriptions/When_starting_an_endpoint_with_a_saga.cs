@@ -63,7 +63,6 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 Context testContext;
             }
 
-            [SqlSaga(CorrelationProperty = nameof(AutoSubscriptionSagaData.SomeId))]
             public class AutoSubscriptionSaga : SqlSaga<AutoSubscriptionSaga.AutoSubscriptionSagaData>, IAmStartedByMessages<MyEvent>
             {
                 public Task Handle(MyEvent message, IMessageHandlerContext context)
@@ -71,7 +70,9 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<AutoSubscriptionSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(AutoSubscriptionSagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<MyEvent>(msg => msg.SomeId);
                 }
@@ -82,7 +83,6 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.SomeId))]
             public class SagaThatReactsToSuperEvent : SqlSaga<SagaThatReactsToSuperEvent.SagaData>,
                 IAmStartedByMessages<MyEventBase>
             {
@@ -91,7 +91,9 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<MyEventBase>(msg => msg.SomeId);
                 }

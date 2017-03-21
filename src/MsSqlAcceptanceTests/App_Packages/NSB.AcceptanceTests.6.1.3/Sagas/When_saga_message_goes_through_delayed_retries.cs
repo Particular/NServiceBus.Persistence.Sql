@@ -48,7 +48,6 @@
                 });
             }
 
-            [SqlSaga(CorrelationProperty = nameof(DelayedRetryTestingSagaData.SomeId))]
             public class DelayedRetryTestingSaga : SqlSaga<DelayedRetryTestingSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>
@@ -79,7 +78,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<DelayedRetryTestingSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(DelayedRetryTestingSagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                     mapper.MapMessage<SecondSagaMessage>(m => m.SomeId);

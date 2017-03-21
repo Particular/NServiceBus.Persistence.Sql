@@ -61,7 +61,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(PlaceOrderSagaData.DataId))]
             public class PlaceOrderSaga : SqlSaga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
@@ -70,7 +69,9 @@
                     return context.SendLocal(new SignalDone());
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<PlaceOrderSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(PlaceOrderSagaData.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<PlaceOrder>(m => m.DataId);
                 }

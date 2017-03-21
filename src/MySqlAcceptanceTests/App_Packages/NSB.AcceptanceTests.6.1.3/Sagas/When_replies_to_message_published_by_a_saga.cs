@@ -72,7 +72,6 @@
                 });
             }
 
-            [SqlSaga(CorrelationProperty = nameof(ReplyToPubMsgSagaData.DataId))]
             public class ReplyToPubMsgSaga : SqlSaga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
                 public Context Context { get; set; }
@@ -93,7 +92,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<ReplyToPubMsgSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(ReplyToPubMsgSagaData.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.DataId);
                 }

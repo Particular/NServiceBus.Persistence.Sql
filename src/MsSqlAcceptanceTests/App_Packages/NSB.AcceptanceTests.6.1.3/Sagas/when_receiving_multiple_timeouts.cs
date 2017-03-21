@@ -48,7 +48,6 @@
                 });
             }
 
-            [SqlSaga(CorrelationProperty = nameof(MultiTimeoutsSaga1Data.ContextId))]
             public class MultiTimeoutsSaga1 : SqlSaga<MultiTimeoutsSaga1.MultiTimeoutsSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>,
@@ -103,7 +102,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MultiTimeoutsSaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(MultiTimeoutsSaga1Data.ContextId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga1>(m => m.ContextId);
                 }

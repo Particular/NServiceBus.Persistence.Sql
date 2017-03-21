@@ -180,9 +180,6 @@ public class SagaConsistencyTests
         public Guid SagaId { get; set; }
     }
 
-    [SqlSaga(
-         CorrelationProperty = nameof(SagaData.CorrelationId)
-     )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleMessages<FailingMessage>,
@@ -196,7 +193,9 @@ public class SagaConsistencyTests
             public bool PersistedFailingMessageResult { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
             mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
             mapper.MapMessage<FailingMessage>(m => m.SagaId);

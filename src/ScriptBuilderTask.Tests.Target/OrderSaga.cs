@@ -4,16 +4,15 @@ using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 
-[SqlSaga(
-    CorrelationProperty= nameof(SagaData.OrderId)
-)]
 public class OrderSaga :
     SqlSaga<OrderSaga.SagaData>,
     IAmStartedByMessages<StartOrder>
 {
     static ILog log = LogManager.GetLogger<OrderSaga>();
 
-    protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+    protected override string CorrelationPropertyName => nameof(SagaData.OrderId);
+
+    protected override void ConfigureMapping(IMessagePropertyMapper mapper)
     {
     }
 

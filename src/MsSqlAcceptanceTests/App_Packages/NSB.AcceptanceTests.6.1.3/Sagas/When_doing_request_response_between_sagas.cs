@@ -23,7 +23,6 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.CorrIdForResponse))]
             public class RequestingSaga : SqlSaga<RequestingSaga.SagaData>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
@@ -47,7 +46,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.CorrIdForResponse);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<InitiateRequestingSaga>(m => m.Id);
                     mapper.MapMessage<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
@@ -59,7 +60,6 @@
                 }
             }
 
-            [SqlSaga(CorrelationProperty = nameof(SagaData.CorrIdForRequest))]
             public class RespondingSaga : SqlSaga<RespondingSaga.SagaData>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
                 IHandleTimeouts<RespondingSaga.DelayReply>,
@@ -98,7 +98,9 @@
                     return SendReply(context);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaData.CorrIdForRequest);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                     //this line is just needed so we can test the non initiating handler case

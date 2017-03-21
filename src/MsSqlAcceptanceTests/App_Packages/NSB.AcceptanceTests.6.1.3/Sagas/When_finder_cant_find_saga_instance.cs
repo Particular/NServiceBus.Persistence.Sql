@@ -60,7 +60,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<SagaData06> mapper)
+                protected override string CorrelationPropertyName { get; }
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     // not required because of CustomFinder
                 }

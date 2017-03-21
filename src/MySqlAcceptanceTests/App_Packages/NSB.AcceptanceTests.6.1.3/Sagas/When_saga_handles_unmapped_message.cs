@@ -50,7 +50,6 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            [SqlSaga(CorrelationProperty = nameof(UnmappedMsgSagaData.SomeId))]
             public class UnmappedMsgSaga : SqlSaga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<MappedEchoMessage>,
@@ -76,7 +75,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<UnmappedMsgSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(UnmappedMsgSagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(msg => msg.SomeId);
                     mapper.MapMessage<MappedEchoMessage>(msg => msg.SomeId);

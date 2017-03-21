@@ -36,8 +36,7 @@
             {
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
-
-            [SqlSaga(CorrelationProperty = nameof(MySagaData.DataId))]
+            
             public class MySaga : SqlSaga<MySaga.MySagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<MySaga.TimeHasPassed>
@@ -58,7 +57,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<MySagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(MySagaData.DataId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga>(m => m.DataId);
                 }

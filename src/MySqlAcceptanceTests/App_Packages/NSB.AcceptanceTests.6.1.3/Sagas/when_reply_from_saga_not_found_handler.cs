@@ -57,7 +57,6 @@
                 EndpointSetup<DefaultServer>(c => c.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(CorrelationProperty = nameof(NotFoundHandlerSaga1Data.ContextId))]
             public class NotFoundHandlerSaga1 : SqlSaga<NotFoundHandlerSaga1.NotFoundHandlerSaga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga1 message, IMessageHandlerContext context)
@@ -71,7 +70,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<NotFoundHandlerSaga1Data> mapper)
+                protected override string CorrelationPropertyName => nameof(NotFoundHandlerSaga1Data.ContextId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSaga1>(m => m.ContextId);
                     mapper.MapMessage<MessageToSaga>(m => m.ContextId);

@@ -78,6 +78,7 @@
     <Compile Include="Config\SqlVariant.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\IMessagePropertyMapper.cs" />
     <Compile Include="Saga\ParameterAppender.cs" />
     <Compile Include="Saga\SagaPersister_Save.cs" />
     <Compile Include="Saga\SagaPersister_Update.cs" />
@@ -108,7 +109,7 @@
     <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\Config\SagaSettings.cs" />
     <Compile Include="Saga\Serialization\SagaPropertyFilter.cs" />
-    <Compile Include="Saga\SqlSagaAttributeData.cs" />
+    <Compile Include="Saga\SqlSagaTypeData.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SqlPersistenceSettingsAttribute.cs" />
@@ -122,7 +123,7 @@
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
-    <Compile Include="Saga\SqlSagaAttributeReader.cs" />
+    <Compile Include="Saga\SqlSagaTypeDataReader.cs" />
     <Compile Include="Saga\SqlSaga.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />

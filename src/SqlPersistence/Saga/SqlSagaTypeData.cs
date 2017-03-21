@@ -1,4 +1,4 @@
-﻿class SqlSagaAttributeData
+﻿class SqlSagaTypeData
 {
     public string TableSuffix;
     public string CorrelationProperty;

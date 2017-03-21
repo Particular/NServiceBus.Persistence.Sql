@@ -23,7 +23,6 @@
                 EndpointSetup<DefaultServer>(b => b.ExecuteTheseHandlersFirst(typeof(InterceptingHandler)));
             }
 
-            [SqlSaga(CorrelationProperty = nameof(TestSagaData03.SomeId))]
             public class TestSaga03 : SqlSaga<TestSaga03.TestSagaData03>, IAmStartedByMessages<StartSagaMessage>
             {
                 public SagaEndpointContext Context { get; set; }
@@ -35,7 +34,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<TestSagaData03> mapper)
+                protected override string CorrelationPropertyName => nameof(TestSagaData03.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }

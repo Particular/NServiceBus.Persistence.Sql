@@ -4,14 +4,14 @@ using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 [TestFixture]
-    public class MessagePropertyMapperTests
-    {
+public class MessagePropertyMapperTests
+{
 
 
-        [Test]
+    [Test]
     public void StringCorrelationId()
     {
-        var expression = MessagePropertyMapper<SagaWithStringCorrelationId.SagaData>.GetExpression(typeof(SagaWithStringCorrelationId));
+        var expression = new SagaWithStringCorrelationId().GetExpression();
         var instance = new SagaWithStringCorrelationId.SagaData
         {
             CorrelationProperty = "Foo"
@@ -20,20 +20,25 @@ using NUnit.Framework;
         Assert.AreEqual("Foo", property);
     }
 
-    [SqlSaga( CorrelationProperty = "CorrelationProperty")]
-    public class SagaWithStringCorrelationId
+    public class SagaWithStringCorrelationId : SqlSaga<SagaWithStringCorrelationId.SagaData>
     {
 
         public class SagaData : ContainSagaData
         {
             public string CorrelationProperty { get; set; }
         }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
     }
 
     [Test]
     public void IntCorrelationId()
     {
-        var expression = MessagePropertyMapper<SagaWithIntCorrelationId.SagaData>.GetExpression(typeof(SagaWithIntCorrelationId));
+        var expression = new SagaWithIntCorrelationId().GetExpression();
         var instance = new SagaWithIntCorrelationId.SagaData
         {
             CorrelationProperty = 10
@@ -42,19 +47,24 @@ using NUnit.Framework;
         Assert.AreEqual(10, property);
     }
 
-    [SqlSaga(CorrelationProperty = "CorrelationProperty")]
-    public class SagaWithIntCorrelationId
+    public class SagaWithIntCorrelationId : SqlSaga<SagaWithIntCorrelationId.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public int CorrelationProperty { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
         }
     }
 
     [Test]
     public void GuidCorrelationId()
     {
-        var expression = MessagePropertyMapper<SagaWithGuidCorrelationId.SagaData>.GetExpression(typeof(SagaWithGuidCorrelationId));
+        var expression = new SagaWithGuidCorrelationId().GetExpression();
         var guid = Guid.NewGuid();
         var instance = new SagaWithGuidCorrelationId.SagaData
         {
@@ -64,12 +74,17 @@ using NUnit.Framework;
         Assert.AreEqual(guid, property);
     }
 
-    [SqlSaga(CorrelationProperty = "CorrelationProperty")]
-    public class SagaWithGuidCorrelationId
+    public class SagaWithGuidCorrelationId : SqlSaga<SagaWithGuidCorrelationId.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public Guid CorrelationProperty { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
         }
     }
 

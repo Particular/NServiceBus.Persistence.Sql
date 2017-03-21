@@ -87,9 +87,6 @@ public class SqlTransportIntegrationTests : IDisposable
     {
     }
 
-    [SqlSaga(
-        CorrelationProperty= nameof(SagaData.StartId)
-    )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
@@ -111,7 +108,9 @@ public class SqlTransportIntegrationTests : IDisposable
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.StartId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
             mapper.MapMessage<StartSagaMessage>(m => m.StartId);
         }

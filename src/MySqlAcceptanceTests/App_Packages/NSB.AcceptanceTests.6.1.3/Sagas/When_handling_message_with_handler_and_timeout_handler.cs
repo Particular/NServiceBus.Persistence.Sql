@@ -38,7 +38,6 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            [SqlSaga(CorrelationProperty = nameof(HandlerAndTimeoutSagaData.SomeId))]
             public class HandlerAndTimeoutSaga : SqlSaga<HandlerAndTimeoutSagaData>, IAmStartedByMessages<StartSagaMessage>,
                 IHandleTimeouts<StartSagaMessage>
             {
@@ -56,7 +55,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(MessagePropertyMapper<HandlerAndTimeoutSagaData> mapper)
+                protected override string CorrelationPropertyName => nameof(HandlerAndTimeoutSagaData.SomeId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
                 }

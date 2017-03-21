@@ -53,7 +53,7 @@ class RuntimeSagaInfo
         this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga(sagaType);
-        var sqlSagaAttributeData = SqlSagaAttributeReader.GetSqlSagaAttributeData(sagaType);
+        var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
 
         switch (sqlVariant)

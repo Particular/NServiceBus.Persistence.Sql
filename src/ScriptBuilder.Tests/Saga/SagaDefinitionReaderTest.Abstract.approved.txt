@@ -1,1 +1,1 @@
-﻿The type 'SagaDefinitionReaderTest/AbstractSaga' has a [SqlSagaAttribute] but has is abstract.
+﻿The type 'SagaDefinitionReaderTest/AbstractSaga' is abstract.
