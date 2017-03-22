@@ -166,23 +166,23 @@ insert into {tableName}
 )
 values
 (
-    :1,
-    :2,
-    :3,
-    :4,
-    :5,
-    :6,
-    :7
+    :Id,
+    :Destination,
+    :SagaId,
+    :State,
+    :Time,
+    :Headers,
+    :PersistenceVersion
 )";
 
             var removeByIdCommandText = $@"
 delete from {tableName}
-where Id = :1";
+where Id = :Id";
 
 
             var removeBySagaIdCommandText = $@"
 delete from {tableName}
-where SagaId = :1";
+where SagaId = :SagaId";
 
             var selectByIdCommandText = $@"
 select
@@ -192,19 +192,19 @@ select
     ExpireTime,
     Headers
 from {tableName}
-where Id = :1";
+where Id = :Id";
 
             var rangeComandText = $@"
 select Id, ExpireTime
 from {tableName}
-where ExpireTime between :1 and :2";
+where ExpireTime between :StartTime and :EndTime";
 
             var nextCommandText = $@"
 select ExpireTime
 from
 (
     select ExpireTime from {tableName}
-    where ExpireTime > :1
+    where ExpireTime > :EndTime
     order by ExpireTime
 ) subquery
 where rownum <= 1";
