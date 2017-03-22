@@ -109,7 +109,7 @@ public class MsmqTransportIntegrationTests : IDisposable
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(message => message.StartId);
+            mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId);
         }
 
     }

@@ -74,7 +74,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<MyEvent>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<MyEvent>(msg => msg.SomeId);
                 }
 
                 public class SagaData : ContainSagaData
@@ -95,7 +95,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<MyEventBase>(saga => saga.SomeId);
+                    mapper.ConfigureMapping<MyEventBase>(saga => saga.SomeId);
                 }
 
                 public class SagaData : ContainSagaData

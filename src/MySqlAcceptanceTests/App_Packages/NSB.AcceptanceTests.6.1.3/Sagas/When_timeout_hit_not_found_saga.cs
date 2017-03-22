@@ -87,8 +87,8 @@
                 protected override string CorrelationPropertyName => nameof(TimeoutHitsNotFoundSagaData.DataId);
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.DataId);
-                    mapper.MapMessage<SomeOtherMessage>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<SomeOtherMessage>(m => m.DataId);
                 }
 
                 public class TimeoutHitsNotFoundSagaData : ContainSagaData

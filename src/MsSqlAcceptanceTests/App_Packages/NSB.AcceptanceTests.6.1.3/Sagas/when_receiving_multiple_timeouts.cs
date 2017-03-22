@@ -106,7 +106,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga1>(m => m.ContextId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.ContextId);
                 }
 
                 public class MultiTimeoutsSaga1Data : ContainSagaData

@@ -73,7 +73,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<PlaceOrder>(m => m.DataId);
+                    mapper.ConfigureMapping<PlaceOrder>(m => m.DataId);
                 }
 
                 public class PlaceOrderSagaData : ContainSagaData

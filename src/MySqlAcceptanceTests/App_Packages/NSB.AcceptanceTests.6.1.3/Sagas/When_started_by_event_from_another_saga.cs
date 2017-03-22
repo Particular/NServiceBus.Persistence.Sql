@@ -86,7 +86,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga1Data : ContainSagaData
@@ -136,7 +136,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<SomethingHappenedEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<SomethingHappenedEvent>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga2Data : ContainSagaData

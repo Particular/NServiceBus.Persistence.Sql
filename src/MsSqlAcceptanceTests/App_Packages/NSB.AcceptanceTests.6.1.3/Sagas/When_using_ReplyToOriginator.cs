@@ -61,8 +61,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<InitiateRequestingSaga>(m => m.SomeCorrelationId);
-                    mapper.MapMessage<AnotherRequest>(m => m.SomeCorrelationId);
+                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.SomeCorrelationId);
+                    mapper.ConfigureMapping<AnotherRequest>(m => m.SomeCorrelationId);
                 }
 
                 public class RequestingSagaData : ContainSagaData

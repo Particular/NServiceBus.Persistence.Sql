@@ -112,7 +112,7 @@ public class SqlTransportIntegrationTests : IDisposable
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(m => m.StartId);
+            mapper.ConfigureMapping<StartSagaMessage>(m => m.StartId);
         }
 
     }

@@ -81,7 +81,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
+                    mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
                     // Mapping not required for SomeOtherMessage because CustomFinder used
                 }
 

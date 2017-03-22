@@ -94,8 +94,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.Id);
-                    mapper.MapMessage<MessageToSaga>(m => m.Id);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class CantBeFoundSaga1Data : ContainSagaData
@@ -121,8 +121,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.Id);
-                    mapper.MapMessage<MessageToSaga>(m => m.Id);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class CantBeFoundSaga2Data : ContainSagaData
@@ -197,8 +197,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.Id);
-                    mapper.MapMessage<MessageToSaga>(m => m.Id);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class SagaData : ContainSagaData
@@ -228,8 +228,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.Id);
-                    mapper.MapMessage<MessageToSaga>(m => m.Id);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class SagaData : ContainSagaData

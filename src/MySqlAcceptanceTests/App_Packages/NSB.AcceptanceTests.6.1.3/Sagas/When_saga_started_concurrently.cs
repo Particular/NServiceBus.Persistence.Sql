@@ -97,8 +97,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartMessageOne>(msg => msg.SomeId);
-                    mapper.MapMessage<StartMessageTwo>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<StartMessageOne>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<StartMessageTwo>(msg => msg.SomeId);
                 }
             }
 

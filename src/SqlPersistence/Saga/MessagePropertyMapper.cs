@@ -19,7 +19,7 @@ namespace NServiceBus.Persistence.Sql
             this.sagaType = sagaType;
         }
 
-        public void MapMessage<TMessage>(Expression<Func<TMessage, object>> messageProperty)
+        public void ConfigureMapping<TMessage>(Expression<Func<TMessage, object>> messageProperty)
         {
             if (sagaEntityProperty == null)
             {

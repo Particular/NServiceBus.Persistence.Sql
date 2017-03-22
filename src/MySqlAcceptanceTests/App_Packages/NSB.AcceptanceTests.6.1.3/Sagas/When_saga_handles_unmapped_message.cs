@@ -79,8 +79,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSagaMessage>(msg => msg.SomeId);
-                    mapper.MapMessage<MappedEchoMessage>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<MappedEchoMessage>(msg => msg.SomeId);
                     // No mapping for EchoMessage, so saga can't possibly be found
                 }
             }

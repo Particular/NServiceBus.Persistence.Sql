@@ -106,8 +106,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<OriginalMessage>(msg => msg.SomeId);
-                    mapper.MapMessage<NewMessage>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<OriginalMessage>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<NewMessage>(msg => msg.SomeId);
                 }
 
                 Context TestContext;

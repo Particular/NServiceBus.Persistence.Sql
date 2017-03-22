@@ -50,8 +50,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<InitiateRequestingSaga>(m => m.Id);
-                    mapper.MapMessage<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
+                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id);
+                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
                 public class SagaData : ContainSagaData
@@ -102,9 +102,9 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
+                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                     //this line is just needed so we can test the non initiating handler case
-                    mapper.MapMessage<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
+                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
                 }
 
                 Task SendReply(IMessageHandlerContext context)

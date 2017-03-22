@@ -83,7 +83,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<BaseEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId);
                 }
 
                 public class SagaStartedByBaseEventSagaData : ContainSagaData

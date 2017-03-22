@@ -15,8 +15,8 @@ public class MySaga : SqlSaga<MySaga.SagaData>,
 
     protected override void ConfigureMapping(IMessagePropertyMapper mapper)
     {
-        mapper.MapMessage<StartSagaMessage>(_ => _.MySagaId);
-        mapper.MapMessage<CompleteSagaMessage>(_ => _.MySagaId);
+        mapper.ConfigureMapping<StartSagaMessage>(_ => _.MySagaId);
+        mapper.ConfigureMapping<CompleteSagaMessage>(_ => _.MySagaId);
     }
 
     public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

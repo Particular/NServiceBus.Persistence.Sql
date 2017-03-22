@@ -66,7 +66,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<SagaMessageBase>(m => m.SomeId);
+                    mapper.ConfigureMapping<SagaMessageBase>(m => m.SomeId);
                 }
 
                 public class BaseClassIsMappedSagaData : ContainSagaData

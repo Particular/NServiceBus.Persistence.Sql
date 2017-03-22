@@ -62,7 +62,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga1>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.DataId);
                 }
 
                 public class SendFromTimeoutSaga1Data : ContainSagaData
@@ -86,7 +86,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga2>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId);
                 }
 
                 public class SendFromTimeoutSaga2Data : ContainSagaData

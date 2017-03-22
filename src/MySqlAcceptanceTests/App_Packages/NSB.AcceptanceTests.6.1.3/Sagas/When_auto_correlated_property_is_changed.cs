@@ -60,7 +60,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
                 }
 
                 public class CorrIdChangedSagaData : ContainSagaData

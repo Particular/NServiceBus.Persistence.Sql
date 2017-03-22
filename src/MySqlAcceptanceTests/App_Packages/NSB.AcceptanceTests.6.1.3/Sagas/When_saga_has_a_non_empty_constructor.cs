@@ -66,8 +66,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSagaMessage>(m => m.SomeId);
-                    mapper.MapMessage<OtherMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<OtherMessage>(m => m.SomeId);
                 }
             }
 

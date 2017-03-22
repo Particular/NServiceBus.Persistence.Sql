@@ -97,7 +97,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
-                mapper.MapMessage<StartSagaMessage>(saga => saga.Property);
+                mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
             }
 
             public class SagaData : ContainSagaData

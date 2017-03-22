@@ -197,9 +197,9 @@ public class SagaConsistencyTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
-            mapper.MapMessage<FailingMessage>(m => m.SagaId);
-            mapper.MapMessage<CheckMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<StartSagaMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<FailingMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<CheckMessage>(m => m.SagaId);
         }
 
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

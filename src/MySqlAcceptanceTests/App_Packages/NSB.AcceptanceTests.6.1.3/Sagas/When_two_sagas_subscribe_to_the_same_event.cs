@@ -107,8 +107,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
-                    mapper.MapMessage<CompleteSaga1Now>(m => m.DataId);
+                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<CompleteSaga1Now>(m => m.DataId);
                 }
 
                 public class MySaga1Data : ContainSagaData
@@ -144,8 +144,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga2>(m => m.DataId);
-                    mapper.MapMessage<GroupPendingEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId);
+                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId);
                 }
 
                 public class MySaga2Data : ContainSagaData

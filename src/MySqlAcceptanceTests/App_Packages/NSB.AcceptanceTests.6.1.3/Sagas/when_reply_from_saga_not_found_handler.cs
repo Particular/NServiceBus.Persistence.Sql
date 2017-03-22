@@ -74,8 +74,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga1>(m => m.ContextId);
-                    mapper.MapMessage<MessageToSaga>(m => m.ContextId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.ContextId);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.ContextId);
                 }
 
                 public class NotFoundHandlerSaga1Data : ContainSagaData

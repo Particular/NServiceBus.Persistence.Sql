@@ -61,8 +61,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<MessageSaga1WillHandle>(m => m.DataId);
-                    mapper.MapMessage<StartSaga1>(m => m.DataId);
+                    mapper.ConfigureMapping<MessageSaga1WillHandle>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.DataId);
                 }
             }
 
@@ -87,7 +87,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga2>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId);
                 }
 
                 public class TwoSaga1Saga2Data : ContainSagaData

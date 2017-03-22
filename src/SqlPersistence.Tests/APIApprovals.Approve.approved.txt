@@ -2,7 +2,7 @@
 {
     public interface IMessagePropertyMapper
     {
-        void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty);
+        void ConfigureMapping<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty);
     }
     public interface ISqlStorageSession
     {

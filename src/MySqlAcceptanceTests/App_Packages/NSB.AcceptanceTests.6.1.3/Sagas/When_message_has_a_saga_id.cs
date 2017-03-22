@@ -81,7 +81,7 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<MessageWithSagaId>(m => m.DataId);
+                    mapper.ConfigureMapping<MessageWithSagaId>(m => m.DataId);
                 }
 
                 public class MessageWithSagaIdSagaData : ContainSagaData

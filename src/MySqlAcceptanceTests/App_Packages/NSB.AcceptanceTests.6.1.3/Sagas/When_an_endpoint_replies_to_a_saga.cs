@@ -103,8 +103,8 @@
 
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.MapMessage<StartSaga>(m => m.RunId);
-                    mapper.MapMessage<DoSomethingResponse>(m => m.RunId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.RunId);
+                    mapper.ConfigureMapping<DoSomethingResponse>(m => m.RunId);
                 }
 
                 public class CorrelationTestSagaData : ContainSagaData
