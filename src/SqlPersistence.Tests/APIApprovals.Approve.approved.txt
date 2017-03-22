@@ -9,6 +9,21 @@
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
     }
+    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be removed in version 3.0.0.", true)]
+    public class static MessagePropertyMapper
+    {
+        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be removed in version" +
+            " 3.0.0.", true)]
+        public static void MapMessage<TMessage>(this NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper, System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
+    }
+    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be removed in version 3.0.0.", true)]
+    public class MessagePropertyMapper<SagaData>
+    {
+        public MessagePropertyMapper() { }
+        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be removed in version" +
+            " 3.0.0.", true)]
+        public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
+    }
     [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
     {
@@ -66,6 +81,8 @@
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
+        [System.ObsoleteAttribute(@"This constructor is obsolete.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty use the property SqlSagaAttribute.TransitionalCorrelationProperty\r\n * For tableSuffix use the property SqlSagaAttribute.TableSuffix. Will be removed in version 3.0.0.", true)]
+        public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
         public SqlSagaAttribute() { }
         public string TableSuffix { get; set; }
         public string TransitionalCorrelationProperty { get; set; }
