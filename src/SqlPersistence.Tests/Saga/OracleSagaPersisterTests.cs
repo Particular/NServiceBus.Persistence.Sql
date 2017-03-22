@@ -22,7 +22,7 @@ public class OracleSagaPersisterTests : SagaPersisterTests
 
     protected override bool IsConcurrencyException(Exception innerException)
     {
-        // TODO: Figure out what this value would be
-        return innerException.Message.Contains("????????");
+        // ORA-00001: unique constraint (TESTUSER.SAGAWITHCORRELATION_CP) violated
+        return innerException.Message.Contains("ORA-00001");
     }
 }

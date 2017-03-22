@@ -72,6 +72,11 @@ class RuntimeSagaInfo
                 break;
             case SqlVariant.Oracle:
                 TableName = tableSuffix.ToUpper();
+                // TODO: Can't deal with table name length this way
+                if (TableName.Length > 27)
+                {
+                    TableName = TableName.Substring(0, 27);
+                }
                 FillParameter = ParameterFiller.OracleFill;
                 break;
             default:

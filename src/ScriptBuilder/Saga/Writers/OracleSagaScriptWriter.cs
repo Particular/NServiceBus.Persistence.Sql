@@ -13,6 +13,11 @@ class OracleSagaScriptWriter : ISagaScriptWriter
         writer = textWriter;
         this.saga = saga;
         tableName = saga.Name.ToUpper();
+        // TODO: Can't deal with length issue this way
+        if (tableName.Length > 27)
+        {
+            tableName = tableName.Substring(0, 27);
+        }
     }
 
     public void Initialize()
@@ -89,7 +94,7 @@ end if;
 select count(*) into n from user_indexes where index_name = '{tableName}_{indexType}';
 if(n = 0)
 then
-  sqlStatement := 'create index {tableName}_{indexType} on {tableName} ({name} ASC)';
+  sqlStatement := 'create unique index {tableName}_{indexType} on {tableName} ({name} ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -159,8 +164,8 @@ end if;
         , DATA CLOB NOT NULL 
         , PERSISTENCEVERSION VARCHAR2(23) NOT NULL 
         , SAGATYPEVERSION VARCHAR2(23) NOT NULL 
-        , CONCURRENCY NUMBER(10) NOT NULL 
-        , CONSTRAINT SAGADATA_PK PRIMARY KEY 
+        , CONCURRENCY NUMBER(9) NOT NULL 
+        , CONSTRAINT {tableName}_PK PRIMARY KEY 
           (
             ID 
           )
