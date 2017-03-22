@@ -17,6 +17,11 @@ namespace NServiceBus.Persistence.Sql
             this.sqlVariant = sqlVariant;
         }
 
+        [Obsolete("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts for.", true)]
+        public SagaCommandBuilder()
+        {
+        }
+
         public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
         {
             var valuesBuilder = new StringBuilder();

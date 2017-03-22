@@ -25,4 +25,6 @@ public class OracleSagaPersisterTests : SagaPersisterTests
         // ORA-00001: unique constraint (TESTUSER.SAGAWITHCORRELATION_CP) violated
         return innerException.Message.Contains("ORA-00001");
     }
+
+    protected override bool SupportsUnicodeIdentifiers { get; } = false;
 }

@@ -28,6 +28,9 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class SagaCommandBuilder
     {
+        public SagaCommandBuilder(NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
+        [System.ObsoleteAttribute("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts fo" +
+            "r.", true)]
         public SagaCommandBuilder() { }
         public string BuildCompleteCommand(string tableName) { }
         public string BuildGetByPropertyCommand(string propertyName, string tableName) { }

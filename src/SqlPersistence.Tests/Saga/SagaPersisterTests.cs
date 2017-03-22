@@ -148,6 +148,11 @@ public abstract class SagaPersisterTests
     [Test]
     public virtual void SaveWithWeirdCharacters()
     {
+        if (!SupportsUnicodeIdentifiers)
+        {
+            return;
+        }
+
         var endpointName = nameof(SaveWithWeirdCharacters);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithWeirdCharactersಠ_ಠ",
@@ -642,4 +647,6 @@ public abstract class SagaPersisterTests
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);
+
+    protected virtual bool SupportsUnicodeIdentifiers { get; } = true;
 }
