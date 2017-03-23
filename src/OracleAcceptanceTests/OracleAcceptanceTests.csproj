@@ -28,6 +28,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.AcceptanceTesting.6.1.3\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
@@ -303,10 +309,30 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\UnicastRoutingExtensions.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
+    <Compile Include="ConfigureEndpointSqlPersistence.cs" />
+    <Compile Include="ConfigureScenariosForSqlPersistence.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj">
+      <Project>{88a9e98a-0ddd-4d48-b073-0255b36a7e6f}</Project>
+      <Name>AcceptanceTestHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
+      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
+      <Name>ScriptBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj">
+      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
+      <Name>SqlPersistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj">
+      <Project>{9545ecab-396f-4ecb-ab79-4c3afd48ba93}</Project>
+      <Name>TestHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
