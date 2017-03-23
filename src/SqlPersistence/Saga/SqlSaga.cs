@@ -71,6 +71,10 @@ namespace NServiceBus.Persistence.Sql
 
         internal Expression<Func<TSagaData, object>> GetExpression()
         {
+            if (CorrelationPropertyName == null)
+            {
+                return null;
+            }
             var correlationProperty = GetCorrelationProperty();
             var parameterExpression = Expression.Parameter(typeof(TSagaData));
             var propertyExpression = Expression.Property(parameterExpression, correlationProperty);
