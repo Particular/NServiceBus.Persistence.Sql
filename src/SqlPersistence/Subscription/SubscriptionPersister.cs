@@ -15,16 +15,15 @@ class SubscriptionPersister : ISubscriptionStorage
     Func<DbConnection> connectionBuilder;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;
-    ConcurrentDictionary<string, CacheItem> cache = new ConcurrentDictionary<string, CacheItem>();
-
+    public ConcurrentDictionary<string, CacheItem> Cache;
 
     public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
         this.cacheFor = cacheFor;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
+        Cache = new ConcurrentDictionary<string, CacheItem>();
     }
-
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
@@ -32,7 +31,25 @@ class SubscriptionPersister : ISubscriptionStorage
         {
             await Subscribe(subscriber, connection, messageType);
         }
-        cache.Clear();
+
+        ClearForMessageType(messageType);
+    }
+
+    void ClearForMessageType(MessageType messageType)
+    {
+        if (cacheFor == null)
+        {
+            return;
+        }
+        var keyPart = GetKeyPart(messageType);
+        foreach (var cacheKey in Cache.Keys)
+        {
+            if (cacheKey.Contains(keyPart))
+            {
+                CacheItem cacheItem;
+                Cache.TryRemove(cacheKey, out cacheItem);
+            }
+        }
     }
 
     async Task Subscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
@@ -46,9 +63,8 @@ class SubscriptionPersister : ISubscriptionStorage
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx();
         }
-        cache.Clear();
+        ClearForMessageType(messageType);
     }
-
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
@@ -56,7 +72,7 @@ class SubscriptionPersister : ISubscriptionStorage
         {
             await Unsubscribe(subscriber, connection, messageType);
         }
-        cache.Clear();
+        Cache.Clear();
     }
 
     async Task Unsubscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
@@ -70,55 +86,59 @@ class SubscriptionPersister : ISubscriptionStorage
         }
     }
 
-    public async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
+
+    public Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageHierarchy, ContextBag context)
     {
-        var types = messageTypes.ToList();
+        var types = messageHierarchy.ToList();
 
         if (cacheFor == null)
         {
-            return await GetSubscriptions(types).ConfigureAwait(false);
+            return GetSubscriptions(types);
         }
 
-        var typeNames = types.Select(_ => _.TypeName);
-        var key = string.Join(",", typeNames);
-        CacheItem cacheItem;
-        if (cache.TryGetValue(key, out cacheItem))
-        {
-            if (DateTimeOffset.UtcNow - cacheItem.Stored < cacheFor)
+        var key = GetKey(types);
+
+        var cacheItem = Cache.GetOrAdd(key,
+            valueFactory: _ => new CacheItem
             {
-                return cacheItem.Subscribers;
-            }
-        }
+                Stored = DateTime.UtcNow,
+                Subscribers = GetSubscriptions(types)
+            });
 
-        var baseSubscribers = await GetSubscriptions(types)
-            .ConfigureAwait(false);
-
-        cacheItem = new CacheItem
+        if (!(DateTime.UtcNow - cacheItem.Stored < cacheFor))
         {
-            Stored = DateTime.UtcNow,
-            Subscribers = baseSubscribers.ToList()
-        };
-
-        cache.AddOrUpdate(key, s => cacheItem, (s, tuple) => cacheItem);
-
+            cacheItem.Subscribers = GetSubscriptions(types);
+            cacheItem.Stored = DateTime.UtcNow;
+        }
         return cacheItem.Subscribers;
     }
 
-    class CacheItem
+    static string GetKey(List<MessageType> types)
     {
-        public DateTime Stored;
-        public List<Subscriber> Subscribers;
+        var typeNames = types.Select(_ => _.TypeName);
+        return string.Join(",", typeNames) + ",";
     }
 
-    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> types)
+    static string GetKeyPart(MessageType type)
     {
-        var getSubscribersCommand = subscriptionCommands.GetSubscribers(types);
+        return $"{type.TypeName},";
+    }
+
+    internal class CacheItem
+    {
+        public DateTime Stored;
+        public Task<IEnumerable<Subscriber>> Subscribers;
+    }
+
+    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
+    {
+        var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (var connection = await connectionBuilder.OpenConnection())
         using (var command = connection.CreateCommand())
         {
-            for (var i = 0; i < types.Count; i++)
+            for (var i = 0; i < messageHierarchy.Count; i++)
             {
-                var messageType = types[i];
+                var messageType = messageHierarchy[i];
                 var paramName = $"@type{i}";
                 command.AddParameter(paramName, messageType.TypeName);
             }
