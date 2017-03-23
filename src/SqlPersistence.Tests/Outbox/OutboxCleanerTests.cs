@@ -11,7 +11,7 @@ public class OutboxCleanerTests
     {
         var timer = new FakeTimer();
         var cutOffTime = DateTime.MinValue;
-        var cleaner = new TestableClenaer((time, token) =>
+        var cleaner = new TestableCleaner((time, token) =>
         {
             cutOffTime = time;
             return Task.FromResult(0);
@@ -31,7 +31,7 @@ public class OutboxCleanerTests
     {
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
-        var cleaner = new TestableClenaer((time, token) => Task.FromResult(0),
+        var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
             (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start();
@@ -58,7 +58,7 @@ public class OutboxCleanerTests
     {
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
-        var cleaner = new TestableClenaer((time, token) => Task.FromResult(0),
+        var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
             (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start();
@@ -78,9 +78,9 @@ public class OutboxCleanerTests
         Assert.IsFalse(criticalActionTriggered);
     }
 
-    class TestableClenaer : OutboxCleaner
+    class TestableCleaner : OutboxCleaner
     {
-        public TestableClenaer(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer) 
+        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer) 
             : base(cleanup, criticalError, timeToKeepDeduplicationData, frequencyToRunCleanup, timer)
         {
         }
