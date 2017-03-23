@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -12,12 +13,15 @@ class OracleSagaScriptWriter : ISagaScriptWriter
     {
         writer = textWriter;
         this.saga = saga;
-        tableName = saga.Name.ToUpper();
-        // TODO: Can't deal with length issue this way
-        if (tableName.Length > 27)
+        if (saga.Name.Length > 27)
         {
-            tableName = tableName.Substring(0, 27);
+            throw new Exception($"Saga '{saga.Name}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
         }
+        if (Encoding.UTF8.GetBytes(saga.Name).Length != saga.Name.Length)
+        {
+            throw new Exception($"Saga '{saga.Name}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
+        }
+        tableName = saga.Name.ToUpper();
     }
 
     public void Initialize()

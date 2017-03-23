@@ -95,7 +95,7 @@ public abstract class SagaPersisterTests
             public string SimplePropertyಠ_ಠ { get; set; }
             public string Contentಠ_ಠ { get; set; }
         }
-        
+
         protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
         {
         }
@@ -148,11 +148,6 @@ public abstract class SagaPersisterTests
     [Test]
     public virtual void SaveWithWeirdCharacters()
     {
-        if (!SupportsUnicodeIdentifiers)
-        {
-            return;
-        }
-
         var endpointName = nameof(SaveWithWeirdCharacters);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithWeirdCharactersಠ_ಠ",
@@ -163,14 +158,27 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        using (var connection = dbConnection())
+
+        var execute = new TestDelegate(() =>
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
+            using (var connection = dbConnection())
+            {
+                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName);
+            }
+            var id = Guid.NewGuid();
+            var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
+            ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        });
+
+        if (SupportsUnicodeIdentifiers)
+        {
+            execute();
         }
-        var id = Guid.NewGuid();
-        var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
-        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        else
+        {
+            Assert.Throws<Exception>(execute);
+        }
     }
 
     async Task<SagaWithWeirdCharactersಠ_ಠ.SagaData> SaveWeirdAsync(Guid id, string endpointName)
@@ -348,7 +356,7 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-        CorrelationProperty= nameof(SagaData.CorrelationProperty),
+        CorrelationProperty = nameof(SagaData.CorrelationProperty),
         TransitionalCorrelationProperty = nameof(SagaData.TransitionalCorrelationProperty)
     )]
     public class SagaWithCorrelationAndTransitional : SqlSaga<SagaWithCorrelationAndTransitional.SagaData>
@@ -366,7 +374,7 @@ public abstract class SagaPersisterTests
     }
 
     [SqlSaga(
-        CorrelationProperty=  nameof(SagaData.CorrelationProperty)
+        CorrelationProperty = nameof(SagaData.CorrelationProperty)
     )]
     public class SagaWithCorrelation : SqlSaga<SagaWithCorrelation.SagaData>
     {
@@ -492,8 +500,8 @@ public abstract class SagaPersisterTests
     {
         var endpointName = nameof(GetByNonStringMapping);
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithNonStringCorrelation",
-            name: "SagaWithNonStringCorrelation",
+            tableSuffix: "NonStringCorrelationSaga",
+            name: "NonStringCorrelationSaga",
             correlationProperty: new CorrelationProperty
             (
                 name: "CorrelationProperty",
@@ -510,9 +518,9 @@ public abstract class SagaPersisterTests
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<SagaWithNonStringCorrelation.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
+    async Task<NonStringCorrelationSaga.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
     {
-        var sagaData = new SagaWithNonStringCorrelation.SagaData
+        var sagaData = new NonStringCorrelationSaga.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -524,14 +532,14 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithNonStringCorrelation), 666);
-            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, typeof(NonStringCorrelationSaga), 666);
+            return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession, typeof(NonStringCorrelationSaga))).Data;
         }
     }
     [SqlSaga(
         CorrelationProperty = nameof(SagaData.CorrelationProperty)
     )]
-    public class SagaWithNonStringCorrelation : SqlSaga<SagaWithNonStringCorrelation.SagaData>
+    public class NonStringCorrelationSaga : SqlSaga<NonStringCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
