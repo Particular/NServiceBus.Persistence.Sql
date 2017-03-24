@@ -31,10 +31,28 @@ class SubscriptionPersister : ISubscriptionStorage
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection())
+        using (var command = connection.CreateCommand())
         {
-            await Subscribe(subscriber, connection, messageType);
+            command.CommandText = subscriptionCommands.Subscribe;
+            command.AddParameter("MessageType", messageType.TypeName);
+            command.AddParameter("Subscriber", subscriber.TransportAddress);
+            command.AddParameter("Endpoint", subscriber.Endpoint);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+            await command.ExecuteNonQueryEx();
         }
+        ClearForMessageType(messageType);
+    }
 
+    public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
+    {
+        using (var connection = await connectionBuilder.OpenConnection())
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = subscriptionCommands.Unsubscribe;
+            command.AddParameter("MessageType", messageType.TypeName);
+            command.AddParameter("Subscriber", subscriber.TransportAddress);
+            await command.ExecuteNonQueryEx();
+        }
         ClearForMessageType(messageType);
     }
 
@@ -52,40 +70,6 @@ class SubscriptionPersister : ISubscriptionStorage
                 CacheItem cacheItem;
                 Cache.TryRemove(cacheKey, out cacheItem);
             }
-        }
-    }
-
-    async Task Subscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
-    {
-        using (var command = connection.CreateCommand())
-        {
-            command.CommandText = subscriptionCommands.Subscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            command.AddParameter("Endpoint", subscriber.Endpoint);
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx();
-        }
-        ClearForMessageType(messageType);
-    }
-
-    public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
-    {
-        using (var connection = await connectionBuilder.OpenConnection())
-        {
-            await Unsubscribe(subscriber, connection, messageType);
-        }
-        Cache?.Clear();
-    }
-
-    async Task Unsubscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
-    {
-        using (var command = connection.CreateCommand())
-        {
-            command.CommandText = subscriptionCommands.Unsubscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            await command.ExecuteNonQueryEx();
         }
     }
 
