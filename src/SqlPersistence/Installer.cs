@@ -27,6 +27,8 @@ class Installer : INeedToInstallSomething
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlVariant);
         var tablePrefix = settings.GetTablePrefix();
 
+        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+
         using (var connection = await connectionBuilder.OpenConnection())
         using (var transaction = connection.BeginTransaction())
         {

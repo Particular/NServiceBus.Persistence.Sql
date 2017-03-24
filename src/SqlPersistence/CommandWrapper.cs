@@ -48,6 +48,11 @@ class CommandWrapper : IDisposable
         return command.ExecuteNonQueryAsync();
     }
 
+    public Task<DbDataReader> ExecuteReaderAsync()
+    {
+        return command.ExecuteReaderAsync();
+    }
+
     public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior)
     {
         return command.ExecuteReaderAsync(behavior);

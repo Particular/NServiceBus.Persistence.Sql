@@ -13,11 +13,13 @@ class SubscriptionPersister : ISubscriptionStorage
 {
     Func<DbConnection> connectionBuilder;
     SubscriptionCommands subscriptionCommands;
+    CommandBuilder commandBuilder;
 
     public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema)
     {
         this.connectionBuilder = connectionBuilder;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
+        commandBuilder = new CommandBuilder(sqlVariant);
     }
 
 
@@ -31,7 +33,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
     async Task Subscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
     {
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Subscribe;
             command.AddParameter("MessageType", messageType.TypeName);
@@ -53,7 +55,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
     async Task Unsubscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
     {
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Unsubscribe;
             command.AddParameter("MessageType", messageType.TypeName);
@@ -68,12 +70,12 @@ class SubscriptionPersister : ISubscriptionStorage
 
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(types);
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             for (var i = 0; i < types.Count; i++)
             {
                 var messageType = types[i];
-                var paramName = $"@type{i}";
+                var paramName = $"type{i}";
                 command.AddParameter(paramName, messageType.TypeName);
             }
             command.CommandText = getSubscribersCommand;

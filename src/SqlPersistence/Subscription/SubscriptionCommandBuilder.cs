@@ -28,7 +28,7 @@ namespace NServiceBus.Persistence.Sql
                     break;
 
                 case SqlVariant.Oracle:
-                    tableName = $"\"{tablePrefix}SS\"";
+                    tableName = $"{tablePrefix}SS";
                     break;
 
                 default:
@@ -107,10 +107,10 @@ begin
     )
     values
     (
-        :1,
-        :2,
-        :3,
-        :4
+        :MessageType,
+        :Subscriber,
+        :Endpoint,
+        :PersistenceVersion
     );
     commit;
 exception
@@ -132,8 +132,8 @@ end;
                     return $@"
 delete from {tableName}
 where
-    Subscriber = :1 and
-    MessageType = :2";
+    Subscriber = :Subscriber and
+    MessageType = :MessageType";
 
                 default:
                     return $@"
@@ -160,7 +160,7 @@ where MessageType in (";
                         var builder = new StringBuilder(getSubscribersPrefixOracle);
                         for (var i = 0; i < messageTypes.Count; i++)
                         {
-                            var paramName = $":{i}";
+                            var paramName = $":type{i}";
                             builder.Append(paramName);
                             if (i < messageTypes.Count - 1)
                             {

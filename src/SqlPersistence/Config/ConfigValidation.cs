@@ -9,9 +9,9 @@ static class ConfigValidation
     {
         if (variant == SqlVariant.Oracle)
         {
-            if (tablePrefix.Length > 24)
+            if (tablePrefix.Length > 25)
             {
-                throw new Exception($"Table prefix '{tablePrefix}' contains more than 24 characters, which is not supported by SQL persistence using Oracle. Shorten the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).");
+                throw new Exception($"Table prefix '{tablePrefix}' contains more than 25 characters, which is not supported by SQL persistence using Oracle. Shorten the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).");
             }
             if (Encoding.UTF8.GetBytes(tablePrefix).Length != tablePrefix.Length)
             {
