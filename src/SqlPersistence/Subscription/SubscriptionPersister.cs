@@ -22,7 +22,10 @@ class SubscriptionPersister : ISubscriptionStorage
         this.connectionBuilder = connectionBuilder;
         this.cacheFor = cacheFor;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
-        Cache = new ConcurrentDictionary<string, CacheItem>();
+        if (cacheFor != null)
+        {
+            Cache = new ConcurrentDictionary<string, CacheItem>();
+        }
     }
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
@@ -86,7 +89,6 @@ class SubscriptionPersister : ISubscriptionStorage
         }
     }
 
-
     public Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageHierarchy, ContextBag context)
     {
         var types = messageHierarchy.ToList();
@@ -105,7 +107,8 @@ class SubscriptionPersister : ISubscriptionStorage
                 Subscribers = GetSubscriptions(types)
             });
 
-        if (!(DateTime.UtcNow - cacheItem.Stored < cacheFor))
+        var age = DateTime.UtcNow - cacheItem.Stored;
+        if (age >= cacheFor)
         {
             cacheItem.Subscribers = GetSubscriptions(types);
             cacheItem.Stored = DateTime.UtcNow;
