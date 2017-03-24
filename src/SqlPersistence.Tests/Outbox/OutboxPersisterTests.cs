@@ -12,6 +12,7 @@ public abstract class OutboxPersisterTests
 {
     OutboxPersister persister;
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
 
     protected abstract Func<DbConnection> GetConnection();
@@ -19,23 +20,24 @@ public abstract class OutboxPersisterTests
     public OutboxPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
-        persister = new OutboxPersister(connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(OutboxPersisterTests)}_",
-            schema: schema,
-            sqlVariant: sqlVariant.Convert(),
-            cleanupBatchSize: 5);
     }
 
 
     [SetUp]
     public void Setup()
     {
+        persister = new OutboxPersister(connectionBuilder: dbConnection,
+            tablePrefix: $"{GetTablePrefix()}_",
+            schema: schema,
+            sqlVariant: sqlVariant.Convert(),
+            cleanupBatchSize: 5);
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix());
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix());
         }
     }
 
@@ -45,10 +47,19 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), nameof(OutboxPersisterTests));
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix());
         }
     }
 
+    protected virtual string GetTablePrefix()
+    {
+        return nameof(OutboxPersisterTests);
+    }
+
+    protected virtual string GetTableSuffix()
+    {
+        return "_OutboxData";
+    }
 
     [Test]
     public void StoreDispatchAndGet()
@@ -67,7 +78,7 @@ public abstract class OutboxPersisterTests
             {
                 command.CommandText = $@"
 select Operations
-from {nameof(OutboxPersisterTests)}_OutboxData
+from {GetTablePrefix()}{GetTableSuffix()}
 where MessageId = '{result.MessageId}'";
                 using (var reader = command.ExecuteReader())
                 {

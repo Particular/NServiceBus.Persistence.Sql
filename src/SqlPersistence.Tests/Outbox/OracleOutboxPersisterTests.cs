@@ -14,4 +14,14 @@ public class OracleOutboxPersisterTests : OutboxPersisterTests
     {
         return OracleConnectionBuilder.Build;
     }
+
+    protected override string GetTablePrefix()
+    {
+        return "OUTBOXPERSISTER";
+    }
+
+    protected override string GetTableSuffix()
+    {
+        return "_OD";
+    }
 }

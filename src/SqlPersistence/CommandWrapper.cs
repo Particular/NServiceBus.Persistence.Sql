@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 
 class CommandWrapper : IDisposable
@@ -56,6 +57,11 @@ class CommandWrapper : IDisposable
     public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior)
     {
         return command.ExecuteReaderAsync(behavior);
+    }
+
+    public Task<int> ExecuteNonQueryEx(CancellationToken cancellationToken)
+    {
+        return command.ExecuteNonQueryEx(cancellationToken);
     }
 
     public virtual void Dispose()
