@@ -1,11 +1,11 @@
 ﻿declare 
-  tableName varchar2(30) := :1 || 'OD';
+  tableName varchar2(30) := UPPER(:1) || 'OD';
   indexName varchar2(30) := tableName || '_IDX';
   dropTable varchar2(50);
   dropIndex varchar2(50);
   n number(10);
 begin
-  select count(*) into n from user_indexes where index_name = UPPER(indexName);
+  select count(*) into n from user_indexes where index_name = indexName;
   if(n = 1)
   then
 
@@ -16,7 +16,7 @@ begin
 
   end if;
 
-  select count(*) into n from user_tables where table_name = UPPER(tableName);
+  select count(*) into n from user_tables where table_name = tableName;
   if(n = 1)
   then
     
