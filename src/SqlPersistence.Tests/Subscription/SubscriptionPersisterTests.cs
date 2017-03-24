@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
@@ -23,19 +24,19 @@ public abstract class SubscriptionPersisterTests
     {
         this.sqlVariant = sqlVariant;
         this.schema = schema;
+    }
+
+    [SetUp]
+    public void Setup()
+    {
         dbConnection = GetConnection();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
             sqlVariant: sqlVariant.Convert(),
             schema: schema,
-            cacheFor:TimeSpan.FromSeconds(10)
+            cacheFor: TimeSpan.FromSeconds(10)
         );
-    }
-
-    [SetUp]
-    public void Setup()
-    {
         using (var connection = dbConnection())
         {
             connection.Open();
@@ -73,7 +74,7 @@ public abstract class SubscriptionPersisterTests
     }
 
     [Test]
-    public async Task Should_be_cached()
+    public async Task Cached_get_should_be_faster()
     {
         var type = new MessageType("type1", new Version(0, 0, 0, 0));
         var messageTypes = new List<MessageType>
@@ -91,6 +92,53 @@ public abstract class SubscriptionPersisterTests
         var secondTime = second.ElapsedMilliseconds;
         Assert.IsTrue(secondTime * 1000 < firstTime);
         Assert.AreEqual(subscribersFirst.Count(), subscribersSecond.Count());
+    }
+
+    [Test]
+    public void Should_be_cached()
+    {
+        var type = new MessageType("type1", new Version(0, 0, 0, 0));
+        var messageTypes = new List<MessageType>
+        {
+            type,
+        };
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type, null).Await();
+        persister.GetSubscriberAddressesForMessage(messageTypes, null).Await();
+        VerifyCache(persister.Cache);
+    }
+
+    static void VerifyCache(ConcurrentDictionary<string, SubscriptionPersister.CacheItem> cache)
+    {
+        var items = cache.Values.Select(_=>_.Subscribers.Result);
+        ObjectApprover.VerifyWithJson(items);
+    }
+
+    [Test]
+    public void Subscribe_with_same_type_should_clear_cache()
+    {
+        var matchingType = new MessageType("matchingType", new Version(0, 0, 0, 0));
+        var messageTypes = new List<MessageType>
+        {
+            matchingType
+        };
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
+        persister.GetSubscriberAddressesForMessage(messageTypes, null).Await();
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
+        VerifyCache(persister.Cache);
+    }
+
+    [Test]
+    public void Unsubscribe_with_same_type_should_clear_cache()
+    {
+        var matchingType = new MessageType("matchingType", new Version(0, 0, 0, 0));
+        var messageTypes = new List<MessageType>
+        {
+            matchingType
+        };
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
+        persister.GetSubscriberAddressesForMessage(messageTypes, null).Await();
+        persister.Unsubscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
+        VerifyCache(persister.Cache);
     }
 
     [Test]
