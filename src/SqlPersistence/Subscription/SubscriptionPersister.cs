@@ -75,7 +75,7 @@ class SubscriptionPersister : ISubscriptionStorage
         {
             await Unsubscribe(subscriber, connection, messageType);
         }
-        Cache.Clear();
+        Cache?.Clear();
     }
 
     async Task Unsubscribe(Subscriber subscriber, DbConnection connection, MessageType messageType)
