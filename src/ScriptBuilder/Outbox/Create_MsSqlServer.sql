@@ -32,23 +32,6 @@ begin
   declare @createDispatchedAtIndex nvarchar(max);
   set @createDispatchedAtIndex = '
   create index Index_DispatchedAt
-  on ' + @tableName + '(DispatchedAt);';
+  on ' + @tableName + '(DispatchedAt) where Dispatched = 1;';
   exec(@createDispatchedAtIndex);
-end
-
-
-if not exists
-(
-    select *
-    from sys.indexes
-    where
-        name = 'Index_Dispatched' and
-        object_id = object_id(@tableName)
-)
-begin
-  declare @createDispatchedIndex nvarchar(max);
-  set @createDispatchedIndex = '
-  create index Index_Dispatched
-  on ' + @tableName + '(Dispatched);';
-  exec(@createDispatchedIndex);
 end
