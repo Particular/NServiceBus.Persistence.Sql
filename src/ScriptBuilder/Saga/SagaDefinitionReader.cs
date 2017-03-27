@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -18,14 +17,8 @@ static class SagaDefinitionReader
         CheckIsValidSaga(type);
 
         var correlation = GetCorrelationPropertyName(type);
-        string transitional = null;
-        string tableSuffix = null;
-        var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
-        if (attribute != null)
-        {
-            transitional = attribute.GetStringProperty("TransitionalCorrelationProperty");
-            tableSuffix = attribute.GetStringProperty("TableSuffix");
-        }
+        var transitional = GetTransitionalCorrelationPropertyName(type);
+        var tableSuffix = GetTableSuffix(type);
 
         SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional, tableSuffix);
 
@@ -48,26 +41,51 @@ static class SagaDefinitionReader
 
     static string GetCorrelationPropertyName(TypeDefinition type)
     {
-        var instructions = type.Properties.Single(_ => _.Name == "CorrelationPropertyName").GetMethod.Body.Instructions;
-        if (instructions.Count == 2)
+        string value;
+        var property = type.GetProperty("CorrelationPropertyName");
+        if (property.TryGetPropertyAssignment(out value))
         {
-            if (instructions[1].OpCode == OpCodes.Ret)
-            {
-                var first = instructions[0];
-                if (first.OpCode == OpCodes.Ldstr)
-                {
-                    return (string) first.Operand;
-                }
-                if (first.OpCode == OpCodes.Ldnull)
-                {
-                    return null;
-                }
-            }
+            return value;
         }
         throw new ErrorsException(
             $@"Only a direct string (or null) return is allowed in '{type.FullName}.CorrelationPropertyName'.
-For example: protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+For example: protected override string CorrelationPropertyName => nameof(SagaData.TheProperty);
 When all messages are mapped using finders then use the following: protected override string CorrelationPropertyName => null;");
+    }
+
+
+    static string GetTransitionalCorrelationPropertyName(TypeDefinition type)
+    {
+        string value;
+        PropertyDefinition property;
+        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out property))
+        {
+            return null;
+        }
+        if (property.TryGetPropertyAssignment(out value))
+        {
+            return value;
+        }
+        throw new ErrorsException(
+            $@"Only a direct string return is allowed in '{type.FullName}.TransitionalCorrelationPropertyName'.
+For example: protected override string TransitionalCorrelationPropertyName => nameof(SagaData.TheProperty);");
+    }
+
+    static string GetTableSuffix(TypeDefinition type)
+    {
+        string value;
+        PropertyDefinition property;
+        if (!type.TryGetProperty("TableSuffix", out property))
+        {
+            return null;
+        }
+        if (property.TryGetPropertyAssignment(out value))
+        {
+            return value;
+        }
+        throw new ErrorsException(
+            $@"Only a direct string return is allowed in '{type.FullName}.TableSuffix'.
+For example: protected override string TableSuffix => ""TheCustomTableSuffix"";");
     }
 
     static void CheckIsValidSaga(TypeDefinition type)

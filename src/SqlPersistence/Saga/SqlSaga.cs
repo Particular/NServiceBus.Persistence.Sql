@@ -41,6 +41,18 @@ namespace NServiceBus.Persistence.Sql
         protected abstract string CorrelationPropertyName { get; }
 
         /// <summary>
+        /// Gets the name of the transitional property for <typeparamref name="TSagaData"/>.
+        /// Used to transition between different properties for saga correlation.
+        /// </summary>
+        protected virtual string TransitionalCorrelationPropertyName { get; }
+
+        /// <summary>
+        /// The name of the table to use when storing the current <see cref="SqlSaga{TSagaData}"/>. 
+        /// Will be appended to the value specified in <see cref="SqlPersistenceConfig.TablePrefix"/>.
+        /// </summary>
+        protected virtual string TableSuffix { get; }
+
+        /// <summary>
         /// The saga's strongly typed data. Wraps <see cref="Saga.Entity" />.
         /// </summary>
         public TSagaData Data

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using NServiceBus.Persistence.Sql;
 
 static class CecilExtentions
 {
@@ -18,6 +20,47 @@ static class CecilExtentions
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
         return value != null && (bool)value;
+    }
+
+    public static PropertyDefinition GetProperty(this TypeDefinition type, string propertyName)
+    {
+        var property = type.Properties.SingleOrDefault(_ => _.Name == propertyName);
+        if (property != null)
+        {
+            return property;
+        }
+        throw new ErrorsException($@"Expected to find a property named '{propertyName}' on '{type.FullName}'.");
+    }
+
+    public static bool TryGetProperty(this TypeDefinition type, string propertyName, out PropertyDefinition property)
+    {
+        property = type.Properties.SingleOrDefault(_ => _.Name == propertyName);
+        return property != null;
+    }
+
+    public static bool TryGetPropertyAssignment(this PropertyDefinition property, out string value)
+    {
+        value = null;
+        var instructions = property.GetMethod.Body.Instructions;
+        if (instructions.Count != 2)
+        {
+            return false;
+        }
+        if (instructions[1].OpCode != OpCodes.Ret)
+        {
+            return false;
+        }
+        var first = instructions[0];
+        if (first.OpCode == OpCodes.Ldstr)
+        {
+            value = (string)first.Operand;
+            return true;
+        }
+        if (first.OpCode == OpCodes.Ldnull)
+        {
+            return true;
+        }
+        return false;
     }
 
     public static CustomAttribute GetSingleAttribute(this TypeDefinition type, string attributeName)

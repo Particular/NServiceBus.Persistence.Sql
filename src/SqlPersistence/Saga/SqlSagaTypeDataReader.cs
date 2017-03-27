@@ -1,37 +1,56 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using NServiceBus.Persistence.Sql;
 
 static class SqlSagaTypeDataReader
 {
     public static SqlSagaTypeData GetTypeData(Type sagaType)
     {
-        var attribute = sagaType.GetCustomAttribute<SqlSagaAttribute>(false);
-        string tableName = null;
-        string transitionalCorrelationProperty = null;
-        if (attribute != null)
+        var instance = FormatterServices.GetUninitializedObject(sagaType);
+
+        string transitionalCorrelationPropertyName = null;
+        var transitionalCorrelationProperty = GetProperty(sagaType, "TransitionalCorrelationPropertyName");
+        if (transitionalCorrelationProperty != null)
         {
-            tableName = attribute.TableSuffix;
-            transitionalCorrelationProperty = attribute.TransitionalCorrelationProperty;
+            transitionalCorrelationPropertyName = GetPropertyValue(transitionalCorrelationProperty, instance);
         }
-        if (tableName == null)
+
+        string tableName;
+        var tableNameProperty = GetProperty(sagaType, "TableSuffix");
+        if (tableNameProperty == null)
         {
             tableName = sagaType.Name;
         }
-        var instance = FormatterServices.GetUninitializedObject(sagaType);
-        var correlationProperty = GetCorrelationProperty(sagaType);
-        correlationProperty.GetMethod.Invoke(instance, null);
+        else
+        {
+            tableName = GetPropertyValue(tableNameProperty, instance);
+        }
+
+        var correlationProperty = GetProperty(sagaType, "CorrelationPropertyName");
         return new SqlSagaTypeData
         {
             TableSuffix = tableName,
-            CorrelationProperty = (string) correlationProperty.GetMethod.Invoke(instance, null),
-            TransitionalCorrelationProperty = transitionalCorrelationProperty
+            CorrelationProperty = GetPropertyValue(correlationProperty, instance),
+            TransitionalCorrelationProperty = transitionalCorrelationPropertyName
         };
     }
 
-    static PropertyInfo GetCorrelationProperty(Type sagaType)
+    static string GetPropertyValue(PropertyInfo property, object instance)
     {
-        return sagaType.GetProperty("CorrelationPropertyName", BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
+        return (string) property.GetMethod.Invoke(instance, null);
+    }
+
+    static PropertyInfo GetProperty(Type sagaType, string propertyName)
+    {
+        var propertyInfo = sagaType.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
+        if (propertyInfo == null)
+        {
+            return null;
+        }
+        if (propertyInfo.DeclaringType != sagaType)
+        {
+            return null;
+        }
+        return propertyInfo;
     }
 }
