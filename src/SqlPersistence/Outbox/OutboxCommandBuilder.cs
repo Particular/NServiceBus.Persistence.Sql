@@ -21,7 +21,7 @@
                     tableName = $"`{tablePrefix}OutboxData`";
                     break;
                 case SqlVariant.Oracle:
-                    tableName = $"\"{tablePrefix}OD\"";
+                    tableName = $"{tablePrefix}OD";
                     break;
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}");

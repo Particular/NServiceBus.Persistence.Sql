@@ -1,7 +1,7 @@
 ﻿declare 
   tableName varchar2(30) := UPPER(:1) || 'OD';
   pkName varchar2(30) := tableName || '_PK';
-  indexName varchar2(30) := tableName || '_IDX';
+  indexName varchar2(30) := tableName || '_IX';
   createTable varchar2(500);
   createIndex varchar2(500);
   n number(10);
