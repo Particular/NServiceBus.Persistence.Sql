@@ -342,9 +342,6 @@ public abstract class SagaPersisterTests
         }
     }
 
-    [SqlSaga(
-        TransitionalCorrelationProperty = nameof(SagaData.TransitionalCorrelationProperty)
-    )]
     public class SagaWithCorrelationAndTransitional : SqlSaga<SagaWithCorrelationAndTransitional.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -355,6 +352,7 @@ public abstract class SagaPersisterTests
         }
 
         protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.TransitionalCorrelationProperty);
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {

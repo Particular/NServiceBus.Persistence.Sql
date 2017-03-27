@@ -1,45 +1,23 @@
 ﻿using System;
+#pragma warning disable 1591
 
 namespace NServiceBus.Persistence.Sql
 {
-    /// <summary>
-    /// Exposes extra configuration options for <see cref="SqlSaga{TSagaData}"/>.
-    /// </summary>
+    [ObsoleteEx(
+        Message = @"Replaced by overrides on SqlSaga.
+ * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.
+ * For transitionalCorrelationProperty override TransitionalCorrelationPropertyName on the saga implementing SqlSaga<T>
+ * For tableSuffix override TableSuffix on the saga implementing SqlSaga<T>",
+        RemoveInVersion = "3.0",
+        TreatAsErrorFromVersion = "2.0")]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class SqlSagaAttribute : Attribute
     {
-        /// <summary>
-        /// Obsolete
-        /// </summary>
-        [ObsoleteEx(
-            Message= @"This constructor is obsolete.
- * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.
- * For transitionalCorrelationProperty use the property " + nameof(SqlSagaAttribute) + "." + nameof(TransitionalCorrelationProperty) + @"
- * For tableSuffix use the property " + nameof(SqlSagaAttribute) + "." + nameof(TableSuffix) ,
-            RemoveInVersion = "3.0",
-            TreatAsErrorFromVersion = "2.0")]
         public SqlSagaAttribute(
             string correlationProperty = null,
             string transitionalCorrelationProperty = null,
-            string tableSuffix = null) { }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="SqlSagaAttribute"/>.
-        /// </summary>
-        public SqlSagaAttribute()
+            string tableSuffix = null)
         {
-            
         }
-
-        /// <summary>
-        /// Used to transition between different properties for saga correlation.
-        /// </summary>
-        public string TransitionalCorrelationProperty;
-
-        /// <summary>
-        /// The name of the tabe to use when storing the current <see cref="SqlSaga{TSagaData}"/>. 
-        /// Will be appended to the value specified in <see cref="SqlPersistenceConfig.TablePrefix"/>.
-        /// </summary>
-        public string TableSuffix;
     }
 }

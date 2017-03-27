@@ -98,9 +98,6 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
-        TransitionalCorrelationProperty = nameof(SagaData.Transitional)
-    )]
     public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -108,6 +105,8 @@ public class SagaDefinitionReaderTest
             public string Correlation { get; set; }
             public string Transitional { get; set; }
         }
+
+        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.Transitional);
 
         protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
 
@@ -174,9 +173,6 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
-        TableSuffix = "TheTableSuffix"
-    )]
     public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
     {
         public class SagaData : ContainSagaData
@@ -184,6 +180,7 @@ public class SagaDefinitionReaderTest
             public string Correlation { get; set; }
         }
 
+        protected override string TableSuffix => "TheTableSuffix";
         protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
@@ -200,7 +197,6 @@ public class SagaDefinitionReaderTest
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga]
     public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData

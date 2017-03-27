@@ -75,17 +75,16 @@
         protected SqlSaga() { }
         protected abstract string CorrelationPropertyName { get; }
         public TSagaData Data { get; set; }
+        protected virtual string TableSuffix { get; }
+        protected virtual string TransitionalCorrelationPropertyName { get; }
         protected override void ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    [System.ObsoleteAttribute(@"Replaced by overrides on SqlSaga.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty override TransitionalCorrelationPropertyName on the saga implementing SqlSaga<T>\r\n * For tableSuffix override TableSuffix on the saga implementing SqlSaga<T>. Will be removed in version 3.0.0.", true)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
-        [System.ObsoleteAttribute(@"This constructor is obsolete.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty use the property SqlSagaAttribute.TransitionalCorrelationProperty\r\n * For tableSuffix use the property SqlSagaAttribute.TableSuffix. Will be removed in version 3.0.0.", true)]
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
-        public SqlSagaAttribute() { }
-        public string TableSuffix { get; set; }
-        public string TransitionalCorrelationProperty { get; set; }
     }
     public enum SqlVariant
     {
