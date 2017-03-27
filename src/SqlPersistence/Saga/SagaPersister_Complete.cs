@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
@@ -9,13 +8,12 @@ partial class SagaPersister
 
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaType = context.GetSagaType();
-        return Complete(sagaData, session, sagaType, GetConcurrency(context));
+        return Complete(sagaData, session, GetConcurrency(context));
     }
 
-    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int concurrency)
+    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, int concurrency)
     {
-        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         var sqlSession = session.SqlPersistenceSession();
 
         using (var command = sqlSession.Connection.CreateCommand())

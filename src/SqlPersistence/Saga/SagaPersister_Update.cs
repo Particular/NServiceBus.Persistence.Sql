@@ -9,14 +9,13 @@ partial class SagaPersister
 
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        var sagaType = context.GetSagaType();
-        return Update(sagaData, session, sagaType, GetConcurrency(context));
+        return Update(sagaData, session, GetConcurrency(context));
     }
 
-    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, Type sagaType, int concurrency)
+    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, int concurrency)
     {
         var sqlSession = session.SqlPersistenceSession();
-        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType(), sagaType);
+        var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
 
         using (var command = sqlSession.Connection.CreateCommand())
         {
@@ -31,7 +30,7 @@ partial class SagaPersister
             var affected = await command.ExecuteNonQueryAsync();
             if (affected != 1)
             {
-                throw new Exception($"Optimistic concurrency violation when trying to save saga {sagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");
+                throw new Exception($"Optimistic concurrency violation when trying to save saga {sagaInfo.SagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");
             }
         }
     }

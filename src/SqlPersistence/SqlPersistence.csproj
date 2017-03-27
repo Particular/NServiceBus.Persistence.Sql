@@ -115,7 +115,6 @@
     <Compile Include="Installer.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
-    <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\Config\SagaSettings.cs" />
     <Compile Include="Saga\Serialization\SagaPropertyFilter.cs" />
     <Compile Include="Saga\SqlSagaTypeData.cs" />
