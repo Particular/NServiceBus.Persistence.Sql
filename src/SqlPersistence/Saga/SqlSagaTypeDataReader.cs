@@ -37,19 +37,19 @@ static class SqlSagaTypeDataReader
 
     static string GetPropertyValue(PropertyInfo property, object instance)
     {
-        property.GetMethod.Invoke(instance, null);
         return (string) property.GetMethod.Invoke(instance, null);
     }
 
     static PropertyInfo GetProperty(Type sagaType, string propertyName)
     {
         var propertyInfo = sagaType.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Public);
-        if (propertyInfo != null)
+        if (propertyInfo == null)
         {
-            if (propertyInfo.DeclaringType != sagaType)
-            {
-                return null;
-            }
+            return null;
+        }
+        if (propertyInfo.DeclaringType != sagaType)
+        {
+            return null;
         }
         return propertyInfo;
     }
