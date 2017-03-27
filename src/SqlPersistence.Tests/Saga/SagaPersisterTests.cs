@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Sagas;
 using NUnit.Framework;
 using ObjectApproval;
+using NServiceBus.Extensibility;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 
@@ -30,6 +35,10 @@ public abstract class SagaPersisterTests
 #pragma warning disable 618
         var commandBuilder = new SagaCommandBuilder();
 #pragma warning restore 618
+
+        var sagaMetadataCollection = new SagaMetadataCollection();
+        sagaMetadataCollection.Initialize(GetSagasAndFinders());
+
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
             jsonSerializer: Serializer.JsonSerializer,
@@ -38,8 +47,25 @@ public abstract class SagaPersisterTests
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
             schema: schema,
-            sqlVariant: sqlVariant.Convert());
+            sqlVariant: sqlVariant.Convert(), 
+            metadataCollection: sagaMetadataCollection);
         return new SagaPersister(infoCache);
+    }
+
+    IEnumerable<Type> GetSagasAndFinders()
+    {
+        foreach (var nestedType in typeof(SagaPersisterTests).GetNestedTypes())
+        {
+            if (typeof(Saga).IsAssignableFrom(nestedType))
+            {
+                yield return nestedType;
+            }
+            if (nestedType.GetInterfaces().Any(_=>_.Name.StartsWith("Using")))
+            {
+                yield return nestedType;
+            }
+            
+        }
     }
 
     [Test]
@@ -80,13 +106,15 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
-            await persister.Complete(sagaData, storageSession, typeof(SagaWithCorrelation), 1);
-            Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data);
+            await persister.Save(sagaData, storageSession, "theProperty");
+            await persister.Complete(sagaData, storageSession, 1);
+            Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession)).Data);
         }
     }
 
-    public class SagaWithWeirdCharactersಠ_ಠ : SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>
+    public class SagaWithWeirdCharactersಠ_ಠ : 
+        SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -98,7 +126,19 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+            mapper.ConfigureMapping<AMessage>(_=>_.StringId);
         }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
+        }
+    }
+
+    public class AMessage:IMessage
+    {
+        public string StringId { get; set; }
+        public int IntId { get; set; }
     }
 
     [Test]
@@ -140,8 +180,8 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, "theProperty");
+            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession)).Data;
         }
     }
 
@@ -184,8 +224,8 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ), "thePropertyಠ_ಠ");
-            return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, typeof(SagaWithWeirdCharactersಠ_ಠ))).Data;
+            await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ");
+            return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession)).Data;
         }
     }
 
@@ -222,7 +262,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty").GetAwaiter().GetResult();
+            persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -230,9 +270,9 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)).GetAwaiter().GetResult();
+            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
-            persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), sagaData.Version).GetAwaiter().GetResult();
+            persister.Update(sagaData.Data, storageSession, sagaData.Version).GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -240,7 +280,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation)).GetAwaiter().GetResult();
+            var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.AreEqual(2, sagaData.Version);
         }
@@ -280,7 +320,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theProperty");
+            await persister.Save(sagaData1, storageSession, "theProperty");
             await storageSession.CompleteAsync();
         }
 
@@ -288,10 +328,10 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation));
+            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, typeof(SagaWithCorrelation), wrongVersion));
+            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
 
@@ -337,15 +377,17 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, typeof(SagaWithCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty");
+            return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession)).Data;
         }
     }
 
     [SqlSaga(
         TransitionalCorrelationProperty = nameof(SagaData.TransitionalCorrelationProperty)
     )]
-    public class SagaWithCorrelationAndTransitional : SqlSaga<SagaWithCorrelationAndTransitional.SagaData>
+    public class SagaWithCorrelationAndTransitional :
+        SqlSaga<SagaWithCorrelationAndTransitional.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -358,10 +400,18 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
         }
     }
 
-    public class SagaWithCorrelation : SqlSaga<SagaWithCorrelation.SagaData>
+    public class SagaWithCorrelation :
+        SqlSaga<SagaWithCorrelation.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -373,6 +423,12 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
         }
     }
 
@@ -463,12 +519,14 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithStringCorrelation), "theCorrelationProperty");
-            return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, typeof(SagaWithStringCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty");
+            return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession)).Data;
         }
     }
 
-    public class SagaWithStringCorrelation : SqlSaga<SagaWithStringCorrelation.SagaData>
+    public class SagaWithStringCorrelation :
+        SqlSaga<SagaWithStringCorrelation.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -479,6 +537,12 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
         }
     }
 
@@ -519,12 +583,14 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithNonStringCorrelation), 666);
-            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession, typeof(SagaWithNonStringCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, 666);
+            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession)).Data;
         }
     }
 
-    public class SagaWithNonStringCorrelation : SqlSaga<SagaWithNonStringCorrelation.SagaData>
+    public class SagaWithNonStringCorrelation :
+        SqlSaga<SagaWithNonStringCorrelation.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -535,6 +601,12 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+            mapper.ConfigureMapping<AMessage>(_ => _.IntId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
         }
     }
 
@@ -570,7 +642,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData1, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
+            await persister.Save(sagaData1, storageSession, "theCorrelationProperty");
             var sagaData2 = new SagaWithCorrelation.SagaData
             {
                 Id = Guid.NewGuid(),
@@ -581,7 +653,7 @@ public abstract class SagaPersisterTests
             };
             var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
             {
-                await persister.Save(sagaData2, storageSession, typeof(SagaWithCorrelation), "theCorrelationProperty");
+                await persister.Save(sagaData2, storageSession, "theCorrelationProperty");
                 await storageSession.CompleteAsync();
             });
             var innerException = throwsAsync.InnerException;
@@ -623,12 +695,14 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, typeof(SagaWithNoCorrelation), null);
-            return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession, typeof(SagaWithNoCorrelation))).Data;
+            await persister.Save(sagaData, storageSession, null);
+            return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession)).Data;
         }
     }
 
-    public class SagaWithNoCorrelation : SqlSaga<SagaWithNoCorrelation.SagaData>
+    public class SagaWithNoCorrelation :
+        SqlSaga<SagaWithNoCorrelation.SagaData>,
+        IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
         {
@@ -639,6 +713,19 @@ public abstract class SagaPersisterTests
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
+        }
+    }
+
+    public class CustomFinder : IFindSagas<SagaWithNoCorrelation.SagaData>.Using<AMessage>
+    {
+        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+        {
+            return null;
         }
     }
 

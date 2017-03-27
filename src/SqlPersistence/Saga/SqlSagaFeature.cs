@@ -37,14 +37,24 @@ class SqlSagaFeature : Feature
         var tablePrefix = settings.GetTablePrefix();
         var schema = settings.GetSchema();
         var sqlVariant = settings.GetSqlVariant();
-        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder, tablePrefix, schema, sqlVariant);
+        var infoCache = new SagaInfoCache(
+            versionSpecificSettings:
+            versionDeserializeBuilder,
+            jsonSerializer: jsonSerializer,
+            readerCreator: readerCreator,
+            writerCreator: writerCreator,
+            commandBuilder: commandBuilder,
+            tablePrefix: tablePrefix,
+            schema: schema,
+            sqlVariant: sqlVariant,
+            metadataCollection: settings.Get<SagaMetadataCollection>());
         var sagaPersister = new SagaPersister(infoCache);
         var container = context.Container;
         container.ConfigureComponent(() => infoCache, DependencyLifecycle.SingleInstance);
         container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }
 
-     static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
+    static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
     {
         if (jsonSerializerSettings == null)
         {

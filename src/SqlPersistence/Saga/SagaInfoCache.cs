@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
+
 #pragma warning disable 618
 
 class SagaInfoCache
 {
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
     SagaCommandBuilder commandBuilder;
-    ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo> serializerCache = new ConcurrentDictionary<RuntimeTypeHandle, RuntimeSagaInfo>();
+    Dictionary<Type, RuntimeSagaInfo> cache = new Dictionary<Type, RuntimeSagaInfo>();
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
@@ -25,7 +27,8 @@ class SagaInfoCache
         SagaCommandBuilder commandBuilder,
         string tablePrefix,
         string schema,
-        SqlVariant sqlVariant)
+        SqlVariant sqlVariant,
+        SagaMetadataCollection metadataCollection)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
@@ -35,12 +38,31 @@ class SagaInfoCache
         this.tablePrefix = tablePrefix;
         this.schema = schema;
         this.sqlVariant = sqlVariant;
+        Initialize(metadataCollection);
     }
 
-    public RuntimeSagaInfo GetInfo(Type sagaDataType, Type sagaType)
+    void Initialize(SagaMetadataCollection metadataCollection)
     {
-        var handle = sagaDataType.TypeHandle;
-        return serializerCache.GetOrAdd(handle, _ => BuildSagaInfo(sagaDataType, sagaType));
+        foreach (var metadata in metadataCollection)
+        {
+            RuntimeSagaInfo existing;
+            var sagaDataType = metadata.SagaEntityType;
+            if (cache.TryGetValue(sagaDataType, out existing))
+            {
+                throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
+            }
+            cache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
+        }
+    }
+
+    public RuntimeSagaInfo GetInfo(Type sagaDataType)
+    {
+        RuntimeSagaInfo value;
+        if (cache.TryGetValue(sagaDataType, out value))
+        {
+            return value;
+        }
+        throw new Exception($"Could not find RuntimeSagaInfo for {sagaDataType.FullName}.");
     }
 
     RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
