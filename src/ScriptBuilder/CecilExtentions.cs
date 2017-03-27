@@ -29,7 +29,7 @@ static class CecilExtentions
         {
             return property;
         }
-        throw new ErrorsException($@"Expected to to find a property a property named '{propertyName}' on '{type.FullName}'.");
+        throw new ErrorsException($@"Expected to find a property named '{propertyName}' on '{type.FullName}'.");
     }
 
     public static bool TryGetProperty(this TypeDefinition type, string propertyName, out PropertyDefinition property)
