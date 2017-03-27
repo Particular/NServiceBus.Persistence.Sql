@@ -12,6 +12,7 @@ class RuntimeSagaInfo
 {
     Type sagaDataType;
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
+    public Type SagaType;
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
@@ -48,11 +49,12 @@ class RuntimeSagaInfo
             deserializers = new ConcurrentDictionary<Version, JsonSerializer>();
         }
         this.versionSpecificSettings = versionSpecificSettings;
+        SagaType = sagaType;
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
-        ValidateIsSqlSaga(sagaType);
+        ValidateIsSqlSaga();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
 
@@ -89,11 +91,11 @@ class RuntimeSagaInfo
         }
     }
 
-    void ValidateIsSqlSaga(Type sagaType)
+    void ValidateIsSqlSaga()
     {
-        if (!sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
+        if (!SagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
         {
-            throw new Exception($"Type '{sagaType.FullName}' does not inherit from SqlSaga<T>. Change the type to inherit from SqlSaga<T>.");
+            throw new Exception($"Type '{SagaType.FullName}' does not inherit from SqlSaga<T>. Change the type to inherit from SqlSaga<T>.");
         }
     }
 

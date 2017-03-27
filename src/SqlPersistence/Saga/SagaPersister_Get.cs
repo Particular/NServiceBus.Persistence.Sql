@@ -13,15 +13,14 @@ partial class SagaPersister
     internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
-        var sagaType = context.GetSagaType();
-        var result = await GetByWhereClause<TSagaData>(whereClause, session, sagaType, appendParameters, sagaInfoCache);
+        var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache);
         return SetConcurrency(result, context);
     }
 
-    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, Type sagaType, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
         var commandText = $@"
 {sagaInfo.SelectFromCommand}
 where {whereClause}";
@@ -31,15 +30,14 @@ where {whereClause}";
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(propertyName, propertyValue, session, sagaType);
+        var result = await Get<TSagaData>(propertyName, propertyValue, session);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, Type sagaType)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session)
         where TSagaData : IContainSagaData
     {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
 
         ValidatePropertyName<TSagaData>(propertyName, sagaInfo);
         var commandText = sagaInfo.GetByCorrelationPropertyCommand;
@@ -56,15 +54,14 @@ where {whereClause}";
     public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var sagaType = context.GetSagaType();
-        var result = await Get<TSagaData>(sagaId, session, sagaType);
+        var result = await Get<TSagaData>(sagaId, session);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, Type sagaType)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session)
         where TSagaData : IContainSagaData
     {
-        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData), sagaType);
+        var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
         return GetSagaData<TSagaData>(session, sagaInfo.GetBySagaIdCommand, sagaInfo,
             appendParameters: (parameterBuilder, append) =>
             {
