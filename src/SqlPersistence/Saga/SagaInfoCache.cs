@@ -11,7 +11,7 @@ class SagaInfoCache
 {
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
     SagaCommandBuilder commandBuilder;
-    Dictionary<Type, RuntimeSagaInfo> serializerCache = new Dictionary<Type, RuntimeSagaInfo>();
+    Dictionary<Type, RuntimeSagaInfo> cache = new Dictionary<Type, RuntimeSagaInfo>();
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
@@ -47,18 +47,18 @@ class SagaInfoCache
         {
             RuntimeSagaInfo existing;
             var sagaDataType = metadata.SagaEntityType;
-            if (serializerCache.TryGetValue(sagaDataType, out existing))
+            if (cache.TryGetValue(sagaDataType, out existing))
             {
                 throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
             }
-            serializerCache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
+            cache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
         }
     }
 
     public RuntimeSagaInfo GetInfo(Type sagaDataType)
     {
         RuntimeSagaInfo value;
-        if (serializerCache.TryGetValue(sagaDataType, out value))
+        if (cache.TryGetValue(sagaDataType, out value))
         {
             return value;
         }
