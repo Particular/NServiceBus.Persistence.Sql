@@ -11,8 +11,6 @@ using NServiceBus.Transport;
 class StorageAdapter : ISynchronizedStorageAdapter
 {
     static Task<CompletableSynchronizedStorageSession> EmptyResultTask = Task.FromResult(default(CompletableSynchronizedStorageSession));
-    static CompletableSynchronizedStorageSession EmptyResult = default(CompletableSynchronizedStorageSession);
-    static SqlTransaction NoSqlTransaction = default(SqlTransaction);
 
     SagaInfoCache infoCache;
     Func<DbConnection> connectionBuilder;
@@ -26,12 +24,12 @@ class StorageAdapter : ISynchronizedStorageAdapter
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
     {
         var outboxTransaction = transaction as SqlOutboxTransaction;
-        if (outboxTransaction != null)
+        if (outboxTransaction == null)
         {
-            CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
-            return Task.FromResult(session);
+            return EmptyResultTask;
         }
-        return EmptyResultTask;
+        CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
+        return Task.FromResult(session);
     }
 
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
@@ -50,11 +48,11 @@ class StorageAdapter : ISynchronizedStorageAdapter
         if (transportTransaction.TryGet(out existingTransaction))
         {
             var connection = await connectionBuilder.OpenConnection();
-            CompletableSynchronizedStorageSession session = new StorageSession(connection, NoSqlTransaction, true, infoCache);
+            CompletableSynchronizedStorageSession session = new StorageSession(connection, null, true, infoCache);
             return session;
         }
 
         //Other modes handled by creating a new session.
-        return EmptyResult;
+        return null;
     }
 }
