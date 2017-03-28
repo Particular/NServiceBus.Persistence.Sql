@@ -107,6 +107,7 @@
     public class SubscriptionSettings
     {
         public void CacheFor(System.TimeSpan timeSpan) { }
+        public void DisableCache() { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class static TimeoutCommandBuilder

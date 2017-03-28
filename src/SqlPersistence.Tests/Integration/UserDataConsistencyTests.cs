@@ -115,6 +115,7 @@ end";
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
+        persistence.SubscriptionSettings().DisableCache();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
             message = c.Error;

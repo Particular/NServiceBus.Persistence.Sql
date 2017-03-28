@@ -64,6 +64,7 @@ public class MsmqTransportIntegrationTests : IDisposable
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
+        persistence.SubscriptionSettings().DisableCache();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);
         var startSagaMessage = new StartSagaMessage
