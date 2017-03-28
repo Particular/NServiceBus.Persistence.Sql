@@ -26,9 +26,11 @@ namespace NServiceBus.Persistence.Sql
 
         internal static TimeSpan? GetCacheFor(ReadOnlySettings settings)
         {
-            TimeSpan? cache;
+            TimeSpan cache;
             if (settings.TryGet("SqlPersistence.Subscription.CacheFor", out cache))
             {
+                // since ReadOnlySettings.TryGet will return false if the underlying value is null
+                // we use TimeSpan.Zero as a marker for DisableCache
                 if (cache == TimeSpan.Zero)
                 {
                     return null;
