@@ -4,6 +4,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using AcceptanceTesting;
     using NUnit.Framework;
 
+    [Explicit]
     public class When_doing_request_response_between_sagas_first_handler_responding : When_doing_request_response_between_sagas
     {
         [Test]

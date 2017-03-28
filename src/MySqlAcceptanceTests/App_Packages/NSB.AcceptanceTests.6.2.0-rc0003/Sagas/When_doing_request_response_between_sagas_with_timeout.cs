@@ -5,6 +5,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using AcceptanceTesting;
     using NUnit.Framework;
 
+    [Explicit]
     public class When_doing_request_response_between_sagas_with_timeout : When_doing_request_response_between_sagas
     {
         [Test]
