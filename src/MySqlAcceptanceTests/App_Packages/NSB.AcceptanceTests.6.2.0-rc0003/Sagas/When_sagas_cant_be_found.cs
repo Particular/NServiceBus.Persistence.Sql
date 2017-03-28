@@ -26,6 +26,7 @@
         }
 
         [Test]
+        [Explicit]
         public async Task IHandleSagaNotFound_not_called_if_second_saga_is_executed()
         {
             var context = await Scenario.Define<Context>()

@@ -11,6 +11,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
     using Persistence.Sql;
 
     [TestFixture]
+    [Explicit]
     public class When_starting_an_endpoint_with_a_saga_autosubscribe_disabled : NServiceBusAcceptanceTest
     {
         [Test]

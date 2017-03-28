@@ -5,8 +5,10 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using Features;
+    using NUnit.Framework;
     using Persistence.Sql;
 
+    [Explicit]
     public class When_doing_request_response_between_sagas : NServiceBusAcceptanceTest
     {
         public class Context : ScenarioContext
