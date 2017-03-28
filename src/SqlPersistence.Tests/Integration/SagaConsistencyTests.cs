@@ -97,6 +97,7 @@ public class SagaConsistencyTests
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
+        persistence.SubscriptionSettings().DisableCache();
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
