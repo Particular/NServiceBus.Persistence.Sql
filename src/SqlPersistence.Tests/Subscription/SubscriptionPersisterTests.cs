@@ -95,7 +95,15 @@ public abstract class SubscriptionPersisterTests
 
     static void VerifyCache(ConcurrentDictionary<string, SubscriptionPersister.CacheItem> cache)
     {
-        var items = cache.ToDictionary(_=>_.Key, item => item.Value.Subscribers.Result);
+        var items = cache
+            .OrderBy(_ => _.Key)
+            .ToDictionary(_ => _.Key,
+                elementSelector: item =>
+                {
+                    return item.Value.Subscribers.Result
+                        .OrderBy(_ => _.Endpoint)
+                        .ThenBy(_ => _.TransportAddress);
+                });
         ObjectApprover.VerifyWithJson(items);
     }
 
