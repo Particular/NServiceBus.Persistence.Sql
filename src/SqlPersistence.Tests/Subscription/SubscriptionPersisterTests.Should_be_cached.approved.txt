@@ -1,8 +1,8 @@
-﻿[
-  [
+﻿{
+  "type1,": [
     {
       "TransportAddress": "e@machine1",
       "Endpoint": "endpoint"
     }
   ]
-]
+}

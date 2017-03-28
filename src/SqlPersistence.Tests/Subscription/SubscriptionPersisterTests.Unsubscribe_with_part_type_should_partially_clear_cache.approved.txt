@@ -1,0 +1,20 @@
+﻿{
+  "type1,type3,": [
+    {
+      "TransportAddress": "e@machine1",
+      "Endpoint": "endpoint"
+    }
+  ],
+  "type1,": [
+    {
+      "TransportAddress": "e@machine1",
+      "Endpoint": "endpoint"
+    }
+  ],
+  "type3,": [
+    {
+      "TransportAddress": "e@machine1",
+      "Endpoint": "endpoint"
+    }
+  ]
+}
