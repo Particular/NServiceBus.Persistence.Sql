@@ -7,6 +7,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
 
     // Repro for issue  https://github.com/NServiceBus/NServiceBus/issues/1277
@@ -83,10 +84,12 @@
                     metadata => metadata.RegisterPublisherFor<GroupPendingEvent>(typeof(Publisher)));
             }
 
-            public class Saga1 : Saga<Saga1.MySaga1Data>,
+            public class Saga1 : SqlSaga<Saga1.MySaga1Data>,
                 IAmStartedByMessages<GroupPendingEvent>,
                 IHandleMessages<CompleteSaga1Now>
             {
+                protected override string CorrelationPropertyName => nameof(MySaga1Data.DataId);
+
                 public Context TestContext { get; set; }
 
                 public Task Handle(GroupPendingEvent message, IMessageHandlerContext context)
@@ -108,10 +111,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId).ToSaga(s => s.DataId);
-                    mapper.ConfigureMapping<CompleteSaga1Now>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<CompleteSaga1Now>(m => m.DataId);
                 }
 
                 public class MySaga1Data : ContainSagaData
@@ -120,10 +123,12 @@
                 }
             }
 
-            public class Saga2 : Saga<Saga2.MySaga2Data>,
+            public class Saga2 : SqlSaga<Saga2.MySaga2Data>,
                 IAmStartedByMessages<StartSaga2>,
                 IHandleMessages<GroupPendingEvent>
             {
+                protected override string CorrelationPropertyName => nameof(MySaga2Data.DataId);
+
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga2 message, IMessageHandlerContext context)
@@ -143,10 +148,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId).ToSaga(s => s.DataId);
-                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId);
+                    mapper.ConfigureMapping<GroupPendingEvent>(m => m.DataId);
                 }
 
                 public class MySaga2Data : ContainSagaData

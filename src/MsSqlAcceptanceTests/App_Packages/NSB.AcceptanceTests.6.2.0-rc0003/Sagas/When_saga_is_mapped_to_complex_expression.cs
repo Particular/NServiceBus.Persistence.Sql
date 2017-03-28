@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_saga_is_mapped_to_complex_expression : NServiceBusAcceptanceTest
     {
@@ -43,9 +44,11 @@
                 EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            public class TestSaga02 : Saga<TestSagaData02>,
+            public class TestSaga02 : SqlSaga<TestSagaData02>,
                 IAmStartedByMessages<StartSagaMessage>, IAmStartedByMessages<OtherMessage>
             {
+                protected override string CorrelationPropertyName => nameof(TestSagaData02.KeyValue);
+
                 public Context Context { get; set; }
 
                 public Task Handle(OtherMessage message, IMessageHandlerContext context)
@@ -62,13 +65,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData02> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Key)
-                        .ToSaga(s => s.KeyValue);
-
-                    mapper.ConfigureMapping<OtherMessage>(m => m.Part1 + "_" + m.Part2)
-                        .ToSaga(s => s.KeyValue);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Key);
+                    mapper.ConfigureMapping<OtherMessage>(m => m.Part1 + "_" + m.Part2);
                 }
             }
 

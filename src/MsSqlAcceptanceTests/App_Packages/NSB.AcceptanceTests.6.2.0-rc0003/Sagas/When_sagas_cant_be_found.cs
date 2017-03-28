@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_sagas_cant_be_found : NServiceBusAcceptanceTest
     {
@@ -76,8 +77,9 @@
                 }
             }
 
-            public class CantBeFoundSaga1 : Saga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            public class CantBeFoundSaga1 : SqlSaga<CantBeFoundSaga1.CantBeFoundSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
+                protected override string CorrelationPropertyName => nameof(CantBeFoundSaga1Data.MessageId);
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
                     Data.MessageId = message.Id;
@@ -89,10 +91,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CantBeFoundSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class CantBeFoundSaga1Data : ContainSagaData
@@ -101,7 +103,7 @@
                 }
             }
 
-            public class CantBeFoundSaga2 : Saga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            public class CantBeFoundSaga2 : SqlSaga<CantBeFoundSaga2.CantBeFoundSaga2Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
@@ -114,16 +116,19 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CantBeFoundSaga2Data> mapper)
+                protected override string CorrelationPropertyName => nameof(CantBeFoundSaga2Data.MessageId);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class CantBeFoundSaga2Data : ContainSagaData
                 {
                     public virtual Guid MessageId { get; set; }
                 }
+
             }
 
             public class SagaNotFound : IHandleSagaNotFound
@@ -175,8 +180,10 @@
                 }
             }
 
-            public class ReceiverWithOrderedSagasSaga1 : Saga<ReceiverWithOrderedSagasSaga1.ReceiverWithOrderedSagasSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
+            public class ReceiverWithOrderedSagasSaga1 : SqlSaga<ReceiverWithOrderedSagasSaga1.ReceiverWithOrderedSagasSaga1Data>, IAmStartedByMessages<StartSaga>, IHandleMessages<MessageToSaga>
             {
+                protected override string CorrelationPropertyName => nameof(ReceiverWithOrderedSagasSaga1Data.MessageId);
+
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
                     Data.MessageId = message.Id;
@@ -188,10 +195,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReceiverWithOrderedSagasSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class ReceiverWithOrderedSagasSaga1Data : ContainSagaData
@@ -200,8 +207,10 @@
                 }
             }
 
-            public class ReceiverWithOrderedSagasSaga2 : Saga<ReceiverWithOrderedSagasSaga2.ReceiverWithOrderedSagasSaga2Data>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
+            public class ReceiverWithOrderedSagasSaga2 : SqlSaga<ReceiverWithOrderedSagasSaga2.ReceiverWithOrderedSagasSaga2Data>, IHandleMessages<StartSaga>, IAmStartedByMessages<MessageToSaga>
             {
+                protected override string CorrelationPropertyName => nameof(ReceiverWithOrderedSagasSaga2Data.MessageId);
+
                 public Context Context { get; set; }
 
                 public Task Handle(MessageToSaga message, IMessageHandlerContext context)
@@ -216,11 +225,11 @@
                     Data.MessageId = message.Id;
                     return Task.FromResult(0);
                 }
-
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReceiverWithOrderedSagasSaga2Data> mapper)
+                
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.Id).ToSaga(s => s.MessageId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id).ToSaga(s => s.MessageId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.Id);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.Id);
                 }
 
                 public class ReceiverWithOrderedSagasSaga2Data : ContainSagaData

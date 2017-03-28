@@ -8,6 +8,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
     using EndpointTemplates;
     using NServiceBus.Pipeline;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     [TestFixture]
     public class When_starting_an_endpoint_with_a_saga_autosubscribe_disabled : NServiceBusAcceptanceTest
@@ -62,25 +63,26 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                 Context testContext;
             }
 
-            public class NotAutoSubscribedSaga : Saga<NotAutoSubscribedSaga.NotAutoSubscribedSagaSagaData>, IAmStartedByMessages<MyEvent>
+            public class NotAutoSubscribedSaga : SqlSaga<NotAutoSubscribedSaga.NotAutoSubscribedSagaSagaData>, IAmStartedByMessages<MyEvent>
             {
                 public Task Handle(MyEvent message, IMessageHandlerContext context)
                 {
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NotAutoSubscribedSagaSagaData> mapper)
-                {
-                    mapper.ConfigureMapping<MyEvent>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
-                }
-
                 public class NotAutoSubscribedSagaSagaData : ContainSagaData
                 {
                     public virtual string SomeId { get; set; }
                 }
+
+                protected override string CorrelationPropertyName => nameof(NotAutoSubscribedSagaSagaData.SomeId);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                {
+                    mapper.ConfigureMapping<MyEvent>(msg => msg.SomeId);
+                }
             }
 
-            public class NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent : Saga<NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent.NotAutosubscribeSuperClassEventSagaData>,
+            public class NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent : SqlSaga<NotAutoSubsubscribedSagaThatReactsOnASuperClassEvent.NotAutosubscribeSuperClassEventSagaData>,
                 IAmStartedByMessages<MyEventBase>
             {
                 public Task Handle(MyEventBase message, IMessageHandlerContext context)
@@ -88,14 +90,15 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NotAutosubscribeSuperClassEventSagaData> mapper)
-                {
-                    mapper.ConfigureMapping<MyEventBase>(saga => saga.SomeId).ToSaga(saga => saga.SomeId);
-                }
-
                 public class NotAutosubscribeSuperClassEventSagaData : ContainSagaData
                 {
                     public virtual string SomeId { get; set; }
+                }
+
+                protected override string CorrelationPropertyName => nameof(NotAutosubscribeSuperClassEventSagaData.SomeId);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                {
+                    mapper.ConfigureMapping<MyEventBase>(saga => saga.SomeId);
                 }
             }
         }

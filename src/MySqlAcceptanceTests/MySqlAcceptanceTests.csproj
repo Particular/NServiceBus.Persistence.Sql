@@ -62,45 +62,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Mutators\When_incoming_mutator_changes_message_type.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Reliability\Outbox\When_clearing_saga_timeouts.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Routing\AutomaticSubscriptions\When_starting_an_endpoint_with_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Routing\AutomaticSubscriptions\When_starting_an_endpoint_with_a_saga_autosubscribe_disabled.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_adding_state_to_context.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_an_endpoint_replies_to_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_auto_correlated_property_is_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_a_base_class_mapped_is_handled_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_a_base_class_message_starts_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_finder_cant_find_saga_instance.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_finder_returns_existing_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_forgetting_to_set_a_corr_property.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_message_has_a_saga_id.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\when_receiving_multiple_timeouts.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_receiving_that_completes_the_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_receiving_that_should_start_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_replies_to_message_published_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\when_reply_from_saga_not_found_handler.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_sagas_cant_be_found.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_exists_for_start_message.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_handles_unmapped_message.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_has_a_non_empty_constructor.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_id_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_is_mapped_to_complex_expression.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_message_goes_through_delayed_retries.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_saga_started_concurrently.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_sending_from_a_saga_handle.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_sending_from_a_saga_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_started_by_base_event_from_other_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_started_by_event_from_another_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_timeout_hit_not_found_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_two_sagas_subscribe_to_the_same_event.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_updating_existing_correlation_property.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_using_a_received_message_for_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_using_contain_saga_data.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\Sagas\When_using_ReplyToOriginator.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.3\SelfVerification\When_running_saga_tests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0-rc0003\Audit\When_auditing.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0-rc0003\Audit\When_auditing_message_with_TimeToBeReceived.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0-rc0003\Audit\When_audit_is_overridden_in_code.cs" />
@@ -292,7 +253,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0-rc0003\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0-rc0003\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureEndpointSqlPersistence.cs" />
-    <Compile Include="ConfigureScenariosForSqlPersistence.cs" />
+    <Compile Include="TestSuiteConstraints.cs" />
     <Compile Include="When_all_messages_have_finders.cs" />
     <Compile Include="When_custom_finder_returns_existing_saga.cs" />
   </ItemGroup>

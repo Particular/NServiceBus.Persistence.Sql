@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_saga_has_a_non_empty_constructor : NServiceBusAcceptanceTest
     {
@@ -34,10 +35,12 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class TestSaga11 : Saga<TestSagaData11>,
+            public class TestSaga11 : SqlSaga<TestSagaData11>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<OtherMessage>
             {
+                protected override string CorrelationPropertyName => nameof(TestSagaData11.SomeId);
+
                 public TestSaga11(Context testContext)
                 {
                     this.testContext = testContext;
@@ -58,12 +61,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData11> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<OtherMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<OtherMessage>(m => m.SomeId);
                 }
 
                 Context testContext;
