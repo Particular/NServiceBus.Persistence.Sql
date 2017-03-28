@@ -1,5 +1,8 @@
+using System;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
@@ -7,26 +10,29 @@ using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
 {
-    static Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);
-    SagaInfoCache infoCache;
+    static Task<CompletableSynchronizedStorageSession> EmptyResultTask = Task.FromResult(default(CompletableSynchronizedStorageSession));
 
-    public StorageAdapter(SagaInfoCache infoCache)
+    SagaInfoCache infoCache;
+    Func<DbConnection> connectionBuilder;
+
+    public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache)
     {
+        this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
     {
         var outboxTransaction = transaction as SqlOutboxTransaction;
-        if (outboxTransaction != null)
+        if (outboxTransaction == null)
         {
-            CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
-            return Task.FromResult(session);
+            return EmptyResultTask;
         }
-        return EmptyResult;
+        CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
+        return Task.FromResult(session);
     }
 
-    public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
         SqlConnection existingSqlConnection;
         SqlTransaction existingSqlTransaction;
@@ -34,9 +40,19 @@ class StorageAdapter : ISynchronizedStorageAdapter
         if (transportTransaction.TryGet(out existingSqlConnection) && transportTransaction.TryGet(out existingSqlTransaction))
         {
             CompletableSynchronizedStorageSession session = new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
-            return Task.FromResult(session);
+            return session;
         }
+
+        Transaction existingTransaction;
+        // Transport supports DTC and uses TxScope owned by the transport
+        if (transportTransaction.TryGet(out existingTransaction))
+        {
+            var connection = await connectionBuilder.OpenConnection();
+            CompletableSynchronizedStorageSession session = new StorageSession(connection, null, true, infoCache);
+            return session;
+        }
+
         //Other modes handled by creating a new session.
-        return EmptyResult;
+        return null;
     }
 }
