@@ -114,7 +114,14 @@ class RuntimeSagaInfo
             using (var stringWriter = new StringWriter(builder))
             using (var writer = writerCreator(stringWriter))
             {
-                jsonSerializer.Serialize(writer, sagaData);
+                try
+                {
+                    jsonSerializer.Serialize(writer, sagaData);
+                }
+                catch (Exception exception)
+                {
+                    throw new SerializationException(exception);
+                }
             }
             return builder.ToString();
         }
@@ -131,9 +138,17 @@ class RuntimeSagaInfo
         where TSagaData : IContainSagaData
     {
         var serializer = GetDeserialize(storedSagaTypeVersion);
+
         using (var jsonReader = readerCreator(textReader))
         {
-            return serializer.Deserialize<TSagaData>(jsonReader);
+            try
+            {
+                return serializer.Deserialize<TSagaData>(jsonReader);
+            }
+            catch (Exception exception)
+            {
+                throw new SerializationException(exception);
+            }
         }
     }
 
