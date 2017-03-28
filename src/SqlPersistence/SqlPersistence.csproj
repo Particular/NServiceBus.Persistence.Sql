@@ -90,6 +90,7 @@
     <Compile Include="Saga\SagaPersister_Update.cs" />
     <Compile Include="Saga\SagaPersister_Complete.cs" />
     <Compile Include="Saga\SagaPersister_Get.cs" />
+    <Compile Include="SerializationException.cs" />
     <Compile Include="Subscription\Config\SqlPersistenceConfig.cs" />
     <Compile Include="Subscription\Config\SubscriptionSettings.cs" />
     <Compile Include="Subscription\Config\SubscriptionSettings_CacheFor.cs" />

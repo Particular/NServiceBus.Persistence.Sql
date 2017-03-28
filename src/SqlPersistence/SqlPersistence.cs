@@ -12,11 +12,11 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public SqlPersistence()
         {
-            
             Defaults(s =>
             {
                 // always enable these ones since they will only enable if the outbox or sagas are on
                 s.EnableFeatureByDefault<StorageSessionFeature>();
+                s.AddUnrecoverableException(typeof(SerializationException));
                 s.Set<EnabledStorageFeatures>(new EnabledStorageFeatures());
             });
             Supports<StorageType.Outbox>(s =>
