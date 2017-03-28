@@ -11,7 +11,7 @@ class StorageSessionFeature : Feature
         var connectionBuilder = context.Settings.GetConnectionBuilder();
         var container = context.Container;
         container.ConfigureComponent(builder => new SynchronizedStorage(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(builder => new StorageAdapter(GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(builder => new StorageAdapter(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
     }
 
     static SagaInfoCache GetInfoCache(IBuilder builder)
