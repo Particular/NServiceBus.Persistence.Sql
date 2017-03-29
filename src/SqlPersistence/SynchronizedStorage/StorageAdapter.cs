@@ -43,11 +43,21 @@ class StorageAdapter : ISynchronizedStorageAdapter
             return session;
         }
 
-        Transaction existingTransaction;
+        Transaction transportTx;
         // Transport supports DTC and uses TxScope owned by the transport
-        if (transportTransaction.TryGet(out existingTransaction))
+        transportTransaction.TryGet(out transportTx);
+        if (transportTx != null && Transaction.Current != null && !transportTx.Equals(Transaction.Current))
+        {
+            throw new Exception("A TransctionScope has been opened in the current context overriding the one created by the transport. " 
+                + "This setup can result in insonsistent data because operations done via connections enlisted in the context scope won't be committed "
+                + "atomically with the receive transaction. If you wish to manually control the TransactionScope in the pipeline switch the transport transaction mode "
+                + "to values lower than 'TransactionScope'.");
+        }
+        var ambientTransaction = transportTx ?? Transaction.Current;
+        if (ambientTransaction != null)
         {
             var connection = await connectionBuilder.OpenConnection();
+            connection.EnlistTransaction(ambientTransaction);
             CompletableSynchronizedStorageSession session = new StorageSession(connection, null, true, infoCache);
             return session;
         }
