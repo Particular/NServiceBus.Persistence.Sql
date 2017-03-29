@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Transactions;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
@@ -51,7 +52,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
             throw new Exception("A TransctionScope has been opened in the current context overriding the one created by the transport. " 
                 + "This setup can result in insonsistent data because operations done via connections enlisted in the context scope won't be committed "
                 + "atomically with the receive transaction. If you wish to manually control the TransactionScope in the pipeline switch the transport transaction mode "
-                + "to values lower than 'TransactionScope'.");
+                + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
         }
         var ambientTransaction = transportTx ?? Transaction.Current;
         if (ambientTransaction != null)
