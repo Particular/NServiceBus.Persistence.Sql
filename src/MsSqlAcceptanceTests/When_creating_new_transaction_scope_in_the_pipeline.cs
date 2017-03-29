@@ -34,9 +34,6 @@
 
         public class Context : ScenarioContext
         {
-            public bool SecondMessageReceived { get; set; }
-            public Guid FirstSagaId { get; set; }
-            public Guid SecondSagaId { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
@@ -79,7 +76,6 @@
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
                 {
-                    Data.Counter++;
                     return Task.FromResult(0);
                 }
 
@@ -89,13 +85,9 @@
                 }
             }
 
-            public class TestSagaData12 : IContainSagaData
+            public class TestSagaData12 : ContainSagaData
             {
-                public virtual Guid SomeId { get; set; }
-                public virtual Guid Id { get; set; }
-                public virtual string Originator { get; set; }
-                public virtual string OriginalMessageId { get; set; }
-                public virtual int Counter { get; set; }
+                public Guid SomeId { get; set; }
             }
         }
 
@@ -104,8 +96,6 @@
             public Guid SomeId { get; set; }
 
             public bool SecondMessage { get; set; }
-
-            public int Counter { get; set; }
         }
     }
 }

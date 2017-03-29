@@ -99,13 +99,10 @@
                 }
             }
 
-            public class TestSagaData13 : IContainSagaData
+            public class TestSagaData13 : ContainSagaData
             {
-                public virtual Guid SomeId { get; set; }
-                public virtual Guid Id { get; set; }
-                public virtual string Originator { get; set; }
-                public virtual string OriginalMessageId { get; set; }
-                public virtual int Counter { get; set; }
+                public Guid SomeId { get; set; }
+                public int Counter { get; set; }
             }
         }
 
