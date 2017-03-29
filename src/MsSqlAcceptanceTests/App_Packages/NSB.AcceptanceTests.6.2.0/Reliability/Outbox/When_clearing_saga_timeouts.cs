@@ -11,7 +11,6 @@
     using NServiceBus;
     using NUnit.Framework;
     using Persistence;
-    using Persistence.Sql;
 
     public class When_clearing_saga_timeouts : NServiceBusAcceptanceTest
     {
@@ -62,19 +61,17 @@
                 }
             }
 
-            public class PlaceOrderSaga : SqlSaga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
+            public class PlaceOrderSaga : Saga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {
-                protected override string CorrelationPropertyName => nameof(PlaceOrderSagaData.DataId);
-
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
                     return context.SendLocal(new SignalDone());
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<PlaceOrderSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<PlaceOrder>(m => m.DataId);
+                    mapper.ConfigureMapping<PlaceOrder>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class PlaceOrderSagaData : ContainSagaData

@@ -5,7 +5,6 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_saga_exists_for_start_message : NServiceBusAcceptanceTest
     {
@@ -39,10 +38,8 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class TestSaga05 : SqlSaga<TestSagaData05>, IAmStartedByMessages<StartSagaMessage>
+            public class TestSaga05 : Saga<TestSagaData05>, IAmStartedByMessages<StartSagaMessage>
             {
-                protected override string CorrelationPropertyName => nameof(TestSagaData05.SomeId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -65,9 +62,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData05> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
+                        .ToSaga(s => s.SomeId);
                 }
             }
 

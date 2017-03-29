@@ -7,7 +7,6 @@
     using AcceptanceTesting.Support;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     [TestFixture]
     public class When_auto_correlated_property_is_changed : NServiceBusAcceptanceTest
@@ -44,11 +43,9 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class CorrIdChangedSaga : SqlSaga<CorrIdChangedSaga.CorrIdChangedSagaData>,
+            public class CorrIdChangedSaga : Saga<CorrIdChangedSaga.CorrIdChangedSagaData>,
                 IAmStartedByMessages<StartSaga>
             {
-                protected override string CorrelationPropertyName => nameof(CorrIdChangedSagaData.DataId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -58,9 +55,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CorrIdChangedSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class CorrIdChangedSagaData : ContainSagaData

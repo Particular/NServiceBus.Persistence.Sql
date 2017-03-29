@@ -7,7 +7,6 @@
     using AcceptanceTesting.Support;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     [TestFixture]
     public class When_saga_id_changed : NServiceBusAcceptanceTest
@@ -43,11 +42,9 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class SagaIdChangedSaga : SqlSaga<SagaIdChangedSaga.SagaIdChangedSagaData>,
+            public class SagaIdChangedSaga : Saga<SagaIdChangedSaga.SagaIdChangedSagaData>,
                 IAmStartedByMessages<StartSaga>
             {
-                protected override string CorrelationPropertyName => nameof(SagaIdChangedSagaData.DataId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -57,9 +54,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaIdChangedSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class SagaIdChangedSagaData : ContainSagaData

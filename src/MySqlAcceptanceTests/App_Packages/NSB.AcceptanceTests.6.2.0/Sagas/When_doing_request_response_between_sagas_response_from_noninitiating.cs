@@ -4,7 +4,6 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using AcceptanceTesting;
     using NUnit.Framework;
 
-    [Explicit]
     public class When_doing_request_response_between_sagas_response_from_noninitiating : When_doing_request_response_between_sagas
     {
         [Test]
