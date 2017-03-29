@@ -81,10 +81,12 @@
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
-    [System.ObsoleteAttribute(@"Replaced by overrides on SqlSaga.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty override TransitionalCorrelationPropertyName on the saga implementing SqlSaga<T>\r\n * For tableSuffix override TableSuffix on the saga implementing SqlSaga<T>. Will be removed in version 3.0.0.", true)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
+        public string CorrelationProperty { get; }
+        public string TableSuffix { get; }
+        public string TransitionalCorrelationProperty { get; }
     }
     public enum SqlVariant
     {
