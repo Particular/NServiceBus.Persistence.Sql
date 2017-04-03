@@ -88,6 +88,7 @@
     <Compile Include="OracleCommandWrapper.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\Config\SagaSettings_NameFilter.cs" />
     <Compile Include="Saga\IMessagePropertyMapper.cs" />
     <Compile Include="Saga\MessagePropertyMapper.cs" />
     <Compile Include="Saga\ParameterAppender.cs" />

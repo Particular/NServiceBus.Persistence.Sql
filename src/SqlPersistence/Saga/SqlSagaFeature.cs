@@ -34,6 +34,11 @@ class SqlSagaFeature : Feature
         {
             writerCreator = writer => new JsonTextWriter(writer);
         }
+        var nameFilter = SagaSettings.GetNameFilter(settings);
+        if (nameFilter == null)
+        {
+            nameFilter = (sagaName => sagaName);
+        }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix();
         var schema = settings.GetSchema();
@@ -46,7 +51,8 @@ class SqlSagaFeature : Feature
             tablePrefix: tablePrefix,
             schema: schema,
             sqlVariant: sqlVariant,
-            metadataCollection: settings.Get<SagaMetadataCollection>());
+            metadataCollection: settings.Get<SagaMetadataCollection>(),
+            nameFilter: nameFilter);
         var sagaPersister = new SagaPersister(infoCache, sqlVariant);
         var container = context.Container;
         container.ConfigureComponent(() => infoCache, DependencyLifecycle.SingleInstance);

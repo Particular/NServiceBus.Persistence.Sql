@@ -49,7 +49,8 @@ public abstract class SagaPersisterTests
             tablePrefix: $"{endpointName}_",
             schema: schema,
             sqlVariant: runtimeSqlVariant,
-            metadataCollection: sagaMetadataCollection);
+            metadataCollection: sagaMetadataCollection,
+            nameFilter: sagaName => sagaName);
         return new SagaPersister(infoCache, runtimeSqlVariant);
     }
 
