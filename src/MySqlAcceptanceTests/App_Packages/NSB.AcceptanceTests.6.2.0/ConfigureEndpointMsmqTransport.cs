@@ -20,7 +20,7 @@ public class ConfigureEndpointMsmqTransport : IConfigureEndpointTestExecution
             EnvironmentHelper.GetEnvironmentVariable($"{nameof(MsmqTransport)}.ConnectionString")
             ?? DefaultConnectionString;
         var transportConfig = configuration.UseTransport<MsmqTransport>();
-
+        transportConfig.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
         transportConfig.ConnectionString(connectionString);
 
         var routingConfig = transportConfig.Routing();
