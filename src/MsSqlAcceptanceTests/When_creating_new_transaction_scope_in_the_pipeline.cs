@@ -29,7 +29,7 @@
                 .Run();
 
             var exceptionMessage = context.FailedMessages.First().Value.First().Exception.Message;
-            StringAssert.StartsWith("A TransctionScope has been opened in the current context overriding the one created by the transport.", exceptionMessage);
+            StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", exceptionMessage);
         }
 
         public class Context : ScenarioContext
