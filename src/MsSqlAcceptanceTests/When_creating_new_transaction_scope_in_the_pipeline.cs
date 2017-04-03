@@ -87,7 +87,7 @@
 
             public class TestSagaData12 : ContainSagaData
             {
-                public Guid SomeId { get; set; }
+                public virtual Guid SomeId { get; set; }
             }
         }
 
