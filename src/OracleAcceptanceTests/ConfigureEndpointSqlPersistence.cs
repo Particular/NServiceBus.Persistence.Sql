@@ -31,6 +31,11 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
+
+        //Force Saga table names to 27 characters to fit in Oracle
+        var sagaSettings = persistence.SagaSettings();
+        sagaSettings.NameFilter(sagaName => sagaName.Substring(0, Math.Min(27, sagaName.Length)));
+
         return Task.FromResult(0);
     }
 
