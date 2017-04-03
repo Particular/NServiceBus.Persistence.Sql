@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
@@ -27,4 +27,14 @@ public class OracleSagaPersisterTests : SagaPersisterTests
     }
 
     protected override bool SupportsUnicodeIdentifiers { get; } = false;
+
+    protected override bool LoadTypeForSagaMetadata(Type type)
+    {
+        if (type == typeof(SagaWithWeirdCharactersಠ_ಠ))
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
