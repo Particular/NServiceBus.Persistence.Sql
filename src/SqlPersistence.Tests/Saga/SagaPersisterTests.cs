@@ -55,7 +55,7 @@ public abstract class SagaPersisterTests
 
     IEnumerable<Type> GetSagasAndFinders()
     {
-        foreach (var nestedType in typeof(SagaPersisterTests).GetNestedTypes())
+        foreach (var nestedType in typeof(SagaPersisterTests).GetNestedTypes().Where(LoadTypeForSagaMetadata))
         {
             if (typeof(Saga).IsAssignableFrom(nestedType))
             {
@@ -423,8 +423,8 @@ public abstract class SagaPersisterTests
         }
     }
 
-    public class SagaWithCorrelationAndTransitional :
-        SqlSaga<SagaWithCorrelationAndTransitional.SagaData>,
+    public class CorrAndTransitionalSaga :
+        SqlSaga<CorrAndTransitionalSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -590,8 +590,8 @@ public abstract class SagaPersisterTests
     {
         var endpointName = nameof(GetByNonStringMapping);
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithNonStringCorrelation",
-            name: "SagaWithNonStringCorrelation",
+            tableSuffix: "NonStringCorrelationSaga",
+            name: "NonStringCorrelationSaga",
             correlationProperty: new CorrelationProperty
             (
                 name: "CorrelationProperty",
@@ -608,9 +608,9 @@ public abstract class SagaPersisterTests
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<SagaWithNonStringCorrelation.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
+    async Task<NonStringCorrelationSaga.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
     {
-        var sagaData = new SagaWithNonStringCorrelation.SagaData
+        var sagaData = new NonStringCorrelationSaga.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -623,12 +623,12 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, 666);
-            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession)).Data;
+            return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession)).Data;
         }
     }
 
-    public class SagaWithNonStringCorrelation :
-        SqlSaga<SagaWithNonStringCorrelation.SagaData>,
+    public class NonStringCorrelationSaga :
+        SqlSaga<NonStringCorrelationSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -771,4 +771,9 @@ public abstract class SagaPersisterTests
     protected abstract bool IsConcurrencyException(Exception innerException);
 
     protected virtual bool SupportsUnicodeIdentifiers { get; } = true;
+
+    protected virtual bool LoadTypeForSagaMetadata(Type type)
+    {
+        return true;
+    }
 }
