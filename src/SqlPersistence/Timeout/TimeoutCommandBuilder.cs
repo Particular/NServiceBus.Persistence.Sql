@@ -19,7 +19,7 @@ namespace NServiceBus.Persistence.Sql
                 case SqlVariant.MsSqlServer:
                     return BuildSqlServerCommands($"[{schema}].[{tablePrefix}TimeoutData]");
                 case SqlVariant.Oracle:
-                    return BuildOracleCommands($"\"{tablePrefix}TO\"");
+                    return BuildOracleCommands($"{tablePrefix}TO");
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
