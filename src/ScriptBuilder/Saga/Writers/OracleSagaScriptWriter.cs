@@ -15,11 +15,11 @@ class OracleSagaScriptWriter : ISagaScriptWriter
         this.saga = saga;
         if (saga.TableSuffix.Length > 27)
         {
-            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
+            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
         }
         if (Encoding.UTF8.GetBytes(saga.TableSuffix).Length != saga.TableSuffix.Length)
         {
-            throw new Exception($"Saga '{saga.TableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
+            throw new Exception($"Saga '{saga.TableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
         }
         tableName = saga.TableSuffix.ToUpper();
     }

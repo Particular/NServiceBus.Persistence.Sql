@@ -76,11 +76,11 @@ class RuntimeSagaInfo
             case SqlVariant.Oracle:
                 if (tableSuffix.Length > 27)
                 {
-                    throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
+                    throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
                 }
                 if (Encoding.UTF8.GetBytes(tableSuffix).Length != tableSuffix.Length)
                 {
-                    throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name using the SqlSagaAttribute's 'tablePrefix' parameter.");
+                    throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
                 }
                 TableName = tableSuffix.ToUpper();
                 FillParameter = ParameterFiller.OracleFill;
