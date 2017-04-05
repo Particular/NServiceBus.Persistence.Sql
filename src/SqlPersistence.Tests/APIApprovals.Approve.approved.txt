@@ -70,6 +70,7 @@
         public SqlPersistenceSettingsAttribute() { }
         public bool MsSqlServerScripts { get; set; }
         public bool MySqlScripts { get; set; }
+        public bool OracleScripts { get; set; }
         public string ScriptPromotionPath { get; set; }
     }
     public abstract class SqlSaga<TSagaData> : NServiceBus.Saga
