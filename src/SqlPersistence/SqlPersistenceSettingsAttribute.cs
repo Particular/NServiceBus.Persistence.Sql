@@ -9,16 +9,22 @@ namespace NServiceBus.Persistence.Sql
     public sealed class SqlPersistenceSettingsAttribute : Attribute
     {
         /// <summary>
-        /// True to produce SQL installation scripts that taregt Microsoft SQL Server.
+        /// True to produce SQL installation scripts that target Microsoft SQL Server.
         /// Defaults to False.
         /// </summary>
         public bool MsSqlServerScripts;
 
         /// <summary>
-        /// True to produce SQL installation scripts that taregt MySql.
+        /// True to produce SQL installation scripts that target MySql.
         /// Defaults to False.
         /// </summary>
         public bool MySqlScripts;
+
+        /// <summary>
+        /// True to produce SQL installation scripts that target Oracle.
+        /// Defaults to False.
+        /// </summary>
+        public bool OracleScripts;
 
         /// <summary>
         /// Path to promote SQL installation scripts to.
