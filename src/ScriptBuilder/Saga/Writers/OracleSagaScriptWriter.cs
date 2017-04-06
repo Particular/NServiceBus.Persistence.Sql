@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -87,18 +88,14 @@ end if;
 
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
-        var name = OracleCorrelationPropertyName(correlationProperty);
-        var indexType = "CP";
-        if (correlationProperty == saga.TransitionalCorrelationProperty)
-        {
-            indexType = "TP";
-        }
+        var columnName = OracleCorrelationPropertyName(correlationProperty);
+        var indexName = CreateSagaIndexName(tableName, correlationProperty.Name);
 
         writer.Write($@"
-select count(*) into n from user_indexes where index_name = '{tableName}_{indexType}';
+select count(*) into n from user_indexes where table_name = '{tableName}' and index_name = '{indexName}';
 if(n = 0)
 then
-  sqlStatement := 'create unique index {tableName}_{indexType} on {tableName} ({name} ASC)';
+  sqlStatement := 'create unique index {indexName} on {tableName} ({columnName} ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -111,11 +108,11 @@ end if;
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> 'CORR_{saga.CorrelationProperty.Name.ToUpper()}'");
+            builder.Append($" and\r\n        column_name <> '{OracleCorrelationPropertyName(saga.CorrelationProperty)}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> N'CORR_{saga.TransitionalCorrelationProperty.Name.ToUpper()}'");
+            builder.Append($" and\r\n        column_name <> '{OracleCorrelationPropertyName(saga.TransitionalCorrelationProperty)}'");
         }
         writer.Write($@"
 select count(*) into n
@@ -137,20 +134,7 @@ end if;
 
     public void WritePurgeObsoleteIndex()
     {
-        if (saga.TransitionalCorrelationProperty != null)
-        {
-            return;
-        }
-
-        writer.Write($@"
-select count(*) into n from user_indexes where index_name = '{tableName}_TP';
-if(n > 0)
-then
-  sqlStatement := 'drop index {tableName}_TP';
-
-  execute immediate sqlStatement;
-end if;
-");
+        // Dropping the column with the index attached removes the index as well
     }
 
     public void WriteCreateTable()
@@ -197,7 +181,7 @@ end;
 ");
     }
 
-    private string OracleCorrelationPropertyName(CorrelationProperty property)
+    string OracleCorrelationPropertyName(CorrelationProperty property)
     {
         var name = "CORR_" + property.Name.ToUpper();
         if (name.Length > 30)
@@ -205,5 +189,26 @@ end;
             name = name.Substring(0, 30);
         }
         return name;
+    }
+
+    /// <summary>
+    /// Generates a 30ch index name like "SAGAIDX_66462BF46C9DCB70FD257D" based on
+    /// SHA1 hash of saga name and correlation property name
+    /// </summary>
+    string CreateSagaIndexName(string sagaName, string correlationPropertyName)
+    {
+        var sb = new StringBuilder("SAGAIDX_", 30);
+
+        var clearText = Encoding.UTF8.GetBytes($"{sagaName}/{correlationPropertyName}");
+        using (var sha1 = new SHA1CryptoServiceProvider())
+        {
+            var hashBytes = sha1.ComputeHash(clearText);
+            // SHA1 hash contains 20 bytes, but only have space in 30 char index name for 11 bytes => 22 chars
+            for (var i = 0; i < 11; i++)
+            {
+                sb.Append(hashBytes[i].ToString("X2"));
+            }
+        }
+        return sb.ToString();
     }
 }
