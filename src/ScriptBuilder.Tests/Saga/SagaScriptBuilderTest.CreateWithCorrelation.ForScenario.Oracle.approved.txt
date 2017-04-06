@@ -68,23 +68,15 @@ end if;
 
 /* WriteCreateIndex CorrelationProperty */
 
-select count(*) into n from user_indexes where index_name = 'THESAGA_CP';
+select count(*) into n from user_indexes where table_name = 'THESAGA' and index_name = 'SAGAIDX_E78AFF37B286FF56612DF6';
 if(n = 0)
 then
-  sqlStatement := 'create unique index THESAGA_CP on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
+  sqlStatement := 'create unique index SAGAIDX_E78AFF37B286FF56612DF6 on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
 
   execute immediate sqlStatement;
 end if;
 
 /* PurgeObsoleteIndex */
-
-select count(*) into n from user_indexes where index_name = 'THESAGA_TP';
-if(n > 0)
-then
-  sqlStatement := 'drop index THESAGA_TP';
-
-  execute immediate sqlStatement;
-end if;
 
 /* PurgeObsoleteProperties */
 

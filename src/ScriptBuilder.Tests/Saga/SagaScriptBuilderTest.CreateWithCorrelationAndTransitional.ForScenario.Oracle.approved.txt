@@ -68,10 +68,10 @@ end if;
 
 /* WriteCreateIndex CorrelationProperty */
 
-select count(*) into n from user_indexes where index_name = 'THESAGA_CP';
+select count(*) into n from user_indexes where table_name = 'THESAGA' and index_name = 'SAGAIDX_E78AFF37B286FF56612DF6';
 if(n = 0)
 then
-  sqlStatement := 'create unique index THESAGA_CP on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
+  sqlStatement := 'create unique index SAGAIDX_E78AFF37B286FF56612DF6 on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -109,10 +109,10 @@ end if;
 
 /* CreateIndex TransitionalProperty */
 
-select count(*) into n from user_indexes where index_name = 'THESAGA_TP';
+select count(*) into n from user_indexes where table_name = 'THESAGA' and index_name = 'SAGAIDX_E7CBAA5C3429959F4D7907';
 if(n = 0)
 then
-  sqlStatement := 'create unique index THESAGA_TP on THESAGA (CORR_TRANSITIONALPROPERTY ASC)';
+  sqlStatement := 'create unique index SAGAIDX_E7CBAA5C3429959F4D7907 on THESAGA (CORR_TRANSITIONALPROPERTY ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -125,7 +125,7 @@ select count(*) into n
 from ALL_TAB_COLUMNS
 where TABLE_NAME = 'THESAGA' and COLUMN_NAME LIKE 'CORR_%' and
         column_name <> 'CORR_CORRELATIONPROPERTY' and
-        column_name <> N'CORR_TRANSITIONALPROPERTY';
+        column_name <> 'CORR_TRANSITIONALPROPERTY';
   
 if(n > 0)
 then
@@ -134,7 +134,7 @@ then
   from ALL_TAB_COLUMNS
   where TABLE_NAME = 'THESAGA' and COLUMN_NAME LIKE 'CORR_%' and
         column_name <> 'CORR_CORRELATIONPROPERTY' and
-        column_name <> N'CORR_TRANSITIONALPROPERTY';
+        column_name <> 'CORR_TRANSITIONALPROPERTY';
     
   execute immediate sqlStatement;
 
