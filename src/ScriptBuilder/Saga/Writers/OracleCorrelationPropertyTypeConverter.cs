@@ -12,9 +12,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             switch (propertyType)
             {
                 case CorrelationPropertyType.DateTime:
-                    return "DATE";
-                case CorrelationPropertyType.DateTimeOffset:
-                    return "DATE";
+                    return "TIMESTAMP";
                 case CorrelationPropertyType.String:
                     return "NVARCHAR2(200)";
                 case CorrelationPropertyType.Int:
