@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Transactions;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
@@ -43,11 +44,21 @@ class StorageAdapter : ISynchronizedStorageAdapter
             return session;
         }
 
-        Transaction existingTransaction;
         // Transport supports DTC and uses TxScope owned by the transport
-        if (transportTransaction.TryGet(out existingTransaction))
+        Transaction transportTx;
+        var scopeTx = Transaction.Current;
+        if (transportTransaction.TryGet(out transportTx) && scopeTx != null && !transportTx.Equals(scopeTx))
+        {
+            throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. " 
+                + "This setup can result in inconsistent data because operations done via connections enlisted in the context scope won't be committed "
+                + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
+                + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
+        }
+        var ambientTransaction = transportTx ?? scopeTx;
+        if (ambientTransaction != null)
         {
             var connection = await connectionBuilder.OpenConnection();
+            connection.EnlistTransaction(ambientTransaction);
             CompletableSynchronizedStorageSession session = new StorageSession(connection, null, true, infoCache);
             return session;
         }
