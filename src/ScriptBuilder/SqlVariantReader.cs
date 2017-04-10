@@ -30,7 +30,7 @@ static class SqlVariantReader
             yield return BuildSqlVariant.MySql;
         }
 
-        var oracleScripts = attribute.GetBoolProperty("MySqlScripts");
+        var oracleScripts = attribute.GetBoolProperty("OracleScripts");
         if (oracleScripts)
         {
             yield return BuildSqlVariant.Oracle;
