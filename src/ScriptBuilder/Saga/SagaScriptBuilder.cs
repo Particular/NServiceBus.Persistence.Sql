@@ -66,7 +66,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             WriteComment(writer, "PurgeObsoleteProperties");
             sqlVariantWriter.WritePurgeObsoleteProperties();
 
-            WriteComment(writer, "CreateComplete");
+            WriteComment(writer, "CompleteSagaScript");
             sqlVariantWriter.CreateComplete();
         }
 
