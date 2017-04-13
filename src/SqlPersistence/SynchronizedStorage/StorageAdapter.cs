@@ -38,7 +38,8 @@ class StorageAdapter : ISynchronizedStorageAdapter
         SqlConnection existingSqlConnection;
         SqlTransaction existingSqlTransaction;
         //SQL server transport in native TX mode
-        if (transportTransaction.TryGet(out existingSqlConnection) && transportTransaction.TryGet(out existingSqlTransaction))
+        if (transportTransaction.TryGet(out existingSqlConnection) &&
+            transportTransaction.TryGet(out existingSqlTransaction))
         {
             return new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
         }
@@ -46,7 +47,9 @@ class StorageAdapter : ISynchronizedStorageAdapter
         // Transport supports DTC and uses TxScope owned by the transport
         Transaction transportTx;
         var scopeTx = Transaction.Current;
-        if (transportTransaction.TryGet(out transportTx) && scopeTx != null && !transportTx.Equals(scopeTx))
+        if (transportTransaction.TryGet(out transportTx) &&
+            scopeTx != null &&
+            transportTx != scopeTx)
         {
             throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. "
                 + "This setup can result in inconsistent data because operations done via connections enlisted in the context scope won't be committed "
