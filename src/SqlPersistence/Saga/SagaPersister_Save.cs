@@ -40,7 +40,7 @@ partial class SagaPersister
             {
                 command.AddParameter("CorrelationId", correlationId);
             }
-            AddTransitionalParameter(sagaData, sagaInfo, command.InnerCommand);
+            AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx();
         }
     }
