@@ -82,7 +82,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 return Task.FromResult(0);
             }
 
-            protected override string CorrelationPropertyName { get; }
+            protected override string CorrelationPropertyName => null;
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
