@@ -40,8 +40,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         //SQL server transport in native TX mode
         if (transportTransaction.TryGet(out existingSqlConnection) && transportTransaction.TryGet(out existingSqlTransaction))
         {
-            CompletableSynchronizedStorageSession session = new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
-            return session;
+            return new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
         }
 
         // Transport supports DTC and uses TxScope owned by the transport
@@ -49,7 +48,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         var scopeTx = Transaction.Current;
         if (transportTransaction.TryGet(out transportTx) && scopeTx != null && !transportTx.Equals(scopeTx))
         {
-            throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. " 
+            throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. "
                 + "This setup can result in inconsistent data because operations done via connections enlisted in the context scope won't be committed "
                 + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
                 + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
@@ -59,8 +58,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         {
             var connection = await connectionBuilder.OpenConnection();
             connection.EnlistTransaction(ambientTransaction);
-            CompletableSynchronizedStorageSession session = new StorageSession(connection, null, true, infoCache);
-            return session;
+            return new StorageSession(connection, null, true, infoCache);
         }
 
         //Other modes handled by creating a new session.
