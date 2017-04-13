@@ -1,6 +1,8 @@
-﻿set @tableName = concat('`', @tablePrefix, 'TimeoutData`');
+﻿set @tableNameQuoted = concat('`', @tablePrefix, 'TimeoutData`');
+set @tableNameNonQuoted = concat(@tablePrefix, 'TimeoutData');
+
 set @createTable = concat('
-    create table if not exists ', @tableName, '(
+    create table if not exists ', @tableNameQuoted, '(
         Id varchar(38) not null,
         Destination nvarchar(200),
         SagaId varchar(38),
@@ -22,11 +24,11 @@ from information_schema.statistics
 where
     table_schema = database() and
     index_name = 'Index_SagaId' and
-    table_name = @tableName;
+    table_name = @tableNameNonQuoted;
 
 set @query = IF(
     @exist <= 0,
-    concat('create index Index_SagaId on ', @tableName, '(SagaId)'), 'select \'Index Exists\' status');
+    concat('create index Index_SagaId on ', @tableNameQuoted, '(SagaId)'), 'select \'Index Exists\' status');
 
 prepare script from @query;
 execute script;
@@ -39,11 +41,11 @@ from information_schema.statistics
 where
     table_schema = database() and
     index_name = 'Index_Time' and
-    table_name = @tableName;
+    table_name = @tableNameNonQuoted;
 
 set @query = IF(
     @exist <= 0,
-    concat('create index Index_Time on ', @tableName, '(Time)'), 'select \'Index Exists\' status');
+    concat('create index Index_Time on ', @tableNameQuoted, '(Time)'), 'select \'Index Exists\' status');
 
 prepare script from @query;
 execute script;

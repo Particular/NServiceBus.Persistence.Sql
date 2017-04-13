@@ -55,6 +55,17 @@ public abstract class SubscriptionPersisterTests
     }
 
     [Test]
+    public void ExecuteCreateTwice()
+    {
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+        }
+    }
+
+    [Test]
     public void Subscribe()
     {
         var type1 = new MessageType("type1", new Version(0, 0, 0, 0));

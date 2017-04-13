@@ -103,6 +103,7 @@ execute script;
 deallocate prepare script;
 ");
     }
+
     public void WritePurgeObsoleteIndex()
     {
         var builder = new StringBuilder();

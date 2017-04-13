@@ -53,6 +53,17 @@ public abstract class OutboxPersisterTests
 
 
     [Test]
+    public void ExecuteCreateTwice()
+    {
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+        }
+    }
+
+    [Test]
     public void StoreDispatchAndGet()
     {
         var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();

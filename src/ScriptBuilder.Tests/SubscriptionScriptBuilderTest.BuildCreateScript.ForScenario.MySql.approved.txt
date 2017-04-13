@@ -1,4 +1,5 @@
 ﻿set @tableName = concat('`', @tablePrefix, 'SubscriptionData`');
+
 set @createTable = concat('
     create table if not exists ', @tableName, '(
         Subscriber nvarchar(200) not null,

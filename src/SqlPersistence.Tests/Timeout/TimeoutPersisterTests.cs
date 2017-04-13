@@ -48,6 +48,18 @@ public abstract class TimeoutPersisterTests
     }
 
     [Test]
+    public void ExecuteCreateTwice()
+    {
+        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+        }
+    }
+
+    [Test]
     public void TryRemove()
     {
         var timeout = new TimeoutData
