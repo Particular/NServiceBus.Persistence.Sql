@@ -14,10 +14,11 @@ public static class RuntimeSagaDefinitionReader
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration)
     {
         var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
-        var result = sagaTypes.Select(GetSagaDefinition);
-
+        if (!sagaTypes.Any())
+        {
+            return Enumerable.Empty<SagaDefinition>();
+        }
         var sagaAssembly = sagaTypes.First().Assembly;
-
         //Validate the saga definitions using script builder compile-time validation
         var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred));
         var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
@@ -30,7 +31,7 @@ public static class RuntimeSagaDefinitionReader
         {
             throw new AggregateException(exceptions);
         }
-        return result;
+        return sagaTypes.Select(GetSagaDefinition);
     }
 
     static SagaDefinition GetSagaDefinition(Type sagaType)
