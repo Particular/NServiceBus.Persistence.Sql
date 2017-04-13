@@ -26,7 +26,7 @@ partial class SagaPersister
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             command.AddParameter("Concurrency", concurrency);
-            AddTransitionalParameter(sagaData, sagaInfo, command.InnerCommand);
+            AddTransitionalParameter(sagaData, sagaInfo, command);
             var affected = await command.ExecuteNonQueryAsync();
             if (affected != 1)
             {

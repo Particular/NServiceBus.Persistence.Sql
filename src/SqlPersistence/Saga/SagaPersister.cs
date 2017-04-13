@@ -16,7 +16,7 @@ partial class SagaPersister : ISagaPersister
         commandBuilder = new CommandBuilder(sqlVariant);
     }
 
-    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, DbCommand command)
+    static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, CommandWrapper command)
     {
         if (!sagaInfo.HasTransitionalCorrelationProperty)
         {
