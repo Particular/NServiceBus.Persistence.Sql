@@ -69,6 +69,33 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public void ExecuteCreateTwice()
+    {
+        var endpointName = nameof(ExecuteCreateTwice);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        using (var connection = dbConnection())
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName, schema: schema);
+            var createScript = SagaScriptBuilder.BuildCreateScript(definition, sqlVariant);
+            connection.ExecuteCommand(createScript, endpointName, schema: schema);
+            connection.ExecuteCommand(createScript, endpointName, schema: schema);
+        }
+    }
+
+    [Test]
     public async Task Complete()
     {
         var endpointName = nameof(Complete);
