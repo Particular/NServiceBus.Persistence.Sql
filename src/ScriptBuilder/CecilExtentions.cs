@@ -7,16 +7,16 @@ using NServiceBus.Persistence.Sql;
 static class CecilExtentions
 {
 
-    public static string GetStringProperty(this CustomAttribute attribute, string name)
+    public static string GetStringField(this CustomAttribute attribute, string name)
     {
-        return (string)attribute.Properties
+        return (string)attribute.Fields
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
     }
 
-    public static bool GetBoolProperty(this CustomAttribute attribute, string name)
+    public static bool GetBoolField(this CustomAttribute attribute, string name)
     {
-        var value = attribute.Properties
+        var value = attribute.Fields
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
         return value != null && (bool)value;

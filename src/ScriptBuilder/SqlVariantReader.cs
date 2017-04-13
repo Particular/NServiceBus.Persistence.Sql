@@ -17,13 +17,13 @@ static class SqlVariantReader
             yield break;
         }
 
-        var msSqlServerScripts = attribute.GetBoolProperty("MsSqlServerScripts");
+        var msSqlServerScripts = attribute.GetBoolField("MsSqlServerScripts");
         if (msSqlServerScripts)
         {
             yield return BuildSqlVariant.MsSqlServer;
         }
 
-        var mySqlScripts = attribute.GetBoolProperty("MySqlScripts");
+        var mySqlScripts = attribute.GetBoolField("MySqlScripts");
         if (mySqlScripts)
         {
             yield return BuildSqlVariant.MySql;

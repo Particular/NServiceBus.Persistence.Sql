@@ -14,7 +14,7 @@ static class ScriptPromotionPathReader
             return false;
         }
         
-        target = customAttribute.GetStringProperty("ScriptPromotionPath");
+        target = customAttribute.GetStringField("ScriptPromotionPath");
         if (target == null)
         {
             return false;
