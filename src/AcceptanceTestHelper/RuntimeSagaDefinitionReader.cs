@@ -31,7 +31,7 @@ public static class RuntimeSagaDefinitionReader
         {
             throw new AggregateException(exceptions);
         }
-        return sagaTypes.Select(GetSagaDefinition);
+        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlVariant));
     }
 
     static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlVariant sqlVariant)

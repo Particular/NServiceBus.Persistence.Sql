@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql;
