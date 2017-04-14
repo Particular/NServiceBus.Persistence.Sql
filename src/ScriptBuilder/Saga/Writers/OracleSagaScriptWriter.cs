@@ -28,7 +28,7 @@ class OracleSagaScriptWriter : ISagaScriptWriter
     public void Initialize()
     {
         writer.WriteLine(@"
-declare 
+declare
   sqlStatement varchar2(500);
   dataType varchar2(30);
   n number(10);
@@ -49,11 +49,11 @@ begin");
         var columnType = OracleCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = OracleCorrelationPropertyName(correlationProperty);
         writer.Write($@"
-select count(*) into n from ALL_TAB_COLUMNS where TABLE_NAME = '{tableName}' and COLUMN_NAME = '{name}';
+select count(*) into n from all_tab_columns where table_name = '{tableName}' and column_name = '{name}';
 if(n = 0)
 then
   sqlStatement := 'alter table {tableName} add ( {name} {columnType} )';
-  
+
   execute immediate sqlStatement;
 end if;
 ");
@@ -65,19 +65,19 @@ end if;
         var name = OracleCorrelationPropertyName(correlationProperty);
 
         writer.Write($@"
-select DATA_TYPE ||
-  case when CHAR_LENGTH > 0 then 
-    '(' || CHAR_LENGTH || ')' 
+select data_type ||
+  case when char_length > 0 then
+    '(' || char_length || ')'
   else
-    case when DATA_PRECISION is not null then
-      '(' || DATA_PRECISION ||
-        case when DATA_SCALE is not null and DATA_SCALE > 0 then
-          ',' || DATA_SCALE
+    case when data_precision is not null then
+      '(' || data_precision ||
+        case when data_scale is not null and data_scale > 0 then
+          ',' || data_scale
         end || ')'
     end
   end into dataType
-from ALL_TAB_COLUMNS 
-where TABLE_NAME = '{tableName}' and COLUMN_NAME = '{name}';
+from all_tab_columns 
+where table_name = '{tableName}' and column_name = '{name}';
 
 if(dataType <> '{columnType}')
 then
@@ -116,16 +116,16 @@ end if;
         }
         writer.Write($@"
 select count(*) into n
-from ALL_TAB_COLUMNS
-where TABLE_NAME = '{tableName}' and COLUMN_NAME LIKE 'CORR_%'{builder};
-  
+from all_tab_columns
+where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
+
 if(n > 0)
 then
 
-  select 'alter table {tableName} drop column ' || COLUMN_NAME into sqlStatement
-  from ALL_TAB_COLUMNS
-  where TABLE_NAME = '{tableName}' and COLUMN_NAME LIKE 'CORR_%'{builder};
-    
+  select 'alter table {tableName} drop column ' || column_name into sqlStatement
+  from all_tab_columns
+  where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
+
   execute immediate sqlStatement;
 
 end if;
@@ -145,23 +145,23 @@ end if;
   then
     
     sqlStatement :=
-       'CREATE TABLE {tableName} 
-		(
-          ID VARCHAR2(38) NOT NULL 
-        , METADATA CLOB NOT NULL 
-        , DATA CLOB NOT NULL 
-        , PERSISTENCEVERSION VARCHAR2(23) NOT NULL 
-        , SAGATYPEVERSION VARCHAR2(23) NOT NULL 
-        , CONCURRENCY NUMBER(9) NOT NULL 
-        , CONSTRAINT {tableName}_PK PRIMARY KEY 
+       'create table {tableName} 
+       (
+          id varchar2(38) not null,
+          metadata clob not null,
+          data clob not null,
+          persistenceversion varchar2(23) not null,
+          sagatypeversion varchar2(23) not null,
+          concurrency number(9) not null,
+          constraint {tableName}_PK primary key
           (
-            ID 
+            id
           )
-          ENABLE 
+          enable
         )';
-    
+
     execute immediate sqlStatement;
-    
+
   end if;
 ");
     }
@@ -191,10 +191,8 @@ end;
         return name;
     }
 
-    /// <summary>
-    /// Generates a 30ch index name like "SAGAIDX_66462BF46C9DCB70FD257D" based on
-    /// SHA1 hash of saga name and correlation property name
-    /// </summary>
+    // Generates a 30ch index name like "SAGAIDX_66462BF46C9DCB70FD257D" based on
+    // SHA1 hash of saga name and correlation property name
     string CreateSagaIndexName(string sagaName, string correlationPropertyName)
     {
         var sb = new StringBuilder("SAGAIDX_", 30);
