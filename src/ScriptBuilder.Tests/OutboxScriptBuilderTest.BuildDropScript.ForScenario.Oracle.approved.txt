@@ -1,4 +1,4 @@
-﻿declare 
+﻿declare
   tableName varchar2(30) := UPPER(:1) || 'OD';
   dropTable varchar2(50);
   n number(10);
@@ -6,10 +6,10 @@ begin
   select count(*) into n from user_tables where table_name = tableName;
   if(n = 1)
   then
-    
-    dropTable := 'DROP TABLE ' || tableName;
-    
+
+    dropTable := 'drop table ' || tableName;
+
     execute immediate dropTable;
-    
+
   end if;
 end;

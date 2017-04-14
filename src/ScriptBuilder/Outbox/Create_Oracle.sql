@@ -1,4 +1,4 @@
-﻿declare 
+﻿declare
   tableName varchar2(30) := UPPER(:1) || 'OD';
   pkName varchar2(30) := tableName || '_PK';
   indexName varchar2(30) := tableName || '_IX';
@@ -9,27 +9,27 @@ begin
   select count(*) into n from user_tables where table_name = tableName;
   if(n = 0)
   then
-    
+
     createTable :=
-       'CREATE TABLE ' || tableName || ' 
+       'create table ' || tableName || '
         (
-          MESSAGEID NVARCHAR2(200) NOT NULL
-        , DISPATCHED NUMBER(1,0) DEFAULT 0 NOT NULL CHECK
+          messageid nvarchar2(200) not null,
+          dispatched number(1,0) default 0 not null check
           (
-            DISPATCHED IN (0,1)
-          )
-        , DISPATCHEDAT TIMESTAMP
-        , OPERATIONS CLOB NOT NULL
-        , PERSISTENCEVERSION VARCHAR2(23) NOT NULL
-        , CONSTRAINT ' || pkName || ' PRIMARY KEY
+            dispatched in (0,1)
+          ),
+          dispatchedat timestamp,
+          operations clob not null,
+          persistenceversion varchar2(23) not null,
+          constraint ' || pkName || ' primary key
           (
-            MESSAGEID
+            messageid
           )
-          ENABLE
+          enable
         )';
-    
+
     execute immediate createTable;
-    
+
   end if;
 
   select count(*) into n from user_indexes where index_name = indexName;
@@ -37,7 +37,7 @@ begin
   then
 
     createIndex :=
-      'CREATE INDEX ' || indexName || ' ON ' || tableName || ' (DISPATCHED, DISPATCHEDAT)';
+      'create index ' || indexName || ' on ' || tableName || ' (dispatched, dispatchedat)';
 
     execute immediate createIndex;
 
