@@ -55,7 +55,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void ExecuteCreateTwice()
     {
-        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        var name = GetTablePrefix();
         using (var connection = dbConnection())
         {
             connection.Open();
