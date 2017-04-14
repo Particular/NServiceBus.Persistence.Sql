@@ -12,11 +12,8 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,7 +62,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -78,6 +74,7 @@
     <Compile Include="BuildSqlVariant.cs" />
     <Compile Include="CecilExtentions.cs" />
     <Compile Include="ErrorsException.cs" />
+    <Compile Include="ScriptPromotionPathReader.cs" />
     <Compile Include="ResourceReader.cs" />
     <Compile Include="Saga\AllSagaDefinitionReader.cs" />
     <Compile Include="Saga\CorrelationProperty.cs" />

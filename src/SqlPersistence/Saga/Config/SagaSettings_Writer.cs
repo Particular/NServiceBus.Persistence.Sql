@@ -9,6 +9,9 @@ namespace NServiceBus.Persistence.Sql
     public partial class SagaSettings
     {
 
+        /// <summary>
+        /// Builds up a <see cref="Newtonsoft.Json.JsonWriter"/> for serializing saga data.
+        /// </summary>
         public void WriterCreator(Func<StringBuilder, JsonWriter> writerCreator)
         {
             settings.Set("SqlPersistence.Saga.WriterCreator", writerCreator);

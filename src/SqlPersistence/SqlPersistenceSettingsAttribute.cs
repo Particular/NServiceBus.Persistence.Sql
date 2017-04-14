@@ -2,19 +2,30 @@
 
 namespace NServiceBus.Persistence.Sql
 {
+    /// <summary>
+    /// Configuration options that are evaluated at compile time.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class SqlPersistenceSettingsAttribute : Attribute
+    public sealed class SqlPersistenceSettingsAttribute : Attribute
     {
-        public bool MsSqlServerScripts { get; }
-        public bool MySqlScripts { get; }
+        /// <summary>
+        /// True to produce SQL installation scripts that taregt Microsoft SQL Server.
+        /// Defaults to False.
+        /// </summary>
+        public bool MsSqlServerScripts;
 
-        public SqlPersistenceSettingsAttribute(
-            bool msSqlServerScripts = false,
-            bool mySqlScripts = false
-            )
-        {
-            MySqlScripts = mySqlScripts;
-            MsSqlServerScripts = msSqlServerScripts;
-        }
+        /// <summary>
+        /// True to produce SQL installation scripts that taregt MySql.
+        /// Defaults to False.
+        /// </summary>
+        public bool MySqlScripts;
+
+        /// <summary>
+        /// Path to promote SQL installation scripts to.
+        /// The token '$(SolutionDir)' will be replace witht he current solution directory.
+        /// The token '$(ProjectDir)' will be replace witht he current solution directory.
+        /// The path calculation is performed relative to the current project directory.
+        /// </summary>
+        public string ScriptPromotionPath;
     }
 }

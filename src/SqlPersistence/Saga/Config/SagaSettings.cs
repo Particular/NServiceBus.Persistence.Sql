@@ -2,6 +2,9 @@
 
 namespace NServiceBus.Persistence.Sql
 {
+    /// <summary>
+    /// Configuration options for Saga persistence.
+    /// </summary>
     public partial class SagaSettings
     {
 

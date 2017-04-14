@@ -97,6 +97,7 @@ public class SagaConsistencyTests
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
+        persistence.SubscriptionSettings().DisableCache();
         persistence.DisableInstaller();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
@@ -137,6 +138,7 @@ public class SagaConsistencyTests
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{endpointName}_");
+                command.AddParameter("schema", "dbo");
                 command.ExecuteNonQuery();
             }
         }
@@ -179,9 +181,6 @@ public class SagaConsistencyTests
         public Guid SagaId { get; set; }
     }
 
-    [SqlSaga(
-         correlationProperty: nameof(SagaData.CorrelationId)
-     )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleMessages<FailingMessage>,
@@ -195,11 +194,13 @@ public class SagaConsistencyTests
             public bool PersistedFailingMessageResult { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(m => m.SagaId);
-            mapper.MapMessage<FailingMessage>(m => m.SagaId);
-            mapper.MapMessage<CheckMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<StartSagaMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<FailingMessage>(m => m.SagaId);
+            mapper.ConfigureMapping<CheckMessage>(m => m.SagaId);
         }
 
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

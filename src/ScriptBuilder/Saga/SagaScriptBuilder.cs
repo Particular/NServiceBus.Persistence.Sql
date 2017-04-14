@@ -38,7 +38,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 
             WriteComment(writer, "CreateTable");
             sqlVariantWriter.WriteCreateTable();
-            if (saga.CorrelationProperty != null)
+            if(saga.CorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
                 sqlVariantWriter.AddProperty(saga.CorrelationProperty);

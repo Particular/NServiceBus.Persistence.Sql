@@ -12,11 +12,8 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuSpecFileName>NServiceBus.Persistence.Sql.MsBuild</NuSpecFileName>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,9 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
@@ -73,7 +68,9 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BuildLogger.cs" />
+    <Compile Include="DirectoryExtentions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
+    <Compile Include="InnerTask.cs" />
     <Compile Include="Writers\OutboxWriter.cs" />
     <Compile Include="Writers\SagaWriter.cs" />
     <Compile Include="ScriptBuilderTask.cs" />

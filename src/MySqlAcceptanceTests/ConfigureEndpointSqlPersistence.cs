@@ -21,13 +21,14 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
         persistence.SqlVariant(SqlVariant.MySql);
         persistence.TablePrefix($"{tablePrefix}_");
+        var subscriptions = persistence.SubscriptionSettings();
+        subscriptions.DisableCache();
         persistence.DisableInstaller();
         return Task.FromResult(0);
     }
 
     public Task Cleanup()
     {
-        endpointHelper?.Cleanup();
-        return Task.FromResult(0);
+        return endpointHelper?.Cleanup();
     }
 }

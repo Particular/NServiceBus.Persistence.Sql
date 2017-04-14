@@ -64,6 +64,7 @@ public class MsmqTransportIntegrationTests : IDisposable
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
+        persistence.SubscriptionSettings().DisableCache();
 
         var endpoint = await Endpoint.Start(endpointConfiguration);
         var startSagaMessage = new StartSagaMessage
@@ -84,9 +85,6 @@ public class MsmqTransportIntegrationTests : IDisposable
     {
     }
 
-    [SqlSaga(
-         correlationProperty: nameof(SagaData.StartId)
-     )]
     public class Saga1 : SqlSaga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
@@ -108,9 +106,11 @@ public class MsmqTransportIntegrationTests : IDisposable
             public Guid StartId { get; set; }
         }
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.StartId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
-            mapper.MapMessage<StartSagaMessage>(message => message.StartId);
+            mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId);
         }
 
     }

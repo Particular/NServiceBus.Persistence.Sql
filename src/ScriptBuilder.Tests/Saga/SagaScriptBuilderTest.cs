@@ -43,34 +43,6 @@ public class SagaScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
-    public void CreateWithNoCorrelation(BuildSqlVariant sqlVariant)
-    {
-        var saga = new SagaDefinition(
-            tableSuffix: "theSaga",
-            name: "theSaga"
-        );
-
-        var builder = new StringBuilder();
-        using (var writer = new StringWriter(builder))
-        {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
-        }
-        var script = builder.ToString();
-
-        if (sqlVariant != BuildSqlVariant.MySql)
-        {
-            SqlValidator.Validate(script);
-        }
-
-        using (ApprovalResults.ForScenario(sqlVariant))
-        {
-            Approvals.Verify(script);
-        }
-    }
-
-    [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
     public void CreateWithCorrelationAndTransitional(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
@@ -115,6 +87,11 @@ public class SagaScriptBuilderTest
         using (var writer = new StringWriter(builder))
         {
             var saga = new SagaDefinition(
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.String
+                ),
                 tableSuffix: "theSaga",
                 name: "theSaga"
             );

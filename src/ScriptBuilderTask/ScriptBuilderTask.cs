@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Mono.Cecil;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 namespace NServiceBus.Persistence.Sql
 {
+    using System.IO;
+
     public class ScriptBuilderTask : Task
     {
         BuildLogger logger;
@@ -18,6 +17,12 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string IntermediateDirectory { get; set; }
 
+        [Required]
+        public string ProjectDirectory { get; set; }
+
+        [Required]
+        public string SolutionDirectory { get; set; }
+
         public override bool Execute()
         {
             logger = new BuildLogger(BuildEngine);
@@ -27,11 +32,13 @@ namespace NServiceBus.Persistence.Sql
 
             try
             {
-                if (!ValidateInputs())
+                ValidateInputs();
+                Action<string, string> logError = (error, file) =>
                 {
-                    return false;
-                }
-                Inner();
+                    logger.LogError(error, file);
+                };
+                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory, logError);
+                innerTask.Execute();
             }
             catch (ErrorsException exception)
             {
@@ -48,44 +55,27 @@ namespace NServiceBus.Persistence.Sql
             return !logger.ErrorOccurred;
         }
 
-        bool ValidateInputs()
+        void ValidateInputs()
         {
             if (!File.Exists(AssemblyPath))
             {
-                logger.LogError($"AssemblyPath '{AssemblyPath}' does not exist.");
-                return false;
+                throw new ErrorsException($"AssemblyPath '{AssemblyPath}' does not exist.");
             }
 
             if (!Directory.Exists(IntermediateDirectory))
             {
-                logger.LogError($"IntermediateDirectory '{IntermediateDirectory}' does not exist.");
-                return false;
+                throw new ErrorsException($"IntermediateDirectory '{IntermediateDirectory}' does not exist.");
             }
-            return true;
-        }
 
-        void Inner()
-        {
-            var moduleDefinition = ModuleDefinition.ReadModule(AssemblyPath, new ReaderParameters(ReadingMode.Deferred));
-            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql");
-            if (Directory.Exists(scriptPath))
+            if (!Directory.Exists(ProjectDirectory))
             {
-                Directory.Delete(scriptPath, true);
+                throw new ErrorsException($"ProjectDirectory '{ProjectDirectory}' does not exist.");
             }
-            foreach (var variant in SqlVariantReader.Read(moduleDefinition))
-            {
-                Write(moduleDefinition, variant);
-            }
-        }
 
-        void Write(ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant)
-        {
-            var scriptPath = Path.Combine(IntermediateDirectory, "NServiceBus.Persistence.Sql", sqlVariant.ToString());
-            Directory.CreateDirectory(scriptPath);
-            SagaWriter.WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant, logger);
-            TimeoutWriter.WriteTimeoutScript(scriptPath, sqlVariant);
-            SubscriptionWriter.WriteSubscriptionScript(scriptPath, sqlVariant);
-            OutboxWriter.WriteOutboxScript(scriptPath, sqlVariant);
+            if (!Directory.Exists(SolutionDirectory))
+            {
+                throw new ErrorsException($"SolutionDirectory '{SolutionDirectory}' does not exist.");
+            }
         }
     }
 }

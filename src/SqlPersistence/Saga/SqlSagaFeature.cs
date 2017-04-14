@@ -15,13 +15,11 @@ class SqlSagaFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        context.Settings.EnableFeature<StorageType.Sagas>();
-
         var settings = context.Settings;
-        var endpointName = settings.GetTablePrefix();
-        var sqlVariant = settings.GetSqlVariant();
+        settings.EnableFeature<StorageType.Sagas>();
+
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(sqlVariant,endpointName);
+        var commandBuilder = new SagaCommandBuilder();
 #pragma warning restore 618
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
@@ -36,9 +34,23 @@ class SqlSagaFeature : Feature
             writerCreator = writer => new JsonTextWriter(writer);
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
-        var infoCache = new SagaInfoCache(versionDeserializeBuilder, jsonSerializer, readerCreator, writerCreator, commandBuilder);
+        var tablePrefix = settings.GetTablePrefix();
+        var schema = settings.GetSchema();
+        var sqlVariant = settings.GetSqlVariant();
+        var infoCache = new SagaInfoCache(
+            versionSpecificSettings: versionDeserializeBuilder,
+            jsonSerializer: jsonSerializer,
+            readerCreator: readerCreator,
+            writerCreator: writerCreator,
+            commandBuilder: commandBuilder,
+            tablePrefix: tablePrefix,
+            schema: schema,
+            sqlVariant: sqlVariant,
+            metadataCollection: settings.Get<SagaMetadataCollection>());
         var sagaPersister = new SagaPersister(infoCache);
-        context.Container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
+        var container = context.Container;
+        container.ConfigureComponent(() => infoCache, DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
     }
 
      static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)

@@ -23,6 +23,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTestHelper", "Acc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHelper", "TestHelper\TestHelper.csproj", "{9545ECAB-396F-4ECB-AB79-4C3AFD48BA93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask.Tests", "ScriptBuilderTask.Tests\ScriptBuilderTask.Tests.csproj", "{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptBuilderTask.Tests.Target", "ScriptBuilderTask.Tests.Target\ScriptBuilderTask.Tests.Target.csproj", "{D6836F7B-0D9F-45B2-ACB5-851978B7C234}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{87FC4455-07B6-4490-A31D-F386A11A4095}"
+	ProjectSection(SolutionItems) = preProject
+		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec
+		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets
+		..\packaging\nuget\NServiceBus.Persistence.Sql.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.nuspec
+		..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +77,14 @@ Global
 		{9545ECAB-396F-4ECB-AB79-4C3AFD48BA93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9545ECAB-396F-4ECB-AB79-4C3AFD48BA93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9545ECAB-396F-4ECB-AB79-4C3AFD48BA93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FE2A543-0EDA-4A6E-BFF7-278F2AD71E55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

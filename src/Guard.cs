@@ -20,6 +20,14 @@ static class Guard
         }
     }
 
+    public static void AgainstSqlDelimiters(string argumentName, string value)
+    {
+        if (value.Contains("]") || value.Contains("[") || value.Contains("`"))
+        {
+            throw new ArgumentException($"The argument '{value}' contains a ']', '[' or '`'. Names and schemas automatically quoted.");
+        }
+    }
+
     public static void AgainstEmpty(string argumentName, string value)
     {
         if (value !=null && string.IsNullOrWhiteSpace(value))

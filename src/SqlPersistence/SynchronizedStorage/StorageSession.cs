@@ -9,15 +9,17 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
 
-    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction)
+    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
     {
         Guard.AgainstNull(nameof(connection), connection);
-        Guard.AgainstNull(nameof(transaction), transaction);
+
         Connection = connection;
         this.ownsTransaction = ownsTransaction;
+        InfoCache = infoCache;
         Transaction = transaction;
     }
 
+    internal SagaInfoCache InfoCache;
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }
 
@@ -25,11 +27,8 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
     {
         if (ownsTransaction)
         {
-            if (Transaction != null)
-            {
-                Transaction.Commit();
-                Transaction.Dispose();
-            }
+            Transaction?.Commit();
+            Transaction?.Dispose();
             Connection.Dispose();
         }
         return Task.FromResult(0);
@@ -40,7 +39,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         if (ownsTransaction)
         {
             Transaction?.Dispose();
-            Connection.Dispose();
+            Connection?.Dispose();
         }
     }
 }

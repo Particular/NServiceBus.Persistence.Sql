@@ -79,6 +79,7 @@ end";
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{endpointName}_");
+                command.AddParameter("schema", "dbo");
                 command.ExecuteNonQuery();
             }
         }
@@ -114,6 +115,7 @@ end";
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
+        persistence.SubscriptionSettings().DisableCache();
         endpointConfiguration.DefineCriticalErrorAction(c =>
         {
             message = c.Error;

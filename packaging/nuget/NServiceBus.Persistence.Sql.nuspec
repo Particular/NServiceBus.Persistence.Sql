@@ -13,8 +13,8 @@
     <description>Sql Server persistence for NServiceBus.</description>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="NServiceBus" version="[6.0.0, 7.0.0)" />
-      <dependency id="Newtonsoft.Json" version="[9.0.0, 10.0.0)" />
+      <dependency id="NServiceBus" version="[6.2.0, 7.0.0)" />
+      <dependency id="Newtonsoft.Json" version="[10.0.1, 11.0.0)" />
     </dependencies>
   </metadata>
   <files>

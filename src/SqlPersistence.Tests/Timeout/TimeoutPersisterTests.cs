@@ -9,12 +9,14 @@ using ObjectApproval;
 public abstract class TimeoutPersisterTests
 {
     BuildSqlVariant sqlVariant;
+    string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public TimeoutPersisterTests(BuildSqlVariant sqlVariant)
+    public TimeoutPersisterTests(BuildSqlVariant sqlVariant, string schema)
     {
         this.sqlVariant = sqlVariant;
+        this.schema = schema;
         dbConnection = GetConnection();
     }
 
@@ -24,13 +26,14 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
         }
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
-            sqlVariant: sqlVariant.Convert());
+            sqlVariant: sqlVariant.Convert(),
+            schema: schema);
     }
 
     [TearDown]
@@ -40,7 +43,19 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
+        }
+    }
+
+    [Test]
+    public void ExecuteCreateTwice()
+    {
+        var name = $"{nameof(TimeoutPersisterTests)}{TestContext.CurrentContext.Test.Name}";
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
         }
     }
 

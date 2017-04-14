@@ -30,7 +30,8 @@ end;");
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-set @tableName = concat(@tablePrefix, '{saga.TableSuffix}');
+set @tableNameQuoted = concat('`', @tablePrefix, '{saga.TableSuffix}`');
+set @tableNameNonQuoted = concat(@tablePrefix, '{saga.TableSuffix}');
 ");
     }
 
@@ -44,11 +45,11 @@ into @exist
 from information_schema.columns
 where table_schema = database() and
       column_name = 'Correlation_{name}' and
-      table_name = @tableName;
+      table_name = @tableNameNonQuoted;
 
 set @query = IF(
     @exist <= 0,
-    concat('alter table ', @tableName, ' add column Correlation_{name} {columnType}'), 'select \'Column Exists\' status');
+    concat('alter table ', @tableNameQuoted, ' add column Correlation_{name} {columnType}'), 'select \'Column Exists\' status');
 
 prepare script from @query;
 execute script;
@@ -66,7 +67,7 @@ set @column_type_{name} = (
   from information_schema.columns
   where
     table_schema = database() and
-    table_name = @tableName and
+    table_name = @tableNameNonQuoted and
     column_name = 'Correlation_{name}'
 );
 
@@ -91,17 +92,18 @@ from information_schema.statistics
 where
     table_schema = database() and
     index_name = 'Index_Correlation_{name}' and
-    table_name = @tableName;
+    table_name = @tableNameNonQuoted;
 
 set @query = IF(
     @exist <= 0,
-    concat('create unique index Index_Correlation_{name} on ', @tableName, '(Correlation_{name})'), 'select \'Index Exists\' status');
+    concat('create unique index Index_Correlation_{name} on ', @tableNameQuoted, '(Correlation_{name})'), 'select \'Index Exists\' status');
 
 prepare script from @query;
 execute script;
 deallocate prepare script;
 ");
     }
+
     public void WritePurgeObsoleteIndex()
     {
         var builder = new StringBuilder();
@@ -118,11 +120,11 @@ deallocate prepare script;
         }
 
         writer.Write($@"
-select concat('drop index ', index_name, ' on ', @tableName, ';')
+select concat('drop index ', index_name, ' on ', @tableNameQuoted, ';')
 from information_schema.statistics
 where
     table_schema = database() and
-    table_name = @tableName and
+    table_name = @tableNameNonQuoted and
     index_name like 'Index_Correlation_%'{builder} and
     table_schema = database()
 into @dropIndexQuery;
@@ -157,7 +159,7 @@ select concat('alter table ', @tableName, ' drop column ', column_name, ';')
 from information_schema.columns
 where
     table_schema = database() and
-    table_name = @tableName and
+    table_name = @tableNameNonQuoted and
     column_name like 'Correlation_%'{builder}
 into @dropPropertiesQuery;
 
@@ -178,7 +180,7 @@ deallocate prepare script;
     {
         writer.Write(@"
 set @createTable = concat('
-    create table if not exists ', @tableName, '(
+    create table if not exists ', @tableNameQuoted, '(
         Id varchar(38) not null,
         Metadata json not null,
         Data json not null,
@@ -197,7 +199,7 @@ deallocate prepare script;
     public void WriteDropTable()
     {
         writer.Write(@"
-set @dropTable = concat('drop table if exists ', @tableName);
+set @dropTable = concat('drop table if exists ', @tableNameQuoted);
 prepare script from @dropTable;
 execute script;
 deallocate prepare script;

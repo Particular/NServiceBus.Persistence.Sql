@@ -19,6 +19,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlVariant.MsSqlServer, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
+        var subscriptions = persistence.SubscriptionSettings();
+        subscriptions.DisableCache();
         persistence.DisableInstaller();
         return Task.FromResult(0);
     }
@@ -30,7 +32,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     public Task Cleanup()
     {
-        endpointHelper?.Cleanup();
-        return Task.FromResult(0);
+        return endpointHelper?.Cleanup();
     }
 }

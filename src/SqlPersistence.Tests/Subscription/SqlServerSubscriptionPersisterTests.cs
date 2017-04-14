@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
 {
-    public SqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MsSqlServer)
+    public SqlServerSubscriptionPersisterTests() : base(BuildSqlVariant.MsSqlServer, "schema_name")
     {
     }
 

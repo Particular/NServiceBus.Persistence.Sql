@@ -1,4 +1,4 @@
-﻿declare @tableName nvarchar(max) = @tablePrefix + 'OutboxData';
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'OutboxData]';
 
 if not exists (
     select * from sys.objects
@@ -18,4 +18,20 @@ set @createTable = '
     )
 ';
 exec(@createTable);
+end
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_DispatchedAt' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createDispatchedAtIndex nvarchar(max);
+  set @createDispatchedAtIndex = '
+  create index Index_DispatchedAt
+  on ' + @tableName + '(DispatchedAt) where Dispatched = 1;';
+  exec(@createDispatchedAtIndex);
 end

@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using NServiceBus.Persistence.Sql;
 
 static class Serializer
 {
@@ -20,7 +22,14 @@ static class Serializer
     {
         using (var jsonReader = new JsonTextReader(reader))
         {
-            return JsonSerializer.Deserialize<T>(jsonReader);
+            try
+            {
+                return JsonSerializer.Deserialize<T>(jsonReader);
+            }
+            catch (Exception exception)
+            {
+                throw new SerializationException(exception);
+            }
         }
     }
 
@@ -30,7 +39,14 @@ static class Serializer
         var stringWriter = new StringWriter(stringBuilder);
         using (var jsonWriter = new JsonTextWriter(stringWriter))
         {
-            JsonSerializer.Serialize(jsonWriter, target);
+            try
+            {
+                JsonSerializer.Serialize(jsonWriter, target);
+            }
+            catch (Exception exception)
+            {
+                throw new SerializationException(exception);
+            }
         }
         return stringBuilder.ToString();
     }

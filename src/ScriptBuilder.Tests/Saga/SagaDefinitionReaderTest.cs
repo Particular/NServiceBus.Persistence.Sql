@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using ApprovalTests;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -19,19 +20,85 @@ public class SagaDefinitionReaderTest
     }
 
     [Test]
+    public void WithGeneric()
+    {
+        var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
+        SagaDefinition definition;
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+
+    [Test]
+    public void Abstract()
+    {
+        var sagaType = module.GetTypeDefinition<AbstractSaga>();
+        SagaDefinition definition;
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+    }
+
+    [Test]
+    public void NonSqlSaga()
+    {
+        var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
+        SagaDefinition definition;
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
+    }
+
+    public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+        }
+    }
+
+    [Test]
     public void Simple()
     {
-        var dataType = module.GetTypeDefinition<SimpleSaga>();
+        var sagaType = module.GetTypeDefinition<SimpleSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(
-         correlationProperty: nameof(SagaData.Correlation),
-         transitionalCorrelationProperty: nameof(SagaData.Transitional)
-     )]
-    public class SimpleSaga : Saga<SimpleSaga.SagaData>
+    public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
@@ -39,53 +106,37 @@ public class SagaDefinitionReaderTest
             public string Transitional { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
-    }
-    [Test]
-    public void SqlSaga()
-    {
-        var dataType = module.GetTypeDefinition<SimpleSqlSaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
-        ObjectApprover.VerifyWithJson(definition);
-    }
+        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.Transitional);
 
-    [SqlSaga(
-         correlationProperty: nameof(SagaData.Correlation),
-         transitionalCorrelationProperty: nameof(SagaData.Transitional)
-     )]
-    public class SimpleSqlSaga : SqlSaga<SimpleSqlSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-            public string Transitional { get; set; }
-        }
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
 
-        protected override void ConfigureMapping(MessagePropertyMapper<SagaData> mapper)
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
 
     [Test]
-    public void WithNoCorrelation()
+    public void WithReadonlyProperty()
     {
-        var dataType = module.GetTypeDefinition<WithNoCorrelationSaga>();
+        var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
-        ObjectApprover.VerifyWithJson(definition);
+        var exception = Assert.Throws<ErrorsException>(() =>
+        {
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        });
+        Approvals.Verify(exception.Message);
     }
 
-    [SqlSaga]
-    public class WithNoCorrelationSaga : Saga<WithNoCorrelationSaga.SagaData>
+    public class WithReadonlyPropertySaga : SqlSaga<WithReadonlyPropertySaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
+            public string Correlation { get; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
@@ -93,22 +144,69 @@ public class SagaDefinitionReaderTest
     [Test]
     public void WithNoTransitionalCorrelation()
     {
-        var dataType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
+        var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(dataType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga]
-    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
+    public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void WithTableSuffix()
+    {
+        var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+        }
+
+        protected override string TableSuffix => "TheTableSuffix";
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void WithNoCorrelation()
+    {
+        var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => null;
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }
-
 }

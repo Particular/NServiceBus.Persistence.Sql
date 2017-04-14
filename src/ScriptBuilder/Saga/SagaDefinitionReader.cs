@@ -3,45 +3,25 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SagaDefinitionReader
+static class SagaDefinitionReader
 {
 
     public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
-        var typeFullName = type.FullName;
-        var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
-        if (attribute == null)
+        ValidateIsNotDirectSaga(type);
+        if (!IsSqlSaga(type))
         {
-            if (!type.IsAbstract && type.BaseType != null)
-            {
-                var baseTypeFullName = type.BaseType.FullName;
-                if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
-                {
-                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Saga but is missing a [SqlSagaAttribute].");
-                }
-                if (baseTypeFullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga"))
-                {
-                    throw new ErrorsException($"The type '{typeFullName}' inherits from NServiceBus.Persistence.Sql.SqlSaga but is missing a [SqlSagaAttribute].");
-                }
-            }
             definition = null;
             return false;
         }
-        if (type.HasGenericParameters)
-        {
-            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has generic parameters.");
-        }
-        if (type.IsAbstract)
-        {
-            throw new ErrorsException($"The type '{typeFullName}' has a [SqlSagaAttribute] but has is abstract.");
-        }
+        CheckIsValidSaga(type);
 
-        var arguments = attribute.ConstructorArguments;
-        var correlation = (string)arguments[0].Value;
-        var transitional = (string)arguments[1].Value;
-        var tableSuffix = (string)arguments[2].Value;
-        SagaDefinitionValidator.ValidateSagaDefinition(correlation, typeFullName, transitional, tableSuffix);
-        
+        var correlation = GetCorrelationPropertyName(type);
+        var transitional = GetTransitionalCorrelationPropertyName(type);
+        var tableSuffix = GetTableSuffix(type);
+
+        SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional, tableSuffix);
+
         if (tableSuffix == null)
         {
             tableSuffix = type.Name;
@@ -59,52 +39,101 @@ class SagaDefinitionReader
         return true;
     }
 
-   
-    static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
+    static string GetCorrelationPropertyName(TypeDefinition type)
     {
-        foreach (var method in sagaType.Methods)
+        string value;
+        var property = type.GetProperty("CorrelationPropertyName");
+        if (property.TryGetPropertyAssignment(out value))
         {
-            var parameters = method.Parameters;
-            if (method.Name == "ConfigureHowToFindSaga")
-            {
-                if (parameters.Count == 1)
-                {
-                    var parameterType = parameters[0].ParameterType;
-                    var parameterTypeName = parameterType.Name;
-                    if (parameterTypeName.StartsWith("SagaPropertyMapper"))
-                    {
-                        var genericInstanceType = (GenericInstanceType)parameterType;
-                        var argument = genericInstanceType.GenericArguments.Single();
-                        return ToTypeDefinition(sagaType, argument);
-                    }
-                }
-            }
-            if (method.Name == "ConfigureMapping")
-            {
-                if (parameters.Count == 1)
-                {
-                    var parameterType = parameters[0].ParameterType;
-                    var parameterTypeName = parameterType.Name;
-                    if (parameterTypeName.StartsWith("MessagePropertyMapper"))
-                    {
-                        var genericInstanceType = (GenericInstanceType)parameterType;
-                        var argument = genericInstanceType.GenericArguments.Single();
-                        return ToTypeDefinition(sagaType, argument);
-                    }
-                }
-            }
+            return value;
         }
-        throw new ErrorsException($"The type '{sagaType.FullName}' needs to override Saga.ConfigureHowToFindSaga(SagaPropertyMapper) or SqlSaga.ConfigureHowToFindSaga(MessagePropertyMapper).");
+        throw new ErrorsException(
+            $@"Only a direct string (or null) return is allowed in '{type.FullName}.CorrelationPropertyName'.
+For example: protected override string CorrelationPropertyName => nameof(SagaData.TheProperty);
+When all messages are mapped using finders then use the following: protected override string CorrelationPropertyName => null;");
     }
 
-    static TypeDefinition ToTypeDefinition(TypeDefinition sagaType, TypeReference argument)
+
+    static string GetTransitionalCorrelationPropertyName(TypeDefinition type)
     {
-        var sagaDataType = argument as TypeDefinition;
-        if (sagaDataType == null)
+        string value;
+        PropertyDefinition property;
+        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out property))
         {
-            throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type not defined in the same assembly.");
+            return null;
         }
-        return sagaDataType;
+        if (property.TryGetPropertyAssignment(out value))
+        {
+            return value;
+        }
+        throw new ErrorsException(
+            $@"Only a direct string return is allowed in '{type.FullName}.TransitionalCorrelationPropertyName'.
+For example: protected override string TransitionalCorrelationPropertyName => nameof(SagaData.TheProperty);");
+    }
+
+    static string GetTableSuffix(TypeDefinition type)
+    {
+        string value;
+        PropertyDefinition property;
+        if (!type.TryGetProperty("TableSuffix", out property))
+        {
+            return null;
+        }
+        if (property.TryGetPropertyAssignment(out value))
+        {
+            return value;
+        }
+        throw new ErrorsException(
+            $@"Only a direct string return is allowed in '{type.FullName}.TableSuffix'.
+For example: protected override string TableSuffix => ""TheCustomTableSuffix"";");
+    }
+
+    static void CheckIsValidSaga(TypeDefinition type)
+    {
+        if (type.HasGenericParameters)
+        {
+            throw new ErrorsException($"The type '{type.FullName}' has generic parameters.");
+        }
+        if (type.IsAbstract)
+        {
+            throw new ErrorsException($"The type '{type.FullName}' is abstract.");
+        }
+    }
+
+    static bool IsSqlSaga(TypeDefinition type)
+    {
+        var baseType = type.BaseType;
+        if (baseType == null)
+        {
+            return false;
+        }
+        return baseType.Scope.Name.StartsWith("NServiceBus.Persistence.Sql") &&
+               baseType.FullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga");
+    }
+
+    static void ValidateIsNotDirectSaga(TypeDefinition type)
+    {
+        if (type.BaseType == null)
+        {
+            return;
+        }
+        var baseTypeFullName = type.BaseType.FullName;
+        if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
+        {
+            throw new ErrorsException($"The type '{type.FullName}' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.");
+        }
+    }
+
+    static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
+    {
+        var baseType = (GenericInstanceType) sagaType.BaseType;
+        var sagaDataReference = baseType.GenericArguments.Single();
+        var sagaDataType = sagaDataReference as TypeDefinition;
+        if (sagaDataType != null)
+        {
+            return sagaDataType;
+        }
+        throw new ErrorsException($"The type '{sagaType.FullName}' uses a SagaData type '{sagaDataReference.FullName}' that is not defined in the same assembly.");
     }
 
     static CorrelationProperty BuildConstraintProperty(TypeDefinition sagaDataTypeDefinition, string propertyName)
@@ -119,8 +148,10 @@ class SagaDefinitionReader
         {
             throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
         }
-
-        //todo: verify not readonly
+        if (propertyDefinition.SetMethod == null)
+        {
+            throw new ErrorsException($"The type '{sagaDataTypeDefinition.FullName}' has a constraint property '{propertyName}' that is read-only.");
+        }
         return BuildConstraintProperty(propertyDefinition);
     }
 
@@ -133,5 +164,5 @@ class SagaDefinitionReader
             type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(propertyType)
         );
     }
-    
+
 }

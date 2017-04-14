@@ -9,9 +9,8 @@ public class SagaDefinitionValidatorTest
     [Test]
     public void Simple()
     {
-        SagaDefinitionValidator.ValidateSagaDefinition("Correlation","saga1", "Transitional","tableSuffix");
+        SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "tableSuffix");
     }
-
 
     [Test]
     public void WithMatchingIds()
@@ -20,6 +19,26 @@ public class SagaDefinitionValidatorTest
         Approvals.Verify(errorsException.Message);
     }
 
+    [Test]
+    public void WithInvalidSuffixLeft()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table[Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
+
+    [Test]
+    public void WithInvalidSuffixRight()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table]Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
+
+    [Test]
+    public void WithInvalidSuffixTick()
+    {
+        var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table`Suffix"));
+        Approvals.Verify(errorsException.Message);
+    }
 
     [Test]
     public void WithNoCorrelation()
@@ -27,21 +46,21 @@ public class SagaDefinitionValidatorTest
         SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", null, "tableSuffix");
     }
 
-
     [Test]
     public void WithNoTransitionalCorrelation()
     {
         SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", null, "tableSuffix");
     }
 
-    [SqlSaga]
-    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
+    public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
+            public string Correlation { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
     }

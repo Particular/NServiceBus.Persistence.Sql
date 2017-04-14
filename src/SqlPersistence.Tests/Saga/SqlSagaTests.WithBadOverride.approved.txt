@@ -1,1 +1,1 @@
-﻿SqlSaga should only have ConfigureMapping(MessagePropertyMapper) overriden and not ConfigureHowToFindSaga(SagaPropertyMapper). Saga: SqlSagaTests+SagaWithBadOverride.
+﻿SqlSaga should only override ConfigureMapping(IMessagePropertyMapper) overriden and not ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage). Saga: SqlSagaTests+SagaWithBadOverride.

@@ -1,5 +1,6 @@
 ﻿{
   "Data": {
+    "CorrelationProperty": "theCorrelationProperty",
     "SimpleProperty": "UpdatedValue",
     "Id": "theSagaId",
     "Originator": "theOriginator",

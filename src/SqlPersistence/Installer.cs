@@ -23,22 +23,23 @@ class Installer : INeedToInstallSomething
     {
         var connectionBuilder = settings.GetConnectionBuilder();
         var sqlVariant = settings.GetSqlVariant();
+        var schema = settings.GetSchema();
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlVariant);
         var tablePrefix = settings.GetTablePrefix();
 
         using (var connection = await connectionBuilder.OpenConnection())
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix);
-            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix);
-            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix);
-            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix);
+            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, schema);
+            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, schema);
+            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, schema);
+            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, schema);
 
             transaction.Commit();
         }
     }
 
-    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix)
+    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema)
     {
         if (!settings.ShouldInstall<StorageType.Outbox>())
         {
@@ -51,10 +52,11 @@ class Installer : INeedToInstallSomething
         return connection.ExecuteTableCommand(
             transaction: transaction,
             script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix);
+            tablePrefix: tablePrefix,
+            schema: schema);
     }
 
-    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix)
+    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema)
     {
         if (!settings.ShouldInstall<StorageType.Subscriptions>())
         {
@@ -67,11 +69,12 @@ class Installer : INeedToInstallSomething
         return connection.ExecuteTableCommand(
             transaction: transaction,
             script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix
+            tablePrefix: tablePrefix,
+            schema: schema
         );
     }
 
-    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix)
+    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema)
     {
         if (!settings.ShouldInstall<StorageType.Timeouts>())
         {
@@ -84,10 +87,11 @@ class Installer : INeedToInstallSomething
         return connection.ExecuteTableCommand(
             transaction: transaction,
             script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix);
+            tablePrefix: tablePrefix,
+            schema: schema);
     }
 
-    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix)
+    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema)
     {
         if (!settings.ShouldInstall<StorageType.Sagas>())
         {
@@ -108,6 +112,7 @@ class Installer : INeedToInstallSomething
         return connection.ExecuteTableCommand(
             transaction: transaction,
             scripts: sagaScripts,
-            tablePrefix: tablePrefix);
+            tablePrefix: tablePrefix,
+            schema: schema);
     }
 }

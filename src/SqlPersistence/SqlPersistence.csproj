@@ -12,11 +12,8 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuSpecFileName>NServiceBus.Persistence.Sql</NuSpecFileName>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +26,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>bin\Debug\NServiceBus.Persistence.Sql.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>CS0419</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,7 +38,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>bin\Release\NServiceBus.Persistence.Sql.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>CS0419</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ConfigureAwait, Version=1.0.0.0, Culture=neutral, PublicKeyToken=233850a516558a98, processorArchitecture=MSIL">
@@ -52,19 +49,21 @@
       <HintPath>..\packages\Janitor.Fody.1.2.2.0\lib\dotnet\Janitor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.1.3\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.2.0\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Obsolete, Version=4.1.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\Obsolete.Fody.4.1.0\lib\dotnet\Obsolete.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
   </ItemGroup>
@@ -76,10 +75,25 @@
       <Link>Guard.cs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Config\ReadOnlySettingsExtendions.cs" />
+    <Compile Include="Config\ReadOnlySettingsExtensions.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_Schema.cs" />
+    <Compile Include="Config\SqlPersistenceConfig.cs" />
     <Compile Include="Config\SqlVariant.cs" />
+    <Compile Include="Outbox\AsyncTimer.cs" />
+    <Compile Include="Outbox\IAsyncTimer.cs" />
     <Compile Include="Outbox\OutboxCommands.cs" />
     <Compile Include="Outbox\OutboxCommandBuilder.cs" />
+    <Compile Include="Saga\IMessagePropertyMapper.cs" />
+    <Compile Include="Saga\MessagePropertyMapper.cs" />
+    <Compile Include="Saga\ParameterAppender.cs" />
+    <Compile Include="Saga\SagaPersister_Save.cs" />
+    <Compile Include="Saga\SagaPersister_Update.cs" />
+    <Compile Include="Saga\SagaPersister_Complete.cs" />
+    <Compile Include="Saga\SagaPersister_Get.cs" />
+    <Compile Include="SerializationException.cs" />
+    <Compile Include="Subscription\Config\SqlPersistenceConfig.cs" />
+    <Compile Include="Subscription\Config\SubscriptionSettings.cs" />
+    <Compile Include="Subscription\Config\SubscriptionSettings_CacheFor.cs" />
     <Compile Include="Subscription\SubscriptionCommands.cs" />
     <Compile Include="Subscription\SubscriptionCommandBuilder.cs" />
     <Compile Include="TableNameCleaner.cs" />
@@ -88,10 +102,10 @@
     <Compile Include="Saga\Config\SagaSettings_Writer.cs" />
     <Compile Include="Saga\Config\SagaSettings_Reader.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Connection.cs" />
-    <Compile Include="Saga\Config\SqlPersistenceConfig_Saga.cs" />
+    <Compile Include="Saga\Config\SqlPersistenceConfig.cs" />
     <Compile Include="Config\SqlPersistenceConfig_Enabled.cs" />
     <Compile Include="Config\SqlPersistenceConfig_TablePrefix.cs" />
-    <Compile Include="Config\SqlVariantConfig.cs" />
+    <Compile Include="Config\SqlPersistenceConfig_SqlVariant.cs" />
     <Compile Include="EnabledStorageFeatures.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogManager.cs" />
@@ -102,10 +116,9 @@
     <Compile Include="Installer.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Outbox\SqlOutboxTransaction.cs" />
-    <Compile Include="Saga\ContextBagExtentions.cs" />
     <Compile Include="Saga\Config\SagaSettings.cs" />
     <Compile Include="Saga\Serialization\SagaPropertyFilter.cs" />
-    <Compile Include="Saga\SqlSagaAttributeData.cs" />
+    <Compile Include="Saga\SqlSagaTypeData.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SqlPersistenceStorageSessionExtensions.cs" />
     <Compile Include="SqlPersistenceSettingsAttribute.cs" />
@@ -114,12 +127,12 @@
     <Compile Include="SynchronizedStorage\StorageSession.cs" />
     <Compile Include="SynchronizedStorage\StorageAdapter.cs" />
     <Compile Include="Saga\SqlSagaAttribute.cs" />
-    <Compile Include="Saga\MessagePropertyMapper.cs" />
+    <Compile Include="Saga\PropertyMapper.cs" />
     <Compile Include="Saga\Serialization\RetrieveVersionSpecificJsonSettings.cs" />
     <Compile Include="Saga\SagaCommandBuilder.cs" />
     <Compile Include="Saga\RuntimeSagaInfo.cs" />
     <Compile Include="Saga\SagaInfoCache.cs" />
-    <Compile Include="Saga\SqlSagaAttributeReader.cs" />
+    <Compile Include="Saga\SqlSagaTypeDataReader.cs" />
     <Compile Include="Saga\SqlSaga.cs" />
     <Compile Include="ScriptLocation.cs" />
     <Compile Include="StaticVersions.cs" />
@@ -158,9 +171,9 @@
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*"/>
+      <Files Include="$(TargetDir)$(TargetName).*" />
     </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries"/>
+    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
   </Target>

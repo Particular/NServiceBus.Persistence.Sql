@@ -15,7 +15,7 @@
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql" version="[1.0, 2.0)"/>
+      <dependency id="NServiceBus.Persistence.Sql" version="[$version$, $version$]"/>
     </dependencies>
   </metadata>
   <files>

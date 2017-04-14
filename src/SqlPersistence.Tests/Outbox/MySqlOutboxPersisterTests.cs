@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class MySqlOutboxPersisterTests : OutboxPersisterTests
 {
-    public MySqlOutboxPersisterTests() : base(BuildSqlVariant.MySql)
+    public MySqlOutboxPersisterTests() : base(BuildSqlVariant.MySql, null)
     {
     }
 
