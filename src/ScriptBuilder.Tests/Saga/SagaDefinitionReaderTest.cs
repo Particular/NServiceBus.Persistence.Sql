@@ -26,7 +26,7 @@ public class SagaDefinitionReaderTest
         SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
     }
@@ -53,7 +53,7 @@ public class SagaDefinitionReaderTest
         SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
     }
@@ -67,34 +67,11 @@ public class SagaDefinitionReaderTest
     }
 
     [Test]
-    public void NonSqlSaga()
-    {
-        var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
-        SagaDefinition definition;
-        var exception = Assert.Throws<ErrorsException>(() =>
-        {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
-        });
-        Approvals.Verify(exception.Message);
-    }
-
-    public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
-    }
-
-    [Test]
     public void Simple()
     {
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -122,7 +99,7 @@ public class SagaDefinitionReaderTest
         SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         });
         Approvals.Verify(exception.Message);
     }
@@ -146,7 +123,7 @@ public class SagaDefinitionReaderTest
     {
         var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -169,7 +146,7 @@ public class SagaDefinitionReaderTest
     {
         var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -193,7 +170,7 @@ public class SagaDefinitionReaderTest
     {
         var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
         SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 

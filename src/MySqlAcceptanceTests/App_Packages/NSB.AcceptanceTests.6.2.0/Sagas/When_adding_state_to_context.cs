@@ -10,7 +10,6 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NServiceBus.Sagas;
     using NUnit.Framework;
     using Persistence;
-    using Persistence.Sql;
 
     [TestFixture]
     public class When_adding_state_to_context : NServiceBusAcceptanceTest
@@ -56,10 +55,8 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
 
-            public class TestSaga07 : SqlSaga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
+            public class TestSaga07 : Saga<TestSaga07.SagaData07>, IAmStartedByMessages<StartSagaMessage>
             {
-                protected override string CorrelationPropertyName => null;
-
                 public Context Context { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -67,7 +64,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData07> mapper)
                 {
                     // custom finder used
                 }

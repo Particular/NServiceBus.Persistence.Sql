@@ -95,6 +95,7 @@
     <Compile Include="AssemblySqlPersistenceSettingsAttribute.cs" />
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Saga\InferSagaMetadataTests.cs" />
     <Compile Include="SqlAttributeParametersReadersTest.cs" />
     <Compile Include="Saga\SagaDefinitionReaderTest.cs" />
     <Compile Include="Saga\SagaDefinitionValidatorTest.cs" />

@@ -46,16 +46,16 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             EndpointSetup<DefaultServer>();
         }
 
-        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
+        public class CustomFinder : IFindSagas<SqlCustomFinderSaga.SqlCustomFinderSagaData>.Using<SomeOtherMessage>
         {
             // ReSharper disable once MemberCanBePrivate.Global
             public Context Context { get; set; }
 
-            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+            public Task<SqlCustomFinderSaga.SqlCustomFinderSagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
                 Context.FinderUsed = true;
 
-                return session.GetSagaData<TestSaga.SagaData>(
+                return session.GetSagaData<SqlCustomFinderSaga.SqlCustomFinderSagaData>(
                     context: context,
                     whereClause: "json_extract(Data,'$.Property') = @propertyValue",
                     appendParameters: (builder, append) =>
@@ -68,7 +68,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class SqlCustomFinderSaga : SqlSaga<SqlCustomFinderSaga.SqlCustomFinderSagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
@@ -89,12 +89,12 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 return Task.FromResult(0);
             }
 
-            public class SagaData : ContainSagaData
+            public class SqlCustomFinderSagaData : ContainSagaData
             {
                 public string Property { get; set; }
             }
 
-            protected override string CorrelationPropertyName => nameof(SagaData.Property);
+            protected override string CorrelationPropertyName => nameof(SqlCustomFinderSagaData.Property);
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {

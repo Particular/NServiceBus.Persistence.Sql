@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 #pragma warning disable 618
 
@@ -35,7 +36,7 @@ class RuntimeSagaInfo
         SagaCommandBuilder commandBuilder,
         Type sagaDataType,
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
-        Type sagaType,
+        SagaMetadata metadata,
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
@@ -49,13 +50,12 @@ class RuntimeSagaInfo
             deserializers = new ConcurrentDictionary<Version, JsonSerializer>();
         }
         this.versionSpecificSettings = versionSpecificSettings;
-        SagaType = sagaType;
+        SagaType = metadata.SagaType;
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
-        ValidateIsSqlSaga();
-        var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
+        var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(metadata);
         var tableSuffix = sqlSagaAttributeData.TableSuffix;
 
         switch (sqlVariant)
@@ -90,16 +90,7 @@ class RuntimeSagaInfo
             TransitionalAccessor = sagaDataType.GetPropertyAccessor<IContainSagaData>(TransitionalCorrelationProperty);
         }
     }
-
-    void ValidateIsSqlSaga()
-    {
-        if (!SagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
-        {
-            throw new Exception($"Type '{SagaType.FullName}' does not inherit from SqlSaga<T>. Change the type to inherit from SqlSaga<T>.");
-        }
-    }
-
-
+    
     public string ToJson(IContainSagaData sagaData)
     {
         var originalMessageId = sagaData.OriginalMessageId;

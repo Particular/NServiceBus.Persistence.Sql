@@ -6,7 +6,6 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_saga_handles_unmapped_message : NServiceBusAcceptanceTest
     {
@@ -50,19 +49,17 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class UnmappedMsgSaga : SqlSaga<UnmappedMsgSagaData>,
+            public class UnmappedMsgSaga : Saga<UnmappedMsgSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<MappedEchoMessage>,
                 IHandleMessages<EchoMessage>
             {
-                protected override string CorrelationPropertyName => nameof(UnmappedMsgSagaData.SomeId);
-
                 public Context Context { get; set; }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<UnmappedMsgSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(msg => msg.SomeId);
-                    mapper.ConfigureMapping<MappedEchoMessage>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
+                    mapper.ConfigureMapping<MappedEchoMessage>(msg => msg.SomeId).ToSaga(saga => saga.SomeId);
                     // No mapping for EchoMessage, so saga can't possibly be found
                 }
 

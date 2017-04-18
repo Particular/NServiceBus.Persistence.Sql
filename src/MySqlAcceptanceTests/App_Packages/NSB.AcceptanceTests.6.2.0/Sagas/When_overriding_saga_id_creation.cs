@@ -10,7 +10,6 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_overriding_saga_id_creation : NServiceBusAcceptanceTest
     {
@@ -64,11 +63,9 @@
                 }
             }
 
-            public class CustomSagaIdSaga : SqlSaga<CustomSagaIdSaga.CustomSagaIdSagaData>,
+            public class CustomSagaIdSaga : Saga<CustomSagaIdSaga.CustomSagaIdSagaData>,
                 IAmStartedByMessages<StartSaga>
             {
-                protected override string CorrelationPropertyName => nameof(CustomSagaIdSagaData.CustomerId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -79,9 +76,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CustomSagaIdSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.CustomerId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.CustomerId).ToSaga(s => s.CustomerId);
                 }
 
                 public class CustomSagaIdSagaData : ContainSagaData

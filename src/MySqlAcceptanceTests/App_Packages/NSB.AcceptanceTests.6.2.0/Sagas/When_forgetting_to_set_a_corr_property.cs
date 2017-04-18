@@ -5,7 +5,6 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_forgetting_to_set_a_corr_property : NServiceBusAcceptanceTest
     {
@@ -38,10 +37,8 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class NullCorrPropertySaga : SqlSaga<NullCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
+            public class NullCorrPropertySaga : Saga<NullCorrPropertySagaData>, IAmStartedByMessages<StartSagaMessage>
             {
-                protected override string CorrelationPropertyName => nameof(NullCorrPropertySagaData.SomeId);
-
                 public Context Context { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -61,9 +58,10 @@
                     });
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NullCorrPropertySagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
+                        .ToSaga(s => s.SomeId);
                 }
             }
 
