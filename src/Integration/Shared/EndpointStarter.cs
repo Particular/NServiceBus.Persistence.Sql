@@ -5,16 +5,19 @@ using NServiceBus.Persistence.Sql;
 
 public static class EndpointStarter
 {
-    public static async Task Start(string enpointName, Action<PersistenceExtensions<SqlPersistence>> configurePersistence)
+    public static async Task Start(string endpointName, Action<PersistenceExtensions<SqlPersistence>> configurePersistence)
     {
-        var endpointConfiguration = new EndpointConfiguration($"SqlPersistence.Sample{enpointName}");
+        var endpointConfiguration = new EndpointConfiguration($"SqlPersistence.Sample{endpointName}");
         endpointConfiguration.UseSerialization<JsonSerializer>();
         endpointConfiguration.EnableInstallers();
         endpointConfiguration.EnableOutbox();
         endpointConfiguration.SendFailedMessagesTo("Error");
 
-        var sagaPersistence = endpointConfiguration.UsePersistence<SqlPersistence>();
-        configurePersistence(sagaPersistence);
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        configurePersistence(persistence);
+
+        var subscriptions = persistence.SubscriptionSettings();
+        subscriptions.CacheFor(TimeSpan.FromMinutes(1));
 
         var endpoint = await Endpoint.Start(endpointConfiguration);
         Console.WriteLine("Press any key to exit");
