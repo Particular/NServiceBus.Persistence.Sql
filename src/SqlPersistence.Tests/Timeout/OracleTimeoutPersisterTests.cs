@@ -17,7 +17,7 @@ public class OracleTimeoutPersisterTests : TimeoutPersisterTests
 
     protected override string GetTablePrefix()
     {
-        var name = TestContext.CurrentContext.Test.Name;
+        var name = $"Test {TestContext.CurrentContext.Test.Name}";
         if (name.Length > 24)
         {
             name = name.Substring(0, 24);

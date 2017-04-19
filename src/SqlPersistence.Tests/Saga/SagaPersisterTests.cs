@@ -269,6 +269,70 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public void SaveWithSpaceInName()
+    {
+        var endpointName = nameof(SaveWithSpaceInName);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWith SpaceInName",
+            name: nameof(SagaWithSpaceInName),
+            correlationProperty: new CorrelationProperty
+            (
+                name: "SimpleProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+
+        DropAndCreate(definition, endpointName);
+        var id = Guid.NewGuid();
+        var result = SaveWithSpaceAsync(id, endpointName).GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+    }
+
+    async Task<SagaWithSpaceInName.SagaData> SaveWithSpaceAsync(Guid id, string endpointName)
+    {
+        var sagaData = new SagaWithSpaceInName.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "original message id",
+            Originator = "the originator",
+            SimpleProperty = "property value"
+        };
+
+        var persister = SetUp(endpointName);
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await persister.Save(sagaData, storageSession, "property value");
+            return (await persister.Get<SagaWithSpaceInName.SagaData>(id, storageSession)).Data;
+        }
+    }
+
+    public class SagaWithSpaceInName :
+        SqlSaga<SagaWithSpaceInName.SagaData>,
+        IAmStartedByMessages<AMessage>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string SimpleProperty { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.SimpleProperty);
+
+        protected override string TableSuffix => "SagaWith SpaceInName";
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
+        }
+    }
+
+    [Test]
     public void UpdateWithCorrectVersion()
     {
         var endpointName = nameof(UpdateWithCorrectVersion);

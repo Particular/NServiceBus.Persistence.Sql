@@ -1,0 +1,6 @@
+﻿{
+  "SimpleProperty": "property value",
+  "Id": "theSagaId",
+  "Originator": "the originator",
+  "OriginalMessageId": "original message id"
+}
