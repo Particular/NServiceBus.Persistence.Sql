@@ -8,13 +8,13 @@ begin
   then
 
     createTable :=
-       'create table ' || tableName || '
+       'create table "' || tableName || '"
         (
           messagetype nvarchar2(200) not null,
           subscriber nvarchar2(200) not null,
           endpoint varchar2(200) not null,
           persistenceversion varchar2(23),
-          constraint ' || tableName || '_PK primary key
+          constraint "' || tableName || '_PK" primary key
           (
             messagetype
           , subscriber

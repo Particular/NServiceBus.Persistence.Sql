@@ -16,7 +16,7 @@ begin
   then
     
     sqlStatement :=
-       'create table THESAGA 
+       'create table "THESAGA"
        (
           id varchar2(38) not null,
           metadata clob not null,
@@ -24,7 +24,7 @@ begin
           persistenceversion varchar2(23) not null,
           sagatypeversion varchar2(23) not null,
           concurrency number(9) not null,
-          constraint THESAGA_PK primary key
+          constraint "THESAGA_PK" primary key
           (
             id
           )
@@ -40,7 +40,7 @@ begin
 select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
 if(n = 0)
 then
-  sqlStatement := 'alter table THESAGA add ( CORR_CORRELATIONPROPERTY NVARCHAR2(200) )';
+  sqlStatement := 'alter table "THESAGA" add ( CORR_CORRELATIONPROPERTY NVARCHAR2(200) )';
 
   execute immediate sqlStatement;
 end if;
@@ -71,7 +71,7 @@ end if;
 select count(*) into n from user_indexes where table_name = 'THESAGA' and index_name = 'SAGAIDX_E78AFF37B286FF56612DF6';
 if(n = 0)
 then
-  sqlStatement := 'create unique index SAGAIDX_E78AFF37B286FF56612DF6 on THESAGA (CORR_CORRELATIONPROPERTY ASC)';
+  sqlStatement := 'create unique index "SAGAIDX_E78AFF37B286FF56612DF6" on "THESAGA" (CORR_CORRELATIONPROPERTY ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -81,7 +81,7 @@ end if;
 select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY';
 if(n = 0)
 then
-  sqlStatement := 'alter table THESAGA add ( CORR_TRANSITIONALPROPERTY NVARCHAR2(200) )';
+  sqlStatement := 'alter table "THESAGA" add ( CORR_TRANSITIONALPROPERTY NVARCHAR2(200) )';
 
   execute immediate sqlStatement;
 end if;
@@ -112,7 +112,7 @@ end if;
 select count(*) into n from user_indexes where table_name = 'THESAGA' and index_name = 'SAGAIDX_E7CBAA5C3429959F4D7907';
 if(n = 0)
 then
-  sqlStatement := 'create unique index SAGAIDX_E7CBAA5C3429959F4D7907 on THESAGA (CORR_TRANSITIONALPROPERTY ASC)';
+  sqlStatement := 'create unique index "SAGAIDX_E7CBAA5C3429959F4D7907" on "THESAGA" (CORR_TRANSITIONALPROPERTY ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -130,7 +130,7 @@ where table_name = 'THESAGA' and column_name like 'CORR_%' and
 if(n > 0)
 then
 
-  select 'alter table THESAGA drop column ' || column_name into sqlStatement
+  select 'alter table "THESAGA" drop column ' || column_name into sqlStatement
   from all_tab_columns
   where table_name = 'THESAGA' and column_name like 'CORR_%' and
         column_name <> 'CORR_CORRELATIONPROPERTY' and
