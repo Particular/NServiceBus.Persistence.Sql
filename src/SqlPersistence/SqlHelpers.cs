@@ -13,6 +13,14 @@ static class SqlHelpers
         }
     }
 
+    public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, IEnumerable<string> scripts)
+    {
+        foreach (var script in scripts)
+        {
+            await connection.ExecuteTableCommand(transaction, script);
+        }
+    }
+
     public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, string script, string tablePrefix, string schema)
     {
         //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
@@ -23,6 +31,27 @@ static class SqlHelpers
             command.CommandText = script;
             command.AddParameter("tablePrefix", tablePrefix);
             command.AddParameter("schema", schema);
+            await command.ExecuteNonQueryEx();
+        }
+    }
+
+    public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
+    {
+        using (var command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = script;
+            command.AddParameter("tablePrefix", tablePrefix);
+            await command.ExecuteNonQueryEx();
+        }
+    }
+
+    public static async Task ExecuteTableCommand(this DbConnection connection, DbTransaction transaction, string script)
+    {
+        using (var command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = script;
             await command.ExecuteNonQueryEx();
         }
     }

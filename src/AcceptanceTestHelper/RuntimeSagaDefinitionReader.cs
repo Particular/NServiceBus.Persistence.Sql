@@ -11,7 +11,7 @@ public static class RuntimeSagaDefinitionReader
 {
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
 
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlVariant sqlVariant)
     {
         var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
         if (!sagaTypes.Any())
@@ -31,10 +31,10 @@ public static class RuntimeSagaDefinitionReader
         {
             throw new AggregateException(exceptions);
         }
-        return sagaTypes.Select(GetSagaDefinition);
+        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlVariant));
     }
 
-    static SagaDefinition GetSagaDefinition(Type sagaType)
+    static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlVariant sqlVariant)
     {
         var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
@@ -49,8 +49,15 @@ public static class RuntimeSagaDefinitionReader
                 name: mapper.CorrelationProperty,
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
+
+        var tableSuffix = sagaType.Name;
+        if (sqlVariant == BuildSqlVariant.Oracle)
+        {
+            tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
+        }
+
         return new SagaDefinition(
-            tableSuffix: sagaType.Name,
+            tableSuffix: tableSuffix,
             name: sagaType.FullName,
             correlationProperty: correlationProperty);
     }

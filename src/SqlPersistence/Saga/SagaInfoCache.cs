@@ -15,6 +15,7 @@ class SagaInfoCache
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    Func<string, string> nameFilter;
     string tablePrefix;
     string schema;
     SqlVariant sqlVariant;
@@ -28,7 +29,8 @@ class SagaInfoCache
         string tablePrefix,
         string schema,
         SqlVariant sqlVariant,
-        SagaMetadataCollection metadataCollection)
+        SagaMetadataCollection metadataCollection,
+        Func<string, string> nameFilter)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
@@ -38,6 +40,7 @@ class SagaInfoCache
         this.tablePrefix = tablePrefix;
         this.schema = schema;
         this.sqlVariant = sqlVariant;
+        this.nameFilter = nameFilter;
         Initialize(metadataCollection);
     }
 
@@ -76,6 +79,7 @@ class SagaInfoCache
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
             schema: schema,
-            sqlVariant: sqlVariant);
+            sqlVariant: sqlVariant,
+            nameFilter: nameFilter);
     }
 }

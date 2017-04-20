@@ -12,11 +12,13 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
     Func<DbConnection> connectionBuilder;
     TimeoutCommands timeoutCommands;
+    CommandBuilder commandBuilder;
 
     public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema)
     {
         this.connectionBuilder = connectionBuilder;
         timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix, schema);
+        commandBuilder = new CommandBuilder(sqlVariant);
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
@@ -64,7 +66,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task Add(TimeoutData timeout, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.Add;
             var id = SequentialGuid.Next();
@@ -88,16 +90,8 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         {
             command.CommandText = timeoutCommands.RemoveById;
             command.AddParameter("Id", timeoutId);
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                if (!reader.HasRows)
-                {
-                    return false;
-                }
-                await reader.ReadAsync();
-                var value = reader.GetValue(0);
-                return value != DBNull.Value;
-            }
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+            return rowsAffected == 1;
         }
     }
 
@@ -118,8 +112,8 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                 {
                     while (await reader.ReadAsync())
                     {
-                        var id = reader.GetGuid(0).ToString();
-                        list.Add(new TimeoutsChunk.Timeout(id, reader.GetDateTime(1)));
+                        var id = await reader.GetGuidAsync(0);
+                        list.Add(new TimeoutsChunk.Timeout(id.ToString(), reader.GetDateTime(1)));
                     }
                 }
             }
@@ -145,7 +139,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection())
-        using (var command = connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.RemoveBySagaId;
             command.AddParameter("SagaId", sagaId);

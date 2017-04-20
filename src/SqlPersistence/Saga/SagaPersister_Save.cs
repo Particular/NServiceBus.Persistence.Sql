@@ -18,7 +18,7 @@ partial class SagaPersister
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
 
-        using (var command = sqlSession.Connection.CreateCommand())
+        using (var command = commandBuilder.CreateCommand(sqlSession.Connection))
         {
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;

@@ -14,6 +14,7 @@ static class SqlVariantReader
         {
             yield return BuildSqlVariant.MsSqlServer;
             yield return BuildSqlVariant.MySql;
+            yield return BuildSqlVariant.Oracle;
             yield break;
         }
 
@@ -29,9 +30,15 @@ static class SqlVariantReader
             yield return BuildSqlVariant.MySql;
         }
 
-        if (!msSqlServerScripts && !mySqlScripts)
+        var oracleScripts = attribute.GetBoolProperty("OracleScripts");
+        if (oracleScripts)
         {
-            throw new ErrorsException("Must define either MsSqlServerScripts, MySqlScripts, or both. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
+            yield return BuildSqlVariant.Oracle;
+        }
+
+        if (!msSqlServerScripts && !mySqlScripts && !oracleScripts)
+        {
+            throw new ErrorsException("Must define at least one of MsSqlServerScripts, MySqlScripts, or OracleScripts. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
         }
     }
 }

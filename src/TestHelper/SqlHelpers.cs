@@ -12,13 +12,9 @@ public static class SqlHelpers
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{tablePrefix}_");
-                if (schema == null)
+                if (command is System.Data.SqlClient.SqlCommand)
                 {
-                    command.AddParameter("schema", "dbo");
-                }
-                else
-                {
-                    command.AddParameter("schema", schema);
+                    command.AddParameter("schema", schema ?? "dbo");
                 }
                 command.ExecuteNonQuery();
             }

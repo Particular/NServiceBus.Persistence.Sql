@@ -164,3 +164,5 @@ select @dropPropertiesQuery =
         column_name <> N'Correlation_TransitionalProperty'
 );
 exec sp_executesql @dropPropertiesQuery
+
+/* CompleteSagaScript */
