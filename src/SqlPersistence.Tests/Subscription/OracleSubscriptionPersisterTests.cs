@@ -17,6 +17,6 @@ public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
 
     protected override string GetTablePrefix()
     {
-        return "SUBSCRIPTIONPERSISTER";
+        return "Subscription Tests";
     }
 }

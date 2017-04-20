@@ -67,8 +67,8 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), nameof(OutboxPersisterTests), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
         }
     }
 
@@ -82,6 +82,25 @@ public abstract class OutboxPersisterTests
 
     void VerifyOperationsAreEmpty(OutboxMessage result)
     {
+        
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = BuildOperationsFromMessageIdCommand(result.MessageId);
+                using (var reader = command.ExecuteReader())
+                {
+                    reader.Read();
+                    var operations = reader.GetString(0);
+                    Assert.AreEqual("[]", operations);
+                }
+            }
+        }
+    }
+
+    protected virtual string BuildOperationsFromMessageIdCommand(string messageId)
+    {
         string tableName;
         if (string.IsNullOrEmpty(schema))
         {
@@ -91,23 +110,11 @@ public abstract class OutboxPersisterTests
         {
             tableName = $"{schema}.{GetTablePrefix()}";
         }
-        using (var connection = dbConnection())
-        {
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = $@"
+
+        return $@"
 select Operations
 from {tableName}{GetTableSuffix()}
-where MessageId = '{result.MessageId}'";
-                using (var reader = command.ExecuteReader())
-                {
-                    reader.Read();
-                    var operations = reader.GetString(0);
-                    Assert.AreEqual("[]", operations);
-                }
-            }
-        }
+where MessageId = '{messageId}'";
     }
 
     async Task<OutboxMessage> StoreDispatchAndGetAsync()

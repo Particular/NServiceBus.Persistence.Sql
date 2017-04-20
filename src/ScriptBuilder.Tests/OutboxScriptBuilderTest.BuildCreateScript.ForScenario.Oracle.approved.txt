@@ -11,7 +11,7 @@ begin
   then
 
     createTable :=
-       'create table ' || tableName || '
+       'create table "' || tableName || '"
         (
           messageid nvarchar2(200) not null,
           dispatched number(1,0) default 0 not null check
@@ -21,7 +21,7 @@ begin
           dispatchedat timestamp,
           operations clob not null,
           persistenceversion varchar2(23) not null,
-          constraint ' || pkName || ' primary key
+          constraint "' || pkName || '" primary key
           (
             messageid
           )
@@ -37,7 +37,7 @@ begin
   then
 
     createIndex :=
-      'create index ' || indexName || ' on ' || tableName || ' (dispatched, dispatchedat)';
+      'create index "' || indexName || '" on "' || tableName || '" (dispatched, dispatchedat)';
 
     execute immediate createIndex;
 

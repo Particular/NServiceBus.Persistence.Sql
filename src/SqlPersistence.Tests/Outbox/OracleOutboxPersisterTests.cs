@@ -17,11 +17,18 @@ public class OracleOutboxPersisterTests : OutboxPersisterTests
 
     protected override string GetTablePrefix()
     {
-        return "OUTBOXPERSISTER";
+        return "OUTBOX PERSISTER";
     }
 
     protected override string GetTableSuffix()
     {
         return "_OD";
+    }
+
+    protected override string BuildOperationsFromMessageIdCommand(string messageId)
+    {
+        return $@"select Operations
+from ""{GetTablePrefix()}{GetTableSuffix()}""
+where MessageId = '{messageId}'";
     }
 }

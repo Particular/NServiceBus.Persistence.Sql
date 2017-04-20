@@ -7,7 +7,7 @@ begin
   if(n = 1)
   then
 
-    dropTable := 'drop table ' || tableName;
+    dropTable := 'drop table "' || tableName || '"';
 
     execute immediate dropTable;
 

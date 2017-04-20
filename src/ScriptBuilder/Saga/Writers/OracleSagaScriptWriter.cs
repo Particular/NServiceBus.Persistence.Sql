@@ -52,7 +52,7 @@ begin");
 select count(*) into n from all_tab_columns where table_name = '{tableName}' and column_name = '{name}';
 if(n = 0)
 then
-  sqlStatement := 'alter table {tableName} add ( {name} {columnType} )';
+  sqlStatement := 'alter table ""{tableName}"" add ( {name} {columnType} )';
 
   execute immediate sqlStatement;
 end if;
@@ -95,7 +95,7 @@ end if;
 select count(*) into n from user_indexes where table_name = '{tableName}' and index_name = '{indexName}';
 if(n = 0)
 then
-  sqlStatement := 'create unique index {indexName} on {tableName} ({columnName} ASC)';
+  sqlStatement := 'create unique index ""{indexName}"" on ""{tableName}"" ({columnName} ASC)';
 
   execute immediate sqlStatement;
 end if;
@@ -122,7 +122,7 @@ where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
 if(n > 0)
 then
 
-  select 'alter table {tableName} drop column ' || column_name into sqlStatement
+  select 'alter table ""{tableName}"" drop column ' || column_name into sqlStatement
   from all_tab_columns
   where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
 
@@ -145,7 +145,7 @@ end if;
   then
     
     sqlStatement :=
-       'create table {tableName} 
+       'create table ""{tableName}""
        (
           id varchar2(38) not null,
           metadata clob not null,
@@ -153,7 +153,7 @@ end if;
           persistenceversion varchar2(23) not null,
           sagatypeversion varchar2(23) not null,
           concurrency number(9) not null,
-          constraint {tableName}_PK primary key
+          constraint ""{tableName}_PK"" primary key
           (
             id
           )
@@ -175,7 +175,7 @@ begin
   select count(*) into n from user_tables where table_name = '{tableName}';
   if(n > 0)
   then
-    execute immediate 'drop table {tableName}';
+    execute immediate 'drop table ""{tableName}""';
   end if;
 end;
 ");

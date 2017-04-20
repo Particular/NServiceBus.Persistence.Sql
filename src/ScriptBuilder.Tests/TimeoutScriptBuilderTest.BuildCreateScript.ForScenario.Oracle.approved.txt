@@ -10,7 +10,7 @@ begin
   then
 
     execute immediate
-       'create table ' || tableName || '
+       'create table "' || tableName || '"
        (
          id varchar2(38) not null,
          destination nvarchar2(200) not null,
@@ -19,7 +19,7 @@ begin
          expiretime date,
          headers clob not null,
          persistenceversion varchar2(23) not null,
-         constraint ' || tableName || '_PK primary key 
+         constraint "' || tableName || '_PK" primary key 
          (
            id
          )
@@ -31,12 +31,12 @@ begin
   select count(*) into n from user_indexes where index_name = timeIndex;
   if(n = 0)
   then
-    execute immediate 'create index ' || timeIndex || ' on ' || tableName || ' (expiretime asc)';
+    execute immediate 'create index "' || timeIndex || '" on "' || tableName || '" (expiretime asc)';
   end if;
 
   select count(*) into n from user_indexes where index_name = sagaIndex;
   if(n = 0)
   then
-    execute immediate 'create index ' || sagaIndex || ' on ' || tableName || ' (sagaid asc)';
+    execute immediate 'create index "' || sagaIndex || '" on "' || tableName || '" (sagaid asc)';
   end if;
 end;
