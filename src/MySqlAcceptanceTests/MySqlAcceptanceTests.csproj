@@ -256,6 +256,7 @@
     <Compile Include="TestSuiteConstraints.cs" />
     <Compile Include="When_all_messages_have_finders.cs" />
     <Compile Include="When_custom_finder_returns_existing_saga.cs" />
+    <Compile Include="When_transitioning_correlation_property.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj">
