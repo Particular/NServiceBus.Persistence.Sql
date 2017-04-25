@@ -59,8 +59,8 @@ public static class RuntimeSagaDefinitionReader
         if (transitionalCorrelationPropertyName != null)
         {
             var sagaDataType = sagaType.BaseType.GetGenericArguments()[0];
-            var trnsitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
-            transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(trnsitionalProperty.PropertyType));
+            var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
+            transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
         }
 
         var tableSuffixOverride = (string)sagaType.GetProperty("TableSuffix", AnyInstanceMember).GetValue(saga);
