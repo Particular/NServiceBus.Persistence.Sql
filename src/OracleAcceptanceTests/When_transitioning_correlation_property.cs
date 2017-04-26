@@ -2,10 +2,10 @@
 {
     using System;
     using System.Data;
-    using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
     using NUnit.Framework;
+    using Oracle.ManagedDataAccess.Client;
     using Persistence.Sql;
     using Persistence.Sql.ScriptBuilder;
 
@@ -20,39 +20,60 @@
             var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
             var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
 
-            using (var connection = OracleConnectionBuilder.Build())
+            string[] phase1Schema, phase2Schema, phase3Schema;
+
+            using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
             {
                 await connection.OpenAsync();
+
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
-                var phase1Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
-                var phase2Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
-                var phase3Schema = GetSchema(connection);
+                phase1Schema = GetSchema(connection);
 
-                CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");
-                CollectionAssert.DoesNotContain(phase1Schema, "Correlation_OrderId");
-
-                CollectionAssert.Contains(phase2Schema, "Correlation_OrderNumber");
-                CollectionAssert.Contains(phase2Schema, "Correlation_OrderId");
-
-                CollectionAssert.DoesNotContain(phase3Schema, "Correlation_OrderNumber");
-                CollectionAssert.Contains(phase3Schema, "Correlation_OrderId");
+                connection.PurgeStatementCache();
             }
+
+            using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
+            {
+                await connection.OpenAsync();
+
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                phase2Schema = GetSchema(connection);
+
+                connection.PurgeStatementCache();
+            }
+
+            using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
+            {
+                await connection.OpenAsync();
+
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                phase3Schema = GetSchema(connection);
+
+                connection.PurgeStatementCache();
+            }
+
+            CollectionAssert.Contains(phase1Schema, "CORR_ORDERNUMBER");
+            CollectionAssert.DoesNotContain(phase1Schema, "CORR_ORDERID");
+
+            CollectionAssert.Contains(phase2Schema, "CORR_ORDERNUMBER");
+            CollectionAssert.Contains(phase2Schema, "CORR_ORDERID");
+
+            CollectionAssert.DoesNotContain(phase3Schema, "CORR_ORDERNUMBER");
+            CollectionAssert.Contains(phase3Schema, "CORR_ORDERID");
         }
 
-        static string[] GetSchema(DbConnection connection)
+        static string[] GetSchema(OracleConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = "SELECT * FROM _TransitioningCorrelationPropertySaga";
+                command.CommandText = "SELECT * FROM TRANSCORRPROPSAGA";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = command.ExecuteReader())
                 {
                     var schemaTable = reader.GetSchemaTable();
-                    return schemaTable.Rows.OfType<DataRow>().Select(r => (string)r[0]).ToArray();
+                    return schemaTable.Rows.OfType<DataRow>().Select(r => (string) r[0]).ToArray();
                 }
             }
         }
@@ -63,7 +84,7 @@
             IAmStartedByMessages<StartSagaMessage>
         {
             protected override string CorrelationPropertyName => nameof(SagaData.OrderNumber);
-            protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+            protected override string TableSuffix => "TransCorrPropSaga";
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
@@ -90,7 +111,7 @@
         {
             protected override string CorrelationPropertyName => nameof(SagaData.OrderNumber);
             protected override string TransitionalCorrelationPropertyName => nameof(SagaData.OrderId);
-            protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+            protected override string TableSuffix => "TransCorrPropSaga";
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
@@ -115,7 +136,7 @@
             IAmStartedByMessages<StartSagaMessage>
         {
             protected override string CorrelationPropertyName => nameof(SagaData.OrderId);
-            protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+            protected override string TableSuffix => "TransCorrPropSaga";
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
