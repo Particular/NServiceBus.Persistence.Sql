@@ -2,5 +2,5 @@
 using NServiceBus.Persistence.Sql;
 
 [assembly: SqlPersistenceSettings(
-    MsSqlServerScripts= true,
-    ScriptPromotionPath= "$(SolutionDir)$(ProjectDir)Postfix")]
+    MsSqlServerScripts= true, MySqlScripts = true, OracleScripts = true,
+    ScriptPromotionPath = "$(SolutionDir)$(ProjectDir)Postfix")]

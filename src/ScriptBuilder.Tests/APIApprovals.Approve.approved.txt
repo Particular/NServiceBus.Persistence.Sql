@@ -12,6 +12,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     {
         MsSqlServer = 0,
         MySql = 1,
+        Oracle = 2,
     }
     public class CorrelationProperty
     {
@@ -32,6 +33,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
     }
     public class static MySqlCorrelationPropertyTypeConverter
+    {
+        public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
+    }
+    public class static OracleCorrelationPropertyTypeConverter
     {
         public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
     }

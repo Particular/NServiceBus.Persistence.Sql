@@ -23,6 +23,10 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'{saga.TableSuffix}]';");
     }
 
+    public void CreateComplete()
+    {
+    }
+
     public void AddProperty(CorrelationProperty correlationProperty)
     {
         var columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
@@ -101,6 +105,9 @@ end
         {
             builder.Append($" and\r\n        column_name <> N'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
+        writer.WriteLine($@"
+declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';");
+
         writer.Write($@"
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
@@ -108,7 +115,8 @@ select @dropPropertiesQuery =
     select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
     from information_schema.columns
     where
-        table_name = @tableName and
+        table_name = @tableNameWithoutSchema and
+        table_schema = @schema and
         column_name like 'Correlation_%'{builder}
 );
 exec sp_executesql @dropPropertiesQuery
@@ -135,7 +143,7 @@ select @dropIndexQuery =
     select 'drop index ' + name + ' on ' + @tableName + ';'
     from sysindexes
     where
-        Id = (select object_id from sys.objects where name = @tableName) and
+        Id = object_id(@tableName) and
         Name is not null and
         Name like 'Index_Correlation_%'{builder}
 );

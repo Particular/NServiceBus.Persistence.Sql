@@ -32,8 +32,9 @@ public abstract class SagaPersisterTests
 
     SagaPersister SetUp(string endpointName)
     {
+        var runtimeSqlVariant = sqlVariant.Convert();
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder();
+        var commandBuilder = new SagaCommandBuilder(runtimeSqlVariant);
 #pragma warning restore 618
 
         var sagaMetadataCollection = new SagaMetadataCollection();
@@ -47,14 +48,15 @@ public abstract class SagaPersisterTests
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
             schema: schema,
-            sqlVariant: sqlVariant.Convert(),
-            metadataCollection: sagaMetadataCollection);
-        return new SagaPersister(infoCache);
+            sqlVariant: runtimeSqlVariant,
+            metadataCollection: sagaMetadataCollection,
+            nameFilter: sagaName => sagaName);
+        return new SagaPersister(infoCache, runtimeSqlVariant);
     }
 
     IEnumerable<Type> GetSagasAndFinders()
     {
-        foreach (var nestedType in typeof(SagaPersisterTests).GetNestedTypes())
+        foreach (var nestedType in typeof(SagaPersisterTests).GetNestedTypes().Where(LoadTypeForSagaMetadata))
         {
             if (typeof(Saga).IsAssignableFrom(nestedType))
             {
@@ -226,10 +228,23 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
-        var id = Guid.NewGuid();
-        var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
-        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+
+        var execute = new TestDelegate(() =>
+        {
+            DropAndCreate(definition, endpointName);
+            var id = Guid.NewGuid();
+            var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
+            ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        });
+
+        if (SupportsUnicodeIdentifiers)
+        {
+            execute();
+        }
+        else
+        {
+            Assert.Throws<Exception>(execute);
+        }
     }
 
     async Task<SagaWithWeirdCharactersಠ_ಠ.SagaData> SaveWeirdAsync(Guid id, string endpointName)
@@ -250,6 +265,70 @@ public abstract class SagaPersisterTests
         {
             await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ");
             return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession)).Data;
+        }
+    }
+
+    [Test]
+    public void SaveWithSpaceInName()
+    {
+        var endpointName = nameof(SaveWithSpaceInName);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWith SpaceInName",
+            name: nameof(SagaWithSpaceInName),
+            correlationProperty: new CorrelationProperty
+            (
+                name: "SimpleProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+
+        DropAndCreate(definition, endpointName);
+        var id = Guid.NewGuid();
+        var result = SaveWithSpaceAsync(id, endpointName).GetAwaiter().GetResult();
+        ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+    }
+
+    async Task<SagaWithSpaceInName.SagaData> SaveWithSpaceAsync(Guid id, string endpointName)
+    {
+        var sagaData = new SagaWithSpaceInName.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "original message id",
+            Originator = "the originator",
+            SimpleProperty = "property value"
+        };
+
+        var persister = SetUp(endpointName);
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await persister.Save(sagaData, storageSession, "property value");
+            return (await persister.Get<SagaWithSpaceInName.SagaData>(id, storageSession)).Data;
+        }
+    }
+
+    public class SagaWithSpaceInName :
+        SqlSaga<SagaWithSpaceInName.SagaData>,
+        IAmStartedByMessages<AMessage>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string SimpleProperty { get; set; }
+        }
+
+        protected override string CorrelationPropertyName => nameof(SagaData.SimpleProperty);
+
+        protected override string TableSuffix => "SagaWith SpaceInName";
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
+        }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
         }
     }
 
@@ -394,8 +473,8 @@ public abstract class SagaPersisterTests
         }
     }
 
-    public class SagaWithCorrelationAndTransitional :
-        SqlSaga<SagaWithCorrelationAndTransitional.SagaData>,
+    public class CorrAndTransitionalSaga :
+        SqlSaga<CorrAndTransitionalSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -557,8 +636,8 @@ public abstract class SagaPersisterTests
     {
         var endpointName = nameof(GetByNonStringMapping);
         var definition = new SagaDefinition(
-            tableSuffix: "SagaWithNonStringCorrelation",
-            name: "SagaWithNonStringCorrelation",
+            tableSuffix: "NonStringCorrelationSaga",
+            name: "NonStringCorrelationSaga",
             correlationProperty: new CorrelationProperty
             (
                 name: "CorrelationProperty",
@@ -571,9 +650,9 @@ public abstract class SagaPersisterTests
         ObjectApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
-    async Task<SagaWithNonStringCorrelation.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
+    async Task<NonStringCorrelationSaga.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
     {
-        var sagaData = new SagaWithNonStringCorrelation.SagaData
+        var sagaData = new NonStringCorrelationSaga.SagaData
         {
             Id = id,
             OriginalMessageId = "theOriginalMessageId",
@@ -586,12 +665,12 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, 666);
-            return (await persister.Get<SagaWithNonStringCorrelation.SagaData>("CorrelationProperty", 666, storageSession)).Data;
+            return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession)).Data;
         }
     }
 
-    public class SagaWithNonStringCorrelation :
-        SqlSaga<SagaWithNonStringCorrelation.SagaData>,
+    public class NonStringCorrelationSaga :
+        SqlSaga<NonStringCorrelationSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -724,4 +803,11 @@ public abstract class SagaPersisterTests
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);
+
+    protected virtual bool SupportsUnicodeIdentifiers { get; } = true;
+
+    protected virtual bool LoadTypeForSagaMetadata(Type type)
+    {
+        return true;
+    }
 }

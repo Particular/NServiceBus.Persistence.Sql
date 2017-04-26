@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleAcceptanceTests", "OracleAcceptanceTests\OracleAcceptanceTests.csproj", "{6DFB669B-7BB0-409B-90AE-6968470EA2CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6836F7B-0D9F-45B2-ACB5-851978B7C234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DFB669B-7BB0-409B-90AE-6968470EA2CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DFB669B-7BB0-409B-90AE-6968470EA2CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DFB669B-7BB0-409B-90AE-6968470EA2CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DFB669B-7BB0-409B-90AE-6968470EA2CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +99,6 @@ Global
 		{D7439DC8-6400-4740-855B-BF68AA7C6B05} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{B79BC184-2A06-4B40-9B45-C4722EEDA09D} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{88A9E98A-0DDD-4D48-B073-0255B36A7E6F} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+		{6DFB669B-7BB0-409B-90AE-6968470EA2CB} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 	EndGlobalSection
 EndGlobal

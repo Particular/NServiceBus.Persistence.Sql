@@ -35,6 +35,10 @@ set @tableNameNonQuoted = concat(@tablePrefix, '{saga.TableSuffix}');
 ");
     }
 
+    public void CreateComplete()
+    {
+    }
+
     public void AddProperty(CorrelationProperty correlationProperty)
     {
         var columnType = MySqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
@@ -155,7 +159,7 @@ deallocate prepare script;
             builder.Append($" and\r\n    column_name <> 'Correlation_{transitional.Name}'");
         }
         writer.Write($@"
-select concat('alter table ', @tableName, ' drop column ', column_name, ';')
+select concat('alter table ', table_name, ' drop column ', column_name, ';')
 from information_schema.columns
 where
     table_schema = database() and

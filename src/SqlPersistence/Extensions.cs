@@ -34,6 +34,11 @@ static class Extensions
         {
             return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position));
         }
+        // In Oracle we store bools as NUMBER(1,0) (short).
+        if (type == typeof(short))
+        {
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position));
+        }
         return await reader.GetFieldValueAsync<bool>(position);
     }
 

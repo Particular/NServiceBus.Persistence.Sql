@@ -10,8 +10,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 public static class RuntimeSagaDefinitionReader
 {
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
+    const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlVariant sqlVariant)
     {
         var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
         if (!sagaTypes.Any())
@@ -31,10 +32,10 @@ public static class RuntimeSagaDefinitionReader
         {
             throw new AggregateException(exceptions);
         }
-        return sagaTypes.Select(GetSagaDefinition);
+        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlVariant));
     }
 
-    static SagaDefinition GetSagaDefinition(Type sagaType)
+    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlVariant sqlVariant)
     {
         var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
@@ -49,9 +50,31 @@ public static class RuntimeSagaDefinitionReader
                 name: mapper.CorrelationProperty,
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
+        var transitionalCorrelationPropertyName = (string)sagaType
+            .GetProperty("TransitionalCorrelationPropertyName", AnyInstanceMember)
+            .GetValue(saga);
+
+
+        CorrelationProperty transitional = null;
+        if (transitionalCorrelationPropertyName != null)
+        {
+            var sagaDataType = sagaType.BaseType.GetGenericArguments()[0];
+            var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
+            transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
+        }
+
+        var tableSuffixOverride = (string)sagaType.GetProperty("TableSuffix", AnyInstanceMember).GetValue(saga);
+        var tableSuffix = tableSuffixOverride ?? sagaType.Name;
+
+        if (sqlVariant == BuildSqlVariant.Oracle)
+        {
+            tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
+        }
+
         return new SagaDefinition(
-            tableSuffix: sagaType.Name,
+            tableSuffix: tableSuffix,
             name: sagaType.FullName,
-            correlationProperty: correlationProperty);
+            correlationProperty: correlationProperty,
+            transitionalCorrelationProperty: transitional);
     }
 }

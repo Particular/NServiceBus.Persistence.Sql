@@ -223,7 +223,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\ScenarioDescriptors\EnvironmentHelper.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\ScenarioDescriptors\TypeScanner.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Scheduling\When_scheduling_a_recurring_task.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\SelfVerification\When_running_saga_tests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Serialization\When_configuring_custom_xml_namespace.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Serialization\When_no_content_type.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Serialization\When_registering_additional_deserializers.cs" />
@@ -256,6 +255,7 @@
     <Compile Include="TestSuiteConstraints.cs" />
     <Compile Include="When_all_messages_have_finders.cs" />
     <Compile Include="When_custom_finder_returns_existing_saga.cs" />
+    <Compile Include="When_transitioning_correlation_property.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj">

@@ -11,6 +11,7 @@ public class SagaScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void CreateWithCorrelation(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
@@ -30,7 +31,7 @@ public class SagaScriptBuilderTest
         }
         var script = builder.ToString();
 
-        if (sqlVariant != BuildSqlVariant.MySql)
+        if (sqlVariant == BuildSqlVariant.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
@@ -43,6 +44,7 @@ public class SagaScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void CreateWithCorrelationAndTransitional(BuildSqlVariant sqlVariant)
     {
         var saga = new SagaDefinition(
@@ -67,7 +69,7 @@ public class SagaScriptBuilderTest
         }
         var script = builder.ToString();
 
-        if (sqlVariant != BuildSqlVariant.MySql)
+        if (sqlVariant == BuildSqlVariant.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
@@ -81,6 +83,7 @@ public class SagaScriptBuilderTest
     [Test]
     [TestCase(BuildSqlVariant.MsSqlServer)]
     [TestCase(BuildSqlVariant.MySql)]
+    [TestCase(BuildSqlVariant.Oracle)]
     public void BuildDropScript(BuildSqlVariant sqlVariant)
     {
         var builder = new StringBuilder();

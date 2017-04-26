@@ -17,6 +17,7 @@ public abstract class SubscriptionPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    string tablePrefix;
     SubscriptionPersister persister;
 
     public SubscriptionPersisterTests(BuildSqlVariant sqlVariant, string schema)
@@ -29,19 +30,26 @@ public abstract class SubscriptionPersisterTests
     public void Setup()
     {
         dbConnection = GetConnection();
+        tablePrefix = GetTablePrefix();
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
-            tablePrefix: $"{nameof(SubscriptionPersisterTests)}_",
+            tablePrefix: $"{tablePrefix}_",
             sqlVariant: sqlVariant.Convert(),
             schema: schema,
             cacheFor: TimeSpan.FromSeconds(10)
         );
+
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix, schema: schema);
         }
+    }
+
+    protected virtual string GetTablePrefix()
+    {
+        return nameof(SubscriptionPersisterTests);
     }
 
     [TearDown]
@@ -50,7 +58,7 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, schema: schema);
         }
     }
 
@@ -60,8 +68,8 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), nameof(SubscriptionPersisterTests), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
         }
     }
 
