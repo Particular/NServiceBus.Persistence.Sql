@@ -9,10 +9,10 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class OutboxCommands
     {
-        public string Store;
-        public string Get;
-        public string SetAsDispatched;
-        public string Cleanup;
+        public string Store { get; }
+        public string Get { get; }
+        public string SetAsDispatched { get; }
+        public string Cleanup { get; }
 
         public OutboxCommands(string store, string get, string setAsDispatched, string cleanup)
         {
