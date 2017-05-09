@@ -27,7 +27,7 @@ partial class SagaPersister
             command.AddParameter("Data", sagaInfo.ToJson(sagaData));
             command.AddParameter("Concurrency", concurrency);
             AddTransitionalParameter(sagaData, sagaInfo, command);
-            var affected = await command.ExecuteNonQueryAsync();
+            var affected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             if (affected != 1)
             {
                 throw new Exception($"Optimistic concurrency violation when trying to save saga {sagaInfo.SagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");

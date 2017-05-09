@@ -22,18 +22,18 @@
                         await session.SendLocal(new StartSagaMessage
                         {
                             SomeId = id
-                        });
+                        }).ConfigureAwait(false);
                         await session.SendLocal(new StartSagaMessage
                         {
                             SomeId = id
-                        });
+                        }).ConfigureAwait(false);
                         await session.SendLocal(new StartSagaMessage
                         {
                             SomeId = id
-                        });
+                        }).ConfigureAwait(false);
                     }).DoNotFailOnErrorMessages())
                 .Done(c => c.SagaDataPersisted)
-                .Run();
+                .Run().ConfigureAwait(false);
 
             Assert.IsTrue(context.SagaDataPersisted);
         }

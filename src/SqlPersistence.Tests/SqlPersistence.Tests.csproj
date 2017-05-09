@@ -114,7 +114,6 @@
     <Compile Include="SetUpFixture.cs" />
     <Compile Include="Saga\OracleSagaPersisterTests.cs" />
     <Compile Include="SqlVariantConverter.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Integration\EndpointConfigBuilder.cs" />
     <Compile Include="Integration\EndpointConfigurationExtensions.cs" />
     <Compile Include="Integration\UserDataConsistencyTests.cs" />

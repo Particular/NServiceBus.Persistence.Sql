@@ -108,22 +108,22 @@ public class SagaConsistencyTests
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
         endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");
 
-        var endpoint = await Endpoint.Start(endpointConfiguration);
+        var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var sagaId = Guid.NewGuid();
         await endpoint.SendLocal(new StartSagaMessage
         {
             SagaId = sagaId
-        });
+        }).ConfigureAwait(false);
         await endpoint.SendLocal(new FailingMessage
         {
             SagaId = sagaId
-        });
+        }).ConfigureAwait(false);
         await endpoint.SendLocal(new CheckMessage
         {
             SagaId = sagaId
-        });
+        }).ConfigureAwait(false);
         ManualResetEvent.WaitOne();
-        await endpoint.Stop();
+        await endpoint.Stop().ConfigureAwait(false);
 
         Assert.AreEqual("Success", message);
     }
@@ -148,7 +148,7 @@ public class SagaConsistencyTests
     {
         public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
         {
-            await next();
+            await next().ConfigureAwait(false);
             if (context.Message.Instance is FailingMessage)
             {
                 throw new Exception("Boom!");

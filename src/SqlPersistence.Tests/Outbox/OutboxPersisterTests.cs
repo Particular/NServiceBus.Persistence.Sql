@@ -141,14 +141,14 @@ where MessageId = '{messageId}'";
         };
         var messageId = "a";
 
-        using (var connection = await dbConnection.OpenConnection())
+        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection);
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
             transaction.Commit();
         }
-        await persister.SetAsDispatched(messageId, null);
-        return await persister.Get(messageId, null);
+        await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
+        return await persister.Get(messageId, null).ConfigureAwait(false);
     }
 
     [Test]
@@ -181,38 +181,38 @@ where MessageId = '{messageId}'";
         };
 
         var messageId = "a";
-        using (var connection = await dbConnection.OpenConnection())
+        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection);
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection).ConfigureAwait(false);
             transaction.Commit();
         }
-        return await persister.Get(messageId, null);
+        return await persister.Get(messageId, null).ConfigureAwait(false);
     }
 
     [Test]
     public async Task StoreAndCleanup()
     {
-        using (var connection = await dbConnection.OpenConnection())
+        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         {
             for (var i = 0; i < 13; i++)
             {
-                await Store(i, connection);
+                await Store(i, connection).ConfigureAwait(false);
             }
         }
 
-        await Task.Delay(1000);
+        await Task.Delay(1000).ConfigureAwait(false);
         var dateTime = DateTime.UtcNow;
-        await Task.Delay(1000);
-        using (var connection = await dbConnection.OpenConnection())
+        await Task.Delay(1000).ConfigureAwait(false);
+        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         {
-            await Store(13, connection);
+            await Store(13, connection).ConfigureAwait(false);
         }
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None);
-        Assert.IsNull(await persister.Get("MessageId1", null));
-        Assert.IsNull(await persister.Get("MessageId12", null));
-        Assert.IsNotNull(await persister.Get("MessageId13", null));
+        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
+        Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
+        Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
+        Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
     async Task Store(int i, DbConnection connection)
@@ -244,9 +244,9 @@ where MessageId = '{messageId}'";
 
         using (var transaction = connection.BeginTransaction())
         {
-            await persister.Store(outboxMessage, transaction, connection);
+            await persister.Store(outboxMessage, transaction, connection).ConfigureAwait(false);
             transaction.Commit();
         }
-        await persister.SetAsDispatched(messageId, null);
+        await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
     }
 }

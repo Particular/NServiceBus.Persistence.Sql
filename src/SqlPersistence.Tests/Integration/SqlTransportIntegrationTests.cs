@@ -68,14 +68,14 @@ public class SqlTransportIntegrationTests : IDisposable
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();
 
-        var endpoint = await Endpoint.Start(endpointConfiguration);
+        var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var startSagaMessage = new StartSagaMessage
         {
             StartId = Guid.NewGuid()
         };
-        await endpoint.SendLocal(startSagaMessage);
+        await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
         ManualResetEvent.WaitOne();
-        await endpoint.Stop();
+        await endpoint.Stop().ConfigureAwait(false);
     }
 
 

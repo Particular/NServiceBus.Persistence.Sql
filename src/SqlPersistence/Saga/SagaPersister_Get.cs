@@ -13,7 +13,7 @@ partial class SagaPersister
     internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
-        var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache);
+        var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
@@ -30,7 +30,7 @@ where {whereClause}";
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var result = await Get<TSagaData>(propertyName, propertyValue, session);
+        var result = await Get<TSagaData>(propertyName, propertyValue, session).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
@@ -53,7 +53,7 @@ where {whereClause}";
     public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
         where TSagaData : IContainSagaData
     {
-        var result = await Get<TSagaData>(sagaId, session);
+        var result = await Get<TSagaData>(sagaId, session).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
@@ -81,17 +81,17 @@ where {whereClause}";
             command.Transaction = sqlSession.Transaction;
             appendParameters(command.InnerCommand.CreateParameter, parameter => command.InnerCommand.Parameters.Add(parameter));
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess))
+            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
             {
-                if (!await dataReader.ReadAsync())
+                if (!await dataReader.ReadAsync().ConfigureAwait(false))
                 {
                     return default(Concurrency<TSagaData>);
                 }
 
-                var id = await dataReader.GetGuidAsync(0);
-                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1);
+                var id = await dataReader.GetGuidAsync(0).ConfigureAwait(false);
+                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1).ConfigureAwait(false);
                 var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
-                var concurrency = await dataReader.GetFieldValueAsync<int>(2);
+                var concurrency = await dataReader.GetFieldValueAsync<int>(2).ConfigureAwait(false);
                 string originator;
                 string originalMessageId;
                 ReadMetadata(dataReader, out originator, out originalMessageId);

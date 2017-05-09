@@ -17,10 +17,10 @@ public class OutboxCleanerTests
             return Task.FromResult(0);
         }, (m, e) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
-        await cleaner.Start();
+        await cleaner.Start().ConfigureAwait(false);
 
         var now = new DateTime(2017, 3, 31, 0, 0, 0);
-        await timer.Tick(now, CancellationToken.None);
+        await timer.Tick(now, CancellationToken.None).ConfigureAwait(false);
 
         var expected = new DateTime(2017, 3, 24, 0, 0, 0);
         Assert.AreEqual(expected, cutOffTime);
@@ -34,7 +34,7 @@ public class OutboxCleanerTests
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
             (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
-        await cleaner.Start();
+        await cleaner.Start().ConfigureAwait(false);
 
         for (var i = 0; i < 9; i++)
         {
@@ -61,13 +61,13 @@ public class OutboxCleanerTests
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
             (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
-        await cleaner.Start();
+        await cleaner.Start().ConfigureAwait(false);
 
         for (var i = 0; i < 100; i++)
         {
             if (i%9 == 0) //Succeed every 9th attempt
             {
-                await timer.Tick(DateTime.UtcNow, CancellationToken.None);
+                await timer.Tick(DateTime.UtcNow, CancellationToken.None).ConfigureAwait(false);
             }
             else
             {
