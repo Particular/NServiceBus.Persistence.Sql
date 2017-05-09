@@ -20,7 +20,7 @@ public class OrderSaga :
     {
         return Task.FromResult(0);
     }
-    
+
     public class SagaData :
         ContainSagaData
     {

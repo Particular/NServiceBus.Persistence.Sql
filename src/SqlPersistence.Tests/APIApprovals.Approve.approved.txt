@@ -33,10 +33,10 @@
     public class OutboxCommands
     {
         public OutboxCommands(string store, string get, string setAsDispatched, string cleanup) { }
-        public string Cleanup { get; set; }
-        public string Get { get; set; }
-        public string SetAsDispatched { get; set; }
-        public string Store { get; set; }
+        public string Cleanup { get; }
+        public string Get { get; }
+        public string SetAsDispatched { get; }
+        public string Store { get; }
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
     [System.ObsoleteAttribute("Not for public use")]

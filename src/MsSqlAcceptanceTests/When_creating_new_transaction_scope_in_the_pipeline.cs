@@ -23,10 +23,10 @@
                         await session.SendLocal(new StartSagaMessage
                         {
                             SomeId = id
-                        });
+                        }).ConfigureAwait(false);
                     }).DoNotFailOnErrorMessages())
                 .Done(c => c.FailedMessages.Any())
-                .Run();
+                .Run().ConfigureAwait(false);
 
             var exceptionMessage = context.FailedMessages.First().Value.First().Exception.Message;
             StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", exceptionMessage);

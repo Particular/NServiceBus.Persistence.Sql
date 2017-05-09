@@ -15,12 +15,13 @@ static class OperationConverter
             Options = operation.Options
         });
     }
+
     public static IEnumerable<TransportOperation> FromSerializable(this IEnumerable<SerializableOperation> operations)
     {
         return operations.Select(operation => new TransportOperation(
-            body : operation.Body,
+            body: operation.Body,
             headers: operation.Headers,
-            messageId : operation.MessageId,
+            messageId: operation.MessageId,
             options: operation.Options
         ));
     }

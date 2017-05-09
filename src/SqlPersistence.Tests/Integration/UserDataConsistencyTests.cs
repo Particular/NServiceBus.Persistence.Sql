@@ -125,18 +125,18 @@ end";
         endpointConfiguration.LimitMessageProcessingConcurrencyTo(1);
         endpointConfiguration.Pipeline.Register(new FailureTrigger(), "Failure trigger");
 
-        var endpoint = await Endpoint.Start(endpointConfiguration);
+        var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var dataId = Guid.NewGuid();
         await endpoint.SendLocal(new FailingMessage
         {
             EntityId = dataId
-        });
+        }).ConfigureAwait(false);
         await endpoint.SendLocal(new CheckMessage
         {
             EntityId = dataId
-        });
+        }).ConfigureAwait(false);
         manualResetEvent.WaitOne();
-        await endpoint.Stop();
+        await endpoint.Stop().ConfigureAwait(false);
 
         Assert.AreEqual("Success", message);
     }
@@ -145,7 +145,7 @@ end";
     {
         public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
         {
-            await next();
+            await next().ConfigureAwait(false);
             if (context.Message.Instance is FailingMessage)
             {
                 throw new Exception("Boom!");
@@ -178,7 +178,7 @@ end";
                 command.Transaction = session.Transaction;
                 command.CommandText = commandText;
                 command.AddParameter("@Id", message.EntityId);
-                await command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 
@@ -192,7 +192,7 @@ end";
                 command.Transaction = session.Transaction;
                 command.CommandText = commandText;
                 command.AddParameter("@Id", message.EntityId);
-                count = (int)await command.ExecuteScalarAsync();
+                count = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
             }
 
             if (count > 0)

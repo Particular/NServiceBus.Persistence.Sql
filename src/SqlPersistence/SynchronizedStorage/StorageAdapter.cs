@@ -59,7 +59,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         var ambientTransaction = transportTx ?? scopeTx;
         if (ambientTransaction != null)
         {
-            var connection = await connectionBuilder.OpenConnection();
+            var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
             connection.EnlistTransaction(ambientTransaction);
             return new StorageSession(connection, null, true, infoCache);
         }

@@ -22,7 +22,7 @@ class OutboxCleaner : FeatureStartupTask
         timer.Start(async (utcTime, token) =>
         {
             var dateTime = utcTime - timeToKeepDeduplicationData;
-            await cleanup(dateTime, token);
+            await cleanup(dateTime, token).ConfigureAwait(false);
             cleanupFailures = 0;
         }, frequencyToRunCleanup, exception =>
         {

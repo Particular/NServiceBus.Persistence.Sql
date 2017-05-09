@@ -11,9 +11,9 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class SubscriptionCommands
     {
-        public readonly string Subscribe;
-        public readonly string Unsubscribe;
-        public readonly Func<List<MessageType>, string> GetSubscribers;
+        public string Subscribe { get; }
+        public string Unsubscribe { get; }
+        public Func<List<MessageType>, string> GetSubscribers { get; }
 
         public SubscriptionCommands(string subscribe, string unsubscribe, Func<List<MessageType>, string> getSubscribers)
         {

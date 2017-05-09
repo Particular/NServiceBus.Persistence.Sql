@@ -17,7 +17,7 @@ static class Extensions
     public static async Task<DbConnection> OpenConnection(this Func<DbConnection> connectionBuilder)
     {
         var connection = connectionBuilder();
-        await connection.OpenAsync();
+        await connection.OpenAsync().ConfigureAwait(false);
         return connection;
     }
 
@@ -32,14 +32,14 @@ static class Extensions
         // MySql stores bools as ints
         if (type == typeof(ulong))
         {
-            return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position));
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position).ConfigureAwait(false));
         }
         // In Oracle we store bools as NUMBER(1,0) (short).
         if (type == typeof(short))
         {
-            return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position));
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position).ConfigureAwait(false));
         }
-        return await reader.GetFieldValueAsync<bool>(position);
+        return await reader.GetFieldValueAsync<bool>(position).ConfigureAwait(false);
     }
 
     public static async Task<Guid> GetGuidAsync(this DbDataReader reader, int position)
@@ -48,9 +48,9 @@ static class Extensions
         // MySql stores Guids as strings
         if (type == typeof(string))
         {
-            return new Guid(await reader.GetFieldValueAsync<string>(position));
+            return new Guid(await reader.GetFieldValueAsync<string>(position).ConfigureAwait(false));
         }
-        return await reader.GetFieldValueAsync<Guid>(position);
+        return await reader.GetFieldValueAsync<Guid>(position).ConfigureAwait(false);
     }
 
     internal static Func<T, object> GetPropertyAccessor<T>(this Type sagaDataType, string propertyName)
@@ -72,7 +72,7 @@ static class Extensions
     {
         try
         {
-            return await command.ExecuteNonQueryAsync(cancellationToken);
+            return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

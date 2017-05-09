@@ -32,7 +32,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection())
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Subscribe;
@@ -40,20 +40,20 @@ class SubscriptionPersister : ISubscriptionStorage
             command.AddParameter("Subscriber", subscriber.TransportAddress);
             command.AddParameter("Endpoint", subscriber.Endpoint);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
         ClearForMessageType(messageType);
     }
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection())
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = commandBuilder.CreateCommand(connection))
         {
             command.CommandText = subscriptionCommands.Unsubscribe;
             command.AddParameter("MessageType", messageType.TypeName);
             command.AddParameter("Subscriber", subscriber.TransportAddress);
-            await command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
         ClearForMessageType(messageType);
     }
@@ -122,7 +122,7 @@ class SubscriptionPersister : ISubscriptionStorage
     async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
-        using (var connection = await connectionBuilder.OpenConnection())
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = commandBuilder.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
@@ -132,14 +132,14 @@ class SubscriptionPersister : ISubscriptionStorage
                 command.AddParameter(paramName, messageType.TypeName);
             }
             command.CommandText = getSubscribersCommand;
-            using (var reader = await command.ExecuteReaderAsync())
+            using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
             {
                 var subscribers = new List<Subscriber>();
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var address = reader.GetString(0);
                     string endpoint;
-                    if (await reader.IsDBNullAsync(1))
+                    if (await reader.IsDBNullAsync(1).ConfigureAwait(false))
                     {
                         endpoint = null;
                     }

@@ -30,13 +30,13 @@ class Installer : INeedToInstallSomething
 
         ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
 
-        using (var connection = await connectionBuilder.OpenConnection())
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant);
-            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant);
-            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant);
-            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant);
+            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
+            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
+            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
+            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
 
             transaction.Commit();
         }

@@ -22,7 +22,7 @@
 
             using (var connection = MySqlConnectionBuilder.Build())
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
                 var phase1Schema = GetSchema(connection);
@@ -134,7 +134,7 @@
             }
         }
         #endregion
-        
+
         public class StartSagaMessage : IMessage
         {
             public string OrderId { get; set; }
