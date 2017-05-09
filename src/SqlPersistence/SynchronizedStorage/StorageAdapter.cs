@@ -15,11 +15,42 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     Func<DbConnection> connectionBuilder;
+    bool enlistInAmbientTransaction = true;
 
     public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
+        SetEnlistInAmbientTransaction();
+    }
+
+    void SetEnlistInAmbientTransaction()
+    {
+        var connectionString = connectionBuilder().ConnectionString;
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            return;
+        }
+        var builder = new DbConnectionStringBuilder
+        {
+            ConnectionString = connectionString
+        };
+
+        //For MySql
+        object autoEnlist;
+        if (builder.TryGetValue("AutoEnlist", out autoEnlist))
+        {
+            enlistInAmbientTransaction = bool.Parse((string)autoEnlist);
+            return;
+        }
+
+        //For SqlServer
+        object enlist;
+        if (builder.TryGetValue("Enlist", out enlist))
+        {
+            enlistInAmbientTransaction = bool.Parse((string)enlist);
+            return;
+        }
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -60,7 +91,10 @@ class StorageAdapter : ISynchronizedStorageAdapter
         if (ambientTransaction != null)
         {
             var connection = await connectionBuilder.OpenConnection();
-            connection.EnlistTransaction(ambientTransaction);
+            if (enlistInAmbientTransaction)
+            {
+                connection.EnlistTransaction(ambientTransaction);
+            }
             return new StorageSession(connection, null, true, infoCache);
         }
 
