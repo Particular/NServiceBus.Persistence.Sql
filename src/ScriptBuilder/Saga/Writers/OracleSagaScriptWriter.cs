@@ -76,7 +76,7 @@ select data_type ||
         end || ')'
     end
   end into dataType
-from all_tab_columns 
+from all_tab_columns
 where table_name = '{tableName}' and column_name = '{name}';
 
 if(dataType <> '{columnType}')
@@ -143,7 +143,7 @@ end if;
   select count(*) into n from user_tables where table_name = '{tableName}';
   if(n = 0)
   then
-    
+ 
     sqlStatement :=
        'create table ""{tableName}""
        (

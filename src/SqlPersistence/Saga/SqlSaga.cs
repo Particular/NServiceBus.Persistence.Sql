@@ -47,7 +47,7 @@ namespace NServiceBus.Persistence.Sql
         protected virtual string TransitionalCorrelationPropertyName { get; }
 
         /// <summary>
-        /// The name of the table to use when storing the current <see cref="SqlSaga{TSagaData}"/>. 
+        /// The name of the table to use when storing the current <see cref="SqlSaga{TSagaData}"/>.
         /// Will be appended to the value specified in <see cref="SqlPersistenceConfig.TablePrefix"/>.
         /// </summary>
         protected virtual string TableSuffix { get; }

@@ -7,7 +7,6 @@ using NUnit.Framework;
 public class MessagePropertyMapperTests
 {
 
-
     [Test]
     public void StringCorrelationId()
     {

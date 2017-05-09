@@ -80,7 +80,7 @@ public class OutboxCleanerTests
 
     class TestableCleaner : OutboxCleaner
     {
-        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer) 
+        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
             : base(cleanup, criticalError, timeToKeepDeduplicationData, frequencyToRunCleanup, timer)
         {
         }

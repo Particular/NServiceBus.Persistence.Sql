@@ -7,6 +7,6 @@ namespace NServiceBus
     /// </summary>
     public static partial class SqlPersistenceConfig
     {
-     
+
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System.Data.Common;
 using System.Threading.Tasks;
-using Janitor;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 
-[SkipWeaving]
 class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;

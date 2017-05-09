@@ -90,7 +90,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             protected override string CorrelationPropertyName => null;
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
-                
+
             }
         }
     }

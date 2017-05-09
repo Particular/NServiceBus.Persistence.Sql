@@ -17,7 +17,7 @@
           ProjectDirectory="$(ProjectDir)"
           SolutionDirectory="$(SolutionDir)"/>
   </Target>
-  
+
   <Target
       BeforeTargets="GetCopyToOutputDirectoryItems"
       Name="AddScriptsToGetCopyToOutputDirectoryItems">

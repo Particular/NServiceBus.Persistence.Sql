@@ -134,7 +134,7 @@
             }
         }
         #endregion
-        
+
         public class StartSagaMessage : IMessage
         {
             public string OrderId { get; set; }

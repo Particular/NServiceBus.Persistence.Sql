@@ -28,7 +28,8 @@ public abstract class OutboxPersisterTests
     [SetUp]
     public void Setup()
     {
-        persister = new OutboxPersister(connectionBuilder: dbConnection,
+        persister = new OutboxPersister(
+            connectionBuilder: dbConnection,
             tablePrefix: $"{GetTablePrefix()}_",
             schema: schema,
             sqlVariant: sqlVariant.Convert(),
@@ -82,7 +83,7 @@ public abstract class OutboxPersisterTests
 
     void VerifyOperationsAreEmpty(OutboxMessage result)
     {
-        
+
         using (var connection = dbConnection())
         {
             connection.Open();
