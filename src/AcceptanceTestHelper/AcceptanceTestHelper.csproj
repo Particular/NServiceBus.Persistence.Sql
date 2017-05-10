@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
-    <PackageReference Include="NServiceBus" Version="6.2.0" />
+    <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NUnit" Version="3.6.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

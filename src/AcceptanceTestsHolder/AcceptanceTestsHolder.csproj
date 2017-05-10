@@ -2,25 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <AssemblyName>MySqlAcceptanceTests</AssemblyName>
+    <AssemblyName>AcceptanceTestsHolder</AssemblyName>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.2.1" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="6.2.1" />
     <PackageReference Include="NUnit" Version="3.6.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Messaging" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Configuration" />
-    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
-    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" />
   </ItemGroup>
 
 </Project>
