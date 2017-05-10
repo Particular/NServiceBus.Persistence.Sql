@@ -20,7 +20,9 @@ public class ConfigureEndpointMsmqTransport : IConfigureEndpointTestExecution
             EnvironmentHelper.GetEnvironmentVariable($"{nameof(MsmqTransport)}.ConnectionString")
             ?? DefaultConnectionString;
         var transportConfig = configuration.UseTransport<MsmqTransport>();
-
+#if (MySQL)
+        transportConfig.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
+#endif
         transportConfig.ConnectionString(connectionString);
 
         var routingConfig = transportConfig.Routing();

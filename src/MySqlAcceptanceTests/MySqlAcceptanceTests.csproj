@@ -6,6 +6,7 @@
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>$(DefineConstants);MySQL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
