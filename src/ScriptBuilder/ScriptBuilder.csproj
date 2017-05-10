@@ -1,112 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
+    <TargetFramework>net452</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>bin\Debug\NServiceBus.Persistence.Sql.ScriptBuilder.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>CS1591</NoWarn>
-    <DocumentationFile>bin\Release\NServiceBus.Persistence.Sql.ScriptBuilder.xml</DocumentationFile>
-  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="3.6.5" />
+    <PackageReference Include="Mono.Cecil" Version="0.9.6.4"/>
+    <PackageReference Include="NuGetPackager" Version="0.6.1" />
+    <Compile Include="..\Guard.cs"/>
+    <Compile Include="..\CommonAssemblyInfo.cs"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Guard.cs">
-      <Link>Guard.cs</Link>
-    </Compile>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="BuildSqlVariant.cs" />
-    <Compile Include="CecilExtentions.cs" />
-    <Compile Include="ErrorsException.cs" />
-    <Compile Include="Saga\Writers\OracleCorrelationPropertyTypeConverter.cs" />
-    <Compile Include="Saga\Writers\OracleSagaScriptWriter.cs" />
-    <Compile Include="ScriptPromotionPathReader.cs" />
-    <Compile Include="ResourceReader.cs" />
-    <Compile Include="Saga\AllSagaDefinitionReader.cs" />
-    <Compile Include="Saga\CorrelationProperty.cs" />
-    <Compile Include="Saga\CorrelationPropertyType.cs" />
-    <Compile Include="Saga\CorrelationPropertyTypeReader.cs" />
-    <Compile Include="Saga\ISagaScriptWriter.cs" />
-    <Compile Include="Saga\Writers\MsSqlServerCorrelationPropertyTypeConverter.cs" />
-    <Compile Include="Saga\Writers\MySqlCorrelationPropertyTypeConverter.cs" />
-    <Compile Include="Saga\Writers\MySqlSagaScriptWriter.cs" />
-    <Compile Include="Saga\SagaDefinition.cs" />
-    <Compile Include="Saga\SagaDefinitionReader.cs" />
-    <Compile Include="Saga\SagaDefinitionValidator.cs" />
-    <Compile Include="Saga\Writers\MsSqlServerSagaScriptWriter.cs" />
-    <Compile Include="Saga\SagaScriptBuilder.cs" />
-    <Compile Include="SqlVariantReader.cs" />
-    <Compile Include="Subscription\SubscriptionScriptBuilder.cs" />
-    <Compile Include="Outbox\OutboxScriptBuilder.cs" />
-    <Compile Include="Timeout\TimeoutScriptBuilder.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Outbox\Create_Oracle.sql" />
-    <EmbeddedResource Include="Outbox\Drop_Oracle.sql" />
-    <EmbeddedResource Include="Timeout\Drop_Oracle.sql" />
-    <EmbeddedResource Include="Timeout\Create_Oracle.sql" />
-    <EmbeddedResource Include="Subscription\Drop_Oracle.sql" />
-    <EmbeddedResource Include="Subscription\Create_Oracle.sql" />
-    <EmbeddedResource Include="Timeout\Drop_MySql.sql" />
-    <EmbeddedResource Include="Timeout\Create_MySql.sql" />
-    <EmbeddedResource Include="Subscription\Drop_MySql.sql" />
-    <EmbeddedResource Include="Subscription\Create_MySql.sql" />
-    <EmbeddedResource Include="Outbox\Create_MySql.sql" />
-    <EmbeddedResource Include="Outbox\Drop_MySql.sql" />
-    <EmbeddedResource Include="Outbox\Drop_MsSqlServer.sql" />
-    <EmbeddedResource Include="Outbox\Create_MsSqlServer.sql" />
-    <EmbeddedResource Include="Subscription\Create_MsSqlServer.sql" />
-    <EmbeddedResource Include="Subscription\Drop_MsSqlServer.sql" />
-    <EmbeddedResource Include="Timeout\Create_MsSqlServer.sql" />
-    <EmbeddedResource Include="Timeout\Drop_MsSqlServer.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <PropertyGroup>
       <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
-      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
-      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\Mono.Cecil.dll</Cecil>
+      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
+      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\net452\Mono.Cecil.dll</Cecil>
       <MergeOutput>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutput>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />

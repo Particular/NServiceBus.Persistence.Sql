@@ -1,107 +1,41 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SqlPersistence.Tests</RootNamespace>
+    <TargetFramework>net452</TargetFramework>
     <AssemblyName>SqlPersistence.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="ApprovalTests" Version="3.0.13" />
+    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
+    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
+    <PackageReference Include="MySql.Data" Version="6.9.9" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="NServiceBus" Version="6.2.0" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="3.0.1" />
+    <PackageReference Include="NUnit" Version="3.6.1" />
+    <PackageReference Include="ObjectApproval" Version="1.6.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
+    <PackageReference Include="PublicApiGenerator" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ApprovalTestConfig.cs" />
-    <Compile Include="APIApprovals.cs" />
-    <Compile Include="Outbox\AsyncTimerTests.cs" />
-    <Compile Include="Outbox\OracleOutboxPersisterTests.cs" />
-    <Compile Include="Outbox\MySqlOutboxPersisterTests.cs" />
-    <Compile Include="Outbox\OutboxCleanerTests.cs" />
-    <Compile Include="Outbox\SqlServerOutboxPersisterTests.cs" />
-    <Compile Include="SetUpFixture.cs" />
-    <Compile Include="Saga\OracleSagaPersisterTests.cs" />
-    <Compile Include="SqlVariantConverter.cs" />
-    <Compile Include="Integration\EndpointConfigBuilder.cs" />
-    <Compile Include="Integration\EndpointConfigurationExtensions.cs" />
-    <Compile Include="Integration\UserDataConsistencyTests.cs" />
-    <Compile Include="Integration\SqlQueueDeletion.cs" />
-    <Compile Include="Integration\SagaConsistencyTests.cs" />
-    <Compile Include="Integration\SqlTransportIntegrationTests.cs" />
-    <Compile Include="Integration\MsmqTransportIntegrationTests.cs" />
-    <Compile Include="Integration\MsmqQueueDeletion.cs" />
-    <Compile Include="Integration\TypeScanner.cs" />
-    <Compile Include="Outbox\OperationConverterTests.cs" />
-    <Compile Include="Outbox\OutboxPersisterTests.cs" />
-    <Compile Include="Saga\MessagePropertyMapperTests.cs" />
-    <Compile Include="Saga\SagaPersisterTests.cs" />
-    <Compile Include="Saga\MySqlSagaPersisterTests.cs" />
-    <Compile Include="Saga\SqlServerSagaPersisterTests.cs" />
-    <Compile Include="Saga\SqlSagaTests.cs" />
-    <Compile Include="Subscription\SubscriptionPersisterExtensions.cs" />
-    <Compile Include="Subscription\OracleSubscriptionPersisterTests.cs" />
-    <Compile Include="Subscription\MySqlServerSubscriptionPersisterTests.cs" />
-    <Compile Include="Subscription\SqlServerSubscriptionPersisterTests.cs" />
-    <Compile Include="TaskEx.cs" />
-    <Compile Include="MethodTimeLogger.cs" />
-    <Compile Include="Subscription\SubscriptionPersisterTests.cs" />
-    <Compile Include="Timeout\OracleTimeoutPersisterTests.cs" />
-    <Compile Include="Timeout\MySqlServerTimeoutPersisterTests.cs" />
-    <Compile Include="Timeout\SqlServerTimeoutPersisterTests.cs" />
-    <Compile Include="Timeout\TimeoutPersisterTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
-      <Project>{438D76FC-8BB8-4B40-80A5-F846A450FBD1}</Project>
-      <Name>ScriptBuilder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj">
-      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
-      <Name>SqlPersistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TestHelper\TestHelper.csproj">
-      <Project>{9545ecab-396f-4ecb-ab79-4c3afd48ba93}</Project>
-      <Name>TestHelper</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

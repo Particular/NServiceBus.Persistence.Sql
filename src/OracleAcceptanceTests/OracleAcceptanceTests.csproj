@@ -1,125 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6DFB669B-7BB0-409B-90AE-6968470EA2CB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>OracleAcceptanceTests</RootNamespace>
+    <TargetFramework>net461</TargetFramework>
     <AssemblyName>OracleAcceptanceTests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="NServiceBus" Version="6.2.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.2.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="6.2.0" />
+    <PackageReference Include="NUnit" Version="3.6.1" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Messaging" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\DelayedDelivery\When_Deferring_a_message.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\DelayedDelivery\When_deferring_to_non_local.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Reliability\Outbox\When_clearing_saga_timeouts.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Routing\AutomaticSubscriptions\When_starting_an_endpoint_with_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Routing\AutomaticSubscriptions\When_starting_an_endpoint_with_a_saga_autosubscribe_disabled.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_adding_state_to_context.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_an_endpoint_replies_to_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_auto_correlated_property_is_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_a_base_class_mapped_is_handled_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_a_base_class_message_starts_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_finder_cant_find_saga_instance.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_finder_returns_existing_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_forgetting_to_set_a_corr_property.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_message_has_a_saga_id.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_overriding_saga_id_creation.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\when_receiving_multiple_timeouts.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_receiving_that_completes_the_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_receiving_that_should_start_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_replies_to_message_published_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\when_reply_from_saga_not_found_handler.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_sagas_cant_be_found.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_sagas_share_timeout_messages.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_exists_for_start_message.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_handles_unmapped_message.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_has_a_non_empty_constructor.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_id_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_is_mapped_to_complex_expression.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_message_goes_through_delayed_retries.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_saga_started_concurrently.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_sending_from_a_saga_handle.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_sending_from_a_saga_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_started_by_base_event_from_other_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_started_by_event_from_another_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_timeout_hit_not_found_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_two_sagas_subscribe_to_the_same_event.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_updating_existing_correlation_property.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_using_a_received_message_for_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_using_contain_saga_data.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.2.0\Sagas\When_using_ReplyToOriginator.cs" />
-    <Compile Include="ConfigureEndpointSqlPersistence.cs" />
-    <Compile Include="TestSuiteConstraints.cs" />
-    <Compile Include="When_transitioning_correlation_property.cs" />
+    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj">
-      <Project>{88a9e98a-0ddd-4d48-b073-0255b36a7e6f}</Project>
-      <Name>AcceptanceTestHelper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj">
-      <Project>{438d76fc-8bb8-4b40-80a5-f846a450fbd1}</Project>
-      <Name>ScriptBuilder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj">
-      <Project>{e3cf4cb1-9f87-4f81-b6b0-b599035c1bce}</Project>
-      <Name>SqlPersistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TestHelper\TestHelper.csproj">
-      <Project>{9545ecab-396f-4ecb-ab79-4c3afd48ba93}</Project>
-      <Name>TestHelper</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
