@@ -18,20 +18,15 @@
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
   </ItemGroup>
+  
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <PropertyGroup>
       <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>

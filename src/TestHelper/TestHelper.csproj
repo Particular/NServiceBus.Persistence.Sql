@@ -11,9 +11,6 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

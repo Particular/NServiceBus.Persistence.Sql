@@ -14,29 +14,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Outbox\*.sql" />
-    <None Remove="Subscription\*.sql" />
-    <None Remove="Timeout\*.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="3.6.5" />
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\Guard.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Remove="Outbox\*.sql" />
+    <None Remove="Subscription\*.sql" />
+    <None Remove="Timeout\*.sql" />
     <EmbeddedResource Include="Outbox\*.sql" />
     <EmbeddedResource Include="Subscription\*.sql" />
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
+  
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <PropertyGroup>
       <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>

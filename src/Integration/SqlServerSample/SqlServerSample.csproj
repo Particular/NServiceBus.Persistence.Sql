@@ -9,9 +9,6 @@
 
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
     <PackageReference Include="NServiceBus" Version="6.2.0" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
@@ -19,9 +16,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

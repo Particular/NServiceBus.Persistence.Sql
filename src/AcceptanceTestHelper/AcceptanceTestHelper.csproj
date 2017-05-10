@@ -12,14 +12,8 @@
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
     <PackageReference Include="NServiceBus" Version="6.2.0" />
     <PackageReference Include="NUnit" Version="3.6.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>

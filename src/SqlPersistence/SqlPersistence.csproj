@@ -22,17 +22,12 @@
     <PackageReference Include="Obsolete.Fody" Version="4.2.2" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
     <Compile Include="..\Guard.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Data" />
   </ItemGroup>
+  
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>

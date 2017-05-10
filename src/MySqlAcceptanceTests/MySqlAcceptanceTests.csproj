@@ -14,14 +14,8 @@
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.2.0" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="6.2.0" />
     <PackageReference Include="NUnit" Version="3.6.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
