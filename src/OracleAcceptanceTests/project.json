@@ -1,0 +1,15 @@
+﻿{
+  "dependencies": {
+    "NServiceBus": "6.2.0",
+    "NServiceBus.AcceptanceTesting": "6.2.0",
+    "NServiceBus.AcceptanceTests.Sources": "6.2.0",
+    "NUnit": "3.6.1",
+    "Oracle.ManagedDataAccess": "12.1.24160719"
+  },
+  "frameworks": {
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

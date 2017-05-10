@@ -1,0 +1,15 @@
+﻿{
+  "dependencies": {
+    "ApprovalTests": "3.0.13",
+    "ApprovalUtilities": "3.0.13",
+    "Newtonsoft.Json": "10.0.2",
+    "NUnit": "3.6.1",
+    "ObjectApproval": "1.6.0"
+  },
+  "frameworks": {
+    "net452": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}
