@@ -4,7 +4,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using AcceptanceTesting;
     using NUnit.Framework;
 
-    public class When_doing_request_response_between_sagas_first_handler_responding : When_doing_request_response_between_sagas
+    public partial class When_doing_request_response_between_sagas_first_handler_responding : When_doing_request_response_between_sagas
     {
         [Test]
         public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_the_first_handler()

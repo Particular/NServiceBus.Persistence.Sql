@@ -9,7 +9,7 @@
     using NUnit.Framework;
     using Persistence.Sql;
 
-    public class When_sagas_cant_be_found : NServiceBusAcceptanceTest
+    public partial class When_sagas_cant_be_found : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task IHandleSagaNotFound_only_called_once()
@@ -225,7 +225,7 @@
                     Data.MessageId = message.Id;
                     return Task.FromResult(0);
                 }
-                
+
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<StartSaga>(m => m.Id);
@@ -250,18 +250,18 @@
             }
         }
 
-        
+
         public class StartSaga : ICommand
         {
             public Guid Id { get; set; }
         }
 
-        
+
         public class FinishMessage : ICommand
         {
         }
 
-        
+
         public class MessageToSaga : ICommand
         {
             public Guid Id { get; set; }

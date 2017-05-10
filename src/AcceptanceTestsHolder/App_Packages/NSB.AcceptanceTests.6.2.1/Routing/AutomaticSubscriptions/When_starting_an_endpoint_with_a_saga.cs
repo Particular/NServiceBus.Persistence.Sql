@@ -10,7 +10,7 @@ namespace NServiceBus.AcceptanceTests.Routing.AutomaticSubscriptions
     using Persistence.Sql;
 
     [TestFixture]
-    public class When_starting_an_endpoint_with_a_saga : NServiceBusAcceptanceTest
+    public partial class When_starting_an_endpoint_with_a_saga : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_autoSubscribe_the_saga_messageHandler_by_default()
