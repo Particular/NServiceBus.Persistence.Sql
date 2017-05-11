@@ -13,11 +13,12 @@ class Program
     static Task Start()
     {
         var connection = "Data Source=localhost;User Id=particular; Password=Welcome1; Enlist=false";
-        return EndpointStarter.Start("SqlPersistence.Sample.Oracle", persistence =>
-        {
-            persistence.SqlVariant(SqlVariant.MySql);
-            persistence.TablePrefix("MySql");
-            persistence.ConnectionBuilder(() => new OracleConnection(connection));
-        });
+        return EndpointStarter.Start("SqlPersistence.Sample.Oracle",
+            persistence =>
+            {
+                persistence.SqlVariant(SqlVariant.MySql);
+                persistence.TablePrefix("MySql");
+                persistence.ConnectionBuilder(() => new OracleConnection(connection));
+            });
     }
 }

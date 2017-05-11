@@ -19,7 +19,8 @@ public static class EndpointStarter
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.CacheFor(TimeSpan.FromMinutes(1));
 
-        var endpoint = await Endpoint.Start(endpointConfiguration);
+        var endpoint = await Endpoint.Start(endpointConfiguration)
+            .ConfigureAwait(false);
         Console.WriteLine("Press any key to exit");
         try
         {
@@ -27,13 +28,15 @@ public static class EndpointStarter
             {
                 Property = "PropertyValue"
             };
-            await endpoint.Publish(myEvent);
+            await endpoint.Publish(myEvent)
+                .ConfigureAwait(false);
 
             var startSagaMessage = new StartSagaMessage
             {
                 MySagaId = Guid.NewGuid()
             };
-            await endpoint.SendLocal(startSagaMessage);
+            await endpoint.SendLocal(startSagaMessage)
+                .ConfigureAwait(false);
 
             var deferMessage = new DeferMessage
             {
@@ -42,13 +45,15 @@ public static class EndpointStarter
             var options = new SendOptions();
             options.RouteToThisEndpoint();
             options.DelayDeliveryWith(TimeSpan.FromSeconds(1));
-            await endpoint.Send(deferMessage, options);
+            await endpoint.Send(deferMessage, options)
+                .ConfigureAwait(false);
 
             Console.ReadKey();
         }
         finally
         {
-            await endpoint.Stop();
+            await endpoint.Stop()
+                .ConfigureAwait(false);
         }
     }
 }
