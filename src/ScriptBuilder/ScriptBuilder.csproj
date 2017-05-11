@@ -37,14 +37,15 @@
        <Output TaskParameter="Include" ItemName="MonoCecilRef" />
     </CreateItem>
     <PropertyGroup>
-      <ScriptBuilderDll>$(TargetPath)</ScriptBuilderDll>
+      <ScriptBuilderNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetClassicDll>
+      <ScriptBuilderNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetStandardDll>
       <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
       <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
       <MergeOutputNetClassic>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetClassic>
       <MergeOutputNetStandard>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetStandard>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
   </Target>
 </Project>
