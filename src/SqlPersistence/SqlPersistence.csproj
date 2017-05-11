@@ -13,7 +13,7 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)$(OutDir)$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)bin\$(ConfigurationName)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS0419</NoWarn>
   </PropertyGroup>
 
