@@ -4,12 +4,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class ResourceReader
 {
-    static Assembly assembly;
-
-    static ResourceReader()
-    {
-        assembly = typeof(ResourceReader).GetTypeInfo().Assembly;
-    }
+    static Assembly assembly = typeof(ResourceReader).GetTypeInfo().Assembly;
 
     public static string ReadResource(BuildSqlVariant sqlVariant, string prefix)
     {

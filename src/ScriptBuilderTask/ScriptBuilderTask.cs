@@ -24,12 +24,8 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string SolutionDirectory { get; set; }
 
-        static Version assemblyVersion;
+        static Version assemblyVersion= typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
 
-        static ScriptBuilderTask()
-        {
-            assemblyVersion = typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
-        }
         public override bool Execute()
         {
             logger = new BuildLogger(BuildEngine);
