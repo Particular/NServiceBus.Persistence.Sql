@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="ILRepack" Version="2.0.13" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
@@ -44,7 +45,6 @@
        <Output TaskParameter="Include" ItemName="MonoCecilRef" />
     </CreateItem>
     <PropertyGroup>
-      <ILRepack>"$(SolutionDir)..\Tools\ILRepack.exe"</ILRepack>
       <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\$(TargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
       <ScriptBuilderTaskDll>$(TargetPath)</ScriptBuilderTaskDll>
       <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>

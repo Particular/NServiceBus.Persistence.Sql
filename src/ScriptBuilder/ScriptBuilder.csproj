@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="ILRepack" Version="2.0.13" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" CopyLocal="True" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\Guard.cs" />
@@ -36,7 +37,6 @@
        <Output TaskParameter="Include" ItemName="MonoCecilRef" />
     </CreateItem>
     <PropertyGroup>
-      <ILRepack>"$(SolutionDir)..\Tools\ILRepack.exe"</ILRepack>
       <ScriptBuilderDll>$(TargetPath)</ScriptBuilderDll>
       <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
       <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
