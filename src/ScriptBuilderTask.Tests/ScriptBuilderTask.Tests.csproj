@@ -16,6 +16,7 @@
     <PackageReference Include="ObjectApproval" Version="1.6.0" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <ProjectReference Include="..\ScriptBuilderTask.Tests.Target\ScriptBuilderTask.Tests.Target.csproj" />
     <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj" />
   </ItemGroup>
 
