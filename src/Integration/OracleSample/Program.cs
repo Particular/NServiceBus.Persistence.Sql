@@ -16,8 +16,8 @@ class Program
         return EndpointStarter.Start("SqlPersistence.Sample.Oracle",
             persistence =>
             {
-                persistence.SqlVariant(SqlVariant.MySql);
-                persistence.TablePrefix("MySql");
+                persistence.SqlVariant(SqlVariant.Oracle);
+                persistence.TablePrefix("Oracle");
                 persistence.ConnectionBuilder(() => new OracleConnection(connection));
             });
     }
