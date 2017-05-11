@@ -5,6 +5,8 @@
     <AssemblyName>OracleSample</AssemblyName>
     <PackageId>OracleSample</PackageId>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

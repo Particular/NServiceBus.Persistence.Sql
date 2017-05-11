@@ -5,6 +5,8 @@
     <AssemblyName>SqlServerSample</AssemblyName>
     <PackageId>SqlServerSample</PackageId>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

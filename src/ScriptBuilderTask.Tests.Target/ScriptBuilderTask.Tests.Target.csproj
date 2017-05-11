@@ -5,6 +5,8 @@
     <AssemblyName>ScriptBuilderTask.Tests.Target</AssemblyName>
     <PackageId>ScriptBuilderTask.Tests.Target</PackageId>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,6 +5,8 @@
     <AssemblyName>MySqlSample</AssemblyName>
     <PackageId>MySqlSample</PackageId>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

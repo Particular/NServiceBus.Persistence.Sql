@@ -4,6 +4,8 @@
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>AcceptanceTestsHolder</AssemblyName>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

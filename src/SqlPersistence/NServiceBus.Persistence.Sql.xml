@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NServiceBus.Persistence.Sql</name>
+    </assembly>
+    <members>
+        <member name="T:NServiceBus.SqlPersistenceConfig">
+            <summary>
+            SQL persistence specific configuration option. Provides extension methods to <see cref="T:NServiceBus.PersistenceExtensions`2"/> for <see cref="T:NServiceBus.Persistence.Sql.SqlPersistence"/>.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.ConnectionBuilder(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},System.Func{System.Data.Common.DbConnection})">
+            <summary>
+            Configures how <see cref="T:System.Data.Common.DbConnection"/>s are constructed.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.DisableInstaller(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence})">
+            <summary>
+            Disables the SQL persistence installers.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.Schema(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},System.String)">
+            <summary>
+            Configures the database schema to be used.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.SqlVariant(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},NServiceBus.Persistence.Sql.SqlVariant)">
+            <summary>
+            Sets the <see cref="M:NServiceBus.SqlPersistenceConfig.SqlVariant(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},NServiceBus.Persistence.Sql.SqlVariant)"/> to use for communicating the the current database.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.TablePrefix(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},System.String)">
+            <summary>
+            Configures the table prefix to be prepended to all Saga, Timeout, Subscription and Outbox tables.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.SagaSettings(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence})">
+            <summary>
+            Exposes saga specific settings.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceConfig.SubscriptionSettings(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence})">
+            <summary>
+            Exposes subscription specific settings.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SqlVariant">
+            <summary>
+            Allows for configuring which database engine to target. Used by <see cref="M:NServiceBus.SqlPersistenceConfig.SqlVariant(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},NServiceBus.Persistence.Sql.SqlVariant)"/>.
+            </summary>
+        </member>
+        <member name="F:NServiceBus.Persistence.Sql.SqlVariant.MsSqlServer">
+            <summary>
+            Microsoft SQL Server.
+            </summary>
+        </member>
+        <member name="F:NServiceBus.Persistence.Sql.SqlVariant.MySql">
+            <summary>
+            MySQL.
+            </summary>
+        </member>
+        <member name="F:NServiceBus.Persistence.Sql.SqlVariant.Oracle">
+            <summary>
+            Oracle.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.OutboxCommandBuilder">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.OutboxCommands">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SagaSettings">
+            <summary>
+            Configuration options for Saga persistence.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SagaSettings.JsonSettings(Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            The <see cref="T:Newtonsoft.Json.JsonSerializerSettings"/> to use for serializing sagas.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SagaSettings.ReaderCreator(System.Func{System.IO.TextReader,Newtonsoft.Json.JsonReader})">
+            <summary>
+            Builds up a <see cref="T:Newtonsoft.Json.JsonReader"/> for serializing saga data.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SagaSettings.JsonSettingsForVersion(NServiceBus.Persistence.Sql.RetrieveVersionSpecificJsonSettings)">
+            <summary>
+            Configure how a specific saga data version will be serialized.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SagaSettings.WriterCreator(System.Func{System.Text.StringBuilder,Newtonsoft.Json.JsonWriter})">
+            <summary>
+            Builds up a <see cref="T:Newtonsoft.Json.JsonWriter"/> for serializing saga data.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.IMessagePropertyMapper">
+            <summary>
+            For mapping saga correlation properties by using a <see cref="P:NServiceBus.Persistence.Sql.SqlSaga`1.CorrelationPropertyName"/>. Used by <see cref="M:NServiceBus.Persistence.Sql.SqlSaga`1.ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage)"/>.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.IMessagePropertyMapper.ConfigureMapping``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
+            <summary>
+            Configures the mapping between <see cref="P:NServiceBus.Persistence.Sql.SqlSaga`1.CorrelationPropertyName"/> and <typeparamref name="TMessage" />.
+            </summary>
+            <typeparam name="TMessage">The message type to map to.</typeparam>
+            <param name="messageProperty">An <see cref="T:System.Linq.Expressions.Expression`1"/> that represents the message property.</param>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SagaCommandBuilder">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.RetrieveVersionSpecificJsonSettings">
+            <summary>
+            A delegate used to configure how a specific saga data version will be serialized.
+            <seealso cref="M:NServiceBus.Persistence.Sql.SagaSettings.JsonSettingsForVersion(NServiceBus.Persistence.Sql.RetrieveVersionSpecificJsonSettings)"/>
+            </summary>
+            <param name="sagaDataType">The saga data <see cref="T:System.Type"/> that the <see cref="T:Newtonsoft.Json.JsonSerializerSettings"/> are being returned for.</param>
+            <param name="sagaVersion">The assembly version of the saga data being serialized.</param>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SqlSaga`1">
+            <summary>
+            Base class for all sagas being stored by the SQL Persistence. Replaces <see cref="T:NServiceBus.Saga`1"/>.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlSaga`1.CorrelationPropertyName">
+            <summary>
+            Gets the name of the correlation property for <typeparamref name="TSagaData"/>.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlSaga`1.TransitionalCorrelationPropertyName">
+            <summary>
+            Gets the name of the transitional property for <typeparamref name="TSagaData"/>.
+            Used to transition between different properties for saga correlation.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlSaga`1.TableSuffix">
+            <summary>
+            The name of the table to use when storing the current <see cref="T:NServiceBus.Persistence.Sql.SqlSaga`1"/>.
+            Will be appended to the value specified in <see cref="M:NServiceBus.SqlPersistenceConfig.TablePrefix(NServiceBus.PersistenceExtensions{NServiceBus.Persistence.Sql.SqlPersistence},System.String)"/>.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlSaga`1.Data">
+            <summary>
+            The saga's strongly typed data. Wraps <see cref="P:NServiceBus.Saga.Entity" />.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SqlSaga`1.ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage)">
+            <summary>
+            <see cref="M:NServiceBus.Saga.ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage)"/>. Do not override this method.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SqlSaga`1.ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper)">
+            <summary>
+            Allows messages to be mapped to <see cref="P:NServiceBus.Persistence.Sql.SqlSaga`1.CorrelationPropertyName"/>.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SqlPersistence">
+            <summary>
+            The <see cref="T:NServiceBus.Persistence.PersistenceDefinition"/> for the SQL Persistence.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SqlPersistence.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:NServiceBus.Persistence.Sql.SqlPersistence"/>.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute">
+            <summary>
+            Configuration options that are evaluated at compile time.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute.MsSqlServerScripts">
+            <summary>
+            True to produce SQL installation scripts that target Microsoft SQL Server.
+            Defaults to False.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute.MySqlScripts">
+            <summary>
+            True to produce SQL installation scripts that target MySql.
+            Defaults to False.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute.OracleScripts">
+            <summary>
+            True to produce SQL installation scripts that target Oracle.
+            Defaults to False.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute.ScriptPromotionPath">
+            <summary>
+            Path to promote SQL installation scripts to.
+            The token '$(SolutionDir)' will be replace witht he current solution directory.
+            The token '$(ProjectDir)' will be replace witht he current solution directory.
+            The path calculation is performed relative to the current project directory.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SubscriptionSettings">
+            <summary>
+            Configuration options for Subscription persistence.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SubscriptionSettings.CacheFor(System.TimeSpan)">
+            <summary>
+            Cache subscriptions for a given <see cref="T:System.TimeSpan"/>.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.Persistence.Sql.SubscriptionSettings.DisableCache">
+            <summary>
+            Do not cache subscriptions.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SubscriptionCommandBuilder">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.SubscriptionCommands">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.ISqlStorageSession">
+            <summary>
+            Exposes the current <see cref="T:System.Data.Common.DbTransaction"/> and <see cref="T:System.Data.Common.DbConnection"/>.
+            <seealso cref="M:NServiceBus.SqlPersistenceStorageSessionExtensions.SqlPersistenceSession(NServiceBus.Persistence.SynchronizedStorageSession)"/>
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.ISqlStorageSession.Transaction">
+            <summary>
+            The current <see cref="T:System.Data.Common.DbTransaction"/>.
+            </summary>
+        </member>
+        <member name="P:NServiceBus.Persistence.Sql.ISqlStorageSession.Connection">
+            <summary>
+            The current <see cref="T:System.Data.Common.DbConnection"/>.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.TimeoutCommandBuilder">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.Persistence.Sql.TimeoutCommands">
+            <summary>
+            Not for public use.
+            </summary>
+        </member>
+        <member name="T:NServiceBus.SqlPersistenceStorageSessionExtensions">
+            <summary>
+            Shared session extensions for SqlPersistence.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceStorageSessionExtensions.SqlPersistenceSession(NServiceBus.Persistence.SynchronizedStorageSession)">
+            <summary>
+            Gets the current context SqlPersistence <see cref="T:NServiceBus.Persistence.Sql.ISqlStorageSession"/>.
+            </summary>
+        </member>
+        <member name="M:NServiceBus.SqlPersistenceStorageSessionExtensions.GetSagaData``1(NServiceBus.Persistence.SynchronizedStorageSession,NServiceBus.Extensibility.ReadOnlyContextBag,System.String,ParameterAppender)">
+            <summary>
+            Retrieves a <see cref="T:NServiceBus.IContainSagaData"/> instance. Used when implementing a <see cref="T:NServiceBus.Sagas.IFindSagas`1"/>.
+            </summary>
+            <typeparam name="TSagaData">The <see cref="T:NServiceBus.IContainSagaData"/> type to return.</typeparam>
+            <param name="session">Used to provide an extension point and access the current <see cref="T:System.Data.Common.DbConnection"/> and <see cref="T:System.Data.Common.DbTransaction"/>.</param>
+            <param name="context">Used to append a concurrency value that can be verified when the SagaData is persisted.</param>
+            <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
+            <param name="appendParameters">Used to append <see cref="T:System.Data.Common.DbParameter"/>s used in the <paramref name="whereClause"/>.</param>
+        </member>
+        <member name="T:ParameterAppender">
+            <summary>
+            Appends <see cref="T:System.Data.Common.DbParameter"/>s to a <see cref="T:System.Data.Common.DbParameterCollection"/>.
+            </summary>
+            <param name="parameterBuilder">Provides access to <see cref="M:System.Data.Common.DbCommand.CreateParameter"/>.</param>
+            <param name="append">Append a <see cref="T:System.Data.Common.DbParameter"/> using <see cref="M:System.Data.Common.DbParameterCollection.Add(System.Object)"/> to append to.</param>
+        </member>
+    </members>
+</doc>
