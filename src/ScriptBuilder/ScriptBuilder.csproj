@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="3.6.5" />
-    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\Guard.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
