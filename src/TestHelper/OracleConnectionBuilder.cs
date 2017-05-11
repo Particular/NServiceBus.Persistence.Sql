@@ -18,8 +18,10 @@ public static class OracleConnectionBuilder
 
         if (disableMetadataPooling)
         {
-            var builder = new OracleConnectionStringBuilder(connection);
-            builder.MetadataPooling = false;
+            var builder = new OracleConnectionStringBuilder(connection)
+            {
+                MetadataPooling = false
+            };
             connection = builder.ConnectionString;
         }
 
