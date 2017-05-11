@@ -6,6 +6,7 @@ using Microsoft.Build.Utilities;
 namespace NServiceBus.Persistence.Sql
 {
     using System.IO;
+    using System.Reflection;
 
     public class ScriptBuilderTask : Task
     {
@@ -23,10 +24,16 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string SolutionDirectory { get; set; }
 
+        static Version assemblyVersion;
+
+        static ScriptBuilderTask()
+        {
+            assemblyVersion = typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
+        }
         public override bool Execute()
         {
             logger = new BuildLogger(BuildEngine);
-            logger.LogInfo($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing");
+            logger.LogInfo($"ScriptBuilderTask (version {assemblyVersion}) Executing");
 
             var stopwatch = Stopwatch.StartNew();
 

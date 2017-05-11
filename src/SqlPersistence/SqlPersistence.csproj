@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.0.7" />
-    <PackageReference Include="GitVersionTask" Version="3.6.5" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />

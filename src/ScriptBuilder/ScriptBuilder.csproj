@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
@@ -18,13 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="3.6.5" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" CopyLocal="True" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\Guard.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <None Remove="Outbox\*.sql" />
     <None Remove="Subscription\*.sql" />
     <None Remove="Timeout\*.sql" />
@@ -32,15 +30,18 @@
     <EmbeddedResource Include="Subscription\*.sql" />
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
-  
+
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+    <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
+       <Output TaskParameter="Include" ItemName="MonoCecilRef" />
+    </CreateItem>
     <PropertyGroup>
-      <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
-      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
-      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\net452\Mono.Cecil.dll</Cecil>
+      <ILRepack>"$(SolutionDir)..\Tools\ILRepack.exe"</ILRepack>
+      <ScriptBuilderDll>$(TargetPath)</ScriptBuilderDll>
+      <Cecil>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</Cecil>
       <MergeOutput>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutput>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutput)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutput)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
   </Target>
 </Project>
