@@ -36,11 +36,15 @@
       <Scripts Include="$(ScriptDirectory)**\*.sql" />
     </ItemGroup>
 
-    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
-      <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
+    <CreateItem Include="@(Scripts)"
+                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include"
+              ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
     </CreateItem>
-    <CreateItem Include="@(Scripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
-      <Output TaskParameter="Include" ItemName="AllItemsFullPathWithTargetPath" />
+    <CreateItem Include="@(Scripts)"
+                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include"
+              ItemName="AllItemsFullPathWithTargetPath" />
     </CreateItem>
   </Target>
 
