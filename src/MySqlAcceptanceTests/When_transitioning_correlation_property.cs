@@ -24,11 +24,15 @@
             {
                 await connection.OpenAsync().ConfigureAwait(false);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
+                connection.ExecuteCommand("analyze table _TransitioningCorrelationPropertySaga");
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
+                connection.ExecuteCommand("analyze table _TransitioningCorrelationPropertySaga");
                 var phase1Schema = GetSchema(connection);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                connection.ExecuteCommand("analyze table _TransitioningCorrelationPropertySaga");
                 var phase2Schema = GetSchema(connection);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                connection.ExecuteCommand("analyze table _TransitioningCorrelationPropertySaga");
                 var phase3Schema = GetSchema(connection);
 
                 CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");
