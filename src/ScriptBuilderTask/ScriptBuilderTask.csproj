@@ -58,8 +58,8 @@
       <MsBuildTargets>$(SolutionDir)..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassicDll)&quot; &quot;$(ScriptBuilderTaskNetClassicDll)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandardDll)&quot; &quot;$(ScriptBuilderTaskNetStandardDll)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Condition=" '$(TargetFramework)' == 'net452' " Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassicDll)&quot; &quot;$(ScriptBuilderTaskNetClassicDll)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Condition=" '$(TargetFramework)' == 'netstandard1.5' " Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandardDll)&quot; &quot;$(ScriptBuilderTaskNetStandardDll)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(MergeOutputNetClassicDll)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
     <Copy SourceFiles="$(MergeOutputNetStandardDll)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
