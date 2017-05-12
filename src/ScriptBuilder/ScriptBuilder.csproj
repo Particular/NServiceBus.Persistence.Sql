@@ -21,7 +21,6 @@
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="ILRepack" Version="2.0.13" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" CopyLocal="True" />
-    <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <Compile Include="..\Guard.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
     <None Remove="Outbox\*.sql" />
@@ -30,6 +29,10 @@
     <EmbeddedResource Include="Outbox\*.sql" />
     <EmbeddedResource Include="Subscription\*.sql" />
     <EmbeddedResource Include="Timeout\*.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Include="NuGetPackager" Version="0.6.1" />
   </ItemGroup>
 
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
@@ -45,7 +48,7 @@
       <MergeOutputNetStandard>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetStandard>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Condition=" '$(TargetFramework)' == 'net452' " Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <Exec Condition=" '$(TargetFramework)' == 'netstandard1.5' " Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
   </Target>
 </Project>
