@@ -9,21 +9,19 @@
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
     }
-    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be treated as an error from version 2." +
-        "0.0. Will be removed in version 3.0.0.", false)]
+    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be removed in version 3.0.0.", true)]
     public class static MessagePropertyMapper
     {
-        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be treated as an erro" +
-            "r from version 2.0.0. Will be removed in version 3.0.0.", false)]
+        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be removed in version" +
+            " 3.0.0.", true)]
         public static void MapMessage<TMessage>(this NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper, System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
     }
-    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be treated as an error from version 2." +
-        "0.0. Will be removed in version 3.0.0.", false)]
+    [System.ObsoleteAttribute("Use `IMessagePropertyMapper` instead. Will be removed in version 3.0.0.", true)]
     public class MessagePropertyMapper<SagaData>
     {
         public MessagePropertyMapper() { }
-        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be treated as an erro" +
-            "r from version 2.0.0. Will be removed in version 3.0.0.", false)]
+        [System.ObsoleteAttribute("Use `IMessagePropertyMapper.ConfigureMapping` instead. Will be removed in version" +
+            " 3.0.0.", true)]
         public void MapMessage<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
@@ -87,7 +85,7 @@
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
-    [System.ObsoleteAttribute(@"Replaced by overrides on SqlSaga.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty override TransitionalCorrelationPropertyName on the saga implementing SqlSaga<T>\r\n * For tableSuffix override TableSuffix on the saga implementing SqlSaga<T>. Will be treated as an error from version 2.0.0. Will be removed in version 3.0.0.", false)]
+    [System.ObsoleteAttribute(@"Replaced by overrides on SqlSaga.\r\n * For correlationProperty override CorrelationPropertyName on the saga implementing SqlSaga<T>.\r\n * For transitionalCorrelationProperty override TransitionalCorrelationPropertyName on the saga implementing SqlSaga<T>\r\n * For tableSuffix override TableSuffix on the saga implementing SqlSaga<T>. Will be removed in version 3.0.0.", true)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
