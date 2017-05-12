@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;net452</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
@@ -32,7 +32,7 @@
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
   </ItemGroup>
 
