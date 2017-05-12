@@ -40,15 +40,6 @@ static class ExceptionExtensions
                 stringBuilder.Append(Environment.NewLine);
             }
 
-            //TODO: add back in when move to netstandard 2.0
-            //if (exception.TargetSite != null)
-            //{
-            //    stringBuilder.Append("TargetSite:");
-            //    stringBuilder.Append(Environment.NewLine);
-            //    stringBuilder.Append(exception.TargetSite);
-            //    stringBuilder.Append(Environment.NewLine);
-            //}
-
             exception = exception.InnerException;
         }
 
