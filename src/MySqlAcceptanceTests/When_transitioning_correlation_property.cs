@@ -22,6 +22,8 @@
             {
                 connection.Open();
 
+                //HACK: Thread Sleeps required since information_schema.statistics takes some time to update
+
                 var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
                 Thread.Sleep(200);
