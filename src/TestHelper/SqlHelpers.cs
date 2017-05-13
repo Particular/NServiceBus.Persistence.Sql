@@ -4,6 +4,24 @@ using System.Data.Common;
 public static class SqlHelpers
 {
 
+    public static void ExecuteCommand(this DbConnection connection, string script, Func<Exception, bool> filter = null, string schema = null)
+    {
+        try
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = script;
+                if (command is System.Data.SqlClient.SqlCommand)
+                {
+                    command.AddParameter("schema", schema ?? "dbo");
+                }
+                command.ExecuteNonQuery();
+            }
+        }
+        catch (Exception e) when (filter != null && filter(e))
+        {
+        }
+    }
     public static void ExecuteCommand(this DbConnection connection, string script, string tablePrefix, Func<Exception, bool> filter = null, string schema = null)
     {
         try

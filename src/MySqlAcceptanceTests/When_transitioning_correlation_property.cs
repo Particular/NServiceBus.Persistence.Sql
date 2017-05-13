@@ -4,6 +4,7 @@
     using System.Data;
     using System.Data.Common;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
     using Persistence.Sql;
@@ -13,30 +14,36 @@
     public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_remove_old_property_after_phase_three()
+        public void Should_remove_old_property_after_phase_three()
         {
             var variant = BuildSqlVariant.MySql;
-            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
-            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
-            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
 
             using (var connection = MySqlConnectionBuilder.Build())
             {
-                await connection.OpenAsync().ConfigureAwait(false);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
-                var phase1Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
-                var phase2Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
-                var phase3Schema = GetSchema(connection);
+                connection.Open();
 
+                //HACK: Thread Sleeps required since information_schema.statistics takes some time to update
+
+                var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
+                Thread.Sleep(200);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
+                Thread.Sleep(200);
+                var phase1Schema = GetSchema(connection);
                 CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");
                 CollectionAssert.DoesNotContain(phase1Schema, "Correlation_OrderId");
 
+                var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                Thread.Sleep(200);
+                var phase2Schema = GetSchema(connection);
                 CollectionAssert.Contains(phase2Schema, "Correlation_OrderNumber");
                 CollectionAssert.Contains(phase2Schema, "Correlation_OrderId");
 
+                var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                Thread.Sleep(200);
+                var phase3Schema = GetSchema(connection);
                 CollectionAssert.DoesNotContain(phase3Schema, "Correlation_OrderNumber");
                 CollectionAssert.Contains(phase3Schema, "Correlation_OrderId");
             }
