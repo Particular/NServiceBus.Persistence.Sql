@@ -13,7 +13,7 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)bin\$(ConfigurationName)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS0419</NoWarn>
     <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Data" />
   </ItemGroup>
-  
+
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>

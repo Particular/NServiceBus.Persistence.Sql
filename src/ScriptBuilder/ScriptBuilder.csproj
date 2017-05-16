@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
@@ -13,7 +14,7 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)bin\$(ConfigurationName)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS1591</NoWarn>
     <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
