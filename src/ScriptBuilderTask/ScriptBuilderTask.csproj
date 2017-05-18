@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <NuSpecFileName>NServiceBus.Persistence.Sql.MsBuild</NuSpecFileName>
@@ -13,37 +13,58 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="3.6.5" />
-    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
-    <PackageReference Include="NuGetPackager" Version="0.6.1" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="ILRepack" Version="2.0.13" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <PackageReference Include="Microsoft.Build" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
+    <PackageReference Include="NuGetPackager" Version="0.6.1" />
   </ItemGroup>
   
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+    <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
+       <Output TaskParameter="Include" ItemName="MonoCecilRef" />
+    </CreateItem>
     <PropertyGroup>
-      <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
-      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
-      <ScriptBuilderTaskDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskDll>
-      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\net452\Mono.Cecil.dll</Cecil>
-      <MergeOutputDll>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputDll>
-      <MergeOutputPdb>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputPdb>
+      <ScriptBuilderNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetClassicDll>
+      <ScriptBuilderNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetStandardDll>
+      <ScriptBuilderTaskNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskNetClassicDll>
+      <ScriptBuilderTaskNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskNetStandardDll>
+      <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
+      <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
+      <MergeOutputNetClassicDll>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputNetClassicDll>
+      <MergeOutputNetStandardDll>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputNetStandardDll>
+      <MergeOutputNetClassicPdb>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputNetClassicPdb>
+      <MergeOutputNetStandardPdb>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputNetStandardPdb>
       <MsBuildTargets>$(SolutionDir)..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
     </PropertyGroup>
-    <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutputDll)&quot; &quot;$(ScriptBuilderTaskDll)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassicDll)&quot; &quot;$(ScriptBuilderTaskNetClassicDll)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandardDll)&quot; &quot;$(ScriptBuilderTaskNetStandardDll)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="$(MergeOutputDll)" DestinationFolder="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="$(MergeOutputPdb)" DestinationFolder="$(SolutionDir)ForIntegration" />
+    <Copy SourceFiles="$(MergeOutputNetClassicDll)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
+    <Copy SourceFiles="$(MergeOutputNetStandardDll)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
+    <Copy SourceFiles="$(MergeOutputNetClassicPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
+    <Copy SourceFiles="$(MergeOutputNetStandardPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
     <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
   </Target>
 </Project>

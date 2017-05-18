@@ -13,13 +13,14 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)$(OutDir)$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS0419</NoWarn>
+    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.0.7" />
-    <PackageReference Include="GitVersionTask" Version="3.6.5" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
@@ -31,7 +32,7 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Data" />
   </ItemGroup>
-  
+
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)..\binaries" />
     <ItemGroup>

@@ -78,14 +78,13 @@ static class CecilExtentions
     {
         foreach (var method in type.Methods)
         {
-            var body = method.Body;
-            if (body?.Instructions == null)
+            var debugInformation = method.DebugInformation;
+            if (debugInformation == null)
             {
                 continue;
             }
-            foreach (var instruction in body.Instructions)
+            foreach (var point in debugInformation.SequencePoints)
             {
-                var point = instruction.SequencePoint;
                 if (point?.Document?.Url == null)
                 {
                     continue;

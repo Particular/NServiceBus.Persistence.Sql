@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>AcceptanceTestHelper</AssemblyName>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <SignAssembly>true</SignAssembly>
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NUnit" Version="3.6.1" />
     <Reference Include="System" />

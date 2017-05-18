@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
@@ -13,18 +14,17 @@
     <DebugSymbols>True</DebugSymbols>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)$(OutDir)$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS1591</NoWarn>
+    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="3.6.5" />
-    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
-    <PackageReference Include="NuGetPackager" Version="0.6.1" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="ILRepack" Version="2.0.13" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" CopyLocal="True" />
     <Compile Include="..\Guard.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <None Remove="Outbox\*.sql" />
     <None Remove="Subscription\*.sql" />
     <None Remove="Timeout\*.sql" />
@@ -32,15 +32,25 @@
     <EmbeddedResource Include="Subscription\*.sql" />
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
-  
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <PackageReference Include="NuGetPackager" Version="0.6.1" />
+  </ItemGroup>
+
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+    <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
+       <Output TaskParameter="Include" ItemName="MonoCecilRef" />
+    </CreateItem>
     <PropertyGroup>
-      <IlMerge>"$(SolutionDir)..\Tools\ilmerge.exe"</IlMerge>
-      <ScriptBuilderDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderDll>
-      <Cecil>$(ProjectDir)bin\$(ConfigurationName)\net452\Mono.Cecil.dll</Cecil>
-      <MergeOutput>$(SolutionDir)..\binaries\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutput>
+      <ScriptBuilderNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetClassicDll>
+      <ScriptBuilderNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetStandardDll>
+      <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
+      <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
+      <MergeOutputNetClassic>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetClassic>
+      <MergeOutputNetStandard>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetStandard>
     </PropertyGroup>
     <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(IlMerge) /out:&quot;$(MergeOutput)&quot; &quot;$(ScriptBuilderDll)&quot; &quot;$(Cecil)&quot; /target:library /targetplatform:v4 /internalize" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
   </Target>
 </Project>

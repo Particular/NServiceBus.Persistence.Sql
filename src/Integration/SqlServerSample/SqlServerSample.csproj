@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>SqlServerSample</AssemblyName>
@@ -7,6 +8,7 @@
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <OutputType>exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
