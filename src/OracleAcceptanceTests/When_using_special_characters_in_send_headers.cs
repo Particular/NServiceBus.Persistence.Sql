@@ -8,7 +8,7 @@
     using Features;
     using NUnit.Framework;
 
-    public class When_using_special_characters_in_headers_for_sends : NServiceBusAcceptanceTest
+    public class When_using_special_characters_in_send_headers : NServiceBusAcceptanceTest
     {
         readonly Dictionary<string, string> specialHeaders = new Dictionary<string, string>
         {
