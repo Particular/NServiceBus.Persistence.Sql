@@ -12,31 +12,43 @@
 
     public class When_headers_contain_special_characters : NServiceBusAcceptanceTest
     {
-        static Dictionary<string, string> sentHeaders = new Dictionary<string, string>
-        {
-            { "a-B1", "a-B" },
-            { "a-B2", "a-ɤϡ֎ᾣ♥-b" },
-            { "a-ɤϡ֎ᾣ♥-B3", "a-B" },
-            { "a-B4", "a-\U0001F60D-b" },
-            { "a-\U0001F605-B5", "a-B" },
-            { "a-B6", "a-😍-b" },
-            { "a-😅-B7", "a-B" },
-            {"a-b8", "奥曼克"},
-            {"a-B9", "٩(-̮̮̃-̃)۶ ٩(●̮̮̃•̃)۶ ٩(͡๏̯͡๏)۶ ٩(-̮̮̃•̃)" },
-            {"a-b10", "தமிழ்" }
-        };
+        //static Dictionary<string, string> sentHeaders = new Dictionary<string, string>
+        //{
+        //    { "a-B1", "a-B" },
+        //    { "a-B2", "a-ɤϡ֎ᾣ♥-b" },
+        //    { "a-ɤϡ֎ᾣ♥-B3", "a-B" },
+        //    { "a-B4", "a-\U0001F60D-b" },
+        //    { "a-\U0001F605-B5", "a-B" },
+        //    { "a-B6", "a-😍-b" },
+        //    { "a-😅-B7", "a-B" },
+        //    {"a-b8", "奥曼克"},
+        //    {"a-B9", "٩(-̮̮̃-̃)۶ ٩(●̮̮̃•̃)۶ ٩(͡๏̯͡๏)۶ ٩(-̮̮̃•̃)" },
+        //    {"a-b10", "தமிழ்" }
+        //};
 
-        [Test]
-        public async Task Outbox_should_work()
+        [TestCase("a-ɤϡ֎ᾣ♥-b")]
+        [TestCase("a-ɤϡ֎ᾣ♥-B3")]
+        [TestCase("a-\U0001F60D-b")]
+        [TestCase("a-\U0001F605-B5")]
+        [TestCase("a-😍-b")]
+        [TestCase("奥曼克")]
+        [TestCase("٩(-̮̮̃-̃)۶ ٩(●̮̮̃•̃)۶ ٩(͡๏̯͡๏)۶ ٩(-̮̮̃•̃)")]
+        [TestCase("a-😅-B7")]
+        [TestCase("தமிழ்")]
+        public async Task Outbox_should_work(string header)
         {
             var context =
                 await Scenario.Define<Context>()
-                    .WithEndpoint<OutboxEndpoint>(b => b.When(session => session.SendLocal(new PlaceOrder())))
+                    .WithEndpoint<OutboxEndpoint>(b => b.When(session => session.SendLocal(new PlaceOrder()
+                    {
+                        Header = header
+                    })))
                     .Done(c => c.MessageReceived)
                     .Run();
 
             Assert.IsNotEmpty(context.UnicodeHeaders);
-            CollectionAssert.IsSubsetOf(sentHeaders, context.UnicodeHeaders);
+            var testheader = new[]{ new KeyValuePair<string, string>(header, header)};
+            CollectionAssert.IsSubsetOf(testheader, context.UnicodeHeaders);
         }
 
         class Context : ScenarioContext
@@ -84,10 +96,9 @@
                     var sendOrderAcknowledgement = new SendOrderAcknowledgement();
                     var sendOptions = new SendOptions();
                     sendOptions.RouteToThisEndpoint();
-                    foreach (var header in sentHeaders)
-                    {
-                        sendOptions.SetHeader(header.Key, header.Value);
-                    }
+                    
+                        sendOptions.SetHeader(message.Header, message.Header);
+                    
                     return context.Send(sendOrderAcknowledgement, sendOptions);
                 }
             }
@@ -107,6 +118,7 @@
 
         public class PlaceOrder : ICommand
         {
+            public string Header { get; set; }
         }
 
         public class SendOrderAcknowledgement : IMessage
