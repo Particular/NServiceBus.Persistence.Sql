@@ -9,7 +9,7 @@ set @createTable =  concat('
         PersistenceVersion varchar(23) not null,
         Operations json not null,
         primary key (MessageId)
-    ) default charset=unicode;
+    ) default charset=utf8;
 ');
 prepare script from @createTable;
 execute script;
