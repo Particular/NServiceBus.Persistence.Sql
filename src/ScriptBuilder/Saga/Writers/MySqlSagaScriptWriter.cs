@@ -192,7 +192,7 @@ set @createTable = concat('
         SagaTypeVersion varchar(23) not null,
         Concurrency int not null,
         primary key (Id)
-    ) default charset=ascii;
+    ) default charset=unicode;
 ');
 prepare script from @createTable;
 execute script;

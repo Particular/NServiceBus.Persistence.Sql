@@ -7,7 +7,7 @@ set @createTable = concat('
         MessageType nvarchar(200) not null,
         PersistenceVersion varchar(23) not null,
         primary key clustered (Subscriber, MessageType)
-    ) default charset=ascii;
+    ) default charset=unicode;
 ');
 prepare script from @createTable;
 execute script;
