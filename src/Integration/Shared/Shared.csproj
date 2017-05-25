@@ -14,10 +14,10 @@
     <PackageReference Include="NServiceBus" Version="6.2.0" />
     <Reference Include="NServiceBus.Persistence.Sql">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
+      <HintPath>$(SolutionDir)\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)\..\ForIntegration\build\NServiceBus.Persistence.Sql.MsBuild.targets" />
+  <Import Project="$(SolutionDir)\ForIntegration\build\NServiceBus.Persistence.Sql.MsBuild.targets" />
 </Project>

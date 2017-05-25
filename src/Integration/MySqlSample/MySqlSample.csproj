@@ -15,10 +15,10 @@
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
     <PackageReference Include="NServiceBus" Version="6.2.0" />
-    <ProjectReference Include="$(SolutionDir)\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
     <Reference Include="NServiceBus.Persistence.Sql">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
+      <HintPath>$(SolutionDir)\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
