@@ -15,7 +15,7 @@
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
     <PackageReference Include="NServiceBus" Version="6.2.0" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Integration\Shared\Shared.csproj" />
     <Reference Include="NServiceBus.Persistence.Sql">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SolutionDir)\ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>

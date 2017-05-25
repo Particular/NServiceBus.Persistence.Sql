@@ -15,7 +15,7 @@
     <None Include="App.config" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
     <PackageReference Include="NServiceBus" Version="6.2.0" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Integration\Shared\Shared.csproj" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NServiceBus.Persistence.Sql">
