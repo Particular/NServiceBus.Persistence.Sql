@@ -176,7 +176,7 @@ where MessageType in (";
 
                     var getSubscribersPrefix = $@"
 select distinct Subscriber, Endpoint
-from {tableName}SubscriptionData
+from {tableName}
 where MessageType in (";
 
                     return messageTypes =>
