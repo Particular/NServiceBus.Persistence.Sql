@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlTypes;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
@@ -13,12 +14,29 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     Func<DbConnection> connectionBuilder;
     TimeoutCommands timeoutCommands;
     CommandBuilder commandBuilder;
+    TimeSpan timeoutsCleanupExecutionInterval;
+    DateTime lastTimeoutsCleanupExecution;
+    DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema)
+    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan timeoutsCleanupExecutionInterval)
     {
         this.connectionBuilder = connectionBuilder;
+        this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix, schema);
         commandBuilder = new CommandBuilder(sqlVariant);
+
+        switch (sqlVariant)
+        {
+            case SqlVariant.MsSqlServer:
+                oldestSupportedTimeout = SqlDateTime.MinValue.Value;
+                break;
+            case SqlVariant.Oracle:
+            case SqlVariant.MySql:
+                oldestSupportedTimeout = new DateTime(1000, 1, 1);
+                break;
+            default:
+                throw new NotSupportedException("Not supported SQL dialect: " + sqlVariant);
+        }
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
@@ -100,6 +118,15 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         var list = new List<TimeoutsChunk.Timeout>();
         var now = DateTime.UtcNow;
+
+        //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
+        //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeoute storeage race-condition
+        if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < now)
+        {
+            lastTimeoutsCleanupExecution = now;
+            startSlice = oldestSupportedTimeout;
+        }
+
         DateTime nextTimeToRunQuery;
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         {
@@ -129,7 +156,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                 }
                 else
                 {
-                    nextTimeToRunQuery = (DateTime) executeScalar;
+                    nextTimeToRunQuery = (DateTime)executeScalar;
                 }
             }
         }
