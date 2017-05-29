@@ -70,7 +70,7 @@ where Id = @Id";
             var rangeComandText = $@"
 select Id, Time
 from {tableName}
-where Time between @StartTime and @EndTime";
+where Time > @StartTime and Time <= @EndTime";
 
             var nextCommandText = $@"
 select Time from {tableName}
@@ -134,7 +134,7 @@ where Id = @Id";
             var rangeComandText = $@"
 select Id, Time
 from {tableName}
-where Time between @StartTime and @EndTime";
+where Time > @StartTime and Time <= @EndTime";
 
             var nextCommandText = $@"
 select top 1 Time from {tableName}
@@ -198,7 +198,7 @@ where Id = :Id";
             var rangeComandText = $@"
 select Id, ExpireTime
 from ""{tableName}""
-where ExpireTime between :StartTime and :EndTime";
+where ExpireTime > :StartTime and ExpireTime <= :EndTime";
 
             var nextCommandText = $@"
 select ExpireTime
