@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="NServiceBus" Version="6.2.1" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.2.1" />
-    <PackageReference Include="NUnit" Version="3.6.1" />
+    <PackageReference Include="NUnit" Version="3.7.0" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Messaging" />
