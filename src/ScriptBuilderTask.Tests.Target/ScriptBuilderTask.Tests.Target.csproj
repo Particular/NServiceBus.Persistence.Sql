@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>ScriptBuilderTask.Tests.Target</AssemblyName>
     <PackageId>ScriptBuilderTask.Tests.Target</PackageId>
-    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
