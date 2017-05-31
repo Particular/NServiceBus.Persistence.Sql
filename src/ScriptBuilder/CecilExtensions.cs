@@ -4,7 +4,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using NServiceBus.Persistence.Sql;
 
-static class CecilExtentions
+static class CecilExtensions
 {
 
     public static string GetStringProperty(this CustomAttribute attribute, string name)

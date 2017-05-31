@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-static class DirectoryExtentions
+static class DirectoryExtensions
 {
     public static void Delete(string path)
     {

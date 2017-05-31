@@ -12,8 +12,8 @@
 
   <ItemGroup>
     <None Include="App.config" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
-    <PackageReference Include="NServiceBus" Version="6.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="NServiceBus" Version="6.3.2" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
     <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />
     <Reference Include="NServiceBus.Persistence.Sql">

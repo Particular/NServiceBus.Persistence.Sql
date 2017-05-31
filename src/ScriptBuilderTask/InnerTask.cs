@@ -25,7 +25,7 @@ class InnerTask
     {
         var moduleDefinition = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
         var scriptPath = Path.Combine(intermediateDirectory, "NServiceBus.Persistence.Sql");
-        DirectoryExtentions.Delete(scriptPath);
+        DirectoryExtensions.Delete(scriptPath);
         foreach (var variant in SqlVariantReader.Read(moduleDefinition))
         {
             var variantPath = Path.Combine(scriptPath, variant.ToString());
@@ -47,8 +47,8 @@ class InnerTask
             .Replace("$(SolutionDir)", solutionDirectory);
         try
         {
-            DirectoryExtentions.Delete(replicationPath);
-            DirectoryExtentions.DuplicateDirectory(scriptPath, replicationPath);
+            DirectoryExtensions.Delete(replicationPath);
+            DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
         }
         catch (Exception exception)
         {

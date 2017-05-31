@@ -67,7 +67,7 @@ select
 from {tableName}
 where Id = @Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, Time
 from {tableName}
 where Time > @StartTime and Time <= @EndTime";
@@ -80,7 +80,7 @@ limit 1";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
@@ -131,7 +131,7 @@ select
 from {tableName}
 where Id = @Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, Time
 from {tableName}
 where Time > @StartTime and Time <= @EndTime";
@@ -144,7 +144,7 @@ order by Time";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
@@ -195,7 +195,7 @@ select
 from ""{tableName}""
 where Id = :Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, ExpireTime
 from ""{tableName}""
 where ExpireTime > :StartTime and ExpireTime <= :EndTime";
@@ -213,7 +213,7 @@ where rownum <= 1";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
