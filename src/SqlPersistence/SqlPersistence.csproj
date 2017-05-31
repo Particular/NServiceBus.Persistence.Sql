@@ -19,10 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.0.7" />
+    <PackageReference Include="Fody" Version="2.0.10" />
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="NServiceBus" Version="6.2.1" />
+    <PackageReference Include="NServiceBus" Version="6.3.2" />
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
     <PackageReference Include="Obsolete.Fody" Version="4.2.2" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
