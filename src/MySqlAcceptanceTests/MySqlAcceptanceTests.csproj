@@ -22,6 +22,7 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Configuration" />
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" />
   </ItemGroup>

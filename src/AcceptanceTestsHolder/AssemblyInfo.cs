@@ -1,3 +1,3 @@
 ﻿using NUnit.Framework;
 
-[assembly: Explicit]
+[assembly: Category("AcceptanceTestsHolder")]
