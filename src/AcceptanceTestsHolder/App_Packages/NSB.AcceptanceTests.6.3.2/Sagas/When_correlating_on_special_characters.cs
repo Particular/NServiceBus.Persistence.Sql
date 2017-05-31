@@ -6,7 +6,7 @@
     using NUnit.Framework;
     using NServiceBus.Persistence.Sql;
 
-    class When_correlating_on_special_characters : NServiceBusAcceptanceTest
+    class When_correlating_special_chars : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Saga_persistence_and_correlation_should_work()
@@ -42,14 +42,14 @@
                 public virtual string SpecialCharacterValues { get; set; }
             }
 
-            public class SagaHandlingSpecialPropertyValues :
+            public class SagaSpecialValues :
                 SqlSaga<SagaDataWithSpecialPropertyValues>,
                 IAmStartedByMessages<MessageWithSpecialPropertyValues>,
                 IHandleMessages<FollowupMessageWithSpecialPropertyValues>
             {
                 Context testContext;
 
-                public SagaHandlingSpecialPropertyValues(Context testContext)
+                public SagaSpecialValues(Context testContext)
                 {
                     this.testContext = testContext;
                 }
