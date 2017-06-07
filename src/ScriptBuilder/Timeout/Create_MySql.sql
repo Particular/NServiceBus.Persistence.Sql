@@ -11,7 +11,7 @@ set @createTable = concat('
         Headers json not null,
         PersistenceVersion varchar(23) not null,
         primary key (Id)
-    ) default charset=ascii;
+    ) default charset=utf8;
 ');
 prepare script from @createTable;
 execute script;
