@@ -27,7 +27,17 @@ public class ConfigureEndpointHelper
             foreach (var definition in sagaDefinitions)
             {
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), tablePrefix);
+                try
+                {
+                    connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), tablePrefix);
+                }
+                catch (Exception ex)
+                {
+                    if (!ex.Message.Contains("Can't DROP"))
+                    {
+                        throw; //ignore cleanup exceptions caused by async database operations
+                    }
+                }
             }
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix);
