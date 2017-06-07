@@ -20,7 +20,7 @@ public abstract class TimeoutPersisterTests
         dbConnection = GetConnection();
     }
 
-    TimeoutPersister Setup()
+    TimeoutPersister Setup(TimeSpan? cleanupInterval = null)
     {
         var name = GetTablePrefix();
         using (var connection = dbConnection())
@@ -29,11 +29,15 @@ public abstract class TimeoutPersisterTests
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
         }
+
+        var preventCleanupInterval = DateTime.UtcNow - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
+
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
             sqlVariant: sqlVariant.Convert(),
-            schema: schema);
+            schema: schema, 
+            timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval);
     }
 
     [TearDown]
@@ -149,6 +153,66 @@ public abstract class TimeoutPersisterTests
         persister.Add(timeout2, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
+        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+    }
+
+    [Test]
+    public void GetNextChunk_LowerBound()
+    {
+        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var timeout1Time = startSlice;
+        var timeout1 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout1Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var persister = Setup();
+        persister.Add(timeout1, null).Await();
+        var nextChunk = persister.GetNextChunk(startSlice).Result;
+        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+    }
+
+    [Test]
+    public void GetNextChunk_Cleanup()
+    {
+        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var timeout1Time = startSlice.AddYears(-10);
+        var timeout1 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout1Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var persister = Setup(TimeSpan.FromMinutes(2));
+        persister.Add(timeout1, null).Await();
+        var nextChunk = persister.GetNextChunk(startSlice).Result;
+        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+    }
+
+    [Test]
+    public void GetNextChunk_CleanupOnce()
+    {
+        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var timeout1Time = startSlice.AddYears(-10);
+        var timeout1 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout1Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var persister = Setup(TimeSpan.FromMinutes(2));
+        persister.Add(timeout1, null).Await();
+
+        //Call once triggering clean-up mode
+        persister.GetNextChunk(startSlice).GetAwaiter().GetResult();
+
+        //Call again to check if clean-up mode is now disabled -- expect no results
+        var nextChunk = persister.GetNextChunk(startSlice).Result;
+
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
     }
 

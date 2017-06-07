@@ -14,6 +14,9 @@
     <tags>$tags$</tags>
   </metadata>
   <files>
-    <file src="..\..\binaries\NServiceBus.Persistence.Sql.Scriptbuilder.???" target="lib\net452" />
+    <file src="..\..\binaries\netstandard\NServiceBus.Persistence.Sql.Scriptbuilder.???"
+          target="lib\netstandard1.5" />
+    <file src="..\..\binaries\netclassic\NServiceBus.Persistence.Sql.Scriptbuilder.???"
+          target="lib\net452" />
  </files>
 </package>

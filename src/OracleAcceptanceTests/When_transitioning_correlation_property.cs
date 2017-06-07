@@ -24,7 +24,7 @@
 
             using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
 
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
@@ -35,7 +35,7 @@
 
             using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
 
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
                 phase2Schema = GetSchema(connection);
@@ -45,7 +45,7 @@
 
             using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
 
                 connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
                 phase3Schema = GetSchema(connection);
@@ -155,7 +155,7 @@
             }
         }
         #endregion
-        
+
         public class StartSagaMessage : IMessage
         {
             public string OrderId { get; set; }

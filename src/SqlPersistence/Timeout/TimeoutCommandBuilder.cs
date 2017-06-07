@@ -67,10 +67,10 @@ select
 from {tableName}
 where Id = @Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, Time
 from {tableName}
-where Time between @StartTime and @EndTime";
+where Time > @StartTime and Time <= @EndTime";
 
             var nextCommandText = $@"
 select Time from {tableName}
@@ -80,7 +80,7 @@ limit 1";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
@@ -131,10 +131,10 @@ select
 from {tableName}
 where Id = @Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, Time
 from {tableName}
-where Time between @StartTime and @EndTime";
+where Time > @StartTime and Time <= @EndTime";
 
             var nextCommandText = $@"
 select top 1 Time from {tableName}
@@ -144,7 +144,7 @@ order by Time";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,
@@ -195,10 +195,10 @@ select
 from ""{tableName}""
 where Id = :Id";
 
-            var rangeComandText = $@"
+            var rangeCommandText = $@"
 select Id, ExpireTime
 from ""{tableName}""
-where ExpireTime between :StartTime and :EndTime";
+where ExpireTime > :StartTime and ExpireTime <= :EndTime";
 
             var nextCommandText = $@"
 select ExpireTime
@@ -213,7 +213,7 @@ where rownum <= 1";
             return new TimeoutCommands
             (
                 next: nextCommandText,
-                range: rangeComandText,
+                range: rangeCommandText,
                 peek: selectByIdCommandText,
                 removeBySagaId: removeBySagaIdCommandText,
                 removeById: removeByIdCommandText,

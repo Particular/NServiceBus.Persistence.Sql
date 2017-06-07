@@ -1,9 +1,7 @@
 ﻿using System.Data.Common;
 using System.Threading.Tasks;
-using Janitor;
 using NServiceBus.Outbox;
 
-[SkipWeaving]
 class SqlOutboxTransaction : OutboxTransaction
 {
     public readonly DbTransaction Transaction;

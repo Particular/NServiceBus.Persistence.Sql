@@ -16,8 +16,8 @@ class AsyncTimer : IAsyncTimer
                 try
                 {
                     var utcNow = DateTime.UtcNow;
-                    await delayStrategy(interval, token);
-                    await callback(utcNow, token);
+                    await delayStrategy(interval, token).ConfigureAwait(false);
+                    await callback(utcNow, token).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {

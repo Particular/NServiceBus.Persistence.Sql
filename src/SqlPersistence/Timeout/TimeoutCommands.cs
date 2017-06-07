@@ -18,11 +18,11 @@ namespace NServiceBus.Persistence.Sql
             RemoveBySagaId = removeBySagaId;
             Range = range;
         }
-        public readonly string RemoveById;
-        public readonly string Next;
-        public readonly string Peek;
-        public readonly string Add;
-        public readonly string RemoveBySagaId;
-        public readonly string Range;
+        public string RemoveById { get; }
+        public string Next { get; }
+        public string Peek { get; }
+        public string Add { get; }
+        public string RemoveBySagaId { get; }
+        public string Range { get; }
     }
 }

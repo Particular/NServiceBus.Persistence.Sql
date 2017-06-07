@@ -14,7 +14,7 @@ begin
   select count(*) into n from user_tables where table_name = 'THESAGA';
   if(n = 0)
   then
-    
+ 
     sqlStatement :=
        'create table "THESAGA"
        (
@@ -58,7 +58,7 @@ select data_type ||
         end || ')'
     end
   end into dataType
-from all_tab_columns 
+from all_tab_columns
 where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
 
 if(dataType <> 'NVARCHAR2(200)')

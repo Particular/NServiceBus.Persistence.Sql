@@ -19,7 +19,7 @@ public class AsyncTimerTests
             errorCallbackInvoked.SetResult(true);
         }, Task.Delay);
 
-        Assert.IsTrue(await errorCallbackInvoked.Task);
+        Assert.IsTrue(await errorCallbackInvoked.Task.ConfigureAwait(false));
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class AsyncTimerTests
             exceptionThrown = true;
         }, Task.Delay);
 
-        Assert.IsTrue(await callbackInvokedAfterError.Task);
+        Assert.IsTrue(await callbackInvokedAfterError.Task.ConfigureAwait(false));
     }
 
     [Test]
@@ -66,15 +66,15 @@ public class AsyncTimerTests
             delayStarted.SetResult(true);
             try
             {
-                await Task.Delay(delayTime, token);
+                await Task.Delay(delayTime, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
                 waitCancelled = true;
             }
         });
-        await delayStarted.Task;
-        await timer.Stop();
+        await delayStarted.Task.ConfigureAwait(false);
+        await timer.Stop().ConfigureAwait(false);
 
         Assert.IsTrue(waitCancelled);
     }
@@ -90,7 +90,7 @@ public class AsyncTimerTests
         timer.Start(async (time, token) =>
         {
             callbackStarted.SetResult(true);
-            await stopInitiated.Task;
+            await stopInitiated.Task.ConfigureAwait(false);
             if (token.IsCancellationRequested)
             {
                 callbackCancelled = true;
@@ -100,10 +100,10 @@ public class AsyncTimerTests
             //noop
         }, Task.Delay);
 
-        await callbackStarted.Task;
+        await callbackStarted.Task.ConfigureAwait(false);
         var stopTask = timer.Stop();
         stopInitiated.SetResult(true);
-        await stopTask;
+        await stopTask.ConfigureAwait(false);
         Assert.IsTrue(callbackCancelled);
     }
 
@@ -124,15 +124,15 @@ public class AsyncTimerTests
             //noop
         }, Task.Delay);
 
-        await callbackTaskStarted.Task;
+        await callbackTaskStarted.Task.ConfigureAwait(false);
 
         var stopTask = timer.Stop();
         var delayTask = Task.Delay(1000);
 
-        var firstToComplete = await Task.WhenAny(stopTask, delayTask);
+        var firstToComplete = await Task.WhenAny(stopTask, delayTask).ConfigureAwait(false);
         Assert.AreEqual(delayTask, firstToComplete);
         callbackCompleted.SetResult(true);
 
-        await stopTask;
+        await stopTask.ConfigureAwait(false);
     }
 }

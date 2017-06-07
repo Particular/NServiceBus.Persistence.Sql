@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 class CommandWrapper : IDisposable
 {
     protected DbCommand command;
+    int disposeSignaled;
 
     public CommandWrapper(DbCommand command)
     {
@@ -64,7 +65,13 @@ class CommandWrapper : IDisposable
         return command.ExecuteNonQueryEx(cancellationToken);
     }
 
-    public virtual void Dispose()
+    public void Dispose()
     {
+        if (Interlocked.Exchange(ref disposeSignaled, 1) != 0)
+        {
+            return;
+        }
+        var temp = Interlocked.Exchange(ref command, null);
+        temp?.Dispose();
     }
 }

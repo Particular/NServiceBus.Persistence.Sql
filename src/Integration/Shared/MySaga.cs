@@ -7,7 +7,7 @@ using NServiceBus.Persistence.Sql;
 public class MySaga : SqlSaga<MySaga.SagaData>,
     IAmStartedByMessages<StartSagaMessage>,
     IHandleMessages<CompleteSagaMessage>,
-    IHandleTimeouts<SagaTimoutMessage>
+    IHandleTimeouts<SagaTimeoutMessage>
 {
     static ILog logger = LogManager.GetLogger(typeof(MySaga));
 
@@ -33,14 +33,14 @@ public class MySaga : SqlSaga<MySaga.SagaData>,
     public Task Handle(CompleteSagaMessage message, IMessageHandlerContext context)
     {
         logger.Info($"Completed Saga. Data.MySagaId:{Data.MySagaId}. Message.MySagaId:{message.MySagaId}");
-        var timeout = new SagaTimoutMessage
+        var timeout = new SagaTimeoutMessage
         {
             Property = "PropertyValue"
         };
         return RequestTimeout(context, TimeSpan.FromSeconds(1), timeout);
     }
 
-    public Task Timeout(SagaTimoutMessage state, IMessageHandlerContext context)
+    public Task Timeout(SagaTimeoutMessage state, IMessageHandlerContext context)
     {
         logger.Info($"Timeout {state.Property}");
         MarkAsComplete();

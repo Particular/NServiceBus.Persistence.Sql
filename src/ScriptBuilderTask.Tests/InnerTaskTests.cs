@@ -12,7 +12,7 @@ class InnerTaskTests
     {
         var testDirectory = TestContext.CurrentContext.TestDirectory;
         var temp = Path.Combine(testDirectory, "InnerTaskTemp");
-        DirectoryExtentions.Delete(temp);
+        DirectoryExtensions.Delete(temp);
         var assemblyPath = Path.Combine(testDirectory, "ScriptBuilderTask.Tests.Target.dll");
         var intermediatePath = Path.Combine(temp, "IntermediatePath");
         var promotePath = Path.Combine(temp, "PromotePath");

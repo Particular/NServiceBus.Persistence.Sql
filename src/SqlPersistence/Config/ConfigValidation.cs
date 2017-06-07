@@ -20,4 +20,3 @@ static class ConfigValidation
         }
     }
 }
-

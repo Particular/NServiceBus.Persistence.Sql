@@ -12,7 +12,6 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public SqlPersistence()
         {
-            
             Defaults(s =>
             {
                 // always enable these ones since they will only enable if the outbox or sagas are on

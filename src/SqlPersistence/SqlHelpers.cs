@@ -9,7 +9,7 @@ static class SqlHelpers
     {
         foreach (var script in scripts)
         {
-            await connection.ExecuteTableCommand(transaction, script, tablePrefix, schema);
+            await connection.ExecuteTableCommand(transaction, script, tablePrefix, schema).ConfigureAwait(false);
         }
     }
 
@@ -17,7 +17,7 @@ static class SqlHelpers
     {
         foreach (var script in scripts)
         {
-            await connection.ExecuteTableCommand(transaction, script);
+            await connection.ExecuteTableCommand(transaction, script).ConfigureAwait(false);
         }
     }
 
@@ -31,7 +31,7 @@ static class SqlHelpers
             command.CommandText = script;
             command.AddParameter("tablePrefix", tablePrefix);
             command.AddParameter("schema", schema);
-            await command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
 
@@ -42,7 +42,7 @@ static class SqlHelpers
             command.Transaction = transaction;
             command.CommandText = script;
             command.AddParameter("tablePrefix", tablePrefix);
-            await command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
 
@@ -52,7 +52,7 @@ static class SqlHelpers
         {
             command.Transaction = transaction;
             command.CommandText = script;
-            await command.ExecuteNonQueryEx();
+            await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
 }

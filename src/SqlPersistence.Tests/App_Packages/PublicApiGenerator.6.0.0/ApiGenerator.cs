@@ -213,11 +213,11 @@ namespace PublicApiGenerator
                 else
                     declaration.BaseTypes.Add(CreateCodeTypeReference(publicType.BaseType));
             }
-            foreach(var @interface in publicType.Interfaces.OrderBy(i => i.FullName)
-                .Select(t => new { Reference = t, Definition = t.Resolve() })
+            foreach(var @interface in publicType.Interfaces.OrderBy(i => i.InterfaceType.FullName)
+                .Select(t => new { Reference = t, Definition = t.InterfaceType.Resolve() })
                 .Where(t => ShouldIncludeType(t.Definition))
                 .Select(t => t.Reference))
-                declaration.BaseTypes.Add(CreateCodeTypeReference(@interface));
+                declaration.BaseTypes.Add(CreateCodeTypeReference(@interface.InterfaceType));
 
             foreach (var memberInfo in publicType.GetMembers().Where(ShouldIncludeMember).OrderBy(m => m.Name))
                 AddMemberToTypeDeclaration(declaration, memberInfo);
@@ -584,7 +584,7 @@ namespace PublicApiGenerator
             if (typeDefinition.IsInterface)
             {
                 var interfaceMethods = from @interfaceReference in typeDefinition.Interfaces
-                    let interfaceDefinition = @interfaceReference.Resolve()
+                    let interfaceDefinition = @interfaceReference.InterfaceType.Resolve()
                     where interfaceDefinition != null
                     select interfaceDefinition.Methods;
 

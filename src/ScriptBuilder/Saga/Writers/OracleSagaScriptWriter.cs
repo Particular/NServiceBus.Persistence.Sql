@@ -76,7 +76,7 @@ select data_type ||
         end || ')'
     end
   end into dataType
-from all_tab_columns 
+from all_tab_columns
 where table_name = '{tableName}' and column_name = '{name}';
 
 if(dataType <> '{columnType}')
@@ -143,7 +143,7 @@ end if;
   select count(*) into n from user_tables where table_name = '{tableName}';
   if(n = 0)
   then
-    
+ 
     sqlStatement :=
        'create table ""{tableName}""
        (
@@ -196,9 +196,8 @@ end;
     string CreateSagaIndexName(string sagaName, string correlationPropertyName)
     {
         var sb = new StringBuilder("SAGAIDX_", 30);
-
         var clearText = Encoding.UTF8.GetBytes($"{sagaName}/{correlationPropertyName}");
-        using (var sha1 = new SHA1CryptoServiceProvider())
+        using (var sha1 = SHA1.Create())
         {
             var hashBytes = sha1.ComputeHash(clearText);
             // SHA1 hash contains 20 bytes, but only have space in 30 char index name for 11 bytes => 22 chars

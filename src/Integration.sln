@@ -1,0 +1,40 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 15.0.26403.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Integration\Shared\Shared.csproj", "{595E1284-D95D-47ED-8A59-43BB17123BE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlSample", "Integration\MySqlSample\MySqlSample.csproj", "{785A51DE-68BA-44E5-8727-7C0D57D38B0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSample", "Integration\SqlServerSample\SqlServerSample.csproj", "{CC7CDF07-B297-4C7D-913F-2A83724DE01F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleSample", "Integration\OracleSample\OracleSample.csproj", "{E7089FA4-6E0E-443E-B6B3-86D07B092A52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{595E1284-D95D-47ED-8A59-43BB17123BE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{785A51DE-68BA-44E5-8727-7C0D57D38B0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC7CDF07-B297-4C7D-913F-2A83724DE01F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC7CDF07-B297-4C7D-913F-2A83724DE01F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC7CDF07-B297-4C7D-913F-2A83724DE01F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC7CDF07-B297-4C7D-913F-2A83724DE01F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

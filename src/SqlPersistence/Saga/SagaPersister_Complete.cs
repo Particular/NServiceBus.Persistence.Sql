@@ -22,7 +22,7 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("Concurrency", concurrency);
-            await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
     }
 }

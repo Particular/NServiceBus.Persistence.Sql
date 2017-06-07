@@ -177,8 +177,6 @@ set @createTable = '
 exec(@createTable);
 end
 ");
-        //TODO: move Originator and OriginalMessageId into metadata dictionary
-
     }
 
     public void WriteDropTable()
