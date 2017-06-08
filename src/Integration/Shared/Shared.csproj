@@ -1,14 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
-    <AssemblyName>Shared</AssemblyName>
-    <PackageId>Shared</PackageId>
-    <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="NServiceBus" Version="6.3.2" />
@@ -16,8 +11,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SolutionDir)ForIntegration\NServiceBus.Persistence.Sql.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <Import Project="$(SolutionDir)ForIntegration\build\NServiceBus.Persistence.Sql.MsBuild.targets" />
 </Project>

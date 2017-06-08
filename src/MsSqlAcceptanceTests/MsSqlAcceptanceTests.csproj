@@ -1,20 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
     <AssemblyName>MsSqlAcceptanceTests</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="NServiceBus" Version="6.3.2" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.3.2" />
     <PackageReference Include="NUnit" Version="3.7.0" />
-    <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
@@ -25,5 +21,4 @@
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" />
   </ItemGroup>
-
 </Project>

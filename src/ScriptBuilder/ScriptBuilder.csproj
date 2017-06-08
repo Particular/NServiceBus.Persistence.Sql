@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
@@ -11,13 +10,11 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
-    <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>CS1591</NoWarn>
     <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="ILRepack" Version="2.0.13" />
@@ -31,11 +28,9 @@
     <EmbeddedResource Include="Subscription\*.sql" />
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
   </ItemGroup>
-
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
        <Output TaskParameter="Include" ItemName="MonoCecilRef" />

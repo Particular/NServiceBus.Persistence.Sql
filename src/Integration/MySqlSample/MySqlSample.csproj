@@ -1,17 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
     <AssemblyName>MySqlSample</AssemblyName>
     <PackageId>MySqlSample</PackageId>
-    <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <OutputType>exe</OutputType>
   </PropertyGroup>
-
   <ItemGroup>
-    <None Include="App.config" />
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="NServiceBus" Version="6.3.2" />
@@ -23,5 +19,4 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
 </Project>
