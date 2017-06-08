@@ -1,18 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
-    <AssemblyName>SqlPersistence.Tests</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="ApprovalTests" Version="3.0.13" />
     <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
@@ -25,13 +21,10 @@
     <PackageReference Include="ObjectApproval" Version="1.6.0" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
     <PackageReference Include="PublicApiGenerator" Version="6.0.0" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
   </ItemGroup>
-
 </Project>
