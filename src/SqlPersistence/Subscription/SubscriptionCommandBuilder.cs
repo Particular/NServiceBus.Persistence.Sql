@@ -52,7 +52,7 @@ namespace NServiceBus.Persistence.Sql
                 case SqlVariant.MsSqlServer:
                     return $@"
 declare @dummy int;
-merge {tableName} with (holdlock) as target
+merge {tableName} with (holdlock, tablock) as target
 using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
 on target.Endpoint = source.Endpoint and
    target.Subscriber = source.Subscriber and

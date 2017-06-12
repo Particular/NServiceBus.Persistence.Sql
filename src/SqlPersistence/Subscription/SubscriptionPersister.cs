@@ -32,16 +32,19 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        await Retry(async () =>
         {
-            command.CommandText = subscriptionCommands.Subscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
-        }
+            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var command = commandBuilder.CreateCommand(connection))
+            {
+                command.CommandText = subscriptionCommands.Subscribe;
+                command.AddParameter("MessageType", messageType.TypeName);
+                command.AddParameter("Subscriber", subscriber.TransportAddress);
+                command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
+                command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+                await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            }
+        }).ConfigureAwait(false);
         ClearForMessageType(messageType);
     }
 
@@ -52,15 +55,41 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        await Retry(async () =>
         {
-            command.CommandText = subscriptionCommands.Unsubscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
-        }
+            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var command = commandBuilder.CreateCommand(connection))
+            {
+                command.CommandText = subscriptionCommands.Unsubscribe;
+                command.AddParameter("MessageType", messageType.TypeName);
+                command.AddParameter("Subscriber", subscriber.TransportAddress);
+                await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            }
+        }).ConfigureAwait(false);
         ClearForMessageType(messageType);
+    }
+
+    static async Task Retry(Func<Task> action)
+    {
+        var attempts = 0;
+        while (true)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+                return;
+            }
+            catch (Exception)
+            {
+                attempts++;
+
+                if (attempts > 10)
+                {
+                    throw;
+                }
+                await Task.Delay(100).ConfigureAwait(false);
+            }
+        }
     }
 
     void ClearForMessageType(MessageType messageType)
