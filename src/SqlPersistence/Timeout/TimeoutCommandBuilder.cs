@@ -25,7 +25,7 @@ namespace NServiceBus.Persistence.Sql
 
         static TimeoutCommands BuildMySqlCommands(string tableName)
         {
-            string insertCommandText = $@"
+            var insertCommandText = $@"
 insert into {tableName}
 (
     Id,
@@ -47,18 +47,18 @@ values
     @PersistenceVersion
 )";
 
-            string removeByIdCommandText = $@"
+            var removeByIdCommandText = $@"
 set @sagaId := (select SagaId from {tableName} where Id = @Id);
 delete from {tableName}
 where Id = @Id;
 select @sagaId;";
 
 
-            string removeBySagaIdCommandText = $@"
+            var removeBySagaIdCommandText = $@"
 delete from {tableName}
 where SagaId = @SagaId";
 
-            string selectByIdCommandText = $@"
+            var selectByIdCommandText = $@"
 select
     Destination,
     SagaId,
@@ -68,12 +68,12 @@ select
 from {tableName}
 where Id = @Id";
 
-            string rangeComandText = $@"
+            var rangeComandText = $@"
 select Id, Time
 from {tableName}
 where Time between @StartTime and @EndTime";
 
-            string nextCommandText = $@"
+            var nextCommandText = $@"
 select Time from {tableName}
 where Time > @EndTime
 order by Time
@@ -91,7 +91,7 @@ limit 1";
 
         static TimeoutCommands BuildSqlServerCommands(string tableName)
         {
-            string insertCommandText = $@"
+            var insertCommandText = $@"
 insert into {tableName}
 (
     Id,
@@ -113,17 +113,17 @@ values
     @PersistenceVersion
 )";
 
-            string removeByIdCommandText = $@"
+            var removeByIdCommandText = $@"
 delete from {tableName}
 output deleted.SagaId
 where Id = @Id";
 
 
-            string removeBySagaIdCommandText = $@"
+            var removeBySagaIdCommandText = $@"
 delete from {tableName}
 where SagaId = @SagaId";
 
-            string selectByIdCommandText = $@"
+            var selectByIdCommandText = $@"
 select
     Destination,
     SagaId,
@@ -133,12 +133,12 @@ select
 from {tableName}
 where Id = @Id";
 
-            string rangeComandText = $@"
+            var rangeComandText = $@"
 select Id, Time
 from {tableName}
 where Time between @StartTime and @EndTime";
 
-            string nextCommandText = $@"
+            var nextCommandText = $@"
 select top 1 Time from {tableName}
 where Time > @EndTime
 order by Time";
