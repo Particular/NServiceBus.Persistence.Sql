@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -61,7 +62,8 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
-        var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result;
+        persister.Subscribe(new Subscriber("e@machine3", null), type2, null).Await();
+        var result = persister.GetSubscriberAddressesForMessage(messageTypes, null).Result.OrderBy(s => s.TransportAddress);
         ObjectApprover.VerifyWithJson(result);
     }
 
