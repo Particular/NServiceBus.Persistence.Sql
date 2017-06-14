@@ -74,6 +74,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
+        persister.Subscribe(new Subscriber("e@machine3", null), type2, null).Await();
         var result = persister.GetSubscribers(type1,type2).Result;
         ObjectApprover.VerifyWithJson(result);
     }
