@@ -6,5 +6,9 @@
   {
     "TransportAddress": "e@machine2",
     "Endpoint": "endpoint"
+  },
+  {
+    "TransportAddress": "e@machine3",
+    "Endpoint": null
   }
 ]
