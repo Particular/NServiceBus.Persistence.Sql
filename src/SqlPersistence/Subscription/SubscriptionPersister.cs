@@ -38,11 +38,16 @@ class SubscriptionPersister : ISubscriptionStorage
             command.CommandText = subscriptionCommands.Subscribe;
             command.AddParameter("MessageType", messageType.TypeName);
             command.AddParameter("Subscriber", subscriber.TransportAddress);
-            command.AddParameter("Endpoint", subscriber.Endpoint);
+            command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
         ClearForMessageType(messageType);
+    }
+
+    static object Nullable(object value)
+    {
+        return value ?? DBNull.Value;
     }
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
