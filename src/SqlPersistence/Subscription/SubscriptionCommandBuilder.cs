@@ -70,7 +70,7 @@ on duplicate key update
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
 
-            string unsubscribeCommandText = $@"
+            var unsubscribeCommandText = $@"
 delete from {tableName}
 where
     Subscriber = @Subscriber and

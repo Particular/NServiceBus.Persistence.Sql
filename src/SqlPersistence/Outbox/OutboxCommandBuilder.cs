@@ -12,7 +12,7 @@
         public static OutboxCommands Build(SqlVariant sqlVariant, string tablePrefix)
         {
             var tableName = $@"{tablePrefix}OutboxData";
-            string storeCommandText = $@"
+            var storeCommandText = $@"
 insert into {tableName}
 (
     MessageId,
@@ -26,17 +26,17 @@ values
     @PersistenceVersion
 )";
 
-            string cleanupCommandText = $@"
+            var cleanupCommandText = $@"
 delete from {tableName} where Dispatched = 1 And DispatchedAt < @Date";
 
-            string getCommandText = $@"
+            var getCommandText = $@"
 select
     Dispatched,
     Operations
 from {tableName}
 where MessageId = @MessageId";
 
-            string setAsDispatchedCommandText = $@"
+            var setAsDispatchedCommandText = $@"
 update {tableName}
 set
     Dispatched = 1,
