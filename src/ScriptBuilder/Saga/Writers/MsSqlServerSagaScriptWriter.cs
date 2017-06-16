@@ -56,7 +56,8 @@ set @dataType_{name} = (
   from information_schema.columns
   where
     table_name = ' + @tableName + N' and
-    column_name = 'Correlation_{name}'
+    column_name = 'Correlation_{name}' and
+    table_schema = schema_name()
 );
 if (@dataType_{name} <> '{columnType}')
   begin
@@ -109,7 +110,8 @@ select @dropPropertiesQuery =
     from information_schema.columns
     where
         table_name = @tableName and
-        column_name like 'Correlation_%'{builder}
+        column_name like 'Correlation_%'{builder} and
+        table_schema = schema_name()
 );
 exec sp_executesql @dropPropertiesQuery
 ");
@@ -135,7 +137,7 @@ select @dropIndexQuery =
     select 'drop index ' + name + ' on ' + @tableName + ';'
     from sysindexes
     where
-        Id = (select object_id from sys.objects where name = @tableName) and
+        Id = (select object_id from sys.objects where name = @tableName and schema_id = schema_id(schema_name())) and
         Name is not null and
         Name like 'Index_Correlation_%'{builder}
 );
