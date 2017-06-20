@@ -28,7 +28,8 @@
 
   <Target
       BeforeTargets="GetCopyToOutputDirectoryItems"
-      Name="AddScriptsToGetCopyToOutputDirectoryItems">
+      Name="AddScriptsToGetCopyToOutputDirectoryItems"
+      Condition="'$(DesignTimeBuild)' != 'true'">
     <PropertyGroup>
       <ScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</ScriptDirectory>
     </PropertyGroup>
