@@ -7,7 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
+    <PackageReference Include="NServiceBus" Version="6.3.4" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 </Project>

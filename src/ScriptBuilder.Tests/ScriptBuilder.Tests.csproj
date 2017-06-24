@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.0.3660.1" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
+    <PackageReference Include="NServiceBus" Version="6.3.4" />
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="ObjectApproval" Version="1.6.0" />
     <PackageReference Include="PublicApiGenerator" Version="6.0.0" />
