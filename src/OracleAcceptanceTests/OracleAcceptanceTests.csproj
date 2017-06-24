@@ -8,10 +8,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.3.2" />
-    <PackageReference Include="NUnit" Version="3.7.0" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.24160719" />
+    <PackageReference Include="NServiceBus" Version="6.3.4" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.3.4" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
