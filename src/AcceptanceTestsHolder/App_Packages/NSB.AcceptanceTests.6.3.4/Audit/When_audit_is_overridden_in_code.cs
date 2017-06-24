@@ -5,6 +5,7 @@
     using EndpointTemplates;
     using NUnit.Framework;
 
+    [Explicit]
     public class When_audit_is_overridden_in_code : NServiceBusAcceptanceTest
     {
         [Test]

@@ -7,6 +7,7 @@
     using NUnit.Framework;
 
     [TestFixture]
+    [Explicit]
     public class When_running_saga_tests : NServiceBusAcceptanceTest
     {
         [Test]

@@ -7,6 +7,7 @@
     using Features;
     using NUnit.Framework;
 
+    [Explicit]
     public class When_auditing : NServiceBusAcceptanceTest
     {
         [Test]

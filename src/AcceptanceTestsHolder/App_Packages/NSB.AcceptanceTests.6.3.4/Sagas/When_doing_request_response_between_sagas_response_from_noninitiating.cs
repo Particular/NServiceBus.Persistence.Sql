@@ -6,8 +6,9 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
-    public class When_doing_request_response_between_sagas_response_from_noninitiating : NServiceBusAcceptanceTest
+    public partial class When_doing_request_response_between_sagas_response_from_noninitiating : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_autocorrelate_the_response_back()
@@ -32,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestResponseRequestingSaga2 : Saga<RequestResponseRequestingSaga2.RequestResponseRequestingSagaData2>,
+            public class RequestResponseRequestingSaga2 : SqlSaga<RequestResponseRequestingSaga2.RequestResponseRequestingSagaData2>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -55,10 +56,11 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<RequestResponseRequestingSagaData2> mapper)
+                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData2.CorrIdForResponse);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id).ToSaga(s => s.CorrIdForResponse);
-                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId).ToSaga(s => s.CorrIdForResponse);
+                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id);
+                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
                 public class RequestResponseRequestingSagaData2 : ContainSagaData
@@ -67,7 +69,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
 
-            public class RequestResponseRespondingSaga2 : Saga<RequestResponseRespondingSaga2.RequestResponseRespondingSagaData2>,
+            public class RequestResponseRespondingSaga2 : SqlSaga<RequestResponseRespondingSaga2.RequestResponseRespondingSagaData2>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
                 IHandleMessages<SendReplyFromNonInitiatingHandler>
             {
@@ -90,11 +92,12 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     });
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<RequestResponseRespondingSagaData2> mapper)
+                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData2.CorrIdForRequest);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs).ToSaga(s => s.CorrIdForRequest);
+                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                     //this line is just needed so we can test the non initiating handler case
-                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate).ToSaga(s => s.CorrIdForRequest);
+                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
                 }
 
                 public class RequestResponseRespondingSagaData2 : ContainSagaData
