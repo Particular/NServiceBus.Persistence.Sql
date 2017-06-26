@@ -7,7 +7,6 @@
     <authors>$authors$</authors>
     <owners>$owners$</owners>
     <licenseUrl>$licenseUrl$</licenseUrl>
-    <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <iconUrl>$iconUrl$</iconUrl>
     <description>Sql Server persistence for NServiceBus.</description>

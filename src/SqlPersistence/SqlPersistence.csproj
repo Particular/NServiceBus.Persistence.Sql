@@ -20,7 +20,7 @@
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NServiceBus" Version="6.3.4" />
-    <PackageReference Include="NuGetPackager" Version="0.6.3" />
+    <PackageReference Include="NuGetPackager" Version="0.6.4" />
     <PackageReference Include="Obsolete.Fody" Version="4.2.2" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
     <Compile Include="..\Guard.cs" />
