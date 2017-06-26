@@ -41,9 +41,8 @@ static class SagaDefinitionReader
 
     static string GetCorrelationPropertyName(TypeDefinition type)
     {
-        string value;
         var property = type.GetProperty("CorrelationPropertyName");
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out string value))
         {
             return value;
         }
@@ -56,13 +55,11 @@ When all messages are mapped using finders then use the following: protected ove
 
     static string GetTransitionalCorrelationPropertyName(TypeDefinition type)
     {
-        string value;
-        PropertyDefinition property;
-        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out property))
+        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out PropertyDefinition property))
         {
             return null;
         }
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out string value))
         {
             return value;
         }
@@ -73,13 +70,11 @@ For example: protected override string TransitionalCorrelationPropertyName => na
 
     static string GetTableSuffix(TypeDefinition type)
     {
-        string value;
-        PropertyDefinition property;
-        if (!type.TryGetProperty("TableSuffix", out property))
+        if (!type.TryGetProperty("TableSuffix", out PropertyDefinition property))
         {
             return null;
         }
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out string value))
         {
             return value;
         }

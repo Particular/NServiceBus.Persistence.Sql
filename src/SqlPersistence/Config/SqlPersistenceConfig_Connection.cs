@@ -21,8 +21,7 @@ namespace NServiceBus
 
         internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings)
         {
-            Func<DbConnection> value;
-            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out value))
+            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out Func<DbConnection> value))
             {
                 return value;
             }

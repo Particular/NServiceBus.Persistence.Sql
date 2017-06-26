@@ -127,8 +127,7 @@ class SubscriptionPersister : ISubscriptionStorage
         {
             if (cacheKey.Contains(keyPart))
             {
-                CacheItem cacheItem;
-                Cache.TryRemove(cacheKey, out cacheItem);
+                Cache.TryRemove(cacheKey, out CacheItem _);
             }
         }
     }
