@@ -21,8 +21,7 @@
             var subscriptionMessageType = GetSubscriptionMessageTypeFrom(context.Message);
             if (subscriptionMessageType != null)
             {
-                string returnAddress;
-                if (!context.Message.Headers.TryGetValue(Headers.SubscriberTransportAddress, out returnAddress))
+                if (!context.Message.Headers.TryGetValue(Headers.SubscriberTransportAddress, out string returnAddress))
                 {
                     context.Message.Headers.TryGetValue(Headers.ReplyToAddress, out returnAddress);
                 }
@@ -43,8 +42,7 @@
 
         static string GetSubscriptionMessageTypeFrom(IncomingMessage msg)
         {
-            string headerValue;
-            return msg.Headers.TryGetValue(Headers.SubscriptionMessageType, out headerValue) ? headerValue : null;
+            return msg.Headers.TryGetValue(Headers.SubscriptionMessageType, out string headerValue) ? headerValue : null;
         }
 
         Action<SubscriptionEventArgs, TContext> action;

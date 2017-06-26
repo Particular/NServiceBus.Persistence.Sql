@@ -23,8 +23,7 @@ namespace NServiceBus
 
         internal static string GetSchema(this ReadOnlySettings settings)
         {
-            string schema;
-            if (settings.TryGet("SqlPersistence.Schema", out schema))
+            if (settings.TryGet("SqlPersistence.Schema", out string schema))
             {
                 return schema;
             }

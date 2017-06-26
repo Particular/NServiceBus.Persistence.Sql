@@ -8,8 +8,7 @@ static class ReadOnlySettingsExtensions
         where TStorageType : StorageType
     {
         var key = $"SqlPersistence.{typeof(TStorageType).Name}.{suffix}";
-        TValue value;
-        if (settings.TryGet(key, out value))
+        if (settings.TryGet(key, out TValue value))
         {
             return value;
         }

@@ -20,8 +20,7 @@ namespace NServiceBus
 
         static bool GetDisableInstaller(this ReadOnlySettings settings)
         {
-            bool value;
-            if (settings.TryGet("SqlPersistence.DisableInstaller", out value))
+            if (settings.TryGet("SqlPersistence.DisableInstaller", out bool value))
             {
                 return value;
             }

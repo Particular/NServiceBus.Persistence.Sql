@@ -32,8 +32,7 @@ partial class SagaPersister : ISagaPersister
 
     static int GetConcurrency(ContextBag context)
     {
-        int concurrency;
-        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
+        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out int concurrency))
         {
             throw new Exception("Cannot save saga because optimistic concurrency version is missing in the context.");
         }

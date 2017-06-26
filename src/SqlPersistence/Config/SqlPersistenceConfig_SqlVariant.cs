@@ -18,8 +18,7 @@ namespace NServiceBus
 
         internal static SqlVariant GetSqlVariant(this ReadOnlySettings settings)
         {
-            SqlVariant value;
-            if (settings.TryGet("SqlPersistence.SqlVariant", out value))
+            if (settings.TryGet("SqlPersistence.SqlVariant", out SqlVariant value))
             {
                 return value;
             }

@@ -35,19 +35,16 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        SqlConnection existingSqlConnection;
-        SqlTransaction existingSqlTransaction;
         //SQL server transport in native TX mode
-        if (transportTransaction.TryGet(out existingSqlConnection) &&
-            transportTransaction.TryGet(out existingSqlTransaction))
+        if (transportTransaction.TryGet(out SqlConnection existingSqlConnection) &&
+            transportTransaction.TryGet(out SqlTransaction existingSqlTransaction))
         {
             return new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
         }
 
         // Transport supports DTC and uses TxScope owned by the transport
-        Transaction transportTx;
         var scopeTx = Transaction.Current;
-        if (transportTransaction.TryGet(out transportTx) &&
+        if (transportTransaction.TryGet(out Transaction transportTx) &&
             scopeTx != null &&
             transportTx != scopeTx)
         {

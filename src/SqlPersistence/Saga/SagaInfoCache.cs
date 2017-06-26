@@ -44,27 +44,26 @@ class SagaInfoCache
         Initialize(metadataCollection);
     }
 
-     void Initialize(SagaMetadataCollection metadataCollection)
-     {
-         foreach (var metadata in metadataCollection)
-         {
-             RuntimeSagaInfo existing;
-             var sagaDataType = metadata.SagaEntityType;
-             if (cache.TryGetValue(sagaDataType, out existing))
-             {
-                 throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
-             }
-             cache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
-         }
-      }
+    void Initialize(SagaMetadataCollection metadataCollection)
+    {
+        foreach (var metadata in metadataCollection)
+        {
+            var sagaDataType = metadata.SagaEntityType;
+            if (cache.TryGetValue(sagaDataType, out RuntimeSagaInfo existing))
+            {
+                throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
+            }
+            cache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
+        }
+    }
+
     public RuntimeSagaInfo GetInfo(Type sagaDataType)
     {
-         RuntimeSagaInfo value;
-         if (cache.TryGetValue(sagaDataType, out value))
-         {
-             return value;
-         }
-         throw new Exception($"Could not find RuntimeSagaInfo for {sagaDataType.FullName}.");
+        if (cache.TryGetValue(sagaDataType, out RuntimeSagaInfo value))
+        {
+            return value;
+        }
+        throw new Exception($"Could not find RuntimeSagaInfo for {sagaDataType.FullName}.");
     }
 
     RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)

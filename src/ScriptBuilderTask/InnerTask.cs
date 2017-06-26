@@ -37,8 +37,7 @@ class InnerTask
 
     void PromoteFiles(ModuleDefinition moduleDefinition, string scriptPath)
     {
-        string customPath;
-        if (!ScriptPromotionPathReader.TryRead(moduleDefinition, out customPath))
+        if (!ScriptPromotionPathReader.TryRead(moduleDefinition, out string customPath))
         {
             return;
         }
