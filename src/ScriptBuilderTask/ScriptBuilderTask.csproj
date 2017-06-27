@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
-    <PackageReference Include="NuGetPackager" Version="0.6.3" />
+    <PackageReference Include="NuGetPackager" Version="0.6.5" />
   </ItemGroup>
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
