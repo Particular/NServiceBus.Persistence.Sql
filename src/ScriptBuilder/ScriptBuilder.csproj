@@ -29,7 +29,7 @@
     <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="NuGetPackager" Version="0.6.4" />
+    <PackageReference Include="NuGetPackager" Version="0.6.5" />
   </ItemGroup>
   <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
