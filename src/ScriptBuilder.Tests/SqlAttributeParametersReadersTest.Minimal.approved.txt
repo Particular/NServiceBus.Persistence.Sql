@@ -1,8 +1,6 @@
 ﻿{
   "BuildVariants": [
-    "MsSqlServer",
-    "MySql",
-    "Oracle"
+    "MsSqlServer"
   ],
   "ScriptPromotionPath": null,
   "ProduceOutboxScripts": true,

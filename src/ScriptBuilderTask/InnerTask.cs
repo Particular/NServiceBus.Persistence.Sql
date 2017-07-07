@@ -53,7 +53,7 @@ class InnerTask
 
     void PromoteFiles(string scriptPath, Settings settings)
     {
-        if (settings.ScriptPromotionPath==null)
+        if (settings.ScriptPromotionPath == null)
         {
             return;
         }

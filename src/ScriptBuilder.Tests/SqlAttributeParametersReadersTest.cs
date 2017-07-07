@@ -7,9 +7,9 @@ public class SqlAttributeParametersReadersTest
 {
 
     [Test]
-    public void Defaults()
+    public void Minimal()
     {
-        var result = SettingsAttributeReader.Read(
+        var result = SettingsAttributeReader.ReadFromAttribute(
             new CustomAttributeMock(
                 new Dictionary<string, object>
                 {
@@ -22,9 +22,16 @@ public class SqlAttributeParametersReadersTest
     }
 
     [Test]
+    public void Defaults()
+    {
+        var result = SettingsAttributeReader.ReadFromAttribute(null);
+        ObjectApprover.VerifyWithJson(result);
+    }
+
+    [Test]
     public void NonDefaults()
     {
-        var result = SettingsAttributeReader.Read(
+        var result = SettingsAttributeReader.ReadFromAttribute(
             new CustomAttributeMock(
                 new Dictionary<string, object>
                 {

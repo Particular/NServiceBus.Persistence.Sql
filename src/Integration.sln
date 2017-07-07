@@ -1,15 +1,16 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 15.0.26403.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Integration\Shared\Shared.csproj", "{595E1284-D95D-47ED-8A59-43BB17123BE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Integration\Shared\Shared.csproj", "{595E1284-D95D-47ED-8A59-43BB17123BE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlSample", "Integration\MySqlSample\MySqlSample.csproj", "{785A51DE-68BA-44E5-8727-7C0D57D38B0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySqlSample", "Integration\MySqlSample\MySqlSample.csproj", "{785A51DE-68BA-44E5-8727-7C0D57D38B0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSample", "Integration\SqlServerSample\SqlServerSample.csproj", "{CC7CDF07-B297-4C7D-913F-2A83724DE01F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServerSample", "Integration\SqlServerSample\SqlServerSample.csproj", "{CC7CDF07-B297-4C7D-913F-2A83724DE01F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleSample", "Integration\OracleSample\OracleSample.csproj", "{E7089FA4-6E0E-443E-B6B3-86D07B092A52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleSample", "Integration\OracleSample\OracleSample.csproj", "{E7089FA4-6E0E-443E-B6B3-86D07B092A52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PartialScriptsSample", "Integration\PartialScriptsSample\PartialScriptsSample.csproj", "{A8C2B62B-E287-4444-B20D-434F25ED4B96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +34,10 @@ Global
 		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7089FA4-6E0E-443E-B6B3-86D07B092A52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8C2B62B-E287-4444-B20D-434F25ED4B96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8C2B62B-E287-4444-B20D-434F25ED4B96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8C2B62B-E287-4444-B20D-434F25ED4B96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8C2B62B-E287-4444-B20D-434F25ED4B96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

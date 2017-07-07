@@ -11,10 +11,10 @@ static class SettingsAttributeReader
         var attribute = module.Assembly.CustomAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
 
-        return Read(attribute);
+        return ReadFromAttribute(attribute);
     }
 
-    public static Settings Read(ICustomAttribute attribute)
+    public static Settings ReadFromAttribute(ICustomAttribute attribute)
     {
         return new Settings
         {

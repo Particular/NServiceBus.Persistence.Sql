@@ -16,6 +16,10 @@ static class CecilExtensions
 
     public static bool GetBoolProperty(this ICustomAttribute attribute, string name, bool fallback = false)
     {
+        if (attribute == null)
+        {
+            return fallback;
+        }
         var value = attribute.Properties
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
