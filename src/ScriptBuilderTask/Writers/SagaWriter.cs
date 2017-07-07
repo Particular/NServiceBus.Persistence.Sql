@@ -11,10 +11,11 @@ class SagaWriter
         var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
         Directory.CreateDirectory(sagasScriptPath);
         var index = 0;
-        foreach (var saga in metaDataReader.GetSagas((exception, type) =>
-        {
-            logError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
-        }))
+        foreach (var saga in metaDataReader.GetSagas(
+            logError: (exception, type) =>
+            {
+                logError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
+            }))
         {
             var sagaFileName = saga.TableSuffix;
             var maximumNameLength = 244 - sagasScriptPath.Length;

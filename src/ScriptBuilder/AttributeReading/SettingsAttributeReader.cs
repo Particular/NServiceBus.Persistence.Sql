@@ -4,12 +4,36 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-static class SqlVariantReader
+static class SettingsAttributeReader
 {
-    public static IEnumerable<BuildSqlVariant> Read(ModuleDefinition moduleDefinition)
+    public static Settings Read(ModuleDefinition module)
     {
-        var attribute = moduleDefinition.Assembly.CustomAttributes
+        var attribute = module.Assembly.CustomAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
+
+        return new Settings
+        {
+            BuildVariants = ReadBuildVariants(attribute).ToList(),
+            ScriptPromotionPath = ReadScriptPromotionPath(attribute)
+        };
+    }
+
+    static string ReadScriptPromotionPath(CustomAttribute attribute)
+    {
+        var target = attribute?.GetStringProperty("ScriptPromotionPath");
+        if (target == null)
+        {
+            return null;
+        }
+        if (!string.IsNullOrWhiteSpace(target))
+        {
+            return target;
+        }
+        throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
+    }
+
+    static IEnumerable<BuildSqlVariant> ReadBuildVariants(CustomAttribute attribute)
+    {
         if (attribute == null)
         {
             yield return BuildSqlVariant.MsSqlServer;
@@ -41,4 +65,5 @@ static class SqlVariantReader
             throw new ErrorsException("Must define at least one of MsSqlServerScripts, MySqlScripts, or OracleScripts. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
         }
     }
+
 }

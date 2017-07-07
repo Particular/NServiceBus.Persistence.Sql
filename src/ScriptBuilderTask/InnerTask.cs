@@ -23,25 +23,26 @@ class InnerTask
 
     public void Execute()
     {
-        var moduleDefinition = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
+        var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
         var scriptPath = Path.Combine(intermediateDirectory, "NServiceBus.Persistence.Sql");
         DirectoryExtensions.Delete(scriptPath);
-        foreach (var variant in SqlVariantReader.Read(moduleDefinition))
+        var settings = SettingsAttributeReader.Read(module);
+        foreach (var variant in settings.BuildVariants)
         {
             var variantPath = Path.Combine(scriptPath, variant.ToString());
-            Write(moduleDefinition, variant, variantPath);
+            Write(module, variant, variantPath);
         }
 
-        PromoteFiles(moduleDefinition, scriptPath);
+        PromoteFiles(scriptPath, settings);
     }
 
-    void PromoteFiles(ModuleDefinition moduleDefinition, string scriptPath)
+    void PromoteFiles(string scriptPath, Settings settings)
     {
-        if (!ScriptPromotionPathReader.TryRead(moduleDefinition, out var customPath))
+        if (settings.ScriptPromotionPath==null)
         {
             return;
         }
-        var replicationPath = customPath
+        var replicationPath = settings.ScriptPromotionPath
             .Replace("$(ProjectDir)", projectDirectory)
             .Replace("$(SolutionDir)", solutionDirectory);
         try
