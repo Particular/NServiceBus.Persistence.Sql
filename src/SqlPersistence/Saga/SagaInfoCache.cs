@@ -49,7 +49,7 @@ class SagaInfoCache
         foreach (var metadata in metadataCollection)
         {
             var sagaDataType = metadata.SagaEntityType;
-            if (cache.TryGetValue(sagaDataType, out RuntimeSagaInfo existing))
+            if (cache.TryGetValue(sagaDataType, out var existing))
             {
                 throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
             }
@@ -59,7 +59,7 @@ class SagaInfoCache
 
     public RuntimeSagaInfo GetInfo(Type sagaDataType)
     {
-        if (cache.TryGetValue(sagaDataType, out RuntimeSagaInfo value))
+        if (cache.TryGetValue(sagaDataType, out var value))
         {
             return value;
         }

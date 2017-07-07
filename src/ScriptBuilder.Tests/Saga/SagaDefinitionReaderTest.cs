@@ -90,7 +90,7 @@ public class SagaDefinitionReaderTest
     public void Simple()
     {
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -140,7 +140,7 @@ public class SagaDefinitionReaderTest
     public void WithNoTransitionalCorrelation()
     {
         var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -162,7 +162,7 @@ public class SagaDefinitionReaderTest
     public void WithTableSuffix()
     {
         var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
@@ -185,7 +185,7 @@ public class SagaDefinitionReaderTest
     public void WithNoCorrelation()
     {
         var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 
