@@ -1,6 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
 using NUnit.Framework;
 using ObjectApproval;
 
@@ -11,29 +10,35 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void Variant()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
-        var assemblyResolver = new DefaultAssemblyResolver();
-        assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
-        var readerParameters = new ReaderParameters(ReadingMode.Deferred)
-        {
-            AssemblyResolver = assemblyResolver
-        };
-        var module = ModuleDefinition.ReadModule(path, readerParameters);
-        ObjectApprover.VerifyWithJson(SettingsAttributeReader.Read(module).BuildVariants.ToList());
+        var result = SettingsAttributeReader.Read(
+            new CustomAttributeMock(
+                new Dictionary<string, object>
+                {
+                    {
+                        "MsSqlServerScripts", true
+                    },
+                    {
+                        "OracleScripts", true
+                    }
+                }));
+        ObjectApprover.VerifyWithJson(result.BuildVariants.ToList());
     }
 
     [Test]
     public void ScriptPromotionPath()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
-        var assemblyResolver = new DefaultAssemblyResolver();
-        assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
-        var readerParameters = new ReaderParameters(ReadingMode.Deferred)
-        {
-            AssemblyResolver = assemblyResolver
-        };
-        var module = ModuleDefinition.ReadModule(path, readerParameters);
-        var result = SettingsAttributeReader.Read(module);
+        var result = SettingsAttributeReader.Read(
+            new CustomAttributeMock(
+                new Dictionary<string, object>
+                {
+                    {
+                        "ScriptPromotionPath", @"D:\scripts"
+                    },
+                    {
+                        "MsSqlServerScripts", true
+                    }
+                }));
         ObjectApprover.VerifyWithJson(result.ScriptPromotionPath);
     }
+
 }

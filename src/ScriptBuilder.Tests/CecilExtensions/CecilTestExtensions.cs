@@ -1,9 +1,21 @@
+using System;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
 
-public static class Extensions
+public static class CecilTestExtensions
 {
+    static CecilTestExtensions()
+    {
+        var path = new Uri(typeof(string).Assembly.CodeBase).LocalPath;
+        var parameters = new ReaderParameters(ReadingMode.Immediate)
+        {
+            ReadWrite = false
+        };
+        MsCoreLib = ModuleDefinition.ReadModule(path, parameters);
+    }
+
+    public static ModuleDefinition MsCoreLib;
 
     public static TypeDefinition GetTypeDefinition<T>(this ModuleDefinition moduleDefinition)
     {
