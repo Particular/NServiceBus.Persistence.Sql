@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using ObjectApproval;
 
@@ -8,24 +7,22 @@ public class SqlAttributeParametersReadersTest
 {
 
     [Test]
-    public void Variant()
+    public void Defaults()
     {
         var result = SettingsAttributeReader.Read(
             new CustomAttributeMock(
                 new Dictionary<string, object>
                 {
                     {
+                        //At least one is required
                         "MsSqlServerScripts", true
-                    },
-                    {
-                        "OracleScripts", true
                     }
                 }));
-        ObjectApprover.VerifyWithJson(result.BuildVariants.ToList());
+        ObjectApprover.VerifyWithJson(result);
     }
 
     [Test]
-    public void ScriptPromotionPath()
+    public void NonDefaults()
     {
         var result = SettingsAttributeReader.Read(
             new CustomAttributeMock(
@@ -36,9 +33,28 @@ public class SqlAttributeParametersReadersTest
                     },
                     {
                         "MsSqlServerScripts", true
+                    },
+                    {
+                        "MySqlScripts", true
+                    },
+                    {
+                        "OracleScripts", true
+                    },
+                    {
+                        "ProduceSagaScripts", false
+                    },
+                    {
+                        "ProduceTimeoutScripts", false
+                    },
+                    {
+                        "ProduceSubscriptionScripts", false
+                    },
+                    {
+                        "ProduceOutboxScripts", false
                     }
                 }));
-        ObjectApprover.VerifyWithJson(result.ScriptPromotionPath);
+        ObjectApprover.VerifyWithJson(result);
     }
+
 
 }

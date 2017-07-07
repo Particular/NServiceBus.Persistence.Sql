@@ -14,12 +14,16 @@ static class CecilExtensions
             .Argument.Value;
     }
 
-    public static bool GetBoolProperty(this ICustomAttribute attribute, string name)
+    public static bool GetBoolProperty(this ICustomAttribute attribute, string name, bool fallback = false)
     {
         var value = attribute.Properties
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
-        return value != null && (bool)value;
+        if (value == null)
+        {
+            return fallback;
+        }
+        return (bool)value;
     }
 
     public static PropertyDefinition GetProperty(this TypeDefinition type, string propertyName)

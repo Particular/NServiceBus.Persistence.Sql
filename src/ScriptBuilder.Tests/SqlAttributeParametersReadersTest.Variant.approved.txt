@@ -1,4 +1,0 @@
-﻿[
-  "MsSqlServer",
-  "Oracle"
-]

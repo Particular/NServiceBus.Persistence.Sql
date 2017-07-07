@@ -19,7 +19,11 @@ static class SettingsAttributeReader
         return new Settings
         {
             BuildVariants = ReadBuildVariants(attribute).ToList(),
-            ScriptPromotionPath = ReadScriptPromotionPath(attribute)
+            ScriptPromotionPath = ReadScriptPromotionPath(attribute),
+            ProduceSagaScripts = attribute.GetBoolProperty("ProduceSagaScripts", true),
+            ProduceTimeoutScripts = attribute.GetBoolProperty("ProduceTimeoutScripts", true),
+            ProduceSubscriptionScripts = attribute.GetBoolProperty("ProduceSubscriptionScripts", true),
+            ProduceOutboxScripts = attribute.GetBoolProperty("ProduceOutboxScripts", true),
         };
     }
 
