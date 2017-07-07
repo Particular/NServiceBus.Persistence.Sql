@@ -19,7 +19,7 @@ public class SqlAttributeParametersReadersTest
             AssemblyResolver = assemblyResolver
         };
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        ObjectApprover.VerifyWithJson(SqlVariantReader.Read(module).ToList());
+        ObjectApprover.VerifyWithJson(SettingsAttributeReader.Read(module).BuildVariants.ToList());
     }
 
     [Test]
@@ -33,8 +33,7 @@ public class SqlAttributeParametersReadersTest
             AssemblyResolver = assemblyResolver
         };
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        var tryRead = ScriptPromotionPathReader.TryRead(module, out path);
-        Assert.IsTrue(tryRead);
-        ObjectApprover.VerifyWithJson(path);
+        var result = SettingsAttributeReader.Read(module);
+        ObjectApprover.VerifyWithJson(result.ScriptPromotionPath);
     }
 }
