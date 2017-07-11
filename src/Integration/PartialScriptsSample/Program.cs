@@ -29,6 +29,7 @@ class Program
         persistence.ConnectionBuilder(() => new SqlConnection(connection));
 
         endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Sagas>();
+        endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Outbox>();
 
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.CacheFor(TimeSpan.FromMinutes(1));

@@ -20,4 +20,6 @@ namespace NServiceBus
             return enabledFeatures.Contains(typeof(TStorageType));
         }
     }
+
+
 }

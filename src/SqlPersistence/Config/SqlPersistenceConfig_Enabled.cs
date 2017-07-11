@@ -27,16 +27,16 @@ namespace NServiceBus
             return false;
         }
 
-        internal static void EnableFeature<TStorageType>(this ReadOnlySettings settingsHolder)
+        internal static void EnableFeature<TStorageType>(this SettingsHolder settingsHolder)
             where TStorageType : StorageType
         {
-            settingsHolder.Get<EnabledStorageFeatures>().Enable<TStorageType>();
+            settingsHolder.GetOrCreate<EnabledStorageFeatures>().Enable<TStorageType>();
         }
 
-        static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
+        internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
             where TStorageType : StorageType
         {
-            return settings.GetOrDefault<EnabledStorageFeatures>()?.IsEnabled<TStorageType>() ?? false;
+            return settings.Get<EnabledStorageFeatures>().IsEnabled<TStorageType>();
         }
 
         internal static bool ShouldInstall<TStorageType>(this ReadOnlySettings settings)
