@@ -4,6 +4,7 @@ using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.ObjectBuilder;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class StorageSessionFeature : Feature
 {
@@ -11,16 +12,26 @@ class StorageSessionFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var isSagasEnabled = settings.GetFeatureEnabled<StorageType.Sagas>();
-        var isOutboxEnabled = settings.GetFeatureEnabled<StorageType.Outbox>();
-        if (!isSagasEnabled || !isOutboxEnabled)
-        {
-            throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
-        }
+        ValidateSagaOutboxCombo(settings);
         var connectionBuilder = settings.GetConnectionBuilder();
         var container = context.Container;
         container.ConfigureComponent(builder => new SynchronizedStorage(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
         container.ConfigureComponent(builder => new StorageAdapter(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
+    }
+
+    static void ValidateSagaOutboxCombo(ReadOnlySettings settings)
+    {
+        var isSagasEnabledForSqlPersistence = settings.GetFeatureEnabled<StorageType.Sagas>();
+        var isOutboxEnabledForSqlPersistence = settings.GetFeatureEnabled<StorageType.Outbox>();
+        var isOutboxEnabled = settings.IsFeatureActive(typeof(Outbox)) || settings.IsFeatureEnabled(typeof(Outbox));
+        var isSagasEnabled = settings.IsFeatureActive(typeof(Sagas)) || settings.IsFeatureEnabled(typeof(Sagas));
+        if (isOutboxEnabled && isSagasEnabled)
+        {
+            if (!isSagasEnabledForSqlPersistence || !isOutboxEnabledForSqlPersistence)
+            {
+                throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
+            }
+        }
     }
 
     static SagaInfoCache GetInfoCache(IBuilder builder)
