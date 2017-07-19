@@ -1,0 +1,12 @@
+﻿{
+  "BuildVariants": [
+    "MsSqlServer",
+    "MySql",
+    "Oracle"
+  ],
+  "ScriptPromotionPath": "D:\\scripts",
+  "ProduceOutboxScripts": false,
+  "ProduceSubscriptionScripts": false,
+  "ProduceTimeoutScripts": false,
+  "ProduceSagaScripts": false
+}

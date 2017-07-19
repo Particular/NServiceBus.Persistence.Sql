@@ -1,7 +1,6 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Persistence;
 using NServiceBus.Timeout.Core;
 
 class SqlTimeoutFeature : Feature
@@ -15,7 +14,6 @@ class SqlTimeoutFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        settings.EnableFeature<StorageType.Timeouts>();
         var sqlVariant = settings.GetSqlVariant();
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();

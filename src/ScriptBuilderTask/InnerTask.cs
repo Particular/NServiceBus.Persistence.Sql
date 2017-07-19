@@ -2,7 +2,6 @@
 using System.IO;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class InnerTask
 {
@@ -30,7 +29,23 @@ class InnerTask
         foreach (var variant in settings.BuildVariants)
         {
             var variantPath = Path.Combine(scriptPath, variant.ToString());
-            Write(module, variant, variantPath);
+            Directory.CreateDirectory(variantPath);
+            if (settings.ProduceSagaScripts)
+            {
+                SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
+            }
+            if (settings.ProduceTimeoutScripts)
+            {
+                TimeoutWriter.WriteTimeoutScript(variantPath, variant);
+            }
+            if (settings.ProduceSubscriptionScripts)
+            {
+                SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
+            }
+            if (settings.ProduceOutboxScripts)
+            {
+                OutboxWriter.WriteOutboxScript(variantPath, variant);
+            }
         }
 
         PromoteFiles(scriptPath, settings);
@@ -38,7 +53,7 @@ class InnerTask
 
     void PromoteFiles(string scriptPath, Settings settings)
     {
-        if (settings.ScriptPromotionPath==null)
+        if (settings.ScriptPromotionPath == null)
         {
             return;
         }
@@ -54,14 +69,5 @@ class InnerTask
         {
             throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
         }
-    }
-
-    void Write(ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant, string scriptPath)
-    {
-        Directory.CreateDirectory(scriptPath);
-        SagaWriter.WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant, logError);
-        TimeoutWriter.WriteTimeoutScript(scriptPath, sqlVariant);
-        SubscriptionWriter.WriteSubscriptionScript(scriptPath, sqlVariant);
-        OutboxWriter.WriteOutboxScript(scriptPath, sqlVariant);
     }
 }

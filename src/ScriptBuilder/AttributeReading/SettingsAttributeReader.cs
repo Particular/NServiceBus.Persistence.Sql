@@ -11,14 +11,23 @@ static class SettingsAttributeReader
         var attribute = module.Assembly.CustomAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
 
+        return ReadFromAttribute(attribute);
+    }
+
+    public static Settings ReadFromAttribute(ICustomAttribute attribute)
+    {
         return new Settings
         {
             BuildVariants = ReadBuildVariants(attribute).ToList(),
-            ScriptPromotionPath = ReadScriptPromotionPath(attribute)
+            ScriptPromotionPath = ReadScriptPromotionPath(attribute),
+            ProduceSagaScripts = attribute.GetBoolProperty("ProduceSagaScripts", true),
+            ProduceTimeoutScripts = attribute.GetBoolProperty("ProduceTimeoutScripts", true),
+            ProduceSubscriptionScripts = attribute.GetBoolProperty("ProduceSubscriptionScripts", true),
+            ProduceOutboxScripts = attribute.GetBoolProperty("ProduceOutboxScripts", true),
         };
     }
 
-    static string ReadScriptPromotionPath(CustomAttribute attribute)
+    static string ReadScriptPromotionPath(ICustomAttribute attribute)
     {
         var target = attribute?.GetStringProperty("ScriptPromotionPath");
         if (target == null)
@@ -32,7 +41,7 @@ static class SettingsAttributeReader
         throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
     }
 
-    static IEnumerable<BuildSqlVariant> ReadBuildVariants(CustomAttribute attribute)
+    static IEnumerable<BuildSqlVariant> ReadBuildVariants(ICustomAttribute attribute)
     {
         if (attribute == null)
         {

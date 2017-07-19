@@ -1,7 +1,6 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Persistence;
 
 class SqlOutboxFeature : Feature
 {
@@ -12,7 +11,6 @@ class SqlOutboxFeature : Feature
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        context.Settings.EnableFeature<StorageType.Outbox>();
         var settings = context.Settings;
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();

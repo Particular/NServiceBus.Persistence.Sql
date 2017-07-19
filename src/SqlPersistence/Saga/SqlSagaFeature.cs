@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -16,7 +15,6 @@ class SqlSagaFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        settings.EnableFeature<StorageType.Sagas>();
 
         var sqlVariant = settings.GetSqlVariant();
 #pragma warning disable 618

@@ -7,19 +7,27 @@ using NServiceBus.Persistence.Sql;
 static class CecilExtensions
 {
 
-    public static string GetStringProperty(this CustomAttribute attribute, string name)
+    public static string GetStringProperty(this ICustomAttribute attribute, string name)
     {
         return (string)attribute.Properties
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
     }
 
-    public static bool GetBoolProperty(this CustomAttribute attribute, string name)
+    public static bool GetBoolProperty(this ICustomAttribute attribute, string name, bool fallback = false)
     {
+        if (attribute == null)
+        {
+            return fallback;
+        }
         var value = attribute.Properties
             .SingleOrDefault(argument => argument.Name == name)
             .Argument.Value;
-        return value != null && (bool)value;
+        if (value == null)
+        {
+            return fallback;
+        }
+        return (bool)value;
     }
 
     public static PropertyDefinition GetProperty(this TypeDefinition type, string propertyName)
