@@ -10,17 +10,38 @@ public class MixedSagaAndOutbox
 {
 
     [Test]
-    public void Run()
+    public void RunSqlForSaga()
     {
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MixedSagaAndOutbox));
         var typesToScan = TypeScanner.NestedTypes<MixedSagaAndOutbox>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         endpointConfiguration.UseTransport<LearningTransport>();
+
+        endpointConfiguration.EnableOutbox();
+
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
-        endpointConfiguration.EnableOutbox();
         endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Outbox>();
+
+        var exception = Assert.ThrowsAsync<Exception>(() => Endpoint.Start(endpointConfiguration));
+        Assert.IsTrue(exception.Message == "Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
+    }
+
+    [Test]
+    public void RunSqlForOutbox()
+    {
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MixedSagaAndOutbox));
+        var typesToScan = TypeScanner.NestedTypes<MixedSagaAndOutbox>();
+        endpointConfiguration.SetTypesToScan(typesToScan);
+        endpointConfiguration.UseTransport<LearningTransport>();
+
+        endpointConfiguration.EnableOutbox();
+
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
+        persistence.DisableInstaller();
+        endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Sagas>();
 
         var exception = Assert.ThrowsAsync<Exception>(() => Endpoint.Start(endpointConfiguration));
         Assert.IsTrue(exception.Message == "Sql Persistence must be enable for either both Sagas and Outbox, or neither.");

@@ -6,6 +6,7 @@
     <OutputType>exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\SqlHelper.cs" Link="SqlHelper.cs" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NServiceBus" Version="6.3.4" />
     <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />
