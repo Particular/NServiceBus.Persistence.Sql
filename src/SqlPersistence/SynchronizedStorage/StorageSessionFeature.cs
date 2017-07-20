@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
+using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.ObjectBuilder;
+using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
 using NServiceBus.Settings;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class StorageSessionFeature : Feature
 {
@@ -12,10 +14,20 @@ class StorageSessionFeature : Feature
     {
         var settings = context.Settings;
         ValidateSagaOutboxCombo(settings);
-        var connectionBuilder = settings.GetConnectionBuilder();
+
+        var sqlVariant = settings.GetSqlVariant();
+        var infoCache = BuildSagaInfoCache(sqlVariant, settings);
         var container = context.Container;
-        container.ConfigureComponent(builder => new SynchronizedStorage(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(builder => new StorageAdapter(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
+        var connectionBuilder = settings.GetConnectionBuilder();
+        container.RegisterSingleton(new SynchronizedStorage(connectionBuilder, infoCache));
+        container.RegisterSingleton(new StorageAdapter(connectionBuilder, infoCache));
+
+        var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
+        if (isSagasEnabledForSqlPersistence)
+        {
+            ISagaPersister sagaPersister = new SagaPersister(infoCache, sqlVariant);
+            container.RegisterSingleton(sagaPersister);
+        }
     }
 
     static void ValidateSagaOutboxCombo(ReadOnlySettings settings)
@@ -35,8 +47,50 @@ class StorageSessionFeature : Feature
         throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
     }
 
-    static SagaInfoCache GetInfoCache(IBuilder builder)
+    static SagaInfoCache BuildSagaInfoCache(SqlVariant sqlVariant, ReadOnlySettings settings)
     {
-        return builder.BuildAll<SagaInfoCache>().SingleOrDefault();
+#pragma warning disable 618
+        var commandBuilder = new SagaCommandBuilder(sqlVariant);
+#pragma warning restore 618
+        var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
+        var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
+        var readerCreator = SagaSettings.GetReaderCreator(settings);
+        if (readerCreator == null)
+        {
+            readerCreator = reader => new JsonTextReader(reader);
+        }
+        var writerCreator = SagaSettings.GetWriterCreator(settings);
+        if (writerCreator == null)
+        {
+            writerCreator = writer => new JsonTextWriter(writer);
+        }
+        var nameFilter = SagaSettings.GetNameFilter(settings);
+        if (nameFilter == null)
+        {
+            nameFilter = sagaName => sagaName;
+        }
+        var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
+        var tablePrefix = settings.GetTablePrefix();
+        var schema = settings.GetSchema();
+        return new SagaInfoCache(
+            versionSpecificSettings: versionDeserializeBuilder,
+            jsonSerializer: jsonSerializer,
+            readerCreator: readerCreator,
+            writerCreator: writerCreator,
+            commandBuilder: commandBuilder,
+            tablePrefix: tablePrefix,
+            schema: schema,
+            sqlVariant: sqlVariant,
+            metadataCollection: settings.Get<SagaMetadataCollection>(),
+            nameFilter: nameFilter);
+    }
+
+    static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
+    {
+        if (jsonSerializerSettings == null)
+        {
+            return Serializer.JsonSerializer;
+        }
+        return JsonSerializer.Create(jsonSerializerSettings);
     }
 }
