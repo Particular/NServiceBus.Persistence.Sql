@@ -1,10 +1,10 @@
 using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
 namespace NServiceBus
 {
+    using Features;
 
     public static partial class SqlPersistenceConfig
     {
@@ -20,29 +20,13 @@ namespace NServiceBus
 
         static bool GetDisableInstaller(this ReadOnlySettings settings)
         {
-            if (settings.TryGet("SqlPersistence.DisableInstaller", out bool value))
-            {
-                return value;
-            }
-            return false;
+            return settings.TryGet("SqlPersistence.DisableInstaller", out bool value) && value;
         }
 
-        internal static void EnableFeature<TStorageType>(this SettingsHolder settingsHolder)
-            where TStorageType : StorageType
+        internal static bool ShouldInstall<TFeature>(this ReadOnlySettings settings)
+            where TFeature : Feature
         {
-            settingsHolder.GetOrCreate<EnabledStorageFeatures>().Enable<TStorageType>();
-        }
-
-        internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
-            where TStorageType : StorageType
-        {
-            return settings.Get<EnabledStorageFeatures>().IsEnabled<TStorageType>();
-        }
-
-        internal static bool ShouldInstall<TStorageType>(this ReadOnlySettings settings)
-            where TStorageType : StorageType
-        {
-            var featureEnabled = settings.GetFeatureEnabled<TStorageType>();
+            var featureEnabled = settings.IsFeatureActive(typeof(TFeature));
             var disableInstaller = settings.GetDisableInstaller();
             return
                 featureEnabled &&

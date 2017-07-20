@@ -13,6 +13,7 @@ class Program
     static Task Start()
     {
         var connection = @"Data Source=.\SQLEXPRESS;Initial Catalog=sqlpersistencesample;Integrated Security=True";
+        SqlHelper.EnsureDatabaseExists(connection);
         return EndpointStarter.Start("SqlPersistence.Sample.MsSqlServer",
             persistence =>
             {

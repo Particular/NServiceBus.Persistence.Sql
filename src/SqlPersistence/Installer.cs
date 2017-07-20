@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Logging;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
@@ -44,7 +43,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Outbox>())
+        if (!settings.ShouldInstall<SqlOutboxFeature>())
         {
             return Task.FromResult(0);
         }
@@ -71,7 +70,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Subscriptions>())
+        if (!settings.ShouldInstall<SqlSubscriptionFeature>())
         {
             return Task.FromResult(0);
         }
@@ -98,7 +97,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Timeouts>())
+        if (!settings.ShouldInstall<SqlTimeoutFeature>())
         {
             return Task.FromResult(0);
         }
@@ -125,7 +124,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Sagas>())
+        if (!settings.ShouldInstall<SqlSagaFeature>())
         {
             return Task.FromResult(0);
         }
