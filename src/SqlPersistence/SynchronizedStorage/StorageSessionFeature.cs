@@ -19,14 +19,14 @@ class StorageSessionFeature : Feature
         var infoCache = BuildSagaInfoCache(sqlVariant, settings);
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
-        container.RegisterSingleton(new SynchronizedStorage(connectionBuilder, infoCache));
-        container.RegisterSingleton(new StorageAdapter(connectionBuilder, infoCache));
 
+        container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         if (isSagasEnabledForSqlPersistence)
         {
-            ISagaPersister sagaPersister = new SagaPersister(infoCache, sqlVariant);
-            container.RegisterSingleton(sagaPersister);
+            var sagaPersister = new SagaPersister(infoCache, sqlVariant);
+            container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
         }
     }
 
