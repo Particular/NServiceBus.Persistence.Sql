@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence;
@@ -13,6 +14,7 @@ public class MixedSagaAndNoOutbox : IDisposable
     BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
+    static ManualResetEvent manualResetEvent;
 
     public MixedSagaAndNoOutbox()
     {
@@ -32,18 +34,46 @@ public class MixedSagaAndNoOutbox : IDisposable
     [SetUp]
     public void Setup()
     {
+        manualResetEvent = new ManualResetEvent(false);
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
     }
 
     [TearDown]
     public void TearDown()
     {
         dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
     }
 
     [Test]
-    public async Task Run()
+    public async Task RunSqlPrimary()
+    {
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MixedSagaAndNoOutbox));
+        var typesToScan = TypeScanner.NestedTypes<MixedSagaAndNoOutbox>();
+        endpointConfiguration.SetTypesToScan(typesToScan);
+        endpointConfiguration.UseTransport<LearningTransport>();
+
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
+        persistence.DisableInstaller();
+        endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Sagas>();
+
+        var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
+        var startSagaMessage = new StartSagaMessage
+        {
+            StartId = Guid.NewGuid()
+        };
+        await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
+        manualResetEvent.WaitOne();
+        await endpoint.Stop().ConfigureAwait(false);
+    }
+
+    [Test]
+    [Explicit("Core mem persistence does not allow this yet")]
+    public async Task RunSqlSecondary()
     {
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MixedSagaAndNoOutbox));
         var typesToScan = TypeScanner.NestedTypes<MixedSagaAndNoOutbox>();
@@ -61,6 +91,7 @@ public class MixedSagaAndNoOutbox : IDisposable
             StartId = Guid.NewGuid()
         };
         await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
+        manualResetEvent.WaitOne();
         await endpoint.Stop().ConfigureAwait(false);
     }
 
@@ -69,12 +100,24 @@ public class MixedSagaAndNoOutbox : IDisposable
         public Guid StartId { get; set; }
     }
 
+    public class TimeoutMessage : IMessage
+    {
+    }
+
     public class Saga1 : SqlSaga<Saga1.SagaData>,
-        IAmStartedByMessages<StartSagaMessage>
+        IAmStartedByMessages<StartSagaMessage>,
+        IHandleTimeouts<TimeoutMessage>
     {
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
-            return Task.CompletedTask;
+            return RequestTimeout<TimeoutMessage>(context, TimeSpan.FromMilliseconds(100));
+        }
+
+        public Task Timeout(TimeoutMessage state, IMessageHandlerContext context)
+        {
+            MarkAsComplete();
+            manualResetEvent.Set();
+            return Task.FromResult(0);
         }
 
         public class SagaData : ContainSagaData
