@@ -50,12 +50,7 @@ namespace NServiceBus
             Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
             var writableContextBag = (ContextBag)context;
             var sqlSession = session.GetSqlStorageSession();
-            var sagaInfoCache = sqlSession.InfoCache;
-            if (sagaInfoCache == null)
-            {
-                throw new Exception($"{nameof(GetSagaData)} can only be executed when Sagas have been enabled on the endpoint.");
-            }
-            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sagaInfoCache);
+            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sqlSession.InfoCache);
         }
     }
 }

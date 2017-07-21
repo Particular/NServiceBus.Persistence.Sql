@@ -17,7 +17,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         Transaction = transaction;
     }
 
-    internal SagaInfoCache InfoCache;
+    internal SagaInfoCache InfoCache { get; }
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }
 
