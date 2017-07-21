@@ -1,62 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
-    <NuSpecFileName>NServiceBus.Persistence.Sql.MsBuild</NuSpecFileName>
+    <AssemblyTitle>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyTitle>
+    <Product>NServiceBus.Persistence.Sql.ScriptBuilderTask</Product>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\binaries\</OutputPath>
     <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
-    <PackageReference Include="ILRepack" Version="2.0.13" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
-    <Compile Include="..\CommonAssemblyInfo.cs" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
+    <PackageReference Include="ILRepack" Version="2.0.13" PrivateAssets="All" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" PrivateAssets="All" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="Microsoft.Build" Version="15.1.1012" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
-    <PackageReference Include="NuGetPackager" Version="0.6.5" />
+    <PackageReference Include="Microsoft.Build" Version="15.1.1012" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" PrivateAssets="All" />
   </ItemGroup>
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
-       <Output TaskParameter="Include" ItemName="MonoCecilRef" />
-    </CreateItem>
+
+  <PropertyGroup>
+    <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
+    <Description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
+    <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
+    <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <Target Name="SetPackageDependencies" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <ScriptBuilderNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetClassicDll>
-      <ScriptBuilderNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetStandardDll>
-      <ScriptBuilderTaskNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskNetClassicDll>
-      <ScriptBuilderTaskNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</ScriptBuilderTaskNetStandardDll>
-      <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
-      <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
-      <MergeOutputNetClassicDll>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputNetClassicDll>
-      <MergeOutputNetStandardDll>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</MergeOutputNetStandardDll>
-      <MergeOutputNetClassicPdb>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputNetClassicPdb>
-      <MergeOutputNetStandardPdb>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.pdb</MergeOutputNetStandardPdb>
-      <MsBuildTargets>$(SolutionDir)..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets</MsBuildTargets>
+      <NuspecProperties>id=$(PackageId);version=$(PackageVersion);authors=$(Authors);owners=$(Authors);licenseUrl=$(PackageLicenseUrl);requireLicenseAcceptance=$(PackageRequireLicenseAcceptance);iconUrl=$(PackageIconUrl);projectUrl=$(PackageProjectUrl);description=$(Description);copyright=$(Copyright);tags=$(PackageTags)</NuspecProperties>
     </PropertyGroup>
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassicDll)&quot; &quot;$(ScriptBuilderTaskNetClassicDll)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandardDll)&quot; &quot;$(ScriptBuilderTaskNetStandardDll)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+  </Target>
+
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
+    </PropertyGroup>
+    <MakeDir Directories="$(TempFolder)" />
+    <Exec Command="$(ILRepack) /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <ItemGroup>
+      <TempFiles Include="$(TempFolder)\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TempFiles)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
+    <Delete Files="@(TempFiles)" />
+    <RemoveDir Directories="$(TempFolder)" />
+  </Target>
+
+  <!--<Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
     <MakeDir Directories="$(SolutionDir)ForIntegration" />
     <Copy SourceFiles="$(MergeOutputNetClassicDll)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
     <Copy SourceFiles="$(MergeOutputNetStandardDll)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
     <Copy SourceFiles="$(MergeOutputNetClassicPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
     <Copy SourceFiles="$(MergeOutputNetStandardPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
     <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
-  </Target>
+  </Target>-->
+
 </Project>
