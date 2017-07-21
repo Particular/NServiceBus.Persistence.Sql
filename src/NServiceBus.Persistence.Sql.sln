@@ -31,7 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		Directory.Build.targets = Directory.Build.targets
 		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec
 		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets
-		..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleAcceptanceTests", "OracleAcceptanceTests\OracleAcceptanceTests.csproj", "{6DFB669B-7BB0-409B-90AE-6968470EA2CB}"
