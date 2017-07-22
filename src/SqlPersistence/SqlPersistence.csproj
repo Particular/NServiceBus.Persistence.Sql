@@ -35,12 +35,7 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*" />
-    </ItemGroup>
-    <MakeDir Directories="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
+  <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
+    <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
-
 </Project>

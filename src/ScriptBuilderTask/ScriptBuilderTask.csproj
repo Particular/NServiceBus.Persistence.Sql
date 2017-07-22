@@ -67,13 +67,4 @@
     <RemoveDir Directories="$(TempFolder)" />
   </Target>
 
-  <!--<Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <MakeDir Directories="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="$(MergeOutputNetClassicDll)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
-    <Copy SourceFiles="$(MergeOutputNetStandardDll)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
-    <Copy SourceFiles="$(MergeOutputNetClassicPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netclassic" />
-    <Copy SourceFiles="$(MergeOutputNetStandardPdb)" DestinationFolder="$(SolutionDir)ForIntegration\netstandard" />
-    <Copy SourceFiles="$(MsBuildTargets)" DestinationFolder="$(SolutionDir)ForIntegration\build" />
-  </Target>-->
-
 </Project>
