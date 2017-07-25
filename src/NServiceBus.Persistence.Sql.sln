@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26711.1
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 EndProject
@@ -28,10 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilderTask.Tests.Tar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{87FC4455-07B6-4490-A31D-F386A11A4095}"
 	ProjectSection(SolutionItems) = preProject
-		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.nuspec
-		..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets = ..\packaging\nuget\NServiceBus.Persistence.Sql.MsBuild.targets
-		..\packaging\nuget\NServiceBus.Persistence.Sql.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.nuspec
-		..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec = ..\packaging\nuget\NServiceBus.Persistence.Sql.ScriptBuilder.nuspec
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleAcceptanceTests", "OracleAcceptanceTests\OracleAcceptanceTests.csproj", "{6DFB669B-7BB0-409B-90AE-6968470EA2CB}"
@@ -106,5 +103,8 @@ Global
 		{88A9E98A-0DDD-4D48-B073-0255B36A7E6F} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{6DFB669B-7BB0-409B-90AE-6968470EA2CB} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{8B2246AB-4FAA-481D-AC1B-0A3F24E48CC8} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90D6A734-35FA-4702-BDFD-74EADABDE821}
 	EndGlobalSection
 EndGlobal
