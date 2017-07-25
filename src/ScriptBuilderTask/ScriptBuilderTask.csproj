@@ -45,6 +45,7 @@
     <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);MergeDependencies</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <Target Name="SetPackageDependencies" BeforeTargets="GenerateNuspec">
@@ -53,7 +54,7 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="MergeDependencies" Condition="'$(Configuration)' == 'Release'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>

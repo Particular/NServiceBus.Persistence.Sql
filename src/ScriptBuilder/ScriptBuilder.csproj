@@ -33,9 +33,10 @@
     <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);MergeDependencies</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="MergeDependencies" Condition="'$(Configuration)' == 'Release'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>
