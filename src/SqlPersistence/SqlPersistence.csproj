@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <AssemblyTitle>NServiceBus.Persistence.Sql</AssemblyTitle>
