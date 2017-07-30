@@ -12,6 +12,7 @@
     <OutputPath>..\..\binaries\</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoWarn>$(NoWarn);CS0419</NoWarn>
   </PropertyGroup>
 
