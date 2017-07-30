@@ -12,6 +12,7 @@
     <OutputPath>..\..\binaries\</OutputPath>
     <DebugType>full</DebugType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,7 +44,6 @@
     <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="SetPackageDependencies" BeforeTargets="GenerateNuspec">

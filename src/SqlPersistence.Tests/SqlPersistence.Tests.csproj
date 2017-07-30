@@ -11,7 +11,6 @@
   <ItemGroup>
     <PackageReference Include="ApprovalTests" Version="3.0.13" />
     <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-beta6" />
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

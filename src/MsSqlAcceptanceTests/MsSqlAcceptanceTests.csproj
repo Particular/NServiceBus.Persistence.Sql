@@ -7,7 +7,6 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="NServiceBus" Version="6.3.4" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.3.4" />
     <PackageReference Include="NUnit" Version="3.7.1" />

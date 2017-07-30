@@ -11,8 +11,8 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoWarn>$(NoWarn);CS0419</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +33,6 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql</PackageId>
     <Description>Sql persistence for NServiceBus</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
