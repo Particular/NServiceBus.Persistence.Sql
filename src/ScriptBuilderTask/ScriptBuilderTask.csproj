@@ -41,7 +41,6 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
     <Description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
-    <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
