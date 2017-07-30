@@ -2,7 +2,6 @@ using System;
 using System.Text;
 
 static class ExceptionExtensions
-
 {
     public static string ToFriendlyString(this Exception exception)
     {

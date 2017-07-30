@@ -62,6 +62,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant, System.IO.TextWriter writer) { }
         public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
     }
+    public class static ScriptWriter
+    {
+        public static void Write(string assemblyPath, string targetDirectory, System.Action<string, string> logError, System.Func<string, string> promotionPathFinder) { }
+    }
     public class static SubscriptionScriptBuilder
     {
         public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }

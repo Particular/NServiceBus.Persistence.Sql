@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
     <PackageReference Include="ILRepack" Version="2.0.13" PrivateAssets="All" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" PrivateAssets="All" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,19 +34,4 @@
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <PackageProjectUrl>https://docs.particular.net/nuget/nservicebus.persistence.sql</PackageProjectUrl>
   </PropertyGroup>
-
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
-    <PropertyGroup>
-      <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
-    </PropertyGroup>
-    <MakeDir Directories="$(TempFolder)" />
-    <Exec Command="$(ILRepack) /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <ItemGroup>
-      <TempFiles Include="$(TempFolder)\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TempFiles)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
-    <Delete Files="@(TempFiles)" />
-    <RemoveDir Directories="$(TempFolder)" />
-  </Target>
-
 </Project>

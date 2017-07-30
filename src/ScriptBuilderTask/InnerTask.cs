@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class InnerTask
 {
@@ -21,30 +20,13 @@ class InnerTask
 
     public void Execute()
     {
-        var scriptPath = Path.Combine(intermediateDirectory, "NServiceBus.Persistence.Sql");
-        DirectoryExtensions.Delete(scriptPath);
-        var settings = ScriptWriter.Write(assemblyPath, scriptPath, logError);
-
-        PromoteFiles(scriptPath, settings);
+        ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
-    void PromoteFiles(string scriptPath, Settings settings)
+    string FindPromotionPath(string propotionPathSetting)
     {
-        if (settings.ScriptPromotionPath == null)
-        {
-            return;
-        }
-        var replicationPath = settings.ScriptPromotionPath
+        return propotionPathSetting
             .Replace("$(ProjectDir)", projectDirectory)
             .Replace("$(SolutionDir)", solutionDirectory);
-        try
-        {
-            DirectoryExtensions.Delete(replicationPath);
-            DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
-        }
-        catch (Exception exception)
-        {
-            throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
-        }
     }
 }

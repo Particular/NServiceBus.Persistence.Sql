@@ -1,35 +1,59 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using Mono.Cecil;
 
-public static class ScriptWriter
+namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
-    public static Settings Write(string assemblyPath, string targetDirectory, Action<string, string> logError)
+    public static class ScriptWriter
     {
-        var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
-        var settings = SettingsAttributeReader.Read(module);
-        foreach (var variant in settings.BuildVariants)
+        public static void Write(string assemblyPath, string targetDirectory, Action<string, string> logError, Func<string,string> promotionPathFinder)
         {
-            var variantPath = Path.Combine(targetDirectory, variant.ToString());
-            Directory.CreateDirectory(variantPath);
-            if (settings.ProduceSagaScripts)
+            var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
+            DirectoryExtensions.Delete(scriptPath);
+            var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
+            var settings = SettingsAttributeReader.Read(module);
+            foreach (var variant in settings.BuildVariants)
             {
-                SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
+                var variantPath = Path.Combine(scriptPath, variant.ToString());
+                Directory.CreateDirectory(variantPath);
+                if (settings.ProduceSagaScripts)
+                {
+                    SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
+                }
+                if (settings.ProduceTimeoutScripts)
+                {
+                    TimeoutWriter.WriteTimeoutScript(variantPath, variant);
+                }
+                if (settings.ProduceSubscriptionScripts)
+                {
+                    SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
+                }
+                if (settings.ProduceOutboxScripts)
+                {
+                    OutboxWriter.WriteOutboxScript(variantPath, variant);
+                }
             }
-            if (settings.ProduceTimeoutScripts)
+
+            var scriptPromotionPath = settings.ScriptPromotionPath;
+            if (scriptPromotionPath == null)
             {
-                TimeoutWriter.WriteTimeoutScript(variantPath, variant);
+                return;
             }
-            if (settings.ProduceSubscriptionScripts)
+            var replicationPath = promotionPathFinder(scriptPromotionPath);
+            Promote(replicationPath, scriptPath);
+        }
+
+        static void Promote(string replicationPath, string scriptPath)
+        {
+            try
             {
-                SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
+                DirectoryExtensions.Delete(replicationPath);
+                DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
             }
-            if (settings.ProduceOutboxScripts)
+            catch (Exception exception)
             {
-                OutboxWriter.WriteOutboxScript(variantPath, variant);
+                throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
             }
         }
-        return settings;
     }
 }
