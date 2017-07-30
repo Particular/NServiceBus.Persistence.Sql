@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilderTask.Tests.Tar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{87FC4455-07B6-4490-A31D-F386A11A4095}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.targets = Directory.Build.targets
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleAcceptanceTests", "OracleAcceptanceTests\OracleAcceptanceTests.csproj", "{6DFB669B-7BB0-409B-90AE-6968470EA2CB}"
