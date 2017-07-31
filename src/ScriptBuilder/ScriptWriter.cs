@@ -10,6 +10,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         {
             var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
             DirectoryExtensions.Delete(scriptPath);
+            Directory.CreateDirectory(scriptPath);
             var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
             var settings = SettingsAttributeReader.Read(module);
             foreach (var variant in settings.BuildVariants)

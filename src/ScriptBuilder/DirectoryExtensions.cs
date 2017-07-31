@@ -10,6 +10,7 @@ static class DirectoryExtensions
         }
         Directory.Delete(path, true);
     }
+
     public static void DuplicateDirectory(string source, string destination)
     {
         foreach (var dirPath in Directory.GetDirectories(source, "*", SearchOption.AllDirectories))
