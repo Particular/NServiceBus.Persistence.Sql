@@ -13,6 +13,7 @@
     <PackageOutputPath>..\..\nugets</PackageOutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludePDBsInPackage</TargetsForTfmSpecificContentInPackage>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="IncludePDBsInPackage" Condition="'$(IncludeBuildOutput)' != 'false'">
