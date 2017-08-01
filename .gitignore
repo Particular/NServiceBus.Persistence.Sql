@@ -97,3 +97,4 @@ src/scaffolding.config
 # JetBrains Rider
 .idea/
 *.sln.iml
+src/Integration/Directory.Build.props
