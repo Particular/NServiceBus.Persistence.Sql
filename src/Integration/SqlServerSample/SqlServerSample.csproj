@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <OutputType>exe</OutputType>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\SqlHelper.cs" Link="SqlHelper.cs" />
