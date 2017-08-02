@@ -15,6 +15,7 @@ namespace NServiceBus.AcceptanceTests
         [SetUp]
         public void SetUp()
         {
+            System.Configuration.ConfigurationManager.GetSection("MySQL");
             Conventions.EndpointNamingConvention = t =>
             {
                 var classAndEndpoint = t.FullName.Split('.').Last();
