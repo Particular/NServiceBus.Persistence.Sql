@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_receiving_that_completes_the_saga : NServiceBusAcceptanceTest
     {
@@ -86,11 +87,13 @@
                 });
             }
 
-            public class TestSaga10 : Saga<TestSagaData10>,
+            public class TestSaga10 : SqlSaga<TestSagaData10>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<CompleteSagaMessage>,
                 IHandleMessages<AnotherMessage>
             {
+                protected override string CorrelationPropertyName => nameof(TestSagaData10.SomeId);
+
                 public Context Context { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -119,14 +122,11 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData10> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<CompleteSagaMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<AnotherMessage>(m => m.SomeId)
-                        .ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<CompleteSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<AnotherMessage>(m => m.SomeId);
                 }
             }
 

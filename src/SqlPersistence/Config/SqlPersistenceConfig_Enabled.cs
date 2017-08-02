@@ -1,4 +1,4 @@
-using NServiceBus.Configuration.AdvanceExtensibility;
+using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 

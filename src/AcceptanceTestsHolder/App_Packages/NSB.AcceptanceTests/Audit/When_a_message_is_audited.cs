@@ -9,6 +9,7 @@
     using MessageMutator;
     using NUnit.Framework;
 
+    [Explicit]
     public class When_a_message_is_audited : NServiceBusAcceptanceTest
     {
         [Test]

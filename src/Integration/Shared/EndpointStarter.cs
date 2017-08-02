@@ -8,8 +8,8 @@ public static class EndpointStarter
     public static async Task Start(string endpointName, Action<PersistenceExtensions<SqlPersistence>> configurePersistence)
     {
         var endpointConfiguration = new EndpointConfiguration($"SqlPersistence.Sample{endpointName}");
-        endpointConfiguration.UseSerialization<JsonSerializer>();
         endpointConfiguration.EnableInstallers();
+        endpointConfiguration.UseTransport<MsmqTransport>();
         endpointConfiguration.EnableOutbox();
         endpointConfiguration.SendFailedMessagesTo("Error");
 

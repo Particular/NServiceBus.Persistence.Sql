@@ -6,6 +6,8 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
+    using Routing;
 
     //Repro for #1323
     public class When_started_by_event_from_another_saga : NServiceBusAcceptanceTest
@@ -55,10 +57,12 @@
                 });
             }
 
-            public class EventFromOtherSaga1 : Saga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
+            public class EventFromOtherSaga1 : SqlSaga<EventFromOtherSaga1.EventFromOtherSaga1Data>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<EventFromOtherSaga1.Timeout1>
             {
+                protected override string CorrelationPropertyName => nameof(EventFromOtherSaga1Data.DataId);
+
                 public Context TestContext { get; set; }
 
                 public async Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -79,9 +83,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<EventFromOtherSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga1Data : ContainSagaData
@@ -107,10 +111,12 @@
                 metadata => metadata.RegisterPublisherFor<SomethingHappenedEvent>(typeof(SagaThatPublishesAnEvent)));
             }
 
-            public class EventFromOtherSaga2 : Saga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
+            public class EventFromOtherSaga2 : SqlSaga<EventFromOtherSaga2.EventFromOtherSaga2Data>,
                 IAmStartedByMessages<SomethingHappenedEvent>,
                 IHandleTimeouts<EventFromOtherSaga2.Saga2Timeout>
             {
+                protected override string CorrelationPropertyName => nameof(EventFromOtherSaga2Data.DataId);
+
                 public Context Context { get; set; }
 
                 public Task Handle(SomethingHappenedEvent message, IMessageHandlerContext context)
@@ -127,9 +133,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<EventFromOtherSaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<SomethingHappenedEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<SomethingHappenedEvent>(m => m.DataId);
                 }
 
                 public class EventFromOtherSaga2Data : ContainSagaData

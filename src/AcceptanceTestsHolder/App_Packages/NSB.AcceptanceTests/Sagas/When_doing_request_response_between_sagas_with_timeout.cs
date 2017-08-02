@@ -6,8 +6,9 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
-    public class When_doing_request_response_between_sagas_with_timeout : NServiceBusAcceptanceTest
+    public partial class When_doing_request_response_between_sagas_with_timeout : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_timeouts()
@@ -32,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestResponseRequestingSaga3 : Saga<RequestResponseRequestingSaga3.RequestResponseRequestingSagaData3>,
+            public class RequestResponseRequestingSaga3 : SqlSaga<RequestResponseRequestingSaga3.RequestResponseRequestingSagaData3>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -55,10 +56,11 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<RequestResponseRequestingSagaData3> mapper)
+                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData3.CorrIdForResponse);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id).ToSaga(s => s.CorrIdForResponse);
-                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId).ToSaga(s => s.CorrIdForResponse);
+                    mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id);
+                    mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
                 public class RequestResponseRequestingSagaData3 : ContainSagaData
@@ -67,7 +69,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
 
-            public class RequestResponseRespondingSaga3 : Saga<RequestResponseRespondingSaga3.RequestResponseRespondingSagaData3>,
+            public class RequestResponseRespondingSaga3 : SqlSaga<RequestResponseRespondingSaga3.RequestResponseRespondingSagaData3>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
                 IHandleTimeouts<RequestResponseRespondingSaga3.DelayReply>
             {
@@ -80,16 +82,17 @@ namespace NServiceBus.AcceptanceTests.Sagas
 
                 public Task Timeout(DelayReply state, IMessageHandlerContext context)
                 {
-                    //reply to originator must be used here since the sender of the incoming message is the TimeoutManager and not the requesting saga
-                    return ReplyToOriginator(context, new ResponseFromOtherSaga //change this line to Bus.Reply(new ResponseFromOtherSaga and see it fail
+                    //reply to originator must be used here since the sender of the incoming message the timeoutmanager and not the requesting saga
+                    return ReplyToOriginator(context, new ResponseFromOtherSaga //change this line to Bus.Reply(new ResponseFromOtherSaga  and see it fail
                     {
                         SomeCorrelationId = Data.CorrIdForRequest //wont be needed in the future
                     });
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<RequestResponseRespondingSagaData3> mapper)
+                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData3.CorrIdForRequest);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs).ToSaga(s => s.CorrIdForRequest);
+                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
                 }
 
 
