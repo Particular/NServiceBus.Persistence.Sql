@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NServiceBus" Version="6.3.4" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
     <PackageReference Include="NServiceBus.Persistence.Sql" Version="$(IntegrationVersion)" />
     <PackageReference Include="NServiceBus.Persistence.Sql.MsBuild" Version="$(IntegrationVersion)" />
   </ItemGroup>
