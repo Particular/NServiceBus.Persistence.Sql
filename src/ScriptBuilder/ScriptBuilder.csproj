@@ -30,4 +30,10 @@
     <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)"
+               ContinueOnError="WarnAndContinue" />
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)"
+               ContinueOnError="WarnAndContinue" />
+  </Target>
 </Project>
