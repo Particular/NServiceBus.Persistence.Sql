@@ -57,7 +57,7 @@ public class MixedSagaAndOutbox
     {
         public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         public class SagaData : ContainSagaData

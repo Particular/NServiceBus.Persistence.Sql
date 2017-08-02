@@ -1,37 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
-    <NuSpecFileName>NServiceBus.Persistence.Sql</NuSpecFileName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyTitle>NServiceBus.Persistence.Sql</AssemblyTitle>
+    <Product>NServiceBus.Persistence.Sql</Product>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <OutputPath>..\..\binaries\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>CS0419</NoWarn>
-    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
+    <NoWarn>$(NoWarn);CS0419</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NServiceBus" Version="6.3.4" />
-    <PackageReference Include="NuGetPackager" Version="0.6.5" />
-    <Compile Include="..\CommonAssemblyInfo.cs" />
-    <Compile Include="..\Guard.cs" />
-    <Reference Include="System.Transactions" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Transactions" />
   </ItemGroup>
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
-    <MakeDir Directories="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
+    <PackageReference Include="NServiceBus" Version="[6.2.0, 7.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Guard.cs" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>NServiceBus.Persistence.Sql</PackageId>
+    <Description>Sql persistence for NServiceBus</Description>
+  </PropertyGroup>
+
+  <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
+    <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
 </Project>

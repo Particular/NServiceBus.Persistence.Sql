@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
-using Mono.Cecil;
-using NServiceBus.Persistence.Sql;
+using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class InnerTask
 {
@@ -22,52 +20,13 @@ class InnerTask
 
     public void Execute()
     {
-        var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
-        var scriptPath = Path.Combine(intermediateDirectory, "NServiceBus.Persistence.Sql");
-        DirectoryExtensions.Delete(scriptPath);
-        var settings = SettingsAttributeReader.Read(module);
-        foreach (var variant in settings.BuildVariants)
-        {
-            var variantPath = Path.Combine(scriptPath, variant.ToString());
-            Directory.CreateDirectory(variantPath);
-            if (settings.ProduceSagaScripts)
-            {
-                SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
-            }
-            if (settings.ProduceTimeoutScripts)
-            {
-                TimeoutWriter.WriteTimeoutScript(variantPath, variant);
-            }
-            if (settings.ProduceSubscriptionScripts)
-            {
-                SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
-            }
-            if (settings.ProduceOutboxScripts)
-            {
-                OutboxWriter.WriteOutboxScript(variantPath, variant);
-            }
-        }
-
-        PromoteFiles(scriptPath, settings);
+        ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
-    void PromoteFiles(string scriptPath, Settings settings)
+    string FindPromotionPath(string propotionPathSetting)
     {
-        if (settings.ScriptPromotionPath == null)
-        {
-            return;
-        }
-        var replicationPath = settings.ScriptPromotionPath
+        return propotionPathSetting
             .Replace("$(ProjectDir)", projectDirectory)
             .Replace("$(SolutionDir)", solutionDirectory);
-        try
-        {
-            DirectoryExtensions.Delete(replicationPath);
-            DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
-        }
-        catch (Exception exception)
-        {
-            throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
-        }
     }
 }

@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net452</TargetFramework>
     <AssemblyName>MySqlAcceptanceTests</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);MySQL</DefineConstants>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="MySql.Data" Version="6.9.9" />
     <PackageReference Include="NServiceBus" Version="6.3.4" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.3.4" />

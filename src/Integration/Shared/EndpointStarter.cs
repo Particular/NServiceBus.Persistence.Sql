@@ -22,38 +22,32 @@ public static class EndpointStarter
         var endpoint = await Endpoint.Start(endpointConfiguration)
             .ConfigureAwait(false);
         Console.WriteLine("Press any key to exit");
-        try
+        var myEvent = new MyEvent
         {
-            var myEvent = new MyEvent
-            {
-                Property = "PropertyValue"
-            };
-            await endpoint.Publish(myEvent)
-                .ConfigureAwait(false);
+            Property = "PropertyValue"
+        };
+        await endpoint.Publish(myEvent)
+            .ConfigureAwait(false);
 
-            var startSagaMessage = new StartSagaMessage
-            {
-                MySagaId = Guid.NewGuid()
-            };
-            await endpoint.SendLocal(startSagaMessage)
-                .ConfigureAwait(false);
-
-            var deferMessage = new DeferMessage
-            {
-                Property = "PropertyValue"
-            };
-            var options = new SendOptions();
-            options.RouteToThisEndpoint();
-            options.DelayDeliveryWith(TimeSpan.FromSeconds(1));
-            await endpoint.Send(deferMessage, options)
-                .ConfigureAwait(false);
-
-            Console.ReadKey();
-        }
-        finally
+        var startSagaMessage = new StartSagaMessage
         {
-            await endpoint.Stop()
-                .ConfigureAwait(false);
-        }
+            MySagaId = Guid.NewGuid()
+        };
+        await endpoint.SendLocal(startSagaMessage)
+            .ConfigureAwait(false);
+
+        var deferMessage = new DeferMessage
+        {
+            Property = "PropertyValue"
+        };
+        var options = new SendOptions();
+        options.RouteToThisEndpoint();
+        options.DelayDeliveryWith(TimeSpan.FromSeconds(1));
+        await endpoint.Send(deferMessage, options)
+            .ConfigureAwait(false);
+
+        Console.ReadKey();
+        await endpoint.Stop()
+            .ConfigureAwait(false);
     }
 }

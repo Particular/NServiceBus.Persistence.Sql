@@ -4,7 +4,7 @@
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>ScriptBuilderTask.Tests.Target</AssemblyName>
     <PackageId>ScriptBuilderTask.Tests.Target</PackageId>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NServiceBus" Version="6.3.4" />
