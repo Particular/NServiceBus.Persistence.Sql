@@ -67,7 +67,7 @@ public class MixedSagaAndNoOutbox : IDisposable
             StartId = Guid.NewGuid()
         };
         await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
-        manualResetEvent.WaitOne();
+        manualResetEvent.WaitOne(TimeSpan.FromSeconds(30));
         await endpoint.Stop().ConfigureAwait(false);
     }
 
