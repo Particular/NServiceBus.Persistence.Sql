@@ -72,7 +72,7 @@ public class MsmqTransportIntegrationTests : IDisposable
             StartId = Guid.NewGuid()
         };
         await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
-        ManualResetEvent.WaitOne();
+        Assert.IsTrue(ManualResetEvent.WaitOne(TimeSpan.FromSeconds(30)));
         await endpoint.Stop().ConfigureAwait(false);
     }
 

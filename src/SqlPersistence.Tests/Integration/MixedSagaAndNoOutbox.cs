@@ -67,7 +67,7 @@ public class MixedSagaAndNoOutbox : IDisposable
             StartId = Guid.NewGuid()
         };
         await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
-        manualResetEvent.WaitOne();
+        Assert.IsTrue(manualResetEvent.WaitOne(TimeSpan.FromSeconds(30)));
         await endpoint.Stop().ConfigureAwait(false);
     }
 
@@ -91,7 +91,7 @@ public class MixedSagaAndNoOutbox : IDisposable
             StartId = Guid.NewGuid()
         };
         await endpoint.SendLocal(startSagaMessage).ConfigureAwait(false);
-        manualResetEvent.WaitOne();
+        Assert.IsTrue(manualResetEvent.WaitOne(TimeSpan.FromSeconds(30)));
         await endpoint.Stop().ConfigureAwait(false);
     }
 
