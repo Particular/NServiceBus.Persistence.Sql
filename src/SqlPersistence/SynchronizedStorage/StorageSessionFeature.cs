@@ -20,9 +20,14 @@ class StorageSessionFeature : Feature
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
 
-        container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
+        var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
+
+        if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
+        {
+            container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+            container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+        }
         if (isSagasEnabledForSqlPersistence)
         {
             var sagaPersister = new SagaPersister(infoCache, sqlVariant);
