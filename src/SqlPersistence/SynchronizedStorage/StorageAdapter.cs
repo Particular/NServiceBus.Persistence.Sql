@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
@@ -36,8 +35,8 @@ class StorageAdapter : ISynchronizedStorageAdapter
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
         //SQL server transport in native TX mode
-        if (transportTransaction.TryGet(out SqlConnection existingSqlConnection) &&
-            transportTransaction.TryGet(out SqlTransaction existingSqlTransaction))
+        if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
+            transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
         {
             return new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
         }
@@ -54,14 +53,14 @@ class StorageAdapter : ISynchronizedStorageAdapter
                 + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
         }
         var ambientTransaction = transportTx ?? scopeTx;
-        if (ambientTransaction != null)
+        if (ambientTransaction == null)
         {
-            var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
-            connection.EnlistTransaction(ambientTransaction);
-            return new StorageSession(connection, null, true, infoCache);
+            //Other modes handled by creating a new session.
+            return null;
         }
+        var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
+        connection.EnlistTransaction(ambientTransaction);
+        return new StorageSession(connection, null, true, infoCache);
 
-        //Other modes handled by creating a new session.
-        return null;
     }
 }
