@@ -11,27 +11,30 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
             DirectoryExtensions.Delete(scriptPath);
             Directory.CreateDirectory(scriptPath);
-            var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
-            var settings = SettingsAttributeReader.Read(module);
-            foreach (var variant in settings.BuildVariants)
+            Settings settings;
+            using (var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred)))
             {
-                var variantPath = Path.Combine(scriptPath, variant.ToString());
-                Directory.CreateDirectory(variantPath);
-                if (settings.ProduceSagaScripts)
+                settings = SettingsAttributeReader.Read(module);
+                foreach (var variant in settings.BuildVariants)
                 {
-                    SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
-                }
-                if (settings.ProduceTimeoutScripts)
-                {
-                    TimeoutWriter.WriteTimeoutScript(variantPath, variant);
-                }
-                if (settings.ProduceSubscriptionScripts)
-                {
-                    SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
-                }
-                if (settings.ProduceOutboxScripts)
-                {
-                    OutboxWriter.WriteOutboxScript(variantPath, variant);
+                    var variantPath = Path.Combine(scriptPath, variant.ToString());
+                    Directory.CreateDirectory(variantPath);
+                    if (settings.ProduceSagaScripts)
+                    {
+                        SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
+                    }
+                    if (settings.ProduceTimeoutScripts)
+                    {
+                        TimeoutWriter.WriteTimeoutScript(variantPath, variant);
+                    }
+                    if (settings.ProduceSubscriptionScripts)
+                    {
+                        SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
+                    }
+                    if (settings.ProduceOutboxScripts)
+                    {
+                        OutboxWriter.WriteOutboxScript(variantPath, variant);
+                    }
                 }
             }
 
