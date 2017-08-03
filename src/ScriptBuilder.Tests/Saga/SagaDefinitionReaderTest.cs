@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using ApprovalTests;
 using Mono.Cecil;
 using NServiceBus;
@@ -8,7 +9,7 @@ using NUnit.Framework;
 using ObjectApproval;
 
 [TestFixture]
-public class SagaDefinitionReaderTest
+public class SagaDefinitionReaderTest: IDisposable
 {
     ModuleDefinition module;
 
@@ -200,5 +201,10 @@ public class SagaDefinitionReaderTest
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)
         {
         }
+    }
+
+    public void Dispose()
+    {
+        module?.Dispose();
     }
 }
