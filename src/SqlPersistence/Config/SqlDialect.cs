@@ -1,26 +1,26 @@
 namespace NServiceBus
 {
     /// <summary>
-    /// 
+    /// Allows for configuring which database engine to target. Used by <see cref="SqlPersistenceConfig.SqlDialect{T}"/>.
     /// </summary>
     public class SqlDialect
     {
         /// <summary>
-        /// Microsoft SQL Server.
+        /// Microsoft SQL Server
         /// </summary>
         public class MsSqlServer : SqlDialect
         {
         }
 
         /// <summary>
-        /// MySQL.
+        /// MySQL
         /// </summary>
         public class MySql : SqlDialect
         {
         }
 
         /// <summary>
-        /// Oracle.
+        /// Oracle
         /// </summary>
         public class Oracle : SqlDialect
         {
