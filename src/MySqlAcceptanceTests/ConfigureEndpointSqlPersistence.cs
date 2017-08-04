@@ -19,7 +19,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlVariant.MySql);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
-        var settings = persistence.Dialect<SqlDialect.MySql>();
+        var dialectSettings = persistence.Dialect<SqlDialect.MySql>();
         persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
