@@ -1,59 +1,4 @@
-﻿namespace NServiceBus
-{
-    public class MsSqlDialectSettings : NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer>
-    {
-        public MsSqlDialectSettings() { }
-    }
-    public class MySqlDialectSettings : NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MySql>
-    {
-        public MySqlDialectSettings() { }
-    }
-    public class OracleDialectSettings : NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle>
-    {
-        public OracleDialectSettings() { }
-    }
-    public class SqlDialect
-    {
-        public SqlDialect() { }
-        public class MsSqlServer : NServiceBus.SqlDialect
-        {
-            public MsSqlServer() { }
-        }
-        public class MySql : NServiceBus.SqlDialect
-        {
-            public MySql() { }
-        }
-        public class Oracle : NServiceBus.SqlDialect
-        {
-            public Oracle() { }
-        }
-    }
-    public class SqlDialectSettings<T>
-        where T : NServiceBus.SqlDialect
-    {
-        public SqlDialectSettings() { }
-    }
-    public class static SqlPersistenceConfig
-    {
-        public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
-        public static NServiceBus.SqlDialectSettings<T> Dialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
-            where T : NServiceBus.SqlDialect { }
-        public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
-        [System.ObsoleteAttribute()]
-        public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
-        public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
-    }
-    public class static SqlPersistenceStorageSessionExtensions
-    {
-        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
-            where TSagaData : NServiceBus.IContainSagaData { }
-        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
-    }
-}
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     public interface IMessagePropertyMapper
     {
@@ -168,6 +113,50 @@ namespace NServiceBus.Persistence.Sql
         public string Range { get; }
         public string RemoveById { get; }
         public string RemoveBySagaId { get; }
+    }
+}
+namespace NServiceBus
+{
+    public class SqlDialect
+    {
+        public SqlDialect() { }
+        public class MsSqlServer : NServiceBus.SqlDialect
+        {
+            public MsSqlServer() { }
+        }
+        public class MySql : NServiceBus.SqlDialect
+        {
+            public MySql() { }
+        }
+        public class Oracle : NServiceBus.SqlDialect
+        {
+            public Oracle() { }
+        }
+    }
+    public class SqlDialectSettings<T>
+        where T : NServiceBus.SqlDialect
+    {
+        public SqlDialectSettings() { }
+    }
+    public class static SqlPersistenceConfig
+    {
+        public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+        public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings) { }
+        public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
+        public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
+            where T : NServiceBus.SqlDialect { }
+        [System.ObsoleteAttribute()]
+        public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
+        public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
+    }
+    public class static SqlPersistenceStorageSessionExtensions
+    {
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
+            where TSagaData : NServiceBus.IContainSagaData { }
+        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
 public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);
