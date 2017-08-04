@@ -4,7 +4,7 @@ namespace NServiceBus
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SqlDialectSettings<T> where T : SqlDialect
+    public abstract class SqlDialectSettings<T> where T : SqlDialect
     {
     }
 
