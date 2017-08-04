@@ -14,7 +14,7 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan? cacheFor)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, Type sqlVariant, string schema, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
         this.cacheFor = cacheFor;

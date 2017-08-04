@@ -14,8 +14,8 @@ class StorageSessionFeature : Feature
     {
         var settings = context.Settings;
         ValidateSagaOutboxCombo(settings);
-
-        var sqlVariant = settings.GetSqlVariant();
+        
+        var sqlVariant = settings.GetSqlDialect();
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
 
@@ -53,7 +53,7 @@ class StorageSessionFeature : Feature
         throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
     }
 
-    static SagaInfoCache BuildSagaInfoCache(SqlVariant sqlVariant, ReadOnlySettings settings)
+    static SagaInfoCache BuildSagaInfoCache(Type sqlVariant, ReadOnlySettings settings)
     {
 #pragma warning disable 618
         var commandBuilder = new SagaCommandBuilder(sqlVariant);

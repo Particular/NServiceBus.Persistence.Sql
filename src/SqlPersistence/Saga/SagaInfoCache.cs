@@ -18,7 +18,7 @@ class SagaInfoCache
     Func<string, string> nameFilter;
     string tablePrefix;
     string schema;
-    SqlVariant sqlVariant;
+    Type sqlVariant;
 
     public SagaInfoCache(
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
@@ -28,7 +28,7 @@ class SagaInfoCache
         SagaCommandBuilder commandBuilder,
         string tablePrefix,
         string schema,
-        SqlVariant sqlVariant,
+        Type sqlVariant,
         SagaMetadataCollection metadataCollection,
         Func<string, string> nameFilter)
     {

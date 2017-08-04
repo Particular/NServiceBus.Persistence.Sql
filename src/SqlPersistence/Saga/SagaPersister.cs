@@ -1,7 +1,6 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Extensibility;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
 partial class SagaPersister : ISagaPersister
@@ -9,7 +8,7 @@ partial class SagaPersister : ISagaPersister
     SagaInfoCache sagaInfoCache;
     CommandBuilder commandBuilder;
 
-    public SagaPersister(SagaInfoCache sagaInfoCache, SqlVariant sqlVariant)
+    public SagaPersister(SagaInfoCache sagaInfoCache, Type sqlVariant)
     {
         this.sagaInfoCache = sagaInfoCache;
         commandBuilder = new CommandBuilder(sqlVariant);

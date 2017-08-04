@@ -27,8 +27,8 @@ namespace NServiceBus
             {
                 return schema;
             }
-            var sqlVariant = settings.GetSqlVariant();
-            if (sqlVariant == Persistence.Sql.SqlVariant.MsSqlServer)
+            var sqlVariant = settings.GetSqlDialect();
+            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
             {
                 return "dbo";
             }

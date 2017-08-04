@@ -16,7 +16,7 @@ class SqlSubscriptionFeature : Feature
 
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
-        var sqlVariant = settings.GetSqlVariant();
+        var sqlVariant = settings.GetSqlDialect();
         var schema = settings.GetSchema();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema, cacheFor);

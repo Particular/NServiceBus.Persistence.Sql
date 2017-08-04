@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Installation;
 using NServiceBus.Logging;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
 class Installer : INeedToInstallSomething
@@ -22,7 +21,7 @@ class Installer : INeedToInstallSomething
     public async Task Install(string identity)
     {
         var connectionBuilder = settings.GetConnectionBuilder();
-        var sqlVariant = settings.GetSqlVariant();
+        var sqlVariant = settings.GetSqlDialect();
         var schema = settings.GetSchema();
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlVariant);
         var tablePrefix = settings.GetTablePrefix();
@@ -41,7 +40,7 @@ class Installer : INeedToInstallSomething
         }
     }
 
-    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, Type sqlVariant)
     {
         if (!settings.ShouldInstall<SqlOutboxFeature>())
         {
@@ -51,7 +50,7 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Outbox_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
+        if (sqlVariant == typeof(SqlDialect.Oracle))
         {
             return connection.ExecuteTableCommand(
                 transaction: transaction,
@@ -68,7 +67,7 @@ class Installer : INeedToInstallSomething
         }
     }
 
-    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, Type sqlVariant)
     {
         if (!settings.ShouldInstall<SqlSubscriptionFeature>())
         {
@@ -78,7 +77,7 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Subscription_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
+        if (sqlVariant == typeof(SqlDialect.Oracle))
         {
             return connection.ExecuteTableCommand(
                 transaction: transaction,
@@ -95,7 +94,7 @@ class Installer : INeedToInstallSomething
         }
     }
 
-    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, Type sqlVariant)
     {
         if (!settings.ShouldInstall<SqlTimeoutFeature>())
         {
@@ -105,7 +104,7 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
+        if (sqlVariant == typeof(SqlDialect.Oracle))
         {
             return connection.ExecuteTableCommand(
                 transaction: transaction,
@@ -122,7 +121,7 @@ class Installer : INeedToInstallSomething
         }
     }
 
-    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, Type sqlVariant)
     {
         if (!settings.ShouldInstall<SqlSagaFeature>())
         {
@@ -140,7 +139,7 @@ class Installer : INeedToInstallSomething
 {string.Join(Environment.NewLine, scriptFiles)}");
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
-        if (sqlVariant == SqlVariant.Oracle)
+        if (sqlVariant == typeof(SqlDialect.Oracle))
         {
             return connection.ExecuteTableCommand(
                 transaction: transaction,

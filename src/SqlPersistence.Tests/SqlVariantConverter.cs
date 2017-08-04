@@ -1,33 +1,38 @@
 using System;
-using NServiceBus.Persistence.Sql;
+using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 public static class SqlVariantConverter
 {
-    public static BuildSqlVariant Convert(this SqlVariant sqlVariant)
+    public static BuildSqlVariant Convert(this Type sqlVariant)
     {
-        switch (sqlVariant)
+       if(sqlVariant == typeof(SqlDialect.MsSqlServer))
+       {
+           return BuildSqlVariant.MsSqlServer;
+       }
+
+        if (sqlVariant == typeof(SqlDialect.MySql))
         {
-            case SqlVariant.MsSqlServer:
-                return BuildSqlVariant.MsSqlServer;
-            case SqlVariant.MySql:
-                return BuildSqlVariant.MySql;
-            case SqlVariant.Oracle:
-                return BuildSqlVariant.Oracle;
-            default:
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            return BuildSqlVariant.MySql;
         }
+
+        if (sqlVariant == typeof(SqlDialect.Oracle))
+        {
+            return BuildSqlVariant.Oracle;
+        }
+
+        throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
     }
-    public static SqlVariant Convert(this BuildSqlVariant sqlVariant)
+    public static Type Convert(this BuildSqlVariant sqlVariant)
     {
         switch (sqlVariant)
         {
             case BuildSqlVariant.MsSqlServer:
-                return SqlVariant.MsSqlServer;
+                return typeof(SqlDialect.MsSqlServer);
             case BuildSqlVariant.MySql:
-                return SqlVariant.MySql;
+                return typeof(SqlDialect.MySql);
             case BuildSqlVariant.Oracle:
-                return SqlVariant.Oracle;
+                return typeof(SqlDialect.Oracle);
             default:
                 throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
         }

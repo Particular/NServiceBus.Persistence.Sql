@@ -19,7 +19,7 @@ class OutboxPersister : IOutboxStorage
     OutboxCommands outboxCommands;
     CommandBuilder commandBuilder;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchSize = 10000)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, Type sqlVariant, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
         this.cleanupBatchSize = cleanupBatchSize;

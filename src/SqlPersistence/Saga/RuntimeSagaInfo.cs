@@ -44,7 +44,7 @@ class RuntimeSagaInfo
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
         string schema,
-        SqlVariant sqlVariant,
+        Type sqlVariant,
         Func<string, string> nameFilter)
     {
         this.sagaDataType = sagaDataType;
@@ -63,32 +63,34 @@ class RuntimeSagaInfo
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
-        switch (sqlVariant)
+        if (sqlVariant == typeof(SqlDialect.MsSqlServer))
         {
-            case SqlVariant.MsSqlServer:
-                TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
-                FillParameter = ParameterFiller.Fill;
-                break;
-            case SqlVariant.MySql:
-                TableName = $"`{tablePrefix}{tableSuffix}`";
-                FillParameter = ParameterFiller.Fill;
-                break;
-            case SqlVariant.Oracle:
-                if (tableSuffix.Length > 27)
-                {
-                    throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-                }
-                if (Encoding.UTF8.GetBytes(tableSuffix).Length != tableSuffix.Length)
-                {
-                    throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-                }
-                TableName = tableSuffix.ToUpper();
-                FillParameter = ParameterFiller.OracleFill;
-                break;
-            default:
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
+            FillParameter = ParameterFiller.Fill;
         }
-
+        else if (sqlVariant == typeof(SqlDialect.MySql))
+        {
+            TableName = $"`{tablePrefix}{tableSuffix}`";
+            FillParameter = ParameterFiller.Fill;
+        }
+        else if (sqlVariant == typeof(SqlDialect.Oracle))
+        {
+            if (tableSuffix.Length > 27)
+            {
+                throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
+            }
+            if (Encoding.UTF8.GetBytes(tableSuffix).Length != tableSuffix.Length)
+            {
+                throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
+            }
+            TableName = tableSuffix.ToUpper();
+            FillParameter = ParameterFiller.OracleFill;
+        }
+        else
+        {
+            throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+        }
+        
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
         SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);

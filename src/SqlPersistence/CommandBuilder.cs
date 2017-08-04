@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Data.Common;
-using NServiceBus.Persistence.Sql;
+using NServiceBus;
 
 class CommandBuilder
 {
-    readonly SqlVariant sqlVariant;
+    readonly Type sqlVariant;
 
-    public CommandBuilder(SqlVariant sqlVariant)
+    public CommandBuilder(Type sqlVariant)
     {
         this.sqlVariant = sqlVariant;
     }
@@ -15,15 +15,14 @@ class CommandBuilder
     {
         var command = connection.CreateCommand();
 
-        switch (sqlVariant)
+        if (sqlVariant == typeof(SqlDialect.MsSqlServer) || sqlVariant == typeof(SqlDialect.MySql))
         {
-            case SqlVariant.MsSqlServer:
-            case SqlVariant.MySql:
-                return new CommandWrapper(command);
-            case SqlVariant.Oracle:
-                return new OracleCommandWrapper(command);
-            default:
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            return new CommandWrapper(command);
         }
+        if (sqlVariant == typeof(SqlDialect.Oracle))
+        {
+            return new OracleCommandWrapper(command);
+        }
+        throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
     }
 }

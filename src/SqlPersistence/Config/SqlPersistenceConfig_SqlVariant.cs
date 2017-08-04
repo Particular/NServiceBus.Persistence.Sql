@@ -1,28 +1,17 @@
-using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
 
 namespace NServiceBus
 {
+    using System;
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>
         /// Sets the <see cref="SqlVariant"/> to use for communicating the the current database.
         /// </summary>
+        [Obsolete]
         public static void SqlVariant(this PersistenceExtensions<SqlPersistence> configuration, SqlVariant sqlVariant)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            var settings = configuration.GetSettings();
-            settings.Set("SqlPersistence.SqlVariant", sqlVariant);
-        }
-
-        internal static SqlVariant GetSqlVariant(this ReadOnlySettings settings)
-        {
-            if (settings.TryGet("SqlPersistence.SqlVariant", out SqlVariant value))
-            {
-                return value;
-            }
-            return Persistence.Sql.SqlVariant.MsSqlServer;
         }
     }
 }

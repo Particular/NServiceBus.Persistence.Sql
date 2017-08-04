@@ -14,7 +14,7 @@ class SqlTimeoutFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var sqlVariant = settings.GetSqlVariant();
+        var sqlVariant = settings.GetSqlDialect();
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
         var schema= settings.GetSchema();
