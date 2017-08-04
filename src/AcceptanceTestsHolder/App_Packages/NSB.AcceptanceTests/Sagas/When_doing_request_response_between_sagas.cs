@@ -8,7 +8,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NUnit.Framework;
     using Persistence.Sql;
 
-    public class When_doing_request_response_between_sagas : NServiceBusAcceptanceTest
+    public partial class When_doing_request_response_between_sagas : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga()

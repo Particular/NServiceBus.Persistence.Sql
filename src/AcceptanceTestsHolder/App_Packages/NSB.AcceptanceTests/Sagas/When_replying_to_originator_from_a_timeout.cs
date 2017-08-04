@@ -8,7 +8,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NUnit.Framework;
     using Persistence.Sql;
 
-    public class When_replying_to_originator_from_a_timeout : NServiceBusAcceptanceTest
+    public partial class When_replying_to_originator_from_a_timeout : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_route_the_message_to_the_endpoint_starting_the_saga()
