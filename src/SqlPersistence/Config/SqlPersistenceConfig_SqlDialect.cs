@@ -21,14 +21,16 @@ namespace NServiceBus
         }
 
         /// <summary>
-        /// Configures hich database engine to target.
+        /// Configures which database engine to target.
         /// </summary>
         /// <returns>Settings options available for the selected database engine.</returns>
         public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration) where T : SqlDialect
         {
             var settings = configuration.GetSettings();
             settings.Set("SqlPersistence.SqlDialect", typeof(T));
-            return (SqlDialectSettings<T>)Activator.CreateInstance(typeof(SqlDialectSettings<T>));
+            
+            var type = typeof(SqlDialectSettings<>).MakeGenericType(typeof(T));
+            return (SqlDialectSettings<T>)Activator.CreateInstance(type);
         }
     }
 }

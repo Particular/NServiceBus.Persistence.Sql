@@ -3,28 +3,18 @@ namespace NServiceBus
     /// <summary>
     /// Exposes settings options available for the selected database engine.
     /// </summary>
-    public abstract class SqlDialectSettings<T> where T : SqlDialect
+    public class SqlDialectSettings<T> where T : SqlDialect
     {
     }
 
-    /// <summary>
-    /// Exposes settings options available for MySQL.
-    /// </summary>
-    public class MySqlDialectSettings : SqlDialectSettings<SqlDialect.MySql>
+    public static partial class SqlPersistenceConfig
     {
-    }
-
-    /// <summary>
-    /// Exposes settings options available for MS SQL Server.
-    /// </summary>
-    public class MsSqlDialectSettings : SqlDialectSettings<SqlDialect.MsSqlServer>
-    {
-    }
-
-    /// <summary>
-    /// Exposes settings options available for Oracle.
-    /// </summary>
-    public class OracleDialectSettings : SqlDialectSettings<SqlDialect.Oracle>
-    {
+        /// <summary>
+        /// Shows how settings will be exposed for each SQL dialect.
+        /// </summary>
+        public static void Schema(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings)
+        {
+            
+        }
     }
 }
