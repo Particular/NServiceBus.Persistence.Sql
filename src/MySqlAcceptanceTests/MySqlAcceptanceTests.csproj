@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="MySql.Data" Version="6.9.9" />
+    <PackageReference Include="MySql.Data" Version="6.10.2-beta" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.0.0-*" />
     <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
