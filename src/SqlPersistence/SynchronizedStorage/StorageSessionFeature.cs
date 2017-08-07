@@ -16,15 +16,16 @@ class StorageSessionFeature : Feature
         ValidateSagaOutboxCombo(settings);
 
         var sqlVariant = settings.GetSqlVariant();
-        var infoCache = BuildSagaInfoCache(sqlVariant, settings);
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
 
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
 
+        SagaInfoCache infoCache = null;
         if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
         {
+            infoCache = BuildSagaInfoCache(sqlVariant, settings);
             container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
             container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
         }

@@ -104,7 +104,7 @@ public class MixedSagaAndNoOutbox : IDisposable
     {
     }
 
-    public class Saga1 : SqlSaga<Saga1.SagaData>,
+    public class Saga1 : Saga<Saga1.SagaData>,
         IAmStartedByMessages<StartSagaMessage>,
         IHandleTimeouts<TimeoutMessage>
     {
@@ -125,11 +125,10 @@ public class MixedSagaAndNoOutbox : IDisposable
             public Guid StartId { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.StartId);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
-            mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId);
+            mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId)
+                .ToSaga(data => data.StartId);
         }
     }
 
