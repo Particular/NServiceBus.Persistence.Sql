@@ -35,8 +35,7 @@ public abstract class TimeoutPersisterTests
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
-            sqlVariant: sqlVariant.Convert(),
-            schema: schema, 
+            sqlDialect: sqlVariant.Convert(schema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval);
     }
 

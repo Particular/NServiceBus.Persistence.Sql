@@ -10,33 +10,33 @@ namespace NServiceBus.Persistence.Sql
     public static class OutboxCommandBuilder
     {
 
-        public static OutboxCommands Build(string tablePrefix, string schema, Type sqlVariant)
+        public static OutboxCommands Build(string tablePrefix, SqlDialect sqlDialect)
         {
             string tableName;
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                tableName = $"[{schema}].[{tablePrefix}OutboxData]";
+                tableName = $"[{sqlDialect.Schema}].[{tablePrefix}OutboxData]";
             }
-            else if (sqlVariant == typeof(SqlDialect.MySql))
+            else if (sqlDialect is SqlDialect.MySql)
             {
                 tableName = $"`{tablePrefix}OutboxData`";
             }
-            else if (sqlVariant == typeof(SqlDialect.Oracle))
+            else if (sqlDialect is SqlDialect.Oracle)
             {
                 tableName = $"{tablePrefix.ToUpper()}OD";
             }
             else
             {
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+                throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
             }
 
-            var storeCommandText = GetStoreCommand(sqlVariant, tableName);
+            var storeCommandText = GetStoreCommand(sqlDialect, tableName);
 
-            var cleanupCommand = GetCleanupCommand(sqlVariant, tableName);
+            var cleanupCommand = GetCleanupCommand(sqlDialect, tableName);
 
-            var getCommandText = GetGetCommand(sqlVariant, tableName);
+            var getCommandText = GetGetCommand(sqlDialect, tableName);
 
-            var setAsDispatchedCommand = GetSetAsDispatchedCommand(sqlVariant, tableName);
+            var setAsDispatchedCommand = GetSetAsDispatchedCommand(sqlDialect, tableName);
 
             return new OutboxCommands(
                 store: storeCommandText,
@@ -45,9 +45,9 @@ namespace NServiceBus.Persistence.Sql
                 cleanup: cleanupCommand);
         }
 
-        static string GetSetAsDispatchedCommand(Type sqlVariant, string tableName)
+        static string GetSetAsDispatchedCommand(SqlDialect sqlVariant, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer) || sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlVariant is SqlDialect.MsSqlServer || sqlVariant is SqlDialect.MySql)
             {
                 return $@"
 update {tableName}
@@ -57,7 +57,7 @@ set
     Operations = '[]'
 where MessageId = @MessageId";
             }
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlVariant is SqlDialect.Oracle)
             {
                 return $@"
 update ""{tableName}""
@@ -71,9 +71,9 @@ where MessageId = :MessageId";
             throw new Exception($"Unknown SqlVariant: {sqlVariant}");
         }
 
-        static string GetGetCommand(Type sqlVariant, string tableName)
+        static string GetGetCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer) || sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
                 return $@"
 select
@@ -82,7 +82,7 @@ select
 from {tableName}
 where MessageId = @MessageId";
             }
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $@"
 select
@@ -92,12 +92,12 @@ from ""{tableName}""
 where MessageId = :MessageId";
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            throw new Exception($"Unknown SqlVariant: {sqlDialect}");
         }
 
-        static string GetStoreCommand(Type sqlVariant, string tableName)
+        static string GetStoreCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer) || sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
                 return $@"
 insert into {tableName}
@@ -113,7 +113,7 @@ values
     @PersistenceVersion
 )";
             }
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $@"
 insert into ""{tableName}""
@@ -130,19 +130,19 @@ values
 )";
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
         }
 
-        static string GetCleanupCommand(Type sqlVariant, string tableName)
+        static string GetCleanupCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
                 return $@"
 delete top (@BatchSize) from {tableName}
 where Dispatched = 'true'
     and DispatchedAt < @DispatchedBefore";
             }
-            if (sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlDialect is SqlDialect.MySql)
             {
                 return $@"
 delete from {tableName}
@@ -150,7 +150,7 @@ where Dispatched = true
     and DispatchedAt < @DispatchedBefore
 limit @BatchSize";
             }
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
 
                 return $@"
@@ -160,7 +160,7 @@ where Dispatched = 1
     and rownum <= :BatchSize";
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
         }
     }
 }

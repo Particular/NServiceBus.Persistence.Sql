@@ -4,25 +4,25 @@ using NServiceBus;
 
 class CommandBuilder
 {
-    readonly Type sqlVariant;
+    readonly SqlDialect sqlDialect;
 
-    public CommandBuilder(Type sqlVariant)
+    public CommandBuilder(SqlDialect sqlDialect)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
     }
 
     public CommandWrapper CreateCommand(DbConnection connection)
     {
         var command = connection.CreateCommand();
 
-        if (sqlVariant == typeof(SqlDialect.MsSqlServer) || sqlVariant == typeof(SqlDialect.MySql))
+        if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
         {
             return new CommandWrapper(command);
         }
-        if (sqlVariant == typeof(SqlDialect.Oracle))
+        if (sqlDialect is SqlDialect.Oracle)
         {
             return new OracleCommandWrapper(command);
         }
-        throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+        throw new Exception($"Unknown SqlVariant: {sqlDialect.Name}.");
     }
 }

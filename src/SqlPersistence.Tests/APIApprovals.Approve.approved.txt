@@ -12,7 +12,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.OutboxCommands Build(string tablePrefix, string schema, System.Type sqlVariant) { }
+        public static NServiceBus.Persistence.Sql.OutboxCommands Build(string tablePrefix, NServiceBus.SqlDialect sqlDialect) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class OutboxCommands
@@ -27,7 +27,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class SagaCommandBuilder
     {
-        public SagaCommandBuilder(System.Type sqlVariant) { }
+        public SagaCommandBuilder(NServiceBus.SqlDialect sqlDialect) { }
         [System.ObsoleteAttribute("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts fo" +
             "r.", true)]
         public SagaCommandBuilder() { }
@@ -83,7 +83,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static SubscriptionCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(System.Type sqlVariant, string tablePrefix, string schema) { }
+        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.SqlDialect sqlDialect, string tablePrefix) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class SubscriptionCommands
@@ -101,7 +101,7 @@
     [System.ObsoleteAttribute("Not for public use")]
     public class static TimeoutCommandBuilder
     {
-        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(System.Type sqlVariant, string tablePrefix, string schema) { }
+        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.SqlDialect sqlDialect, string tablePrefix) { }
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class TimeoutCommands
@@ -120,6 +120,7 @@ namespace NServiceBus
     public class SqlDialect
     {
         public SqlDialect() { }
+        public override string ToString() { }
         public class MsSqlServer : NServiceBus.SqlDialect
         {
             public MsSqlServer() { }
@@ -134,7 +135,7 @@ namespace NServiceBus
         }
     }
     public class SqlDialectSettings<T>
-        where T : NServiceBus.SqlDialect
+        where T : NServiceBus.SqlDialect, new ()
     {
         public SqlDialectSettings() { }
     }
@@ -145,8 +146,9 @@ namespace NServiceBus
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings) { }
         public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
+        public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
         public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
-            where T : NServiceBus.SqlDialect { }
+            where T : NServiceBus.SqlDialect, new () { }
         [System.ObsoleteAttribute()]
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }

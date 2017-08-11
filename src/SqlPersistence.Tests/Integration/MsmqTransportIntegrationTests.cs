@@ -62,6 +62,7 @@ public class MsmqTransportIntegrationTests : IDisposable
         var transport = endpointConfiguration.UseTransport<MsmqTransport>();
         transport.Transactions(transactionMode);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();

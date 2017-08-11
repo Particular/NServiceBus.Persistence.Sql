@@ -57,6 +57,7 @@ public class MixedSagaAndNoOutbox : IDisposable
         endpointConfiguration.UseTransport<LearningTransport>();
 
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         endpointConfiguration.UsePersistence<InMemoryPersistence, StorageType.Sagas>();

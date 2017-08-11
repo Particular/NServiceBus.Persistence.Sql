@@ -1,6 +1,4 @@
-using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
 
 namespace NServiceBus
 {
@@ -14,25 +12,17 @@ namespace NServiceBus
         /// </summary>
         public static void Schema(this PersistenceExtensions<SqlPersistence> configuration, string schema)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNullAndEmpty(nameof(schema), schema);
-            Guard.AgainstSqlDelimiters(nameof(schema), schema);
-            configuration.GetSettings()
-                .Set("SqlPersistence.Schema", schema);
         }
 
-        internal static string GetSchema(this ReadOnlySettings settings)
+        /// <summary>
+        /// Configures the database schema to be used.
+        /// </summary>
+        public static void Schema(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings, string schema)
         {
-            if (settings.TryGet("SqlPersistence.Schema", out string schema))
-            {
-                return schema;
-            }
-            var sqlVariant = settings.GetSqlDialect();
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
-            {
-                return "dbo";
-            }
-            return null;
+            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
+            Guard.AgainstNullAndEmpty(nameof(schema), schema);
+            Guard.AgainstSqlDelimiters(nameof(schema), schema);
+            dialectSettings.Settings.Schema = schema;
         }
 
     }

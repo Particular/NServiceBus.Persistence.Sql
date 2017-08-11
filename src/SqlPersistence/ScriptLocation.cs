@@ -1,14 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using NServiceBus;
 
 static class ScriptLocation
 {
-    public static string FindScriptDirectory(Type sqlVariant)
+    public static string FindScriptDirectory(SqlDialect dialect)
     {
         var codeBase = Assembly.GetExecutingAssembly().CodeBase;
         var currentDirectory = Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", sqlVariant.ToString());
+        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", dialect.Name);
     }
 
     public static void ValidateScriptExists(string createScript)

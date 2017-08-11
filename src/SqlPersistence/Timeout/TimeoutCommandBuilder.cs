@@ -10,22 +10,22 @@ namespace NServiceBus.Persistence.Sql
     public static class TimeoutCommandBuilder
     {
 
-        public static TimeoutCommands Build(Type sqlVariant, string tablePrefix, string schema)
+        public static TimeoutCommands Build(SqlDialect sqlDialect, string tablePrefix)
         {
-            if (sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlDialect is SqlDialect.MySql)
             {
                 return BuildMySqlCommands($"`{tablePrefix}TimeoutData`");
             }
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                return BuildSqlServerCommands($"[{schema}].[{tablePrefix}TimeoutData]");
+                return BuildSqlServerCommands($"[{sqlDialect.Schema}].[{tablePrefix}TimeoutData]");
             }
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return BuildOracleCommands($"{tablePrefix.ToUpper()}TO");
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            throw new Exception($"Unknown SqlVariant: {sqlDialect}.");
         }
 
         static TimeoutCommands BuildMySqlCommands(string tableName)

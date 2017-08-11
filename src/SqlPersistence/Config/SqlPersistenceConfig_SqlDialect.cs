@@ -11,26 +11,27 @@ namespace NServiceBus
     public static partial class SqlPersistenceConfig
     {
 
-        internal static Type GetSqlDialect(this ReadOnlySettings settings)
+        internal static SqlDialect GetSqlDialect(this ReadOnlySettings settings)
         {
-            if (settings.TryGet("SqlPersistence.SqlDialect", out Type value))
+            if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialect value))
             {
                 return value;
             }
-            return typeof(SqlDialect.MsSqlServer);
+            throw new Exception("Must specify SQL dialect using persistence.SqlDialect<T>() method.");
         }
 
         /// <summary>
         /// Configures which database engine to target.
         /// </summary>
         /// <returns>Settings options available for the selected database engine.</returns>
-        public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration) where T : SqlDialect
+        public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration) where T : SqlDialect, new()
         {
             var settings = configuration.GetSettings();
-            settings.Set("SqlPersistence.SqlDialect", typeof(T));
             
             var type = typeof(SqlDialectSettings<>).MakeGenericType(typeof(T));
-            return (SqlDialectSettings<T>)Activator.CreateInstance(type);
+            var instance = (SqlDialectSettings<T>)Activator.CreateInstance(type);
+            settings.Set("SqlPersistence.SqlDialect", instance.Settings);
+            return instance;
         }
     }
 }

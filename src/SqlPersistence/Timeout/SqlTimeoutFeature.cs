@@ -14,15 +14,14 @@ class SqlTimeoutFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var sqlVariant = settings.GetSqlDialect();
+        var sqlDialect = settings.GetSqlDialect();
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
-        var schema= settings.GetSchema();
         var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
-        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+        ConfigValidation.ValidateTableSettings(sqlDialect, tablePrefix);
 
-        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlVariant, schema, timeoutsCleanupExecutionInterval);
+        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
     }

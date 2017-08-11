@@ -16,12 +16,11 @@ class SqlSubscriptionFeature : Feature
 
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
-        var sqlVariant = settings.GetSqlDialect();
-        var schema = settings.GetSchema();
+        var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
-        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema, cacheFor);
+        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlDialect, cacheFor);
 
-        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+        ConfigValidation.ValidateTableSettings(sqlDialect, tablePrefix);
 
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }

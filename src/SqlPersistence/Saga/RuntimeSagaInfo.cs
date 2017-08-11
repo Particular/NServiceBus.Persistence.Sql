@@ -43,8 +43,7 @@ class RuntimeSagaInfo
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
-        string schema,
-        Type sqlVariant,
+        SqlDialect sqlDialect,
         Func<string, string> nameFilter)
     {
         this.sagaDataType = sagaDataType;
@@ -57,23 +56,23 @@ class RuntimeSagaInfo
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
-        this.commandBuilder = new CommandBuilder(sqlVariant);
+        this.commandBuilder = new CommandBuilder(sqlDialect);
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
-        if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+        if (sqlDialect is SqlDialect.MsSqlServer)
         {
-            TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
+            TableName = $"[{sqlDialect.Schema}].[{tablePrefix}{tableSuffix}]";
             FillParameter = ParameterFiller.Fill;
         }
-        else if (sqlVariant == typeof(SqlDialect.MySql))
+        else if (sqlDialect is SqlDialect.MySql)
         {
             TableName = $"`{tablePrefix}{tableSuffix}`";
             FillParameter = ParameterFiller.Fill;
         }
-        else if (sqlVariant == typeof(SqlDialect.Oracle))
+        else if (sqlDialect is SqlDialect.Oracle)
         {
             if (tableSuffix.Length > 27)
             {
@@ -88,7 +87,7 @@ class RuntimeSagaInfo
         }
         else
         {
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
         }
         
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);

@@ -31,8 +31,7 @@ public abstract class OutboxPersisterTests
         persister = new OutboxPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{GetTablePrefix()}_",
-            schema: schema,
-            sqlVariant: sqlVariant.Convert(),
+            sqlDialect: sqlVariant.Convert(schema),
             cleanupBatchSize: 5);
         using (var connection = dbConnection())
         {

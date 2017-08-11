@@ -10,6 +10,13 @@ namespace NServiceBus
         /// </summary>
         public class MsSqlServer : SqlDialect
         {
+            /// <summary>
+            /// Microsoft SQL Server
+            /// </summary>
+            public MsSqlServer()
+            {
+                Schema = "dbo";
+            }
         }
 
         /// <summary>
@@ -24,6 +31,18 @@ namespace NServiceBus
         /// </summary>
         public class Oracle : SqlDialect
         {
+        }
+
+        internal string Schema { get; set; }
+
+        internal string Name => this.GetType().Name;
+
+        /// <summary>
+        /// Gets the name of the SqlDialect.
+        /// </summary>
+        public override string ToString()
+        {
+            return this.Name;
         }
     }
 }

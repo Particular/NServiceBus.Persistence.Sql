@@ -19,24 +19,24 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, Type sqlVariant, string schema, TimeSpan timeoutsCleanupExecutionInterval)
+    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval)
     {
         this.connectionBuilder = connectionBuilder;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
-        timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix, schema);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, tablePrefix);
+        commandBuilder = new CommandBuilder(sqlDialect);
 
-        if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+        if (sqlDialect is SqlDialect.MsSqlServer)
         {
             oldestSupportedTimeout = SqlDateTime.MinValue.Value;
         }
-        else if (sqlVariant == typeof(SqlDialect.Oracle) || sqlVariant == typeof(SqlDialect.MySql))
+        else if (sqlDialect is SqlDialect.Oracle || sqlDialect is SqlDialect.MySql)
         {
             oldestSupportedTimeout = new DateTime(1000, 1, 1);
         }
         else
         {
-            throw new NotSupportedException("Not supported SQL dialect: " + sqlVariant);
+            throw new NotSupportedException("Not supported SQL dialect: " + sqlDialect.Name);
         }
     }
 

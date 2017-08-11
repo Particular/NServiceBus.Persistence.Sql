@@ -8,10 +8,10 @@ partial class SagaPersister : ISagaPersister
     SagaInfoCache sagaInfoCache;
     CommandBuilder commandBuilder;
 
-    public SagaPersister(SagaInfoCache sagaInfoCache, Type sqlVariant)
+    public SagaPersister(SagaInfoCache sagaInfoCache, SqlDialect sqlDialect)
     {
         this.sagaInfoCache = sagaInfoCache;
-        commandBuilder = new CommandBuilder(sqlVariant);
+        commandBuilder = new CommandBuilder(sqlDialect);
     }
 
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, CommandWrapper command)

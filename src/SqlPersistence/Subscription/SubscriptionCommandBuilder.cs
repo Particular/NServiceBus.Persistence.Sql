@@ -14,30 +14,30 @@ namespace NServiceBus.Persistence.Sql
     public static class SubscriptionCommandBuilder
     {
 
-        public static SubscriptionCommands Build(Type sqlVariant, string tablePrefix, string schema)
+        public static SubscriptionCommands Build(SqlDialect sqlDialect, string tablePrefix)
         {
             string tableName;
 
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                tableName = $"[{schema}].[{tablePrefix}SubscriptionData]";
+                tableName = $"[{sqlDialect.Schema}].[{tablePrefix}SubscriptionData]";
             }
-            else if (sqlVariant == typeof(SqlDialect.MySql))
+            else if (sqlDialect is SqlDialect.MySql)
             {
                 tableName = $"`{tablePrefix}SubscriptionData`";
             }
-            else if (sqlVariant == typeof(SqlDialect.Oracle))
+            else if (sqlDialect is SqlDialect.Oracle)
             {
                 tableName = $"{tablePrefix.ToUpper()}SS";
             }
             else
             {
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+                throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
             }
 
-            var subscribeCommand = GetSubscribeCommand(sqlVariant, tableName);
-            var unsubscribeCommand = GetUnsubscribeCommand(sqlVariant, tableName);
-            var getSubscribers = GetSubscribersFunc(sqlVariant, tableName);
+            var subscribeCommand = GetSubscribeCommand(sqlDialect, tableName);
+            var unsubscribeCommand = GetUnsubscribeCommand(sqlDialect, tableName);
+            var getSubscribers = GetSubscribersFunc(sqlDialect, tableName);
 
             return new SubscriptionCommands(
                 subscribe: subscribeCommand,
@@ -45,9 +45,9 @@ namespace NServiceBus.Persistence.Sql
                 getSubscribers: getSubscribers);
         }
 
-        static string GetSubscribeCommand(Type sqlVariant, string tableName)
+        static string GetSubscribeCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.MsSqlServer))
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
                 return $@"
 declare @dummy int;
@@ -75,7 +75,7 @@ values
 );";
             }
 
-            if (sqlVariant == typeof(SqlDialect.MySql))
+            if (sqlDialect is SqlDialect.MySql)
             {
                 return $@"
 insert into {tableName}
@@ -98,7 +98,7 @@ on duplicate key update
 ";
             }
 
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $@"
 begin
@@ -124,12 +124,12 @@ end;
 ";
             }
             
-             throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+             throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
         }
 
-        static string GetUnsubscribeCommand(Type sqlVariant, string tableName)
+        static string GetUnsubscribeCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $@"
 delete from ""{tableName}""
@@ -146,9 +146,9 @@ where
         }
 
 
-        static Func<List<MessageType>, string> GetSubscribersFunc(Type sqlVariant, string tableName)
+        static Func<List<MessageType>, string> GetSubscribersFunc(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 var getSubscribersPrefixOracle = $@"
 select distinct Subscriber, Endpoint

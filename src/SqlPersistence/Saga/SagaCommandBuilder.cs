@@ -11,11 +11,11 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class SagaCommandBuilder
     {
-        readonly Type sqlVariant;
+        readonly SqlDialect sqlDialect;
 
-        public SagaCommandBuilder(Type sqlVariant)
+        public SagaCommandBuilder(SqlDialect sqlDialect)
         {
-            this.sqlVariant = sqlVariant;
+            this.sqlDialect = sqlDialect;
         }
 
         [Obsolete("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts for.", true)]
@@ -133,7 +133,7 @@ from {TableName(tableName)}
 
         string CorrelationPropertyName(string propertyName)
         {
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 var oracleName = "CORR_" + propertyName.ToUpper();
                 return oracleName.Length > 30 ? oracleName.Substring(0, 30) : oracleName;
@@ -144,7 +144,7 @@ from {TableName(tableName)}
 
         string TableName(string name)
         {
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $"\"{name.ToUpper()}\"";
             }
@@ -154,7 +154,7 @@ from {TableName(tableName)}
 
         string ParamName(string name)
         {
-            if (sqlVariant == typeof(SqlDialect.Oracle))
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return ":" + name;
             }

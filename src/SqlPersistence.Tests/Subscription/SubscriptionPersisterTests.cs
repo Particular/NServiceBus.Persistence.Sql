@@ -34,8 +34,7 @@ public abstract class SubscriptionPersisterTests
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{tablePrefix}_",
-            sqlVariant: sqlVariant.Convert(),
-            schema: schema,
+            sqlDialect: sqlVariant.Convert(schema),
             cacheFor: TimeSpan.FromSeconds(10)
         );
 
