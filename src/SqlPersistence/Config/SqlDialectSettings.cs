@@ -15,15 +15,4 @@ namespace NServiceBus
 
         internal T Settings { get; }
     }
-
-    public static partial class SqlPersistenceConfig
-    {
-        /// <summary>
-        /// Shows how settings will be exposed for each SQL dialect.
-        /// </summary>
-        public static void Schema(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings)
-        {
-            
-        }
-    }
 }

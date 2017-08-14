@@ -7,11 +7,12 @@ namespace NServiceBus
     public static partial class SqlPersistenceConfig
     {
         /// <summary>
-        /// Sets the <see cref="SqlVariant"/> to use for communicating the the current database.
+        /// Obsolete: Use 'persistence.UseSchema&lt;SqlDialect.DialectType&gt;()' instead. Will be removed in version 4.0.0.
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use 'persistence.UseSchema<SqlDialect.DialectType>()' instead. Will be removed in version 4.0.0.", true)]
         public static void SqlVariant(this PersistenceExtensions<SqlPersistence> configuration, SqlVariant sqlVariant)
         {
+            throw new NotImplementedException();
         }
     }
 }

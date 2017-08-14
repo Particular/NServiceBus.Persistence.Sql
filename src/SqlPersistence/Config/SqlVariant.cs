@@ -3,9 +3,9 @@ namespace NServiceBus.Persistence.Sql
     using System;
 
     /// <summary>
-    /// Allows for configuring which database engine to target. Used by <see cref="SqlPersistenceConfig.SqlVariant"/>.
+    /// Obsolete: Use 'persistence.SqlDialect&lt;SqlDialect.MsSqlServer&gt;()' (or other dialect) instead. Will be removed in version 4.0.0.
     /// </summary>
-    [Obsolete]
+    [Obsolete("Use 'persistence.SqlDialect<SqlDialect.MsSqlServer>()' (or other dialect) instead. Will be removed in version 4.0.0.", true)]
     public enum SqlVariant
     {
         /// <summary>
