@@ -6,6 +6,13 @@ namespace NServiceBus
     public class SqlDialect
     {
         /// <summary>
+        /// Allows for configuring which database engine to target. Used by <see cref="SqlPersistenceConfig.SqlDialect{T}"/>.
+        /// </summary>
+        protected SqlDialect()
+        {    
+        }
+
+        /// <summary>
         /// Microsoft SQL Server
         /// </summary>
         public class MsSqlServer : SqlDialect
