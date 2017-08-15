@@ -25,7 +25,7 @@ namespace NServiceBus.Persistence.Sql
                 return BuildOracleCommands($"{tablePrefix.ToUpper()}TO");
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlDialect}.");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect}.");
         }
 
         static TimeoutCommands BuildMySqlCommands(string tableName)

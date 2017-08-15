@@ -45,9 +45,9 @@ namespace NServiceBus.Persistence.Sql
                 cleanup: cleanupCommand);
         }
 
-        static string GetSetAsDispatchedCommand(SqlDialect sqlVariant, string tableName)
+        static string GetSetAsDispatchedCommand(SqlDialect sqlDialect, string tableName)
         {
-            if (sqlVariant is SqlDialect.MsSqlServer || sqlVariant is SqlDialect.MySql)
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
                 return $@"
 update {tableName}
@@ -57,7 +57,7 @@ set
     Operations = '[]'
 where MessageId = @MessageId";
             }
-            if (sqlVariant is SqlDialect.Oracle)
+            if (sqlDialect is SqlDialect.Oracle)
             {
                 return $@"
 update ""{tableName}""
@@ -68,7 +68,7 @@ set
 where MessageId = :MessageId";
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect}");
         }
 
         static string GetGetCommand(SqlDialect sqlDialect, string tableName)
@@ -92,7 +92,7 @@ from ""{tableName}""
 where MessageId = :MessageId";
             }
 
-            throw new Exception($"Unknown SqlVariant: {sqlDialect}");
+            throw new Exception($"Unknown SqlDialect: {sqlDialect}");
         }
 
         static string GetStoreCommand(SqlDialect sqlDialect, string tableName)

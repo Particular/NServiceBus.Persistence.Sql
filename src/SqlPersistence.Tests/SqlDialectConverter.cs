@@ -2,7 +2,7 @@ using System;
 using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-public static class SqlVariantConverter
+public static class SqlDialectConverter
 {
     public static BuildSqlDialect Convert(this SqlDialect sqlDialect)
     {

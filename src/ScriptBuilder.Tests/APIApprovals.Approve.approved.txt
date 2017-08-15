@@ -8,7 +8,7 @@
 }
 namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
-    public enum BuildSqlVariant
+    public enum BuildSqlDialect
     {
         MsSqlServer = 0,
         MySql = 1,
@@ -42,10 +42,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     }
     public class static OutboxScriptBuilder
     {
-        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
     public class SagaDefinition
     {
@@ -57,10 +57,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     }
     public class static SagaScriptBuilder
     {
-        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static void BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant, System.IO.TextWriter writer) { }
-        public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant, System.IO.TextWriter writer) { }
-        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect, System.IO.TextWriter writer) { }
+        public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect, System.IO.TextWriter writer) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
     public class static ScriptWriter
     {
@@ -68,16 +68,16 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     }
     public class static SubscriptionScriptBuilder
     {
-        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
     public class static TimeoutScriptBuilder
     {
-        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
-        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlVariant sqlVariant) { }
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
 }

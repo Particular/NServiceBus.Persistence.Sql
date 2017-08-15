@@ -3,7 +3,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class Settings
 {
-    public List<BuildSqlDialect> BuildVariants;
+    public List<BuildSqlDialect> BuildDialects;
     public string ScriptPromotionPath;
     public bool ProduceOutboxScripts;
     public bool ProduceSubscriptionScripts;

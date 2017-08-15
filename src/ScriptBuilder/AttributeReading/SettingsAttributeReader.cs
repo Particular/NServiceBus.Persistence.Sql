@@ -18,7 +18,7 @@ static class SettingsAttributeReader
     {
         return new Settings
         {
-            BuildVariants = ReadBuildVariants(attribute).ToList(),
+            BuildDialects = ReadBuildDialects(attribute).ToList(),
             ScriptPromotionPath = ReadScriptPromotionPath(attribute),
             ProduceSagaScripts = attribute.GetBoolProperty("ProduceSagaScripts", true),
             ProduceTimeoutScripts = attribute.GetBoolProperty("ProduceTimeoutScripts", true),
@@ -41,7 +41,7 @@ static class SettingsAttributeReader
         throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
     }
 
-    static IEnumerable<BuildSqlDialect> ReadBuildVariants(ICustomAttribute attribute)
+    static IEnumerable<BuildSqlDialect> ReadBuildDialects(ICustomAttribute attribute)
     {
         if (attribute == null)
         {

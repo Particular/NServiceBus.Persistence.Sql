@@ -23,6 +23,6 @@ class CommandBuilder
         {
             return new OracleCommandWrapper(command);
         }
-        throw new Exception($"Unknown SqlVariant: {sqlDialect.Name}.");
+        throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
     }
 }

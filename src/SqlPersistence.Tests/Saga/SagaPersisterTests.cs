@@ -32,9 +32,9 @@ public abstract class SagaPersisterTests
 
     SagaPersister SetUp(string endpointName)
     {
-        var runtimeSqlVariant = sqlDialect.Convert(schema);
+        var runtimeSqlDialect = sqlDialect.Convert(schema);
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(runtimeSqlVariant);
+        var commandBuilder = new SagaCommandBuilder(runtimeSqlDialect);
 #pragma warning restore 618
 
         var sagaMetadataCollection = new SagaMetadataCollection();
@@ -47,10 +47,10 @@ public abstract class SagaPersisterTests
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
-            sqlDialect: runtimeSqlVariant,
+            sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);
-        return new SagaPersister(infoCache, runtimeSqlVariant);
+        return new SagaPersister(infoCache, runtimeSqlDialect);
     }
 
     IEnumerable<Type> GetSagasAndFinders()

@@ -15,20 +15,20 @@
         [Test]
         public async Task Should_remove_old_property_after_phase_three()
         {
-            var variant = BuildSqlDialect.MsSqlServer;
-            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
-            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
-            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
+            var dialect = BuildSqlDialect.MsSqlServer;
+            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
+            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
+            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
 
             using (var connection = MsSqlConnectionBuilder.Build())
             {
                 await connection.OpenAsync().ConfigureAwait(false);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
                 var phase1Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
                 var phase2Schema = GetSchema(connection);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
                 var phase3Schema = GetSchema(connection);
 
                 CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");

@@ -28,46 +28,46 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
                 tableSuffix: saga.TableSuffix,
                 transitionalProperty: saga.TransitionalCorrelationProperty?.Name);
 
-            var sqlVariantWriter = GetSqlVariantWriter(sqlDialect, writer, saga);
+            var sqlDialectWriter = GetSqlDialectWriter(sqlDialect, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
-            sqlVariantWriter.WriteTableNameVariable();
+            sqlDialectWriter.WriteTableNameVariable();
 
             WriteComment(writer, "Initialize");
-            sqlVariantWriter.Initialize();
+            sqlDialectWriter.Initialize();
 
             WriteComment(writer, "CreateTable");
-            sqlVariantWriter.WriteCreateTable();
+            sqlDialectWriter.WriteCreateTable();
             if(saga.CorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
-                sqlVariantWriter.AddProperty(saga.CorrelationProperty);
+                sqlDialectWriter.AddProperty(saga.CorrelationProperty);
 
                 WriteComment(writer, $"VerifyColumnType {saga.CorrelationProperty.Type}");
-                sqlVariantWriter.VerifyColumnType(saga.CorrelationProperty);
+                sqlDialectWriter.VerifyColumnType(saga.CorrelationProperty);
 
                 WriteComment(writer, $"WriteCreateIndex {saga.CorrelationProperty.Name}");
-                sqlVariantWriter.WriteCreateIndex(saga.CorrelationProperty);
+                sqlDialectWriter.WriteCreateIndex(saga.CorrelationProperty);
             }
             if (saga.TransitionalCorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.TransitionalCorrelationProperty.Name}");
-                sqlVariantWriter.AddProperty(saga.TransitionalCorrelationProperty);
+                sqlDialectWriter.AddProperty(saga.TransitionalCorrelationProperty);
 
                 WriteComment(writer, $"VerifyColumnType {saga.TransitionalCorrelationProperty.Type}");
-                sqlVariantWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
+                sqlDialectWriter.VerifyColumnType(saga.TransitionalCorrelationProperty);
 
                 WriteComment(writer, $"CreateIndex {saga.TransitionalCorrelationProperty.Name}");
-                sqlVariantWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
+                sqlDialectWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
             }
             WriteComment(writer, "PurgeObsoleteIndex");
-            sqlVariantWriter.WritePurgeObsoleteIndex();
+            sqlDialectWriter.WritePurgeObsoleteIndex();
 
             WriteComment(writer, "PurgeObsoleteProperties");
-            sqlVariantWriter.WritePurgeObsoleteProperties();
+            sqlDialectWriter.WritePurgeObsoleteProperties();
 
             WriteComment(writer, "CompleteSagaScript");
-            sqlVariantWriter.CreateComplete();
+            sqlDialectWriter.CreateComplete();
         }
 
         static void WriteComment(TextWriter writer, string text)
@@ -76,7 +76,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 /* {text} */");
         }
 
-        static ISagaScriptWriter GetSqlVariantWriter(BuildSqlDialect sqlDialect, TextWriter textWriter, SagaDefinition saga)
+        static ISagaScriptWriter GetSqlDialectWriter(BuildSqlDialect sqlDialect, TextWriter textWriter, SagaDefinition saga)
         {
             if (sqlDialect == BuildSqlDialect.MsSqlServer)
             {
@@ -91,18 +91,18 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
                 return new OracleSagaScriptWriter(textWriter, saga);
             }
 
-            throw new Exception($"Unknown SqlVariant {sqlDialect}.");
+            throw new Exception($"Unknown SqlDialect {sqlDialect}.");
         }
 
         public static void BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
-            var sqlVariantWriter = GetSqlVariantWriter(sqlDialect, writer, saga);
+            var sqlDialectWriter = GetSqlDialectWriter(sqlDialect, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
-            sqlVariantWriter.WriteTableNameVariable();
+            sqlDialectWriter.WriteTableNameVariable();
 
             WriteComment(writer, "DropTable");
-            sqlVariantWriter.WriteDropTable();
+            sqlDialectWriter.WriteDropTable();
         }
 
 

@@ -16,7 +16,7 @@
         [Test]
         public void Should_remove_old_property_after_phase_three()
         {
-            var variant = BuildSqlDialect.MySql;
+            var dialect = BuildSqlDialect.MySql;
 
             using (var connection = MySqlConnectionBuilder.Build())
             {
@@ -24,24 +24,24 @@
 
                 //HACK: Thread Sleeps required since information_schema.statistics takes some time to update
 
-                var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
+                var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
                 Thread.Sleep(200);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
                 Thread.Sleep(200);
                 var phase1Schema = GetSchema(connection);
                 CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");
                 CollectionAssert.DoesNotContain(phase1Schema, "Correlation_OrderId");
 
-                var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
                 Thread.Sleep(200);
                 var phase2Schema = GetSchema(connection);
                 CollectionAssert.Contains(phase2Schema, "Correlation_OrderNumber");
                 CollectionAssert.Contains(phase2Schema, "Correlation_OrderId");
 
-                var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
                 Thread.Sleep(200);
                 var phase3Schema = GetSchema(connection);
                 CollectionAssert.DoesNotContain(phase3Schema, "Correlation_OrderNumber");
