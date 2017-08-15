@@ -7,17 +7,17 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
     public static class SagaScriptBuilder
     {
 
-        public static string BuildCreateScript(SagaDefinition saga, BuildSqlVariant sqlVariant)
+        public static string BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildCreateScript(saga, sqlVariant, stringWriter);
+                BuildCreateScript(saga, sqlDialect, stringWriter);
             }
             return stringBuilder.ToString();
         }
 
-        public static void BuildCreateScript(SagaDefinition saga, BuildSqlVariant sqlVariant, TextWriter writer)
+        public static void BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
             Guard.AgainstNull(nameof(saga), saga);
             Guard.AgainstNull(nameof(writer), writer);
@@ -28,7 +28,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
                 tableSuffix: saga.TableSuffix,
                 transitionalProperty: saga.TransitionalCorrelationProperty?.Name);
 
-            var sqlVariantWriter = GetSqlVariantWriter(sqlVariant, writer, saga);
+            var sqlVariantWriter = GetSqlVariantWriter(sqlDialect, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
             sqlVariantWriter.WriteTableNameVariable();
@@ -76,27 +76,27 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 /* {text} */");
         }
 
-        static ISagaScriptWriter GetSqlVariantWriter(BuildSqlVariant sqlVariant, TextWriter textWriter, SagaDefinition saga)
+        static ISagaScriptWriter GetSqlVariantWriter(BuildSqlDialect sqlDialect, TextWriter textWriter, SagaDefinition saga)
         {
-            if (sqlVariant == BuildSqlVariant.MsSqlServer)
+            if (sqlDialect == BuildSqlDialect.MsSqlServer)
             {
                 return new MsSqlServerSagaScriptWriter(textWriter, saga);
             }
-            if (sqlVariant == BuildSqlVariant.MySql)
+            if (sqlDialect == BuildSqlDialect.MySql)
             {
                 return new MySqlSagaScriptWriter(textWriter, saga);
             }
-            if (sqlVariant == BuildSqlVariant.Oracle)
+            if (sqlDialect == BuildSqlDialect.Oracle)
             {
                 return new OracleSagaScriptWriter(textWriter, saga);
             }
 
-            throw new Exception($"Unknown SqlVariant {sqlVariant}.");
+            throw new Exception($"Unknown SqlVariant {sqlDialect}.");
         }
 
-        public static void BuildDropScript(SagaDefinition saga, BuildSqlVariant sqlVariant, TextWriter writer)
+        public static void BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
-            var sqlVariantWriter = GetSqlVariantWriter(sqlVariant, writer, saga);
+            var sqlVariantWriter = GetSqlVariantWriter(sqlDialect, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
             sqlVariantWriter.WriteTableNameVariable();
@@ -106,12 +106,12 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         }
 
 
-        public static string BuildDropScript(SagaDefinition saga, BuildSqlVariant sqlVariant)
+        public static string BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildDropScript(saga, sqlVariant, stringWriter);
+                BuildDropScript(saga, sqlDialect, stringWriter);
             }
             return stringBuilder.ToString();
         }

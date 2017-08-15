@@ -11,7 +11,7 @@ using NUnit.Framework;
 [TestFixture]
 public class MixedSagaAndNoOutbox : IDisposable
 {
-    BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
+    BuildSqlDialect sqlDialect = BuildSqlDialect.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
     static ManualResetEvent manualResetEvent;
@@ -35,17 +35,17 @@ public class MixedSagaAndNoOutbox : IDisposable
     public void Setup()
     {
         manualResetEvent = new ManualResetEvent(false);
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlDialect), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), nameof(MixedSagaAndNoOutbox));
     }
 
     [TearDown]
     public void TearDown()
     {
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlVariant), nameof(MixedSagaAndNoOutbox));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(MixedSagaAndNoOutbox));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(MixedSagaAndNoOutbox));
     }
 
     [Test]

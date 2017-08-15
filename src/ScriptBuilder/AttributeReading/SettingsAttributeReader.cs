@@ -41,32 +41,32 @@ static class SettingsAttributeReader
         throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
     }
 
-    static IEnumerable<BuildSqlVariant> ReadBuildVariants(ICustomAttribute attribute)
+    static IEnumerable<BuildSqlDialect> ReadBuildVariants(ICustomAttribute attribute)
     {
         if (attribute == null)
         {
-            yield return BuildSqlVariant.MsSqlServer;
-            yield return BuildSqlVariant.MySql;
-            yield return BuildSqlVariant.Oracle;
+            yield return BuildSqlDialect.MsSqlServer;
+            yield return BuildSqlDialect.MySql;
+            yield return BuildSqlDialect.Oracle;
             yield break;
         }
 
         var msSqlServerScripts = attribute.GetBoolProperty("MsSqlServerScripts");
         if (msSqlServerScripts)
         {
-            yield return BuildSqlVariant.MsSqlServer;
+            yield return BuildSqlDialect.MsSqlServer;
         }
 
         var mySqlScripts = attribute.GetBoolProperty("MySqlScripts");
         if (mySqlScripts)
         {
-            yield return BuildSqlVariant.MySql;
+            yield return BuildSqlDialect.MySql;
         }
 
         var oracleScripts = attribute.GetBoolProperty("OracleScripts");
         if (oracleScripts)
         {
-            yield return BuildSqlVariant.Oracle;
+            yield return BuildSqlDialect.Oracle;
         }
 
         if (!msSqlServerScripts && !mySqlScripts && !oracleScripts)

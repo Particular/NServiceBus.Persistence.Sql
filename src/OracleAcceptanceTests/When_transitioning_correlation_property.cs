@@ -15,7 +15,7 @@
         [Test]
         public async Task Should_remove_old_property_after_phase_three()
         {
-            var variant = BuildSqlVariant.Oracle;
+            var variant = BuildSqlDialect.Oracle;
             var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
             var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
             var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);

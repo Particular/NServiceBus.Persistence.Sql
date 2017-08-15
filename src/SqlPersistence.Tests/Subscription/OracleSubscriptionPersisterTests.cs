@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
 {
-    public OracleSubscriptionPersisterTests() : base(BuildSqlVariant.Oracle, null)
+    public OracleSubscriptionPersisterTests() : base(BuildSqlDialect.Oracle, null)
     {
     }
 

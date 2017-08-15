@@ -16,7 +16,7 @@
         [Test]
         public void Should_remove_old_property_after_phase_three()
         {
-            var variant = BuildSqlVariant.MySql;
+            var variant = BuildSqlDialect.MySql;
 
             using (var connection = MySqlConnectionBuilder.Build())
             {

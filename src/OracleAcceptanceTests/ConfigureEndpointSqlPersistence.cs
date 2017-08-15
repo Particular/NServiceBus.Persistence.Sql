@@ -23,7 +23,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 24));
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, OracleConnectionBuilder.Build, BuildSqlVariant.Oracle, FilterTableExists);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, OracleConnectionBuilder.Build, BuildSqlDialect.Oracle, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.Oracle>();
         persistence.ConnectionBuilder(OracleConnectionBuilder.Build);

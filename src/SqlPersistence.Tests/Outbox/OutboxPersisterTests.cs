@@ -11,15 +11,15 @@ using ObjectApproval;
 public abstract class OutboxPersisterTests
 {
     OutboxPersister persister;
-    BuildSqlVariant sqlVariant;
+    BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
 
     protected abstract Func<DbConnection> GetConnection();
 
-    public OutboxPersisterTests(BuildSqlVariant sqlVariant, string schema)
+    public OutboxPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.schema = schema;
         dbConnection = GetConnection();
     }
@@ -31,13 +31,13 @@ public abstract class OutboxPersisterTests
         persister = new OutboxPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{GetTablePrefix()}_",
-            sqlDialect: sqlVariant.Convert(schema),
+            sqlDialect: sqlDialect.Convert(schema),
             cleanupBatchSize: 5);
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix(), schema: schema);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: schema);
         }
     }
 
@@ -67,8 +67,8 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
         }
     }
 

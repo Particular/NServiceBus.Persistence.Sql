@@ -5,7 +5,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class SagaWriter
 {
-    public static void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant, Action<string, string> logError)
+    public static void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlDialect sqlDialect, Action<string, string> logError)
     {
         var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
         var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
@@ -28,14 +28,14 @@ class SagaWriter
             File.Delete(createPath);
             using (var writer = File.CreateText(createPath))
             {
-                SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
+                SagaScriptBuilder.BuildCreateScript(saga, sqlDialect, writer);
             }
 
             var dropPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Drop.sql");
             File.Delete(dropPath);
             using (var writer = File.CreateText(dropPath))
             {
-                SagaScriptBuilder.BuildDropScript(saga, sqlVariant, writer);
+                SagaScriptBuilder.BuildDropScript(saga, sqlDialect, writer);
             }
         }
     }

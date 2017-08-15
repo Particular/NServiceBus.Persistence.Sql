@@ -1,6 +1,6 @@
 ﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
-    public enum BuildSqlVariant
+    public enum BuildSqlDialect
     {
         MsSqlServer,
         MySql,

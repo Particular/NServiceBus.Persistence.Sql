@@ -12,7 +12,7 @@ public static class RuntimeSagaDefinitionReader
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
     const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlVariant sqlVariant)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlDialect sqlDialect)
     {
         var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
         if (!sagaTypes.Any())
@@ -35,10 +35,10 @@ public static class RuntimeSagaDefinitionReader
         {
             throw new AggregateException(exceptions);
         }
-        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlVariant));
+        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
     }
 
-    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlVariant sqlVariant)
+    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
     {
         var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
@@ -69,7 +69,7 @@ public static class RuntimeSagaDefinitionReader
         var tableSuffixOverride = (string)sagaType.GetProperty("TableSuffix", AnyInstanceMember).GetValue(saga);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 
-        if (sqlVariant == BuildSqlVariant.Oracle)
+        if (sqlDialect == BuildSqlDialect.Oracle)
         {
             tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
         }

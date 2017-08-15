@@ -4,42 +4,42 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 public static class SqlVariantConverter
 {
-    public static BuildSqlVariant Convert(this SqlDialect sqlDialect)
+    public static BuildSqlDialect Convert(this SqlDialect sqlDialect)
     {
        if(sqlDialect is SqlDialect.MsSqlServer)
        {
-           return BuildSqlVariant.MsSqlServer;
+           return BuildSqlDialect.MsSqlServer;
        }
 
         if (sqlDialect is SqlDialect.MySql)
         {
-            return BuildSqlVariant.MySql;
+            return BuildSqlDialect.MySql;
         }
 
         if (sqlDialect is SqlDialect.Oracle)
         {
-            return BuildSqlVariant.Oracle;
+            return BuildSqlDialect.Oracle;
         }
 
         throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
     }
-    public static SqlDialect Convert(this BuildSqlVariant sqlVariant, string schema = null)
+    public static SqlDialect Convert(this BuildSqlDialect sqlDialect, string schema = null)
     {
         SqlDialect dialect;
 
-        switch (sqlVariant)
+        switch (sqlDialect)
         {
-            case BuildSqlVariant.MsSqlServer:
+            case BuildSqlDialect.MsSqlServer:
                 dialect = new SqlDialect.MsSqlServer();
                 break;
-            case BuildSqlVariant.MySql:
+            case BuildSqlDialect.MySql:
                 dialect = new SqlDialect.MySql();
                 break;
-            case BuildSqlVariant.Oracle:
+            case BuildSqlDialect.Oracle:
                 dialect = new SqlDialect.Oracle();
                 break;
             default:
-                throw new Exception($"Unknown BuildSqlVariant: {sqlVariant}.");
+                throw new Exception($"Unknown BuildSqlDialect: {sqlDialect}.");
         }
 
         dialect.Schema = schema;

@@ -16,7 +16,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.FromResult(0);
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlVariant.MsSqlServer, FilterTableExists);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlDialect.MsSqlServer, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();

@@ -15,7 +15,7 @@ public class SqlTransportIntegrationTests : IDisposable
 {
 
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
-    BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
+    BuildSqlDialect sqlVariant = BuildSqlDialect.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 

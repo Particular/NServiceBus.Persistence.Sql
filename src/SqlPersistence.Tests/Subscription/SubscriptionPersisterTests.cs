@@ -13,16 +13,16 @@ using ObjectApproval;
 public abstract class SubscriptionPersisterTests
 {
 
-    BuildSqlVariant sqlVariant;
+    BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
     string tablePrefix;
     SubscriptionPersister persister;
 
-    public SubscriptionPersisterTests(BuildSqlVariant sqlVariant, string schema)
+    public SubscriptionPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.schema = schema;
     }
 
@@ -34,15 +34,15 @@ public abstract class SubscriptionPersisterTests
         persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{tablePrefix}_",
-            sqlDialect: sqlVariant.Convert(schema),
+            sqlDialect: sqlDialect.Convert(schema),
             cacheFor: TimeSpan.FromSeconds(10)
         );
 
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, schema: schema);
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), tablePrefix, schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, schema: schema);
         }
     }
 
@@ -57,7 +57,7 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlVariant), tablePrefix, schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: schema);
         }
     }
 
@@ -67,8 +67,8 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlVariant), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
         }
     }
 
