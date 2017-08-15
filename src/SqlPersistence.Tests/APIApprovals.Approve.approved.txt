@@ -70,8 +70,8 @@
         protected override void ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
-    [System.ObsoleteAttribute("Use \'persistence.SqlDialect<SqlDialect.MsSqlServer>()\' (or other dialect) instead" +
-        ". Will be removed in version 4.0.0.", true)]
+    [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
+        "n version 4.0.0.", true)]
     public enum SqlVariant
     {
         MsSqlServer = 0,
@@ -142,14 +142,15 @@ namespace NServiceBus
         public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        [System.ObsoleteAttribute("Use \'persistence.UseSchema<SqlDialect.DialectType>().Schema(\"schema_name\")\' inste" +
-            "ad. Will be removed in version 4.0.0.", true)]
+        [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>().Schema(\"schema_name\")` inst" +
+            "ead. The member currently throws a NotImplementedException. Will be removed in v" +
+            "ersion 4.0.0.", true)]
         public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
         public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
             where T : NServiceBus.SqlDialect, new () { }
-        [System.ObsoleteAttribute("Use \'persistence.UseSchema<SqlDialect.DialectType>()\' instead. Will be removed in" +
-            " version 4.0.0.", true)]
+        [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. The member curren" +
+            "tly throws a NotImplementedException. Will be removed in version 4.0.0.", true)]
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }

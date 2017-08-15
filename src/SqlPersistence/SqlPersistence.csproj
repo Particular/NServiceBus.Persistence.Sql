@@ -23,6 +23,7 @@
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
     <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
+    <PackageReference Include="Obsolete.Fody" Version="4.2.4" />
   </ItemGroup>
 
   <ItemGroup>

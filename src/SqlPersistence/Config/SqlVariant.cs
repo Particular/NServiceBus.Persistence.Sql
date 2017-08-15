@@ -1,11 +1,11 @@
+#pragma warning disable 1591
+
 namespace NServiceBus.Persistence.Sql
 {
-    using System;
-
-    /// <summary>
-    /// Obsolete: Use 'persistence.SqlDialect&lt;SqlDialect.MsSqlServer&gt;()' (or other dialect) instead. Will be removed in version 4.0.0.
-    /// </summary>
-    [Obsolete("Use 'persistence.SqlDialect<SqlDialect.MsSqlServer>()' (or other dialect) instead. Will be removed in version 4.0.0.", true)]
+    [ObsoleteEx(
+        TreatAsErrorFromVersion = "3.0",
+        RemoveInVersion = "4.0",
+        ReplacementTypeOrMember = "persistence.SqlDialect<SqlDialect.DialectType>()")]
     public enum SqlVariant
     {
         /// <summary>
@@ -24,3 +24,5 @@ namespace NServiceBus.Persistence.Sql
         Oracle
     }
 }
+
+#pragma warning restore 1591
