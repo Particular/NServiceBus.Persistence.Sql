@@ -28,9 +28,6 @@
     public class SagaCommandBuilder
     {
         public SagaCommandBuilder(NServiceBus.SqlDialect sqlDialect) { }
-        [System.ObsoleteAttribute("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts fo" +
-            "r.", true)]
-        public SagaCommandBuilder() { }
         public string BuildCompleteCommand(string tableName) { }
         public string BuildGetByPropertyCommand(string propertyName, string tableName) { }
         public string BuildGetBySagaIdCommand(string tableName) { }
@@ -120,7 +117,7 @@ namespace NServiceBus
 {
     public class SqlDialect
     {
-        public SqlDialect() { }
+        protected SqlDialect() { }
         public override string ToString() { }
         public class MsSqlServer : NServiceBus.SqlDialect
         {
