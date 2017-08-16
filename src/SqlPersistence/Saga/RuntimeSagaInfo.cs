@@ -17,8 +17,8 @@ class RuntimeSagaInfo
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    SqlDialect sqlDialect;
     ConcurrentDictionary<Version, JsonSerializer> deserializers;
-    CommandBuilder commandBuilder;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string SelectFromCommand;
@@ -32,7 +32,6 @@ class RuntimeSagaInfo
     public readonly string TransitionalCorrelationProperty;
     public readonly string GetByCorrelationPropertyCommand;
     public readonly string TableName;
-    public readonly Action<DbParameter, string, object> FillParameter;
 
     public RuntimeSagaInfo(
         SagaCommandBuilder commandBuilder,
@@ -56,39 +55,13 @@ class RuntimeSagaInfo
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
-        this.commandBuilder = new CommandBuilder(sqlDialect);
+        this.sqlDialect = sqlDialect;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
-        if (sqlDialect is SqlDialect.MsSqlServer)
-        {
-            TableName = $"[{sqlDialect.Schema}].[{tablePrefix}{tableSuffix}]";
-            FillParameter = ParameterFiller.Fill;
-        }
-        else if (sqlDialect is SqlDialect.MySql)
-        {
-            TableName = $"`{tablePrefix}{tableSuffix}`";
-            FillParameter = ParameterFiller.Fill;
-        }
-        else if (sqlDialect is SqlDialect.Oracle)
-        {
-            if (tableSuffix.Length > 27)
-            {
-                throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-            }
-            if (Encoding.UTF8.GetBytes(tableSuffix).Length != tableSuffix.Length)
-            {
-                throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-            }
-            TableName = tableSuffix.ToUpper();
-            FillParameter = ParameterFiller.OracleFill;
-        }
-        else
-        {
-            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
-        }
+        TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
         
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
         SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
@@ -121,7 +94,7 @@ class RuntimeSagaInfo
 
     public CommandWrapper CreateCommand(DbConnection connection)
     {
-        return commandBuilder.CreateCommand(connection);
+        return sqlDialect.CreateCommand(connection);
     }
 
     public string ToJson(IContainSagaData sagaData)

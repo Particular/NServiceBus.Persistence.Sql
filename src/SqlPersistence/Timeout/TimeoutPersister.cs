@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlTypes;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -13,8 +12,8 @@ using NServiceBus.Persistence.Sql;
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
     Func<DbConnection> connectionBuilder;
+    SqlDialect sqlDialect;
     TimeoutCommands timeoutCommands;
-    CommandBuilder commandBuilder;
     TimeSpan timeoutsCleanupExecutionInterval;
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
@@ -22,22 +21,10 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval)
     {
         this.connectionBuilder = connectionBuilder;
+        this.sqlDialect = sqlDialect;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, tablePrefix);
-        commandBuilder = new CommandBuilder(sqlDialect);
-
-        if (sqlDialect is SqlDialect.MsSqlServer)
-        {
-            oldestSupportedTimeout = SqlDateTime.MinValue.Value;
-        }
-        else if (sqlDialect is SqlDialect.Oracle || sqlDialect is SqlDialect.MySql)
-        {
-            oldestSupportedTimeout = new DateTime(1000, 1, 1);
-        }
-        else
-        {
-            throw new NotSupportedException("Not supported SQL dialect: " + sqlDialect.Name);
-        }
+        oldestSupportedTimeout = sqlDialect.OldestSupportedTimeout;
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
@@ -85,7 +72,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task Add(TimeoutData timeout, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.Add;
             var id = SequentialGuid.Next();
@@ -167,7 +154,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.RemoveBySagaId;
             command.AddParameter("SagaId", sagaId);

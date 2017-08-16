@@ -6,12 +6,12 @@ using NServiceBus.Sagas;
 partial class SagaPersister : ISagaPersister
 {
     SagaInfoCache sagaInfoCache;
-    CommandBuilder commandBuilder;
+    SqlDialect sqlDialect;
 
     public SagaPersister(SagaInfoCache sagaInfoCache, SqlDialect sqlDialect)
     {
         this.sagaInfoCache = sagaInfoCache;
-        commandBuilder = new CommandBuilder(sqlDialect);
+        this.sqlDialect = sqlDialect;
     }
 
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, CommandWrapper command)

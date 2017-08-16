@@ -3,15 +3,18 @@ using System.Data;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
 
 class CommandWrapper : IDisposable
 {
     protected DbCommand command;
+    SqlDialect dialect;
     int disposeSignaled;
 
-    public CommandWrapper(DbCommand command)
+    public CommandWrapper(DbCommand command, SqlDialect dialect)
     {
         this.command = command;
+        this.dialect = dialect;
     }
 
     public DbCommand InnerCommand => command;
@@ -28,10 +31,10 @@ class CommandWrapper : IDisposable
         set { command.Transaction = value; }
     }
 
-    public virtual void AddParameter(string name, object value)
+    public void AddParameter(string name, object value)
     {
         var parameter = command.CreateParameter();
-        ParameterFiller.Fill(parameter, name, value);
+        dialect.FillParameter(parameter, name, value);
         command.Parameters.Add(parameter);
     }
 

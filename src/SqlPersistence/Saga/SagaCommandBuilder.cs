@@ -128,33 +128,17 @@ from {TableName(tableName)}
 
         string CorrelationPropertyName(string propertyName)
         {
-            if (sqlDialect is SqlDialect.Oracle)
-            {
-                var oracleName = "CORR_" + propertyName.ToUpper();
-                return oracleName.Length > 30 ? oracleName.Substring(0, 30) : oracleName;
-            }
-
-            return "Correlation_" + propertyName;
+            return sqlDialect.GetSagaCorrelationPropertyName(propertyName);
         }
 
         string TableName(string name)
         {
-            if (sqlDialect is SqlDialect.Oracle)
-            {
-                return $"\"{name.ToUpper()}\"";
-            }
-
-            return name;
+            return sqlDialect.QuoteSagaTableName(name);
         }
 
         string ParamName(string name)
         {
-            if (sqlDialect is SqlDialect.Oracle)
-            {
-                return ":" + name;
-            }
-
-            return "@" + name;
+            return sqlDialect.GetSagaParameterName(name);
         }
     }
 }

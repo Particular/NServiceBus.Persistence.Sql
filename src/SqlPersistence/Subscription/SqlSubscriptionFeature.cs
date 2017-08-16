@@ -20,7 +20,7 @@ class SqlSubscriptionFeature : Feature
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlDialect, cacheFor);
 
-        ConfigValidation.ValidateTableSettings(sqlDialect, tablePrefix);
+        sqlDialect.ValidateTablePrefix(tablePrefix);
 
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }

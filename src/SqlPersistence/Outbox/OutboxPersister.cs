@@ -16,16 +16,16 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
+    SqlDialect sqlDialect;
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
-    CommandBuilder commandBuilder;
 
     public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
+        this.sqlDialect = sqlDialect;
         this.cleanupBatchSize = cleanupBatchSize;
         outboxCommands = OutboxCommandBuilder.Build(tablePrefix, sqlDialect);
-        commandBuilder = new CommandBuilder(sqlDialect);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
@@ -38,7 +38,7 @@ class OutboxPersister : IOutboxStorage
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.SetAsDispatched;
             command.AddParameter("MessageId", messageId);
@@ -54,7 +54,7 @@ class OutboxPersister : IOutboxStorage
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;
-            using (var command = commandBuilder.CreateCommand(connection))
+            using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = outboxCommands.Get;
                 command.Transaction = transaction;
@@ -98,7 +98,7 @@ class OutboxPersister : IOutboxStorage
 
     internal async Task Store(OutboxMessage message, DbTransaction transaction, DbConnection connection)
     {
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.Store;
             command.Transaction = transaction;
@@ -117,7 +117,7 @@ class OutboxPersister : IOutboxStorage
             var continuePurging = true;
             while (continuePurging && !cancellationToken.IsCancellationRequested)
             {
-                using (var command = commandBuilder.CreateCommand(connection))
+                using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = outboxCommands.Cleanup;
                     command.AddParameter("DispatchedBefore", dateTime);

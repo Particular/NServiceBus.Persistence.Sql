@@ -115,7 +115,7 @@
 }
 namespace NServiceBus
 {
-    public class SqlDialect
+    public abstract class SqlDialect
     {
         protected SqlDialect() { }
         public override string ToString() { }
