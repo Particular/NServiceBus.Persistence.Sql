@@ -25,24 +25,18 @@ public static class SqlDialectConverter
     }
     public static SqlDialect Convert(this BuildSqlDialect sqlDialect, string schema = null)
     {
-        SqlDialect dialect;
-
         switch (sqlDialect)
         {
             case BuildSqlDialect.MsSqlServer:
-                dialect = new SqlDialect.MsSqlServer();
-                break;
+                var dialect = new SqlDialect.MsSqlServer();
+                dialect.Schema = schema;
+                return dialect;
             case BuildSqlDialect.MySql:
-                dialect = new SqlDialect.MySql();
-                break;
+                return new SqlDialect.MySql();
             case BuildSqlDialect.Oracle:
-                dialect = new SqlDialect.Oracle();
-                break;
+                return new SqlDialect.Oracle();
             default:
                 throw new Exception($"Unknown BuildSqlDialect: {sqlDialect}.");
         }
-
-        dialect.Schema = schema;
-        return dialect;
     }
 }

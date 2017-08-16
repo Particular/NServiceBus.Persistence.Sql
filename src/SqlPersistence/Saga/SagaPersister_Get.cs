@@ -45,7 +45,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sagaInfo.FillParameter(parameter, "propertyValue", propertyValue);
+                sqlDialect.FillParameter(parameter, "propertyValue", propertyValue);
                 append(parameter);
             });
     }
@@ -65,7 +65,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sagaInfo.FillParameter(parameter, "Id", sagaId);
+                sqlDialect.FillParameter(parameter, "Id", sagaId);
                 append(parameter);
             });
     }

@@ -19,7 +19,7 @@ class SqlTimeoutFeature : Feature
         var tablePrefix = settings.GetTablePrefix();
         var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
-        ConfigValidation.ValidateTableSettings(sqlDialect, tablePrefix);
+        sqlDialect.ValidateTablePrefix(tablePrefix);
 
         var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
@@ -25,7 +26,7 @@ class Installer : INeedToInstallSomething
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlDialect);
         var tablePrefix = settings.GetTablePrefix();
 
-        ConfigValidation.ValidateTableSettings(sqlDialect, tablePrefix);
+        sqlDialect.ValidateTablePrefix(tablePrefix);
 
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
@@ -49,21 +50,12 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Outbox_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlDialect is SqlDialect.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: sqlDialect.Schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
     Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
@@ -76,21 +68,12 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Subscription_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlDialect is SqlDialect.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: sqlDialect.Schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
     Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
@@ -103,54 +86,36 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlDialect is SqlDialect.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: sqlDialect.Schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
-    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
         if (!settings.ShouldInstall<SqlSagaFeature>())
         {
-            return Task.FromResult(0);
+            return;
         }
 
         var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
             log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
-            return Task.FromResult(0);
+            return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
         log.Info($@"Executing saga creation scripts:
 {string.Join(Environment.NewLine, scriptFiles)}");
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
-        if (sqlDialect is SqlDialect.Oracle)
+
+        foreach (var script in sagaScripts)
         {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                scripts: sagaScripts);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                scripts: sagaScripts,
-                tablePrefix: tablePrefix,
-                schema: sqlDialect.Schema);
+            await sqlDialect.ExecuteTableCommand(connection, transaction, tablePrefix, script).ConfigureAwait(false);
         }
     }
 }
