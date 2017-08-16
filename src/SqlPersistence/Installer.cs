@@ -115,7 +115,7 @@ class Installer : INeedToInstallSomething
 
         foreach (var script in sagaScripts)
         {
-            await sqlDialect.ExecuteTableCommand(connection, transaction, tablePrefix, script).ConfigureAwait(false);
+            await sqlDialect.ExecuteTableCommand(connection, transaction, script, tablePrefix).ConfigureAwait(false);
         }
     }
 }
