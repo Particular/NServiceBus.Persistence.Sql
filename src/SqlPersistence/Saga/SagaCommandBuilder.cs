@@ -11,16 +11,11 @@ namespace NServiceBus.Persistence.Sql
     [Obsolete("Not for public use")]
     public class SagaCommandBuilder
     {
-        readonly SqlVariant sqlVariant;
+        readonly SqlDialect sqlDialect;
 
-        public SagaCommandBuilder(SqlVariant sqlVariant)
+        public SagaCommandBuilder(SqlDialect sqlDialect)
         {
-            this.sqlVariant = sqlVariant;
-        }
-
-        [Obsolete("The SagaCommandBuilder constructor requires the SqlVariant to generate scripts for.", true)]
-        public SagaCommandBuilder()
-        {
+            this.sqlDialect = sqlDialect;
         }
 
         public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
@@ -133,36 +128,33 @@ from {TableName(tableName)}
 
         string CorrelationPropertyName(string propertyName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.Oracle)
             {
-                case SqlVariant.Oracle:
-                    var oracleName = "CORR_" + propertyName.ToUpper();
-                    return oracleName.Length > 30 ? oracleName.Substring(0, 30) : oracleName;
-                default:
-                    return "Correlation_" + propertyName;
+                var oracleName = "CORR_" + propertyName.ToUpper();
+                return oracleName.Length > 30 ? oracleName.Substring(0, 30) : oracleName;
             }
+
+            return "Correlation_" + propertyName;
         }
 
         string TableName(string name)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.Oracle)
             {
-                    case SqlVariant.Oracle:
-                        return $"\"{name.ToUpper()}\"";
-                    default:
-                        return name;
+                return $"\"{name.ToUpper()}\"";
             }
+
+            return name;
         }
 
         string ParamName(string name)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.Oracle)
             {
-                case SqlVariant.Oracle:
-                    return ":" + name;
-                default:
-                    return "@" + name;
+                return ":" + name;
             }
+
+            return "@" + name;
         }
     }
 }

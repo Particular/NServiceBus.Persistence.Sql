@@ -12,6 +12,7 @@
     <PackageReference Include="NUnit" Version="3.7.1" />
     <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
 </Project>

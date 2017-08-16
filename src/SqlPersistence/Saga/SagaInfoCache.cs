@@ -2,8 +2,10 @@
 using System.Collections.Concurrent;
 using System.IO;
 using Newtonsoft.Json;
+using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 #pragma warning disable 618
 
@@ -17,8 +19,7 @@ class SagaInfoCache
     Func<TextWriter, JsonWriter> writerCreator;
     Func<string, string> nameFilter;
     string tablePrefix;
-    string schema;
-    SqlVariant sqlVariant;
+    SqlDialect sqlDialect;
 
     public SagaInfoCache(
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
@@ -27,8 +28,7 @@ class SagaInfoCache
         Func<TextWriter, JsonWriter> writerCreator,
         SagaCommandBuilder commandBuilder,
         string tablePrefix,
-        string schema,
-        SqlVariant sqlVariant,
+        SqlDialect sqlDialect,
         SagaMetadataCollection metadataCollection,
         Func<string, string> nameFilter)
     {
@@ -38,8 +38,7 @@ class SagaInfoCache
         this.jsonSerializer = jsonSerializer;
         this.commandBuilder = commandBuilder;
         this.tablePrefix = tablePrefix;
-        this.schema = schema;
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.nameFilter = nameFilter;
         Initialize(metadataCollection);
     }
@@ -77,8 +76,7 @@ class SagaInfoCache
             readerCreator: readerCreator,
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
-            schema: schema,
-            sqlVariant: sqlVariant,
+            sqlDialect: sqlDialect,
             nameFilter: nameFilter);
     }
 }

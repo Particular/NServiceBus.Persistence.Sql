@@ -10,31 +10,33 @@ namespace NServiceBus.Persistence.Sql
     public static class OutboxCommandBuilder
     {
 
-        public static OutboxCommands Build(string tablePrefix, string schema, SqlVariant sqlVariant)
+        public static OutboxCommands Build(string tablePrefix, SqlDialect sqlDialect)
         {
             string tableName;
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                case SqlVariant.MsSqlServer:
-                    tableName = $"[{schema}].[{tablePrefix}OutboxData]";
-                    break;
-                case SqlVariant.MySql:
-                    tableName = $"`{tablePrefix}OutboxData`";
-                    break;
-                case SqlVariant.Oracle:
-                    tableName = $"{tablePrefix.ToUpper()}OD";
-                    break;
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
+                tableName = $"[{sqlDialect.Schema}].[{tablePrefix}OutboxData]";
+            }
+            else if (sqlDialect is SqlDialect.MySql)
+            {
+                tableName = $"`{tablePrefix}OutboxData`";
+            }
+            else if (sqlDialect is SqlDialect.Oracle)
+            {
+                tableName = $"{tablePrefix.ToUpper()}OD";
+            }
+            else
+            {
+                throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
             }
 
-            var storeCommandText = GetStoreCommand(sqlVariant, tableName);
+            var storeCommandText = GetStoreCommand(sqlDialect, tableName);
 
-            var cleanupCommand = GetCleanupCommand(sqlVariant, tableName);
+            var cleanupCommand = GetCleanupCommand(sqlDialect, tableName);
 
-            var getCommandText = GetGetCommand(sqlVariant, tableName);
+            var getCommandText = GetGetCommand(sqlDialect, tableName);
 
-            var setAsDispatchedCommand = GetSetAsDispatchedCommand(sqlVariant, tableName);
+            var setAsDispatchedCommand = GetSetAsDispatchedCommand(sqlDialect, tableName);
 
             return new OutboxCommands(
                 store: storeCommandText,
@@ -43,63 +45,61 @@ namespace NServiceBus.Persistence.Sql
                 cleanup: cleanupCommand);
         }
 
-        static string GetSetAsDispatchedCommand(SqlVariant sqlVariant, string tableName)
+        static string GetSetAsDispatchedCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
-                case SqlVariant.MsSqlServer:
-                case SqlVariant.MySql:
-                    return $@"
+                return $@"
 update {tableName}
 set
     Dispatched = 1,
     DispatchedAt = @DispatchedAt,
     Operations = '[]'
 where MessageId = @MessageId";
-                case SqlVariant.Oracle:
-                    return $@"
+            }
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+                return $@"
 update ""{tableName}""
 set
     Dispatched = 1,
     DispatchedAt = :DispatchedAt,
     Operations = '[]'
 where MessageId = :MessageId";
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
+
+            throw new Exception($"Unknown SqlDialect: {sqlDialect}");
         }
 
-        static string GetGetCommand(SqlVariant sqlVariant, string tableName)
+        static string GetGetCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
-                case SqlVariant.MsSqlServer:
-                case SqlVariant.MySql:
-                    return $@"
+                return $@"
 select
     Dispatched,
     Operations
 from {tableName}
 where MessageId = @MessageId";
-                case SqlVariant.Oracle:
-                    return $@"
+            }
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+                return $@"
 select
     Dispatched,
     Operations
 from ""{tableName}""
 where MessageId = :MessageId";
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
+
+            throw new Exception($"Unknown SqlDialect: {sqlDialect}");
         }
 
-        static string GetStoreCommand(SqlVariant sqlVariant, string tableName)
+        static string GetStoreCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
             {
-                case SqlVariant.MsSqlServer:
-                case SqlVariant.MySql:
-                    return $@"
+                return $@"
 insert into {tableName}
 (
     MessageId,
@@ -112,8 +112,10 @@ values
     @Operations,
     @PersistenceVersion
 )";
-                case SqlVariant.Oracle:
-                    return $@"
+            }
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+                return $@"
 insert into ""{tableName}""
 (
     MessageId,
@@ -126,36 +128,39 @@ values
     :Operations,
     :PersistenceVersion
 )";
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
 
+            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
         }
 
-        static string GetCleanupCommand(SqlVariant sqlVariant, string tableName)
+        static string GetCleanupCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                case SqlVariant.MsSqlServer:
-                    return $@"
+                return $@"
 delete top (@BatchSize) from {tableName}
 where Dispatched = 'true'
     and DispatchedAt < @DispatchedBefore";
-                case SqlVariant.MySql:
-                    return $@"
+            }
+            if (sqlDialect is SqlDialect.MySql)
+            {
+                return $@"
 delete from {tableName}
 where Dispatched = true
     and DispatchedAt < @DispatchedBefore
 limit @BatchSize";
-                case SqlVariant.Oracle:
-                    return $@"
+            }
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+
+                return $@"
 delete from ""{tableName}""
 where Dispatched = 1
     and DispatchedAt < :DispatchedBefore
     and rownum <= :BatchSize";
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}");
             }
+
+            throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}");
         }
     }
 }

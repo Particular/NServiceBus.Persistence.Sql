@@ -17,14 +17,14 @@ using NServiceBus.Extensibility;
 
 public abstract class SagaPersisterTests
 {
-    BuildSqlVariant sqlVariant;
+    BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public SagaPersisterTests(BuildSqlVariant sqlVariant, string schema)
+    public SagaPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.schema = schema;
         dbConnection = GetConnection();
     }
@@ -32,9 +32,9 @@ public abstract class SagaPersisterTests
 
     SagaPersister SetUp(string endpointName)
     {
-        var runtimeSqlVariant = sqlVariant.Convert();
+        var runtimeSqlDialect = sqlDialect.Convert(schema);
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(runtimeSqlVariant);
+        var commandBuilder = new SagaCommandBuilder(runtimeSqlDialect);
 #pragma warning restore 618
 
         var sagaMetadataCollection = new SagaMetadataCollection();
@@ -47,11 +47,10 @@ public abstract class SagaPersisterTests
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
-            schema: schema,
-            sqlVariant: runtimeSqlVariant,
+            sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);
-        return new SagaPersister(infoCache, runtimeSqlVariant);
+        return new SagaPersister(infoCache, runtimeSqlDialect);
     }
 
     IEnumerable<Type> GetSagasAndFinders()
@@ -90,8 +89,8 @@ public abstract class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName, schema: schema);
-            var createScript = SagaScriptBuilder.BuildCreateScript(definition, sqlVariant);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: schema);
+            var createScript = SagaScriptBuilder.BuildCreateScript(definition, sqlDialect);
             connection.ExecuteCommand(createScript, endpointName, schema: schema);
             connection.ExecuteCommand(createScript, endpointName, schema: schema);
         }
@@ -189,8 +188,8 @@ public abstract class SagaPersisterTests
     {
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlVariant), endpointName, schema: schema);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlVariant), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), endpointName, schema: schema);
         }
     }
 
@@ -538,8 +537,8 @@ public abstract class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlVariant), endpointName, schema: schema);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlVariant), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
 
             var definition2 = new SagaDefinition(
                 tableSuffix: "SagaWithCorrelation",
@@ -555,7 +554,7 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.Guid
                 )
             );
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlVariant), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "SagaWithCorrelation",
@@ -566,7 +565,7 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.Guid
                 )
             );
-            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlVariant);
+            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName);
         }
     }

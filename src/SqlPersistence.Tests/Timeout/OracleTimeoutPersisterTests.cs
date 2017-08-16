@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class OracleTimeoutPersisterTests : TimeoutPersisterTests
 {
-    public OracleTimeoutPersisterTests() : base(BuildSqlVariant.Oracle, null)
+    public OracleTimeoutPersisterTests() : base(BuildSqlDialect.Oracle, null)
     {
     }
 

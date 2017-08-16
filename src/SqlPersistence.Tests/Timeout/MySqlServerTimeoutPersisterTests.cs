@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class MySqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
-    public MySqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MySql, null)
+    public MySqlServerTimeoutPersisterTests() : base(BuildSqlDialect.MySql, null)
     {
     }
 

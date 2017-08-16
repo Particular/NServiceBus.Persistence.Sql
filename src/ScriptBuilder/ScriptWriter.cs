@@ -15,25 +15,25 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             using (var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred)))
             {
                 settings = SettingsAttributeReader.Read(module);
-                foreach (var variant in settings.BuildVariants)
+                foreach (var dialect in settings.BuildDialects)
                 {
-                    var variantPath = Path.Combine(scriptPath, variant.ToString());
-                    Directory.CreateDirectory(variantPath);
+                    var dialectPath = Path.Combine(scriptPath, dialect.ToString());
+                    Directory.CreateDirectory(dialectPath);
                     if (settings.ProduceSagaScripts)
                     {
-                        SagaWriter.WriteSagaScripts(variantPath, module, variant, logError);
+                        SagaWriter.WriteSagaScripts(dialectPath, module, dialect, logError);
                     }
                     if (settings.ProduceTimeoutScripts)
                     {
-                        TimeoutWriter.WriteTimeoutScript(variantPath, variant);
+                        TimeoutWriter.WriteTimeoutScript(dialectPath, dialect);
                     }
                     if (settings.ProduceSubscriptionScripts)
                     {
-                        SubscriptionWriter.WriteSubscriptionScript(variantPath, variant);
+                        SubscriptionWriter.WriteSubscriptionScript(dialectPath, dialect);
                     }
                     if (settings.ProduceOutboxScripts)
                     {
-                        OutboxWriter.WriteOutboxScript(variantPath, variant);
+                        OutboxWriter.WriteOutboxScript(dialectPath, dialect);
                     }
                 }
             }

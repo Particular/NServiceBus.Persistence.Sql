@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class MySqlSagaPersisterTests: SagaPersisterTests
 {
-    public MySqlSagaPersisterTests() : base(BuildSqlVariant.MySql, null)
+    public MySqlSagaPersisterTests() : base(BuildSqlDialect.MySql, null)
     {
     }
 

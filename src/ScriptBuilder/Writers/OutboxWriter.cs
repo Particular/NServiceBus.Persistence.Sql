@@ -3,19 +3,19 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class OutboxWriter
 {
-    public static void WriteOutboxScript(string scriptPath, BuildSqlVariant sqlVariant)
+    public static void WriteOutboxScript(string scriptPath, BuildSqlDialect sqlDialect)
     {
         var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
         File.Delete(createPath);
         using (var writer = File.CreateText(createPath))
         {
-            OutboxScriptBuilder.BuildCreateScript(writer, sqlVariant);
+            OutboxScriptBuilder.BuildCreateScript(writer, sqlDialect);
         }
         var dropPath = Path.Combine(scriptPath, "Outbox_Drop.sql");
         File.Delete(dropPath);
         using (var writer = File.CreateText(dropPath))
         {
-            OutboxScriptBuilder.BuildDropScript(writer, sqlVariant);
+            OutboxScriptBuilder.BuildDropScript(writer, sqlDialect);
         }
     }
 }

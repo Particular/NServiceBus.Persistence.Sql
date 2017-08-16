@@ -7,7 +7,7 @@ using NUnit.Framework;
 public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
 
-    public SqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MsSqlServer, "schema_name")
+    public SqlServerTimeoutPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }
 

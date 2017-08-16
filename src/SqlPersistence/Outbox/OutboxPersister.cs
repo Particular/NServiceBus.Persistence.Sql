@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql;
@@ -19,12 +20,12 @@ class OutboxPersister : IOutboxStorage
     OutboxCommands outboxCommands;
     CommandBuilder commandBuilder;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchSize = 10000)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
         this.cleanupBatchSize = cleanupBatchSize;
-        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, sqlDialect);
+        commandBuilder = new CommandBuilder(sqlDialect);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)

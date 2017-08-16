@@ -1,5 +1,5 @@
 ﻿{
-  "BuildVariants": [
+  "BuildDialects": [
     "MsSqlServer",
     "MySql",
     "Oracle"

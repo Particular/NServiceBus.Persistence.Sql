@@ -15,10 +15,10 @@
         [Test]
         public async Task Should_remove_old_property_after_phase_three()
         {
-            var variant = BuildSqlVariant.Oracle;
-            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), variant);
-            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), variant);
-            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), variant);
+            var dialect = BuildSqlDialect.Oracle;
+            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
+            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
+            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
 
             string[] phase1Schema, phase2Schema, phase3Schema;
 
@@ -26,8 +26,8 @@
             {
                 await connection.OpenAsync().ConfigureAwait(false);
 
-                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, variant), "");
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
                 phase1Schema = GetSchema(connection);
 
                 connection.PurgeStatementCache();
@@ -37,7 +37,7 @@
             {
                 await connection.OpenAsync().ConfigureAwait(false);
 
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
                 phase2Schema = GetSchema(connection);
 
                 connection.PurgeStatementCache();
@@ -47,7 +47,7 @@
             {
                 await connection.OpenAsync().ConfigureAwait(false);
 
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, variant), "");
+                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
                 phase3Schema = GetSchema(connection);
 
                 connection.PurgeStatementCache();

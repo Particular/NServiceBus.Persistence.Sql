@@ -1,38 +1,17 @@
-using NServiceBus.Configuration.AdvancedExtensibility;
-using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
-
 namespace NServiceBus
 {
-
     //TODO: throw for schema in mysql
     public static partial class SqlPersistenceConfig
     {
-
         /// <summary>
         /// Configures the database schema to be used.
         /// </summary>
-        public static void Schema(this PersistenceExtensions<SqlPersistence> configuration, string schema)
+        public static void Schema(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings, string schema)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
+            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
             Guard.AgainstNullAndEmpty(nameof(schema), schema);
             Guard.AgainstSqlDelimiters(nameof(schema), schema);
-            configuration.GetSettings()
-                .Set("SqlPersistence.Schema", schema);
-        }
-
-        internal static string GetSchema(this ReadOnlySettings settings)
-        {
-            if (settings.TryGet("SqlPersistence.Schema", out string schema))
-            {
-                return schema;
-            }
-            var sqlVariant = settings.GetSqlVariant();
-            if (sqlVariant == Persistence.Sql.SqlVariant.MsSqlServer)
-            {
-                return "dbo";
-            }
-            return null;
+            dialectSettings.Settings.Schema = schema;
         }
 
     }

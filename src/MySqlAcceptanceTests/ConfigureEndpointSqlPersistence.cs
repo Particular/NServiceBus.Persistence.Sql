@@ -16,10 +16,10 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.FromResult(0);
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 35));
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlVariant.MySql);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlDialect.MySql);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
-        persistence.SqlVariant(SqlVariant.MySql);
+        persistence.SqlDialect<SqlDialect.MySql>();
         persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();

@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Data.Common;
-using NServiceBus.Persistence.Sql;
+using NServiceBus;
 
 class CommandBuilder
 {
-    readonly SqlVariant sqlVariant;
+    readonly SqlDialect sqlDialect;
 
-    public CommandBuilder(SqlVariant sqlVariant)
+    public CommandBuilder(SqlDialect sqlDialect)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
     }
 
     public CommandWrapper CreateCommand(DbConnection connection)
     {
         var command = connection.CreateCommand();
 
-        switch (sqlVariant)
+        if (sqlDialect is SqlDialect.MsSqlServer || sqlDialect is SqlDialect.MySql)
         {
-            case SqlVariant.MsSqlServer:
-            case SqlVariant.MySql:
-                return new CommandWrapper(command);
-            case SqlVariant.Oracle:
-                return new OracleCommandWrapper(command);
-            default:
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+            return new CommandWrapper(command);
         }
+        if (sqlDialect is SqlDialect.Oracle)
+        {
+            return new OracleCommandWrapper(command);
+        }
+        throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
     }
 }

@@ -5,32 +5,32 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
     public static class SubscriptionScriptBuilder
     {
-        public static void BuildCreateScript(TextWriter writer, BuildSqlVariant sqlVariant)
+        public static void BuildCreateScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
-            writer.Write(ResourceReader.ReadResource(sqlVariant, "Subscription.Create"));
+            writer.Write(ResourceReader.ReadResource(sqlDialect, "Subscription.Create"));
         }
 
-        public static string BuildCreateScript(BuildSqlVariant sqlVariant)
+        public static string BuildCreateScript(BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildCreateScript(stringWriter, sqlVariant);
+                BuildCreateScript(stringWriter, sqlDialect);
             }
             return stringBuilder.ToString();
         }
 
-        public static void BuildDropScript(TextWriter writer, BuildSqlVariant sqlVariant)
+        public static void BuildDropScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
-            writer.Write(ResourceReader.ReadResource(sqlVariant, "Subscription.Drop"));
+            writer.Write(ResourceReader.ReadResource(sqlDialect, "Subscription.Drop"));
         }
 
-        public static string BuildDropScript(BuildSqlVariant sqlVariant)
+        public static string BuildDropScript(BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildDropScript(stringWriter, sqlVariant);
+                BuildDropScript(stringWriter, sqlDialect);
             }
             return stringBuilder.ToString();
         }

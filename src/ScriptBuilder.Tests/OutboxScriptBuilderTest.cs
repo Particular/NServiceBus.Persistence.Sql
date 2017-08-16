@@ -9,44 +9,44 @@ using NUnit.Framework;
 public class OutboxScriptBuilderTest
 {
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void BuildCreateScript(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    public void BuildCreateScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            OutboxScriptBuilder.BuildCreateScript(writer,sqlVariant);
+            OutboxScriptBuilder.BuildCreateScript(writer,sqlDialect);
         }
         var script = builder.ToString();
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVariant))
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
     }
 
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void BuildDropScript(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    public void BuildDropScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            OutboxScriptBuilder.BuildDropScript(writer, sqlVariant);
+            OutboxScriptBuilder.BuildDropScript(writer, sqlDialect);
         }
         var script = builder.ToString();
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVariant))
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }

@@ -8,14 +8,14 @@ using ObjectApproval;
 
 public abstract class TimeoutPersisterTests
 {
-    BuildSqlVariant sqlVariant;
+    BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
 
-    public TimeoutPersisterTests(BuildSqlVariant sqlVariant, string schema)
+    public TimeoutPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.schema = schema;
         dbConnection = GetConnection();
     }
@@ -26,8 +26,8 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
         }
 
         var preventCleanupInterval = DateTime.UtcNow - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
@@ -35,8 +35,7 @@ public abstract class TimeoutPersisterTests
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
-            sqlVariant: sqlVariant.Convert(),
-            schema: schema, 
+            sqlDialect: sqlDialect.Convert(schema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval);
     }
 
@@ -47,7 +46,7 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
         }
     }
 
@@ -63,8 +62,8 @@ public abstract class TimeoutPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
         }
     }
 

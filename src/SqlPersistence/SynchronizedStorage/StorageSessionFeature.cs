@@ -14,8 +14,8 @@ class StorageSessionFeature : Feature
     {
         var settings = context.Settings;
         ValidateSagaOutboxCombo(settings);
-
-        var sqlVariant = settings.GetSqlVariant();
+        
+        var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
 
@@ -25,13 +25,13 @@ class StorageSessionFeature : Feature
         SagaInfoCache infoCache = null;
         if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
         {
-            infoCache = BuildSagaInfoCache(sqlVariant, settings);
+            infoCache = BuildSagaInfoCache(sqlDialect, settings);
             container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
             container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
         }
         if (isSagasEnabledForSqlPersistence)
         {
-            var sagaPersister = new SagaPersister(infoCache, sqlVariant);
+            var sagaPersister = new SagaPersister(infoCache, sqlDialect);
             container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
         }
     }
@@ -53,10 +53,10 @@ class StorageSessionFeature : Feature
         throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
     }
 
-    static SagaInfoCache BuildSagaInfoCache(SqlVariant sqlVariant, ReadOnlySettings settings)
+    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)
     {
 #pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(sqlVariant);
+        var commandBuilder = new SagaCommandBuilder(sqlDialect);
 #pragma warning restore 618
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
@@ -77,7 +77,6 @@ class StorageSessionFeature : Feature
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix();
-        var schema = settings.GetSchema();
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,
@@ -85,8 +84,7 @@ class StorageSessionFeature : Feature
             writerCreator: writerCreator,
             commandBuilder: commandBuilder,
             tablePrefix: tablePrefix,
-            schema: schema,
-            sqlVariant: sqlVariant,
+            sqlDialect: sqlDialect,
             metadataCollection: settings.Get<SagaMetadataCollection>(),
             nameFilter: nameFilter);
     }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Text;
 using NServiceBus;
-using NServiceBus.Persistence.Sql;
 
 static class ConfigValidation
 {
-    public static void ValidateTableSettings(SqlVariant variant, string tablePrefix, string schema)
+    public static void ValidateTableSettings(SqlDialect dialect, string tablePrefix)
     {
-        if (variant == SqlVariant.Oracle)
+        if (dialect is SqlDialect.Oracle)
         {
             if (tablePrefix.Length > 25)
             {

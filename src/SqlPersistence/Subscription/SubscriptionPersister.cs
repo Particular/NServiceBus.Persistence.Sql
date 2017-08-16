@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
@@ -14,12 +15,12 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan? cacheFor)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
         this.cacheFor = cacheFor;
-        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlDialect, tablePrefix);
+        commandBuilder = new CommandBuilder(sqlDialect);
         if (cacheFor != null)
         {
             Cache = new ConcurrentDictionary<string, CacheItem>();

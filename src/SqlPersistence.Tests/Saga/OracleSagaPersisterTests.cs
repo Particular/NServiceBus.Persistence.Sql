@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class OracleSagaPersisterTests : SagaPersisterTests
 {
-    public OracleSagaPersisterTests() : base(BuildSqlVariant.Oracle, null)
+    public OracleSagaPersisterTests() : base(BuildSqlDialect.Oracle, null)
     {
     }
 

@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class OracleOutboxPersisterTests : OutboxPersisterTests
 {
-    public OracleOutboxPersisterTests() : base(BuildSqlVariant.Oracle, null)
+    public OracleOutboxPersisterTests() : base(BuildSqlDialect.Oracle, null)
     {
     }
 

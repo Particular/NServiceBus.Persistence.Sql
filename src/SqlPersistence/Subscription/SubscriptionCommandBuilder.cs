@@ -14,30 +14,30 @@ namespace NServiceBus.Persistence.Sql
     public static class SubscriptionCommandBuilder
     {
 
-        public static SubscriptionCommands Build(SqlVariant sqlVariant, string tablePrefix, string schema)
+        public static SubscriptionCommands Build(SqlDialect sqlDialect, string tablePrefix)
         {
             string tableName;
 
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                case SqlVariant.MsSqlServer:
-                    tableName = $"[{schema}].[{tablePrefix}SubscriptionData]";
-                    break;
-
-                case SqlVariant.MySql:
-                    tableName = $"`{tablePrefix}SubscriptionData`";
-                    break;
-
-                case SqlVariant.Oracle:
-                    tableName = $"{tablePrefix.ToUpper()}SS";
-                    break;
-
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
+                tableName = $"[{sqlDialect.Schema}].[{tablePrefix}SubscriptionData]";
             }
-            var subscribeCommand = GetSubscribeCommand(sqlVariant, tableName);
-            var unsubscribeCommand = GetUnsubscribeCommand(sqlVariant, tableName);
-            var getSubscribers = GetSubscribersFunc(sqlVariant, tableName);
+            else if (sqlDialect is SqlDialect.MySql)
+            {
+                tableName = $"`{tablePrefix}SubscriptionData`";
+            }
+            else if (sqlDialect is SqlDialect.Oracle)
+            {
+                tableName = $"{tablePrefix.ToUpper()}SS";
+            }
+            else
+            {
+                throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
+            }
+
+            var subscribeCommand = GetSubscribeCommand(sqlDialect, tableName);
+            var unsubscribeCommand = GetUnsubscribeCommand(sqlDialect, tableName);
+            var getSubscribers = GetSubscribersFunc(sqlDialect, tableName);
 
             return new SubscriptionCommands(
                 subscribe: subscribeCommand,
@@ -45,12 +45,11 @@ namespace NServiceBus.Persistence.Sql
                 getSubscribers: getSubscribers);
         }
 
-        static string GetSubscribeCommand(SqlVariant sqlVariant, string tableName)
+        static string GetSubscribeCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.MsSqlServer)
             {
-                case SqlVariant.MsSqlServer:
-                    return $@"
+                return $@"
 declare @dummy int;
 merge {tableName} with (holdlock, tablock) as target
 using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
@@ -74,9 +73,11 @@ values
     @Endpoint,
     @PersistenceVersion
 );";
+            }
 
-                case SqlVariant.MySql:
-                    return $@"
+            if (sqlDialect is SqlDialect.MySql)
+            {
+                return $@"
 insert into {tableName}
 (
     Subscriber,
@@ -95,9 +96,11 @@ on duplicate key update
     Endpoint = @Endpoint,
     PersistenceVersion = @PersistenceVersion
 ";
+            }
 
-                case SqlVariant.Oracle:
-                    return $@"
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+                return $@"
 begin
     insert into ""{tableName}""
     (
@@ -119,62 +122,57 @@ exception
     then ROLLBACK;
 end;
 ";
-
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
+            
+             throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
         }
 
-        static string GetUnsubscribeCommand(SqlVariant sqlVariant, string tableName)
+        static string GetUnsubscribeCommand(SqlDialect sqlDialect, string tableName)
         {
-            switch (sqlVariant)
+            if (sqlDialect is SqlDialect.Oracle)
             {
-                case SqlVariant.Oracle:
-                    return $@"
+                return $@"
 delete from ""{tableName}""
 where
     Subscriber = :Subscriber and
     MessageType = :MessageType";
+            }
 
-                default:
-                    return $@"
+            return $@"
 delete from {tableName}
 where
     Subscriber = @Subscriber and
     MessageType = @MessageType";
-            }
         }
 
-        static Func<List<MessageType>, string> GetSubscribersFunc(SqlVariant sqlVariant, string tableName)
-        {
-            switch (sqlVariant)
-            {
-                case SqlVariant.Oracle:
 
-                    var getSubscribersPrefixOracle = $@"
+        static Func<List<MessageType>, string> GetSubscribersFunc(SqlDialect sqlDialect, string tableName)
+        {
+            if (sqlDialect is SqlDialect.Oracle)
+            {
+                var getSubscribersPrefixOracle = $@"
 select distinct Subscriber, Endpoint
 from ""{tableName}""
 where MessageType in (";
 
-                    return messageTypes =>
+                return messageTypes =>
+                {
+                    var builder = new StringBuilder(getSubscribersPrefixOracle);
+                    for (var i = 0; i < messageTypes.Count; i++)
                     {
-                        var builder = new StringBuilder(getSubscribersPrefixOracle);
-                        for (var i = 0; i < messageTypes.Count; i++)
+                        var paramName = $":type{i}";
+                        builder.Append(paramName);
+                        if (i < messageTypes.Count - 1)
                         {
-                            var paramName = $":type{i}";
-                            builder.Append(paramName);
-                            if (i < messageTypes.Count - 1)
-                            {
-                                builder.Append(", ");
-                            }
+                            builder.Append(", ");
                         }
-                        builder.Append(")");
-                        return builder.ToString();
-                    };
+                    }
+                    builder.Append(")");
+                    return builder.ToString();
+                };
+            }
 
-                default:
-
-                    var getSubscribersPrefix = $@"
+            var getSubscribersPrefix = $@"
 select distinct Subscriber, Endpoint
 from {tableName}
 where MessageType in (";
@@ -195,6 +193,5 @@ where MessageType in (";
                         return builder.ToString();
                     };
             }
-        }
     }
 }

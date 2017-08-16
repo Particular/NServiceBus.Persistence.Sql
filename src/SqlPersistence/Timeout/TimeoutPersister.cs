@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SqlTypes;
 using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql;
 #pragma warning disable 618
@@ -18,24 +19,24 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan timeoutsCleanupExecutionInterval)
+    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval)
     {
         this.connectionBuilder = connectionBuilder;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
-        timeoutCommands = TimeoutCommandBuilder.Build(sqlVariant, tablePrefix, schema);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, tablePrefix);
+        commandBuilder = new CommandBuilder(sqlDialect);
 
-        switch (sqlVariant)
+        if (sqlDialect is SqlDialect.MsSqlServer)
         {
-            case SqlVariant.MsSqlServer:
-                oldestSupportedTimeout = SqlDateTime.MinValue.Value;
-                break;
-            case SqlVariant.Oracle:
-            case SqlVariant.MySql:
-                oldestSupportedTimeout = new DateTime(1000, 1, 1);
-                break;
-            default:
-                throw new NotSupportedException("Not supported SQL dialect: " + sqlVariant);
+            oldestSupportedTimeout = SqlDateTime.MinValue.Value;
+        }
+        else if (sqlDialect is SqlDialect.Oracle || sqlDialect is SqlDialect.MySql)
+        {
+            oldestSupportedTimeout = new DateTime(1000, 1, 1);
+        }
+        else
+        {
+            throw new NotSupportedException("Not supported SQL dialect: " + sqlDialect.Name);
         }
     }
 
