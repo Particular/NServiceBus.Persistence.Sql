@@ -3,6 +3,7 @@ namespace NServiceBus
     using System;
     using System.Data;
     using System.Data.Common;
+    using System.Reflection;
     using System.Text;
 
     public abstract partial class SqlDialect
@@ -12,6 +13,8 @@ namespace NServiceBus
         /// </summary>
         public partial class Oracle : SqlDialect
         {
+            volatile PropertyInfo bindByNameProperty;
+
             internal override void FillParameter(DbParameter parameter, string paramName, object value)
             {
                 parameter.ParameterName = paramName;
@@ -34,7 +37,10 @@ namespace NServiceBus
             {
                 var command = connection.CreateCommand();
 
-                var bindByNameProperty = command.GetType().GetProperty("BindByName");
+                if (bindByNameProperty == null)
+                {
+                    bindByNameProperty = command.GetType().GetProperty("BindByName");
+                }
                 bindByNameProperty.SetValue(command, true);
 
                 return new CommandWrapper(command, this);
