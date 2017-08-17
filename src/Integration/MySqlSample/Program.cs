@@ -16,7 +16,7 @@ class Program
         return EndpointStarter.Start("SqlPersistence.Sample.MySql",
             persistence =>
             {
-                persistence.SqlVariant(SqlVariant.MySql);
+                persistence.SqlDialect<SqlDialect.MySql>();
                 persistence.TablePrefix("MySql");
                 persistence.ConnectionBuilder(() => new MySqlConnection(connection));
             });

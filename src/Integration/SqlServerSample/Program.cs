@@ -17,7 +17,7 @@ class Program
         return EndpointStarter.Start("SqlPersistence.Sample.MsSqlServer",
             persistence =>
             {
-                persistence.SqlVariant(SqlVariant.MsSqlServer);
+                persistence.SqlDialect<SqlDialect.MsSqlServer>();
                 persistence.TablePrefix("AcceptanceTests");
                 persistence.ConnectionBuilder(() => new SqlConnection(connection));
             });
