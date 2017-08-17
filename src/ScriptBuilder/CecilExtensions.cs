@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using NServiceBus.Persistence.Sql;
 
 static class CecilExtensions
@@ -50,15 +51,51 @@ static class CecilExtensions
     {
         value = null;
         var instructions = property.GetMethod.Body.Instructions;
-        if (instructions.Count != 2)
+        if (instructions.Count == 2)
         {
-            return false;
+            //Ldstr-Ret
+            return TryGetExpressionBodyPropertyAssignment(instructions, out value);
         }
+        if (instructions.Count == 6)
+        {
+            //Nop-Ldstr-Stloc.0-Br.S-Ldloc.0-Ret
+            return TryGetStatementBodyPropertyAssignment(instructions, out value);
+        }
+        return false;
+    }
+
+    static bool TryGetExpressionBodyPropertyAssignment(Collection<Instruction> instructions, out string value)
+    {
+        value = null;
         if (instructions[1].OpCode != OpCodes.Ret)
         {
             return false;
         }
         var first = instructions[0];
+        if (first.OpCode == OpCodes.Ldstr)
+        {
+            value = (string)first.Operand;
+            return true;
+        }
+        if (first.OpCode == OpCodes.Ldnull)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    static bool TryGetStatementBodyPropertyAssignment(Collection<Instruction> instructions, out string value)
+    {
+        value = null;
+        if (instructions[5].OpCode != OpCodes.Ret
+            || instructions[4].OpCode != OpCodes.Ldloc_0
+            || instructions[3].OpCode != OpCodes.Br_S
+            || instructions[2].OpCode != OpCodes.Stloc_0
+            || instructions[0].OpCode != OpCodes.Nop)
+        {
+            return false;
+        }
+        var first = instructions[1];
         if (first.OpCode == OpCodes.Ldstr)
         {
             value = (string)first.Operand;
