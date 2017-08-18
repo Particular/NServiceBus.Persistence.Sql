@@ -1,4 +1,5 @@
 ﻿//TODO: re enable when sql transport is updated
+//TODO: add tests for the new option to not reuse the connection
 
 /**
 using System;

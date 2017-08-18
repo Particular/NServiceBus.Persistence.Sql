@@ -13,9 +13,9 @@ namespace NServiceBus
 
         internal static SqlDialect GetSqlDialect(this ReadOnlySettings settings)
         {
-            if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialect value))
+            if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialectSettings value))
             {
-                return value;
+                return value.Dialect;
             }
             throw new Exception("Must specify SQL dialect using persistence.SqlDialect<T>() method.");
         }
@@ -27,11 +27,17 @@ namespace NServiceBus
         public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration) where T : SqlDialect, new()
         {
             var settings = configuration.GetSettings();
-            
+
+            SqlDialectSettings<T> dialectSettings;
+            if (settings.TryGet("SqlPersistence.SqlDialect", out dialectSettings))
+            {
+                return dialectSettings;
+            }
+
             var type = typeof(SqlDialectSettings<>).MakeGenericType(typeof(T));
-            var instance = (SqlDialectSettings<T>)Activator.CreateInstance(type);
-            settings.Set("SqlPersistence.SqlDialect", instance.Settings);
-            return instance;
+            dialectSettings = (SqlDialectSettings<T>)Activator.CreateInstance(type);
+            settings.Set("SqlPersistence.SqlDialect", dialectSettings);
+            return dialectSettings;
         }
     }
 }
