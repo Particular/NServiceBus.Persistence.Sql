@@ -1,7 +1,4 @@
-﻿//TODO: re enable when sql transport is updated
-
-/**
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -209,4 +206,3 @@ end";
         }
     }
 }
-**/

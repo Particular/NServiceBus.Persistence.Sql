@@ -1,7 +1,4 @@
-﻿//TODO: re enable when sql transport is updated
-
-/**
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
@@ -131,4 +128,3 @@ public class SqlTransportIntegrationTests : IDisposable
         dbConnection?.Dispose();
     }
 }
-**/
