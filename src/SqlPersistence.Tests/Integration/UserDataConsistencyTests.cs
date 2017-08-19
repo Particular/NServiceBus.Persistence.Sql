@@ -43,8 +43,6 @@ end";
     {
         return RunTest(e =>
         {
-            //Hack: enable outbox to force sql session since we have no saga
-            e.EnableOutbox();
             var transport = e.UseTransport<MsmqTransport>();
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
@@ -109,6 +107,8 @@ end";
         Execute(createUserDataTableText);
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
+        //Hack: enable outbox to force sql session since we have no saga
+        endpointConfiguration.EnableOutbox();
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         endpointConfiguration.DisableFeature<TimeoutManager>();
