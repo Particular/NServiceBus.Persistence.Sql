@@ -1,7 +1,4 @@
-﻿//TODO: re enable when sql transport is updated
-
-/**
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,6 +64,7 @@ public class SqlTransportIntegrationTests : IDisposable
         transport.Transactions(transactionMode);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();
@@ -131,4 +129,3 @@ public class SqlTransportIntegrationTests : IDisposable
         dbConnection?.Dispose();
     }
 }
-**/

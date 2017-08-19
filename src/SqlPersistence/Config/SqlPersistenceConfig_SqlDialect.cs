@@ -24,7 +24,8 @@ namespace NServiceBus
         /// Configures which database engine to target.
         /// </summary>
         /// <returns>Settings options available for the selected database engine.</returns>
-        public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration) where T : SqlDialect, new()
+        public static SqlDialectSettings<T> SqlDialect<T>(this PersistenceExtensions<SqlPersistence> configuration)
+            where T : SqlDialect, new()
         {
             var settings = configuration.GetSettings();
             

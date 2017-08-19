@@ -1,11 +1,9 @@
-﻿//TODO: re enable when sql transport is updated
-
-/**
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Configuration.AdvancedExtensibility;
+using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
@@ -109,13 +107,16 @@ end";
         Execute(createUserDataTableText);
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
+        //Hack: enable outbox to force sql session since we have no saga
+        endpointConfiguration.EnableOutbox();
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
-        endpointConfiguration.DisableFeature<NServiceBus.Features.TimeoutManager>();
+        endpointConfiguration.DisableFeature<TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();
@@ -130,14 +131,19 @@ end";
 
         var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var dataId = Guid.NewGuid();
-        await endpoint.SendLocal(new FailingMessage
+
+        var failingMessage = new FailingMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
-        await endpoint.SendLocal(new CheckMessage
+        };
+        await endpoint.SendLocal(failingMessage).ConfigureAwait(false);
+
+        var checkMessage = new CheckMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
+        };
+        await endpoint.SendLocal(checkMessage).ConfigureAwait(false);
+
         manualResetEvent.WaitOne();
         await endpoint.Stop().ConfigureAwait(false);
 
@@ -209,4 +215,3 @@ end";
         }
     }
 }
-**/
