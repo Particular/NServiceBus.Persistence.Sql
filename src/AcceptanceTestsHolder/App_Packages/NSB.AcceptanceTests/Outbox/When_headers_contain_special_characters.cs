@@ -8,7 +8,7 @@
     using NServiceBus.Pipeline;
     using NUnit.Framework;
 
-    public class When_headers_contain_special_characters : NServiceBusAcceptanceTest
+    public partial class When_headers_contain_special_characters : NServiceBusAcceptanceTest
     {
         static Dictionary<string, string> sentHeaders = new Dictionary<string, string>
         {

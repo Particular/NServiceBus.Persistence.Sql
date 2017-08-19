@@ -7,6 +7,7 @@
     using Extensibility;
     using Features;
     using NServiceBus;
+    using NServiceBus.Persistence.Sql;
     using NServiceBus.Outbox;
     using NServiceBus.Persistence;
     using NUnit.Framework;
@@ -60,17 +61,18 @@
                 }
             }
 
-            public class PlaceOrderSaga : Saga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
+            public class PlaceOrderSaga : SqlSaga<PlaceOrderSaga.PlaceOrderSagaData>, IAmStartedByMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
                     return context.SendLocal(new SignalDone());
                 }
+                protected override string CorrelationPropertyName => nameof(PlaceOrderSagaData.DataId);
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<PlaceOrderSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<PlaceOrder>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<PlaceOrder>(m => m.DataId);
                 }
 
                 public class PlaceOrderSagaData : ContainSagaData

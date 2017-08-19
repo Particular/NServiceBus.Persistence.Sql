@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_sending_from_a_saga_timeout : NServiceBusAcceptanceTest
     {
@@ -35,10 +36,12 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class SendFromTimeoutSaga1 : Saga<SendFromTimeoutSaga1.SendFromTimeoutSaga1Data>,
+            public class SendFromTimeoutSaga1 : SqlSaga<SendFromTimeoutSaga1.SendFromTimeoutSaga1Data>,
                 IAmStartedByMessages<StartSaga1>,
                 IHandleTimeouts<Saga1Timeout>
             {
+                protected override string CorrelationPropertyName => nameof(SendFromTimeoutSaga1Data.DataId);
+
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga1 message, IMessageHandlerContext context)
@@ -56,9 +59,9 @@
                     MarkAsComplete();
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SendFromTimeoutSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga1>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.DataId);
                 }
 
                 public class SendFromTimeoutSaga1Data : ContainSagaData
@@ -67,8 +70,10 @@
                 }
             }
 
-            public class SendFromTimeoutSaga2 : Saga<SendFromTimeoutSaga2.SendFromTimeoutSaga2Data>, IAmStartedByMessages<StartSaga2>
+            public class SendFromTimeoutSaga2 : SqlSaga<SendFromTimeoutSaga2.SendFromTimeoutSaga2Data>, IAmStartedByMessages<StartSaga2>
             {
+                protected override string CorrelationPropertyName => nameof(SendFromTimeoutSaga2Data.DataId);
+
                 public Context Context { get; set; }
 
                 public Task Handle(StartSaga2 message, IMessageHandlerContext context)
@@ -78,9 +83,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SendFromTimeoutSaga2Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga2>(m => m.DataId);
                 }
 
                 public class SendFromTimeoutSaga2Data : ContainSagaData
