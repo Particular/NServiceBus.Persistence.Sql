@@ -64,6 +64,7 @@ public class SqlTransportIntegrationTests : IDisposable
         transport.Transactions(transactionMode);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();
