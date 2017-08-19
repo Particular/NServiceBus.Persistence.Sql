@@ -115,7 +115,8 @@ where {whereClause}";
         }
     }
 
-    static void ValidatePropertyName<TSagaData>(string propertyName, RuntimeSagaInfo sagaInfo) where TSagaData : IContainSagaData
+    static void ValidatePropertyName<TSagaData>(string propertyName, RuntimeSagaInfo sagaInfo)
+        where TSagaData : IContainSagaData
     {
         if (!sagaInfo.HasCorrelationProperty)
         {
