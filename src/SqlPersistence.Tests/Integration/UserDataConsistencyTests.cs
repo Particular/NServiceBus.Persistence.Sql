@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Configuration.AdvancedExtensibility;
+using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
@@ -42,6 +43,8 @@ end";
     {
         return RunTest(e =>
         {
+            //Hack: enable outbox to force sql session since we have no saga
+            e.EnableOutbox();
             var transport = e.UseTransport<MsmqTransport>();
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
@@ -108,7 +111,7 @@ end";
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
-        endpointConfiguration.DisableFeature<NServiceBus.Features.TimeoutManager>();
+        endpointConfiguration.DisableFeature<TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
@@ -128,14 +131,19 @@ end";
 
         var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var dataId = Guid.NewGuid();
-        await endpoint.SendLocal(new FailingMessage
+
+        var failingMessage = new FailingMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
-        await endpoint.SendLocal(new CheckMessage
+        };
+        await endpoint.SendLocal(failingMessage).ConfigureAwait(false);
+
+        var checkMessage = new CheckMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
+        };
+        await endpoint.SendLocal(checkMessage).ConfigureAwait(false);
+
         manualResetEvent.WaitOne();
         await endpoint.Stop().ConfigureAwait(false);
 
