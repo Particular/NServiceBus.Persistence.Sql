@@ -6,7 +6,6 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_handling_message_with_handler_and_timeout_handler : NServiceBusAcceptanceTest
     {
@@ -38,11 +37,9 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class HandlerAndTimeoutSaga : SqlSaga<HandlerAndTimeoutSagaData>, IAmStartedByMessages<StartSagaMessage>,
+            public class HandlerAndTimeoutSaga : Saga<HandlerAndTimeoutSagaData>, IAmStartedByMessages<StartSagaMessage>,
                 IHandleTimeouts<StartSagaMessage>
             {
-                protected override string CorrelationPropertyName => nameof(HandlerAndTimeoutSagaData.SomeId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -57,9 +54,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<HandlerAndTimeoutSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
+                        .ToSaga(s => s.SomeId);
                 }
             }
 

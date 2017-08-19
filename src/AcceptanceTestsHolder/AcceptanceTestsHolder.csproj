@@ -29,7 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0036\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0051\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0051\lib\net452\NServiceBus.Core.dll</HintPath>
@@ -64,14 +64,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing_message_with_TimeToBeReceived.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_audit_is_overridden_in_code.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_replymessage_is_audited.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_replying_to_received_message_without_correlationid.cs" />
@@ -168,15 +167,9 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Routing\When_routing_reply_to_specific_instance.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Routing\When_using_custom_routing_strategy.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_an_endpoint_replies_to_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_auto_correlated_property_is_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_mapped_is_handled_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_message_starts_a_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlated_property_value_is_changed.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlating_on_special_characters.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_first_handler_responding.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_response_from_noninitiating.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_with_timeout.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_finder_returns_existing_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_forgetting_to_set_a_corr_property.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />

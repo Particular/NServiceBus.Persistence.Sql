@@ -6,7 +6,6 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     public class When_using_contain_saga_data : NServiceBusAcceptanceTest
     {
@@ -37,12 +36,10 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class MySaga : SqlSaga<MySaga.MySagaData>,
+            public class MySaga : Saga<MySaga.MySagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleTimeouts<MySaga.TimeHasPassed>
             {
-                protected override string CorrelationPropertyName => nameof(MySagaData.DataId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -59,9 +56,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class MySagaData : ContainSagaData

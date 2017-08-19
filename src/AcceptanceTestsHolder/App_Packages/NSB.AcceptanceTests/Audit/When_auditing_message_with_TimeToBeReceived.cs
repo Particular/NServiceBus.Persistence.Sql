@@ -7,7 +7,6 @@
     using EndpointTemplates;
     using NUnit.Framework;
 
-    [Explicit]
     public class When_auditing_message_with_TimeToBeReceived : NServiceBusAcceptanceTest
     {
         [Test]
