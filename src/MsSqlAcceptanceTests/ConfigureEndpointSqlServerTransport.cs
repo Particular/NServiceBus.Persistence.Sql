@@ -12,15 +12,8 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         queueBindings = configuration.GetSettings().Get<QueueBindings>();
-
-        connectionString = Environment.GetEnvironmentVariable("SqlServerTransport.ConnectionString");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new Exception("The 'SqlServerTransport.ConnectionString' environment variable is not set.");
-        }
-
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
-        transportConfig.ConnectionString(connectionString);
+        transportConfig.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
 
         transportConfig.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
 
