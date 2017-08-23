@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if NET452
+using System.Collections.Generic;
 using NServiceBus.Outbox;
 using NUnit.Framework;
 using ObjectApproval;
@@ -34,3 +35,4 @@ public class OperationConverterTests
     }
 
 }
+#endif
