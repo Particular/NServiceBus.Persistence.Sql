@@ -4,7 +4,11 @@
 
     public partial class TestSuiteConstraints
     {
+#if NET452
         public bool SupportsDtc => true;
+#else
+        public bool SupportsDtc => false;
+#endif
         public bool SupportsCrossQueueTransactions => true;
         public bool SupportsNativePubSub => false;
         public bool SupportsNativeDeferral => false;
