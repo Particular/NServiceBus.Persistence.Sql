@@ -13,7 +13,8 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
     {
         queueBindings = configuration.GetSettings().Get<QueueBindings>();
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
-        transportConfig.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        connectionString = MsSqlConnectionBuilder.ConnectionString;
+        transportConfig.ConnectionString(connectionString);
 
         transportConfig.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
 
