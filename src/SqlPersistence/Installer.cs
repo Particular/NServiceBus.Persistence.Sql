@@ -20,6 +20,15 @@ class Installer : INeedToInstallSomething
 
     public async Task Install(string identity)
     {
+        //If neither of the features is configured then do not even attempt to validate config
+        if (!settings.ShouldInstall<SqlOutboxFeature>()
+            && !settings.ShouldInstall<SqlSubscriptionFeature>()
+            && !settings.ShouldInstall<SqlTimeoutFeature>()
+            && !settings.ShouldInstall<SqlSagaFeature>())
+        {
+            return;
+        }
+
         var connectionBuilder = settings.GetConnectionBuilder();
         var sqlDialect = settings.GetSqlDialect();
         var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlDialect);
