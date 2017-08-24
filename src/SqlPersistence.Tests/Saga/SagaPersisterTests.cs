@@ -193,6 +193,80 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [Test]
+    public async Task CallbackIsInvoked()
+    {
+        var callbackInvoked = false;
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            storageSession.OnSaveChanges(s =>
+            {
+                callbackInvoked = true;
+                return Task.FromResult(0);
+            });
+            await storageSession.CompleteAsync();
+        }
+        Assert.IsTrue(callbackInvoked);
+    }
+
+    [Test]
+    public async Task CallbackThrows()
+    {
+        var exceptionThrown = false;
+        var id = Guid.NewGuid();
+        var sagaData = new SagaWithCorrelation.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            SimpleProperty = "PropertyValue",
+            CorrelationProperty = "theCorrelationProperty"
+        };
+
+        var persister = SetUp(nameof(CallbackThrows));
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        DropAndCreate(definition, nameof(CallbackThrows));
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            storageSession.OnSaveChanges(s =>
+            {
+                throw new Exception("Simulated");
+            });
+            try
+            {
+                await storageSession.CompleteAsync();
+            }
+            catch (Exception)
+            {
+                exceptionThrown = true;
+            }
+        }
+
+        Assert.IsTrue(exceptionThrown);
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
+            Assert.IsNull(savedEntity.Data);
+        }
+    }
+
     async Task<SagaWithCorrelation.SagaData> SaveAsync(Guid id, string endpointName)
     {
         var sagaData = new SagaWithCorrelation.SagaData

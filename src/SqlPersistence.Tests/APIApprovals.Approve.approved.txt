@@ -8,6 +8,7 @@
     {
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
+        void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.Tasks.Task> callback);
     }
     [System.ObsoleteAttribute("Not for public use")]
     public class static OutboxCommandBuilder
