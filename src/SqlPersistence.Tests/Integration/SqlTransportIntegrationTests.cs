@@ -1,4 +1,6 @@
-﻿using System;
+//TODO: add tests for the new option to not reuse the connection
+
+using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;

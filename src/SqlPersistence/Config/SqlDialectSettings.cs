@@ -3,16 +3,32 @@ namespace NServiceBus
     /// <summary>
     /// Exposes settings options available for the selected database engine.
     /// </summary>
-    public class SqlDialectSettings<T> where T : SqlDialect, new()
+    public abstract class SqlDialectSettings
+    {
+        internal SqlDialect Dialect;
+
+        /// <summary>
+        /// Exposes settings options available for the selected database engine.
+        /// </summary>
+        protected SqlDialectSettings(SqlDialect dialect)
+        {
+            this.Dialect = dialect;
+        }
+    }
+
+    /// <summary>
+    /// Exposes settings options available for the selected database engine.
+    /// </summary>
+    public class SqlDialectSettings<T> : SqlDialectSettings
+        where T : SqlDialect, new()
     {
         /// <summary>
         /// Exposes settings options available for the selected database engine.
         /// </summary>
-        public SqlDialectSettings()
+        public SqlDialectSettings() : base(new T())
         {
-            Settings = new T();
         }
 
-        internal T Settings { get; }
+        internal T TypedDialect => (T)Dialect;
     }
 }

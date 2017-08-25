@@ -27,7 +27,7 @@ class StorageSessionFeature : Feature
         {
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
             container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
-            container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+            container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
         }
         if (isSagasEnabledForSqlPersistence)
         {

@@ -11,8 +11,16 @@ namespace NServiceBus
             Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
             Guard.AgainstNullAndEmpty(nameof(schema), schema);
             Guard.AgainstSqlDelimiters(nameof(schema), schema);
-            dialectSettings.Settings.Schema = schema;
+            dialectSettings.TypedDialect.Schema = schema;
         }
 
+        /// <summary>
+        /// Instructs the persistence to not use the connection established by the SQL Server transport.
+        /// </summary>
+        public static void DoNotUseSqlServerTransportConnection(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings)
+        {
+            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
+            dialectSettings.TypedDialect.DoNotUseTransportConnection = true;
+        }
     }
 }
