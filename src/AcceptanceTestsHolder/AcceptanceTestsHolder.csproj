@@ -29,10 +29,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0036\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0051\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0036\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0051\lib\net452\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Transport.Msmq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-alpha0037\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
@@ -41,19 +41,13 @@
       <HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.4.0-preview2-25405-01\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
-    <Reference Include="System.Reflection.Metadata, Version=1.4.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.1.5.0-preview2-25405-01\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0-preview2-25405-01\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -64,14 +58,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing_message_with_TimeToBeReceived.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_audit_is_overridden_in_code.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_replymessage_is_audited.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_replying_to_received_message_without_correlationid.cs" />
@@ -168,15 +161,9 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Routing\When_routing_reply_to_specific_instance.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Routing\When_using_custom_routing_strategy.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_an_endpoint_replies_to_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_auto_correlated_property_is_changed.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_mapped_is_handled_by_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_message_starts_a_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlated_property_value_is_changed.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlating_on_special_characters.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_first_handler_responding.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_response_from_noninitiating.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_with_timeout.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_finder_returns_existing_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_forgetting_to_set_a_corr_property.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />

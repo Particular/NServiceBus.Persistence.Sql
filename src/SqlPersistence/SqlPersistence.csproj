@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <AssemblyTitle>NServiceBus.Persistence.Sql</AssemblyTitle>
@@ -15,17 +15,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Transactions" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
     <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
-    <PackageReference Include="Obsolete.Fody" Version="4.2.4" />
+    <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Reference Include="System.Transactions" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Guard.cs" />
   </ItemGroup>

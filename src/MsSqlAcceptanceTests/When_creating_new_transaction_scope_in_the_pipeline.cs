@@ -15,6 +15,8 @@
         [Test]
         public async Task Should_fail_when_creating_synchronized_storage_session()
         {
+            Requires.DtcSupport();
+
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b
                     .When(async session =>
@@ -42,6 +44,7 @@
             {
                 EndpointSetup<DefaultServer>(c =>
                 {
+                    c.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.TransactionScope);
                     c.Pipeline.Register(new TransactionScopeBehavior(), "Creates a new transaction scope");
                     c.Pipeline.Register(new SimulateFailureBehavior(), "Simulates failure before committing transport transaction");
                 });

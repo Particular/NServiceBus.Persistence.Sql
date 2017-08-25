@@ -9,23 +9,29 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="ApprovalTests" Version="3.0.13" />
-    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta6" />
-    <PackageReference Include="MySql.Data" Version="6.9.9" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.*" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
-    <!--<PackageReference Include="NServiceBus.SqlServer" Version="3.0.2" />-->
-    <PackageReference Include="NUnit" Version="3.7.1" />
-    <PackageReference Include="ObjectApproval" Version="1.6.0" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
-    <PackageReference Include="PublicApiGenerator" Version="6.0.0" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-alpha0027" />
+    <PackageReference Include="NUnit" Version="3.7.*" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <Reference Include="System.Messaging" />
     <Reference Include="System.Transactions" />
+    <PackageReference Include="ApprovalTests" Version="3.*" />
+    <PackageReference Include="ApprovalUtilities" Version="3.*" />
+    <PackageReference Include="ObjectApproval" Version="1.*" />
+    <PackageReference Include="NUnit.ApplicationDomain" Version="11.0.0" />
+    <PackageReference Include="PublicApiGenerator" Version="6.1.0-*" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
+    <PackageReference Include="MySql.Data" Version="6.*" />
   </ItemGroup>
 </Project>

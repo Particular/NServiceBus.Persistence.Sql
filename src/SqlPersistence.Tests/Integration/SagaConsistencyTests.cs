@@ -1,7 +1,4 @@
-﻿//TODO: re enable when sql transport is updated
-
-/**
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -99,6 +96,7 @@ public class SagaConsistencyTests
         testCase(endpointConfiguration);
         transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.SubscriptionSettings().DisableCache();
         persistence.DisableInstaller();
@@ -231,4 +229,3 @@ public class SagaConsistencyTests
         }
     }
 }
-**/

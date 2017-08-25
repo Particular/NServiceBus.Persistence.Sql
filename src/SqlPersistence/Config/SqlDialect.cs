@@ -8,14 +8,14 @@ namespace NServiceBus
     /// </summary>
     public abstract partial class SqlDialect
     {
-        internal string Name => this.GetType().Name;
+        internal string Name => GetType().Name;
 
         /// <summary>
         /// Gets the name of the SqlDialect.
         /// </summary>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         internal virtual void AddCreationScriptParametrs(DbCommand command)

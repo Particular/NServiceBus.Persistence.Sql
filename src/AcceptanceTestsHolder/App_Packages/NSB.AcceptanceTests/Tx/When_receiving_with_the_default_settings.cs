@@ -31,7 +31,7 @@
         {
             public TransactionalEndpoint()
             {
-                EndpointSetup<DefaultServer>();
+                EndpointSetup<DefaultServer>(c => c.ConfigureTransport().Transactions(TransportTransactionMode.TransactionScope));
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
