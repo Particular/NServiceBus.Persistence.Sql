@@ -31,12 +31,9 @@ public class ConfigureEndpointHelper
                 {
                     connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), tablePrefix);
                 }
-                catch (Exception ex)
+                catch (Exception exception) when (exception.Message.Contains("Can't DROP"))
                 {
-                    if (!ex.Message.Contains("Can't DROP"))
-                    {
-                        throw; //ignore cleanup exceptions caused by async database operations
-                    }
+                    //ignore cleanup exceptions caused by async database operations
                 }
             }
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
