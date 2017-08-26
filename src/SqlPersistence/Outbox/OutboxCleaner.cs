@@ -19,21 +19,25 @@ class OutboxCleaner : FeatureStartupTask
     protected override Task OnStart(IMessageSession session)
     {
         var cleanupFailures = 0;
-        timer.Start(async (utcTime, token) =>
-        {
-            var dateTime = utcTime - timeToKeepDeduplicationData;
-            await cleanup(dateTime, token).ConfigureAwait(false);
-            cleanupFailures = 0;
-        }, frequencyToRunCleanup, exception =>
-        {
-            log.Error("Error cleaning outbox data", exception);
-            cleanupFailures++;
-            if (cleanupFailures >= 10)
+        timer.Start(
+            callback: async (utcTime, token) =>
             {
-                criticalError("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
+                var dateTime = utcTime - timeToKeepDeduplicationData;
+                await cleanup(dateTime, token).ConfigureAwait(false);
                 cleanupFailures = 0;
-            }
-        }, Task.Delay);
+            },
+            interval: frequencyToRunCleanup,
+            errorCallback: exception =>
+            {
+                log.Error("Error cleaning outbox data", exception);
+                cleanupFailures++;
+                if (cleanupFailures >= 10)
+                {
+                    criticalError("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
+                    cleanupFailures = 0;
+                }
+            },
+            delayStrategy: Task.Delay);
         return Task.FromResult(0);
     }
 

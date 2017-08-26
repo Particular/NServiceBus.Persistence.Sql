@@ -20,7 +20,7 @@ public static class RuntimeSagaDefinitionReader
             return Enumerable.Empty<SagaDefinition>();
         }
         var sagaAssembly = sagaTypes.First().Assembly;
-            var exceptions = new List<Exception>();
+        var exceptions = new List<Exception>();
         //Validate the saga definitions using script builder compile-time validation
         using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
         {
@@ -40,7 +40,7 @@ public static class RuntimeSagaDefinitionReader
 
     public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
     {
-        var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
+        var saga = (Saga)FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
         methodInfo.Invoke(saga, new object[]
         {

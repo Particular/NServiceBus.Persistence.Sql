@@ -26,7 +26,7 @@ namespace NServiceBus
         internal abstract CommandWrapper CreateCommand(DbConnection connection);
         internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
         {
-            //TODO: catch   DbException   "Parameter XXX must be defined" for mysql
+            //TODO: catch DbException "Parameter XXX must be defined" for mysql
             // throw and hint to add 'Allow User Variables=True' to connection string
             using (var command = connection.CreateCommand())
             {

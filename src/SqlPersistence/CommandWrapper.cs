@@ -21,14 +21,14 @@ class CommandWrapper : IDisposable
 
     public string CommandText
     {
-        get { return command.CommandText; }
-        set { command.CommandText = value; }
+        get => command.CommandText;
+        set => command.CommandText = value;
     }
 
     public DbTransaction Transaction
     {
-        get { return command.Transaction; }
-        set { command.Transaction = value; }
+        get => command.Transaction;
+        set => command.Transaction = value;
     }
 
     public void AddParameter(string name, object value)

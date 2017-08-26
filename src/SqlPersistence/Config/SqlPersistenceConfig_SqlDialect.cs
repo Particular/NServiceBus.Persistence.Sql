@@ -5,19 +5,15 @@ using NServiceBus.Settings;
 
 namespace NServiceBus
 {
-    /// <summary>
-    /// Configures the table prefix to be prepended to all Saga, Timeout, Subscription and Outbox tables.
-    /// </summary>
     public static partial class SqlPersistenceConfig
     {
-
         internal static SqlDialect GetSqlDialect(this ReadOnlySettings settings)
         {
             if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialectSettings value))
             {
                 return value.Dialect;
             }
-            throw new Exception("Must specify SQL dialect using persistence.SqlDialect<T>() method.");
+            throw new Exception($"Must specify a SQL dialect using persistence.{nameof(SqlDialect)}<T>() method.");
         }
 
         /// <summary>
@@ -29,8 +25,7 @@ namespace NServiceBus
         {
             var settings = configuration.GetSettings();
 
-            SqlDialectSettings<T> dialectSettings;
-            if (settings.TryGet("SqlPersistence.SqlDialect", out dialectSettings))
+            if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialectSettings<T> dialectSettings))
             {
                 return dialectSettings;
             }

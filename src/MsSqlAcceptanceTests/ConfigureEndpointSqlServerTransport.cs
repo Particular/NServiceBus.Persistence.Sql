@@ -57,12 +57,8 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
                 comm.ExecuteNonQuery();
             }
         }
-        catch (Exception e)
+        catch (Exception exception) when (exception.Message.Contains("it does not exist or you do not have permission"))
         {
-            if (!e.Message.Contains("it does not exist or you do not have permission"))
-            {
-                throw;
-            }
         }
     }
 

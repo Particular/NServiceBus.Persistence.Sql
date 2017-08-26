@@ -17,13 +17,11 @@ class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage
 
     MemberExpression GetMemberExpression(Expression body)
     {
-        var unaryExpression = body as UnaryExpression;
-        if (unaryExpression != null)
+        if (body is UnaryExpression unaryExpression)
         {
             return (MemberExpression)unaryExpression.Operand;
         }
-        var memberExpression = body as MemberExpression;
-        if (memberExpression != null)
+        if (body is MemberExpression memberExpression)
         {
             return memberExpression;
         }

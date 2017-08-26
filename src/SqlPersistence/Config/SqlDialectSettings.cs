@@ -12,7 +12,7 @@ namespace NServiceBus
         /// </summary>
         protected SqlDialectSettings(SqlDialect dialect)
         {
-            this.Dialect = dialect;
+            Dialect = dialect;
         }
     }
 

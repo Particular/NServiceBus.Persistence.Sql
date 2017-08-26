@@ -57,7 +57,7 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public TSagaData Data
         {
-            get { return (TSagaData)Entity; }
+            get => (TSagaData)Entity;
             set
             {
                 Guard.AgainstNull(nameof(value), value);
