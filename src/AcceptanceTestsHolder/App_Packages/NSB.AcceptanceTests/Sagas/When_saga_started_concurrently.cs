@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_saga_started_concurrently : NServiceBusAcceptanceTest
     {
@@ -54,10 +55,12 @@
                 });
             }
 
-            public class ConcurrentlyStartedSaga : Saga<ConcurrentlyStartedSagaData>,
+            public class ConcurrentlyStartedSaga : SqlSaga<ConcurrentlyStartedSagaData>,
                 IAmStartedByMessages<StartMessageTwo>,
                 IAmStartedByMessages<StartMessageOne>
             {
+                protected override string CorrelationPropertyName => nameof(ConcurrentlyStartedSagaData.OrderId);
+
                 public Context Context { get; set; }
 
                 public async Task Handle(StartMessageOne message, IMessageHandlerContext context)
@@ -82,10 +85,10 @@
                     CheckForCompletion(context);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ConcurrentlyStartedSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartMessageOne>(msg => msg.SomeId).ToSaga(saga => saga.OrderId);
-                    mapper.ConfigureMapping<StartMessageTwo>(msg => msg.SomeId).ToSaga(saga => saga.OrderId);
+                    mapper.ConfigureMapping<StartMessageOne>(msg => msg.SomeId);
+                    mapper.ConfigureMapping<StartMessageTwo>(msg => msg.SomeId);
                 }
 
                 void CheckForCompletion(IMessageHandlerContext context)
