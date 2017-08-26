@@ -26,7 +26,7 @@ class Installer : INeedToInstallSomething
             && !settings.ShouldInstall<SqlTimeoutFeature>()
             && !settings.ShouldInstall<SqlSagaFeature>())
         {
-            return;
+           // return;
         }
 
         var connectionBuilder = settings.GetConnectionBuilder();
