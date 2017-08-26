@@ -13,7 +13,7 @@ namespace NServiceBus
         /// </summary>
         public partial class Oracle : SqlDialect
         {
-            volatile PropertyInfo bindByNameProperty;
+            volatile PropertyInfo bindByName;
 
             internal override void FillParameter(DbParameter parameter, string paramName, object value)
             {
@@ -21,27 +21,33 @@ namespace NServiceBus
                 if (value is Guid)
                 {
                     parameter.Value = value.ToString();
+                    return;
                 }
-                else if (value is Version)
+
+                if (value is Version)
                 {
                     parameter.DbType = DbType.String;
                     parameter.Value = value.ToString();
+                    return;
                 }
-                else
-                {
-                    parameter.Value = value;
-                }
+
+                parameter.Value = value;
             }
 
             internal override CommandWrapper CreateCommand(DbConnection connection)
             {
                 var command = connection.CreateCommand();
 
-                if (bindByNameProperty == null)
+                if (bindByName == null)
                 {
-                    bindByNameProperty = command.GetType().GetProperty("BindByName");
+                    var type = command.GetType();
+                    bindByName = type.GetProperty("BindByName");
+                    if (bindByName == null)
+                    {
+                        throw new Exception($"Could not extract field 'BindByName' from '{type.AssemblyQualifiedName}'.");
+                    }
                 }
-                bindByNameProperty.SetValue(command, true);
+                bindByName.SetValue(command, true);
 
                 return new CommandWrapper(command, this);
             }
