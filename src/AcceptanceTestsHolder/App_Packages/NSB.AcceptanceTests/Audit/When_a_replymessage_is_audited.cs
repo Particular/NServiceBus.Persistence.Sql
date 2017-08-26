@@ -9,7 +9,6 @@
     using NUnit.Framework;
     using AcceptanceTesting.Customization;
 
-    [Explicit]
     public class When_a_replymessage_is_audited : NServiceBusAcceptanceTest
     {
         [Test]

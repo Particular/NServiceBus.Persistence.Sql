@@ -39,11 +39,8 @@ public class ConfigureEndpointLearningTransport : IConfigureEndpointTestExecutio
         //we want the tests to be exposed to concurrency
         configuration.LimitMessageProcessingConcurrencyTo(PushRuntimeSettings.Default.MaxConcurrency);
 
-        var transport = configuration.UseTransport<LearningTransport>();
-#if (MySQL)
-        transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-#endif
-        transport.StorageDirectory(storageDir);
+        configuration.UseTransport<LearningTransport>()
+            .StorageDirectory(storageDir);
 
         return Task.FromResult(0);
     }
