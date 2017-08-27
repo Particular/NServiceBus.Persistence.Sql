@@ -29,10 +29,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0051\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0062\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0051\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0062\lib\net452\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Transport.Msmq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-alpha0037\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
@@ -66,6 +66,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_replying_to_received_message_without_correlationid.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_sending_with_no_correlation_id.cs" />
