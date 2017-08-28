@@ -16,9 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-*" PrivateAssets="All" />
     <PackageReference Include="ILRepack" Version="2.0.*" PrivateAssets="All" />
   </ItemGroup>
@@ -38,6 +35,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
     <Description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>

@@ -5,7 +5,6 @@
     <AssemblyName>ScriptBuilder.Tests</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>

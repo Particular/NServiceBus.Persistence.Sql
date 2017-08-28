@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
