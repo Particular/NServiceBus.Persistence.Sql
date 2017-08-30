@@ -2,8 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <AssemblyName>ScriptBuilderTask.Tests.Target</AssemblyName>
-    <PackageId>ScriptBuilderTask.Tests.Target</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />

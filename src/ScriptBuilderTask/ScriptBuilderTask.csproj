@@ -9,8 +9,8 @@
     <Product>NServiceBus.Persistence.Sql.ScriptBuilderTask</Product>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\binaries\</OutputPath>
     <DebugType>full</DebugType>
+    <OutputPath>..\..\binaries\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 

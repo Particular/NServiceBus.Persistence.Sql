@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <OutputType>exe</OutputType>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="6.*" />

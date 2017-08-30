@@ -9,8 +9,8 @@
     <Product>NServiceBus.Persistence.Sql</Product>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\binaries\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutputPath>..\..\binaries\</OutputPath>
     <NoWarn>$(NoWarn);CS0419</NoWarn>
   </PropertyGroup>
 
