@@ -10,6 +10,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutputPath>..\..\binaries\</OutputPath>
     <DebugType>full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
