@@ -33,6 +33,10 @@ namespace NServiceBus.Persistence.Sql
             {
                 s.EnableFeatureByDefault<SqlSubscriptionFeature>();
             });
+            Defaults(s =>
+            {
+                s.EnableFeatureByDefault<InstallerFeature>();
+            });
         }
 
         static void EnableSession(SettingsHolder s)
