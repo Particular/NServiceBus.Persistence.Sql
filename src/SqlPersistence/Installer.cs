@@ -4,53 +4,47 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Features;
 using NServiceBus.Installation;
 using NServiceBus.Logging;
 using NServiceBus.Settings;
 
 class Installer : INeedToInstallSomething
 {
+    InstallerSettings installerSettings;
     ReadOnlySettings settings;
     static ILog log = LogManager.GetLogger<Installer>();
 
     public Installer(ReadOnlySettings settings)
     {
         this.settings = settings;
+        installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
     public async Task Install(string identity)
     {
-        //If neither of the features is configured then do not even attempt to validate config
-        if (!settings.ShouldInstall<SqlOutboxFeature>()
-            && !settings.ShouldInstall<SqlSubscriptionFeature>()
-            && !settings.ShouldInstall<SqlTimeoutFeature>()
-            && !settings.ShouldInstall<SqlSagaFeature>())
+        if (installerSettings == null || installerSettings.Disabled)
         {
             return;
         }
 
-        var connectionBuilder = settings.GetConnectionBuilder();
-        var sqlDialect = settings.GetSqlDialect();
-        var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlDialect);
-        var tablePrefix = settings.GetTablePrefix();
+        installerSettings.Dialect.ValidateTablePrefix(installerSettings.TablePrefix);
 
-        sqlDialect.ValidateTablePrefix(tablePrefix);
-
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await installerSettings.ConnectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
+            await InstallOutbox(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallSagas(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallSubscriptions(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallTimeouts(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
 
             transaction.Commit();
         }
     }
-
+    
     Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.ShouldInstall<SqlOutboxFeature>())
+        if (!settings.IsFeatureActive(typeof(SqlOutboxFeature)))
         {
             return Task.FromResult(0);
         }
@@ -68,7 +62,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.ShouldInstall<SqlSubscriptionFeature>())
+        if (!settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
         {
             return Task.FromResult(0);
         }
@@ -86,7 +80,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.ShouldInstall<SqlTimeoutFeature>())
+        if (!settings.IsFeatureActive(typeof(SqlTimeoutFeature)))
         {
             return Task.FromResult(0);
         }
@@ -104,7 +98,7 @@ class Installer : INeedToInstallSomething
 
     async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.ShouldInstall<SqlSagaFeature>())
+        if (!settings.IsFeatureActive(typeof(SqlSagaFeature)))
         {
             return;
         }
