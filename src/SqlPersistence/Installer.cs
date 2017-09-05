@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
@@ -28,20 +29,26 @@ class Installer : INeedToInstallSomething
             return;
         }
 
-        installerSettings.Dialect.ValidateTablePrefix(installerSettings.TablePrefix);
-
+        var prefix = installerSettings.TablePrefix;
+        var dialect = installerSettings.Dialect;
+        dialect.ValidateTablePrefix(prefix);
+        var scriptDirectory = installerSettings.ScriptDirectory;
         using (var connection = await installerSettings.ConnectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallSagas(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallSubscriptions(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallTimeouts(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            var tasks = new List<Task>
+            {
+                InstallOutbox(scriptDirectory, connection, transaction, prefix, dialect),
+                InstallSubscriptions(scriptDirectory, connection, transaction, prefix, dialect),
+                InstallTimeouts(scriptDirectory, connection, transaction, prefix, dialect)
+            };
+            tasks.AddRange(InstallSagas(scriptDirectory, connection, transaction, prefix, dialect));
 
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             transaction.Commit();
         }
     }
-    
+
     Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
         if (!settings.IsFeatureActive(typeof(SqlOutboxFeature)))
@@ -96,28 +103,30 @@ class Installer : INeedToInstallSomething
             tablePrefix: tablePrefix);
     }
 
-    async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    IEnumerable<Task> InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
         if (!settings.IsFeatureActive(typeof(SqlSagaFeature)))
         {
-            return;
+            return Enumerable.Empty<Task>();
         }
 
         var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
             log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
-            return;
+            return Enumerable.Empty<Task>();
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
         log.Info($@"Executing saga creation scripts:
 {string.Join(Environment.NewLine, scriptFiles)}");
-        var sagaScripts = scriptFiles
-            .Select(File.ReadAllText);
 
-        foreach (var script in sagaScripts)
-        {
-            await sqlDialect.ExecuteTableCommand(connection, transaction, script, tablePrefix).ConfigureAwait(false);
-        }
+        return scriptFiles
+            .Select(scriptFile => Execute(scriptFile, connection, transaction, tablePrefix, sqlDialect));
+    }
+
+    Task Execute(string scriptFile, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    {
+        var script = File.ReadAllText(scriptFile);
+        return sqlDialect.ExecuteTableCommand(connection, transaction, script, tablePrefix);
     }
 }
