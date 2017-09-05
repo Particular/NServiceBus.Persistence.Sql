@@ -74,7 +74,7 @@ class Installer : INeedToInstallSomething
 
         var createScript = Path.Combine(scriptDirectory, "Outbox_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"The follow outbox script will be executed '{createScript}'");
+        log.Info($"The outbox script will be executed '{createScript}'");
 
         scripts.Add(createScript);
     }
@@ -88,7 +88,7 @@ class Installer : INeedToInstallSomething
 
         var createScript = Path.Combine(scriptDirectory, "Subscription_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"The follow subscriptions script will be executed '{createScript}'");
+        log.Info($"The subscription script will be executed '{createScript}'");
 
         scripts.Add(createScript);
     }
@@ -102,7 +102,7 @@ class Installer : INeedToInstallSomething
 
         var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"The follow timeouts script will be executed '{createScript}'");
+        log.Info($"The timeout script will be executed '{createScript}'");
 
         scripts.Add(createScript);
     }
@@ -121,7 +121,7 @@ class Installer : INeedToInstallSomething
             return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
-        log.Info($@"The follow saga scripts will be executed:
+        log.Info($@"The saga scripts will be executed:
 {string.Join(Environment.NewLine, scriptFiles)}");
 
         scripts.AddRange(scriptFiles);
