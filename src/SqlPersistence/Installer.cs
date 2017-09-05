@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Data.Common;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Installation;
 using NServiceBus.Logging;
@@ -28,75 +28,86 @@ class Installer : INeedToInstallSomething
             return;
         }
 
-        installerSettings.Dialect.ValidateTablePrefix(installerSettings.TablePrefix);
-
+        var prefix = installerSettings.TablePrefix;
+        var dialect = installerSettings.Dialect;
+        dialect.ValidateTablePrefix(prefix);
+        var scriptDirectory = installerSettings.ScriptDirectory;
         using (var connection = await installerSettings.ConnectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallSagas(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallSubscriptions(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-            await InstallTimeouts(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
-
+            var scripts = new List<string>();
+            AddOutboxScript(scriptDirectory, scripts);
+            AddSubscriptionsScript(scriptDirectory, scripts);
+            AddTimeoutsSctipt(scriptDirectory, scripts);
+            AddSagaScripts(scriptDirectory, scripts);
+            var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
+            if (builder.MultipleActiveResultSets)
+            {
+                log.Info("Executing using MultipleActiveResultSets");
+                var tasks = scripts.Select(script =>
+                {
+                    log.Info($"Executing '{script}'");
+                    var allText = File.ReadAllText(script);
+                    return dialect.ExecuteTableCommand(connection, transaction, allText, prefix);
+                });
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+            else
+            {
+                foreach (var script in scripts)
+                {
+                    log.Info($"Executing '{script}'");
+                    var allText = File.ReadAllText(script);
+                    await dialect.ExecuteTableCommand(connection, transaction, allText, prefix).ConfigureAwait(false);
+                }
+            }
             transaction.Commit();
         }
     }
-    
-    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+
+    void AddOutboxScript(string scriptDirectory, List<string> scripts)
     {
         if (!settings.IsFeatureActive(typeof(SqlOutboxFeature)))
         {
-            return Task.FromResult(0);
+            return;
         }
 
         var createScript = Path.Combine(scriptDirectory, "Outbox_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"Executing '{createScript}'");
+        log.Info($"The outbox script will be executed '{createScript}'");
 
-        return sqlDialect.ExecuteTableCommand(
-            connection: connection,
-            transaction: transaction,
-            script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix);
+        scripts.Add(createScript);
     }
 
-    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    void AddSubscriptionsScript(string scriptDirectory, List<string> scripts)
     {
         if (!settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
         {
-            return Task.FromResult(0);
+            return;
         }
 
         var createScript = Path.Combine(scriptDirectory, "Subscription_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"Executing '{createScript}'");
+        log.Info($"The subscription script will be executed '{createScript}'");
 
-        return sqlDialect.ExecuteTableCommand(
-            connection: connection,
-            transaction: transaction,
-            script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix);
+        scripts.Add(createScript);
     }
 
-    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    void AddTimeoutsSctipt(string scriptDirectory, List<string> scripts)
     {
         if (!settings.IsFeatureActive(typeof(SqlTimeoutFeature)))
         {
-            return Task.FromResult(0);
+            return;
         }
 
         var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
-        log.Info($"Executing '{createScript}'");
+        log.Info($"The timeout script will be executed '{createScript}'");
 
-        return sqlDialect.ExecuteTableCommand(
-            connection: connection,
-            transaction: transaction,
-            script: File.ReadAllText(createScript),
-            tablePrefix: tablePrefix);
+        scripts.Add(createScript);
     }
 
-    async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
+    void AddSagaScripts(string scriptDirectory, List<string> scripts)
     {
         if (!settings.IsFeatureActive(typeof(SqlSagaFeature)))
         {
@@ -110,14 +121,10 @@ class Installer : INeedToInstallSomething
             return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
-        log.Info($@"Executing saga creation scripts:
+        log.Info($@"The saga scripts will be executed:
 {string.Join(Environment.NewLine, scriptFiles)}");
-        var sagaScripts = scriptFiles
-            .Select(File.ReadAllText);
 
-        foreach (var script in sagaScripts)
-        {
-            await sqlDialect.ExecuteTableCommand(connection, transaction, script, tablePrefix).ConfigureAwait(false);
-        }
+        scripts.AddRange(scriptFiles);
     }
+
 }
