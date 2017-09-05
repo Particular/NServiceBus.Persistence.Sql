@@ -123,8 +123,7 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
     {
         var baseType = (GenericInstanceType) sagaType.BaseType;
         var sagaDataReference = baseType.GenericArguments.Single();
-        var sagaDataType = sagaDataReference as TypeDefinition;
-        if (sagaDataType != null)
+        if (sagaDataReference is TypeDefinition sagaDataType)
         {
             return sagaDataType;
         }

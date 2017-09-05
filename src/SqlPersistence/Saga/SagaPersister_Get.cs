@@ -85,7 +85,7 @@ where {whereClause}";
             {
                 if (!await dataReader.ReadAsync().ConfigureAwait(false))
                 {
-                    return default(Concurrency<TSagaData>);
+                    return default;
                 }
 
                 var id = await dataReader.GetGuidAsync(0).ConfigureAwait(false);
@@ -135,7 +135,7 @@ where {whereClause}";
         //TODO: remove when core adds a class constraint to TSagaData
         if (result.Data == null)
         {
-            return default(TSagaData);
+            return default;
         }
         context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
         return result.Data;

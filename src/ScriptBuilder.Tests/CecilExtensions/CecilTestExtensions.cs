@@ -29,8 +29,7 @@ public static class CecilTestExtensions
 
     public static string DisplayName(this TypeReference typeReference)
     {
-        var genericInstanceType = typeReference as GenericInstanceType;
-        if (genericInstanceType != null && genericInstanceType.HasGenericArguments)
+        if (typeReference is GenericInstanceType genericInstanceType && genericInstanceType.HasGenericArguments)
         {
             return $"{typeReference.Name.Split('`').First()}<{string.Join(", ", genericInstanceType.GenericArguments.Select(c => c.DisplayName()))}>";
         }

@@ -1,13 +1,13 @@
 ﻿using System;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
+using System.Data.Common;
+using System.Threading.Tasks;
+using NServiceBus.Extensibility;
+using NServiceBus.Sagas;
 
 namespace NServiceBus
 {
-    using System.Data.Common;
-    using System.Threading.Tasks;
-    using Extensibility;
-    using Sagas;
 
     /// <summary>
     /// Shared session extensions for SqlPersistence.
@@ -25,8 +25,7 @@ namespace NServiceBus
 
         static StorageSession GetSqlStorageSession(this SynchronizedStorageSession session)
         {
-            var storageSession = session as StorageSession;
-            if (storageSession != null)
+            if (session is StorageSession storageSession)
             {
                 return storageSession;
             }
