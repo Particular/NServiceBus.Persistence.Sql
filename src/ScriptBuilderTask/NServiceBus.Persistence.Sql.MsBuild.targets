@@ -18,7 +18,8 @@
 
   <Target
       AfterTargets="AfterCompile"
-      Name="SqlPersistenceScriptBuilder">
+      Name="SqlPersistenceScriptBuilder"
+      Condition="'$(DesignTimeBuild)' != 'true'">
     <ScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
