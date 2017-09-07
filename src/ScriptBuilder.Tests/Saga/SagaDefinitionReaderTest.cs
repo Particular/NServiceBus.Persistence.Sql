@@ -209,4 +209,34 @@ public class SagaDefinitionReaderTest
         {
         }
     }
+
+    [Test]
+    public void WithStatementBodyProperty()
+    {
+        var sagaType = module.GetTypeDefinition<WithStatementBodyPropertySaga>();
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    public class WithStatementBodyPropertySaga : SqlSaga<WithStatementBodyPropertySaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+        }
+
+        protected override string CorrelationPropertyName
+        {
+            //Explicitly not use expression body
+            get { return null; }
+        }
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        module?.Dispose();
+    }
 }
