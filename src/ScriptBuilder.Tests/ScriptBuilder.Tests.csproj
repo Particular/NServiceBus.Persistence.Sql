@@ -1,24 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
-    <PackageReference Include="ApprovalTests" Version="3.*" />
-    <PackageReference Include="ApprovalUtilities" Version="3.*" />
-    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.*" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
     <PackageReference Include="Newtonsoft.Json" Version="10.*" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
     <PackageReference Include="NUnit" Version="3.7.*" />
-    <PackageReference Include="ObjectApproval" Version="1.*" />
-    <PackageReference Include="PublicApiGenerator" Version="6.1.0-*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.*" />
+    <PackageReference Include="ApprovalTests" Version="3.*" />
+    <PackageReference Include="ApprovalUtilities" Version="3.*" />
+    <PackageReference Include="ObjectApproval" Version="1.*" />
+    <PackageReference Include="PublicApiGenerator" Version="6.1.0-*" />
   </ItemGroup>
 </Project>
