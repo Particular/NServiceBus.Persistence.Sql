@@ -1,10 +1,10 @@
 #if NET452
 using Microsoft.SqlServer.TransactSql.ScriptDom;
-#endif
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#endif
 
 public static class SqlValidator
 {
