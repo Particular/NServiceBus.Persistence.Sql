@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 [TestFixture]
 class InnerTaskTests
