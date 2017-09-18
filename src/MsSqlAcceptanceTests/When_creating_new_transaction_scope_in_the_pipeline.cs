@@ -44,9 +44,11 @@ public class When_creating_new_transaction_scope_in_the_pipeline : NServiceBusAc
         {
             EndpointSetup<DefaultServer>(c =>
             {
-                c.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.TransactionScope);
-                c.Pipeline.Register(new TransactionScopeBehavior(), "Creates a new transaction scope");
-                c.Pipeline.Register(new SimulateFailureBehavior(), "Simulates failure before committing transport transaction");
+                var transport = c.UseTransport<SqlServerTransport>();
+                transport.Transactions(TransportTransactionMode.TransactionScope);
+                var pipeline = c.Pipeline;
+                pipeline.Register(new TransactionScopeBehavior(), "Creates a new transaction scope");
+                pipeline.Register(new SimulateFailureBehavior(), "Simulates failure before committing transport transaction");
             });
         }
 

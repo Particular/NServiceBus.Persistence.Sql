@@ -31,7 +31,8 @@ public class SagaConsistencyTests
     {
         return RunTest(e =>
         {
-            var transport = e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
@@ -65,7 +66,8 @@ public class SagaConsistencyTests
         return RunTest(e =>
         {
             e.GetSettings().Set("DisableOutboxTransportCheck", true);
-            e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
             e.EnableOutbox();
         });
     }

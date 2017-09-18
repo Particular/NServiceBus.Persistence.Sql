@@ -12,13 +12,13 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         queueBindings = configuration.GetSettings().Get<QueueBindings>();
-        var transportConfig = configuration.UseTransport<SqlServerTransport>();
+        var transport = configuration.UseTransport<SqlServerTransport>();
         connectionString = MsSqlConnectionBuilder.ConnectionString;
-        transportConfig.ConnectionString(connectionString);
+        transport.ConnectionString(connectionString);
 
-        transportConfig.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
+        transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
 
-        var routingConfig = transportConfig.Routing();
+        var routingConfig = transport.Routing();
 
         foreach (var publisher in publisherMetadata.Publishers)
         {
