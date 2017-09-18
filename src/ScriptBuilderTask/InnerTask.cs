@@ -23,9 +23,9 @@ class InnerTask
         ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
-    string FindPromotionPath(string propotionPathSetting)
+    string FindPromotionPath(string promotionPathSetting)
     {
-        return propotionPathSetting
+        return promotionPathSetting
             .Replace("$(ProjectDir)", projectDirectory)
             .Replace("$(SolutionDir)", solutionDirectory);
     }
