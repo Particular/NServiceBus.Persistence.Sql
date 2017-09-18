@@ -99,6 +99,18 @@ class RuntimeSagaInfo
 
     public string ToJson(IContainSagaData sagaData)
     {
+        var builder = new StringBuilder();
+        using (var stringWriter = new StringWriter(builder))
+        {
+            ToJson(sagaData, stringWriter);
+            stringWriter.Flush();
+        }
+
+        return builder.ToString();
+    }
+
+    public void ToJson(IContainSagaData sagaData, TextWriter textWriter)
+    {
         var originalMessageId = sagaData.OriginalMessageId;
         var originator = sagaData.Originator;
         var id = sagaData.Id;
@@ -107,20 +119,19 @@ class RuntimeSagaInfo
         sagaData.Id = Guid.Empty;
         try
         {
-            var builder = new StringBuilder();
-            using (var stringWriter = new StringWriter(builder))
-            using (var writer = writerCreator(stringWriter))
+            using (var writer = writerCreator(textWriter))
             {
-                 try
-                 {
-                     jsonSerializer.Serialize(writer, sagaData);
-                 }
-                 catch (Exception exception)
-                 {
-                     throw new SerializationException(exception);
-                 }
+                try
+                {
+                    jsonSerializer.Serialize(writer, sagaData);
+                }
+                catch (Exception exception)
+                {
+                    throw new SerializationException(exception);
+                }
+
+                writer.Flush();
             }
-            return builder.ToString();
         }
         finally
         {
@@ -129,7 +140,6 @@ class RuntimeSagaInfo
             sagaData.Id = id;
         }
     }
-
 
     public TSagaData FromString<TSagaData>(TextReader textReader, Version storedSagaTypeVersion)
         where TSagaData : IContainSagaData
