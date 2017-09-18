@@ -4,7 +4,9 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 public abstract class TimeoutPersisterTests
 {
@@ -123,7 +125,10 @@ public abstract class TimeoutPersisterTests
         var persister = Setup();
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.Peek(timeout1.Id, null).Result;
+        Assert.IsNotNull(nextChunk);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
 
@@ -152,7 +157,10 @@ public abstract class TimeoutPersisterTests
         persister.Add(timeout2, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
+        Assert.IsNotNull(nextChunk);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -170,7 +178,10 @@ public abstract class TimeoutPersisterTests
         var persister = Setup();
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
+        Assert.IsNotNull(nextChunk);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -188,7 +199,10 @@ public abstract class TimeoutPersisterTests
         var persister = Setup(TimeSpan.FromMinutes(2));
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
+        Assert.IsNotNull(nextChunk);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -212,7 +226,10 @@ public abstract class TimeoutPersisterTests
         //Call again to check if clean-up mode is now disabled -- expect no results
         var nextChunk = persister.GetNextChunk(startSlice).Result;
 
+        Assert.IsNotNull(nextChunk);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]

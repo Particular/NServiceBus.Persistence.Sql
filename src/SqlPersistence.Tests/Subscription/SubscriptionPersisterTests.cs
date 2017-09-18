@@ -8,7 +8,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 public abstract class SubscriptionPersisterTests
 {
@@ -82,7 +84,10 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine3", null), type2, null).Await();
         var result = persister.GetSubscribers(type1,type2).Result.OrderBy(s => s.TransportAddress);
+        Assert.IsNotEmpty(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     [Test]
@@ -122,7 +127,10 @@ public abstract class SubscriptionPersisterTests
                         .OrderBy(_ => _.Endpoint)
                         .ThenBy(_ => _.TransportAddress);
                 });
+        Assert.IsNotEmpty(items);
+#if NET452
         ObjectApprover.VerifyWithJson(items);
+#endif
     }
 
     [Test]
@@ -176,8 +184,11 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
-        var result = persister.GetSubscribers(type1, type2).Result;
+        var result = persister.GetSubscribers(type1, type2).Result.ToList();
+        Assert.IsNotEmpty(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     [Test]
@@ -192,7 +203,10 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(address2, message2, null).Await();
         persister.Subscribe(address2, message1, null).Await();
         persister.Unsubscribe(address1, message2, null).Await();
-        var result = persister.GetSubscribers(message2, message1).Result;
+        var result = persister.GetSubscribers(message2, message1).Result.ToList();
+        Assert.IsNotEmpty(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 }

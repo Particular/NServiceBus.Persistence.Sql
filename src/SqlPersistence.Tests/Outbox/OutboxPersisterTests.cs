@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 public abstract class OutboxPersisterTests
 {
@@ -76,13 +78,14 @@ public abstract class OutboxPersisterTests
     public void StoreDispatchAndGet()
     {
         var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
         VerifyOperationsAreEmpty(result);
     }
 
     void VerifyOperationsAreEmpty(OutboxMessage result)
     {
-
         using (var connection = dbConnection())
         {
             connection.Open();
@@ -154,7 +157,10 @@ where MessageId = '{messageId}'";
     public void StoreAndGet()
     {
         var result = StoreAndGetAsync().GetAwaiter().GetResult();
+        Assert.IsNotNull(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     async Task<OutboxMessage> StoreAndGetAsync()
