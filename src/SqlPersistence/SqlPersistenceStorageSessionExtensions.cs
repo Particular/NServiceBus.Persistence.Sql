@@ -40,7 +40,7 @@
         /// <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
         /// <param name="appendParameters">Used to append <see cref="DbParameter"/>s used in the <paramref name="whereClause"/>.</param>
         public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
-            where TSagaData : IContainSagaData
+            where TSagaData : class, IContainSagaData
         {
             Guard.AgainstNull(nameof(session), session);
             Guard.AgainstNull(nameof(context), context);
