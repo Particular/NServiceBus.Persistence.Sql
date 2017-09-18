@@ -118,6 +118,7 @@ public abstract class SubscriptionPersisterTests
 
     static void VerifyCache(ConcurrentDictionary<string, SubscriptionPersister.CacheItem> cache)
     {
+#if NET452
         var items = cache
             .OrderBy(_ => _.Key)
             .ToDictionary(_ => _.Key,
@@ -127,8 +128,6 @@ public abstract class SubscriptionPersisterTests
                         .OrderBy(_ => _.Endpoint)
                         .ThenBy(_ => _.TransportAddress);
                 });
-        Assert.IsNotEmpty(items);
-#if NET452
         ObjectApprover.VerifyWithJson(items);
 #endif
     }
