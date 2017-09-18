@@ -28,7 +28,6 @@
     <PackageReference Include="ApprovalTests" Version="3.*" />
     <PackageReference Include="ApprovalUtilities" Version="3.*" />
     <PackageReference Include="ObjectApproval" Version="1.*" />
-    <PackageReference Include="NUnit.ApplicationDomain" Version="11.*" />
     <PackageReference Include="PublicApiGenerator" Version="6.1.0-*" />
     <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
