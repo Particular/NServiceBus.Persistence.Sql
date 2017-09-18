@@ -245,5 +245,4 @@ public abstract class TimeoutPersisterTests
         // MSSQL stores 42ms as .043 because it doesn't have millisecond precision. MySQL/Oracle store to nearest second.
         Assert.That(nextChunk.DueTimeouts[0].DueTime, Is.EqualTo(timeout1Time).Within(TimeSpan.FromMilliseconds(43)));
     }
-
 }

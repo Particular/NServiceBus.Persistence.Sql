@@ -15,5 +15,4 @@ static class ResourceReader
             return streamReader.ReadToEnd();
         }
     }
-
 }

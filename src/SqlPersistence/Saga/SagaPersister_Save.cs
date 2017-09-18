@@ -44,5 +44,4 @@ partial class SagaPersister
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
-
 }

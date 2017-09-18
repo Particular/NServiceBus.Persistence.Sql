@@ -139,5 +139,4 @@ static class CecilExtensions
         }
         return null;
     }
-
 }

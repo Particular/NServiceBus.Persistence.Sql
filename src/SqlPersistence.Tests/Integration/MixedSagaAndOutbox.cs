@@ -73,5 +73,4 @@ public class MixedSagaAndOutbox
             mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId);
         }
     }
-
 }

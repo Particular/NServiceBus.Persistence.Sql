@@ -34,5 +34,4 @@ partial class SagaPersister
             }
         }
     }
-
 }

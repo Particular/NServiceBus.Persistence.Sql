@@ -10,5 +10,4 @@ class SqlSagaFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
     }
-
 }

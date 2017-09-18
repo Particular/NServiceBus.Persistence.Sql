@@ -88,5 +88,4 @@ public class SagaDefinitionValidatorTest
         Approvals.Verify(errorsException.Message);
 #endif
     }
-
 }

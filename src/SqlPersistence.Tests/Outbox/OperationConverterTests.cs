@@ -33,6 +33,5 @@ public class OperationConverterTests
         var serializableOperations = operations.ToSerializable();
         ObjectApprover.VerifyWithJson(serializableOperations);
     }
-
 }
 #endif

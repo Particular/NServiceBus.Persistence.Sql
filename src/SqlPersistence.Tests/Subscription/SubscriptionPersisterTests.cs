@@ -196,5 +196,4 @@ public abstract class SubscriptionPersisterTests
         var result = persister.GetSubscribers(message2, message1).Result;
         ObjectApprover.VerifyWithJson(result);
     }
-
 }

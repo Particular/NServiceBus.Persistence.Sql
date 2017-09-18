@@ -12,5 +12,4 @@ public class MyEventHandler : IHandleMessages<MyEvent>
         logger.Info($"Received MyEvent {message.Property}");
         return Task.FromResult(0);
     }
-
 }

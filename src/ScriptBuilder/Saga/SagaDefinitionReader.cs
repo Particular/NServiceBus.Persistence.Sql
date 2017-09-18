@@ -158,5 +158,4 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
             type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(propertyType)
         );
     }
-
 }

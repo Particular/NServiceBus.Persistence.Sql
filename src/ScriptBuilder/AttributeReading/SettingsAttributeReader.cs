@@ -74,5 +74,4 @@ static class SettingsAttributeReader
             throw new ErrorsException("Must define at least one of MsSqlServerScripts, MySqlScripts, or OracleScripts. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
         }
     }
-
 }
