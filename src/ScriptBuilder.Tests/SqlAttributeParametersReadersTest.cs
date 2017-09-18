@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 [TestFixture]
 public class SqlAttributeParametersReadersTest
 {
-
     [Test]
     public void Minimal()
     {
@@ -18,14 +19,21 @@ public class SqlAttributeParametersReadersTest
                         "MsSqlServerScripts", true
                     }
                 }));
+
+        Assert.IsNotNull(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     [Test]
     public void Defaults()
     {
         var result = SettingsAttributeReader.ReadFromAttribute(null);
+        Assert.IsNotNull(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     [Test]
@@ -60,7 +68,10 @@ public class SqlAttributeParametersReadersTest
                         "ProduceOutboxScripts", false
                     }
                 }));
+        Assert.IsNotNull(result);
+#if NET452
         ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
 

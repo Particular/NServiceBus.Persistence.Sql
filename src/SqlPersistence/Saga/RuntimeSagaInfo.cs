@@ -62,7 +62,7 @@ class RuntimeSagaInfo
         var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
         TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
-        
+
         CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
         SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
@@ -165,5 +165,4 @@ class RuntimeSagaInfo
             return jsonSerializer;
         });
     }
-
 }

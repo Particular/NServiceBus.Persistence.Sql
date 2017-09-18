@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using Mono.Cecil;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System;
+    using System.IO;
+    using Mono.Cecil;
+
     public static class ScriptWriter
     {
         public static void Write(string assemblyPath, string targetDirectory, Action<string, string> logError, Func<string,string> promotionPathFinder)

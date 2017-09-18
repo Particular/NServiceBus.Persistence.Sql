@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Linq.Expressions;
+using NServiceBus;
+using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
 
-namespace NServiceBus.Persistence.Sql
+class PropertyMapper<TSagaData> : IMessagePropertyMapper
+    where TSagaData : IContainSagaData, new()
 {
-    using Sagas;
+    IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration;
+    Expression<Func<TSagaData, object>> sagaEntityProperty;
+    Type sagaType;
 
-    class PropertyMapper<TSagaData> : IMessagePropertyMapper
-        where TSagaData : IContainSagaData, new()
+    internal PropertyMapper(IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration, Expression<Func<TSagaData, object>> sagaEntityProperty, Type sagaType)
     {
-        IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration;
-        Expression<Func<TSagaData, object>> sagaEntityProperty;
-        Type sagaType;
+        this.sagaMessageFindingConfiguration = sagaMessageFindingConfiguration;
+        this.sagaEntityProperty = sagaEntityProperty;
+        this.sagaType = sagaType;
+    }
 
-        internal PropertyMapper(IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration, Expression<Func<TSagaData, object>> sagaEntityProperty, Type sagaType)
+    public void ConfigureMapping<TMessage>(Expression<Func<TMessage, object>> messageProperty)
+    {
+        if (sagaEntityProperty == null)
         {
-            this.sagaMessageFindingConfiguration = sagaMessageFindingConfiguration;
-            this.sagaEntityProperty = sagaEntityProperty;
-            this.sagaType = sagaType;
+            throw new Exception($"The saga '{sagaType.FullName}' has not defined a CorrelationPropertyName, so it is expected that a {nameof(IFindSagas<TSagaData>)} will be defined for all messages the saga handles.");
         }
-
-        public void ConfigureMapping<TMessage>(Expression<Func<TMessage, object>> messageProperty)
-        {
-            if (sagaEntityProperty == null)
-            {
-                throw new Exception($"The saga '{sagaType.FullName}' has not defined a CorrelationPropertyName, so it is expected that a {nameof(IFindSagas<TSagaData>)} will be defined for all messages the saga handles.");
-            }
-            Guard.AgainstNull(nameof(messageProperty), messageProperty);
-            sagaMessageFindingConfiguration.ConfigureMapping(sagaEntityProperty, messageProperty);
-        }
+        Guard.AgainstNull(nameof(messageProperty), messageProperty);
+        sagaMessageFindingConfiguration.ConfigureMapping(sagaEntityProperty, messageProperty);
     }
 }

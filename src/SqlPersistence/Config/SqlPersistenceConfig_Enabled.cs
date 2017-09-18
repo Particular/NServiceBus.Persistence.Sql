@@ -1,8 +1,8 @@
-using NServiceBus.Configuration.AdvancedExtensibility;
-using NServiceBus.Persistence.Sql;
-
 namespace NServiceBus
 {
+    using Configuration.AdvancedExtensibility;
+    using Persistence.Sql;
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>

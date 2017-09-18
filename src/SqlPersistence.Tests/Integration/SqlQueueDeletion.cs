@@ -23,5 +23,4 @@ static class SqlQueueDeletion
         DeleteQueue(connection, schema, $"{endpointName}.Timeouts");
         DeleteQueue(connection, schema, $"{endpointName}.TimeoutsDispatcher");
     }
-
 }

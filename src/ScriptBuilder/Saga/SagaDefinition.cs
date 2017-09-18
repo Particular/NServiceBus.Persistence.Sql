@@ -1,5 +1,4 @@
-﻿
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
     public class SagaDefinition
     {

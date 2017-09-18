@@ -52,5 +52,4 @@ public class MySaga : SqlSaga<MySaga.SagaData>,
     {
         public Guid MySagaId { get; set; }
     }
-
 }

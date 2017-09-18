@@ -12,7 +12,6 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlTransportIntegrationTests : IDisposable
 {
-
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
     BuildSqlDialect sqlVariant = BuildSqlDialect.MsSqlServer;
     SqlConnection dbConnection;

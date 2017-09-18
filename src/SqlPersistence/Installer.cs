@@ -106,7 +106,7 @@ class Installer : INeedToInstallSomething
         var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
-            log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
+            log.Info($"Directory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
             return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();

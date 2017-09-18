@@ -8,7 +8,6 @@ using NUnit.Framework;
 [TestFixture]
 public class MixedSagaAndOutbox
 {
-
     [Test]
     public void RunSqlForSaga()
     {
@@ -73,5 +72,4 @@ public class MixedSagaAndOutbox
             mapper.ConfigureMapping<StartSagaMessage>(message => message.StartId);
         }
     }
-
 }

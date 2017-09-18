@@ -9,12 +9,11 @@ using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class StorageSessionFeature : Feature
 {
-
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
         ValidateSagaOutboxCombo(settings);
-        
+
         var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();

@@ -23,5 +23,4 @@ static class DirectoryExtensions
             File.Copy(newPath, newPath.Replace(source, destination), true);
         }
     }
-
 }

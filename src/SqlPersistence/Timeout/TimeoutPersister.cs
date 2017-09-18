@@ -161,5 +161,4 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
-
 }

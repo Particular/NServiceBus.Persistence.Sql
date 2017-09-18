@@ -3,7 +3,6 @@ using System.Messaging;
 
 static class MsmqQueueDeletion
 {
-
     public static void DeleteQueue(string queueName)
     {
         var path = $@"{Environment.MachineName}\private$\{queueName}";

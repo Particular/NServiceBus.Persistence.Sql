@@ -12,7 +12,6 @@ using ObjectApproval;
 
 public abstract class SubscriptionPersisterTests
 {
-
     BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
@@ -196,5 +195,4 @@ public abstract class SubscriptionPersisterTests
         var result = persister.GetSubscribers(message2, message1).Result;
         ObjectApprover.VerifyWithJson(result);
     }
-
 }

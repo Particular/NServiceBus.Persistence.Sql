@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
     <DebugSymbols>true</DebugSymbols>
@@ -13,7 +13,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
     <PackageReference Include="Newtonsoft.Json" Version="10.*" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-alpha0027" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta*" />
     <PackageReference Include="NUnit" Version="3.7.*" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
@@ -28,7 +28,6 @@
     <PackageReference Include="ApprovalTests" Version="3.*" />
     <PackageReference Include="ApprovalUtilities" Version="3.*" />
     <PackageReference Include="ObjectApproval" Version="1.*" />
-    <PackageReference Include="NUnit.ApplicationDomain" Version="11.*" />
     <PackageReference Include="PublicApiGenerator" Version="6.1.0-*" />
     <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />

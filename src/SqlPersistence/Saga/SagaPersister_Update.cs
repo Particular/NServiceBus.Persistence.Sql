@@ -6,7 +6,6 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         return Update(sagaData, session, GetConcurrency(context));
@@ -34,5 +33,4 @@ partial class SagaPersister
             }
         }
     }
-
 }

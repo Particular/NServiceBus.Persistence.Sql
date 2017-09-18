@@ -5,7 +5,6 @@ using NServiceBus.Timeout.Core;
 
 class SqlTimeoutFeature : Feature
 {
-
     SqlTimeoutFeature()
     {
         DependsOn<TimeoutManager>();

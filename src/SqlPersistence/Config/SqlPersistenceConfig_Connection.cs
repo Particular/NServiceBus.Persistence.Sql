@@ -1,11 +1,11 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Configuration.AdvancedExtensibility;
-using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
-
 namespace NServiceBus
 {
+    using System;
+    using System.Data.Common;
+    using Configuration.AdvancedExtensibility;
+    using Persistence.Sql;
+    using Settings;
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>

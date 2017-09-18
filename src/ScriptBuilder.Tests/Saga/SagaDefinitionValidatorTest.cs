@@ -1,4 +1,6 @@
-﻿using ApprovalTests;
+﻿#if NET452
+using ApprovalTests;
+#endif
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
@@ -16,28 +18,40 @@ public class SagaDefinitionValidatorTest
     public void WithMatchingIds()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Transitional", "saga1", "Transitional", "tableSuffix"));
+        Assert.IsNotNull(errorsException.Message);
+#if NET452
         Approvals.Verify(errorsException.Message);
+#endif
     }
 
     [Test]
     public void WithInvalidSuffixLeft()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table[Suffix"));
+        Assert.IsNotNull(errorsException.Message);
+#if NET452
         Approvals.Verify(errorsException.Message);
+#endif
     }
 
     [Test]
     public void WithInvalidSuffixRight()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table]Suffix"));
+        Assert.IsNotNull(errorsException.Message);
+#if NET452
         Approvals.Verify(errorsException.Message);
+#endif
     }
 
     [Test]
     public void WithInvalidSuffixTick()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table`Suffix"));
+        Assert.IsNotNull(errorsException.Message);
+#if NET452
         Approvals.Verify(errorsException.Message);
+#endif
     }
 
     [Test]
@@ -69,7 +83,9 @@ public class SagaDefinitionValidatorTest
     public void WithTransitionalAndNoCorrelation()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", "Transitional", "tableSuffix"));
+        Assert.IsNotNull(errorsException.Message);
+#if NET452
         Approvals.Verify(errorsException.Message);
+#endif
     }
-
 }

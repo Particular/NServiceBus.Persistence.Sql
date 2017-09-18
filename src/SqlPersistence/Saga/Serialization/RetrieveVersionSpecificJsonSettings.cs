@@ -1,8 +1,8 @@
-﻿using System;
-using Newtonsoft.Json;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// A delegate used to configure how a specific saga data version will be serialized.
     /// <seealso cref="SagaSettings.JsonSettingsForVersion"/>

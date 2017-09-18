@@ -2,7 +2,6 @@
 
 class BuildLogger
 {
-
     IBuildEngine buildEngine;
 
     public BuildLogger(IBuildEngine buildEngine)

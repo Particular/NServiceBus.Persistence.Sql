@@ -18,7 +18,7 @@ namespace NServiceBus
             return Name;
         }
 
-        internal virtual void AddCreationScriptParametrs(DbCommand command)
+        internal virtual void AddCreationScriptParameters(DbCommand command)
         {
         }
 
@@ -33,7 +33,7 @@ namespace NServiceBus
                 command.Transaction = transaction;
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", tablePrefix);
-                AddCreationScriptParametrs(command);
+                AddCreationScriptParameters(command);
                 await command.ExecuteNonQueryEx().ConfigureAwait(false);
             }
         }
@@ -44,7 +44,7 @@ namespace NServiceBus
             {
                 command.Transaction = transaction;
                 command.CommandText = script;
-                AddCreationScriptParametrs(command);
+                AddCreationScriptParameters(command);
                 await command.ExecuteNonQueryEx().ConfigureAwait(false);
             }
         }

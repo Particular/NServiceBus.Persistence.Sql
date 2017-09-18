@@ -95,5 +95,4 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
     {
         public string Property { get; set; }
     }
-
 }

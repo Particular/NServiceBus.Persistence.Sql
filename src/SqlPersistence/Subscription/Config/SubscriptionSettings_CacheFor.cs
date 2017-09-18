@@ -1,12 +1,10 @@
-﻿using NServiceBus.Settings;
-using System;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using Settings;
+    using System;
 
     public partial class SubscriptionSettings
     {
-
         /// <summary>
         /// Cache subscriptions for a given <see cref="TimeSpan"/>.
         /// </summary>

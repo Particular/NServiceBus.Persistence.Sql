@@ -17,7 +17,7 @@ namespace NServiceBus
                 Schema = "dbo";
             }
 
-            internal override void AddCreationScriptParametrs(DbCommand command)
+            internal override void AddCreationScriptParameters(DbCommand command)
             {
                 command.AddParameter("schema", Schema);
             }

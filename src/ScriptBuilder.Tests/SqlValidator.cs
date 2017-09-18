@@ -1,13 +1,16 @@
+#if NET452
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+#endif
 
 public static class SqlValidator
 {
     public static void Validate(string sql)
     {
+#if NET452
         var parser = new TSql140Parser(false);
         IList<ParseError> errors;
         using (var reader = new StringReader(sql))
@@ -20,5 +23,6 @@ public static class SqlValidator
         }
         var message = $"Sql errors:{string.Join("\r\n", errors.Select(error => error.Message))}";
         throw new Exception(message);
+#endif
     }
 }

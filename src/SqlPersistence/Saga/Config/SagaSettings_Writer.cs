@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-using NServiceBus.Settings;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+    using Settings;
+
     public partial class SagaSettings
     {
 

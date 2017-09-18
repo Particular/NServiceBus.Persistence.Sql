@@ -6,7 +6,6 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
-
     public SqlServerTimeoutPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }

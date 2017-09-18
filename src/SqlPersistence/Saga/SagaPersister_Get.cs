@@ -9,7 +9,6 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-
     internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : IContainSagaData
     {
