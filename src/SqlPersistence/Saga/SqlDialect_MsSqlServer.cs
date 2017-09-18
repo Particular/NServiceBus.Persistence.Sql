@@ -23,6 +23,11 @@
             {
                 return "@" + parameterName;
             }
+
+            internal override object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
+            {
+                return sagaInfo.ToJson(sagaData);
+            }
         }
     }
 }
