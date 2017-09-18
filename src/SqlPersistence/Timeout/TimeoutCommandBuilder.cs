@@ -1,8 +1,8 @@
-﻿using System;
-#pragma warning disable 1591
-
+﻿#pragma warning disable 1591
 namespace NServiceBus.Persistence.Sql
 {
+    using System;
+
     /// <summary>
     /// Not for public use.
     /// </summary>
@@ -20,7 +20,7 @@ namespace NServiceBus.Persistence.Sql
                 add: sqlDialect.GetTimeoutInsertCommand(tableName),
                 removeBySagaId: sqlDialect.GetTimeoutRemoveBySagaIdCommand(tableName),
                 range: sqlDialect.GetTimeoutRangeCommand(tableName)
-                );
+            );
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Text;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System;
+    using System.IO;
+    using System.Text;
+
     public static class SagaScriptBuilder
     {
-
         public static string BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
@@ -104,7 +103,6 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             WriteComment(writer, "DropTable");
             sqlDialectWriter.WriteDropTable();
         }
-
 
         public static string BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
         {

@@ -14,7 +14,7 @@ class StorageSessionFeature : Feature
     {
         var settings = context.Settings;
         ValidateSagaOutboxCombo(settings);
-        
+
         var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();

@@ -1,13 +1,12 @@
-﻿using System;
-using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
-using System.Data.Common;
-using System.Threading.Tasks;
-using NServiceBus.Extensibility;
-using NServiceBus.Sagas;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
+    using System;
+    using Persistence;
+    using Persistence.Sql;
+    using System.Data.Common;
+    using System.Threading.Tasks;
+    using Extensibility;
+    using Sagas;
 
     /// <summary>
     /// Shared session extensions for SqlPersistence.

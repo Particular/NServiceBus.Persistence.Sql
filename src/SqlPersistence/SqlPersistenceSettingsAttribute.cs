@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+
     /// <summary>
     /// Configuration options that are evaluated at compile time.
     /// </summary>

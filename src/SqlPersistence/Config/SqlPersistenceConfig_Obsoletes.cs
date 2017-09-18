@@ -1,10 +1,10 @@
-using System;
-using NServiceBus.Persistence.Sql;
-
 #pragma warning disable 1591
 
 namespace NServiceBus
 {
+    using System;
+    using Persistence.Sql;
+
     public static partial class SqlPersistenceConfig
     {
         [ObsoleteEx(
@@ -26,5 +26,3 @@ namespace NServiceBus
         }
     }
 }
-
-#pragma warning restore 1591

@@ -1,10 +1,10 @@
-﻿using System;
-using NServiceBus.Configuration.AdvancedExtensibility;
-using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
+    using System;
+    using Configuration.AdvancedExtensibility;
+    using Persistence.Sql;
+    using Settings;
+
     public static partial class SqlPersistenceConfig
     {
         internal static SqlDialect GetSqlDialect(this ReadOnlySettings settings)

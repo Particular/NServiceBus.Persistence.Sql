@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
-using NServiceBus.Settings;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using Newtonsoft.Json;
+    using Settings;
 
     public partial class SagaSettings
     {

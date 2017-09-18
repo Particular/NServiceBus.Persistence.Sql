@@ -1,12 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     using System.IO;
     using System.Reflection;
+    using System;
+    using System.Diagnostics;
+    using Microsoft.Build.Framework;
+    using Microsoft.Build.Utilities;
 
     public class ScriptBuilderTask : Task
     {
@@ -24,7 +23,7 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string SolutionDirectory { get; set; }
 
-        static Version assemblyVersion= typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
+        static Version assemblyVersion = typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
 
         public override bool Execute()
         {
@@ -36,11 +35,11 @@ namespace NServiceBus.Persistence.Sql
             try
             {
                 ValidateInputs();
-                Action<string, string> logError = (error, file) =>
-                {
-                    logger.LogError(error, file);
-                };
-                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory, logError);
+                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory,
+                    logError: (error, file) =>
+                    {
+                        logger.LogError(error, file);
+                    });
                 innerTask.Execute();
             }
             catch (ErrorsException exception)

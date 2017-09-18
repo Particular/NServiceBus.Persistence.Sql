@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Text;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System.IO;
+    using System.Text;
+
     public static class SubscriptionScriptBuilder
     {
         public static void BuildCreateScript(TextWriter writer, BuildSqlDialect sqlDialect)
@@ -34,6 +34,5 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
             }
             return stringBuilder.ToString();
         }
-
     }
 }

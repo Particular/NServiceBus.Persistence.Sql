@@ -1,9 +1,8 @@
-using System.Data.Common;
-
 namespace NServiceBus.Persistence.Sql
 {
     using System;
     using System.Threading.Tasks;
+    using System.Data.Common;
 
     /// <summary>
     /// Exposes the current <see cref="DbTransaction"/> and <see cref="DbConnection"/>.

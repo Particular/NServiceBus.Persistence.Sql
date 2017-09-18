@@ -1,11 +1,10 @@
-﻿using System.IO;
-using System.Text;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System.IO;
+    using System.Text;
+
     public static class TimeoutScriptBuilder
     {
-
         public static void BuildCreateScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
             writer.Write(ResourceReader.ReadResource(sqlDialect, "Timeout.Create"));

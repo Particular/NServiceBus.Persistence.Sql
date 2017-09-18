@@ -1,11 +1,10 @@
-﻿using System.IO;
-using System.Text;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System.IO;
+    using System.Text;
+
     public static class OutboxScriptBuilder
     {
-
         public static void BuildCreateScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
             writer.Write(ResourceReader.ReadResource(sqlDialect, "Outbox.Create"));

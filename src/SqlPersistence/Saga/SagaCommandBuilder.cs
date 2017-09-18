@@ -1,17 +1,15 @@
-﻿using System.Text;
-using System;
-#pragma warning disable 1591
-
+﻿#pragma warning disable 1591
 namespace NServiceBus.Persistence.Sql
 {
-
+    using System.Text;
+    using System;
     /// <summary>
     /// Not for public use.
     /// </summary>
     [Obsolete("Not for public use")]
     public class SagaCommandBuilder
     {
-        readonly SqlDialect sqlDialect;
+        SqlDialect sqlDialect;
 
         public SagaCommandBuilder(SqlDialect sqlDialect)
         {
