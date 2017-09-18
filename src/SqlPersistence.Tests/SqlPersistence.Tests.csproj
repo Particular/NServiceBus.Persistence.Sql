@@ -13,7 +13,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
     <PackageReference Include="Newtonsoft.Json" Version="10.*" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-alpha0027" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta*" />
     <PackageReference Include="NUnit" Version="3.7.*" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
