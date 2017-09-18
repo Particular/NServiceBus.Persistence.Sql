@@ -5,7 +5,6 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class SagaDefinitionReader
 {
-
     public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
         ValidateIsNotDirectSaga(type);

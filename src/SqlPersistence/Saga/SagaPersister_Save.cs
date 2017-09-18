@@ -7,7 +7,6 @@ using NServiceBus.Sagas;
 
 partial class SagaPersister
 {
-
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
         return Save(sagaData, session, correlationProperty?.Value);

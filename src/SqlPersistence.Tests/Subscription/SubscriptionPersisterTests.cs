@@ -12,7 +12,6 @@ using ObjectApproval;
 
 public abstract class SubscriptionPersisterTests
 {
-
     BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;

@@ -7,7 +7,6 @@ using NServiceBus.Persistence.Sql;
 
 static class CecilExtensions
 {
-
     public static string GetStringProperty(this ICustomAttribute attribute, string name)
     {
         return (string)attribute.Properties

@@ -9,7 +9,6 @@ using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class StorageSessionFeature : Feature
 {
-
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;

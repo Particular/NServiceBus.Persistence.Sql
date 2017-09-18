@@ -5,7 +5,6 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         return Complete(sagaData, session, GetConcurrency(context));

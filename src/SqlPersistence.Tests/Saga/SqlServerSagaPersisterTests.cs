@@ -6,7 +6,6 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerSagaPersisterTests: SagaPersisterTests
 {
-
     public SqlServerSagaPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }

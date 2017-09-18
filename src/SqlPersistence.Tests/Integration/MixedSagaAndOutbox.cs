@@ -8,7 +8,6 @@ using NUnit.Framework;
 [TestFixture]
 public class MixedSagaAndOutbox
 {
-
     [Test]
     public void RunSqlForSaga()
     {

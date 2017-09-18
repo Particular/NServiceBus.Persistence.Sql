@@ -7,7 +7,6 @@ using ObjectApproval;
 [TestFixture]
 public class SqlAttributeParametersReadersTest
 {
-
     [Test]
     public void Minimal()
     {

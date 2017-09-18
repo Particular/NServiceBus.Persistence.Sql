@@ -6,7 +6,6 @@ using NUnit.Framework;
 [TestFixture]
 public class MessagePropertyMapperTests
 {
-
     [Test]
     public void StringCorrelationId()
     {

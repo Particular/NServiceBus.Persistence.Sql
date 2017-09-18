@@ -3,7 +3,6 @@ using System.Data.Common;
 
 public static class SqlHelpers
 {
-
     public static void ExecuteCommand(this DbConnection connection, string script, Func<Exception, bool> filter = null, string schema = null)
     {
         try
