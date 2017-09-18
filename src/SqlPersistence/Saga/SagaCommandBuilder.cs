@@ -7,6 +7,7 @@ namespace NServiceBus.Persistence.Sql
     /// Not for public use.
     /// </summary>
     [Obsolete("Not for public use")]
+    [DoNotWarnAboutObsoleteUsage]
     public class SagaCommandBuilder
     {
         SqlDialect sqlDialect;

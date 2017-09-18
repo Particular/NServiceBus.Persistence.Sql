@@ -7,6 +7,7 @@ namespace NServiceBus.Persistence.Sql
     /// Not for public use.
     /// </summary>
     [Obsolete("Not for public use")]
+    [DoNotWarnAboutObsoleteUsage]
     public static class TimeoutCommandBuilder
     {
         public static TimeoutCommands Build(SqlDialect sqlDialect, string tablePrefix)

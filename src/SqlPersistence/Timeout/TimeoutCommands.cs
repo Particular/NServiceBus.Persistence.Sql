@@ -7,6 +7,7 @@ namespace NServiceBus.Persistence.Sql
     /// Not for public use.
     /// </summary>
     [Obsolete("Not for public use")]
+    [DoNotWarnAboutObsoleteUsage]
     public class TimeoutCommands
     {
         public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range)
