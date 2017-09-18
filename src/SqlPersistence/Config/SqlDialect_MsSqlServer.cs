@@ -26,9 +26,8 @@ namespace NServiceBus
 
             internal override void FillParameter(DbParameter parameter, string paramName, object value)
             {
-                if (value is ArraySegment<char>)
+                if (value is ArraySegment<char> charSegment)
                 {
-                    var charSegment = (ArraySegment<char>)value;
                     var sqlParameter = (SqlParameter)parameter;
 
                     sqlParameter.ParameterName = paramName;

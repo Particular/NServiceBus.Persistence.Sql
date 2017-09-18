@@ -26,7 +26,9 @@
 
             internal override object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
             {
-                return sagaInfo.ToJson(sagaData);
+                var writer = command.LeaseWriter();
+                sagaInfo.ToJson(sagaData,writer);
+                return writer.ToCharSegment();
             }
         }
     }
