@@ -8,15 +8,15 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class MsmqTransportIntegrationTests : IDisposable
+public class TransportIntegrationTests : IDisposable
 {
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
-    string endpointName = "MsmqTransportIntegration";
+    //string endpointName = "TransportIntegrationTests";
     BuildSqlDialect sqlDialect = BuildSqlDialect.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 
-    public MsmqTransportIntegrationTests()
+    public TransportIntegrationTests()
     {
         dbConnection = MsSqlConnectionBuilder.Build();
         dbConnection.Open();
@@ -34,19 +34,17 @@ public class MsmqTransportIntegrationTests : IDisposable
     [SetUp]
     public void Setup()
     {
-        MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlDialect), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(TransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaDefinition, sqlDialect), nameof(TransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(TransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), nameof(TransportIntegrationTests));
     }
 
     [TearDown]
     public void TearDown()
     {
-        MsmqQueueDeletion.DeleteQueuesForEndpoint(endpointName);
-        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(MsmqTransportIntegrationTests));
-        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(MsmqTransportIntegrationTests));
+        dbConnection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaDefinition, sqlDialect), nameof(TransportIntegrationTests));
+        dbConnection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), nameof(TransportIntegrationTests));
     }
 
     [Test]
@@ -56,10 +54,11 @@ public class MsmqTransportIntegrationTests : IDisposable
     [TestCase(TransportTransactionMode.None)]
     public async Task Write(TransportTransactionMode transactionMode)
     {
-        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(MsmqTransportIntegrationTests));
-        var typesToScan = TypeScanner.NestedTypes<MsmqTransportIntegrationTests>();
+        var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(nameof(TransportIntegrationTests));
+        var typesToScan = TypeScanner.NestedTypes<TransportIntegrationTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
-        var transport = endpointConfiguration.UseTransport<MsmqTransport>();
+        var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
+        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
         transport.Transactions(transactionMode);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.MsSqlServer>();

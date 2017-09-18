@@ -43,7 +43,8 @@ end";
     {
         return RunTest(e =>
         {
-            var transport = e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
@@ -62,11 +63,12 @@ end";
     [Test]
     public Task In_outbox_mode_enlists_in_outbox_transaction()
     {
-        return RunTest(e =>
+        return RunTest(configuration =>
         {
-            e.GetSettings().Set("DisableOutboxTransportCheck", true);
-            e.UseTransport<MsmqTransport>();
-            e.EnableOutbox();
+            configuration.GetSettings().Set("DisableOutboxTransportCheck", true);
+            var transport = configuration.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            configuration.EnableOutbox();
         });
     }
 
