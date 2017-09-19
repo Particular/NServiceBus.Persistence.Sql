@@ -33,7 +33,7 @@ public class CharArrayTextWriterPerformanceTests
         }
 
         var sw = Stopwatch.StartNew();
-        for (var i = 0; i < 1000000; i++)
+        for (var i = 0; i < 10_000_000; i++)
         {
             using (var cmd = new CommandWrapper(null, dialect))
             {
