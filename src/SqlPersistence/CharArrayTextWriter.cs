@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 sealed class CharArrayTextWriter : TextWriter
 {
-    const int InitialSize = 4096;
+    internal const int InitialSize = 4096;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
     char[] _chars = new char[InitialSize];
     int _next;
@@ -120,4 +120,6 @@ sealed class CharArrayTextWriter : TextWriter
     {
         _next = 0;
     }
+
+    public int Size => _next;
 }
