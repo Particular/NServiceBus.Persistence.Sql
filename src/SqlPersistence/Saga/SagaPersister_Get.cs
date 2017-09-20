@@ -10,14 +10,14 @@ using NServiceBus.Persistence;
 partial class SagaPersister
 {
     internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
     static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
         var commandText = $@"
@@ -27,14 +27,14 @@ where {whereClause}";
     }
 
     public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(propertyName, propertyValue, session).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
     internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
 
@@ -50,14 +50,14 @@ where {whereClause}";
     }
 
     public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(sagaId, session).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
     internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
         return GetSagaData<TSagaData>(session, sagaInfo.GetBySagaIdCommand, sagaInfo,
@@ -70,7 +70,7 @@ where {whereClause}";
     }
 
     static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
         var sqlSession = session.SqlPersistenceSession();
 
@@ -78,7 +78,8 @@ where {whereClause}";
         {
             command.CommandText = commandText;
             command.Transaction = sqlSession.Transaction;
-            appendParameters(command.InnerCommand.CreateParameter, parameter => command.InnerCommand.Parameters.Add(parameter));
+            var dbCommand = command.InnerCommand;
+            appendParameters(dbCommand.CreateParameter, parameter => dbCommand.Parameters.Add(parameter));
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
             {
@@ -128,13 +129,11 @@ where {whereClause}";
     }
 
     static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
-        where TSagaData : IContainSagaData
+        where TSagaData : class, IContainSagaData
     {
-        // ReSharper disable once CompareNonConstrainedGenericWithNull
-        //TODO: remove when core adds a class constraint to TSagaData
         if (result.Data == null)
         {
-            return default;
+            return null;
         }
         context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
         return result.Data;
