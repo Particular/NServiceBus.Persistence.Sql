@@ -6,5 +6,10 @@
         internal abstract string QuoteSagaTableName(string tableName);
         internal abstract string GetSagaCorrelationPropertyName(string propertyName);
         internal abstract string GetSagaParameterName(string parameterName);
+
+        internal virtual object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
+        {
+            return sagaInfo.ToJson(sagaData);
+        }
     }
 }

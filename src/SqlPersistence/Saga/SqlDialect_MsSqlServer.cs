@@ -23,6 +23,13 @@
             {
                 return "@" + parameterName;
             }
+
+            internal override object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
+            {
+                var writer = command.LeaseWriter();
+                sagaInfo.ToJson(sagaData,writer);
+                return writer.ToCharSegment();
+            }
         }
     }
 }

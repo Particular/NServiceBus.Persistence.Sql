@@ -1,6 +1,8 @@
 namespace NServiceBus
 {
+    using System;
     using System.Data.Common;
+    using System.Data.SqlClient;
 
     public abstract partial class SqlDialect
     {
@@ -24,8 +26,20 @@ namespace NServiceBus
 
             internal override void FillParameter(DbParameter parameter, string paramName, object value)
             {
-                parameter.ParameterName = paramName;
-                parameter.Value = value;
+                if (value is ArraySegment<char> charSegment)
+                {
+                    var sqlParameter = (SqlParameter)parameter;
+
+                    sqlParameter.ParameterName = paramName;
+                    sqlParameter.Value = charSegment.Array;
+                    sqlParameter.Offset = charSegment.Offset;
+                    sqlParameter.Size = charSegment.Count;
+                }
+                else
+                {
+                    parameter.ParameterName = paramName;
+                    parameter.Value = value;
+                }
             }
 
             internal override CommandWrapper CreateCommand(DbConnection connection)
