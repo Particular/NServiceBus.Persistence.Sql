@@ -7,6 +7,7 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_timeout_hit_not_found_saga : NServiceBusAcceptanceTest
     {
@@ -37,12 +38,14 @@
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class TimeoutHitsNotFoundSaga : Saga<TimeoutHitsNotFoundSaga.TimeoutHitsNotFoundSagaData>,
+            public class TimeoutHitsNotFoundSaga : SqlSaga<TimeoutHitsNotFoundSaga.TimeoutHitsNotFoundSagaData>,
                 IAmStartedByMessages<StartSaga>,
                 IHandleSagaNotFound,
                 IHandleTimeouts<TimeoutHitsNotFoundSaga.MyTimeout>,
                 IHandleMessages<SomeOtherMessage>
             {
+                protected override string CorrelationPropertyName => nameof(TimeoutHitsNotFoundSagaData.DataId);
+
                 public Context TestContext { get; set; }
 
                 public async Task Handle(StartSaga message, IMessageHandlerContext context)
@@ -83,10 +86,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutHitsNotFoundSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
-                    mapper.ConfigureMapping<SomeOtherMessage>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<SomeOtherMessage>(m => m.DataId);
                 }
 
                 public class TimeoutHitsNotFoundSagaData : ContainSagaData

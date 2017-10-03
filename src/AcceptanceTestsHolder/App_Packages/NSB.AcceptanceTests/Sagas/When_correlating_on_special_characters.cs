@@ -4,8 +4,9 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using NServiceBus.Persistence.Sql;
 
-    class When_correlating_special_chars : NServiceBusAcceptanceTest
+    partial class When_correlating_special_chars : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Saga_persistence_and_correlation_should_work()
@@ -36,13 +37,13 @@
                 EndpointSetup<DefaultServer>();
             }
 
-            public class SagaDataSpecialValues : ContainSagaData
+            public class SagaDataWithSpecialPropertyValues : ContainSagaData
             {
                 public virtual string SpecialCharacterValues { get; set; }
             }
 
             public class SagaSpecialValues :
-                Saga<SagaDataSpecialValues>,
+                SqlSaga<SagaDataWithSpecialPropertyValues>,
                 IAmStartedByMessages<MessageWithSpecialPropertyValues>,
                 IHandleMessages<FollowupMessageWithSpecialPropertyValues>
             {
@@ -53,10 +54,12 @@
                     this.testContext = testContext;
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaDataSpecialValues> mapper)
+                protected override string CorrelationPropertyName => nameof(SagaDataWithSpecialPropertyValues.SpecialCharacterValues);
+
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<MessageWithSpecialPropertyValues>(m => m.SpecialCharacterValues).ToSaga(s => s.SpecialCharacterValues);
-                    mapper.ConfigureMapping<FollowupMessageWithSpecialPropertyValues>(m => m.SpecialCharacterValues).ToSaga(s => s.SpecialCharacterValues);
+                    mapper.ConfigureMapping<MessageWithSpecialPropertyValues>(m => m.SpecialCharacterValues);
+                    mapper.ConfigureMapping<FollowupMessageWithSpecialPropertyValues>(m => m.SpecialCharacterValues);
                 }
 
                 public Task Handle(MessageWithSpecialPropertyValues message, IMessageHandlerContext context)

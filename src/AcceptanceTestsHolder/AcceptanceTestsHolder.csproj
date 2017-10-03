@@ -46,9 +46,6 @@
     <Reference Include="System.Messaging" />
     <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -227,6 +224,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Partials\When_running_saga_tests.cs" />
     <Compile Include="TestSuiteConstraints.cs" />
   </ItemGroup>
   <ItemGroup>
