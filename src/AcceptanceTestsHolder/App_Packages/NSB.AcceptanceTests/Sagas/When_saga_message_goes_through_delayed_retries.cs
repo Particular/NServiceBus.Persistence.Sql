@@ -6,7 +6,6 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     //repro for issue: https://github.com/NServiceBus/NServiceBus/issues/1020
     public class When_saga_message_goes_through_delayed_retries : NServiceBusAcceptanceTest
@@ -46,12 +45,10 @@
                 });
             }
 
-            public class DelayedRetryTestingSaga : SqlSaga<DelayedRetryTestingSagaData>,
+            public class DelayedRetryTestingSaga : Saga<DelayedRetryTestingSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleMessages<SecondSagaMessage>
             {
-                protected override string CorrelationPropertyName => nameof(DelayedRetryTestingSagaData.SomeId);
-
                 public Context TestContext { get; set; }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -78,10 +75,12 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DelayedRetryTestingSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId);
-                    mapper.ConfigureMapping<SecondSagaMessage>(m => m.SomeId);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.SomeId)
+                        .ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<SecondSagaMessage>(m => m.SomeId)
+                        .ToSaga(s => s.SomeId);
                 }
             }
 
