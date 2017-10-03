@@ -29,13 +29,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-alpharelease0062\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-beta0007\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.7.0.0-alpharelease0062\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.7.0.0-beta0007\lib\net452\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Transport.Msmq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-alpha0037\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0001\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.7.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
@@ -46,9 +46,6 @@
     <Reference Include="System.Messaging" />
     <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -102,7 +99,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_faulted.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_sent.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_handling_current_message_later.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_sending_to_another_endpoint.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Recoverability\When_cross_q_transactional_message_is_moved_to_error_queue.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Recoverability\When_custom_policy_always_moves_to_error.cs" />
@@ -213,8 +209,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Serialization\When_skip_wrapping_xml.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Serialization\When_wrapping_is_not_skipped.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Serialization\When_xml_serializer_used_with_unobtrusive_mode.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Timeout\CyclingOutageTimeoutPersister.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Timeout\When_timeout_storage_is_unavailable_temporarily.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\TimeToBeReceived\When_TimeToBeReceived_has_expired.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\TimeToBeReceived\When_TimeToBeReceived_has_expired_convention.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\TimeToBeReceived\When_TimeToBeReceived_has_not_expired.cs" />
@@ -230,6 +224,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Partials\When_running_saga_tests.cs" />
     <Compile Include="TestSuiteConstraints.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -76,15 +76,9 @@
                 {
                 }
 
-                public override string SelectReceiver(string[] receiverAddresses)
-                {
-                    throw new NotImplementedException(); // should never be called
-                }
-
                 public override string SelectDestination(DistributionContext context)
                 {
-                    var message = context.Message.Instance as MyCommand;
-                    if (message != null)
+                    if (context.Message.Instance is MyCommand message)
                     {
                         var address = context.ToTransportAddress(new EndpointInstance(Endpoint, message.Instance));
                         return context.ReceiverAddresses.Single(a => a.Contains(address));

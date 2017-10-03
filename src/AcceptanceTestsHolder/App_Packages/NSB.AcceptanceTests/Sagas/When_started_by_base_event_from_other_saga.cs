@@ -7,7 +7,6 @@
     using Features;
     using NUnit.Framework;
     using Persistence.Sql;
-    using Routing;
 
     //Repro for #1323
     public class When_started_by_base_event_from_other_saga : NServiceBusAcceptanceTest
@@ -48,7 +47,7 @@
             {
                 EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<SagaContext>((s, context) =>
                 {
-                    context.AddTrace("Subscription received for " + s.SubscriberReturnAddress);
+                    context.AddTrace($"Subscription received for {s.SubscriberEndpoint}");
                     context.IsEventSubscriptionReceived = true;
                 }));
             }
@@ -63,14 +62,13 @@
                     c.EnableFeature<TimeoutManager>();
                     c.DisableFeature<AutoSubscribe>();
                 },
-                metdata => metdata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
+                metadata => metadata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
 
             public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
-                protected override string CorrelationPropertyName => nameof(SagaStartedByBaseEventSagaData.DataId);
-
                 public SagaContext Context { get; set; }
+                protected override string CorrelationPropertyName => nameof(SagaStartedByBaseEventSagaData.DataId);
 
                 public Task Handle(BaseEvent message, IMessageHandlerContext context)
                 {

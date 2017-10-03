@@ -1,9 +1,12 @@
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
 
-[TestFixture]
+#if RELEASE
+using NUnit.Framework;
+// So this test does not run on CI as server install does not support unicode
+[Explicit("MySqlUnicode")]
+#endif
 public class MySqlSagaPersisterTests: SagaPersisterTests
 {
     public MySqlSagaPersisterTests() : base(BuildSqlDialect.MySql, null)
@@ -24,10 +27,4 @@ public class MySqlSagaPersisterTests: SagaPersisterTests
         return innerException.Message.Contains("Duplicate entry ");
     }
 
-    // So this test can be excluded if a target server install does not support unicode
-    [Category("MySqlUnicode")]
-    public override void SaveWithWeirdCharacters()
-    {
-        base.SaveWithWeirdCharacters();
-    }
 }
