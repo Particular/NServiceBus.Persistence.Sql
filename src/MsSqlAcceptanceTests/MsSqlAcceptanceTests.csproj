@@ -25,5 +25,6 @@
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" Exclude="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\ConfigureEndpointMsmqTransport.cs" />
+    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\Partials\*.cs" />
   </ItemGroup>
 </Project>
