@@ -1,7 +1,8 @@
 ﻿#if NET452
+using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using ApprovalTests;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using PublicApiGenerator;
 
@@ -12,7 +13,9 @@ public class APIApprovals
     [MethodImpl(MethodImplOptions.NoInlining)]
     public void Approve()
     {
-        var publicApi = ApiGenerator.GeneratePublicApi(typeof(BuildSqlDialect).Assembly);
+        var combine = Path.Combine(TestContext.CurrentContext.TestDirectory, "NServiceBus.Persistence.Sql.ScriptBuilder.dll");
+        var assembly = Assembly.LoadFile(combine);
+        var publicApi = ApiGenerator.GeneratePublicApi(assembly);
         Approvals.Verify(publicApi);
     }
 }
