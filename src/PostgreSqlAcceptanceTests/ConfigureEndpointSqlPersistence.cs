@@ -16,7 +16,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.FromResult(0);
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
+        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.PostgreSql>();
