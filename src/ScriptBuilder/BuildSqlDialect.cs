@@ -4,6 +4,7 @@
     {
         MsSqlServer,
         MySql,
-        Oracle
+        Oracle,
+        PostgreSql
     }
 }

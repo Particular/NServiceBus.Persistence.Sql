@@ -5,6 +5,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql " Version="3.*" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
     <PackageReference Include="MySql.Data" Version="6.*" />

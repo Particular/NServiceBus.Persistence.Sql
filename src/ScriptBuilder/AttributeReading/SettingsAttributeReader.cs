@@ -47,6 +47,7 @@ static class SettingsAttributeReader
         {
             yield return BuildSqlDialect.MsSqlServer;
             yield return BuildSqlDialect.MySql;
+            yield return BuildSqlDialect.PostgreSql;
             yield return BuildSqlDialect.Oracle;
             yield break;
         }
@@ -61,6 +62,12 @@ static class SettingsAttributeReader
         if (mySqlScripts)
         {
             yield return BuildSqlDialect.MySql;
+        }
+
+        var postgreSqlScripts = attribute.GetBoolProperty("PostgreSqlScripts");
+        if (postgreSqlScripts)
+        {
+            yield return BuildSqlDialect.PostgreSql;
         }
 
         var oracleScripts = attribute.GetBoolProperty("OracleScripts");

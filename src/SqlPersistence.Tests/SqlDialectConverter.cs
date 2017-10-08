@@ -6,14 +6,19 @@ public static class SqlDialectConverter
 {
     public static BuildSqlDialect Convert(this SqlDialect sqlDialect)
     {
-       if(sqlDialect is SqlDialect.MsSqlServer)
-       {
-           return BuildSqlDialect.MsSqlServer;
-       }
+        if (sqlDialect is SqlDialect.MsSqlServer)
+        {
+            return BuildSqlDialect.MsSqlServer;
+        }
 
         if (sqlDialect is SqlDialect.MySql)
         {
             return BuildSqlDialect.MySql;
+        }
+
+        if (sqlDialect is SqlDialect.PostgreSql)
+        {
+            return BuildSqlDialect.PostgreSql;
         }
 
         if (sqlDialect is SqlDialect.Oracle)
@@ -23,16 +28,20 @@ public static class SqlDialectConverter
 
         throw new Exception($"Unknown SqlDialect: {sqlDialect.Name}.");
     }
+
     public static SqlDialect Convert(this BuildSqlDialect sqlDialect, string schema = null)
     {
         switch (sqlDialect)
         {
             case BuildSqlDialect.MsSqlServer:
-                var dialect = new SqlDialect.MsSqlServer();
-                dialect.Schema = schema;
-                return dialect;
+                return new SqlDialect.MsSqlServer
+                {
+                    Schema = schema
+                };
             case BuildSqlDialect.MySql:
                 return new SqlDialect.MySql();
+            case BuildSqlDialect.PostgreSql:
+                return new SqlDialect.PostgreSql();
             case BuildSqlDialect.Oracle:
                 return new SqlDialect.Oracle();
             default:
