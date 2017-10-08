@@ -21,6 +21,12 @@
         public bool MySqlScripts { get; set; }
 
         /// <summary>
+        /// True to produce SQL installation scripts that target PostgreSqlScripts.
+        /// Defaults to False.
+        /// </summary>
+        public bool PostgreSqlScripts { get; set; }
+
+        /// <summary>
         /// True to produce SQL installation scripts that target Oracle.
         /// Defaults to False.
         /// </summary>
