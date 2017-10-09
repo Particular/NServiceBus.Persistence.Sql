@@ -1,4 +1,5 @@
 ﻿using System;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class InnerTask
@@ -23,10 +24,30 @@ class InnerTask
         ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
-    string FindPromotionPath(string promotionPathSetting)
+    string FindPromotionPath(string promotionPath)
     {
-        return promotionPathSetting
-            .Replace("$(ProjectDir)", projectDirectory)
+        promotionPath = promotionPath
+            .Replace("$(ProjectDir)", projectDirectory);
+
+        if (!promotionPath.Contains("$(SolutionDir)"))
+        {
+            return promotionPath;
+        }
+
+        if (string.IsNullOrWhiteSpace(solutionDirectory))
+        {
+            throw new ErrorsException(
+                @"The ScriptPromotionPath contains '$(SolutionDir)' but no SolutionDirectory was passed to the MSBuildTask. One possible cause of this is a csproj file is being build directly, rather than building the parent solution.
+Possible workarounds:
+
+ * Don't use '$(SolutionDir)' in the ScriptPromotionPath
+ * Build the solution rather than the project
+ * Add a property to the project that adds the SolutionDir property: <PropertyGroup><SolutionDir Condition=""$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"">..\</SolutionDir></PropertyGroup>");
+        }
+
+        promotionPath = promotionPath
             .Replace("$(SolutionDir)", solutionDirectory);
+
+        return promotionPath;
     }
 }
