@@ -7,8 +7,7 @@ static class ScriptLocation
 {
     public static string FindScriptDirectory(SqlDialect dialect)
     {
-        var codeBase = Assembly.GetEntryAssembly().CodeBase;
-        var currentDirectory = Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
+        var currentDirectory = GetCurrentDirectory();
         return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", dialect.Name);
     }
 
