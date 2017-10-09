@@ -7,7 +7,12 @@ public static class MsSqlConnectionBuilder
 
     public static SqlConnection Build()
     {
-        return new SqlConnection(ConnectionString);
+        var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+        if (string.IsNullOrWhiteSpace(connection))
+        {
+            return new SqlConnection(ConnectionString);
+        }
+        return new SqlConnection(connection);
     }
 
     public static bool IsSql2016OrHigher()
