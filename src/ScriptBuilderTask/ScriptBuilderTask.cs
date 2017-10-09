@@ -20,7 +20,6 @@
         [Required]
         public string ProjectDirectory { get; set; }
 
-        [Required]
         public string SolutionDirectory { get; set; }
 
         static Version assemblyVersion = typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
