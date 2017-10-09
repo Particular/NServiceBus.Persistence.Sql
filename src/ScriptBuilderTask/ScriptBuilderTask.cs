@@ -73,7 +73,7 @@
                 throw new ErrorsException($"ProjectDirectory '{ProjectDirectory}' does not exist.");
             }
 
-            if (!Directory.Exists(SolutionDirectory))
+            if (!string.IsNullOrWhiteSpace(SolutionDirectory) && !Directory.Exists(SolutionDirectory))
             {
                 throw new ErrorsException($"SolutionDirectory '{SolutionDirectory}' does not exist.");
             }
