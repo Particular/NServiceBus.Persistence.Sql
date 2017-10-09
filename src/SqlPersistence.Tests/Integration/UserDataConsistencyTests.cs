@@ -41,6 +41,7 @@ end";
     [Test]
     public Task In_DTC_mode_enlists_in_the_ambient_transaction()
     {
+        Requires.DtcSupport();
         return RunTest(e =>
         {
             var transport = e.UseTransport<SqlServerTransport>();
