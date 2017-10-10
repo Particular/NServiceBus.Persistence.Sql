@@ -20,7 +20,6 @@
         [Required]
         public string ProjectDirectory { get; set; }
 
-        [Required]
         public string SolutionDirectory { get; set; }
 
         static Version assemblyVersion = typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
@@ -74,7 +73,7 @@
                 throw new ErrorsException($"ProjectDirectory '{ProjectDirectory}' does not exist.");
             }
 
-            if (!Directory.Exists(SolutionDirectory))
+            if (!string.IsNullOrWhiteSpace(SolutionDirectory) && !Directory.Exists(SolutionDirectory))
             {
                 throw new ErrorsException($"SolutionDirectory '{SolutionDirectory}' does not exist.");
             }

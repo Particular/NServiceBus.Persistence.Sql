@@ -12,6 +12,11 @@
       </PropertyGroup>
     </Otherwise>
   </Choose>
+
+  <PropertyGroup>
+    <SolutionDirEx Condition="$(SolutionDir) == '*Undefined*'"></SolutionDirEx>
+  </PropertyGroup>
+
   <UsingTask
       TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
       AssemblyFile="$(ScriptBuilderTaskPath)" />
@@ -24,7 +29,7 @@
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
           ProjectDirectory="$(ProjectDir)"
-          SolutionDirectory="$(SolutionDir)"/>
+          SolutionDirectory="$(SolutionDirEx)"/>
   </Target>
 
   <Target
