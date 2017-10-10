@@ -1,52 +1,32 @@
-﻿set @tableNameQuoted = concat('`', @tablePrefix, 'TimeoutData`');
-set @tableNameNonQuoted = concat(@tablePrefix, 'TimeoutData');
-
-set @createTable = concat('
-    create table if not exists ', @tableNameQuoted, '(
-        Id varchar(38) not null,
-        Destination nvarchar(200),
-        SagaId varchar(38),
-        State longblob,
-        Time datetime,
-        Headers json not null,
-        PersistenceVersion varchar(23) not null,
-        primary key (Id)
-    ) default charset=ascii;
-');
-prepare script from @createTable;
-execute script;
-deallocate prepare script;
-
-
-select count(*)
-into @exist
-from information_schema.statistics
-where
-    table_schema = database() and
-    index_name = 'Index_SagaId' and
-    table_name = @tableNameNonQuoted;
-
-set @query = IF(
-    @exist <= 0,
-    concat('create index Index_SagaId on ', @tableNameQuoted, '(SagaId)'), 'select \'Index Exists\' status');
-
-prepare script from @query;
-execute script;
-deallocate prepare script;
-
-
-select count(*)
-into @exist
-from information_schema.statistics
-where
-    table_schema = database() and
-    index_name = 'Index_Time' and
-    table_name = @tableNameNonQuoted;
-
-set @query = IF(
-    @exist <= 0,
-    concat('create index Index_Time on ', @tableNameQuoted, '(Time)'), 'select \'Index Exists\' status');
-
-prepare script from @query;
-execute script;
-deallocate prepare script;
+﻿create or replace function create_timeouts_table(tablePrefix varchar) 
+  returns integer as 
+  $body$ 
+    declare 
+      tableNameNonQuoted varchar;
+      createTable text;
+    begin 
+        tableNameNonQuoted := tablePrefix || 'TimeoutData';
+        createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
+    (
+        "Id" character varying(38) NOT NULL,
+        "Destination" character varying(200),
+        "SagaId" character varying(38),
+        "State" bytea,
+        "Time" timestamp with time zone,
+        "Headers" text,
+        "PersistenceVersion" character varying(23),
+        PRIMARY KEY ("Id")
+    )
+    WITH (
+        OIDS = FALSE
+    );
+    CREATE INDEX IF NOT EXISTS "Time_Idx" ON public.' || tableNameNonQuoted || ' USING btree ("Time" ASC NULLS LAST);
+    CREATE INDEX IF NOT EXISTS "SagaId_Idx" ON public.' || tableNameNonQuoted || ' USING btree ("SagaId" ASC NULLS LAST);
+';
+		execute createTable;
+        return 0;
+    end; 
+  $body$ 
+  language 'plpgsql';
+  
+select create_timeouts_table(@tablePrefix);

@@ -10,7 +10,7 @@
 
             internal override string GetTimeoutTableName(string tablePrefix)
             {
-                return $"`{tablePrefix}TimeoutData`";
+                return $"{tablePrefix}TimeoutData";
             }
 
             internal override string GetTimeoutInsertCommand(string tableName)
@@ -18,13 +18,13 @@
                 return $@"
 insert into {tableName}
 (
-    Id,
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers,
-    PersistenceVersion
+    ""Id"",
+    ""Destination"",
+    ""SagaId"",
+    ""State"",
+    ""Time"",
+    ""Headers"",
+    ""PersistenceVersion""
 )
 values
 (
@@ -32,7 +32,7 @@ values
     @Destination,
     @SagaId,
     @State,
-    @Time,
+    @Time AT TIME ZONE 'UTC',
     @Headers,
     @PersistenceVersion
 )";
@@ -42,43 +42,43 @@ values
             {
                 return $@"
 delete from {tableName}
-where Id = @Id;";
+where ""Id"" = @Id;";
             }
 
             internal override string GetTimeoutRemoveBySagaIdCommand(string tableName)
             {
                 return $@"
 delete from {tableName}
-where SagaId = @SagaId";
+where ""SagaId"" = @SagaId";
             }
 
             internal override string GetTimeoutPeekCommand(string tableName)
             {
                 return $@"
 select
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers
+    ""Destination"",
+    ""SagaId"",
+    ""State"",
+    ""Time"",
+    ""Headers""
 from {tableName}
-where Id = @Id";
+where ""Id"" = @Id";
             }
 
             internal override string GetTimeoutRangeCommand(string tableName)
             {
                 return $@"
-select Id, Time
+select ""Id"", ""Time""
 from {tableName}
-where Time > @StartTime and Time <= @EndTime";
+where ""Time"" > @StartTime and ""Time"" <= @EndTime";
             }
 
             internal override string GetTimeoutNextCommand(string tableName)
             {
                 return $@"
-select Time from {tableName}
-where Time > @EndTime
-order by Time
+select ""Time"" from {tableName}
+where ""Time"" > @EndTime
+order by ""Time""
 limit 1";
             }
         }
