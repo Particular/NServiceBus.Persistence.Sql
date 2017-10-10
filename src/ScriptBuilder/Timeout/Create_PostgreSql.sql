@@ -12,7 +12,7 @@
         "Destination" character varying(200),
         "SagaId" character varying(38),
         "State" bytea,
-        "Time" timestamp with time zone,
+        "Time" timestamp,
         "Headers" text,
         "PersistenceVersion" character varying(23),
         PRIMARY KEY ("Id")
