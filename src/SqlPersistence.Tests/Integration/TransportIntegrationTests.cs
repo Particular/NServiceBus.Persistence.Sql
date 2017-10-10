@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Transport.SQLServer;
 using NUnit.Framework;
 
 [TestFixture]
@@ -60,7 +61,12 @@ public class TransportIntegrationTests : IDisposable
         var typesToScan = TypeScanner.NestedTypes<TransportIntegrationTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
-        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
         transport.Transactions(transactionMode);
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.MsSqlServer>();

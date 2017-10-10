@@ -6,6 +6,7 @@ using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Transport;
+using NServiceBus.Transport.SQLServer;
 
 public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecution
 {
@@ -13,8 +14,12 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
     {
         queueBindings = configuration.GetSettings().Get<QueueBindings>();
         var transport = configuration.UseTransport<SqlServerTransport>();
-        connectionString = MsSqlConnectionBuilder.ConnectionString;
-        transport.ConnectionString(connectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
 
         transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
 
@@ -33,7 +38,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
     public Task Cleanup()
     {
-        using (var conn = new SqlConnection(connectionString))
+        using (var conn = MsSqlConnectionBuilder.Build())
         {
             conn.Open();
 
@@ -62,7 +67,6 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         }
     }
 
-    string connectionString;
     QueueBindings queueBindings;
 
     class QueueAddress

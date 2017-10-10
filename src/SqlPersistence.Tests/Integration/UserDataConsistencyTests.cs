@@ -7,6 +7,7 @@ using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
+using NServiceBus.Transport.SQLServer;
 using NUnit.Framework;
 
 [TestFixture]
@@ -45,7 +46,12 @@ end";
         return RunTest(e =>
         {
             var transport = e.UseTransport<SqlServerTransport>();
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
@@ -57,7 +63,12 @@ end";
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
         });
     }
 
@@ -68,7 +79,12 @@ end";
         {
             configuration.GetSettings().Set("DisableOutboxTransportCheck", true);
             var transport = configuration.UseTransport<SqlServerTransport>();
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             configuration.EnableOutbox();
         });
     }
@@ -117,7 +133,12 @@ end";
         endpointConfiguration.DisableFeature<TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
-        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
