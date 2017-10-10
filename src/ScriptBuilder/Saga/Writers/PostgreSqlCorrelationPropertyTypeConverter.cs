@@ -17,7 +17,7 @@
                 case CorrelationPropertyType.Int:
                     return "bigint(20)";
                 case CorrelationPropertyType.Guid:
-                    return "varchar(38) character set ascii";
+                    return "UUID";
             }
             throw new Exception($"Could not convert {propertyType}.");
         }
