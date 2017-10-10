@@ -8,9 +8,9 @@
         tableNameNonQuoted := tablePrefix || 'TimeoutData';
         createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
     (
-        "Id" character varying(38) NOT NULL,
+        "Id" UUID NOT NULL,
         "Destination" character varying(200),
-        "SagaId" character varying(38),
+        "SagaId" UUID,
         "State" bytea,
         "Time" timestamp,
         "Headers" text,

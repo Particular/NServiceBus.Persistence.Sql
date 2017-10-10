@@ -29,11 +29,12 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
+        var guid = GetGuid(timeoutId);
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.Peek;
-            command.AddParameter("Id", timeoutId);
+            command.AddParameter("Id", guid);
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
             using (var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
             {
@@ -91,14 +92,24 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)
     {
+        var guid = GetGuid(timeoutId);
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.RemoveById;
-            command.AddParameter("Id", timeoutId);
+            command.AddParameter("Id", guid);
             var rowsAffected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             return rowsAffected == 1;
         }
+    }
+
+    static Guid GetGuid(string timeoutId)
+    {
+        if (Guid.TryParse(timeoutId, out var guid))
+        {
+            return guid;
+        }
+        throw new Exception($"Expected timeoutId to be in GUID format: {timeoutId}");
     }
 
 
@@ -108,7 +119,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         var now = DateTime.UtcNow;
 
         //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
-        //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeoute storeage race-condition
+        //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeout storage race-condition
         if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < now)
         {
             lastTimeoutsCleanupExecution = now;
