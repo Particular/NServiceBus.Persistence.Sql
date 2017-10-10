@@ -185,7 +185,7 @@ deallocate prepare script;
         writer.Write(@"
 set @createTable = concat('
     create table if not exists ', @tableNameQuoted, '(
-        Id varchar(38) not null,
+        Id UUID not null,
         Metadata json not null,
         Data json not null,
         PersistenceVersion varchar(23) not null,
