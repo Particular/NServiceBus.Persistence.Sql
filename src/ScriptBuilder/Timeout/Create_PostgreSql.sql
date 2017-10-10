@@ -1,10 +1,10 @@
-﻿create or replace function create_timeouts_table(tablePrefix varchar) 
-  returns integer as 
-  $body$ 
-    declare 
+﻿create or replace function create_timeouts_table(tablePrefix varchar)
+  returns integer as
+  $body$
+    declare
       tableNameNonQuoted varchar;
       createTable text;
-    begin 
+    begin
         tableNameNonQuoted := tablePrefix || 'TimeoutData';
         createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
     (
@@ -25,8 +25,8 @@
 ';
 		execute createTable;
         return 0;
-    end; 
-  $body$ 
+    end;
+  $body$
   language 'plpgsql';
-  
+
 select create_timeouts_table(@tablePrefix);
