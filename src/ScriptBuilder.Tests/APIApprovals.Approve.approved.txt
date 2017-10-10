@@ -20,6 +20,7 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         MsSqlServer = 0,
         MySql = 1,
         Oracle = 2,
+        PostgreSql = 3,
     }
     public class CorrelationProperty
     {
@@ -53,6 +54,10 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
         public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
         public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+    }
+    public class static PostgreSqlCorrelationPropertyTypeConverter
+    {
+        public static string GetColumnType(NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType propertyType) { }
     }
     public class SagaDefinition
     {

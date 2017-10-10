@@ -1,0 +1,191 @@
+﻿
+/* TableNameVariable */
+
+set @tableNameQuoted = concat('`', @tablePrefix, 'theSaga`');
+set @tableNameNonQuoted = concat(@tablePrefix, 'theSaga');
+
+
+/* Initialize */
+
+drop procedure if exists sqlpersistence_raiseerror;
+create procedure sqlpersistence_raiseerror(message varchar(256))
+begin
+signal sqlstate
+    'ERROR'
+set
+    message_text = message,
+    mysql_errno = '45000';
+end;
+
+/* CreateTable */
+
+set @createTable = concat('
+    create table if not exists ', @tableNameQuoted, '(
+        Id UUID not null,
+        Metadata json not null,
+        Data json not null,
+        PersistenceVersion varchar(23) not null,
+        SagaTypeVersion varchar(23) not null,
+        Concurrency int not null,
+        primary key (Id)
+    ) default charset=ascii;
+');
+prepare script from @createTable;
+execute script;
+deallocate prepare script;
+
+/* AddProperty CorrelationProperty */
+
+select count(*)
+into @exist
+from information_schema.columns
+where table_schema = database() and
+      column_name = 'Correlation_CorrelationProperty' and
+      table_name = @tableNameNonQuoted;
+
+set @query = IF(
+    @exist <= 0,
+    concat('alter table ', @tableNameQuoted, ' add column Correlation_CorrelationProperty varchar(200) character set utf8mb4'), 'select \'Column Exists\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* VerifyColumnType String */
+
+set @column_type_CorrelationProperty = (
+  select concat(column_type,' character set ', character_set_name)
+  from information_schema.columns
+  where
+    table_schema = database() and
+    table_name = @tableNameNonQuoted and
+    column_name = 'Correlation_CorrelationProperty'
+);
+
+set @query = IF(
+    @column_type_CorrelationProperty <> 'varchar(200) character set utf8mb4',
+    'call sqlpersistence_raiseerror(concat(\'Incorrect data type for Correlation_CorrelationProperty. Expected varchar(200) character set utf8mb4 got \', @column_type_CorrelationProperty, \'.\'));',
+    'select \'Column Type OK\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* WriteCreateIndex CorrelationProperty */
+
+select count(*)
+into @exist
+from information_schema.statistics
+where
+    table_schema = database() and
+    index_name = 'Index_Correlation_CorrelationProperty' and
+    table_name = @tableNameNonQuoted;
+
+set @query = IF(
+    @exist <= 0,
+    concat('create unique index Index_Correlation_CorrelationProperty on ', @tableNameQuoted, '(Correlation_CorrelationProperty)'), 'select \'Index Exists\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* AddProperty TransitionalProperty */
+
+select count(*)
+into @exist
+from information_schema.columns
+where table_schema = database() and
+      column_name = 'Correlation_TransitionalProperty' and
+      table_name = @tableNameNonQuoted;
+
+set @query = IF(
+    @exist <= 0,
+    concat('alter table ', @tableNameQuoted, ' add column Correlation_TransitionalProperty varchar(200) character set utf8mb4'), 'select \'Column Exists\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* VerifyColumnType String */
+
+set @column_type_TransitionalProperty = (
+  select concat(column_type,' character set ', character_set_name)
+  from information_schema.columns
+  where
+    table_schema = database() and
+    table_name = @tableNameNonQuoted and
+    column_name = 'Correlation_TransitionalProperty'
+);
+
+set @query = IF(
+    @column_type_TransitionalProperty <> 'varchar(200) character set utf8mb4',
+    'call sqlpersistence_raiseerror(concat(\'Incorrect data type for Correlation_TransitionalProperty. Expected varchar(200) character set utf8mb4 got \', @column_type_TransitionalProperty, \'.\'));',
+    'select \'Column Type OK\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* CreateIndex TransitionalProperty */
+
+select count(*)
+into @exist
+from information_schema.statistics
+where
+    table_schema = database() and
+    index_name = 'Index_Correlation_TransitionalProperty' and
+    table_name = @tableNameNonQuoted;
+
+set @query = IF(
+    @exist <= 0,
+    concat('create unique index Index_Correlation_TransitionalProperty on ', @tableNameQuoted, '(Correlation_TransitionalProperty)'), 'select \'Index Exists\' status');
+
+prepare script from @query;
+execute script;
+deallocate prepare script;
+
+/* PurgeObsoleteIndex */
+
+select concat('drop index ', index_name, ' on ', @tableNameQuoted, ';')
+from information_schema.statistics
+where
+    table_schema = database() and
+    table_name = @tableNameNonQuoted and
+    index_name like 'Index_Correlation_%' and
+    index_name <> 'Index_Correlation_CorrelationProperty' and
+    index_name <> 'Index_Correlation_TransitionalProperty' and
+    table_schema = database()
+into @dropIndexQuery;
+select if (
+    @dropIndexQuery is not null,
+    @dropIndexQuery,
+    'select ''no index to delete'';')
+    into @dropIndexQuery;
+
+prepare script from @dropIndexQuery;
+execute script;
+deallocate prepare script;
+
+/* PurgeObsoleteProperties */
+
+select concat('alter table ', table_name, ' drop column ', column_name, ';')
+from information_schema.columns
+where
+    table_schema = database() and
+    table_name = @tableNameNonQuoted and
+    column_name like 'Correlation_%' and
+    column_name <> 'Correlation_CorrelationProperty' and
+    column_name <> 'Correlation_TransitionalProperty'
+into @dropPropertiesQuery;
+
+select if (
+    @dropPropertiesQuery is not null,
+    @dropPropertiesQuery,
+    'select ''no property to delete'';')
+    into @dropPropertiesQuery;
+
+prepare script from @dropPropertiesQuery;
+execute script;
+deallocate prepare script;
+
+/* CompleteSagaScript */
