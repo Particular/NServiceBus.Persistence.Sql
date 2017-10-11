@@ -6,24 +6,21 @@
       createTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'TimeoutData';
-        createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
+        createTable = 'create table if not exists public.' || tableNameNonQuoted || '
     (
-        "Id" UUID NOT NULL,
+        "Id" uuid not null,
         "Destination" character varying(200),
-        "SagaId" UUID,
+        "SagaId" uuid,
         "State" bytea,
         "Time" timestamp,
         "Headers" text,
         "PersistenceVersion" character varying(23),
-        PRIMARY KEY ("Id")
-    )
-    WITH (
-        OIDS = FALSE
+        primary key ("Id")
     );
-    CREATE INDEX IF NOT EXISTS "Time_Idx" ON public.' || tableNameNonQuoted || ' USING btree ("Time" ASC NULLS LAST);
-    CREATE INDEX IF NOT EXISTS "SagaId_Idx" ON public.' || tableNameNonQuoted || ' USING btree ("SagaId" ASC NULLS LAST);
+    create index if not exists "Time_Idx" on public.' || tableNameNonQuoted || ' using btree ("Time" asc nulls last);
+    create index if not exists "SagaId_Idx" on public.' || tableNameNonQuoted || ' using btree ("SagaId" asc nulls last);
 ';
-		execute createTable;
+        execute createTable;
         return 0;
     end;
   $body$

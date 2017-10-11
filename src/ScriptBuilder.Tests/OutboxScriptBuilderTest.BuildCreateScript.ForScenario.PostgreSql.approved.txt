@@ -6,22 +6,19 @@
       createTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'OutboxData';
-        createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
+        createTable = 'create table if not exists public.' || tableNameNonQuoted || '
     (
         "MessageId" character varying(200),
         "Dispatched" boolean not null default false,
         "DispatchedAt" timestamp,
         "PersistenceVersion" character varying(23),
         "Operations" jsonb not null,
-        PRIMARY KEY ("MessageId")
-    )
-    WITH (
-        OIDS = FALSE
+        primary key ("MessageId")
     );
-    CREATE INDEX IF NOT EXISTS "Index_DispatchedAt" ON public.' || tableNameNonQuoted || ' USING btree ("DispatchedAt" ASC NULLS LAST);
-    CREATE INDEX IF NOT EXISTS "Index_Dispatched" ON public.' || tableNameNonQuoted || ' USING btree ("Dispatched" ASC NULLS LAST);
+    create index if not exists "Index_DispatchedAt" on public.' || tableNameNonQuoted || ' using btree ("DispatchedAt" asc nulls last);
+    create index if not exists "Index_Dispatched" on public.' || tableNameNonQuoted || ' using btree ("Dispatched" asc nulls last);
 ';
-		execute createTable;
+        execute createTable;
         return 0;
     end;
   $body$

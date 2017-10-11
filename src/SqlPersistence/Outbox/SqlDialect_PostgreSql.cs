@@ -51,7 +51,7 @@ values
             {
                 return $@"
 delete from {tableName}
-where ctid IN
+where ctid in
 (
     select ctid
     from {tableName}

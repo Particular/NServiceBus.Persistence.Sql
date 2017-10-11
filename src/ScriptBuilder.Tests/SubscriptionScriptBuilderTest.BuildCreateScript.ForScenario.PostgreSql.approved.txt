@@ -6,17 +6,14 @@
       createTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'SubscriptionData';
-        createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
+        createTable = 'create table if not exists public.' || tableNameNonQuoted || '
     (
-        "Id" character varying(400) NOT NULL,
-        "Subscriber" character varying(200) NOT NULL,
+        "Id" character varying(400) not null,
+        "Subscriber" character varying(200) not null,
         "Endpoint" character varying(200),
-        "MessageType" character varying(200) NOT NULL,
-        "PersistenceVersion" character varying(200) NOT NULL,
-        PRIMARY KEY ("Id")
-    )
-    WITH (
-        OIDS = FALSE
+        "MessageType" character varying(200) not null,
+        "PersistenceVersion" character varying(200) not null,
+        primary key ("Id")
     );
 ';
         execute createTable;
