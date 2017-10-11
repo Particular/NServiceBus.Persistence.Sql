@@ -16,7 +16,7 @@
 
             internal override string GetSagaCorrelationPropertyName(string propertyName)
             {
-                return "Correlation_" + propertyName;
+                return "\"Correlation_" + propertyName + "\"";
             }
 
             internal override string GetSagaParameterName(string parameterName)

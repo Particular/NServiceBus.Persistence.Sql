@@ -36,12 +36,12 @@ namespace NServiceBus.Persistence.Sql
             return $@"
 insert into {TableName(tableName)}
 (
-    Id,
-    Metadata,
-    Data,
-    PersistenceVersion,
-    SagaTypeVersion,
-    Concurrency{insertBuilder}
+    ""Id"",
+    ""Metadata"",
+    ""Data"",
+    ""PersistenceVersion"",
+    ""SagaTypeVersion"",
+    ""Concurrency""{insertBuilder}
 )
 values
 (
@@ -67,12 +67,12 @@ values
             return $@"
 update {TableName(tableName)}
 set
-    Data = {ParamName("Data")},
-    PersistenceVersion = {ParamName("PersistenceVersion")},
-    SagaTypeVersion = {ParamName("SagaTypeVersion")},
-    Concurrency = {ParamName("Concurrency")} + 1{correlationSet}
+    ""Data"" = {ParamName("Data")},
+    ""PersistenceVersion"" = {ParamName("PersistenceVersion")},
+    ""SagaTypeVersion"" = {ParamName("SagaTypeVersion")},
+    ""Concurrency"" = {ParamName("Concurrency")} + 1{correlationSet}
 where
-    Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
+    ""Id"" = {ParamName("Id")} and ""Concurrency"" = {ParamName("Concurrency")}
 ";
         }
 
@@ -80,13 +80,13 @@ where
         {
             return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {TableName(tableName)}
-where Id = {ParamName("Id")}
+where ""Id"" = {ParamName("Id")}
 ";
         }
 
@@ -94,11 +94,11 @@ where Id = {ParamName("Id")}
         {
             return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {TableName(tableName)}
 where {CorrelationPropertyName(propertyName)} = {ParamName("propertyValue")}
 ";
@@ -108,7 +108,7 @@ where {CorrelationPropertyName(propertyName)} = {ParamName("propertyValue")}
         {
             return $@"
 delete from {TableName(tableName)}
-where Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
+where ""Id"" = {ParamName("Id")} and ""Concurrency"" = {ParamName("Concurrency")}
 ";
         }
 
@@ -116,11 +116,11 @@ where Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
         {
             return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {TableName(tableName)}
 ";
         }
