@@ -7,7 +7,7 @@
     begin
         tableNameNonQuoted := tablePrefix || 'TimeoutData';
         dropTable = 'DROP TABLE IF EXISTS public.' || tableNameNonQuoted || ';';
-		execute dropTable;
+        execute dropTable;
         return 0;
     end;
   $body$
