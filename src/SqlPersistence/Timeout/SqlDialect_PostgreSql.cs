@@ -32,7 +32,7 @@ values
     @Destination,
     @SagaId,
     @State,
-    @Time AT TIME ZONE 'UTC',
+    @Time at time zone 'UTC',
     @Headers,
     @PersistenceVersion
 )";

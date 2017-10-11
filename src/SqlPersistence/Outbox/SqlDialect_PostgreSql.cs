@@ -15,7 +15,7 @@
 update {tableName}
 set
     ""Dispatched"" = true,
-    ""DispatchedAt"" = @DispatchedAt,
+    ""DispatchedAt"" = @DispatchedAt at time zone 'UTC',
     ""Operations"" = '[]'
 where ""MessageId"" = @MessageId";
             }
