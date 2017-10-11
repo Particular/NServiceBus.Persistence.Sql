@@ -19,21 +19,23 @@
                 return $@"
 insert into {tableName}
 (
-    Subscriber,
-    MessageType,
-    Endpoint,
-    PersistenceVersion
+    ""Id"",
+    ""Subscriber"",
+    ""MessageType"",
+    ""Endpoint"",
+    ""PersistenceVersion""
 )
 values
 (
+    concat(@Subscriber, @MessageType),
     @Subscriber,
     @MessageType,
     @Endpoint,
     @PersistenceVersion
 )
-on duplicate key update
-    Endpoint = @Endpoint,
-    PersistenceVersion = @PersistenceVersion
+on conflict (""Id"") do update
+    set ""Endpoint"" = @Endpoint,
+        ""PersistenceVersion"" = @PersistenceVersion
 ";
             }
 
@@ -42,16 +44,16 @@ on duplicate key update
                 return $@"
 delete from {tableName}
 where
-    Subscriber = @Subscriber and
-    MessageType = @MessageType";
+    ""Subscriber"" = @Subscriber and
+    ""MessageType"" = @MessageType";
             }
 
             internal override Func<List<MessageType>, string> GetSubscriptionQueryFactory(string tableName)
             {
                 var getSubscribersPrefix = $@"
-select distinct Subscriber, Endpoint
+select distinct ""Subscriber"", ""Endpoint""
 from {tableName}
-where MessageType in (";
+where ""MessageType"" in (";
 
                 return messageTypes =>
                 {
