@@ -6,7 +6,7 @@
         {
             internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
-                return $"`{tablePrefix}{tableSuffix}`";
+                return $"{tablePrefix}{tableSuffix}";
             }
 
             internal override string QuoteSagaTableName(string tableName)
@@ -16,7 +16,7 @@
 
             internal override string GetSagaCorrelationPropertyName(string propertyName)
             {
-                return "Correlation_" + propertyName;
+                return "\"Correlation_" + propertyName + "\"";
             }
 
             internal override string GetSagaParameterName(string parameterName)
