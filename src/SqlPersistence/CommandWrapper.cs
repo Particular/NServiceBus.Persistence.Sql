@@ -36,7 +36,14 @@ class CommandWrapper : IDisposable
     public void AddParameter(string name, object value)
     {
         var parameter = command.CreateParameter();
-        dialect.FillParameter(parameter, name, value);
+        dialect.AddParameter(parameter, name, value);
+        command.Parameters.Add(parameter);
+    }
+
+    public void AddJsonParameter(string name, object value)
+    {
+        var parameter = command.CreateParameter();
+        dialect.AddJsonParameter(parameter, name, value);
         command.Parameters.Add(parameter);
     }
 

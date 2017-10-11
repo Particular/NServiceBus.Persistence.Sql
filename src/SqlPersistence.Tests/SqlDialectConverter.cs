@@ -1,4 +1,5 @@
 using System;
+using NpgsqlTypes;
 using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -41,7 +42,14 @@ public static class SqlDialectConverter
             case BuildSqlDialect.MySql:
                 return new SqlDialect.MySql();
             case BuildSqlDialect.PostgreSql:
-                return new SqlDialect.PostgreSql();
+                return new SqlDialect.PostgreSql
+                {
+                    JsonBParameterModifier = parameter =>
+                    {
+                        var npgsqlParameter = (Npgsql.NpgsqlParameter)parameter;
+                        npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                    }
+                };
             case BuildSqlDialect.Oracle:
                 return new SqlDialect.Oracle();
             default:

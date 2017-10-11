@@ -24,20 +24,24 @@ namespace NServiceBus
                 command.AddParameter("schema", Schema);
             }
 
-            internal override void FillParameter(DbParameter parameter, string paramName, object value)
+            internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
+                SetParameterValue(parameter, value);
+            }
+
+            internal override void SetParameterValue(DbParameter parameter, object value)
+            {
+                //TODO: do ArraySegment fro outbox
                 if (value is ArraySegment<char> charSegment)
                 {
                     var sqlParameter = (SqlParameter)parameter;
 
-                    sqlParameter.ParameterName = paramName;
                     sqlParameter.Value = charSegment.Array;
                     sqlParameter.Offset = charSegment.Offset;
                     sqlParameter.Size = charSegment.Count;
                 }
                 else
                 {
-                    parameter.ParameterName = paramName;
                     parameter.Value = value;
                 }
             }

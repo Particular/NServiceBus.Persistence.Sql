@@ -10,6 +10,8 @@ public static class PostgreSqlConnectionBuilder
         {
             throw new Exception("PostgreSqlConnectionString environment variable is empty");
         }
-        return new NpgsqlConnection(connection);
+        var npgsqlConnection = new NpgsqlConnection(connection);
+        //npgsqlConnection.CreateCommand().Parameters.AddWithValue("",npg)
+        return npgsqlConnection;
     }
 }

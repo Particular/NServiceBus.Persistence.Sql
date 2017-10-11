@@ -11,7 +11,7 @@
         {
             internal override string GetSubscriptionTableName(string tablePrefix)
             {
-                return $"`{tablePrefix}SubscriptionData`";
+                return $"{tablePrefix}SubscriptionData";
             }
 
             internal override string GetSubscriptionSubscribeCommand(string tableName)
