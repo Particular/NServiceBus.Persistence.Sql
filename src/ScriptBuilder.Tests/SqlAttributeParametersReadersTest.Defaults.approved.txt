@@ -2,6 +2,7 @@
   "BuildDialects": [
     "MsSqlServer",
     "MySql",
+    "PostgreSql",
     "Oracle"
   ],
   "ScriptPromotionPath": null,
