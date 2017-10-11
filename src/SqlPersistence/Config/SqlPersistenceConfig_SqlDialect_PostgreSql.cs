@@ -2,7 +2,7 @@ namespace NServiceBus
 {
     using System;
     using System.Data.Common;
-    
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>

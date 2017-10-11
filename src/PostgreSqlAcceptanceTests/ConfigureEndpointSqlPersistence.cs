@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Npgsql;
+using NpgsqlTypes;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql;
@@ -19,7 +21,13 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
-        persistence.SqlDialect<SqlDialect.PostgreSql>();
+        var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
+        sqlDialect.JsonBParameterModifier(parameter =>
+        {
+            var npgsqlParameter = (NpgsqlParameter)parameter;
+            npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+        });
+
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
