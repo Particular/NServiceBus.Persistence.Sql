@@ -11,13 +11,13 @@
             switch (propertyType)
             {
                 case CorrelationPropertyType.DateTime:
-                    return "datetime";
+                    return "timestamp";
                 case CorrelationPropertyType.String:
-                    return "varchar(200) character set utf8mb4";
+                    return "character varying(200)";
                 case CorrelationPropertyType.Int:
-                    return "bigint(20)";
+                    return "int";
                 case CorrelationPropertyType.Guid:
-                    return "UUID";
+                    return "uuid";
             }
             throw new Exception($"Could not convert {propertyType}.");
         }
