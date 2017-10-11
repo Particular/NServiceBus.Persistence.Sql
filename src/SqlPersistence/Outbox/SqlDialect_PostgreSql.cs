@@ -6,7 +6,7 @@
         {
             internal override string GetOutboxTableName(string tablePrefix)
             {
-                return $"`{tablePrefix}OutboxData`";
+                return $"{tablePrefix}OutboxData";
             }
 
             internal override string GetOutboxSetAsDispatchedCommand(string tableName)
@@ -14,20 +14,20 @@
                 return $@"
 update {tableName}
 set
-    Dispatched = 1,
-    DispatchedAt = @DispatchedAt,
-    Operations = '[]'
-where MessageId = @MessageId";
+    ""Dispatched"" = true,
+    ""DispatchedAt"" = @DispatchedAt,
+    ""Operations"" = '[]'
+where ""MessageId"" = @MessageId";
             }
 
             internal override string GetOutboxGetCommand(string tableName)
             {
                 return $@"
 select
-    Dispatched,
-    Operations
+    ""Dispatched"",
+    ""Operations""
 from {tableName}
-where MessageId = @MessageId";
+where ""MessageId"" = @MessageId";
             }
 
             internal override string GetOutboxStoreCommand(string tableName)
@@ -35,9 +35,9 @@ where MessageId = @MessageId";
                 return $@"
 insert into {tableName}
 (
-    MessageId,
-    Operations,
-    PersistenceVersion
+    ""MessageId"",
+    ""Operations"",
+    ""PersistenceVersion""
 )
 values
 (
@@ -51,9 +51,15 @@ values
             {
                 return $@"
 delete from {tableName}
-where Dispatched = true
-    and DispatchedAt < @DispatchedBefore
-limit @BatchSize";
+where ctid IN
+(
+    select ctid
+    from {tableName}
+    where
+        ""Dispatched"" = true and
+        ""DispatchedAt"" < @DispatchedBefore
+    limit @BatchSize
+)";
             }
         }
     }

@@ -1,50 +1,30 @@
-﻿set @tableNameQuoted = concat('`', @tablePrefix, 'OutboxData`');
-set @tableNameNonQuoted = concat(@tablePrefix, 'OutboxData');
+﻿create or replace function create_outbox_table(tablePrefix varchar)
+  returns integer as
+  $body$
+    declare
+      tableNameNonQuoted varchar;
+      createTable text;
+    begin
+        tableNameNonQuoted := tablePrefix || 'OutboxData';
+        createTable = 'CREATE TABLE IF NOT EXISTS public.' || tableNameNonQuoted || '
+    (
+        "MessageId" character varying(200),
+        "Dispatched" boolean not null default false,
+        "DispatchedAt" timestamp,
+        "PersistenceVersion" character varying(23),
+        "Operations" jsonb not null,
+        PRIMARY KEY ("MessageId")
+    )
+    WITH (
+        OIDS = FALSE
+    );
+    CREATE INDEX IF NOT EXISTS "Index_DispatchedAt" ON public.' || tableNameNonQuoted || ' USING btree ("DispatchedAt" ASC NULLS LAST);
+    CREATE INDEX IF NOT EXISTS "Index_Dispatched" ON public.' || tableNameNonQuoted || ' USING btree ("Dispatched" ASC NULLS LAST);
+';
+		execute createTable;
+        return 0;
+    end;
+  $body$
+  language 'plpgsql';
 
-set @createTable =  concat('
-    create table if not exists ', @tableNameQuoted, '(
-        MessageId nvarchar(200) not null,
-        Dispatched bit not null default 0,
-        DispatchedAt datetime,
-        PersistenceVersion varchar(23) not null,
-        Operations json not null,
-        primary key (MessageId)
-    ) default charset=ascii;
-');
-prepare script from @createTable;
-execute script;
-deallocate prepare script;
-
-
-select count(*)
-into @exist
-from information_schema.statistics
-where
-    table_schema = database() and
-    index_name = 'Index_DispatchedAt' and
-    table_name = @tableNameNonQuoted;
-
-set @query = IF(
-    @exist <= 0,
-    concat('create index Index_DispatchedAt on ', @tableNameQuoted, '(DispatchedAt)'), 'select \'Index Exists\' status');
-
-prepare script from @query;
-execute script;
-deallocate prepare script;
-
-
-select count(*)
-into @exist
-from information_schema.statistics
-where
-    table_schema = database() and
-    index_name = 'Index_Dispatched' and
-    table_name = @tableNameNonQuoted;
-
-set @query = IF(
-    @exist <= 0,
-    concat('create index Index_Dispatched on ', @tableNameQuoted, '(Dispatched)'), 'select \'Index Exists\' status');
-
-prepare script from @query;
-execute script;
-deallocate prepare script;
+select create_outbox_table(@tablePrefix);

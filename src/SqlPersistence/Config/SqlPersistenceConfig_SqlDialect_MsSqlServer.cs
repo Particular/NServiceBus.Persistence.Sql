@@ -1,6 +1,5 @@
 namespace NServiceBus
 {
-    //TODO: throw for schema in mysql
     public static partial class SqlPersistenceConfig
     {
         /// <summary>

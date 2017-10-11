@@ -14,4 +14,11 @@ public class PostgreSqlOutboxPersisterTests : OutboxPersisterTests
     {
         return PostgreSqlConnectionBuilder.Build;
     }
+    protected override string BuildOperationsFromMessageIdCommand(string messageId)
+    {
+        return $@"
+select ""Operations""
+from {GetTablePrefix()}{GetTableSuffix()}
+where ""MessageId"" = '{messageId}'";
+    }
 }

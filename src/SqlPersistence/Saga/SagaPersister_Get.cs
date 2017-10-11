@@ -44,7 +44,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sqlDialect.FillParameter(parameter, "propertyValue", propertyValue);
+                sqlDialect.AddParameter(parameter, "propertyValue", propertyValue);
                 append(parameter);
             });
     }
@@ -64,7 +64,7 @@ where {whereClause}";
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sqlDialect.FillParameter(parameter, "Id", sagaId);
+                sqlDialect.AddParameter(parameter, "Id", sagaId);
                 append(parameter);
             });
     }
