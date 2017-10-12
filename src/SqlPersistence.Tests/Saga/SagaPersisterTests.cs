@@ -35,9 +35,6 @@ public abstract class SagaPersisterTests
     SagaPersister SetUp(string endpointName)
     {
         var runtimeSqlDialect = sqlDialect.Convert(schema);
-#pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(runtimeSqlDialect);
-#pragma warning restore 618
 
         var sagaMetadataCollection = new SagaMetadataCollection();
         sagaMetadataCollection.Initialize(GetSagasAndFinders());
@@ -45,7 +42,6 @@ public abstract class SagaPersisterTests
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
             jsonSerializer: Serializer.JsonSerializer,
-            commandBuilder: commandBuilder,
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",

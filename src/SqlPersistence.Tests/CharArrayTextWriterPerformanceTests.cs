@@ -93,9 +93,6 @@ public class CharArrayTextWriterPerformanceTests
         var infoCache = new SagaInfoCache(
             null,
             Serializer.JsonSerializer,
-#pragma warning disable 618
-            commandBuilder: new SagaCommandBuilder(dialect),
-#pragma warning restore 618
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: "some",
