@@ -19,7 +19,7 @@ public class PostgreSqlSagaPersisterTests : SagaPersisterTests
     }
     protected override bool IsConcurrencyException(Exception innerException)
     {
-        return innerException.Message.Contains("Duplicate entry ");
+        return innerException.Message.Contains("duplicate key value violates unique constraint");
     }
 
 }
