@@ -1,0 +1,9 @@
+﻿
+select
+    Id,
+    SagaTypeVersion,
+    Concurrency,
+    Metadata,
+    Data
+from "THETABLENAME"
+where CORR_THEPROPERTYNAME = :propertyValue

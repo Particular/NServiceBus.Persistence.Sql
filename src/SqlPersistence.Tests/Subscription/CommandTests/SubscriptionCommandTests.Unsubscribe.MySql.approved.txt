@@ -1,0 +1,5 @@
+﻿
+delete from `TheTablePrefixSubscriptionData`
+where
+    Subscriber = @Subscriber and
+    MessageType = @MessageType

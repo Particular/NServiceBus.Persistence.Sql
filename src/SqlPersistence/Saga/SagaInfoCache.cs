@@ -12,7 +12,6 @@ using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 class SagaInfoCache
 {
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;
-    SagaCommandBuilder commandBuilder;
     ConcurrentDictionary<Type, RuntimeSagaInfo> cache = new ConcurrentDictionary<Type, RuntimeSagaInfo>();
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
@@ -26,7 +25,6 @@ class SagaInfoCache
         JsonSerializer jsonSerializer,
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
-        SagaCommandBuilder commandBuilder,
         string tablePrefix,
         SqlDialect sqlDialect,
         SagaMetadataCollection metadataCollection,
@@ -36,7 +34,6 @@ class SagaInfoCache
         this.writerCreator = writerCreator;
         this.readerCreator = readerCreator;
         this.jsonSerializer = jsonSerializer;
-        this.commandBuilder = commandBuilder;
         this.tablePrefix = tablePrefix;
         this.sqlDialect = sqlDialect;
         this.nameFilter = nameFilter;
@@ -73,7 +70,6 @@ class SagaInfoCache
     RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
     {
         return new RuntimeSagaInfo(
-            commandBuilder: commandBuilder,
             sagaDataType: sagaDataType,
             versionSpecificSettings: versionSpecificSettings,
             sagaType: sagaType,

@@ -1,0 +1,10 @@
+﻿
+update TheTableName
+set
+    Data = @Data,
+    PersistenceVersion = @PersistenceVersion,
+    SagaTypeVersion = @SagaTypeVersion,
+    Concurrency = @Concurrency + 1,
+    Correlation_TransitionalName = @TransitionalCorrelationId
+where
+    Id = @Id and Concurrency = @Concurrency

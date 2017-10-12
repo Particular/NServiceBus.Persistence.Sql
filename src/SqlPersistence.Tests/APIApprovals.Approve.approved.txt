@@ -34,17 +34,6 @@ namespace NServiceBus.Persistence.Sql
         public string Store { get; }
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
-    [System.ObsoleteAttribute("Not for public use")]
-    public class SagaCommandBuilder
-    {
-        public SagaCommandBuilder(NServiceBus.SqlDialect sqlDialect) { }
-        public string BuildCompleteCommand(string tableName) { }
-        public string BuildGetByPropertyCommand(string propertyName, string tableName) { }
-        public string BuildGetBySagaIdCommand(string tableName) { }
-        public string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-        public string BuildSelectFromCommand(string tableName) { }
-        public string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
-    }
     public class SagaSettings
     {
         public void JsonSettings(Newtonsoft.Json.JsonSerializerSettings jsonSerializerSettings) { }

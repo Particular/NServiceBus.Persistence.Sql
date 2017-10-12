@@ -94,7 +94,7 @@ class CommandWrapper : IDisposable
         var temp = Interlocked.Exchange(ref command, null);
         temp?.Dispose();
 
-        var tempWriters = Interlocked.Exchange(ref this.writers, null);
+        var tempWriters = Interlocked.Exchange(ref writers, null);
         if (tempWriters != null)
         {
             foreach (var writer in tempWriters)

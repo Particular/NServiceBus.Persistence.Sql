@@ -1,0 +1,3 @@
+﻿
+delete from `TheTablePrefixTimeoutData`
+where SagaId = @SagaId
