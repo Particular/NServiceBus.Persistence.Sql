@@ -103,4 +103,13 @@ public abstract class TimeoutCommandTests
         {
         }
     }
+
+    [TestFixture]
+    public class PostgreSql : TimeoutCommandTests
+    {
+        public PostgreSql() :
+            base(new SqlDialect.PostgreSql())
+        {
+        }
+    }
 }

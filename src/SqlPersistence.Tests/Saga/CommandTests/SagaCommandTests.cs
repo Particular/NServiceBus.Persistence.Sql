@@ -96,4 +96,13 @@ public abstract class SagaCommandTests
         {
         }
     }
+
+    [TestFixture]
+    public class PostgreSql : SagaCommandTests
+    {
+        public PostgreSql() :
+            base(new SqlDialect.PostgreSql())
+        {
+        }
+    }
 }

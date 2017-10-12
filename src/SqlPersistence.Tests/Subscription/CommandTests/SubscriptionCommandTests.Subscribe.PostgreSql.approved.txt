@@ -1,0 +1,20 @@
+﻿
+insert into TheTablePrefixSubscriptionData
+(
+    "Id",
+    "Subscriber",
+    "MessageType",
+    "Endpoint",
+    "PersistenceVersion"
+)
+values
+(
+    concat(@Subscriber, @MessageType),
+    @Subscriber,
+    @MessageType,
+    @Endpoint,
+    @PersistenceVersion
+)
+on conflict ("Id") do update
+    set "Endpoint" = @Endpoint,
+        "PersistenceVersion" = @PersistenceVersion
