@@ -2,7 +2,6 @@
 using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus;
-using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 public abstract class SagaCommandTests
