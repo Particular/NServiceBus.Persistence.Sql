@@ -83,4 +83,13 @@ public abstract class OutboxCommandTests
         {
         }
     }
+
+    [TestFixture]
+    public class PostgreSql : OutboxCommandTests
+    {
+        public PostgreSql() :
+            base(new SqlDialect.PostgreSql())
+        {
+        }
+    }
 }

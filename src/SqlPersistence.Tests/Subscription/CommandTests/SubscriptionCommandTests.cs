@@ -73,4 +73,13 @@ public abstract class SubscriptionCommandTests
         {
         }
     }
+
+    [TestFixture]
+    public class PostgreSql : SubscriptionCommandTests
+    {
+        public PostgreSql() :
+            base(new SqlDialect.PostgreSql())
+        {
+        }
+    }
 }

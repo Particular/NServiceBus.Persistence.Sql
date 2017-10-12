@@ -1,0 +1,5 @@
+﻿
+select "Time" from TheTablePrefixTimeoutData
+where "Time" > @EndTime
+order by "Time"
+limit 1

@@ -1,0 +1,7 @@
+﻿
+update TheTablePrefixOutboxData
+set
+    "Dispatched" = true,
+    "DispatchedAt" = @DispatchedAt at time zone 'UTC',
+    "Operations" = '[]'
+where "MessageId" = @MessageId
