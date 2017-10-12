@@ -1,0 +1,6 @@
+﻿
+select
+    Dispatched,
+    Operations
+from [TheSchema].[TheTablePrefixOutboxData]
+where MessageId = @MessageId

@@ -1,0 +1,5 @@
+﻿
+delete from [TheSchema].[TheTablePrefixSubscriptionData]
+where
+    Subscriber = @Subscriber and
+    MessageType = @MessageType
