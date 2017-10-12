@@ -1,4 +1,4 @@
 ﻿
 delete top (@BatchSize) from [TheSchema].[TheTablePrefixOutboxData]
-where Dispatched = 'true'
-    and DispatchedAt < @DispatchedBefore
+where Dispatched = 'true' and
+      DispatchedAt < @DispatchedBefore

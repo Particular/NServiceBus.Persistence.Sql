@@ -1,5 +1,5 @@
 ﻿
 delete from `TheTablePrefixOutboxData`
-where Dispatched = true
-    and DispatchedAt < @DispatchedBefore
+where Dispatched = true and
+      DispatchedAt < @DispatchedBefore
 limit @BatchSize
