@@ -8,7 +8,7 @@
         {
             internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
-                return $"`{tablePrefix}{tableSuffix}`";
+                return $"{tablePrefix}{tableSuffix}";
             }
 
             internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
@@ -18,24 +18,24 @@
 
                 if (correlationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    Correlation_{correlationProperty}");
+                    insertBuilder.Append($",\r\n    \"Correlation_{correlationProperty}\"");
                     valuesBuilder.Append(",\r\n    @CorrelationId");
                 }
                 if (transitionalCorrelationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    Correlation_{transitionalCorrelationProperty}");
+                    insertBuilder.Append($",\r\n    \"Correlation_{transitionalCorrelationProperty}\"");
                     valuesBuilder.Append(",\r\n    @TransitionalCorrelationId");
                 }
 
                 return $@"
 insert into {tableName}
 (
-    Id,
-    Metadata,
-    Data,
-    PersistenceVersion,
-    SagaTypeVersion,
-    Concurrency{insertBuilder}
+    ""Id"",
+    ""Metadata"",
+    ""Data"",
+    ""PersistenceVersion"",
+    ""SagaTypeVersion"",
+    ""Concurrency""{insertBuilder}
 )
 values
 (
@@ -61,12 +61,12 @@ values
                 return $@"
 update {tableName}
 set
-    Data = @Data,
-    PersistenceVersion = @PersistenceVersion,
-    SagaTypeVersion = @SagaTypeVersion,
-    Concurrency = @Concurrency + 1{correlationSet}
+    ""Data"" = @Data,
+    ""PersistenceVersion"" = @PersistenceVersion,
+    ""SagaTypeVersion"" = @SagaTypeVersion,
+    ""Concurrency"" = @Concurrency + 1{correlationSet}
 where
-    Id = @Id and Concurrency = @Concurrency
+    ""Id"" = @Id and ""Concurrency"" = @Concurrency
 ";
             }
 
@@ -74,13 +74,13 @@ where
             {
                 return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {tableName}
-where Id = @Id
+where ""Id"" = @Id
 ";
             }
 
@@ -88,13 +88,13 @@ where Id = @Id
             {
                 return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {tableName}
-where Correlation_{propertyName} = @propertyValue
+where ""Correlation_{propertyName}"" = @propertyValue
 ";
             }
 
@@ -102,7 +102,7 @@ where Correlation_{propertyName} = @propertyValue
             {
                 return $@"
 delete from {tableName}
-where Id = @Id and Concurrency = @Concurrency
+where ""Id"" = @Id and ""Concurrency"" = @Concurrency
 ";
             }
 
@@ -110,11 +110,11 @@ where Id = @Id and Concurrency = @Concurrency
             {
                 return $@"
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
 from {tableName}
 ";
             }
