@@ -1,0 +1,1 @@
+﻿System.Func`2[System.Collections.Generic.List`1[NServiceBus.Unicast.Subscriptions.MessageType],System.String]

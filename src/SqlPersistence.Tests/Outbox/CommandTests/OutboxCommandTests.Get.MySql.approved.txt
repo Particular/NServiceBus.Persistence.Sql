@@ -1,0 +1,6 @@
+﻿
+select
+    Dispatched,
+    Operations
+from `TheTablePrefixOutboxData`
+where MessageId = @MessageId

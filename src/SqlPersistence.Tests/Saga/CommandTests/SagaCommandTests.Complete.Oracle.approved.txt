@@ -1,0 +1,3 @@
+﻿
+delete from "THETABLENAME"
+where Id = :Id and Concurrency = :Concurrency

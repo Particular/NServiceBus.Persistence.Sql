@@ -34,7 +34,6 @@ class RuntimeSagaInfo
     public readonly string TableName;
 
     public RuntimeSagaInfo(
-        SagaCommandBuilder commandBuilder,
         Type sagaDataType,
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
@@ -63,17 +62,17 @@ class RuntimeSagaInfo
 
         TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
 
-        CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
-        SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
-        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
-        SaveCommand = commandBuilder.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        CompleteCommand = sqlDialect.BuildCompleteCommand(TableName);
+        SelectFromCommand = sqlDialect.BuildSelectFromCommand(TableName);
+        GetBySagaIdCommand = sqlDialect.BuildGetBySagaIdCommand(TableName);
+        SaveCommand = sqlDialect.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        UpdateCommand = sqlDialect.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
         CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
         HasCorrelationProperty = CorrelationProperty != null;
         if (HasCorrelationProperty)
         {
-            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+            GetByCorrelationPropertyCommand = sqlDialect.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
         }
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;

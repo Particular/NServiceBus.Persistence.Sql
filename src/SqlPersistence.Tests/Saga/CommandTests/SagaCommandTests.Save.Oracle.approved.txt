@@ -1,0 +1,23 @@
+﻿
+insert into "THETABLENAME"
+(
+    Id,
+    Metadata,
+    Data,
+    PersistenceVersion,
+    SagaTypeVersion,
+    Concurrency,
+    CORR_CORRELATIONNAME,
+    CORR_TRANSITIONALNAME
+)
+values
+(
+    :Id,
+    :Metadata,
+    :Data,
+    :PersistenceVersion,
+    :SagaTypeVersion,
+    1,
+    :CorrelationId,
+    :TransitionalCorrelationId
+)

@@ -1,0 +1,3 @@
+﻿
+delete from "THETABLEPREFIXTO"
+where Id = :Id
