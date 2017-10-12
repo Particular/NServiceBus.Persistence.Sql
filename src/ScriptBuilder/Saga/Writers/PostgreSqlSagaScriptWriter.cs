@@ -52,10 +52,14 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
+        writer.Write($@"
+createCorrelationIdx = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.' || tableNameNonQuoted || ' using btree (""Correlation_{correlationProperty.Name}"" asc);';
+execute createCorrelationIdx;");
     }
 
     public void WritePurgeObsoleteIndex()
     {
+        // Dropping the column with the index attached removes the index as well
     }
 
     public void WritePurgeObsoleteProperties()
@@ -71,6 +75,7 @@ create or replace function create_saga_table_{saga.TableSuffix}(tablePrefix varc
     $body$
     declare
         tableNameNonQuoted varchar;
+        createCorrelationIdx text;
         script text;
         count int;
         columnType varchar;
