@@ -1,8 +1,8 @@
 ﻿
 select
-    Id,
-    SagaTypeVersion,
-    Concurrency,
-    Metadata,
-    Data
+    "Id",
+    "SagaTypeVersion",
+    "Concurrency",
+    "Metadata",
+    "Data"
 from TheTableName

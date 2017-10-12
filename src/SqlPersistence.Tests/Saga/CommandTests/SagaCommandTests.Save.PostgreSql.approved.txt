@@ -1,14 +1,14 @@
 ﻿
 insert into TheTableName
 (
-    Id,
-    Metadata,
-    Data,
-    PersistenceVersion,
-    SagaTypeVersion,
-    Concurrency,
-    Correlation_CorrelationName,
-    Correlation_TransitionalName
+    "Id",
+    "Metadata",
+    "Data",
+    "PersistenceVersion",
+    "SagaTypeVersion",
+    "Concurrency",
+    "Correlation_CorrelationName",
+    "Correlation_TransitionalName"
 )
 values
 (
