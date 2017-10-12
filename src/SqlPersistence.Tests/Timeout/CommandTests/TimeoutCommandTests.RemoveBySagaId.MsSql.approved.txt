@@ -1,0 +1,3 @@
+﻿
+delete from [TheSchema].[TheTablePrefixTimeoutData]
+where SagaId = @SagaId

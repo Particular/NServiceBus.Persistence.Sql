@@ -5,71 +5,77 @@ using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
-public abstract class SagaCommandTests
+public abstract class TimeoutCommandTests
 {
     SqlDialect sqlDialect;
 
-    public SagaCommandTests(SqlDialect sqlDialect)
+    public TimeoutCommandTests(SqlDialect sqlDialect)
     {
         this.sqlDialect = sqlDialect;
     }
 
     [Test]
-    public void Complete()
+    public void Add()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildCompleteCommand("TheTableName"));
+            Approvals.Verify(timeoutCommands.Add);
         }
     }
 
     [Test]
-    public void GetByProperty()
+    public void Next()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"));
+            Approvals.Verify(timeoutCommands.Next);
         }
     }
 
     [Test]
-    public void GetBySagaId()
+    public void Peek()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"));
+            Approvals.Verify(timeoutCommands.Peek);
         }
     }
 
     [Test]
-    public void Save()
+    public void Range()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"));
+            Approvals.Verify(timeoutCommands.Range);
         }
     }
 
     [Test]
-    public void SelectFrom()
+    public void RemoveById()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildSelectFromCommand("TheTableName"));
+            Approvals.Verify(timeoutCommands.RemoveById);
         }
     }
 
     [Test]
-    public void Update()
+    public void RemoveBySagaId()
     {
+        var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"));
+            Approvals.Verify(timeoutCommands.RemoveBySagaId);
         }
     }
 
     [TestFixture]
-    public class MsSql : SagaCommandTests
+    public class MsSql : TimeoutCommandTests
     {
         public MsSql() :
             base(new SqlDialect.MsSqlServer
@@ -81,7 +87,7 @@ public abstract class SagaCommandTests
     }
 
     [TestFixture]
-    public class Oracle : SagaCommandTests
+    public class Oracle : TimeoutCommandTests
     {
         public Oracle() :
             base(new SqlDialect.Oracle())
@@ -90,7 +96,7 @@ public abstract class SagaCommandTests
     }
 
     [TestFixture]
-    public class MySql : SagaCommandTests
+    public class MySql : TimeoutCommandTests
     {
         public MySql() :
             base(new SqlDialect.MySql())

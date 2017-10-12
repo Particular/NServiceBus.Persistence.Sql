@@ -1,0 +1,4 @@
+﻿
+select Id, ExpireTime
+from "THETABLEPREFIXTO"
+where ExpireTime > :StartTime and ExpireTime <= :EndTime
