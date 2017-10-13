@@ -1,5 +1,5 @@
 ﻿
-insert into TheTablePrefixTimeoutData
+insert into public."TheTablePrefixTimeoutData"
 (
     "Id",
     "Destination",

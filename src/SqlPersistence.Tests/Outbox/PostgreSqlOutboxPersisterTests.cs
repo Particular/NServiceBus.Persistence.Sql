@@ -18,7 +18,7 @@ public class PostgreSqlOutboxPersisterTests : OutboxPersisterTests
     {
         return $@"
 select ""Operations""
-from {GetTablePrefix()}{GetTableSuffix()}
+from ""{GetTablePrefix()}{GetTableSuffix()}""
 where ""MessageId"" = '{messageId}'";
     }
 }

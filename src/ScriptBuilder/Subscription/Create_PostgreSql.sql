@@ -6,7 +6,7 @@
       createTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'SubscriptionData';
-        createTable = 'create table if not exists public.' || tableNameNonQuoted || '
+        createTable = 'create table if not exists  public."' || tableNameNonQuoted || '"
     (
         "Id" character varying(400) not null,
         "Subscriber" character varying(200) not null,

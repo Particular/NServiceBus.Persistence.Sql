@@ -20,14 +20,14 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
     {
     }
 
-    
+
     public void AddProperty(CorrelationProperty correlationProperty)
     {
         var columnType = PostgreSqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = correlationProperty.Name;
 
         writer.Write($@"
-        script = 'alter table public.' || tableNameNonQuoted || ' add column if not exists ""Correlation_{name}"" {columnType}';
+        script = 'alter table public.""' || tableNameNonQuoted || '"" add column if not exists ""Correlation_{name}"" {columnType}';
         execute script;
 ");
     }
@@ -41,11 +41,11 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
             select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
             from information_schema.columns
             where
-            table_name = tableNameNonQuoted and
+            table_name = 'tableNameNonQuoted' and
             column_name = 'Correlation_{name}'
         );
         if columnType <> '{columnType}' then
-            raise exception 'Incorrect data type for Correlation_{name}. Expected {columnType} got %', column_type;
+            raise exception 'Incorrect data type for Correlation_{name}. Expected {columnType} got %', columnType;
         end if;
 ");
     }
@@ -53,7 +53,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
         writer.Write($@"
-createCorrelationIdx = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.' || tableNameNonQuoted || ' using btree (""Correlation_{correlationProperty.Name}"" asc);';
+createCorrelationIdx = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
 execute createCorrelationIdx;");
     }
 
@@ -81,7 +81,7 @@ create or replace function create_saga_table_{saga.TableSuffix}(tablePrefix varc
         columnType varchar;
     begin
         tableNameNonQuoted := tablePrefix || '{saga.TableSuffix}';
-        script = 'create table if not exists public.' || tableNameNonQuoted || '
+        script = 'create table if not exists public.""' || tableNameNonQuoted || '""
 (
     ""Id"" uuid not null,
     ""Metadata"" text not null,
@@ -115,7 +115,7 @@ $@"create or replace function drop_saga_table_{saga.TableSuffix}(tablePrefix var
         dropTable text;
     begin
         tableNameNonQuoted := tablePrefix || '{saga.TableSuffix}';
-        dropTable = 'drop table if exists public.' || tableNameNonQuoted || ';';
+        dropTable = 'drop table if exists public.""' || tableNameNonQuoted || '"";';
         execute dropTable;
         return 0;
     end;

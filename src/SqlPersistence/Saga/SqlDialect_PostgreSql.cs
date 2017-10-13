@@ -28,7 +28,7 @@
                 }
 
                 return $@"
-insert into {tableName}
+insert into public.""{tableName}""
 (
     ""Id"",
     ""Metadata"",
@@ -59,7 +59,7 @@ values
                 }
 
                 return $@"
-update {tableName}
+update public.""{tableName}""
 set
     ""Data"" = @Data,
     ""PersistenceVersion"" = @PersistenceVersion,
@@ -79,7 +79,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from {tableName}
+from public.""{tableName}""
 where ""Id"" = @Id
 ";
             }
@@ -93,7 +93,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from {tableName}
+from public.""{tableName}""
 where ""Correlation_{propertyName}"" = @propertyValue
 ";
             }
@@ -101,7 +101,7 @@ where ""Correlation_{propertyName}"" = @propertyValue
             internal override string BuildCompleteCommand(string tableName)
             {
                 return $@"
-delete from {tableName}
+delete from public.""{tableName}""
 where ""Id"" = @Id and ""Concurrency"" = @Concurrency
 ";
             }
@@ -115,7 +115,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from {tableName}
+from public.""{tableName}""
 ";
             }
         }
