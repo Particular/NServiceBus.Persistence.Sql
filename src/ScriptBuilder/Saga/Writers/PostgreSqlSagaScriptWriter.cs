@@ -69,8 +69,9 @@ execute createCorrelationIdx;");
 
     public void WriteCreateTable()
     {
+        var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write($@"
-create or replace function create_saga_table_{saga.TableSuffix}(tablePrefix varchar)
+create or replace function create_saga_table_{sagaName}(tablePrefix varchar)
     returns integer as
     $body$
     declare
@@ -95,19 +96,21 @@ create or replace function create_saga_table_{saga.TableSuffix}(tablePrefix varc
     }
     public void CreateComplete()
     {
+        var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write($@"
         return 0;
     end;
     $body$
 language 'plpgsql';
 
-select create_saga_table_{saga.TableSuffix}(@tablePrefix);");
+select create_saga_table_{sagaName}(@tablePrefix);");
     }
 
     public void WriteDropTable()
     {
+        var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write(
-$@"create or replace function drop_saga_table_{saga.TableSuffix}(tablePrefix varchar)
+$@"create or replace function drop_saga_table_{sagaName}(tablePrefix varchar)
     returns integer as
     $body$
     declare
@@ -122,7 +125,7 @@ $@"create or replace function drop_saga_table_{saga.TableSuffix}(tablePrefix var
     $body$
     language 'plpgsql';
 
-select drop_saga_table_{saga.TableSuffix}(@tablePrefix);
+select drop_saga_table_{sagaName}(@tablePrefix);
 ");
     }
 }
