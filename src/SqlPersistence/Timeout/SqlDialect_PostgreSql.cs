@@ -16,7 +16,7 @@
             internal override string GetTimeoutInsertCommand(string tableName)
             {
                 return $@"
-insert into {tableName}
+insert into public.""{tableName}""
 (
     ""Id"",
     ""Destination"",
@@ -41,14 +41,14 @@ values
             internal override string GetTimeoutRemoveByIdCommand(string tableName)
             {
                 return $@"
-delete from {tableName}
+delete from public.""{tableName}""
 where ""Id"" = @Id;";
             }
 
             internal override string GetTimeoutRemoveBySagaIdCommand(string tableName)
             {
                 return $@"
-delete from {tableName}
+delete from public.""{tableName}""
 where ""SagaId"" = @SagaId";
             }
 
@@ -61,7 +61,7 @@ select
     ""State"",
     ""Time"",
     ""Headers""
-from {tableName}
+from public.""{tableName}""
 where ""Id"" = @Id";
             }
 
@@ -69,14 +69,14 @@ where ""Id"" = @Id";
             {
                 return $@"
 select ""Id"", ""Time""
-from {tableName}
+from public.""{tableName}""
 where ""Time"" > @StartTime and ""Time"" <= @EndTime";
             }
 
             internal override string GetTimeoutNextCommand(string tableName)
             {
                 return $@"
-select ""Time"" from {tableName}
+select ""Time"" from public.""{tableName}""
 where ""Time"" > @EndTime
 order by ""Time""
 limit 1";

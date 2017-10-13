@@ -6,7 +6,7 @@
       createTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'TimeoutData';
-        createTable = 'create table if not exists public.' || tableNameNonQuoted || '
+        createTable = 'create table if not exists  public."' || tableNameNonQuoted || '"
     (
         "Id" uuid not null,
         "Destination" character varying(200),
@@ -17,8 +17,8 @@
         "PersistenceVersion" character varying(23),
         primary key ("Id")
     );
-    create index if not exists "Time_Idx" on public.' || tableNameNonQuoted || ' using btree ("Time" asc nulls last);
-    create index if not exists "SagaId_Idx" on public.' || tableNameNonQuoted || ' using btree ("SagaId" asc nulls last);
+    create index if not exists "Time_Idx" on  public."' || tableNameNonQuoted || '" using btree ("Time" asc nulls last);
+    create index if not exists "SagaId_Idx" on  public."' || tableNameNonQuoted || '" using btree ("SagaId" asc nulls last);
 ';
         execute createTable;
         return 0;

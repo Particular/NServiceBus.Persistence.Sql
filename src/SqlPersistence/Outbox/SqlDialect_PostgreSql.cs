@@ -12,7 +12,7 @@
             internal override string GetOutboxSetAsDispatchedCommand(string tableName)
             {
                 return $@"
-update {tableName}
+update public.""{tableName}""
 set
     ""Dispatched"" = true,
     ""DispatchedAt"" = @DispatchedAt at time zone 'UTC',
@@ -26,14 +26,14 @@ where ""MessageId"" = @MessageId";
 select
     ""Dispatched"",
     ""Operations""
-from {tableName}
+from public.""{tableName}""
 where ""MessageId"" = @MessageId";
             }
 
             internal override string GetOutboxStoreCommand(string tableName)
             {
                 return $@"
-insert into {tableName}
+insert into public.""{tableName}""
 (
     ""MessageId"",
     ""Operations"",
@@ -50,7 +50,7 @@ values
             internal override string GetOutboxCleanupCommand(string tableName)
             {
                 return $@"
-delete from {tableName}
+delete from public.""{tableName}""
 where ctid in
 (
     select ctid

@@ -1,5 +1,5 @@
 ﻿
-delete from TheTablePrefixSubscriptionData
+delete from public."TheTablePrefixSubscriptionData"
 where
     "Subscriber" = @Subscriber and
     "MessageType" = @MessageType

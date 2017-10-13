@@ -5,5 +5,5 @@ select
     "State",
     "Time",
     "Headers"
-from TheTablePrefixTimeoutData
+from public."TheTablePrefixTimeoutData"
 where "Id" = @Id

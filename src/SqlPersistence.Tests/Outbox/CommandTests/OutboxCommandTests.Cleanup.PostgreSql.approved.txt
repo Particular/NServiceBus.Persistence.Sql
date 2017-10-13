@@ -1,5 +1,5 @@
 ﻿
-delete from TheTablePrefixOutboxData
+delete from public."TheTablePrefixOutboxData"
 where ctid in
 (
     select ctid

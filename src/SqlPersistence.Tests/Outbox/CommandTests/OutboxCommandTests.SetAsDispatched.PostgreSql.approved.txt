@@ -1,5 +1,5 @@
 ﻿
-update TheTablePrefixOutboxData
+update public."TheTablePrefixOutboxData"
 set
     "Dispatched" = true,
     "DispatchedAt" = @DispatchedAt at time zone 'UTC',
