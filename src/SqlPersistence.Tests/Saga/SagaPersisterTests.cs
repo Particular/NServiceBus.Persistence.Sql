@@ -798,21 +798,27 @@ public abstract class SagaPersisterTests
             )
         );
         DropAndCreate(definition, endpointName);
-        var sagaData1 = new SagaWithCorrelation.SagaData
-        {
-            Id = Guid.NewGuid(),
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
-            CorrelationProperty = "theCorrelationProperty",
-            SimpleProperty = "theSimpleProperty"
-        };
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData1, storageSession, "theCorrelationProperty").ConfigureAwait(false);
-            var sagaData2 = new SagaWithCorrelation.SagaData
+            var data = new SagaWithCorrelation.SagaData
+            {
+                Id = Guid.NewGuid(),
+                OriginalMessageId = "theOriginalMessageId",
+                Originator = "theOriginator",
+                CorrelationProperty = "theCorrelationProperty",
+                SimpleProperty = "theSimpleProperty"
+            };
+            await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+            await storageSession.CompleteAsync().ConfigureAwait(false);
+        }
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            var data = new SagaWithCorrelation.SagaData
             {
                 Id = Guid.NewGuid(),
                 OriginalMessageId = "theOriginalMessageId",
@@ -822,7 +828,7 @@ public abstract class SagaPersisterTests
             };
             var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
             {
-                await persister.Save(sagaData2, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+                await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
                 await storageSession.CompleteAsync().ConfigureAwait(false);
             });
             var innerException = throwsAsync.InnerException;
