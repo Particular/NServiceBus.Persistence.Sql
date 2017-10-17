@@ -51,10 +51,10 @@ values
             {
                 return $@"
 delete from public.""{tableName}""
-where ctid in
+where ""MessageId"" in
 (
-    select ctid
-    from {tableName}
+    select ""MessageId""
+    from public.""{tableName}""
     where
         ""Dispatched"" = true and
         ""DispatchedAt"" < @DispatchedBefore
