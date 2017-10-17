@@ -44,12 +44,12 @@ public abstract class TimeoutPersisterTests
     [TearDown]
     public void TearDown()
     {
-        //var name = GetTablePrefix();
-        //using (var connection = dbConnection())
-        //{
-        //    connection.Open();
-        //    connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
-        //}
+        var name = GetTablePrefix();
+        using (var connection = dbConnection())
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
+        }
     }
 
     protected virtual string GetTablePrefix()

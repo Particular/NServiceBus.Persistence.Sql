@@ -23,6 +23,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
         var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
+        persistence.TablePrefix($"{tablePrefix}_");
         sqlDialect.JsonBParameterModifier(parameter =>
         {
             var npgsqlParameter = (NpgsqlParameter)parameter;
