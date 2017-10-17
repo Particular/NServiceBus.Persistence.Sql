@@ -3,7 +3,7 @@ delete from public."TheTablePrefixOutboxData"
 where ctid in
 (
     select ctid
-    from TheTablePrefixOutboxData
+    from public."TheTablePrefixOutboxData"
     where
         "Dispatched" = true and
         "DispatchedAt" < @DispatchedBefore
