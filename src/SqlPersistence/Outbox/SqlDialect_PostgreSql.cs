@@ -51,9 +51,9 @@ values
             {
                 return $@"
 delete from public.""{tableName}""
-where ""MessageId"" in
+where ctid in
 (
-    select ""MessageId""
+    select ctid
     from public.""{tableName}""
     where
         ""Dispatched"" = true and
