@@ -18,7 +18,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
          */
         if (saga.TableSuffix.Length > 43)
         {
-            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 43 characters, which is not supported by SQL persistence using Oracle. Either disable PostgreSQL script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
+            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 43 characters, which is not supported by SQL persistence using PostgreSQL. Either disable PostgreSQL script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
         }
         writer = textWriter;
         this.saga = saga;
