@@ -1,4 +1,4 @@
-﻿create or replace function create_timeouts_table(tablePrefix varchar)
+﻿create or replace function pg_temp.create_timeouts_table(tablePrefix varchar)
   returns integer as
   $body$
     declare
@@ -26,4 +26,4 @@
   $body$
   language 'plpgsql';
 
-select create_timeouts_table(@tablePrefix);
+select pg_temp.create_timeouts_table(@tablePrefix);

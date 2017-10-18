@@ -53,8 +53,9 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
         writer.Write($@"
-createCorrelationIdx = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
-execute createCorrelationIdx;");
+        script = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
+        execute script;"
+);
     }
 
     public void WritePurgeObsoleteIndex()
@@ -71,12 +72,11 @@ execute createCorrelationIdx;");
     {
         var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write($@"
-create or replace function create_saga_table_{sagaName}(tablePrefix varchar)
+create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varchar)
     returns integer as
     $body$
     declare
         tableNameNonQuoted varchar;
-        createCorrelationIdx text;
         script text;
         count int;
         columnType varchar;
@@ -92,7 +92,8 @@ create or replace function create_saga_table_{sagaName}(tablePrefix varchar)
     ""Concurrency"" int not null,
     primary key(""Id"")
 );';
-        execute script;");
+        execute script;
+");
     }
     public void CreateComplete()
     {
@@ -103,14 +104,15 @@ create or replace function create_saga_table_{sagaName}(tablePrefix varchar)
     $body$
 language 'plpgsql';
 
-select create_saga_table_{sagaName}(@tablePrefix);");
+select pg_temp.create_saga_table_{sagaName}(@tablePrefix);
+");
     }
 
     public void WriteDropTable()
     {
         var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write(
-$@"create or replace function drop_saga_table_{sagaName}(tablePrefix varchar)
+$@"create or replace function pg_temp.drop_saga_table_{sagaName}(tablePrefix varchar)
     returns integer as
     $body$
     declare
@@ -125,7 +127,7 @@ $@"create or replace function drop_saga_table_{sagaName}(tablePrefix varchar)
     $body$
     language 'plpgsql';
 
-select drop_saga_table_{sagaName}(@tablePrefix);
+select pg_temp.drop_saga_table_{sagaName}(@tablePrefix);
 ");
     }
 }
