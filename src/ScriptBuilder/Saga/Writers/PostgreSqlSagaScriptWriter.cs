@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -10,6 +11,15 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public PostgreSqlSagaScriptWriter(TextWriter textWriter, SagaDefinition saga)
     {
+        /*
+         * SQLDialect's ValidateTablePrefix reserves up to 20 characters for the prefix.
+         * PostgreSQL supports up to 63 character names by default.
+         * This leaves 43 characters for the suffix.
+         */
+        if (saga.TableSuffix.Length > 43)
+        {
+            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 43 characters, which is not supported by SQL persistence using Oracle. Either disable PostgreSQL script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
+        }
         writer = textWriter;
         this.saga = saga;
     }
@@ -139,13 +149,12 @@ select pg_temp.drop_saga_table_{sagaName}(@tablePrefix);
     // SHA1 hash of saga name and correlation property name
     string CreateSagaIndexName(string sagaName, string correlationPropertyName)
     {
-        var sb = new StringBuilder("idxc_", 30);
+        var sb = new StringBuilder("_i_", 43);
         var clearText = Encoding.UTF8.GetBytes($"{sagaName}/{correlationPropertyName}");
         using (var sha1 = SHA1.Create())
         {
             var hashBytes = sha1.ComputeHash(clearText);
-            // SHA1 hash contains 20 bytes, but only have space in 30 char index name for 11 bytes => 22 chars
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < 30; i++)
             {
                 sb.Append(hashBytes[i].ToString("X2"));
             }
