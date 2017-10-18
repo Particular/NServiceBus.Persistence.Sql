@@ -6,6 +6,22 @@ set @tableNameNonQuoted = concat(@tablePrefix, 'theSaga');
 
 
 /* DropTable */
+create or replace function drop_saga_table_theSaga(tablePrefix varchar)
+    returns integer as
+    $body$
+    declare
+        tableNameNonQuoted varchar;
+        dropTable text;
+    begin
+        tableNameNonQuoted := tablePrefix || 'theSaga';
+        dropTable = 'drop table if exists public."' || tableNameNonQuoted || '";';
+        execute dropTable;
+        return 0;
+    end;
+    $body$
+    language 'plpgsql';
+
+select drop_saga_table_theSaga(@tablePrefix);
 
 set @dropTable = concat('drop table if exists ', @tableNameQuoted);
 prepare script from @dropTable;
