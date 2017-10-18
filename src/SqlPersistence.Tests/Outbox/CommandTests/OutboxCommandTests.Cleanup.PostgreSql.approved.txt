@@ -6,6 +6,6 @@ where ctid in
     from public."TheTablePrefixOutboxData"
     where
         "Dispatched" = true and
-        "DispatchedAt" < @DispatchedBefore
+        "DispatchedAt" < @DispatchedBefore at time zone 'UTC'
     limit @BatchSize
 )

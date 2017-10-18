@@ -57,7 +57,7 @@ where ctid in
     from public.""{tableName}""
     where
         ""Dispatched"" = true and
-        ""DispatchedAt"" < @DispatchedBefore
+        ""DispatchedAt"" < @DispatchedBefore at time zone 'UTC'
     limit @BatchSize
 )";
             }
