@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class PostgreSqlSagaScriptWriter : ISagaScriptWriter
@@ -52,8 +54,10 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void WriteCreateIndex(CorrelationProperty correlationProperty)
     {
+        var indexName = CreateSagaIndexName(saga.TableSuffix, correlationProperty.Name);
+
         writer.Write($@"
-        script = 'create unique index if not exists ""Index_Correlation_{correlationProperty.Name}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
+        script = 'create unique index if not exists ""' || tablePrefix || '{indexName}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
         execute script;"
 );
     }
@@ -129,5 +133,23 @@ $@"create or replace function pg_temp.drop_saga_table_{sagaName}(tablePrefix var
 
 select pg_temp.drop_saga_table_{sagaName}(@tablePrefix);
 ");
+    }
+
+    // Generates an index name like "idxc_66462BF46C9DCB70FD257D" based on
+    // SHA1 hash of saga name and correlation property name
+    string CreateSagaIndexName(string sagaName, string correlationPropertyName)
+    {
+        var sb = new StringBuilder("idxc_", 30);
+        var clearText = Encoding.UTF8.GetBytes($"{sagaName}/{correlationPropertyName}");
+        using (var sha1 = SHA1.Create())
+        {
+            var hashBytes = sha1.ComputeHash(clearText);
+            // SHA1 hash contains 20 bytes, but only have space in 30 char index name for 11 bytes => 22 chars
+            for (var i = 0; i < 20; i++)
+            {
+                sb.Append(hashBytes[i].ToString("X2"));
+            }
+        }
+        return sb.ToString();
     }
 }
