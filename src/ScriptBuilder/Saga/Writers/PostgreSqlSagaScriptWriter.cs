@@ -154,7 +154,7 @@ select pg_temp.drop_saga_table_{sagaName}(@tablePrefix);
         using (var sha1 = SHA1.Create())
         {
             var hashBytes = sha1.ComputeHash(clearText);
-            for (var i = 0; i < 30; i++)
+            for (var i = 0; i < 20; i++)
             {
                 sb.Append(hashBytes[i].ToString("X2"));
             }
