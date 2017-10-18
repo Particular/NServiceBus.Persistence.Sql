@@ -6,7 +6,7 @@
       dropTable text;
     begin
         tableNameNonQuoted := tablePrefix || 'OutboxData';
-        dropTable = 'drop table if exists  public."' || tableNameNonQuoted || '";';
+        dropTable = 'drop table if exists public."' || tableNameNonQuoted || '";';
         execute dropTable;
         return 0;
     end;
