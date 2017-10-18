@@ -1,4 +1,4 @@
-﻿create or replace function drop_outbox_table(tablePrefix varchar)
+﻿create or replace function pg_temp.drop_outbox_table(tablePrefix varchar)
   returns integer as
   $body$
     declare
@@ -13,4 +13,4 @@
   $body$
   language 'plpgsql';
 
-select drop_outbox_table(@tablePrefix);
+select pg_temp.drop_outbox_table(@tablePrefix);
