@@ -6,6 +6,11 @@
     {
         public partial class Oracle
         {
+            internal override object ConvertTimeoutId(string timeoutId)
+            {
+                return timeoutId;
+            }
+
             internal override DateTime OldestSupportedTimeout => new DateTime(1000, 1, 1);
 
             internal override string GetTimeoutTableName(string tablePrefix)
