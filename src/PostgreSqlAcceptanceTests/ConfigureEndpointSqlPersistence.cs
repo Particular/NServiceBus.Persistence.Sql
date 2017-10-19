@@ -17,12 +17,12 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.FromResult(0);
         }
-        var lastDot = endpointName.LastIndexOf('.');
-        if (lastDot > 0)
-        {
-            endpointName = endpointName.Substring(lastDot + 1) + Math.Abs(endpointName.GetHashCode());
-        }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 24));
+
+        var hashcodeString = Math.Abs(endpointName.GetHashCode()).ToString();
+        var suffixLength = 19 - hashcodeString.Length;
+        var nameSuffix = endpointName.Substring(Math.Max(0, endpointName.Length - suffixLength));
+        endpointName = nameSuffix + hashcodeString;
+        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 19));
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
 
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
