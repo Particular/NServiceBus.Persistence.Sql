@@ -1,4 +1,4 @@
-﻿create or replace function create_outbox_table(tablePrefix varchar)
+﻿create or replace function pg_temp.create_outbox_table(tablePrefix varchar)
   returns integer as
   $body$
     declare
@@ -24,4 +24,4 @@
   $body$
   language 'plpgsql';
 
-select create_outbox_table(@tablePrefix);
+select pg_temp.create_outbox_table(@tablePrefix);
