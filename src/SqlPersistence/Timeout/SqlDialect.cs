@@ -12,5 +12,6 @@
         internal abstract string GetTimeoutPeekCommand(string tableName);
         internal abstract string GetTimeoutRangeCommand(string tableName);
         internal abstract string GetTimeoutNextCommand(string tableName);
+        internal abstract object ConvertTimeoutId(string timeoutId);
     }
 }

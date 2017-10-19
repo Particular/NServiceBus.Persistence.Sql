@@ -29,7 +29,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
-        var guid = GetGuid(timeoutId);
+        var guid = sqlDialect.ConvertTimeoutId(timeoutId);
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
@@ -92,7 +92,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)
     {
-        var guid = GetGuid(timeoutId);
+        var guid = sqlDialect.ConvertTimeoutId(timeoutId);
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
@@ -102,16 +102,6 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             return rowsAffected == 1;
         }
     }
-
-    static Guid GetGuid(string timeoutId)
-    {
-        if (Guid.TryParse(timeoutId, out var guid))
-        {
-            return guid;
-        }
-        throw new Exception($"Expected timeoutId to be in GUID format: {timeoutId}");
-    }
-
 
     public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
     {

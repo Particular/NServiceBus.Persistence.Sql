@@ -7,6 +7,15 @@
     {
         public partial class MsSqlServer
         {
+            internal override object ConvertTimeoutId(string timeoutId)
+            {
+                if (Guid.TryParse(timeoutId, out var guid))
+                {
+                    return guid;
+                }
+                throw new Exception($"Expected timeoutId to be in GUID format: {timeoutId}");
+            }
+
             internal override DateTime OldestSupportedTimeout => SqlDateTime.MinValue.Value;
 
             internal override string GetTimeoutTableName(string tablePrefix)
