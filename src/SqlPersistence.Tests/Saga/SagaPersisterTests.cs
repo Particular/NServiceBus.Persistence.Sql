@@ -117,9 +117,14 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithCorrelation.SagaData
         {
             Id = id,
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
+            CorrelationProperty = "theCorrelationProperty"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            CorrelationProperty = "theCorrelationProperty"
         };
 
         var persister = SetUp(endpointName);
@@ -128,7 +133,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty", metadata).ConfigureAwait(false);
             await persister.Complete(sagaData, storageSession, 1).ConfigureAwait(false);
             Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data);
         }
@@ -220,11 +225,17 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithCorrelation.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             SimpleProperty = "PropertyValue",
             CorrelationProperty = "theCorrelationProperty"
         };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+        };
+
 
         var persister = SetUp(nameof(CallbackThrows));
         var definition = new SagaDefinition(
@@ -242,7 +253,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty", metadata).ConfigureAwait(false);
             storageSession.OnSaveChanges(s =>
             {
                 throw new Exception("Simulated");
@@ -273,18 +284,24 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithCorrelation.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             SimpleProperty = "PropertyValue",
             CorrelationProperty = "theCorrelationProperty"
         };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+        };
+
 
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty", metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -329,10 +346,15 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithWeirdCharactersಠ_ಠ.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageIdಠ_ಠ",
-            Originator = "theOriginatorಠ_ಠ",
+            OriginalMessageId = "ignoredOriginalMessageIdಠ_ಠ",
+            Originator = "ignoredOriginatorಠ_ಠ",
             SimplePropertyಠ_ಠ = "PropertyValueಠ_ಠ",
             Contentಠ_ಠ = "♟⛺"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageIdಠ_ಠ",
+            Originator = "theOriginatorಠ_ಠ"
         };
 
         var persister = SetUp(endpointName);
@@ -340,7 +362,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ", metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -373,9 +395,14 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithSpaceInName.SagaData
         {
             Id = id,
-            OriginalMessageId = "original message id",
-            Originator = "the originator",
+            OriginalMessageId = "ignored original message id",
+            Originator = "ignored the originator",
             SimpleProperty = "property value"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "original message id",
+            Originator = "the originator"
         };
 
         var persister = SetUp(endpointName);
@@ -383,7 +410,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "property value").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "property value", metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithSpaceInName.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -431,9 +458,14 @@ public abstract class SagaPersisterTests
         {
             Id = id,
             CorrelationProperty = "theCorrelationProperty",
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             SimpleProperty = "PropertyValue"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator"
         };
 
         var persister = SetUp(endpointName);
@@ -441,7 +473,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
+            persister.Save(sagaData1, storageSession, "theProperty", metadata).GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -451,7 +483,7 @@ public abstract class SagaPersisterTests
         {
             var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
-            persister.Update(sagaData.Data, storageSession, sagaData.Version).GetAwaiter().GetResult();
+            persister.Update(sagaData.Data, storageSession, sagaData.Version, metadata).GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
         }
 
@@ -488,9 +520,14 @@ public abstract class SagaPersisterTests
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
             Id = id,
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
+            SimpleProperty = "PropertyValue"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
             OriginalMessageId = "theOriginalMessageId",
             Originator = "theOriginator",
-            SimpleProperty = "PropertyValue"
         };
 
         var persister = SetUp(endpointName);
@@ -498,7 +535,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData1, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData1, storageSession, "theProperty", metadata).ConfigureAwait(false);
             await storageSession.CompleteAsync().ConfigureAwait(false);
         }
 
@@ -509,7 +546,7 @@ public abstract class SagaPersisterTests
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
+            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion, metadata));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
 
@@ -543,10 +580,15 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithCorrelation.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             SimpleProperty = "theSimpleProperty",
             CorrelationProperty = "theCorrelationProperty"
+        };
+        var metadata = new SagaInstanceMetadata
+        {
+            Originator = "theOriginator",
+            OriginalMessageId = "theOriginalMessageId"
         };
 
         var persister = SetUp(endpointName);
@@ -554,7 +596,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty", metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -684,16 +726,22 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithStringCorrelation.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             CorrelationProperty = "theCorrelationProperty"
         };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator"
+        };
+
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty", metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -747,16 +795,22 @@ public abstract class SagaPersisterTests
         var sagaData = new NonStringCorrelationSaga.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             CorrelationProperty = 10
         };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator"
+        };
+
         var persister = SetUp(endpointName);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, 666).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, 666, metadata).ConfigureAwait(false);
             return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession).ConfigureAwait(false)).Data;
         }
     }
@@ -799,6 +853,11 @@ public abstract class SagaPersisterTests
         );
         DropAndCreate(definition, endpointName);
         var persister = SetUp(endpointName);
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator"
+        };
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -806,12 +865,12 @@ public abstract class SagaPersisterTests
             var data = new SagaWithCorrelation.SagaData
             {
                 Id = Guid.NewGuid(),
-                OriginalMessageId = "theOriginalMessageId",
-                Originator = "theOriginator",
+                OriginalMessageId = "ignoredOriginalMessageId",
+                Originator = "ignoredOriginator",
                 CorrelationProperty = "theCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
-            await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+            await persister.Save(data, storageSession, "theCorrelationProperty", metadata).ConfigureAwait(false);
             await storageSession.CompleteAsync().ConfigureAwait(false);
         }
         using (var connection = dbConnection())
@@ -821,14 +880,14 @@ public abstract class SagaPersisterTests
             var data = new SagaWithCorrelation.SagaData
             {
                 Id = Guid.NewGuid(),
-                OriginalMessageId = "theOriginalMessageId",
-                Originator = "theOriginator",
+                OriginalMessageId = "ignoredOriginalMessageId",
+                Originator = "ignoredOriginator",
                 CorrelationProperty = "theCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
             var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
             {
-                await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
+                await persister.Save(data, storageSession, "theCorrelationProperty", metadata).ConfigureAwait(false);
                 await storageSession.CompleteAsync().ConfigureAwait(false);
             });
             var innerException = throwsAsync.InnerException;
@@ -859,9 +918,14 @@ public abstract class SagaPersisterTests
         var sagaData = new SagaWithNoCorrelation.SagaData
         {
             Id = id,
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
+            OriginalMessageId = "ignoredOriginalMessageId",
+            Originator = "ignoredOriginator",
             SimpleProperty = "PropertyValue",
+        };
+        var metadata = new SagaInstanceMetadata
+        {
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator"
         };
 
         var persister = SetUp(endpointName);
@@ -869,7 +933,7 @@ public abstract class SagaPersisterTests
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
-            await persister.Save(sagaData, storageSession, null).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, null, metadata).ConfigureAwait(false);
             return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
         }
     }

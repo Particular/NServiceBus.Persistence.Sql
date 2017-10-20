@@ -30,6 +30,7 @@ class StorageSessionFeature : Feature
         }
         if (isSagasEnabledForSqlPersistence)
         {
+            context.Pipeline.Register(new IgnoreCancelledTimeoutsBehavior.Registration());
             var sagaPersister = new SagaPersister(infoCache, sqlDialect);
             container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
         }

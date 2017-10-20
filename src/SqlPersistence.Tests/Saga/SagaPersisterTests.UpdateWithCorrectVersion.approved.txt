@@ -6,5 +6,11 @@
     "Originator": "theOriginator",
     "OriginalMessageId": "theOriginalMessageId"
   },
+  "Metadata": {
+    "OriginalMessageId": "theOriginalMessageId",
+    "Originator": "theOriginator",
+    "CanceledTimeouts": [],
+    "PendingTimeouts": {}
+  },
   "Version": 2
 }

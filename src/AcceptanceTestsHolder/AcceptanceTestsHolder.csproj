@@ -227,6 +227,8 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Partials\When_running_saga_tests.cs" />
     <Compile Include="TestSuiteConstraints.cs" />
+    <Compile Include="When_canceling_previous_saga_timeouts.cs" />
+    <Compile Include="When_canceling_saga_timeout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

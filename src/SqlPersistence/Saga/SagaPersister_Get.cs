@@ -13,10 +13,10 @@ partial class SagaPersister
         where TSagaData : class, IContainSagaData
     {
         var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache).ConfigureAwait(false);
-        return SetConcurrency(result, context);
+        return Deconstruct(result, context);
     }
 
-    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+    static Task<ConcurrencyAndMetadata<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -30,10 +30,10 @@ where {whereClause}";
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(propertyName, propertyValue, session).ConfigureAwait(false);
-        return SetConcurrency(result, context);
+        return Deconstruct(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session)
+    internal Task<ConcurrencyAndMetadata<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -53,10 +53,10 @@ where {whereClause}";
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(sagaId, session).ConfigureAwait(false);
-        return SetConcurrency(result, context);
+        return Deconstruct(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session)
+    internal Task<ConcurrencyAndMetadata<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -69,7 +69,7 @@ where {whereClause}";
             });
     }
 
-    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters)
+    static async Task<ConcurrencyAndMetadata<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters)
         where TSagaData : class, IContainSagaData
     {
         var sqlSession = session.SqlPersistenceSession();
@@ -92,26 +92,24 @@ where {whereClause}";
                 var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1).ConfigureAwait(false);
                 var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
                 var concurrency = await dataReader.GetFieldValueAsync<int>(2).ConfigureAwait(false);
-                ReadMetadata(dataReader, out var originator, out var originalMessageId);
+                var metadata = ReadMetadata(dataReader);
                 using (var textReader = dataReader.GetTextReader(4))
                 {
                     var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                     sagaData.Id = id;
-                    sagaData.Originator = originator;
-                    sagaData.OriginalMessageId = originalMessageId;
-                    return new Concurrency<TSagaData>(sagaData, concurrency);
+                    sagaData.Originator = metadata.Originator;
+                    sagaData.OriginalMessageId = metadata.OriginalMessageId;
+                    return new ConcurrencyAndMetadata<TSagaData>(sagaData, concurrency, metadata);
                 }
             }
         }
     }
 
-    static void ReadMetadata(DbDataReader dataReader, out string originator, out string originalMessageId)
+    static SagaInstanceMetadata ReadMetadata(DbDataReader dataReader)
     {
         using (var textReader = dataReader.GetTextReader(3))
         {
-            var metadata = Serializer.Deserialize<Dictionary<string, string>>(textReader);
-            metadata.TryGetValue("Originator", out originator);
-            metadata.TryGetValue("OriginalMessageId", out originalMessageId);
+            return Serializer.Deserialize<SagaInstanceMetadata>(textReader);
         }
     }
 
@@ -128,7 +126,7 @@ where {whereClause}";
         }
     }
 
-    static TSagaData SetConcurrency<TSagaData>(Concurrency<TSagaData> result, ContextBag context)
+    static TSagaData Deconstruct<TSagaData>(ConcurrencyAndMetadata<TSagaData> result, ContextBag context)
         where TSagaData : class, IContainSagaData
     {
         if (result.Data == null)
@@ -136,6 +134,7 @@ where {whereClause}";
             return null;
         }
         context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
+        context.Set(result.Metadata);
         return result.Data;
     }
 }

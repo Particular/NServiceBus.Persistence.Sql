@@ -38,16 +38,35 @@ partial class SagaPersister : ISagaPersister
         return concurrency;
     }
 
-    internal struct Concurrency<TSagaData>
+    SagaInstanceMetadata GetMetadata(IContainSagaData sagaData, ContextBag context)
+    {
+        if (!context.TryGet(out SagaInstanceMetadata metadata))
+        {
+            metadata = new SagaInstanceMetadata();
+        }
+        if (sagaData.OriginalMessageId != null)
+        {
+            metadata.OriginalMessageId = sagaData.OriginalMessageId;
+        }
+        if (sagaData.Originator != null)
+        {
+            metadata.Originator = sagaData.Originator;
+        }
+        return metadata;
+    }
+
+    internal struct ConcurrencyAndMetadata<TSagaData>
         where TSagaData : IContainSagaData
     {
         public readonly TSagaData Data;
+        public readonly SagaInstanceMetadata Metadata;
         public readonly int Version;
 
-        public Concurrency(TSagaData data, int version)
+        public ConcurrencyAndMetadata(TSagaData data, int version, SagaInstanceMetadata metadata)
         {
             Data = data;
             Version = version;
+            Metadata = metadata;
         }
     }
 }

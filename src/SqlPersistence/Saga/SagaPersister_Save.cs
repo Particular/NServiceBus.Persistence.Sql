@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
@@ -9,10 +8,11 @@ partial class SagaPersister
 {
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
-        return Save(sagaData, session, correlationProperty?.Value);
+        var metadata = GetMetadata(sagaData, context);
+        return Save(sagaData, session, correlationProperty?.Value, metadata);
     }
 
-    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, object correlationId)
+    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, object correlationId, SagaInstanceMetadata metadata)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
@@ -22,15 +22,6 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
-            var metadata = new Dictionary<string, string>();
-            if (sagaData.OriginalMessageId != null)
-            {
-                metadata.Add("OriginalMessageId", sagaData.OriginalMessageId);
-            }
-            if (sagaData.Originator != null)
-            {
-                metadata.Add("Originator", sagaData.Originator);
-            }
             command.AddParameter("Metadata", Serializer.Serialize(metadata));
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);

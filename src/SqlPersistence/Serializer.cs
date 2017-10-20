@@ -33,7 +33,7 @@ static class Serializer
         }
     }
 
-    public static string Serialize(object target)
+    public static string Serialize<T>(T target)
     {
         var stringBuilder = new StringBuilder();
         var stringWriter = new StringWriter(stringBuilder);
