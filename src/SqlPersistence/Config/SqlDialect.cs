@@ -53,17 +53,6 @@ namespace NServiceBus
             }
         }
 
-        internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script)
-        {
-            using (var command = connection.CreateCommand())
-            {
-                command.Transaction = transaction;
-                command.CommandText = script;
-                AddCreationScriptParameters(command);
-                await command.ExecuteNonQueryEx().ConfigureAwait(false);
-            }
-        }
-
         internal virtual void ValidateTablePrefix(string tablePrefix)
         {
         }
