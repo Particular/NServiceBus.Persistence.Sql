@@ -8,7 +8,7 @@
         {
             internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
-                return $"{tablePrefix}{tableSuffix}";
+                return $"\"{Schema}\".\"{tablePrefix}{tableSuffix}\"";
             }
 
             internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
@@ -28,7 +28,7 @@
                 }
 
                 return $@"
-insert into public.""{tableName}""
+insert into ""{tableName}""
 (
     ""Id"",
     ""Metadata"",
@@ -59,7 +59,7 @@ values
                 }
 
                 return $@"
-update public.""{tableName}""
+update ""{tableName}""
 set
     ""Data"" = @Data,
     ""PersistenceVersion"" = @PersistenceVersion,
@@ -79,7 +79,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from public.""{tableName}""
+from ""{tableName}""
 where ""Id"" = @Id
 ";
             }
@@ -93,7 +93,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from public.""{tableName}""
+from ""{tableName}""
 where ""Correlation_{propertyName}"" = @propertyValue
 ";
             }
@@ -101,7 +101,7 @@ where ""Correlation_{propertyName}"" = @propertyValue
             internal override string BuildCompleteCommand(string tableName)
             {
                 return $@"
-delete from public.""{tableName}""
+delete from ""{tableName}""
 where ""Id"" = @Id and ""Concurrency"" = @Concurrency
 ";
             }
@@ -115,7 +115,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from public.""{tableName}""
+from ""{tableName}""
 ";
             }
         }

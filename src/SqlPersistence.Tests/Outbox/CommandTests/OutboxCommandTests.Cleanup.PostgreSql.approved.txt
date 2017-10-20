@@ -1,9 +1,9 @@
 ﻿
-delete from public."TheTablePrefixOutboxData"
+delete from "public"."TheTablePrefixOutboxData"
 where ctid in
 (
     select ctid
-    from public."TheTablePrefixOutboxData"
+    from "public"."TheTablePrefixOutboxData"
     where
         "Dispatched" = true and
         "DispatchedAt" < @DispatchedBefore at time zone 'UTC'

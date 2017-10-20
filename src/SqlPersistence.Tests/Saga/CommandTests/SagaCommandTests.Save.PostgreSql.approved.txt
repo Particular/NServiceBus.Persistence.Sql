@@ -1,5 +1,5 @@
 ﻿
-insert into public."TheTableName"
+insert into "TheTableName"
 (
     "Id",
     "Metadata",

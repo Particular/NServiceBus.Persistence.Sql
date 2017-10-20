@@ -5,4 +5,4 @@ select
     "Concurrency",
     "Metadata",
     "Data"
-from public."TheTableName"
+from "TheTableName"

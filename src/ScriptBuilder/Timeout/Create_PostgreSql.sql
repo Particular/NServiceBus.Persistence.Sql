@@ -1,4 +1,4 @@
-﻿create or replace function pg_temp.create_timeouts_table(tablePrefix varchar)
+﻿create or replace function pg_temp.create_timeouts_table(tablePrefix varchar, schema varchar)
   returns integer as
   $body$
     declare
@@ -10,7 +10,7 @@
         tableName := tablePrefix || 'TimeoutData';
         timeIndexName := tableName || '_TimeIdx';
         sagaIndexName := tableName || '_SagaIdx';
-        createTable = 'create table if not exists public."' || tableName || '"
+        createTable = 'create table if not exists "' || schema || '"."' || tableName || '"
     (
         "Id" uuid not null,
         "Destination" character varying(200),
@@ -21,8 +21,8 @@
         "PersistenceVersion" character varying(23),
         primary key ("Id")
     );
-    create index if not exists "' || timeIndexName || '" on public."' || tableName || '" using btree ("Time" asc nulls last);
-    create index if not exists "' || sagaIndexName || '" on public."' || tableName || '" using btree ("SagaId" asc nulls last);
+    create index if not exists "' || timeIndexName || '" on "' || schema || '"."' || tableName || '" using btree ("Time" asc nulls last);
+    create index if not exists "' || sagaIndexName || '" on "' || schema || '"."' || tableName || '" using btree ("SagaId" asc nulls last);
 ';
         execute createTable;
         return 0;
@@ -30,4 +30,4 @@
   $body$
   language 'plpgsql';
 
-select pg_temp.create_timeouts_table(@tablePrefix);
+select pg_temp.create_timeouts_table(@tablePrefix, @schema);

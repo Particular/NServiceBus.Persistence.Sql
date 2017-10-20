@@ -1,5 +1,5 @@
 ﻿
-insert into public."TheTablePrefixOutboxData"
+insert into "public"."TheTablePrefixOutboxData"
 (
     "MessageId",
     "Operations",
