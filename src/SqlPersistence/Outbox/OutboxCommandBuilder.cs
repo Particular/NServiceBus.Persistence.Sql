@@ -22,7 +22,7 @@ namespace NServiceBus.Persistence.Sql
                     tableName = $"`{tablePrefix}OutboxData`";
                     break;
                 case SqlVariant.Oracle:
-                    tableName = $"{tablePrefix.ToUpper()}OD";
+                    tableName = string.IsNullOrEmpty(schema) ? $"\"{tablePrefix.ToUpper()}OD\"" : $"\"{schema}\".\"{tablePrefix.ToUpper()}OD\"";
                     break;
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}");
@@ -58,7 +58,7 @@ set
 where MessageId = @MessageId";
                 case SqlVariant.Oracle:
                     return $@"
-update ""{tableName}""
+update {tableName}
 set
     Dispatched = 1,
     DispatchedAt = :DispatchedAt,
@@ -86,7 +86,7 @@ where MessageId = @MessageId";
 select
     Dispatched,
     Operations
-from ""{tableName}""
+from {tableName}
 where MessageId = :MessageId";
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}");
@@ -114,7 +114,7 @@ values
 )";
                 case SqlVariant.Oracle:
                     return $@"
-insert into ""{tableName}""
+insert into {tableName}
 (
     MessageId,
     Operations,
@@ -149,7 +149,7 @@ where Dispatched = true
 limit @BatchSize";
                 case SqlVariant.Oracle:
                     return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where Dispatched = 1
     and DispatchedAt < :DispatchedBefore
     and rownum <= :BatchSize";

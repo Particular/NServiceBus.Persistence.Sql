@@ -147,8 +147,6 @@ from {TableName(tableName)}
         {
             switch (sqlVariant)
             {
-                    case SqlVariant.Oracle:
-                        return $"\"{name.ToUpper()}\"";
                     default:
                         return name;
             }

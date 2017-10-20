@@ -19,7 +19,7 @@ namespace NServiceBus.Persistence.Sql
                 case SqlVariant.MsSqlServer:
                     return BuildSqlServerCommands($"[{schema}].[{tablePrefix}TimeoutData]");
                 case SqlVariant.Oracle:
-                    return BuildOracleCommands($"{tablePrefix.ToUpper()}TO");
+                    return string.IsNullOrEmpty(schema) ? BuildOracleCommands($"\"{tablePrefix.ToUpper()}TO\"") : BuildOracleCommands($"\"{schema}\".\"{tablePrefix.ToUpper()}TO\"");
                 default:
                     throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
             }
@@ -155,7 +155,7 @@ order by Time";
         static TimeoutCommands BuildOracleCommands(string tableName)
         {
             var insertCommandText = $@"
-insert into ""{tableName}""
+insert into {tableName}
 (
     Id,
     Destination,
@@ -177,12 +177,12 @@ values
 )";
 
             var removeByIdCommandText = $@"
-delete from ""{tableName}""
+delete from {tableName}
 where Id = :Id";
 
 
             var removeBySagaIdCommandText = $@"
-delete from ""{tableName}""
+delete from {tableName}
 where SagaId = :SagaId";
 
             var selectByIdCommandText = $@"
@@ -192,19 +192,19 @@ select
     State,
     ExpireTime,
     Headers
-from ""{tableName}""
+from {tableName}
 where Id = :Id";
 
             var rangeCommandText = $@"
 select Id, ExpireTime
-from ""{tableName}""
+from {tableName}
 where ExpireTime > :StartTime and ExpireTime <= :EndTime";
 
             var nextCommandText = $@"
 select ExpireTime
 from
 (
-    select ExpireTime from ""{tableName}""
+    select ExpireTime from {tableName}
     where ExpireTime > :EndTime
     order by ExpireTime
 ) subquery
