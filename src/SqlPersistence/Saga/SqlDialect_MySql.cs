@@ -1,4 +1,6 @@
-﻿namespace NServiceBus
+﻿#pragma warning disable 672 // overrides obsolete
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+namespace NServiceBus
 {
     using System.Text;
 
@@ -6,12 +8,12 @@
     {
         public partial class MySql
         {
-            internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
                 return $"`{tablePrefix}{tableSuffix}`";
             }
 
-            internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
             {
                 var valuesBuilder = new StringBuilder();
                 var insertBuilder = new StringBuilder();
@@ -48,7 +50,7 @@ values
 )";
             }
 
-            internal override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
             {
                 // no need to set CorrelationProperty since it is immutable
                 var correlationSet = "";
@@ -69,7 +71,7 @@ where
 ";
             }
 
-            internal override string BuildGetBySagaIdCommand(string tableName)
+            public override string BuildGetBySagaIdCommand(string tableName)
             {
                 return $@"
 select
@@ -83,7 +85,7 @@ where Id = @Id
 ";
             }
 
-            internal override string BuildGetByPropertyCommand(string propertyName, string tableName)
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName)
             {
                 return $@"
 select
@@ -97,7 +99,7 @@ where Correlation_{propertyName} = @propertyValue
 ";
             }
 
-            internal override string BuildCompleteCommand(string tableName)
+            public override string BuildCompleteCommand(string tableName)
             {
                 return $@"
 delete from {tableName}
@@ -105,7 +107,7 @@ where Id = @Id and Concurrency = @Concurrency
 ";
             }
 
-            internal override string BuildSelectFromCommand(string tableName)
+            public override string BuildSelectFromCommand(string tableName)
             {
                 return $@"
 select
