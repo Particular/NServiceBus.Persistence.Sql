@@ -119,22 +119,64 @@ namespace NServiceBus
     public abstract class SqlDialect
     {
         protected SqlDialect() { }
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildCompleteCommand(string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildGetByPropertyCommand(string correlationProperty, string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildGetBySagaIdCommand(string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildSelectFromCommand(string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName);
+        [System.ObsoleteAttribute("Not for public use")]
+        public abstract string GetSagaTableName(string tablePrefix, string tableSuffix);
         public override string ToString() { }
         public class MsSqlServer : NServiceBus.SqlDialect
         {
             public MsSqlServer() { }
+            public override string BuildCompleteCommand(string tableName) { }
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+            public override string BuildGetBySagaIdCommand(string tableName) { }
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+            public override string BuildSelectFromCommand(string tableName) { }
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class MySql : NServiceBus.SqlDialect
         {
             public MySql() { }
+            public override string BuildCompleteCommand(string tableName) { }
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+            public override string BuildGetBySagaIdCommand(string tableName) { }
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+            public override string BuildSelectFromCommand(string tableName) { }
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class Oracle : NServiceBus.SqlDialect
         {
             public Oracle() { }
+            public override string BuildCompleteCommand(string tableName) { }
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+            public override string BuildGetBySagaIdCommand(string tableName) { }
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+            public override string BuildSelectFromCommand(string tableName) { }
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class PostgreSql : NServiceBus.SqlDialect
         {
             public PostgreSql() { }
+            public override string BuildCompleteCommand(string tableName) { }
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
+            public override string BuildGetBySagaIdCommand(string tableName) { }
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
+            public override string BuildSelectFromCommand(string tableName) { }
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
     }
     public abstract class SqlDialectSettings
