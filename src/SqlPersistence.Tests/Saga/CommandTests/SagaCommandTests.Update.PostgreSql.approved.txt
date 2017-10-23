@@ -1,5 +1,5 @@
 ﻿
-update TheTableName
+update "TheTableName"
 set
     "Data" = @Data,
     "PersistenceVersion" = @PersistenceVersion,

@@ -1,5 +1,5 @@
 ﻿
-insert into TheTableName
+insert into "TheTableName"
 (
     "Id",
     "Metadata",
