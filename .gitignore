@@ -98,3 +98,5 @@ src/scaffolding.config
 .idea/
 *.sln.iml
 src/Integration/Directory.Build.props
+
+PromotedSqlScripts/
