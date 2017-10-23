@@ -14,7 +14,8 @@
   </Choose>
 
   <PropertyGroup>
-    <SolutionDirEx Condition="$(SolutionDir) == '*Undefined*'"></SolutionDirEx>
+    <SolutionDirEx></SolutionDirEx>
+    <SolutionDirEx Condition="$(SolutionDir) != '' And $(SolutionDir) != '*Undefined*'">$(SolutionDir)</SolutionDirEx>
   </PropertyGroup>
 
   <UsingTask
