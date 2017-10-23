@@ -15,10 +15,6 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
     [Test]
     public async Task Should_use_existing_saga()
     {
-        if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
-        {
-            return;
-        }
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
