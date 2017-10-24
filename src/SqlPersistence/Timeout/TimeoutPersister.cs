@@ -15,14 +15,16 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     SqlDialect sqlDialect;
     TimeoutCommands timeoutCommands;
     TimeSpan timeoutsCleanupExecutionInterval;
+    Func<DateTime> utcNow;
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval)
+    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
     {
         this.connectionBuilder = connectionBuilder;
         this.sqlDialect = sqlDialect;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
+        this.utcNow = utcNow;
         timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, tablePrefix);
         oldestSupportedTimeout = sqlDialect.OldestSupportedTimeout;
     }
@@ -55,7 +57,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                     Destination = destination,
                     SagaId = sagaId,
                     State = value,
-                    Time = dateTime,
+                    Time = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc),
                     Headers = headers,
                 };
             }
@@ -106,7 +108,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
     {
         var list = new List<TimeoutsChunk.Timeout>();
-        var now = DateTime.UtcNow;
+        var now = utcNow();
 
         //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
         //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeout storage race-condition
@@ -129,7 +131,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                     while (await reader.ReadAsync().ConfigureAwait(false))
                     {
                         var id = await reader.GetGuidAsync(0).ConfigureAwait(false);
-                        list.Add(new TimeoutsChunk.Timeout(id.ToString(), reader.GetDateTime(1)));
+                        list.Add(new TimeoutsChunk.Timeout(id.ToString(), DateTime.SpecifyKind(reader.GetDateTime(1), DateTimeKind.Utc)));
                     }
                 }
             }
@@ -149,7 +151,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                 }
             }
         }
-        return new TimeoutsChunk(list.ToArray(), nextTimeToRunQuery);
+        return new TimeoutsChunk(list.ToArray(), DateTime.SpecifyKind(nextTimeToRunQuery, DateTimeKind.Utc));
     }
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
