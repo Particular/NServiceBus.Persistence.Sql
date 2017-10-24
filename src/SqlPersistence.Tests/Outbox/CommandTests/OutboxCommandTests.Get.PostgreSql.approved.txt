@@ -2,5 +2,5 @@
 select
     "Dispatched",
     "Operations"
-from public."TheTablePrefixOutboxData"
+from "public"."TheTablePrefixOutboxData"
 where "MessageId" = @MessageId

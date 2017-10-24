@@ -39,7 +39,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
         var name = correlationProperty.Name;
 
         writer.Write($@"
-        script = 'alter table public.""' || tableNameNonQuoted || '"" add column if not exists ""Correlation_{name}"" {columnType}';
+        script = 'alter table ""' || schema || '"".""' || tableNameNonQuoted || '"" add column if not exists ""Correlation_{name}"" {columnType}';
         execute script;
 ");
     }
@@ -67,7 +67,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
         var indexName = CreateSagaIndexName(saga.TableSuffix, correlationProperty.Name);
 
         writer.Write($@"
-        script = 'create unique index if not exists ""' || tablePrefix || '{indexName}"" on public.""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
+        script = 'create unique index if not exists ""' || tablePrefix || '{indexName}"" on ""' || schema || '"".""' || tableNameNonQuoted || '"" using btree (""Correlation_{correlationProperty.Name}"" asc);';
         execute script;"
 );
     }
@@ -86,7 +86,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
     {
         var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write($@"
-create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varchar)
+create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varchar, schema varchar)
     returns integer as
     $body$
     declare
@@ -96,7 +96,7 @@ create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varc
         columnType varchar;
     begin
         tableNameNonQuoted := tablePrefix || '{saga.TableSuffix}';
-        script = 'create table if not exists public.""' || tableNameNonQuoted || '""
+        script = 'create table if not exists ""' || schema || '"".""' || tableNameNonQuoted || '""
 (
     ""Id"" uuid not null,
     ""Metadata"" text not null,
@@ -118,7 +118,7 @@ create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varc
     $body$
 language 'plpgsql';
 
-select pg_temp.create_saga_table_{sagaName}(@tablePrefix);
+select pg_temp.create_saga_table_{sagaName}(@tablePrefix, @schema);
 ");
     }
 
@@ -126,7 +126,7 @@ select pg_temp.create_saga_table_{sagaName}(@tablePrefix);
     {
         var sagaName = saga.TableSuffix.Replace(' ', '_');
         writer.Write(
-$@"create or replace function pg_temp.drop_saga_table_{sagaName}(tablePrefix varchar)
+$@"create or replace function pg_temp.drop_saga_table_{sagaName}(tablePrefix varchar, schema varchar)
     returns integer as
     $body$
     declare
@@ -134,14 +134,14 @@ $@"create or replace function pg_temp.drop_saga_table_{sagaName}(tablePrefix var
         dropTable text;
     begin
         tableNameNonQuoted := tablePrefix || '{saga.TableSuffix}';
-        dropTable = 'drop table if exists public.""' || tableNameNonQuoted || '"";';
+        dropTable = 'drop table if exists ""' || schema || '"".""' || tableNameNonQuoted || '"";';
         execute dropTable;
         return 0;
     end;
     $body$
     language 'plpgsql';
 
-select pg_temp.drop_saga_table_{sagaName}(@tablePrefix);
+select pg_temp.drop_saga_table_{sagaName}(@tablePrefix, @schema);
 ");
     }
 

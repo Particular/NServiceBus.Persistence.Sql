@@ -11,13 +11,13 @@
         {
             internal override string GetSubscriptionTableName(string tablePrefix)
             {
-                return $"{tablePrefix}SubscriptionData";
+                return $"\"{Schema}\".\"{tablePrefix}SubscriptionData\"";
             }
 
             internal override string GetSubscriptionSubscribeCommand(string tableName)
             {
                 return $@"
-insert into public.""{tableName}""
+insert into {tableName}
 (
     ""Id"",
     ""Subscriber"",
@@ -42,7 +42,7 @@ on conflict (""Id"") do update
             internal override string GetSubscriptionUnsubscribeCommand(string tableName)
             {
                 return $@"
-delete from public.""{tableName}""
+delete from {tableName}
 where
     ""Subscriber"" = @Subscriber and
     ""MessageType"" = @MessageType";
@@ -52,7 +52,7 @@ where
             {
                 var getSubscribersPrefix = $@"
 select distinct ""Subscriber"", ""Endpoint""
-from public.""{tableName}""
+from {tableName}
 where ""MessageType"" in (";
 
                 return messageTypes =>

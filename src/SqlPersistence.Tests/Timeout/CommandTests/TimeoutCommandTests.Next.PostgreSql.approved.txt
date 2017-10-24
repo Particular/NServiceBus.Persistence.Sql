@@ -1,5 +1,5 @@
 ﻿
-select "Time" from public."TheTablePrefixTimeoutData"
+select "Time" from "public"."TheTablePrefixTimeoutData"
 where "Time" > @EndTime
 order by "Time"
 limit 1

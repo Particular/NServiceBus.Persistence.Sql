@@ -19,13 +19,13 @@
 
             internal override string GetTimeoutTableName(string tablePrefix)
             {
-                return $"{tablePrefix}TimeoutData";
+                return $"\"{Schema}\".\"{tablePrefix}TimeoutData\"";
             }
 
             internal override string GetTimeoutInsertCommand(string tableName)
             {
                 return $@"
-insert into public.""{tableName}""
+insert into {tableName}
 (
     ""Id"",
     ""Destination"",
@@ -50,14 +50,14 @@ values
             internal override string GetTimeoutRemoveByIdCommand(string tableName)
             {
                 return $@"
-delete from public.""{tableName}""
+delete from {tableName}
 where ""Id"" = @Id;";
             }
 
             internal override string GetTimeoutRemoveBySagaIdCommand(string tableName)
             {
                 return $@"
-delete from public.""{tableName}""
+delete from {tableName}
 where ""SagaId"" = @SagaId";
             }
 
@@ -70,7 +70,7 @@ select
     ""State"",
     ""Time"",
     ""Headers""
-from public.""{tableName}""
+from {tableName}
 where ""Id"" = @Id";
             }
 
@@ -78,14 +78,14 @@ where ""Id"" = @Id";
             {
                 return $@"
 select ""Id"", ""Time""
-from public.""{tableName}""
+from {tableName}
 where ""Time"" > @StartTime and ""Time"" <= @EndTime";
             }
 
             internal override string GetTimeoutNextCommand(string tableName)
             {
                 return $@"
-select ""Time"" from public.""{tableName}""
+select ""Time"" from {tableName}
 where ""Time"" > @EndTime
 order by ""Time""
 limit 1";

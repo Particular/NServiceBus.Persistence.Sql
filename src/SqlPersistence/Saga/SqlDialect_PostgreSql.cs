@@ -10,7 +10,7 @@ namespace NServiceBus
         {
             public override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
-                return $"{tablePrefix}{tableSuffix}";
+                return $"\"{Schema}\".\"{tablePrefix}{tableSuffix}\"";
             }
 
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
@@ -30,7 +30,7 @@ namespace NServiceBus
                 }
 
                 return $@"
-insert into ""{tableName}""
+insert into {tableName}
 (
     ""Id"",
     ""Metadata"",
@@ -60,7 +60,7 @@ values
                 }
 
                 return $@"
-update ""{tableName}""
+update {tableName}
 set
     ""Data"" = @Data,
     ""PersistenceVersion"" = @PersistenceVersion,
@@ -80,7 +80,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from public.""{tableName}""
+from {tableName}
 where ""Id"" = @Id
 ";
             }
@@ -94,7 +94,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from ""{tableName}""
+from {tableName}
 where ""Correlation_{propertyName}"" = @propertyValue
 ";
             }
@@ -102,7 +102,7 @@ where ""Correlation_{propertyName}"" = @propertyValue
             public override string BuildCompleteCommand(string tableName)
             {
                 return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where ""Id"" = @Id and ""Concurrency"" = @Concurrency
 ";
             }
@@ -116,7 +116,7 @@ select
     ""Concurrency"",
     ""Metadata"",
     ""Data""
-from public.""{tableName}""
+from {tableName}
 ";
             }
         }

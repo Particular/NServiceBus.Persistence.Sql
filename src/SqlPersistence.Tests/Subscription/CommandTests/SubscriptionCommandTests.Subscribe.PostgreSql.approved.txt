@@ -1,5 +1,5 @@
 ﻿
-insert into public."TheTablePrefixSubscriptionData"
+insert into "public"."TheTablePrefixSubscriptionData"
 (
     "Id",
     "Subscriber",
