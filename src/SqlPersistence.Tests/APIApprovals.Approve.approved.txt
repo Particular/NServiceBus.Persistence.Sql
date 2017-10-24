@@ -8,7 +8,7 @@
 
 namespace NServiceBus.Persistence.Sql
 {
-
+    
     public interface IMessagePropertyMapper
     {
         void ConfigureMapping<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty);
