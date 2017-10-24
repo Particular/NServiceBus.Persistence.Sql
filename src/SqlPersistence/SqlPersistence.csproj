@@ -38,6 +38,12 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
   <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>

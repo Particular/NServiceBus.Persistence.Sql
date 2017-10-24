@@ -467,6 +467,68 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public void UpdateWithTransitional()
+    {
+        var endpointName = nameof(UpdateWithTransitional);
+        var definition = new SagaDefinition(
+            tableSuffix: "CorrAndTransitionalSaga",
+            name: "CorrAndTransitionalSaga",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        DropAndCreate(definition, endpointName);
+        var id = Guid.NewGuid();
+        var sagaData1 = new CorrAndTransitionalSaga.SagaData
+        {
+            Id = id,
+            CorrelationProperty = "theCorrelationProperty",
+            TransitionalCorrelationProperty = "theTransitionalCorrelationProperty",
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            SimpleProperty = "PropertyValue"
+        };
+
+        var persister = SetUp(endpointName);
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
+            storageSession.CompleteAsync().GetAwaiter().GetResult();
+        }
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
+            sagaData.Data.SimpleProperty = "UpdatedValue";
+            persister.Update(sagaData.Data, storageSession, sagaData.Version).GetAwaiter().GetResult();
+            storageSession.CompleteAsync().GetAwaiter().GetResult();
+        }
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
+            Assert.IsNotNull(sagaData);
+#if NET452
+            ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
+#endif
+            Assert.AreEqual(2, sagaData.Version);
+        }
+    }
+
+    [Test]
     public async Task UpdateWithWrongVersion()
     {
         var wrongVersion = 666;
