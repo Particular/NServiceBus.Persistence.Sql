@@ -50,14 +50,13 @@ values
 )";
             }
 
-
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
             {
                 // no need to set CorrelationProperty since it is immutable
                 var correlationSet = "";
                 if (transitionalCorrelationProperty != null)
                 {
-                    correlationSet = $",\r\n    Correlation_{transitionalCorrelationProperty} = @TransitionalCorrelationId";
+                    correlationSet = $",\r\n    \"Correlation_{transitionalCorrelationProperty}\" = @TransitionalCorrelationId";
                 }
 
                 return $@"
