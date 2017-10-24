@@ -31,7 +31,6 @@ public abstract class SagaPersisterTests
         dbConnection = GetConnection();
     }
 
-
     SagaPersister SetUp(string endpointName)
     {
         var runtimeSqlDialect = sqlDialect.Convert(schema);
@@ -63,7 +62,6 @@ public abstract class SagaPersisterTests
             {
                 yield return nestedType;
             }
-
         }
     }
 
@@ -512,9 +510,7 @@ public abstract class SagaPersisterTests
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
             Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
         }
-
     }
-
 
     [Test]
     public void GetById()
@@ -611,8 +607,15 @@ public abstract class SagaPersisterTests
     [Explicit]
     public void TransitionId()
     {
-        var endpointName = nameof(TransitionId);
+        using (var connection = dbConnection())
+        {
+            TransitionIdInner(connection);
+        }
+    }
 
+    void TransitionIdInner(DbConnection connection)
+    {
+        var endpointName = nameof(TransitionId);
         var definition1 = new SagaDefinition(
             tableSuffix: "SagaWithCorrelation",
             name: "SagaWithCorrelation",
@@ -622,39 +625,36 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        using (var connection = dbConnection())
-        {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+        connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
 
-            var definition2 = new SagaDefinition(
-                tableSuffix: "SagaWithCorrelation",
-                name: "SagaWithCorrelation",
-                correlationProperty: new CorrelationProperty
-                (
-                    name: "CorrelationProperty",
-                    type: CorrelationPropertyType.String
-                ),
-                transitionalCorrelationProperty: new CorrelationProperty
-                (
-                    name: "TransitionalCorrelationProperty",
-                    type: CorrelationPropertyType.Guid
-                )
-            );
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
+        var definition2 = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.Guid
+            )
+        );
+        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
 
-            var definition3 = new SagaDefinition(
-                tableSuffix: "SagaWithCorrelation",
-                name: "SagaWithCorrelation",
-                correlationProperty: new CorrelationProperty
-                (
-                    name: "TransitionalCorrelationProperty",
-                    type: CorrelationPropertyType.Guid
-                )
-            );
-            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
-            connection.ExecuteCommand(buildCreateScript, endpointName);
-        }
+        var definition3 = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.Guid
+            )
+        );
+        var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
+        connection.ExecuteCommand(buildCreateScript, endpointName);
     }
 
     [Test]
@@ -835,7 +835,6 @@ public abstract class SagaPersisterTests
             Assert.IsTrue(IsConcurrencyException(innerException));
         }
     }
-
 
     [Test]
     public void SaveWithNoCorrelation()
