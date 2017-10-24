@@ -13,6 +13,7 @@ public abstract class TimeoutPersisterTests
     BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
+    static DateTime goodUtcNowValue = new DateTime(2017, 10, 24, 10, 54, 15, DateTimeKind.Utc);
     protected abstract Func<DbConnection> GetConnection();
 
     public TimeoutPersisterTests(BuildSqlDialect sqlDialect, string schema)
@@ -32,13 +33,14 @@ public abstract class TimeoutPersisterTests
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
         }
 
-        var preventCleanupInterval = DateTime.UtcNow - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
+        var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
 
         return new TimeoutPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{name}_",
             sqlDialect: sqlDialect.Convert(schema),
-            timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval);
+            timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,
+            utcNow: () => goodUtcNowValue);
     }
 
     [TearDown]
@@ -126,6 +128,7 @@ public abstract class TimeoutPersisterTests
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.Peek(timeout1.Id, null).Result;
         Assert.IsNotNull(nextChunk);
+        Assert.AreEqual(DateTimeKind.Utc, nextChunk.Time.Kind);
 #if NET452
         ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
 #endif
@@ -137,7 +140,7 @@ public abstract class TimeoutPersisterTests
     {
         var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
         var timeout1Time = startSlice.AddSeconds(1);
-        var timeout2Time = DateTime.UtcNow.AddSeconds(10);
+        var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
         {
             Destination = "theDestination",
@@ -158,8 +161,9 @@ public abstract class TimeoutPersisterTests
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
         Assert.IsNotNull(nextChunk);
+        Assert.AreEqual(DateTimeKind.Utc, nextChunk.NextTimeToQuery.Kind);
 #if NET452
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
 #endif
     }
 
@@ -180,7 +184,7 @@ public abstract class TimeoutPersisterTests
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.IsNotNull(nextChunk);
 #if NET452
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
 #endif
     }
 
@@ -201,7 +205,7 @@ public abstract class TimeoutPersisterTests
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.IsNotNull(nextChunk);
 #if NET452
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
 #endif
     }
 
@@ -228,7 +232,7 @@ public abstract class TimeoutPersisterTests
 
         Assert.IsNotNull(nextChunk);
 #if NET452
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
 #endif
     }
 
@@ -237,7 +241,7 @@ public abstract class TimeoutPersisterTests
     {
         var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, 42, DateTimeKind.Utc); // 42ms
         var timeout1Time = startSlice.AddSeconds(1);
-        var timeout2Time = DateTime.UtcNow.AddSeconds(10);
+        var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
         {
             Destination = "theDestination",
