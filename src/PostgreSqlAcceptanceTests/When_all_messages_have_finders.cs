@@ -56,7 +56,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
-                    whereClause: "json_value(Data,'$.Property') = @propertyValue",
+                    whereClause: @"""Data""->>'Property' ='Test'",
                     appendParameters: (builder, append) =>
                     {
                         var parameter = builder();

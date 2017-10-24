@@ -57,7 +57,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
-                    whereClause: "json_value(Data,'$.Property') = @propertyValue",
+                    whereClause: @"""Data""->>'Property' ='Test'",
                     appendParameters: (builder, append) =>
                     {
                         var parameter = builder();
