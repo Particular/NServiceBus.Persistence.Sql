@@ -42,7 +42,7 @@ namespace NServiceBus
                 var parameterModifier = $"{nameof(SqlDialectSettings)}<{nameof(PostgreSql)}>.{nameof(SqlPersistenceConfig.JsonBParameterModifier)}()";
                 var error = $@"The {parameterModifier} method has not been set.
 Npgsql requires that parameters that pass JSONB data explicitly have {parameterProp} set to {jsonb}.
-Npgsql does not infer this based on the column type.
+Npgsql does not infer this based on the DB column type.
 It is not possible for the Sql Persistence to control this setting while still avoiding a reference to Npgsql.
 As such it is necessary to explicitly set {parameterProp} to {jsonb} via a call to {parameterModifier}:
 
