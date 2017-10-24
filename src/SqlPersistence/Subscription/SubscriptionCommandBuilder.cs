@@ -29,7 +29,7 @@ namespace NServiceBus.Persistence.Sql
                     break;
 
                 case SqlVariant.Oracle:
-                    tableName = $"{tablePrefix.ToUpper()}SS";
+                    tableName = string.IsNullOrEmpty(schema) ? $"\"{tablePrefix.ToUpper()}SS\"" : $"\"{schema}\".\"{tablePrefix.ToUpper()}SS\"";
                     break;
 
                 default:
@@ -96,7 +96,7 @@ on duplicate key update
                 case SqlVariant.Oracle:
                     return $@"
 begin
-    insert into ""{tableName}""
+    insert into {tableName}
     (
         MessageType,
         Subscriber,
@@ -128,7 +128,7 @@ end;
             {
                 case SqlVariant.Oracle:
                     return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where
     Subscriber = :Subscriber and
     MessageType = :MessageType";
@@ -150,7 +150,7 @@ where
 
                     var getSubscribersPrefixOracle = $@"
 select distinct Subscriber, Endpoint
-from ""{tableName}""
+from {tableName}
 where MessageType in (";
 
                     return messageTypes =>
