@@ -18,8 +18,8 @@ public abstract class SubscriptionPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    protected virtual bool SupportsSchemas() => true;
     string tablePrefix;
-    SubscriptionPersister persister;
 
     public SubscriptionPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
@@ -27,24 +27,25 @@ public abstract class SubscriptionPersisterTests
         this.schema = schema;
     }
 
-    [SetUp]
-    public void Setup()
+    SubscriptionPersister Setup(string theSchema)
     {
         dbConnection = GetConnection();
         tablePrefix = GetTablePrefix();
-        persister = new SubscriptionPersister(
+        var persister = new SubscriptionPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{tablePrefix}_",
-            sqlDialect: sqlDialect.Convert(schema),
+            sqlDialect: sqlDialect.Convert(theSchema),
             cacheFor: TimeSpan.FromSeconds(10)
         );
 
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: schema);
-            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, schema: schema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: theSchema);
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, schema: theSchema);
         }
+
+        return persister;
     }
 
     protected virtual string GetTablePrefix()
@@ -58,6 +59,7 @@ public abstract class SubscriptionPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
+            connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: null);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, schema: schema);
         }
     }
@@ -76,6 +78,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Subscribe()
     {
+        var persister = Setup(schema);
+
         var type1 = new MessageType("type1", new Version(0, 0, 0, 0));
         var type2 = new MessageType("type2", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
@@ -93,6 +97,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public async Task Cached_get_should_be_faster()
     {
+        var persister = Setup(schema);
+
         var type = new MessageType("type1", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type, null).Await();
         var first = Stopwatch.StartNew();
@@ -110,6 +116,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Should_be_cached()
     {
+        var persister = Setup(schema);
+
         var type = new MessageType("type1", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type, null).Await();
         persister.GetSubscribers(type).Await();
@@ -135,6 +143,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Subscribe_with_same_type_should_clear_cache()
     {
+        var persister = Setup(schema);
+
         var matchingType = new MessageType("matchingType", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
         persister.GetSubscribers(matchingType).Await();
@@ -145,6 +155,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Unsubscribe_with_same_type_should_clear_cache()
     {
+        var persister = Setup(schema);
+
         var matchingType = new MessageType("matchingType", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), matchingType, null).Await();
         persister.GetSubscribers(matchingType).Await();
@@ -155,6 +167,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Unsubscribe_with_part_type_should_partially_clear_cache()
     {
+        var persister = Setup(schema);
+
         var version = new Version(0, 0, 0, 0);
         var type1 = new MessageType("type1", version);
         var type2 = new MessageType("type2", version);
@@ -177,6 +191,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Subscribe_duplicate_add()
     {
+        var persister = Setup(schema);
+
         var type1 = new MessageType("type1", new Version(0, 0, 0, 0));
         var type2 = new MessageType("type2", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
@@ -193,6 +209,8 @@ public abstract class SubscriptionPersisterTests
     [Test]
     public void Unsubscribe()
     {
+        var persister = Setup(schema);
+
         var message2 = new MessageType("type2", new Version(0, 0));
         var message1 = new MessageType("type1", new Version(0, 0));
         var address1 = new Subscriber("address1@machine1", "endpoint");
@@ -207,5 +225,23 @@ public abstract class SubscriptionPersisterTests
 #if NET452
         ObjectApprover.VerifyWithJson(result);
 #endif
+    }
+
+    [Test]
+    public void UseConfiguredSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        var defaultSchemaPersister = Setup(null);
+        var schemaPersister = Setup(schema);
+
+        var type1 = new MessageType("type1", new Version(0, 0, 0, 0));
+        defaultSchemaPersister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
+
+        var result = schemaPersister.GetSubscribers(type1).Result.OrderBy(s => s.TransportAddress);
+        Assert.IsEmpty(result);
     }
 }

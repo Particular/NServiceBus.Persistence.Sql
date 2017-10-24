@@ -10,6 +10,8 @@ public class MySqlOutboxPersisterTests : OutboxPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return MySqlConnectionBuilder.Build;

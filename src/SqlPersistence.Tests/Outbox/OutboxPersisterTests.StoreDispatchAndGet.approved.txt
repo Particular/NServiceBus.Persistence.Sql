@@ -1,4 +1,21 @@
 ﻿{
-  "MessageId": "a",
-  "TransportOperations": []
+  "Item1": {
+    "MessageId": "a",
+    "TransportOperations": [
+      {
+        "MessageId": "Id1",
+        "Options": {
+          "OptionKey1": "OptionValue1"
+        },
+        "Body": "ICE=",
+        "Headers": {
+          "HeaderKey1": "HeaderValue1"
+        }
+      }
+    ]
+  },
+  "Item2": {
+    "MessageId": "a",
+    "TransportOperations": []
+  }
 }

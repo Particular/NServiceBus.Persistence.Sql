@@ -10,6 +10,8 @@ public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return OracleConnectionBuilder.Build;

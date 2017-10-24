@@ -12,12 +12,12 @@ using ObjectApproval;
 
 public abstract class OutboxPersisterTests
 {
-    OutboxPersister persister;
     BuildSqlDialect sqlDialect;
     string schema;
     Func<DbConnection> dbConnection;
 
     protected abstract Func<DbConnection> GetConnection();
+    protected virtual bool SupportsSchemas() => true;
 
     public OutboxPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
@@ -27,20 +27,20 @@ public abstract class OutboxPersisterTests
     }
 
 
-    [SetUp]
-    public void Setup()
+    OutboxPersister Setup(string theSchema)
     {
-        persister = new OutboxPersister(
+        var persister = new OutboxPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{GetTablePrefix()}_",
-            sqlDialect: sqlDialect.Convert(schema),
+            sqlDialect: sqlDialect.Convert(theSchema),
             cleanupBatchSize: 5);
         using (var connection = dbConnection())
         {
             connection.Open();
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: schema);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: theSchema);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: theSchema);
         }
+        return persister;
     }
 
     [TearDown]
@@ -49,6 +49,7 @@ public abstract class OutboxPersisterTests
         using (var connection = dbConnection())
         {
             connection.Open();
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: null);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: schema);
         }
     }
@@ -77,50 +78,17 @@ public abstract class OutboxPersisterTests
     [Test]
     public void StoreDispatchAndGet()
     {
-        var result = StoreDispatchAndGetAsync().GetAwaiter().GetResult();
+        var persister = Setup(schema);
+        var result = StoreDispatchAndGetAsync(persister).GetAwaiter().GetResult();
 #if NET452
         ObjectApprover.VerifyWithJson(result);
 #endif
-        VerifyOperationsAreEmpty(result);
+
+        Assert.AreEqual(1, result.Item1.TransportOperations.Length);
+        Assert.AreEqual(0, result.Item2.TransportOperations.Length);
     }
 
-    void VerifyOperationsAreEmpty(OutboxMessage result)
-    {
-        using (var connection = dbConnection())
-        {
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = BuildOperationsFromMessageIdCommand(result.MessageId);
-                using (var reader = command.ExecuteReader())
-                {
-                    reader.Read();
-                    var operations = reader.GetString(0);
-                    Assert.AreEqual("[]", operations);
-                }
-            }
-        }
-    }
-
-    protected virtual string BuildOperationsFromMessageIdCommand(string messageId)
-    {
-        string tableName;
-        if (string.IsNullOrEmpty(schema))
-        {
-            tableName = GetTablePrefix();
-        }
-        else
-        {
-            tableName = $"{schema}.{GetTablePrefix()}";
-        }
-
-        return $@"
-select Operations
-from {tableName}{GetTableSuffix()}
-where MessageId = '{messageId}'";
-    }
-
-    async Task<OutboxMessage> StoreDispatchAndGetAsync()
+    async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister)
     {
         var operations = new List<TransportOperation>
         {
@@ -149,21 +117,25 @@ where MessageId = '{messageId}'";
             await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
             transaction.Commit();
         }
+        var beforeDispatch = await persister.Get(messageId, null).ConfigureAwait(false);
         await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
-        return await persister.Get(messageId, null).ConfigureAwait(false);
+        var afterDispatch = await persister.Get(messageId, null).ConfigureAwait(false);
+
+        return Tuple.Create(beforeDispatch, afterDispatch);
     }
 
     [Test]
     public void StoreAndGet()
     {
-        var result = StoreAndGetAsync().GetAwaiter().GetResult();
+        var persister = Setup(schema);
+        var result = StoreAndGetAsync(persister).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
 #if NET452
         ObjectApprover.VerifyWithJson(result);
 #endif
     }
 
-    async Task<OutboxMessage> StoreAndGetAsync()
+    async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister)
     {
         var operations = new[]
         {
@@ -198,11 +170,12 @@ where MessageId = '{messageId}'";
     [Test]
     public async Task StoreAndCleanup()
     {
+        var persister = Setup(schema);
         using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         {
             for (var i = 0; i < 13; i++)
             {
-                await Store(i, connection).ConfigureAwait(false);
+                await Store(i, connection, persister).ConfigureAwait(false);
             }
         }
 
@@ -211,7 +184,7 @@ where MessageId = '{messageId}'";
         await Task.Delay(1000).ConfigureAwait(false);
         using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
         {
-            await Store(13, connection).ConfigureAwait(false);
+            await Store(13, connection, persister).ConfigureAwait(false);
         }
 
         await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
@@ -220,7 +193,7 @@ where MessageId = '{messageId}'";
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
-    async Task Store(int i, DbConnection connection)
+    async Task Store(int i, DbConnection connection, OutboxPersister persister)
     {
         var operations = new[]
         {
@@ -253,5 +226,47 @@ where MessageId = '{messageId}'";
             transaction.Commit();
         }
         await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
+    }
+
+    [Test]
+    public async Task UseConfiguredSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        var schemaPersister = Setup(schema);
+        var defaultSchemaPersister = Setup(null);
+
+        var operations = new List<TransportOperation>
+        {
+            new TransportOperation(
+                messageId: "Id1",
+                options: new Dictionary<string, string>
+                {
+                    {
+                        "OptionKey1", "OptionValue1"
+                    }
+                },
+                body: new byte[] {0x20, 0x21},
+                headers: new Dictionary<string, string>
+                {
+                    {
+                        "HeaderKey1", "HeaderValue1"
+                    }
+                }
+            )
+        };
+        var messageId = "a";
+
+        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
+        using (var transaction = connection.BeginTransaction())
+        {
+            await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
+            transaction.Commit();
+        }
+        var result = await schemaPersister.Get(messageId, null).ConfigureAwait(false);
+        Assert.IsNull(result);
     }
 }
