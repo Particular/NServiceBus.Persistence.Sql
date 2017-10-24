@@ -10,6 +10,8 @@ public class OracleSagaPersisterTests : SagaPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return () =>

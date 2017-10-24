@@ -10,6 +10,8 @@ public class MySqlServerTimeoutPersisterTests : TimeoutPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return MySqlConnectionBuilder.Build;

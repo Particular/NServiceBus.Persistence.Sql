@@ -23,6 +23,7 @@ public abstract class SagaPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    protected virtual bool SupportsSchemas() => true;
 
     public SagaPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
@@ -31,9 +32,9 @@ public abstract class SagaPersisterTests
         dbConnection = GetConnection();
     }
 
-    SagaPersister SetUp(string endpointName)
+    SagaPersister SetUp(string endpointName, string theSchema)
     {
-        var runtimeSqlDialect = sqlDialect.Convert(schema);
+        var runtimeSqlDialect = sqlDialect.Convert(theSchema);
 
         var sagaMetadataCollection = new SagaMetadataCollection();
         sagaMetadataCollection.Initialize(GetSagasAndFinders());
@@ -110,7 +111,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var sagaData = new SagaWithCorrelation.SagaData
         {
@@ -120,7 +121,7 @@ public abstract class SagaPersisterTests
             CorrelationProperty = "theCorrelationProperty"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
@@ -174,7 +175,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = SaveAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -183,12 +184,12 @@ public abstract class SagaPersisterTests
 #endif
     }
 
-    void DropAndCreate(SagaDefinition definition, string endpointName)
+    void DropAndCreate(SagaDefinition definition, string endpointName, string theSchema)
     {
         using (var connection = dbConnection())
         {
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: schema);
-            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: theSchema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), endpointName, schema: theSchema);
         }
     }
 
@@ -224,7 +225,7 @@ public abstract class SagaPersisterTests
             CorrelationProperty = "theCorrelationProperty"
         };
 
-        var persister = SetUp(nameof(CallbackThrows));
+        var persister = SetUp(nameof(CallbackThrows), schema);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithCorrelation",
             name: "SagaWithCorrelation",
@@ -234,7 +235,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, nameof(CallbackThrows));
+        DropAndCreate(definition, nameof(CallbackThrows), schema);
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
@@ -277,7 +278,7 @@ public abstract class SagaPersisterTests
             CorrelationProperty = "theCorrelationProperty"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -303,7 +304,7 @@ public abstract class SagaPersisterTests
 
         var execute = new TestDelegate(() =>
         {
-            DropAndCreate(definition, endpointName);
+            DropAndCreate(definition, endpointName, schema);
             var id = Guid.NewGuid();
             var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
             Assert.IsNotNull(result);
@@ -333,7 +334,7 @@ public abstract class SagaPersisterTests
             Contentಠ_ಠ = "♟⛺"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -357,7 +358,7 @@ public abstract class SagaPersisterTests
             )
         );
 
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = SaveWithSpaceAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -376,7 +377,7 @@ public abstract class SagaPersisterTests
             SimpleProperty = "property value"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -423,7 +424,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
@@ -434,7 +435,7 @@ public abstract class SagaPersisterTests
             SimpleProperty = "PropertyValue"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -484,7 +485,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var sagaData1 = new CorrAndTransitionalSaga.SagaData
         {
@@ -496,7 +497,7 @@ public abstract class SagaPersisterTests
             SimpleProperty = "PropertyValue"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -543,7 +544,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var sagaData1 = new SagaWithCorrelation.SagaData
         {
@@ -553,7 +554,7 @@ public abstract class SagaPersisterTests
             SimpleProperty = "PropertyValue"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -587,7 +588,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -607,7 +608,7 @@ public abstract class SagaPersisterTests
             CorrelationProperty = "theCorrelationProperty"
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -732,7 +733,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = GetByStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -750,7 +751,7 @@ public abstract class SagaPersisterTests
             Originator = "theOriginator",
             CorrelationProperty = "theCorrelationProperty"
         };
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -795,7 +796,7 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.Int
             )
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = GetByNonStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -813,7 +814,7 @@ public abstract class SagaPersisterTests
             Originator = "theOriginator",
             CorrelationProperty = 10
         };
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -859,8 +860,8 @@ public abstract class SagaPersisterTests
                 type: CorrelationPropertyType.String
             )
         );
-        DropAndCreate(definition, endpointName);
-        var persister = SetUp(endpointName);
+        DropAndCreate(definition, endpointName, schema);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -906,7 +907,7 @@ public abstract class SagaPersisterTests
             tableSuffix: "SagaWithNoCorrelation",
             name: "SagaWithNoCorrelation"
         );
-        DropAndCreate(definition, endpointName);
+        DropAndCreate(definition, endpointName, schema);
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
@@ -925,7 +926,7 @@ public abstract class SagaPersisterTests
             SimpleProperty = "PropertyValue",
         };
 
-        var persister = SetUp(endpointName);
+        var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
         using (var storageSession = new StorageSession(connection, transaction, true, null))
@@ -953,6 +954,47 @@ public abstract class SagaPersisterTests
         public Task Handle(AMessage message, IMessageHandlerContext context)
         {
             return Task.FromResult(0);
+        }
+    }
+
+    [Test]
+    public async Task UseConfiguredSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        
+        var endpointName = nameof(SaveWithNoCorrelation);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithNoCorrelation",
+            name: "SagaWithNoCorrelation"
+        );
+        DropAndCreate(definition, endpointName, null);
+        DropAndCreate(definition, endpointName, schema);
+
+        var id = Guid.NewGuid();
+
+        var schemaPersister = SetUp(endpointName, schema);
+        var defaultSchemaPersister = SetUp(endpointName, null);
+
+        var sagaData = new SagaWithNoCorrelation.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            SimpleProperty = "PropertyValue",
+        };
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await defaultSchemaPersister.Save(sagaData, storageSession, null).ConfigureAwait(false);
+            var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
+
+            Assert.IsNull(result);
         }
     }
 

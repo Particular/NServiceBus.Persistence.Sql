@@ -10,6 +10,8 @@ public class OracleTimeoutPersisterTests : TimeoutPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return OracleConnectionBuilder.Build;

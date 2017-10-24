@@ -35,14 +35,16 @@ public static class SqlDialectConverter
         switch (sqlDialect)
         {
             case BuildSqlDialect.MsSqlServer:
-                return new SqlDialect.MsSqlServer
+                var sqlServer = new SqlDialect.MsSqlServer();
+                if (schema != null)
                 {
-                    Schema = schema
-                };
+                    sqlServer.Schema = schema;
+                }
+                return sqlServer;
             case BuildSqlDialect.MySql:
                 return new SqlDialect.MySql();
             case BuildSqlDialect.PostgreSql:
-                return new SqlDialect.PostgreSql
+                var postgreSql = new SqlDialect.PostgreSql
                 {
                     JsonBParameterModifier = parameter =>
                     {
@@ -50,8 +52,14 @@ public static class SqlDialectConverter
                         npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
                     }
                 };
+                if (schema != null)
+                {
+                    postgreSql.Schema = schema;
+                }
+                return postgreSql;
             case BuildSqlDialect.Oracle:
-                return new SqlDialect.Oracle();
+                var oracle = new SqlDialect.Oracle();
+                return oracle;
             default:
                 throw new Exception($"Unknown BuildSqlDialect: {sqlDialect}.");
         }

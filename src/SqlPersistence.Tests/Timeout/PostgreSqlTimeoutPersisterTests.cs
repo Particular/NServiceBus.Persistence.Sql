@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class PostgreSqlTimeoutPersisterTests : TimeoutPersisterTests
 {
-    public PostgreSqlTimeoutPersisterTests() : base(BuildSqlDialect.PostgreSql, null)
+    public PostgreSqlTimeoutPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
     {
     }
 

@@ -4,7 +4,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 public class PostgreSqlSagaPersisterTests : SagaPersisterTests
 {
-    public PostgreSqlSagaPersisterTests() : base(BuildSqlDialect.PostgreSql, null)
+    public PostgreSqlSagaPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
     {
     }
 
