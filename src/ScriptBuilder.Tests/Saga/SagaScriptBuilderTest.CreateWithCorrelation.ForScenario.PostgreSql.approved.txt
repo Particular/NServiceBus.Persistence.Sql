@@ -5,7 +5,7 @@
 
 /* CreateTable */
 
-create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar)
+create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar, schema varchar)
     returns integer as
     $body$
     declare
@@ -15,7 +15,7 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
         columnType varchar;
     begin
         tableNameNonQuoted := tablePrefix || 'theSaga';
-        script = 'create table if not exists public."' || tableNameNonQuoted || '"
+        script = 'create table if not exists "' || schema || '"."' || tableNameNonQuoted || '"
 (
     "Id" uuid not null,
     "Metadata" text not null,
@@ -29,7 +29,7 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
 
 /* AddProperty CorrelationProperty */
 
-        script = 'alter table public."' || tableNameNonQuoted || '" add column if not exists "Correlation_CorrelationProperty" character varying(200)';
+        script = 'alter table "' || schema || '"."' || tableNameNonQuoted || '" add column if not exists "Correlation_CorrelationProperty" character varying(200)';
         execute script;
 
 /* VerifyColumnType String */
@@ -47,7 +47,7 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
 
 /* WriteCreateIndex CorrelationProperty */
 
-        script = 'create unique index if not exists "' || tablePrefix || '_i_D89EC3A0705013CCFF7590FD75D03B38CD0022C9" on public."' || tableNameNonQuoted || '" using btree ("Correlation_CorrelationProperty" asc);';
+        script = 'create unique index if not exists "' || tablePrefix || '_i_D89EC3A0705013CCFF7590FD75D03B38CD0022C9" on "' || schema || '"."' || tableNameNonQuoted || '" using btree ("Correlation_CorrelationProperty" asc);';
         execute script;
 /* PurgeObsoleteIndex */
 
@@ -60,4 +60,4 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
     $body$
 language 'plpgsql';
 
-select pg_temp.create_saga_table_theSaga(@tablePrefix);
+select pg_temp.create_saga_table_theSaga(@tablePrefix, @schema);
