@@ -34,11 +34,12 @@ It is not possible for the Sql Persistence to control this setting while still a
 As such it is necessary to explicitly set {parameterProp} to {jsonb} via a call to {parameterModifier}:
 
 var dialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
-dialect.JsonBParameterModifier(parameter =>
-{{
-    var npgsqlParameter = (NpgsqlParameter)parameter;
-    npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
-}});";
+dialect.JsonBParameterModifier(
+    modifier : parameter =>
+    {{
+        var npgsqlParameter = (NpgsqlParameter)parameter;
+        npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+    }});";
                 throw new Exception(error);
             }
 
