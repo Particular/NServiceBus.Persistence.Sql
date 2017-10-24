@@ -1,6 +1,7 @@
 namespace NServiceBus
 {
     using System;
+    using System.Data;
     using System.Data.Common;
 
     public abstract partial class SqlDialect
@@ -58,6 +59,10 @@ dialect.JsonBParameterModifier(
 
             internal override void SetParameterValue(DbParameter parameter, object value)
             {
+                if (value is DateTime)
+                {
+                    parameter.DbType = DbType.DateTime;
+                }
                 parameter.Value = value;
             }
 

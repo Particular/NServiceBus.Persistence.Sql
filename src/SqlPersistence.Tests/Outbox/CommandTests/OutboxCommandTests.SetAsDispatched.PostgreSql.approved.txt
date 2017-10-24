@@ -2,6 +2,6 @@
 update "public"."TheTablePrefixOutboxData"
 set
     "Dispatched" = true,
-    "DispatchedAt" = @DispatchedAt at time zone 'UTC',
+    "DispatchedAt" = @DispatchedAt,
     "Operations" = '[]'
 where "MessageId" = @MessageId

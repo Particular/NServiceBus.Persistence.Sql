@@ -15,7 +15,7 @@
 update {tableName}
 set
     ""Dispatched"" = true,
-    ""DispatchedAt"" = @DispatchedAt at time zone 'UTC',
+    ""DispatchedAt"" = @DispatchedAt,
     ""Operations"" = '[]'
 where ""MessageId"" = @MessageId";
             }
@@ -57,7 +57,7 @@ where ctid in
     from {tableName}
     where
         ""Dispatched"" = true and
-        ""DispatchedAt"" < @DispatchedBefore at time zone 'UTC'
+        ""DispatchedAt"" < @DispatchedBefore
     limit @BatchSize
 )";
             }
