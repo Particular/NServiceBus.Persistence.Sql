@@ -5,3 +5,6 @@ branches:
     tag: alpha
   release:
     tag: beta
+  postgresql:
+    regex: postgresql
+    tag: alpha
