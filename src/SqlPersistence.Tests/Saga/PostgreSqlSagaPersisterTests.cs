@@ -20,7 +20,34 @@ public class PostgreSqlSagaPersisterTests : SagaPersisterTests
 
     protected override bool PropertyExists(string schema, string table, string propertyName)
     {
-        throw new NotImplementedException();
+        using (var connection = PostgreSqlConnectionBuilder.Build())
+        {
+            connection.Open();
+            var sql = $@"
+select count(*)
+from information_schema.columns
+where
+table_name = '{table}' and
+column_name = '{propertyName}';
+";
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sql;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+                    var int32 = reader.GetInt32(0);
+                    return int32 > 0;
+                }
+            }
+        }
     }
 
     protected override bool IsConcurrencyException(Exception innerException)
