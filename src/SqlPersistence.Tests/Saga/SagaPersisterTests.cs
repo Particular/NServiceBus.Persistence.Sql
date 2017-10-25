@@ -132,7 +132,7 @@ public abstract class SagaPersisterTests
                 exceptionMessage = exception.Message;
             }
             Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
-            StringAssert.Contains("Incorrect data type for Correlation_CorrelationProperty", exceptionMessage);
+            StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
         }
     }
 
