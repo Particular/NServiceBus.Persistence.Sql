@@ -6,7 +6,7 @@ using NUnit.Framework;
 [TestFixture]
 public class PostgreSqlSubscriptionPersisterTests : SubscriptionPersisterTests
 {
-    public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, null)
+    public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
     {
     }
 
