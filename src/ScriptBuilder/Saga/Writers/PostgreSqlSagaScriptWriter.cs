@@ -49,7 +49,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
         string columnType;
         if (correlationProperty.Type == CorrelationPropertyType.String)
         {
-            columnType = "character varying  (200)";
+            columnType = "character varying";
         }
         else
         {
@@ -59,7 +59,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
         var name = correlationProperty.Name;
         writer.Write($@"
         columnType := (
-            select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
+            select data_type
             from information_schema.columns
             where
             table_schema = schema and
@@ -67,7 +67,7 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
             column_name = 'Correlation_{name}'
         );
         if columnType <> '{columnType}' then
-            raise exception 'Incorrect data type for Correlation_{name}. Expected {columnType} got %', columnType;
+            raise exception 'Incorrect data type for Correlation_{name}. Expected ""{columnType}"" got ""%""', columnType;
         end if;
 ");
     }
