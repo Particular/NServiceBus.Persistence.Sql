@@ -8,10 +8,11 @@ partial class SagaPersister
 {
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
-        return Update(sagaData, session, GetConcurrency(context));
+        var metadata = GetMetadata(sagaData, context);
+        return Update(sagaData, session, GetConcurrency(context), metadata);
     }
 
-    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, int concurrency)
+    internal async Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, int concurrency, SagaInstanceMetadata metadata)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
@@ -24,6 +25,7 @@ partial class SagaPersister
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
+            command.AddParameter("Metadata", Serializer.Serialize(metadata));
             command.AddParameter("Concurrency", concurrency);
             AddTransitionalParameter(sagaData, sagaInfo, command);
             var affected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);

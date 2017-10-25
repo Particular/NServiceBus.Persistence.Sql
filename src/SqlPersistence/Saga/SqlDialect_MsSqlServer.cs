@@ -70,6 +70,7 @@ values
 update {tableName}
 set
     Data = @Data,
+    Metadata = @Metadata,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,
     Concurrency = @Concurrency + 1{correlationSet}

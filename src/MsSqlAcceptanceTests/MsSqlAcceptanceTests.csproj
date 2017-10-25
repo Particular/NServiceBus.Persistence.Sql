@@ -26,5 +26,7 @@
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" Exclude="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\Partials\*.cs" />
+    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\When_canceling_saga_timeout.cs" />
+    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\When_canceling_previous_saga_timeouts.cs" />
   </ItemGroup>
 </Project>
