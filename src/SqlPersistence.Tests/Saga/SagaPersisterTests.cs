@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -91,6 +92,47 @@ public abstract class SagaPersisterTests
             var createScript = SagaScriptBuilder.BuildCreateScript(definition, sqlDialect);
             connection.ExecuteCommand(createScript, endpointName, schema: schema);
             connection.ExecuteCommand(createScript, endpointName, schema: schema);
+        }
+    }
+
+    [Test]
+    public void CreateWithDiffCorrelationType()
+    {
+        var endpointName = nameof(CreateWithDiffCorrelationType);
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            var definition2 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.DateTime
+                )
+            );
+            var createScript2 = SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect);
+
+            string exceptionMessage = null;
+            try
+            {
+                connection.ExecuteCommand(createScript2, endpointName, schema: schema);
+            }
+            catch (Exception exception)
+            {
+                exceptionMessage = exception.Message;
+            }
+            Assert.IsTrue(exceptionMessage.StartsWith("Incorrect data type for Correlation_CorrelationProperty"), exceptionMessage);
         }
     }
 

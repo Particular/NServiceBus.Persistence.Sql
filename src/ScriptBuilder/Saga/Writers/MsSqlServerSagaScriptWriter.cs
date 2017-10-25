@@ -20,7 +20,9 @@ class MsSqlServerSagaScriptWriter : ISagaScriptWriter
     public void WriteTableNameVariable()
     {
         writer.WriteLine($@"
-declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'{saga.TableSuffix}]';");
+declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'{saga.TableSuffix}]';
+declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';
+");
     }
 
     public void CreateComplete()
@@ -51,7 +53,15 @@ end
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        string columnType;
+        if (correlationProperty.Type == CorrelationPropertyType.String)
+        {
+            columnType = "nvarchar";
+        }
+        else
+        {
+            columnType = MsSqlServerCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        }
         var name = correlationProperty.Name;
         writer.Write($@"
 declare @dataType_{name} nvarchar(max);
@@ -59,7 +69,8 @@ set @dataType_{name} = (
   select data_type
   from information_schema.columns
   where
-    table_name = ' + @tableName + N' and
+    table_name = @tableNameWithoutSchema and
+    table_schema = @schema and
     column_name = 'Correlation_{name}'
 );
 if (@dataType_{name} <> '{columnType}')
@@ -105,8 +116,6 @@ end
         {
             builder.Append($" and\r\n        column_name <> N'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
-        writer.WriteLine($@"
-declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'{saga.TableSuffix}';");
 
         writer.Write($@"
 declare @dropPropertiesQuery nvarchar(max);
