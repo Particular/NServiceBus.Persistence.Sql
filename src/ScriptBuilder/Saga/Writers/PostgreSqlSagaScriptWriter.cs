@@ -95,9 +95,8 @@ for columnToDelete in
     select column_name
     from information_schema.columns
     where
-    table_name = tableNameNonQuoted and
-    column_name LIKE 'Correlation_%'
-    {builder}
+        table_name = tableNameNonQuoted and
+        column_name LIKE 'Correlation_%'{builder}
 )
 loop
 	script = '
