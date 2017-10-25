@@ -1,6 +1,5 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -31,18 +30,21 @@ select 1 from sys.columns
 where Name = N'{propertyName}'
 and Object_ID = Object_ID(N'{schema}.{table}')
 ";
-            using (var command = new SqlCommand(sql, connection))
-            using (var reader = command.ExecuteReader())
+            using (var command = connection.CreateCommand())
             {
-                if (!reader.HasRows)
+                command.CommandText = sql;
+                using (var reader = command.ExecuteReader())
                 {
-                    return false;
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+                    return reader.GetInt32(0) > 0;
                 }
-                if (!reader.Read())
-                {
-                    return false;
-                }
-                return reader.GetInt32(0) > 0;
             }
         }
     }

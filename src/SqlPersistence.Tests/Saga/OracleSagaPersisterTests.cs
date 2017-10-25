@@ -24,7 +24,32 @@ public class OracleSagaPersisterTests : SagaPersisterTests
 
     protected override bool PropertyExists(string schema, string table, string propertyName)
     {
-        throw new NotImplementedException();
+        using (var connection = OracleConnectionBuilder.Build())
+        {
+            connection.Open();
+            var sql = $@"
+select count(*)
+from all_tab_columns
+where table_name = '{table}' and
+      column_name = '{propertyName}';
+";
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sql;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+                    return reader.GetInt32(0) > 0;
+                }
+            }
+        }
     }
 
     protected override bool IsConcurrencyException(Exception innerException)
