@@ -63,7 +63,7 @@ where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
 
 if(dataType <> 'NVARCHAR2(200)')
 then
-  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+  raise_application_error(-20000, 'Incorrect data type for Correlation_CORR_CORRELATIONPROPERTY.  Expected "NVARCHAR2(200)" got "' || dataType || '".');
 end if;
 
 /* WriteCreateIndex CorrelationProperty */
@@ -104,7 +104,7 @@ where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY';
 
 if(dataType <> 'NVARCHAR2(200)')
 then
-  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+  raise_application_error(-20000, 'Incorrect data type for Correlation_CORR_TRANSITIONALPROPERTY.  Expected "NVARCHAR2(200)" got "' || dataType || '".');
 end if;
 
 /* CreateIndex TransitionalProperty */

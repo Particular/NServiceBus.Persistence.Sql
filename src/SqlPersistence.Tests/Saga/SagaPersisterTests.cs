@@ -95,6 +95,100 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public void CreateWithDiffCorrelationType()
+    {
+        var endpointName = nameof(CreateWithDiffCorrelationType);
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            var definition2 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.DateTime
+                )
+            );
+            var createScript2 = SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect);
+
+            string exceptionMessage = null;
+            try
+            {
+                connection.ExecuteCommand(createScript2, endpointName, schema: schema);
+            }
+            catch (Exception exception)
+            {
+                exceptionMessage = exception.Message;
+            }
+            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
+            StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
+        }
+    }
+
+    [Test]
+    public void CreateWithDiffTransType()
+    {
+        var endpointName = nameof(CreateWithDiffTransType);
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "TransCorrelationProperty",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            var definition2 = new SagaDefinition(
+                tableSuffix: "SagaWithCorrelation",
+                name: "SagaWithCorrelation",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "CorrelationProperty",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "TransCorrelationProperty",
+                    type: CorrelationPropertyType.DateTime
+                )
+            );
+            var createScript2 = SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect);
+
+            string exceptionMessage = null;
+            try
+            {
+                connection.ExecuteCommand(createScript2, endpointName, schema: schema);
+            }
+            catch (Exception exception)
+            {
+                exceptionMessage = exception.Message;
+            }
+            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
+            StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
+        }
+    }
+
+    [Test]
     public async Task Complete()
     {
         var endpointName = nameof(Complete);

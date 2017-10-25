@@ -46,18 +46,28 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = PostgreSqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        string columnType;
+        if (correlationProperty.Type == CorrelationPropertyType.String)
+        {
+            columnType = "character varying";
+        }
+        else
+        {
+            columnType = PostgreSqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        }
+
         var name = correlationProperty.Name;
         writer.Write($@"
         columnType := (
-            select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
+            select data_type
             from information_schema.columns
             where
-            table_name = 'tableNameNonQuoted' and
+            table_schema = schema and
+            table_name = tableNameNonQuoted and
             column_name = 'Correlation_{name}'
         );
         if columnType <> '{columnType}' then
-            raise exception 'Incorrect data type for Correlation_{name}. Expected {columnType} got %', columnType;
+            raise exception 'Incorrect data type for Correlation_{name}. Expected ""{columnType}"" got ""%""', columnType;
         end if;
 ");
     }
