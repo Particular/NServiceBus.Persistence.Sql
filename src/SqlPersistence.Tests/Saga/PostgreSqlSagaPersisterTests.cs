@@ -17,6 +17,18 @@ public class PostgreSqlSagaPersisterTests : SagaPersisterTests
             return connection;
         };
     }
+
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select count(*)
+from information_schema.columns
+where
+table_name = '{table}' and
+column_name = '{propertyName}';
+";
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         return innerException.Message.Contains("duplicate key value violates unique constraint");

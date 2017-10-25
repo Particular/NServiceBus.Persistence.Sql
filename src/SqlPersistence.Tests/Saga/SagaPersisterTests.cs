@@ -23,6 +23,7 @@ public abstract class SagaPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    protected abstract string GetPropertyWhereClauseExists(string schema, string table, string propertyName);
     protected virtual bool SupportsSchemas() => true;
 
     public SagaPersisterTests(BuildSqlDialect sqlDialect, string schema)
@@ -530,6 +531,95 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public void TransitionalProcess()
+    {
+        var endpointName = nameof(TransitionalProcess);
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+
+            var definition2 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.String
+                )
+            );
+
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+
+
+            var definition3 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
+            connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
+            Assert.IsFalse(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+        }
+    }
+
+    protected virtual string CorrelationPropertyName(string propertyName)
+    {
+        return $"Correlation_{propertyName}";
+    }
+
+    protected virtual string TestTableName(string testName, string tableSuffix)
+    {
+        return $"{testName}_{tableSuffix}";
+    }
+
+    bool PropertyExists(string table, string propertyName)
+    {
+        using (var connection = GetConnection()())
+        {
+            var sql = GetPropertyWhereClauseExists(schema, table, propertyName);
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sql;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+                    return reader.GetInt32(0) > 0;
+                }
+            }
+        }
+    }
+
+    [Test]
     public async Task UpdateWithWrongVersion()
     {
         var wrongVersion = 666;
@@ -965,7 +1055,7 @@ public abstract class SagaPersisterTests
             Assert.Ignore();
         }
 
-        
+
         var endpointName = nameof(SaveWithNoCorrelation);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithNoCorrelation",

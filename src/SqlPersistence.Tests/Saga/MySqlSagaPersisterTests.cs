@@ -24,6 +24,18 @@ public class MySqlSagaPersisterTests: SagaPersisterTests
             return connection;
         };
     }
+
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select count(*)
+from information_schema.columns
+where table_schema = database() and
+      column_name = '{propertyName}' and
+      table_name = '{table}';
+";
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         return innerException.Message.Contains("Duplicate entry ");

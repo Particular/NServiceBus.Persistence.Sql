@@ -143,7 +143,7 @@ end if;
   select count(*) into n from user_tables where table_name = '{tableName}';
   if(n = 0)
   then
- 
+
     sqlStatement :=
        'create table ""{tableName}""
        (

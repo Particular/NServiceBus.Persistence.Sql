@@ -20,6 +20,15 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
         };
     }
 
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select 1 from sys.columns
+where Name = N'{propertyName}'
+and Object_ID = Object_ID(N'{schema}.{table}')
+";
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         return innerException.Message.Contains("Cannot insert duplicate key row in object ");
