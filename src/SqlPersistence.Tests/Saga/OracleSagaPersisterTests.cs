@@ -22,13 +22,23 @@ public class OracleSagaPersisterTests : SagaPersisterTests
         };
     }
 
+    protected override string TestTableName(string testName, string tableSuffix)
+    {
+        return $"{tableSuffix.ToUpper()}";
+    }
+
+    protected override string CorrelationPropertyName(string propertyName)
+    {
+        return $"CORR_{propertyName.ToUpper()}";
+    }
+
     protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
     {
         return $@"
 select count(*)
 from all_tab_columns
 where table_name = '{table}' and
-      column_name = '{propertyName}';
+      column_name = '{propertyName}'
 ";
     }
 
