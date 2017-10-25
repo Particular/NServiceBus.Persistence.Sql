@@ -39,11 +39,12 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
             select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
             from information_schema.columns
             where
-            table_name = 'tableNameNonQuoted' and
+            table_schema = schema and
+            table_name = tableNameNonQuoted and
             column_name = 'Correlation_CorrelationProperty'
         );
-        if columnType <> 'character varying(200)' then
-            raise exception 'Incorrect data type for Correlation_CorrelationProperty. Expected character varying(200) got %', columnType;
+        if columnType <> 'character varying  (200)' then
+            raise exception 'Incorrect data type for Correlation_CorrelationProperty. Expected character varying  (200) got %', columnType;
         end if;
 
 /* WriteCreateIndex CorrelationProperty */
@@ -61,11 +62,12 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
             select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
             from information_schema.columns
             where
-            table_name = 'tableNameNonQuoted' and
+            table_schema = schema and
+            table_name = tableNameNonQuoted and
             column_name = 'Correlation_TransitionalProperty'
         );
-        if columnType <> 'character varying(200)' then
-            raise exception 'Incorrect data type for Correlation_TransitionalProperty. Expected character varying(200) got %', columnType;
+        if columnType <> 'character varying  (200)' then
+            raise exception 'Incorrect data type for Correlation_TransitionalProperty. Expected character varying  (200) got %', columnType;
         end if;
 
 /* CreateIndex TransitionalProperty */
