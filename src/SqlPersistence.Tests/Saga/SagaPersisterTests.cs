@@ -547,7 +547,7 @@ public abstract class SagaPersisterTests
             );
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
 
             var definition2 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -565,8 +565,9 @@ public abstract class SagaPersisterTests
             );
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
-            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -579,9 +580,19 @@ public abstract class SagaPersisterTests
             );
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
-            Assert.IsFalse(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
-            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+            Assert.IsFalse(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
         }
+    }
+
+    protected virtual string CorrelationPropertyName(string propertyName)
+    {
+        return $"Correlation_{propertyName}";
+    }
+
+    protected virtual string TestTableName(string testName, string tableSuffix)
+    {
+        return $"{testName}_{tableSuffix}";
     }
 
     bool PropertyExists(string table, string propertyName)
