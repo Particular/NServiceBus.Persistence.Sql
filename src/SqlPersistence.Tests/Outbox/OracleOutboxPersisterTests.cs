@@ -10,6 +10,8 @@ public class OracleOutboxPersisterTests : OutboxPersisterTests
     {
     }
 
+    protected override bool SupportsSchemas() => false;
+
     protected override Func<DbConnection> GetConnection()
     {
         return OracleConnectionBuilder.Build;
@@ -23,12 +25,5 @@ public class OracleOutboxPersisterTests : OutboxPersisterTests
     protected override string GetTableSuffix()
     {
         return "_OD";
-    }
-
-    protected override string BuildOperationsFromMessageIdCommand(string messageId)
-    {
-        return $@"select Operations
-from ""{GetTablePrefix()}{GetTableSuffix()}""
-where MessageId = '{messageId}'";
     }
 }

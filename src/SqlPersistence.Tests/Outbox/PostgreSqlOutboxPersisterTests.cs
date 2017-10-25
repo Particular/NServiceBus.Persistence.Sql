@@ -6,19 +6,12 @@ using NUnit.Framework;
 [TestFixture]
 public class PostgreSqlOutboxPersisterTests : OutboxPersisterTests
 {
-    public PostgreSqlOutboxPersisterTests() : base(BuildSqlDialect.PostgreSql, null)
+    public PostgreSqlOutboxPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
     {
     }
 
     protected override Func<DbConnection> GetConnection()
     {
         return PostgreSqlConnectionBuilder.Build;
-    }
-    protected override string BuildOperationsFromMessageIdCommand(string messageId)
-    {
-        return $@"
-select ""Operations""
-from ""{GetTablePrefix()}{GetTableSuffix()}""
-where ""MessageId"" = '{messageId}'";
     }
 }
