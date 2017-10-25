@@ -20,6 +20,11 @@ public class OracleSagaPersisterTests : SagaPersisterTests
         };
     }
 
+    protected override bool PropertyExists(string schema, string table, string propertyName)
+    {
+        throw new NotImplementedException();
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         // ORA-00001: unique constraint (TESTUSER.SAGAWITHCORRELATION_CP) violated

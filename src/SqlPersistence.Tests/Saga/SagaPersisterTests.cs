@@ -23,6 +23,7 @@ public abstract class SagaPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
+    protected abstract bool PropertyExists(string schema, string table, string propertyName);
 
     public SagaPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
@@ -525,6 +526,59 @@ public abstract class SagaPersisterTests
             ObjectApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
 #endif
             Assert.AreEqual(2, sagaData.Version);
+        }
+    }
+
+    [Test]
+    public void TransitionalProcess()
+    {
+        var endpointName = nameof(TransitionalProcess);
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+
+            var definition2 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.String
+                )
+            );
+
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
+            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+
+            var definition3 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect), endpointName, schema: schema);
+            Assert.IsFalse(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
         }
     }
 
