@@ -81,7 +81,7 @@ where table_name = '{tableName}' and column_name = '{name}';
 
 if(dataType <> '{columnType}')
 then
-  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+  raise_application_error(-20000, 'Incorrect data type for Correlation_{name}.  Expected ""{columnType}"" got ""' || dataType || '"".');
 end if;
 ");
     }

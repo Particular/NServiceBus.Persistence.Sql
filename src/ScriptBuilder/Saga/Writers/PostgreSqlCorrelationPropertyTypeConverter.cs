@@ -15,7 +15,7 @@
                 case CorrelationPropertyType.String:
                     return "character varying(200)";
                 case CorrelationPropertyType.Int:
-                    return "int";
+                    return "integer";
                 case CorrelationPropertyType.Guid:
                     return "uuid";
             }
