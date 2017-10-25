@@ -79,6 +79,33 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void WritePurgeObsoleteProperties()
     {
+        var builder = new StringBuilder();
+
+        if (saga.CorrelationProperty != null)
+        {
+            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
+        }
+        if (saga.TransitionalCorrelationProperty != null)
+        {
+            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+        }
+        writer.Write($@"
+for columnToDelete in
+(
+    select column_name
+    from information_schema.columns
+    where
+    table_name = tableNameNonQuoted and
+    column_name LIKE 'Correlation_%'
+    {builder}
+)
+loop
+	script = '
+alter table ""' || schema || '"".""' || tableNameNonQuoted || '""
+drop column ""' || columnToDelete || '""';
+    execute script;
+end loop;
+");
     }
 
 
@@ -94,6 +121,7 @@ create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varc
         script text;
         count int;
         columnType varchar;
+        columnToDelete text;
     begin
         tableNameNonQuoted := tablePrefix || '{saga.TableSuffix}';
         script = 'create table if not exists ""' || schema || '"".""' || tableNameNonQuoted || '""
@@ -109,6 +137,7 @@ create or replace function pg_temp.create_saga_table_{sagaName}(tablePrefix varc
         execute script;
 ");
     }
+
     public void CreateComplete()
     {
         var sagaName = saga.TableSuffix.Replace(' ', '_');
