@@ -17,6 +17,12 @@ public class PostgreSqlSagaPersisterTests : SagaPersisterTests
             return connection;
         };
     }
+
+    protected override bool PropertyExists(string schema, string table, string propertyName)
+    {
+        throw new NotImplementedException();
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         return innerException.Message.Contains("duplicate key value violates unique constraint");
