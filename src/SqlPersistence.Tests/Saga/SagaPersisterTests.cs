@@ -23,7 +23,8 @@ public abstract class SagaPersisterTests
     string schema;
     Func<DbConnection> dbConnection;
     protected abstract Func<DbConnection> GetConnection();
-    protected abstract bool PropertyExists(string schema, string table, string propertyName);
+    protected abstract string GetPropertyWhereClauseExists(string schema, string table, string propertyName);
+    protected virtual bool SupportsSchemas() => true;
 
     public SagaPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
@@ -546,7 +547,7 @@ public abstract class SagaPersisterTests
             );
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
 
             var definition2 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -564,8 +565,8 @@ public abstract class SagaPersisterTests
             );
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
-            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -578,8 +579,32 @@ public abstract class SagaPersisterTests
             );
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
-            Assert.IsFalse(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
-            Assert.IsTrue(PropertyExists(schema, "TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+            Assert.IsFalse(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property1"));
+            Assert.IsTrue(PropertyExists("TransitionalProcess_CorrAndTransitionalSaga", "Correlation_Property2"));
+        }
+    }
+
+    bool PropertyExists(string table, string propertyName)
+    {
+        using (var connection = GetConnection()())
+        {
+            var sql = GetPropertyWhereClauseExists(schema, table, propertyName);
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = sql;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return false;
+                    }
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+                    return reader.GetInt32(0) > 0;
+                }
+            }
         }
     }
 
@@ -1019,7 +1044,7 @@ public abstract class SagaPersisterTests
             Assert.Ignore();
         }
 
-        
+
         var endpointName = nameof(SaveWithNoCorrelation);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithNoCorrelation",
