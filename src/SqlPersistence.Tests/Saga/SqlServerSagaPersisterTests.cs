@@ -20,33 +20,13 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
         };
     }
 
-    protected override bool PropertyExists(string schema, string table, string propertyName)
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
     {
-        using (var connection = MsSqlConnectionBuilder.Build())
-        {
-            connection.Open();
-            var sql = $@"
+        return $@"
 select 1 from sys.columns
 where Name = N'{propertyName}'
 and Object_ID = Object_ID(N'{schema}.{table}')
 ";
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = sql;
-                using (var reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                    {
-                        return false;
-                    }
-                    if (!reader.Read())
-                    {
-                        return false;
-                    }
-                    return reader.GetInt32(0) > 0;
-                }
-            }
-        }
     }
 
     protected override bool IsConcurrencyException(Exception innerException)
