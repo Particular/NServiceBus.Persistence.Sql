@@ -13,6 +13,7 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
         script text;
         count int;
         columnType varchar;
+        columnToDelete text;
     begin
         tableNameNonQuoted := tablePrefix || 'theSaga';
         script = 'create table if not exists "' || schema || '"."' || tableNameNonQuoted || '"
@@ -74,6 +75,24 @@ create or replace function pg_temp.create_saga_table_theSaga(tablePrefix varchar
 /* PurgeObsoleteIndex */
 
 /* PurgeObsoleteProperties */
+
+for columnToDelete in
+(
+    select column_name
+    from information_schema.columns
+    where
+    table_name = tableNameNonQuoted and
+    column_name LIKE 'Correlation_%'
+     and
+        column_name <> 'Correlation_CorrelationProperty' and
+        column_name <> 'Correlation_TransitionalProperty'
+)
+loop
+	script = '
+alter table "' || schema || '"."' || tableNameNonQuoted || '"
+drop column "' || columnToDelete || '"';
+    execute script;
+end loop;
 
 /* CompleteSagaScript */
 
