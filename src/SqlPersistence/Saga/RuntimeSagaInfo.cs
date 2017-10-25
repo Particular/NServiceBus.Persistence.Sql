@@ -82,7 +82,7 @@ class RuntimeSagaInfo
                 {
                     throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
                 }
-                TableName = string.IsNullOrEmpty(schema) ? tableSuffix.ToUpper() : $"\"{schema.ToUpper()}\".\"{TableName.ToUpper()}\"";
+                TableName = string.IsNullOrEmpty(schema) ? tableSuffix.ToUpper() : $"\"{schema}\".\"{tableSuffix.ToUpper()}\"";
                 FillParameter = ParameterFiller.OracleFill;
                 break;
             default:
