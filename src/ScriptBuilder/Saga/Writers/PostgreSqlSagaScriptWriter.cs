@@ -46,14 +46,24 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
     public void VerifyColumnType(CorrelationProperty correlationProperty)
     {
-        var columnType = PostgreSqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        string columnType;
+        if (correlationProperty.Type == CorrelationPropertyType.String)
+        {
+            columnType = "character varying  (200)";
+        }
+        else
+        {
+            columnType = PostgreSqlCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
+        }
+
         var name = correlationProperty.Name;
         writer.Write($@"
         columnType := (
             select data_type || ' ' || coalesce(' (' || character_maximum_length || ')', '')
             from information_schema.columns
             where
-            table_name = 'tableNameNonQuoted' and
+            table_schema = schema and
+            table_name = tableNameNonQuoted and
             column_name = 'Correlation_{name}'
         );
         if columnType <> '{columnType}' then
