@@ -66,6 +66,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_replying_to_received_message_without_correlationid.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_sending_with_no_correlation_id.cs" />
