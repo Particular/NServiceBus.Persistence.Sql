@@ -8,8 +8,9 @@
     using Features;
     using NServiceBus.Sagas;
     using NUnit.Framework;
+    using Persistence.Sql;
 
-    public class When_reply_from_saga_not_found_handler : NServiceBusAcceptanceTest
+    public class when_reply_from_saga_not_found_handler : NServiceBusAcceptanceTest
     {
         // related to NSB issue #2044
         [Test]
@@ -59,8 +60,10 @@
                 EndpointSetup<DefaultServer>(c => c.EnableFeature<TimeoutManager>());
             }
 
-            public class NotFoundHandlerSaga1 : Saga<NotFoundHandlerSaga1.NotFoundHandlerSaga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageToSaga>
+            public class NotFoundHandlerSaga1 : SqlSaga<NotFoundHandlerSaga1.NotFoundHandlerSaga1Data>, IAmStartedByMessages<StartSaga1>, IHandleMessages<MessageToSaga>
             {
+                protected override string CorrelationPropertyName => nameof(NotFoundHandlerSaga1Data.ContextId);
+
                 public Task Handle(StartSaga1 message, IMessageHandlerContext context)
                 {
                     Data.ContextId = message.ContextId;
@@ -72,12 +75,10 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NotFoundHandlerSaga1Data> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga1>(m => m.ContextId)
-                        .ToSaga(s => s.ContextId);
-                    mapper.ConfigureMapping<MessageToSaga>(m => m.ContextId)
-                        .ToSaga(s => s.ContextId);
+                    mapper.ConfigureMapping<StartSaga1>(m => m.ContextId);
+                    mapper.ConfigureMapping<MessageToSaga>(m => m.ContextId);
                 }
 
                 public class NotFoundHandlerSaga1Data : ContainSagaData
