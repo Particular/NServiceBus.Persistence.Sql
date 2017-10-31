@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using EndpointTemplates;
@@ -12,55 +13,49 @@
         [Test]
         public async Task Should_hydrate_and_invoke_the_existing_instance()
         {
+            var someId = Guid.NewGuid();
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<ExistingSagaInstanceEndpoint>(b => b
-                    .When(session => session.SendLocal(new StartSagaMessage
+                    .When(async session =>
                     {
-                        SomeId = Guid.NewGuid()
-                    })))
-                .Done(c => c.SecondMessageReceived)
+                        await session.SendLocal(
+                            new StartSagaMessage
+                            {
+                                SomeId = someId
+                            });
+                        await session.SendLocal(
+                            new StartSagaMessage
+                            {
+                                SomeId = someId
+                            });
+                    }))
+                .Done(c => c.SagaIds.Count >= 2)
                 .Run();
 
-            Assert.AreEqual(context.FirstSagaId, context.SecondSagaId, "The same saga instance should be invoked invoked for both messages");
+            Assert.AreEqual(2, context.SagaIds.Count);
+            Assert.AreEqual(context.SagaIds[0], context.SagaIds[1]);
         }
 
         public class Context : ScenarioContext
         {
-            public bool SecondMessageReceived { get; set; }
-
-            public Guid FirstSagaId { get; set; }
-            public Guid SecondSagaId { get; set; }
+            public IList<Guid> SagaIds { get; } = new List<Guid>();
         }
 
         public class ExistingSagaInstanceEndpoint : EndpointConfigurationBuilder
         {
             public ExistingSagaInstanceEndpoint()
             {
-                EndpointSetup<DefaultServer>();
+                EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
             public class TestSaga05 : SqlSaga<TestSagaData05>, IAmStartedByMessages<StartSagaMessage>
             {
-                protected override string CorrelationPropertyName => nameof(TestSagaData05.SomeId);
-
                 public Context TestContext { get; set; }
+                protected override string CorrelationPropertyName => nameof(TestSagaData05.SomeId);
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
                 {
-                    if (message.SecondMessage)
-                    {
-                        TestContext.SecondSagaId = Data.Id;
-                        TestContext.SecondMessageReceived = true;
-                    }
-                    else
-                    {
-                        TestContext.FirstSagaId = Data.Id;
-                        return context.SendLocal(new StartSagaMessage
-                        {
-                            SomeId = message.SomeId,
-                            SecondMessage = true
-                        });
-                    }
+                    TestContext.SagaIds.Add(Data.Id);
 
                     return Task.FromResult(0);
                 }
