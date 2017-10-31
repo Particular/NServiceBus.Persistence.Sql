@@ -6,7 +6,6 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
 
     //Repro for #1323
     public class When_started_by_base_event_from_other_saga : NServiceBusAcceptanceTest
@@ -65,10 +64,9 @@
                 metadata => metadata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
 
-            public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
+            public class SagaStartedByBaseEvent : Saga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }
-                protected override string CorrelationPropertyName => nameof(SagaStartedByBaseEventSagaData.DataId);
 
                 public Task Handle(BaseEvent message, IMessageHandlerContext context)
                 {
@@ -78,9 +76,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaStartedByBaseEventSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId);
+                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class SagaStartedByBaseEventSagaData : ContainSagaData

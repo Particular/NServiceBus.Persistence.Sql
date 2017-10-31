@@ -59,8 +59,7 @@
         {
             public DTCEndpoint()
             {
-                // sql needs a TransactionScope
-                EndpointSetup<DefaultServer>(c => c.ConfigureTransport().Transactions(TransportTransactionMode.TransactionScope));
+                EndpointSetup<DefaultServer>();
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>

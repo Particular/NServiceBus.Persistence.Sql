@@ -7,7 +7,7 @@
     using Features;
     using NUnit.Framework;
 
-    public partial class When_deferring_a_message : NServiceBusAcceptanceTest
+    public class When_deferring_a_message : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_delay_delivery()

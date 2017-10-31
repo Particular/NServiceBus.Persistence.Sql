@@ -6,38 +6,37 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
-    using Routing;
 
-    public class When_replies_to_message_published_by_a_saga : NServiceBusAcceptanceTest
+    public class When_replying_to_saga_event : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_reply_to_a_message_published_by_a_saga()
+        public async Task Should_correlate_reply_to_publishing_saga_instance()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<SagaEndpoint>
-                (b => b.When(c => c.Subscribed, session => session.SendLocal(new StartSaga
-                {
-                    DataId = Guid.NewGuid()
-                }))
-                )
-                .WithEndpoint<ReplyEndpoint>(b => b.When(async (session, c) =>
-                {
-                    await session.Subscribe<DidSomething>();
-                    if (c.HasNativePubSubSupport)
+                .WithEndpoint<SagaEndpoint>(b => b
+                    .When(c => c.Subscribed, session => session.SendLocal(new StartSaga
                     {
-                        c.Subscribed = true;
-                    }
-                }))
-                .Done(c => c.DidSagaReplyMessageGetCorrelated)
+                        DataId = Guid.NewGuid()
+                    }))
+                )
+                .WithEndpoint<ReplyEndpoint>(b => b
+                    .When(async (session, c) =>
+                    {
+                        await session.Subscribe<DidSomething>();
+                        if (c.HasNativePubSubSupport)
+                        {
+                            c.Subscribed = true;
+                        }
+                    }))
+                .Done(c => c.CorrelatedResponseReceived)
                 .Run();
 
-            Assert.True(context.DidSagaReplyMessageGetCorrelated);
+            Assert.True(context.CorrelatedResponseReceived);
         }
 
         public class Context : ScenarioContext
         {
-            public bool DidSagaReplyMessageGetCorrelated { get; set; }
+            public bool CorrelatedResponseReceived { get; set; }
             public bool Subscribed { get; set; }
         }
 
@@ -71,15 +70,12 @@
                 });
             }
 
-            public class ReplyToPubMsgSaga : SqlSaga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
+            public class ReplyToPubMsgSaga : Saga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
-                protected override string CorrelationPropertyName => nameof(ReplyToPubMsgSagaData.DataId);
-
                 public Context Context { get; set; }
 
                 public Task Handle(StartSaga message, IMessageHandlerContext context)
                 {
-                    Data.DataId = message.DataId;
                     return context.Publish(new DidSomething
                     {
                         DataId = message.DataId
@@ -88,14 +84,13 @@
 
                 public Task Handle(DidSomethingResponse message, IMessageHandlerContext context)
                 {
-                    Context.DidSagaReplyMessageGetCorrelated = message.ReceivedDataId == Data.DataId;
-                    MarkAsComplete();
+                    Context.CorrelatedResponseReceived = message.ReceivedDataId == Data.DataId;
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReplyToPubMsgSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
                 }
 
                 public class ReplyToPubMsgSagaData : ContainSagaData

@@ -7,7 +7,7 @@
     using NUnit.Framework;
 
     [TestFixture]
-    public partial class When_running_saga_tests : NServiceBusAcceptanceTest
+    public class When_running_saga_tests : NServiceBusAcceptanceTest
     {
         [Test]
         public void All_saga_entities_in_acceptance_tests_should_have_virtual_properties()

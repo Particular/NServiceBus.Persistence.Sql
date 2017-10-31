@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0004\build\NServiceBus.Transport.Msmq.props" Condition="Exists('..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0004\build\NServiceBus.Transport.Msmq.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,6 +12,8 @@
     <AssemblyName>AcceptanceTestsHolder</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,13 +32,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-beta0007\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-beta0009\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.7.0.0-beta0007\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.7.0.0-beta0009\lib\net452\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Transport.Msmq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0001\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0004\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.7.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
@@ -63,7 +66,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_replying_to_received_message_without_correlationid.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Correlation\When_sending_with_no_correlation_id.cs" />
@@ -96,10 +98,8 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Outbox\When_dispatching_forwarded_messages.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Outbox\When_headers_contain_special_characters.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Outbox\When_receiving_a_message.cs" />
-    <Compile Include="Partials\When_Deferring_a_message.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_faulted.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_a_message_is_sent.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Pipeline\When_sending_to_another_endpoint.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Recoverability\When_cross_q_transactional_message_is_moved_to_error_queue.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Recoverability\When_custom_policy_always_moves_to_error.cs" />
@@ -162,20 +162,12 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlated_property_value_is_changed.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlating_on_special_characters.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_finder_returns_existing_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_forgetting_to_set_a_corr_property.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_mapping_saga_messages_using_base_classes.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_message_has_a_saga_id.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\when_receiving_multiple_timeouts.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_receiving_that_completes_the_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_receiving_that_should_start_a_saga.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_receiving_that_should_start_a_saga_without_interception.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_receiving_that_should_start_a_saga_with_interception.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_replies_to_message_published_by_a_saga.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_receiving_multiple_timeouts.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_replying_to_originator.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_replying_to_originator_from_a_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\when_reply_from_saga_not_found_handler.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_replying_to_saga_event.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_reply_from_saga_not_found_handler.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_sagas_cant_be_found.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_sagas_share_timeout_messages.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_saga_exists_for_start_message.cs" />
@@ -224,6 +216,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_receiving_with_the_default_settings.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
+    <Compile Include="Partials\When_Deferring_a_message.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Partials\When_running_saga_tests.cs" />
     <Compile Include="TestSuiteConstraints.cs" />
@@ -239,5 +232,12 @@
       <Name>SqlPersistence</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0004\build\NServiceBus.Transport.Msmq.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0004\build\NServiceBus.Transport.Msmq.props'))" />
+  </Target>
 </Project>
