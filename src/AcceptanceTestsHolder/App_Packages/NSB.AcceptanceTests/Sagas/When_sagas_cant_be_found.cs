@@ -8,7 +8,7 @@
     using NServiceBus.Sagas;
     using NUnit.Framework;
 
-    public class When_sagas_cant_be_found : NServiceBusAcceptanceTest
+    public partial class When_sagas_cant_be_found : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task IHandleSagaNotFound_only_called_once()
