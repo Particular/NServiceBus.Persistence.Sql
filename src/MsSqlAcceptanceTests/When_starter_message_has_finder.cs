@@ -10,10 +10,10 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_only_starter_message_has_finder : NServiceBusAcceptanceTest
+public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 {
     [Test]
-    public async Task Should_use_existing_saga()
+    public async Task Should_correlate_the_following_message_correctly()
     {
         if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
         {
