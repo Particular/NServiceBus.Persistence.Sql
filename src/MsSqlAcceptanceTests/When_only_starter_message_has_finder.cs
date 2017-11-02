@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -11,7 +10,7 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_all_messages_have_finders : NServiceBusAcceptanceTest
+public class When_only_starter_message_has_finder : NServiceBusAcceptanceTest
 {
     [Test]
     public async Task Should_use_existing_saga()
@@ -35,14 +34,12 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             .ConfigureAwait(false);
 
         Assert.True(context.StartSagaFinderUsed);
-        Assert.True(context.SomeOtherFinderUsed);
     }
 
     public class Context : ScenarioContext
     {
         public bool StartSagaFinderUsed { get; set; }
         public bool HandledOtherMessage { get; set; }
-        public bool SomeOtherFinderUsed { get; set; }
     }
 
     public class SagaEndpoint : EndpointConfigurationBuilder
@@ -60,28 +57,6 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
                 Context.StartSagaFinderUsed = true;
-
-                return session.GetSagaData<TestSaga.SagaData>(
-                    context: context,
-                    whereClause: "json_value(Data,'$.Property') = @propertyValue",
-                    appendParameters: (builder, append) =>
-                    {
-                        var parameter = builder();
-                        parameter.ParameterName = "propertyValue";
-                        parameter.Value = "Test";
-                        append(parameter);
-                    });
-            }
-        }
-
-        public class FindBySomeOtherMessage : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
-        {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
-
-            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
-            {
-                Context.SomeOtherFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
@@ -117,10 +92,11 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 return Task.FromResult(0);
             }
 
-            protected override string CorrelationPropertyName => null;
+            protected override string CorrelationPropertyName => nameof(SagaData.Property);
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
+                mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
             }
 
             public class SagaData : ContainSagaData
