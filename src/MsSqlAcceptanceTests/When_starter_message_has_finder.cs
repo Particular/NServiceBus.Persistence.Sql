@@ -75,7 +75,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            public Context TestContext { get; set; }
+            Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
