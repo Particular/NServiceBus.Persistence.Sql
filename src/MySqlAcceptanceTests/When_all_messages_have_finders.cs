@@ -29,12 +29,13 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.FinderUsed);
+        Assert.True(context.StartSagaFinderUsed);
+        Assert.True(context.SomeOtherFinderUsed);
     }
 
     public class Context : ScenarioContext
     {
-        public bool FinderUsed { get; set; }
+        public bool StartSagaFinderUsed { get; set; }
         public bool HandledOtherMessage { get; set; }
         public bool SomeOtherFinderUsed { get; set; }
     }
@@ -53,7 +54,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.FinderUsed = true;
+                Context.StartSagaFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
