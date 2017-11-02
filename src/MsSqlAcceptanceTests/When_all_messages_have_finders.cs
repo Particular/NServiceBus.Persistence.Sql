@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -100,6 +99,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
+            // ReSharper disable once MemberCanBePrivate.Global
             public Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

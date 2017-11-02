@@ -70,8 +70,6 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>
         {
-            public Context TestContext { get; set; }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;

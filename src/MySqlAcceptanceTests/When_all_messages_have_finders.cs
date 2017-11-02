@@ -70,6 +70,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>
         {
+            // ReSharper disable once MemberCanBePrivate.Global
             public Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

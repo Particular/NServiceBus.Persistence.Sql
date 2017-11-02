@@ -75,7 +75,8 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            Context TestContext { get; set; }
+            // ReSharper disable once MemberCanBePrivate.Global
+            public Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {

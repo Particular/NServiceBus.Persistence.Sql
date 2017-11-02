@@ -48,7 +48,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
         public class FindByStartSagaMessage : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
             // ReSharper disable once MemberCanBePrivate.Global
-           Context Context { get; set; }
+            public Context Context { get; set; }
 
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
