@@ -9,7 +9,7 @@
         public static void Write(string assemblyPath, string targetDirectory, Action<string, string> logError, Func<string,string> promotionPathFinder)
         {
             var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
-            DirectoryExtensions.Delete(scriptPath);
+            PurgeDialectDirs(scriptPath);
             Directory.CreateDirectory(scriptPath);
             Settings settings;
             using (var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred)))
@@ -47,11 +47,20 @@
             Promote(replicationPath, scriptPath);
         }
 
+        static void PurgeDialectDirs(string scriptPath)
+        {
+            foreach (var dialect in Enum.GetNames(typeof(BuildSqlDialect)))
+            {
+                var dialectDirectory = Path.Combine(scriptPath, dialect);
+                DirectoryExtensions.Delete(dialectDirectory);
+            }
+        }
+
         static void Promote(string replicationPath, string scriptPath)
         {
             try
             {
-                DirectoryExtensions.Delete(replicationPath);
+                PurgeDialectDirs(replicationPath);
                 DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
             }
             catch (Exception exception)
