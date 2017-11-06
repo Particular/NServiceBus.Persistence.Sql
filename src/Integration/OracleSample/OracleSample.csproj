@@ -5,7 +5,7 @@
     <OutputType>exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
     <PackageReference Include="NServiceBus.Persistence.Sql" Version="$(IntegrationVersion)" />
     <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />

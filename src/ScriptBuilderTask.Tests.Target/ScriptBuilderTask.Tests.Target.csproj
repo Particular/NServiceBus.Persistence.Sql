@@ -4,7 +4,7 @@
     <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0011" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 </Project>

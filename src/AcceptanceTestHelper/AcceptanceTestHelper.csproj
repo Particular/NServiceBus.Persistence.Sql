@@ -6,7 +6,7 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0011" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
     <PackageReference Include="NUnit" Version="3.7.*" />
     <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
