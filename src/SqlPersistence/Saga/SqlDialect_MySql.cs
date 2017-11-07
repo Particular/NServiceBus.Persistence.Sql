@@ -13,6 +13,10 @@ namespace NServiceBus
                 return $"`{tablePrefix}{tableSuffix}`";
             }
 
+            internal override void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            {
+            }
+
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
             {
                 var valuesBuilder = new StringBuilder();
