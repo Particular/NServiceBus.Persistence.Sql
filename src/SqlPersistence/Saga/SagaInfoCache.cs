@@ -49,7 +49,12 @@ class SagaInfoCache
             {
                 throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
             }
-            cache[sagaDataType] = BuildSagaInfo(sagaDataType, metadata.SagaType);
+            var sagaInfo = BuildSagaInfo(sagaDataType, metadata.SagaType);
+            cache[sagaDataType] = sagaInfo;
+            if (sagaInfo.CorrelationProperty != null && !metadata.TryGetCorrelationProperty(out var _))
+            {
+                throw new Exception($"The saga '{metadata.SagaType.FullName}' defines a correlation property '{sagaInfo.CorrelationProperty}' which is not mapped to any message. Either map it or remove it from the saga definition.");
+            }
         }
     }
 

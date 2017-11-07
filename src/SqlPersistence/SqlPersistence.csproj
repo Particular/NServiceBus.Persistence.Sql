@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="4.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
-    <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
   </ItemGroup>
@@ -47,4 +47,11 @@
   <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
+  
+  <!--Workaround for https://github.com/dotnet/sdk/issues/1469 -->
+  <PropertyGroup>
+    <DisableLockFileFrameworks>true</DisableLockFileFrameworks>
+  </PropertyGroup>
+  <!-- End Workaround -->
+  
 </Project>

@@ -10,11 +10,15 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_all_messages_have_finders : NServiceBusAcceptanceTest
+public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 {
     [Test]
-    public async Task Should_use_existing_saga()
+    public async Task Should_correlate_the_following_message_correctly()
     {
+        if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
+        {
+            return;
+        }
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
@@ -30,14 +34,12 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             .ConfigureAwait(false);
 
         Assert.True(context.StartSagaFinderUsed);
-        Assert.True(context.SomeOtherFinderUsed);
     }
 
     public class Context : ScenarioContext
     {
         public bool StartSagaFinderUsed { get; set; }
         public bool HandledOtherMessage { get; set; }
-        public bool SomeOtherFinderUsed { get; set; }
     }
 
     public class SagaEndpoint : EndpointConfigurationBuilder
@@ -47,7 +49,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             EndpointSetup<DefaultServer>();
         }
 
-        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
+        public class FindByStartSagaMessage : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
             // ReSharper disable once MemberCanBePrivate.Global
             public Context Context { get; set; }
@@ -58,29 +60,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
-                    whereClause: "json_extract(Data,'$.Property') = @propertyValue",
-                    appendParameters: (builder, append) =>
-                    {
-                        var parameter = builder();
-                        parameter.ParameterName = "propertyValue";
-                        parameter.Value = "Test";
-                        append(parameter);
-                    });
-            }
-        }
-
-        public class FindBySomeOtherMessage : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
-        {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
-
-            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
-            {
-                Context.SomeOtherFinderUsed = true;
-
-                return session.GetSagaData<TestSaga.SagaData>(
-                    context: context,
-                    whereClause: "json_extract(Data,'$.Property') = @propertyValue",
+                    whereClause: "json_value(Data,'$.Property') = @propertyValue",
                     appendParameters: (builder, append) =>
                     {
                         var parameter = builder();
@@ -113,15 +93,16 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 return Task.FromResult(0);
             }
 
-            public class SagaData : ContainSagaData
-            {
-                public string Property { get; set; }
-            }
-
-            protected override string CorrelationPropertyName => null;
+            protected override string CorrelationPropertyName => nameof(SagaData.Property);
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
+                mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
+            }
+
+            public class SagaData : ContainSagaData
+            {
+                public string Property { get; set; }
             }
         }
     }
