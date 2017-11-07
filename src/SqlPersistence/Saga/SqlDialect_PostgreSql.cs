@@ -3,14 +3,41 @@
 namespace NServiceBus
 {
     using System.Text;
+    using Logging;
+    using Newtonsoft.Json;
+    using Persistence.Sql;
+    using LogManager = LogManager;
 
     public partial class SqlDialect
     {
         public partial class PostgreSql
         {
+            static ILog log = LogManager.GetLogger<PostgreSql>();
+
             public override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
                 return $"\"{Schema}\".\"{tablePrefix}{tableSuffix}\"";
+            }
+
+            internal override void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            {
+                if (!IsTypeNameHandlingCorrect(jsonSerializer))
+                {
+                    throw new SerializationException("PostgreSQL does not guarantee that properties are stored in order. As such, when using any TypeNameHandling other than 'None', then the MetadataPropertyHandling must be set to 'ReadAhead'.");
+                }
+            }
+
+            static bool IsTypeNameHandlingCorrect(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            {
+                if (jsonSerializer.TypeNameHandling == TypeNameHandling.None)
+                {
+                    return true;
+                }
+                if (jsonSerializer.MetadataPropertyHandling == MetadataPropertyHandling.ReadAhead)
+                {
+                    return true;
+                }
+                return false;
             }
 
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)

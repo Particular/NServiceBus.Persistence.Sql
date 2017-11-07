@@ -167,11 +167,13 @@ class RuntimeSagaInfo
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
             var settings = versionSpecificSettings(sagaDataType, storedSagaTypeVersion);
-            if (settings != null)
+            if (settings == null)
             {
-                return JsonSerializer.Create(settings);
+                return jsonSerializer;
             }
-            return jsonSerializer;
+            var serializer = JsonSerializer.Create(settings);
+            sqlDialect.ValidateJsonSettings(serializer);
+            return serializer;
         });
     }
 }

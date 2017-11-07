@@ -56,6 +56,7 @@ class StorageSessionFeature : Feature
     {
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
+        sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
         if (readerCreator == null)
         {
