@@ -22,10 +22,6 @@ namespace NServiceBus
                 return tableSuffix.ToUpper();
             }
 
-            internal override void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
-            {
-            }
-
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
             {
                 var valuesBuilder = new StringBuilder();

@@ -25,6 +25,9 @@ namespace NServiceBus
             return sagaInfo.ToJson(sagaData);
         }
 
-        internal abstract void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer);
+        internal virtual void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
+        {
+
+        }
     }
 }
