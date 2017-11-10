@@ -214,7 +214,8 @@ public class SagaDefinitionReaderTest
     public void WithStatementBodyProperty()
     {
         var sagaType = module.GetTypeDefinition<WithStatementBodyPropertySaga>();
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        SagaDefinition definition;
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
         ObjectApprover.VerifyWithJson(definition);
     }
 

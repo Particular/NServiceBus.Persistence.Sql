@@ -8,7 +8,8 @@ static class ScriptLocation
 {
     public static string FindScriptDirectory(ReadOnlySettings settings)
     {
-        if (settings.TryGet("SqlPersistence.ScriptDirectory", out string scriptDirectory))
+        string scriptDirectory;
+        if (settings.TryGet("SqlPersistence.ScriptDirectory", out scriptDirectory))
         {
             return scriptDirectory;
         }
