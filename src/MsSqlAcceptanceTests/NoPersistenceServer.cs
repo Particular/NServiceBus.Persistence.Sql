@@ -9,14 +9,14 @@
     using Features;
     using Config.ConfigurationSource;
 
-    public class InMemoryServer : IEndpointSetupTemplate
+    public class NoPersistenceServer : IEndpointSetupTemplate
     {
-        public InMemoryServer()
+        public NoPersistenceServer()
         {
             typesToInclude = new List<Type>();
         }
 
-        public InMemoryServer(List<Type> typesToInclude)
+        public NoPersistenceServer(List<Type> typesToInclude)
         {
             this.typesToInclude = typesToInclude;
         }
@@ -45,8 +45,6 @@
             await configuration.DefineTransport(runDescriptor, endpointConfiguration).ConfigureAwait(false);
 
             configuration.RegisterComponentsAndInheritanceHierarchy(runDescriptor);
-
-            configuration.UsePersistence<InMemoryPersistence>();
 
             configuration.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
             configurationBuilderCustomization(configuration);

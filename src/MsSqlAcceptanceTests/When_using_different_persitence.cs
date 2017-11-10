@@ -28,7 +28,7 @@ public class When_using_different_persitence : NServiceBusAcceptanceTest
     {
         public InMemoryPersistenceEndpoint()
         {
-            EndpointSetup<InMemoryServer>();
+            EndpointSetup<NoPersistenceServer>(c => c.UsePersistence<InMemoryPersistence>());
         }
     }
 
