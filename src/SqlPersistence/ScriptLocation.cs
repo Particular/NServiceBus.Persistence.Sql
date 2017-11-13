@@ -1,15 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using NServiceBus.Persistence.Sql;
+using NServiceBus;
+using NServiceBus.Settings;
 
 static class ScriptLocation
 {
-    public static string FindScriptDirectory(SqlVariant sqlVariant)
+    public static string FindScriptDirectory(ReadOnlySettings settings)
     {
+        string scriptDirectory;
+        if (settings.TryGet("SqlPersistence.ScriptDirectory", out scriptDirectory))
+        {
+            return scriptDirectory;
+        }
         var codeBase = Assembly.GetExecutingAssembly().CodeBase;
         var currentDirectory = Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", sqlVariant.ToString());
+        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", settings.GetSqlVariant().ToString());
     }
 
     public static void ValidateScriptExists(string createScript)

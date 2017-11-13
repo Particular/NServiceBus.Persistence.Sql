@@ -14,19 +14,26 @@ class Installer : INeedToInstallSomething
 {
     ReadOnlySettings settings;
     static ILog log = LogManager.GetLogger<Installer>();
+    InstallerSettings installerSettings;
 
     public Installer(ReadOnlySettings settings)
     {
         this.settings = settings;
+        installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
     public async Task Install(string identity)
     {
-        var connectionBuilder = settings.GetConnectionBuilder();
-        var sqlVariant = settings.GetSqlVariant();
+        if (installerSettings == null || installerSettings.Disabled)
+        {
+            return;
+        }
+
+        var connectionBuilder = installerSettings.ConnectionBuilder;
+        var sqlVariant = installerSettings.SqlVariant;
         var schema = settings.GetSchema();
-        var scriptDirectory = ScriptLocation.FindScriptDirectory(sqlVariant);
-        var tablePrefix = settings.GetTablePrefix();
+        var scriptDirectory = installerSettings.ScriptDirectory;
+        var tablePrefix = installerSettings.TablePrefix;
 
         ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
 
@@ -44,7 +51,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Outbox>())
+        if (!settings.GetFeatureEnabled<StorageType.Outbox>())
         {
             return Task.FromResult(0);
         }
@@ -71,7 +78,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Subscriptions>())
+        if (!settings.GetFeatureEnabled<StorageType.Subscriptions>())
         {
             return Task.FromResult(0);
         }
@@ -98,7 +105,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Timeouts>())
+        if (!settings.GetFeatureEnabled<StorageType.Timeouts>())
         {
             return Task.FromResult(0);
         }
@@ -125,7 +132,7 @@ class Installer : INeedToInstallSomething
 
     Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
     {
-        if (!settings.ShouldInstall<StorageType.Sagas>())
+        if (!settings.GetFeatureEnabled<StorageType.Sagas>())
         {
             return Task.FromResult(0);
         }
