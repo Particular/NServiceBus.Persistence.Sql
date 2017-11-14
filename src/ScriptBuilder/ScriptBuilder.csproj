@@ -1,12 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
-    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
-    <AssemblyTitle>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyTitle>
-    <Product>NServiceBus.Persistence.Sql.ScriptBuilder</Product>
+    <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilder</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -22,6 +19,9 @@
 
   <ItemGroup>
     <Compile Include="..\Guard.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="**\*.sql" />
     <EmbeddedResource Include="**\*.sql" />
   </ItemGroup>
@@ -31,10 +31,10 @@
     <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)"
-               ContinueOnError="WarnAndContinue" />
-    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)"
-               ContinueOnError="WarnAndContinue" />
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
   </Target>
+
 </Project>
