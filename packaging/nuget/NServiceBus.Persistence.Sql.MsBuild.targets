@@ -19,7 +19,7 @@
   <Target
       AfterTargets="AfterCompile"
       Name="SqlPersistenceScriptBuilder">
-    <ScriptBuilderTask
+    <SqlPersistenceScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
           ProjectDirectory="$(ProjectDir)"
