@@ -147,8 +147,10 @@ from {TableName(tableName)}
         {
             switch (sqlVariant)
             {
-                    default:
-                        return name;
+                case SqlVariant.Oracle:
+                    return $"\"{name}\"";
+                default:
+                    return name;
             }
         }
 
