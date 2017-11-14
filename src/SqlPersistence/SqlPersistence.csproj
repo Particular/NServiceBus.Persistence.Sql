@@ -6,17 +6,16 @@
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OutputPath>..\..\binaries\</OutputPath>
     <NoWarn>$(NoWarn);CS0419</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
     <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
+    <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -28,7 +27,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>NServiceBus.Persistence.Sql</PackageId>
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
