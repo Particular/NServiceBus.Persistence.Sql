@@ -7,7 +7,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
-    <NoWarn>$(NoWarn);CS0419</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
