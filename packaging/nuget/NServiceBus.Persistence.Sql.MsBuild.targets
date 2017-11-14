@@ -13,7 +13,7 @@
     </Otherwise>
   </Choose>
   <UsingTask
-      TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
+      TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
       AssemblyFile="$(ScriptBuilderTaskPath)" />
 
   <Target
