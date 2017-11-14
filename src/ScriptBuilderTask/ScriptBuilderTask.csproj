@@ -8,6 +8,7 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
     <OutputPath>..\..\binaries\</OutputPath>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
@@ -16,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="4.0.0-*" PrivateAssets="All" />
     <PackageReference Include="ILRepack" Version="2.0.*" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -35,7 +36,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
     <Description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
