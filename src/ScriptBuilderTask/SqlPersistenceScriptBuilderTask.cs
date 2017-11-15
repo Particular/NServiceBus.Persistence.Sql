@@ -8,7 +8,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 namespace NServiceBus.Persistence.Sql
 {
-    public class ScriptBuilderTask : Task
+    public class SqlPersistenceScriptBuilderTask : Task
     {
         BuildLogger logger;
 
@@ -21,7 +21,7 @@ namespace NServiceBus.Persistence.Sql
         public override bool Execute()
         {
             logger = new BuildLogger(BuildEngine);
-            logger.LogInfo($"ScriptBuilderTask (version {typeof(ScriptBuilderTask).Assembly.GetName().Version}) Executing");
+            logger.LogInfo($"SqlPersistenceScriptBuilderTask (version {typeof(SqlPersistenceScriptBuilderTask).Assembly.GetName().Version}) Executing");
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -43,7 +43,7 @@ namespace NServiceBus.Persistence.Sql
             }
             finally
             {
-                logger.LogInfo($"  Finished ScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
+                logger.LogInfo($"  Finished SqlPersistenceScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
             }
             return !logger.ErrorOccurred;
         }

@@ -76,7 +76,7 @@
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Writers\OutboxWriter.cs" />
     <Compile Include="Writers\SagaWriter.cs" />
-    <Compile Include="ScriptBuilderTask.cs" />
+    <Compile Include="SqlPersistenceScriptBuilderTask.cs" />
     <Compile Include="Writers\SubscriptionWriter.cs" />
     <Compile Include="Writers\TimeoutWriter.cs" />
   </ItemGroup>
