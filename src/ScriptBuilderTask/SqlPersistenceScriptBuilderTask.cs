@@ -8,7 +8,7 @@ namespace NServiceBus.Persistence.Sql
     using System.IO;
     using System.Reflection;
 
-    public class ScriptBuilderTask : Task
+    public class SqlPersistenceScriptBuilderTask : Task
     {
         BuildLogger logger;
 
@@ -24,12 +24,12 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string SolutionDirectory { get; set; }
 
-        static Version assemblyVersion= typeof(ScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
+        static Version assemblyVersion= typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
 
         public override bool Execute()
         {
             logger = new BuildLogger(BuildEngine);
-            logger.LogInfo($"ScriptBuilderTask (version {assemblyVersion}) Executing");
+            logger.LogInfo($"SqlPersistenceScriptBuilderTask (version {assemblyVersion}) Executing");
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -53,7 +53,7 @@ namespace NServiceBus.Persistence.Sql
             }
             finally
             {
-                logger.LogInfo($"  Finished ScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
+                logger.LogInfo($"  Finished SqlPersistenceScriptBuilderTask {stopwatch.ElapsedMilliseconds}ms.");
             }
             return !logger.ErrorOccurred;
         }

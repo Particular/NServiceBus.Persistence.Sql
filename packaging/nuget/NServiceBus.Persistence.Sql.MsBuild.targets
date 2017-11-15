@@ -13,13 +13,13 @@
     </Otherwise>
   </Choose>
   <UsingTask
-      TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
+      TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
       AssemblyFile="$(ScriptBuilderTaskPath)" />
 
   <Target
       AfterTargets="AfterCompile"
       Name="SqlPersistenceScriptBuilder">
-    <ScriptBuilderTask
+    <SqlPersistenceScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
           ProjectDirectory="$(ProjectDir)"
