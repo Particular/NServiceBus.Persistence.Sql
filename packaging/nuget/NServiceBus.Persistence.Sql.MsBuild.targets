@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <UsingTask
-      TaskName="NServiceBus.Persistence.Sql.ScriptBuilderTask"
+      TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
       AssemblyFile="$(MSBuildThisFileDirectory)..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
 
   <Target
       AfterTargets="AfterCompile"
       Name="SqlPersistenceScriptBuilder">
-    <ScriptBuilderTask
+    <SqlPersistenceScriptBuilderTask
           AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
           IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"/>
   </Target>
