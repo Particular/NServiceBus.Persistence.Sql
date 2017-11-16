@@ -1,13 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <OutputType>exe</OutputType>
   </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="..\..\SqlHelper.cs" Link="SqlHelper.cs" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
-    <PackageReference Include="NServiceBus.Persistence.Sql" Version="$(IntegrationVersion)" />
     <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\SqlHelper.cs" />
+  </ItemGroup>
+
 </Project>
