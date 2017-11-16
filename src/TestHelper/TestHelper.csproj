@@ -8,7 +8,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
-    <PackageReference Include="MySql.Data" Version="6.*" />
+    <PackageReference Include="MySql.Data" Version="6.*" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
