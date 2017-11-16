@@ -30,7 +30,9 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
-  <Target Name="WritePackageVersionForIntegration" BeforeTargets="GenerateNuspec">
+  <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
     <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
 
