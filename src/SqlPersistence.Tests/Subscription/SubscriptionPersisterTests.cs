@@ -91,6 +91,17 @@ public abstract class SubscriptionPersisterTests
     }
 
     [Test]
+    public void Subscribe_multiple_with_no_endpoint()
+    {
+        var type = new MessageType("type", new Version(0, 0, 0, 0));
+        persister.Subscribe(new Subscriber("e@machine1", null), type, null).Await();
+        // Ensuring that MSSQL's handling of = null vs. is null doesn't cause a PK violation here
+        persister.Subscribe(new Subscriber("e@machine1", null), type, null).Await();
+        var result = persister.GetSubscribers(type).Result.OrderBy(s => s.TransportAddress);
+        Assert.AreEqual(1, result.Count());
+    }
+
+    [Test]
     public async Task Cached_get_should_be_faster()
     {
         var type = new MessageType("type1", new Version(0, 0, 0, 0));

@@ -2,17 +2,23 @@
 using System.IO;
 using System.Reflection;
 using NServiceBus;
+using NServiceBus.Settings;
 
 static class ScriptLocation
 {
-    public static string FindScriptDirectory(SqlDialect dialect)
+    public static string FindScriptDirectory(ReadOnlySettings settings)
     {
-        var currentDirectory = GetCurrentDirectory();
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", dialect.Name);
+        var currentDirectory = GetCurrentDirectory(settings);
+        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", settings.GetSqlDialect().Name);
     }
 
-    static string GetCurrentDirectory()
+    static string GetCurrentDirectory(ReadOnlySettings settings)
     {
+		string scriptDirectory;
+        if (settings.TryGet("SqlPersistence.ScriptDirectory", out scriptDirectory))
+        {
+            return scriptDirectory;
+        }
         var entryAssembly = Assembly.GetEntryAssembly();
         if (entryAssembly == null)
         {
