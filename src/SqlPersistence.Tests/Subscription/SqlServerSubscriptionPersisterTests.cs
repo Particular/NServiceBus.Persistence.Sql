@@ -10,8 +10,8 @@ public class SqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return MsSqlConnectionBuilder.Build;
+        return x => MsSqlConnectionBuilder.Build();
     }
 }

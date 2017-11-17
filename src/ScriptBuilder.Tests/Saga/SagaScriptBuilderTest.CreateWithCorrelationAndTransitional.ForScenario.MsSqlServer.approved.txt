@@ -2,6 +2,8 @@
 /* TableNameVariable */
 
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'theSaga]';
+declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'theSaga';
+
 
 /* Initialize */
 
@@ -54,12 +56,13 @@ set @dataType_CorrelationProperty = (
   select data_type
   from information_schema.columns
   where
-    table_name = ' + @tableName + N' and
+    table_name = @tableNameWithoutSchema and
+    table_schema = @schema and
     column_name = 'Correlation_CorrelationProperty'
 );
-if (@dataType_CorrelationProperty <> 'nvarchar(200)')
+if (@dataType_CorrelationProperty <> 'nvarchar')
   begin
-    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar(200) got ' + @dataType_CorrelationProperty + '.';
+    declare @error_CorrelationProperty nvarchar(max) = N'Incorrect data type for Correlation_CorrelationProperty. Expected nvarchar got ' + @dataType_CorrelationProperty + '.';
     throw 50000, @error_CorrelationProperty, 0
   end
 
@@ -106,12 +109,13 @@ set @dataType_TransitionalProperty = (
   select data_type
   from information_schema.columns
   where
-    table_name = ' + @tableName + N' and
+    table_name = @tableNameWithoutSchema and
+    table_schema = @schema and
     column_name = 'Correlation_TransitionalProperty'
 );
-if (@dataType_TransitionalProperty <> 'nvarchar(200)')
+if (@dataType_TransitionalProperty <> 'nvarchar')
   begin
-    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar(200) got ' + @dataType_TransitionalProperty + '.';
+    declare @error_TransitionalProperty nvarchar(max) = N'Incorrect data type for Correlation_TransitionalProperty. Expected nvarchar got ' + @dataType_TransitionalProperty + '.';
     throw 50000, @error_TransitionalProperty, 0
   end
 
@@ -151,8 +155,6 @@ select @dropIndexQuery =
 exec sp_executesql @dropIndexQuery
 
 /* PurgeObsoleteProperties */
-
-declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'theSaga';
 
 declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =

@@ -24,6 +24,15 @@ exec('create schema schema_name');";
                 command.ExecuteNonQuery();
             }
         }
+        using (var connection = PostgreSqlConnectionBuilder.Build())
+        {
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"create schema if not exists ""SchemaName"";";
+                command.ExecuteNonQuery();
+            }
+        }
     }
 
     void FixCurrentDirectory([CallerFilePath] string callerFilePath="")

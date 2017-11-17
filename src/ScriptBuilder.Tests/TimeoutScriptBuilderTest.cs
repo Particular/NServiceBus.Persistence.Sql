@@ -14,6 +14,7 @@ public class TimeoutScriptBuilderTest
     [TestCase(BuildSqlDialect.MsSqlServer)]
     [TestCase(BuildSqlDialect.MySql)]
     [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
     public void BuildCreateScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
@@ -38,6 +39,7 @@ public class TimeoutScriptBuilderTest
     [TestCase(BuildSqlDialect.MsSqlServer)]
     [TestCase(BuildSqlDialect.MySql)]
     [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
     public void BuildDropScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();

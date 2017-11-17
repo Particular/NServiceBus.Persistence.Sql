@@ -22,7 +22,22 @@ namespace NServiceBus
         {
         }
 
-        internal abstract void FillParameter(DbParameter parameter, string paramName, object value);
+        internal void AddJsonParameter(DbParameter parameter, string paramName, object value)
+        {
+            parameter.ParameterName = paramName;
+            SetJsonParameterValue(parameter, value);
+        }
+
+        internal abstract void SetJsonParameterValue(DbParameter parameter, object value);
+
+        internal void AddParameter(DbParameter parameter, string paramName, object value)
+        {
+            parameter.ParameterName = paramName;
+            SetParameterValue(parameter, value);
+        }
+
+        internal abstract void SetParameterValue(DbParameter parameter, object value);
+
         internal abstract CommandWrapper CreateCommand(DbConnection connection);
         internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
         {
@@ -33,17 +48,6 @@ namespace NServiceBus
                 command.Transaction = transaction;
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", tablePrefix);
-                AddCreationScriptParameters(command);
-                await command.ExecuteNonQueryEx().ConfigureAwait(false);
-            }
-        }
-
-        internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script)
-        {
-            using (var command = connection.CreateCommand())
-            {
-                command.Transaction = transaction;
-                command.CommandText = script;
                 AddCreationScriptParameters(command);
                 await command.ExecuteNonQueryEx().ConfigureAwait(false);
             }

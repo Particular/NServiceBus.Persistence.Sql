@@ -10,14 +10,23 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return () =>
+        return x =>
         {
             var connection = MsSqlConnectionBuilder.Build();
             connection.Open();
             return connection;
         };
+    }
+
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select 1 from sys.columns
+where Name = N'{propertyName}'
+and Object_ID = Object_ID(N'{schema}.{table}')
+";
     }
 
     protected override bool IsConcurrencyException(Exception innerException)

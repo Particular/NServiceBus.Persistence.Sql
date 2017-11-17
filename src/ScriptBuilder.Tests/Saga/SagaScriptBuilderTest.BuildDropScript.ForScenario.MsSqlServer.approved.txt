@@ -2,6 +2,8 @@
 /* TableNameVariable */
 
 declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + N'theSaga]';
+declare @tableNameWithoutSchema nvarchar(max) = @tablePrefix + N'theSaga';
+
 
 /* DropTable */
 

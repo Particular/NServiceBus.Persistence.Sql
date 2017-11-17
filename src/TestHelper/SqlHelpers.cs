@@ -33,6 +33,10 @@ public static class SqlHelpers
                 {
                     command.AddParameter("schema", schema ?? "dbo");
                 }
+                if (command is Npgsql.NpgsqlCommand)
+                {
+                    command.AddParameter("schema", schema ?? "public");
+                }
                 command.ExecuteNonQuery();
             }
         }

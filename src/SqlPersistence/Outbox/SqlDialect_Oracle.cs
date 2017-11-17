@@ -51,9 +51,9 @@ values
             {
                 return $@"
 delete from {tableName}
-where Dispatched = 1
-    and DispatchedAt < :DispatchedBefore
-    and rownum <= :BatchSize";
+where Dispatched = 1 and
+      DispatchedAt < :DispatchedBefore and
+      rownum <= :BatchSize";
             }
         }
     }

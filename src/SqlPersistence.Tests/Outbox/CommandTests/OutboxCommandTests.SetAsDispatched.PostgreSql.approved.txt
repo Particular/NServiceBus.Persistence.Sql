@@ -1,0 +1,7 @@
+﻿
+update "public"."TheTablePrefixOutboxData"
+set
+    "Dispatched" = true,
+    "DispatchedAt" = @DispatchedAt,
+    "Operations" = '[]'
+where "MessageId" = @MessageId

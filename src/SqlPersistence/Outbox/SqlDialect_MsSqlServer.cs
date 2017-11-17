@@ -51,8 +51,8 @@ values
             {
                 return $@"
 delete top (@BatchSize) from {tableName}
-where Dispatched = 'true'
-    and DispatchedAt < @DispatchedBefore";
+where Dispatched = 'true' and
+      DispatchedAt < @DispatchedBefore";
             }
         }
     }

@@ -2,17 +2,32 @@ using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using Oracle.ManagedDataAccess.Client;
 
 [TestFixture]
 public class OracleOutboxPersisterTests : OutboxPersisterTests
 {
-    public OracleOutboxPersisterTests() : base(BuildSqlDialect.Oracle, null)
+    public OracleOutboxPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override bool SupportsSchemas() => true;
+
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return OracleConnectionBuilder.Build;
+        return schema =>
+        {
+            var key = schema == null
+                ? "OracleConnectionString"
+                : $"OracleConnectionString_{schema}";
+
+            var connection = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(connection))
+            {
+                throw new Exception($"{key} environment variable is empty");
+            }
+            return new OracleConnection(connection);
+        };
     }
 
     protected override string GetTablePrefix()
@@ -23,12 +38,5 @@ public class OracleOutboxPersisterTests : OutboxPersisterTests
     protected override string GetTableSuffix()
     {
         return "_OD";
-    }
-
-    protected override string BuildOperationsFromMessageIdCommand(string messageId)
-    {
-        return $@"select Operations
-from ""{GetTablePrefix()}{GetTableSuffix()}""
-where MessageId = '{messageId}'";
     }
 }

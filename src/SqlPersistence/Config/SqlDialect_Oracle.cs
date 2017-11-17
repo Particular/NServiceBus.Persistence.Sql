@@ -15,9 +15,13 @@ namespace NServiceBus
         {
             volatile PropertyInfo bindByName;
 
-            internal override void FillParameter(DbParameter parameter, string paramName, object value)
+            internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
-                parameter.ParameterName = paramName;
+                SetParameterValue(parameter, value);
+            }
+
+            internal override void SetParameterValue(DbParameter parameter, object value)
+            {
                 if (value is Guid)
                 {
                     parameter.Value = value.ToString();

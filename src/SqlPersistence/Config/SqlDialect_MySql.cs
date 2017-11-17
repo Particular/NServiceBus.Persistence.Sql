@@ -9,9 +9,13 @@ namespace NServiceBus
         /// </summary>
         public partial class MySql : SqlDialect
         {
-            internal override void FillParameter(DbParameter parameter, string paramName, object value)
+            internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
-                parameter.ParameterName = paramName;
+                SetParameterValue(parameter, value);
+            }
+
+            internal override void SetParameterValue(DbParameter parameter, object value)
+            {
                 parameter.Value = value;
             }
 

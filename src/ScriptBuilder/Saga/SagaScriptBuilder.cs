@@ -85,6 +85,10 @@
             {
                 return new MySqlSagaScriptWriter(textWriter, saga);
             }
+            if (sqlDialect == BuildSqlDialect.PostgreSql)
+            {
+                return new PostgreSqlSagaScriptWriter(textWriter, saga);
+            }
             if (sqlDialect == BuildSqlDialect.Oracle)
             {
                 return new OracleSagaScriptWriter(textWriter, saga);

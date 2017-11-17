@@ -32,7 +32,7 @@ partial class SagaPersister
                 metadata.Add("Originator", sagaData.Originator);
             }
             command.AddParameter("Metadata", Serializer.Serialize(metadata));
-            command.AddParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
+            command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             if (correlationId != null)

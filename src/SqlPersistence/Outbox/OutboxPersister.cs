@@ -103,7 +103,7 @@ class OutboxPersister : IOutboxStorage
             command.CommandText = outboxCommands.Store;
             command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
-            command.AddParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
+            command.AddJsonParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }

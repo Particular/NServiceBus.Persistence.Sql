@@ -3,7 +3,7 @@
   "Destination": "theDestination",
   "SagaId": "00000000-0000-0000-0000-000000000000",
   "State": "AQ==",
-  "Time": "2000-01-01T01:01:02",
+  "Time": "2000-01-01T01:01:02Z",
   "OwningTimeoutManager": null,
   "Headers": {}
 }

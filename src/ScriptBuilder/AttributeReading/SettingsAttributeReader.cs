@@ -47,6 +47,7 @@ static class SettingsAttributeReader
         {
             yield return BuildSqlDialect.MsSqlServer;
             yield return BuildSqlDialect.MySql;
+            yield return BuildSqlDialect.PostgreSql;
             yield return BuildSqlDialect.Oracle;
             yield break;
         }
@@ -63,15 +64,21 @@ static class SettingsAttributeReader
             yield return BuildSqlDialect.MySql;
         }
 
+        var postgreSqlScripts = attribute.GetBoolProperty("PostgreSqlScripts");
+        if (postgreSqlScripts)
+        {
+            yield return BuildSqlDialect.PostgreSql;
+        }
+
         var oracleScripts = attribute.GetBoolProperty("OracleScripts");
         if (oracleScripts)
         {
             yield return BuildSqlDialect.Oracle;
         }
 
-        if (!msSqlServerScripts && !mySqlScripts && !oracleScripts)
+        if (!msSqlServerScripts && !mySqlScripts && !oracleScripts && !postgreSqlScripts)
         {
-            throw new ErrorsException("Must define at least one of MsSqlServerScripts, MySqlScripts, or OracleScripts. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
+            throw new ErrorsException("Must define at least one of MsSqlServerScripts, MySqlScripts, OracleScripts, or PostgreSqlScripts. Add a [SqlPersistenceSettingsAttribute] to the assembly.");
         }
     }
 }

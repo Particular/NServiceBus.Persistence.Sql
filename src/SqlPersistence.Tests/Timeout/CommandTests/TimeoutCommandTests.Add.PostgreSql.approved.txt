@@ -1,0 +1,21 @@
+﻿
+insert into "public"."TheTablePrefixTimeoutData"
+(
+    "Id",
+    "Destination",
+    "SagaId",
+    "State",
+    "Time",
+    "Headers",
+    "PersistenceVersion"
+)
+values
+(
+    @Id,
+    @Destination,
+    @SagaId,
+    @State,
+    @Time,
+    @Headers,
+    @PersistenceVersion
+)

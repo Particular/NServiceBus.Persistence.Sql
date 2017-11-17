@@ -13,6 +13,7 @@ public class OutboxScriptBuilderTest
     [Test]
     [TestCase(BuildSqlDialect.MsSqlServer)]
     [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
     [TestCase(BuildSqlDialect.Oracle)]
     public void BuildCreateScript(BuildSqlDialect sqlDialect)
     {
@@ -38,6 +39,7 @@ public class OutboxScriptBuilderTest
     [Test]
     [TestCase(BuildSqlDialect.MsSqlServer)]
     [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
     [TestCase(BuildSqlDialect.Oracle)]
     public void BuildDropScript(BuildSqlDialect sqlDialect)
     {

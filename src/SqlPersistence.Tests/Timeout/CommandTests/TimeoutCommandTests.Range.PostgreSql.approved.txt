@@ -1,0 +1,4 @@
+﻿
+select "Id", "Time"
+from "public"."TheTablePrefixTimeoutData"
+where "Time" > @StartTime and "Time" <= @EndTime

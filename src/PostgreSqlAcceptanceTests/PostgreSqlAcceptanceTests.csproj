@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="3.*" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta*" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.0.0-*" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" PrivateAssets="All" />
+    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" Exclude="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\ConfigureEndpointMsmqTransport.cs" />
+    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\Partials\*.cs" />
+  </ItemGroup>
+</Project>

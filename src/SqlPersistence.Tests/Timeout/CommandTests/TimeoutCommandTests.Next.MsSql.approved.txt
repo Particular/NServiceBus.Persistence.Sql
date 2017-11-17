@@ -1,0 +1,4 @@
+﻿
+select top 1 Time from [TheSchema].[TheTablePrefixTimeoutData]
+where Time > @EndTime
+order by Time

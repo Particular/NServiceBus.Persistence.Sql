@@ -54,11 +54,9 @@ class StorageSessionFeature : Feature
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)
     {
-#pragma warning disable 618
-        var commandBuilder = new SagaCommandBuilder(sqlDialect);
-#pragma warning restore 618
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
+        sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
         if (readerCreator == null)
         {
@@ -81,7 +79,6 @@ class StorageSessionFeature : Feature
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
             writerCreator: writerCreator,
-            commandBuilder: commandBuilder,
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
             metadataCollection: settings.Get<SagaMetadataCollection>(),

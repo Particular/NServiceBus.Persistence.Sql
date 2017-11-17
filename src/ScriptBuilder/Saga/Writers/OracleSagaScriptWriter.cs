@@ -32,7 +32,10 @@ declare
   sqlStatement varchar2(500);
   dataType varchar2(30);
   n number(10);
-begin");
+  currentSchema varchar2(500);
+begin
+select sys_context('USERENV','CURRENT_SCHEMA') into currentSchema from dual;
+");
     }
 
     public void WriteTableNameVariable()
@@ -49,7 +52,7 @@ begin");
         var columnType = OracleCorrelationPropertyTypeConverter.GetColumnType(correlationProperty.Type);
         var name = OracleCorrelationPropertyName(correlationProperty);
         writer.Write($@"
-select count(*) into n from all_tab_columns where table_name = '{tableName}' and column_name = '{name}';
+select count(*) into n from all_tab_columns where table_name = '{tableName}' and column_name = '{name}' and owner = currentSchema;
 if(n = 0)
 then
   sqlStatement := 'alter table ""{tableName}"" add ( {name} {columnType} )';
@@ -77,11 +80,11 @@ select data_type ||
     end
   end into dataType
 from all_tab_columns
-where table_name = '{tableName}' and column_name = '{name}';
+where table_name = '{tableName}' and column_name = '{name}' and owner = currentSchema;
 
 if(dataType <> '{columnType}')
 then
-  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+  raise_application_error(-20000, 'Incorrect data type for Correlation_{name}.  Expected ""{columnType}"" got ""' || dataType || '"".');
 end if;
 ");
     }
@@ -117,14 +120,14 @@ end if;
         writer.Write($@"
 select count(*) into n
 from all_tab_columns
-where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
+where table_name = '{tableName}' and column_name like 'CORR_%'{builder} and owner = currentSchema;
 
 if(n > 0)
 then
 
   select 'alter table ""{tableName}"" drop column ' || column_name into sqlStatement
   from all_tab_columns
-  where table_name = '{tableName}' and column_name like 'CORR_%'{builder};
+  where table_name = '{tableName}' and column_name like 'CORR_%'{builder} and owner = currentSchema;
 
   execute immediate sqlStatement;
 
@@ -143,7 +146,7 @@ end if;
   select count(*) into n from user_tables where table_name = '{tableName}';
   if(n = 0)
   then
- 
+
     sqlStatement :=
        'create table ""{tableName}""
        (

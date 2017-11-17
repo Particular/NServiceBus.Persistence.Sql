@@ -1,0 +1,11 @@
+﻿
+delete from "public"."TheTablePrefixOutboxData"
+where ctid in
+(
+    select ctid
+    from "public"."TheTablePrefixOutboxData"
+    where
+        "Dispatched" = true and
+        "DispatchedAt" < @DispatchedBefore
+    limit @BatchSize
+)

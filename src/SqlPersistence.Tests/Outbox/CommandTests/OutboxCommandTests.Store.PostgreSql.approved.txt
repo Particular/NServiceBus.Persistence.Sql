@@ -1,0 +1,13 @@
+﻿
+insert into "public"."TheTablePrefixOutboxData"
+(
+    "MessageId",
+    "Operations",
+    "PersistenceVersion"
+)
+values
+(
+    @MessageId,
+    @Operations,
+    @PersistenceVersion
+)
