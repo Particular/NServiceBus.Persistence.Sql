@@ -162,6 +162,7 @@ namespace NServiceBus
             "ersion 4.0.0.", true)]
         public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
+        public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle> dialectSettings, string schema) { }
         public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
             where T : NServiceBus.SqlDialect, new () { }
         [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. The member curren" +
