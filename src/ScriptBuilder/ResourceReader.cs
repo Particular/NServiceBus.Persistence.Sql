@@ -8,7 +8,7 @@ static class ResourceReader
 
     public static string ReadResource(BuildSqlDialect sqlDialect, string prefix)
     {
-        var text = $"NServiceBus.Persistence.Sql.{prefix}_{sqlDialect}.sql";
+        var text = $"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlDialect}.sql";
         using (var stream = assembly.GetManifestResourceStream(text))
         using (var streamReader = new StreamReader(stream))
         {

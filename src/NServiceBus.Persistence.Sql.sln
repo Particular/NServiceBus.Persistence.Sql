@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26711.1
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 EndProject
@@ -26,14 +26,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilderTask.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilderTask.Tests.Target", "ScriptBuilderTask.Tests.Target\ScriptBuilderTask.Tests.Target.csproj", "{D6836F7B-0D9F-45B2-ACB5-851978B7C234}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{87FC4455-07B6-4490-A31D-F386A11A4095}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.Build.targets = Directory.Build.targets
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleAcceptanceTests", "OracleAcceptanceTests\OracleAcceptanceTests.csproj", "{6DFB669B-7BB0-409B-90AE-6968470EA2CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTestsHolder", "AcceptanceTestsHolder\AcceptanceTestsHolder.csproj", "{8B2246AB-4FAA-481D-AC1B-0A3F24E48CC8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FB898D09-ADF0-49D4-8089-D743F1A31D12}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		..\GitVersion.yml = ..\GitVersion.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

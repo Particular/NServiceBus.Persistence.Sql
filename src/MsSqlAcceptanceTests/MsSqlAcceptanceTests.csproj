@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
@@ -7,25 +7,25 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Configuration" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta0005" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.0.0-beta0012" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta0005" />
     <PackageReference Include="NUnit" Version="3.7.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" PrivateAssets="All" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" PrivateAssets="All" />
-    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
-    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" Exclude="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\ConfigureEndpointMsmqTransport.cs" />
     <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\Partials\*.cs" />
   </ItemGroup>
+
 </Project>
