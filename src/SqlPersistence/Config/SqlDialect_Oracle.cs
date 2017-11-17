@@ -63,6 +63,10 @@ namespace NServiceBus
                     throw new Exception($"Table prefix '{tablePrefix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Change the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).");
                 }
             }
+
+            internal string Schema { get; set; }
+
+            string SchemaPrefix => Schema != null ? $"\"{Schema.ToUpper()}\"." : "";
         }
     }
 }

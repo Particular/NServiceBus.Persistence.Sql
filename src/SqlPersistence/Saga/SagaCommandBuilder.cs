@@ -34,7 +34,7 @@ namespace NServiceBus.Persistence.Sql
             }
 
             return $@"
-insert into {TableName(tableName)}
+insert into {tableName}
 (
     Id,
     Metadata,
@@ -65,7 +65,7 @@ values
             }
 
             return $@"
-update {TableName(tableName)}
+update {tableName}
 set
     Data = {ParamName("Data")},
     PersistenceVersion = {ParamName("PersistenceVersion")},
@@ -85,7 +85,7 @@ select
     Concurrency,
     Metadata,
     Data
-from {TableName(tableName)}
+from {tableName}
 where Id = {ParamName("Id")}
 ";
         }
@@ -99,7 +99,7 @@ select
     Concurrency,
     Metadata,
     Data
-from {TableName(tableName)}
+from {tableName}
 where {CorrelationPropertyName(propertyName)} = {ParamName("propertyValue")}
 ";
         }
@@ -107,7 +107,7 @@ where {CorrelationPropertyName(propertyName)} = {ParamName("propertyValue")}
         public string BuildCompleteCommand(string tableName)
         {
             return $@"
-delete from {TableName(tableName)}
+delete from {tableName}
 where Id = {ParamName("Id")} and Concurrency = {ParamName("Concurrency")}
 ";
         }
@@ -121,18 +121,13 @@ select
     Concurrency,
     Metadata,
     Data
-from {TableName(tableName)}
+from {tableName}
 ";
         }
 
         string CorrelationPropertyName(string propertyName)
         {
             return sqlDialect.GetSagaCorrelationPropertyName(propertyName);
-        }
-
-        string TableName(string name)
-        {
-            return sqlDialect.QuoteSagaTableName(name);
         }
 
         string ParamName(string name)

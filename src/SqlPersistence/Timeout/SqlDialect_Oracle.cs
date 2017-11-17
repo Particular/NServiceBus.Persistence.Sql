@@ -10,13 +10,13 @@
 
             internal override string GetTimeoutTableName(string tablePrefix)
             {
-               return $"{tablePrefix.ToUpper()}TO";
+               return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}TO\"";
             }
 
             internal override string GetTimeoutInsertCommand(string tableName)
             {
                 return $@"
-insert into ""{tableName}""
+insert into {tableName}
 (
     Id,
     Destination,
@@ -41,14 +41,14 @@ values
             internal override string GetTimeoutRemoveByIdCommand(string tableName)
             {
                 return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where Id = :Id";
             }
 
             internal override string GetTimeoutRemoveBySagaIdCommand(string tableName)
             {
                 return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where SagaId = :SagaId";
             }
 
@@ -61,7 +61,7 @@ select
     State,
     ExpireTime,
     Headers
-from ""{tableName}""
+from {tableName}
 where Id = :Id";
             }
 
@@ -69,7 +69,7 @@ where Id = :Id";
             {
                 return $@"
 select Id, ExpireTime
-from ""{tableName}""
+from {tableName}
 where ExpireTime > :StartTime and ExpireTime <= :EndTime";
             }
 
@@ -79,7 +79,7 @@ where ExpireTime > :StartTime and ExpireTime <= :EndTime";
 select ExpireTime
 from
 (
-    select ExpireTime from ""{tableName}""
+    select ExpireTime from {tableName}
     where ExpireTime > :EndTime
     order by ExpireTime
 ) subquery

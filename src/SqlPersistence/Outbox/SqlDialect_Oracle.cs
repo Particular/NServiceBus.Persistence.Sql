@@ -6,13 +6,13 @@
         {
             internal override string GetOutboxTableName(string tablePrefix)
             {
-                return $"{tablePrefix.ToUpper()}OD";
+                return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}OD\"";
             }
 
             internal override string GetOutboxSetAsDispatchedCommand(string tableName)
             {
                 return $@"
-update ""{tableName}""
+update {tableName}
 set
     Dispatched = 1,
     DispatchedAt = :DispatchedAt,
@@ -26,14 +26,14 @@ where MessageId = :MessageId";
 select
     Dispatched,
     Operations
-from ""{tableName}""
+from {tableName}
 where MessageId = :MessageId";
             }
 
             internal override string GetOutboxStoreCommand(string tableName)
             {
                 return $@"
-insert into ""{tableName}""
+insert into {tableName}
 (
     MessageId,
     Operations,
@@ -50,7 +50,7 @@ values
             internal override string GetOutboxCleanupCommand(string tableName)
             {
                 return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where Dispatched = 1
     and DispatchedAt < :DispatchedBefore
     and rownum <= :BatchSize";

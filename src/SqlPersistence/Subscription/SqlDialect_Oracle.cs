@@ -11,14 +11,14 @@
         {
             internal override string GetSubscriptionTableName(string tablePrefix)
             {
-               return $"{tablePrefix.ToUpper()}SS";
+               return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}SS\"";
             }
 
             internal override string GetSubscriptionSubscribeCommand(string tableName)
             {
                 return $@"
 begin
-    insert into ""{tableName}""
+    insert into {tableName}
     (
         MessageType,
         Subscriber,
@@ -43,7 +43,7 @@ end;
             internal override string GetSubscriptionUnsubscribeCommand(string tableName)
             {
                 return $@"
-delete from ""{tableName}""
+delete from {tableName}
 where
     Subscriber = :Subscriber and
     MessageType = :MessageType";
@@ -53,7 +53,7 @@ where
             {
                 var getSubscribersPrefixOracle = $@"
 select distinct Subscriber, Endpoint
-from ""{tableName}""
+from {tableName}
 where MessageType in (";
 
                 return messageTypes =>

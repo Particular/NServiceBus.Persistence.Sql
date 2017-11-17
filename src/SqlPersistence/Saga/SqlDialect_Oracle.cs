@@ -17,14 +17,9 @@
                 {
                     throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
                 }
-                return tableSuffix.ToUpper();
+                return $"{SchemaPrefix}\"{tableSuffix.ToUpper()}\"";
             }
-
-            internal override string QuoteSagaTableName(string tableName)
-            {
-                return $"\"{tableName.ToUpper()}\"";
-            }
-
+            
             internal override string GetSagaCorrelationPropertyName(string propertyName)
             {
                 var oracleName = "CORR_" + propertyName.ToUpper();
