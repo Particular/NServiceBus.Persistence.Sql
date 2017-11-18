@@ -1,3 +1,4 @@
+#if NET452
 #pragma warning disable 618
 using ApprovalTests;
 using ApprovalTests.Namers;
@@ -93,3 +94,4 @@ public abstract class OutboxCommandTests
         }
     }
 }
+#endif
