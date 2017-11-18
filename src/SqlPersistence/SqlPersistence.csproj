@@ -35,12 +35,6 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
-    <Optimize>false</Optimize>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
   <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
     <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
     <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
