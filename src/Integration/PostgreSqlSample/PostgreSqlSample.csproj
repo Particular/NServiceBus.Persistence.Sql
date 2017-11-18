@@ -1,15 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <OutputType>exe</OutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="3.*" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.Persistence.Sql" Version="$(IntegrationVersion)" />
-    <ProjectReference Include="$(SolutionDir)Integration\Shared\Shared.csproj" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+
 </Project>
