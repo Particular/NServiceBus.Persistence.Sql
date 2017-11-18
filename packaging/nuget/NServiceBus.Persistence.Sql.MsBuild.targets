@@ -9,7 +9,9 @@
     TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
     AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)" />
 
-  <Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile">
+  <Target Name="SqlPersistenceScriptBuilder"
+          AfterTargets="AfterCompile"
+          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
 
     <SqlPersistenceScriptBuilderTask
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
@@ -19,7 +21,9 @@
 
   </Target>
 
-  <Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems" BeforeTargets="GetCopyToOutputDirectoryItems">
+  <Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems"
+          BeforeTargets="GetCopyToOutputDirectoryItems"
+          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
 
     <PropertyGroup>
       <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
