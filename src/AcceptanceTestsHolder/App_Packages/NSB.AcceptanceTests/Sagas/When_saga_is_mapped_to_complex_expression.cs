@@ -5,6 +5,7 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
+    using NServiceBus.Persistence.Sql;
 
     public class When_saga_is_mapped_to_complex_expression : NServiceBusAcceptanceTest
     {
@@ -26,13 +27,15 @@
                 .Run();
 
             Assert.IsTrue(context.SecondMessageReceived);
+            Assert.AreEqual(context.SagaIdWhenStartSagaMessageReceived, context.SagaIdWhenOtherMessageReceived);
         }
 
         public class Context : ScenarioContext
         {
             public bool FirstMessageReceived { get; set; }
             public bool SecondMessageReceived { get; set; }
-            public Guid SagaId { get; set; }
+            public Guid SagaIdWhenStartSagaMessageReceived { get; set; }
+            public Guid SagaIdWhenOtherMessageReceived { get; set; }
         }
 
         public class SagaEndpoint : EndpointConfigurationBuilder
@@ -43,14 +46,14 @@
                 EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            public class TestSaga02 : Saga<TestSagaData02>,
+            public class TestSaga02 : SqlSaga<TestSagaData02>,
                 IAmStartedByMessages<StartSagaMessage>, IAmStartedByMessages<OtherMessage>
             {
                 public Context Context { get; set; }
 
                 public Task Handle(OtherMessage message, IMessageHandlerContext context)
                 {
-                    Assert.AreEqual(Context.SagaId, Data.Id, "Existing instance should be found");
+                    Context.SagaIdWhenOtherMessageReceived = Data.Id;
                     Context.SecondMessageReceived = true;
                     return Task.FromResult(0);
                 }
@@ -58,17 +61,16 @@
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
                 {
                     Context.FirstMessageReceived = true;
-                    Context.SagaId = Data.Id;
+                    Context.SagaIdWhenStartSagaMessageReceived = Data.Id;
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData02> mapper)
-                {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Key)
-                        .ToSaga(s => s.KeyValue);
+                protected override string CorrelationPropertyName => nameof(TestSagaData02.KeyValue);
 
-                    mapper.ConfigureMapping<OtherMessage>(m => m.Part1 + "_" + m.Part2)
-                        .ToSaga(s => s.KeyValue);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                {
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Key);
+                    mapper.ConfigureMapping<OtherMessage>(m => m.Part1 + "_" + m.Part2);
                 }
             }
 

@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
 
     public class When_sagas_share_timeout_messages : NServiceBusAcceptanceTest
     {
@@ -40,15 +41,17 @@
                 });
             }
 
-            public class TimeoutSharingSaga1 : Saga<TimeoutSharingSaga1.TimeoutSharingSagaData1>,
+            public class TimeoutSharingSaga1 : SqlSaga<TimeoutSharingSaga1.TimeoutSharingSagaData1>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IHandleTimeouts<MySagaTimeout>
             {
+                protected override string CorrelationPropertyName => nameof(TimeoutSharingSagaData1.CorrelationProperty);
+
                 public Context Context { get; set; }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutSharingSagaData1> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Id).ToSaga(s => s.CorrelationProperty);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Id);
                 }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
@@ -69,13 +72,15 @@
 
             }
 
-            public class TimeoutSharingSaga2 : Saga<TimeoutSharingSaga2.TimeoutSharingSagaData2>, IAmStartedByMessages<StartSagaMessage>, IHandleTimeouts<MySagaTimeout>
+            public class TimeoutSharingSaga2 : SqlSaga<TimeoutSharingSaga2.TimeoutSharingSagaData2>, IAmStartedByMessages<StartSagaMessage>, IHandleTimeouts<MySagaTimeout>
             {
+                protected override string CorrelationPropertyName => nameof(TimeoutSharingSagaData2.CorrelationProperty);
+
                 public Context Context { get; set; }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutSharingSagaData2> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Id).ToSaga(s => s.CorrelationProperty);
+                    mapper.ConfigureMapping<StartSagaMessage>(m => m.Id);
                 }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)

@@ -6,6 +6,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
+    using Persistence.Sql;
     using Routing;
 
     //Repro for #1323
@@ -45,9 +46,9 @@
         {
             public Publisher()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<SagaContext>((s, context) =>
+                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<SagaContext>((args, context) =>
                 {
-                    context.AddTrace("Subscription received for " + s.SubscriberReturnAddress);
+                    context.AddTrace($"Subscription received for {args.SubscriberReturnAddress}");
                     context.IsEventSubscriptionReceived = true;
                 }));
             }
@@ -62,12 +63,13 @@
                     c.EnableFeature<TimeoutManager>();
                     c.DisableFeature<AutoSubscribe>();
                 },
-                metdata => metdata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
+                metadata => metadata.RegisterPublisherFor<BaseEvent>(typeof(Publisher)));
             }
 
-            public class SagaStartedByBaseEvent : Saga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
+            public class SagaStartedByBaseEvent : SqlSaga<SagaStartedByBaseEvent.SagaStartedByBaseEventSagaData>, IAmStartedByMessages<BaseEvent>
             {
                 public SagaContext Context { get; set; }
+                protected override string CorrelationPropertyName => nameof(SagaStartedByBaseEventSagaData.DataId);
 
                 public Task Handle(BaseEvent message, IMessageHandlerContext context)
                 {
@@ -77,9 +79,9 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaStartedByBaseEventSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<BaseEvent>(m => m.DataId);
                 }
 
                 public class SagaStartedByBaseEventSagaData : ContainSagaData
