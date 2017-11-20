@@ -7,12 +7,11 @@
     using Features;
     using NServiceBus.Pipeline;
     using NUnit.Framework;
-    using Conventions = AcceptanceTesting.Customization.Conventions;
 
     public class When_publishing_an_interface_with_unobtrusive : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_receive_event()
+        public async Task Should_receive_event_for_non_xml()
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Publisher>(b =>
@@ -45,11 +44,12 @@
             {
                 EndpointSetup<DefaultPublisher>(c =>
                 {
+                    c.UseSerialization<JsonSerializer>();
                     c.Conventions().DefiningEventsAs(t => t.Namespace != null && t.Name.EndsWith("Event"));
                     c.Pipeline.Register("EventTypeSpy", typeof(EventTypeSpy), "EventTypeSpy");
                     c.OnEndpointSubscribed<Context>((s, context) =>
                     {
-                        if (s.SubscriberEndpoint.Contains(Conventions.EndpointNamingConvention(typeof(Subscriber))))
+                        if (s.SubscriberReturnAddress.Contains("Subscriber"))
                         {
                             context.Subscribed = true;
                         }
@@ -80,6 +80,7 @@
             {
                 EndpointSetup<DefaultServer>(c =>
                 {
+                    c.UseSerialization<JsonSerializer>();
                     c.Conventions().DefiningEventsAs(t => t.Namespace != null && t.Name.EndsWith("Event"));
                     c.DisableFeature<AutoSubscribe>();
                 },

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
-using NServiceBus.Configuration.AdvancedExtensibility;
+using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Transport;
 using NServiceBus.Transport.SQLServer;
 

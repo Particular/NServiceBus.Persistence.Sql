@@ -6,7 +6,7 @@
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
     using EndpointTemplates;
     using NServiceBus.Routing;
     using NUnit.Framework;
@@ -68,10 +68,9 @@
                 {
                 }
 
-                public override string SelectDestination(DistributionContext context)
+                public override string SelectReceiver(string[] receiverAddresses)
                 {
-                    var address = context.ToTransportAddress(new EndpointInstance(ReceiverEndpoint, "XYZ"));
-                    return context.ReceiverAddresses.First(x => x == address);
+                    return receiverAddresses.First(x => x.Contains("XYZ"));
                 }
             }
         }

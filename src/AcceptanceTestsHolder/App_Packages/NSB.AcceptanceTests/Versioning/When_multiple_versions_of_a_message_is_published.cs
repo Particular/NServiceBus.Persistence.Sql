@@ -5,7 +5,7 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Conventions = AcceptanceTesting.Customization.Conventions;
+    using Routing;
 
     public class When_multiple_versions_of_a_message_is_published : NServiceBusAcceptanceTest
     {
@@ -62,12 +62,12 @@
             {
                 EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((s, context) =>
                 {
-                    if (s.SubscriberEndpoint.Contains(Conventions.EndpointNamingConvention(typeof(V1Subscriber))))
+                    if (s.SubscriberReturnAddress.Contains("V1Subscriber"))
                     {
                         context.V1Subscribed = true;
                     }
 
-                    if (s.SubscriberEndpoint.Contains(Conventions.EndpointNamingConvention(typeof(V2Subscriber))))
+                    if (s.SubscriberReturnAddress.Contains("V2Subscriber"))
                     {
                         context.V2Subscribed = true;
                     }

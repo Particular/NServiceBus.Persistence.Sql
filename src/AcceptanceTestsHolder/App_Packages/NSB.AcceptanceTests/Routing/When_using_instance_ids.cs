@@ -1,27 +1,26 @@
-﻿namespace NServiceBus.AcceptanceTests.Routing
+﻿namespace NServiceBus.AcceptanceTests.ScaleOut
 {
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
     using EndpointTemplates;
     using NServiceBus.Routing;
     using NUnit.Framework;
 
-    public class When_making_endpoint_uniquely_addressable : NServiceBusAcceptanceTest
+    public class When_using_instance_ids : NServiceBusAcceptanceTest
     {
         static string ReceiverEndpoint => Conventions.EndpointNamingConvention(typeof(Receiver));
-        const string InstanceDiscriminator = "XYZ";
 
         [Test]
-        public async Task Should_be_addressable_both_by_shared_queue_and_unique_queue()
+        public async Task Should_be_addressable_both_by_shared_queue_and_specific_queue()
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Receiver>()
-                .WithEndpoint<UnawareOfInstanceSender>(b => b.When(s => s.Send(new MyMessage())))
-                .WithEndpoint<InstanceAwareSender>(b => b.When(s => s.Send(new MyMessage())))
+                .WithEndpoint<UnawareSender>(b => b.When(s => s.Send(new MyMessage())))
+                .WithEndpoint<AwareSender>(b => b.When(s => s.Send(new MyMessage())))
                 .Done(c => c.MessagesReceived > 1)
                 .Run();
 
@@ -33,9 +32,9 @@
             public int MessagesReceived;
         }
 
-        public class UnawareOfInstanceSender : EndpointConfigurationBuilder
+        public class UnawareSender : EndpointConfigurationBuilder
         {
-            public UnawareOfInstanceSender()
+            public UnawareSender()
             {
                 EndpointSetup<DefaultServer>((c, r) =>
                 {
@@ -44,9 +43,9 @@
             }
         }
 
-        public class InstanceAwareSender : EndpointConfigurationBuilder
+        public class AwareSender : EndpointConfigurationBuilder
         {
-            public InstanceAwareSender()
+            public AwareSender()
             {
                 EndpointSetup<DefaultServer>((c, r) =>
                 {
@@ -55,7 +54,7 @@
                     c.GetSettings().GetOrCreate<EndpointInstances>()
                         .AddOrReplaceInstances("testing", new List<EndpointInstance>
                         {
-                            new EndpointInstance(ReceiverEndpoint, InstanceDiscriminator)
+                            new EndpointInstance(ReceiverEndpoint, "XYZ")
                         });
                 });
             }
@@ -65,7 +64,7 @@
         {
             public Receiver()
             {
-                EndpointSetup<DefaultServer>(c => { c.MakeInstanceUniquelyAddressable(InstanceDiscriminator); });
+                EndpointSetup<DefaultServer>(c => { c.MakeInstanceUniquelyAddressable("XYZ"); });
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>

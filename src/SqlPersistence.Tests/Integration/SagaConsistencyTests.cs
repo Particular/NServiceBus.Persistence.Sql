@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
-using NServiceBus.Configuration.AdvancedExtensibility;
+using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
