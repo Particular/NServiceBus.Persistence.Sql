@@ -37,7 +37,7 @@
                 EndpointSetup<DefaultServer>(c =>
                 {
                     c.UseSerialization<XmlSerializer>().SanitizeInput();
-                    c.RegisterMessageMutator(new InjectInvalidCharMutator());
+                    c.RegisterComponents(r => r.ConfigureComponent<IncomingMutator>(DependencyLifecycle.SingleInstance));
                 });
             }
 
@@ -59,8 +59,13 @@
                 Context scenarioContext;
             }
 
-            class InjectInvalidCharMutator : IMutateIncomingTransportMessages
+            public class IncomingMutator : IMutateIncomingTransportMessages
             {
+                public IncomingMutator(Context scenarioContext)
+                {
+                    this.scenarioContext = scenarioContext;
+                }
+
                 public Task MutateIncoming(MutateIncomingTransportMessageContext context)
                 {
                     var body = Encoding.UTF8.GetString(context.Body);
@@ -70,6 +75,8 @@
 
                     return Task.FromResult(0);
                 }
+
+                Context scenarioContext;
             }
         }
 

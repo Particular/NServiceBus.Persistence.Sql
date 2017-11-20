@@ -6,17 +6,17 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Persistence.Sql;
+    using NServiceBus.Persistence.Sql;
 
-    public class When_replying_to_originator : NServiceBusAcceptanceTest
+    public class When_req_resp_between_sagas_with_timeout : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_route_the_message_to_the_endpoint_starting_the_saga()
+        public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_timeouts()
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b.When(session => session.SendLocal(new InitiateRequestingSaga())))
                 .Done(c => c.DidRequestingSagaGetTheResponse)
-                .Run();
+                .Run(TimeSpan.FromSeconds(15));
 
             Assert.True(context.DidRequestingSagaGetTheResponse);
         }
@@ -33,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestResponseRequestingSaga2 : SqlSaga<RequestResponseRequestingSaga2.RequestResponseRequestingSagaData2>,
+            public class RequestingSaga3 : SqlSaga<RequestingSaga3.RequestResponseRequestingSagaData3>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -43,7 +43,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     return context.SendLocal(new RequestToRespondingSaga
                     {
-                        SomeIdThatTheResponseSagaCanCorrelateBackToUs = Data.CorrIdForResponse
+                        SomeIdThatTheResponseSagaCanCorrelateBackToUs = Data.CorrIdForResponse //wont be needed in the future
                     });
                 }
 
@@ -56,53 +56,54 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.FromResult(0);
                 }
 
-                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData2.CorrIdForResponse);
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id);
                     mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
-                public class RequestResponseRequestingSagaData2 : ContainSagaData
+                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData3.CorrIdForResponse);
+
+                public class RequestResponseRequestingSagaData3 : ContainSagaData
                 {
-                    public virtual Guid CorrIdForResponse { get; set; }
+                    public virtual Guid CorrIdForResponse { get; set; } //wont be needed in the future
                 }
             }
 
-            public class RequestResponseRespondingSaga2 :
-                SqlSaga<RequestResponseRespondingSaga2.RequestResponseRespondingSagaData2>,
+            public class RespondingSaga3 : SqlSaga<RespondingSaga3.RequestResponseRespondingSagaData3>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
-                IHandleMessages<SendReplyFromNonInitiatingHandler>
+                IHandleTimeouts<RespondingSaga3.DelayReply>
             {
                 public Context TestContext { get; set; }
 
                 public Task Handle(RequestToRespondingSaga message, IMessageHandlerContext context)
                 {
-                    return context.SendLocal(new SendReplyFromNonInitiatingHandler
+                    return RequestTimeout<DelayReply>(context, TimeSpan.FromMilliseconds(1));
+                }
+
+                public Task Timeout(DelayReply state, IMessageHandlerContext context)
+                {
+                    //reply to originator must be used here since the sender of the incoming message the timeoutmanager and not the requesting saga
+                    return ReplyToOriginator(context, new ResponseFromOtherSaga //change this line to Bus.Reply(new ResponseFromOtherSaga  and see it fail
                     {
-                        SagaIdSoWeCanCorrelate = Data.CorrIdForRequest
+                        SomeCorrelationId = Data.CorrIdForRequest //wont be needed in the future
                     });
                 }
 
-                public Task Handle(SendReplyFromNonInitiatingHandler message, IMessageHandlerContext context)
-                {
-                    //reply to originator must be used here since the sender of the incoming message is this saga and not the requesting saga
-                    return ReplyToOriginator(context, new ResponseFromOtherSaga
-                    {
-                        SomeCorrelationId = Data.CorrIdForRequest
-                    });
-                }
-                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData2.CorrIdForRequest);
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
-                    //this line is just needed so we can test the non-initiating handler case
-                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
                 }
 
-                public class RequestResponseRespondingSagaData2 : ContainSagaData
+                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData3.CorrIdForRequest);
+
+                public class RequestResponseRespondingSagaData3 : ContainSagaData
                 {
                     public virtual Guid CorrIdForRequest { get; set; }
+                }
+
+                public class DelayReply
+                {
                 }
             }
         }
@@ -125,11 +126,6 @@ namespace NServiceBus.AcceptanceTests.Sagas
         public class ResponseFromOtherSaga : IMessage
         {
             public Guid SomeCorrelationId { get; set; }
-        }
-
-        public class SendReplyFromNonInitiatingHandler : ICommand
-        {
-            public Guid SagaIdSoWeCanCorrelate { get; set; }
         }
     }
 }

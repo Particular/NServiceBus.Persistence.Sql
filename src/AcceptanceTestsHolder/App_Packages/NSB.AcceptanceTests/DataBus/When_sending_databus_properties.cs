@@ -28,7 +28,7 @@
             Assert.AreEqual(payloadToSend, context.ReceivedPayload, "The large payload should be marshalled correctly using the databus");
         }
 
-        const int PayloadSize = 500;
+        const int PayloadSize = 100;
 
         public class Context : ScenarioContext
         {
@@ -41,8 +41,9 @@
             {
                 EndpointSetup<DefaultServer>(builder =>
                 {
-                    var basePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "databus", "sender");
+                    var basePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"databus\sender");
                     builder.UseDataBus<FileShareDataBus>().BasePath(basePath);
+                    builder.UseSerialization<JsonSerializer>();
 
                     builder.ConfigureTransport().Routing().RouteToEndpoint(typeof(MyMessageWithLargePayload), typeof(Receiver));
                 });
@@ -55,9 +56,10 @@
             {
                 EndpointSetup<DefaultServer>(builder =>
                 {
-                    var basePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "databus", "sender");
+                    var basePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"databus\sender");
                     builder.UseDataBus<FileShareDataBus>().BasePath(basePath);
-                    builder.RegisterMessageMutator(new Mutator());
+                    builder.UseSerialization<JsonSerializer>();
+                    builder.RegisterComponents(c => c.ConfigureComponent<Mutator>(DependencyLifecycle.InstancePerCall));
                 });
             }
 
@@ -79,7 +81,7 @@
                 {
                     if (context.Body.Length > PayloadSize)
                     {
-                        throw new Exception("The message body is too large, which means the DataBus was not used to transfer the payload.");
+                        throw new Exception();
                     }
                     return Task.FromResult(0);
                 }

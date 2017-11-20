@@ -49,7 +49,7 @@
         {
             public DateTimeReceiver()
             {
-                EndpointSetup<DefaultServer>();
+                EndpointSetup<DefaultServer>(c => { c.UseSerialization<JsonSerializer>(); });
             }
 
             class DateTimeMessageHandler : IHandleMessages<DateTimeMessage>

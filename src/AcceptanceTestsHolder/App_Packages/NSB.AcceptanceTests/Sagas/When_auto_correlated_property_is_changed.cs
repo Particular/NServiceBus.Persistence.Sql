@@ -1,15 +1,16 @@
 ﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Support;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
+    using NServiceBus.Persistence.Sql;
 
     [TestFixture]
-    public class When_correlated_property_value_is_changed : NServiceBusAcceptanceTest
+    public class When_auto_correlated_property_is_changed : NServiceBusAcceptanceTest
     {
         [Test]
         public void Should_throw()
@@ -21,9 +22,10 @@
                         {
                             DataId = Guid.NewGuid()
                         })))
-                    .Done(c => c.ModifiedCorrelationProperty)
+                    .Done(c => c.FailedMessages.Any())
                     .Run());
 
+            Assert.IsTrue(((Context)exception.ScenarioContext).ModifiedCorrelationProperty);
             Assert.AreEqual(1, exception.ScenarioContext.FailedMessages.Count);
             StringAssert.Contains(
                 "Changing the value of correlated properties at runtime is currently not supported",
@@ -54,11 +56,12 @@
                     return Task.FromResult(0);
                 }
 
-                protected override string CorrelationPropertyName => nameof(CorrIdChangedSagaData.DataId);
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<StartSaga>(m => m.DataId);
                 }
+
+                protected override string CorrelationPropertyName => nameof(CorrIdChangedSagaData.DataId);
 
                 public class CorrIdChangedSagaData : ContainSagaData
                 {

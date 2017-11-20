@@ -34,7 +34,6 @@
             Assert.AreEqual(1, context.TimesCalled, "The message handler should only be invoked once");
             Assert.AreEqual("StaticHeaderValue", context.ReceivedHeaders["MyStaticHeader"], "Static headers should be attached to outgoing messages");
             Assert.AreEqual("MyHeaderValue", context.MyHeader, "Static headers should be attached to outgoing messages");
-            Assert.AreEqual("MyMessageId", context.MyMessageId, "MessageId should be applied to outgoing messages");
         }
 
         public class Context : ScenarioContext
@@ -48,7 +47,6 @@
             public Guid Id { get; set; }
 
             public string MyHeader { get; set; }
-            public string MyMessageId { get; set; }
         }
 
         public class Sender : EndpointConfigurationBuilder
@@ -81,8 +79,10 @@
                         return Task.FromResult(0);
                     }
 
+                    Assert.AreEqual(context.MessageId, "MyMessageId");
+
                     TestContext.TimesCalled++;
-                    TestContext.MyMessageId = context.MessageId;
+
                     TestContext.MyHeader = context.MessageHeaders["MyHeader"];
 
                     TestContext.ReceivedHeaders = context.MessageHeaders;
