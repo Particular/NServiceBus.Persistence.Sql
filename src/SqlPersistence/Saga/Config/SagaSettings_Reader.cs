@@ -1,4 +1,5 @@
-﻿namespace NServiceBus.Persistence.Sql
+﻿#pragma warning disable CS0419
+namespace NServiceBus.Persistence.Sql
 {
     using System;
     using System.IO;
@@ -21,3 +22,4 @@
         }
     }
 }
+#pragma warning restore CS0419
