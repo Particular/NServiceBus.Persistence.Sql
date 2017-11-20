@@ -8,29 +8,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <Compile Remove="Saga\MySqlSagaPersisterTests.cs" />
-    <Compile Remove="Saga\OracleSagaPersisterTests.cs" />
-    <Compile Remove="Outbox\MySqlOutboxPersisterTests.cs" />
-    <Compile Remove="Outbox\OracleOutboxPersisterTests.cs" />
-    <Compile Remove="Timeout\MySqlServerTimeoutPersisterTests.cs" />
-    <Compile Remove="Timeout\OracleTimeoutPersisterTests.cs" />
-    <Compile Remove="Subscription\MySqlServerSubscriptionPersisterTests.cs" />
-    <Compile Remove="Subscription\OracleSubscriptionPersisterTests.cs" />
-    <Compile Remove="Saga\CommandTests\SagaCommandTests.cs" />
-    <Compile Remove="Outbox\CommandTests\OutboxCommandTests.cs" />
-    <Compile Remove="Subscription\CommandTests\SubscriptionCommandTests.cs" />
-    <Compile Remove="Timeout\CommandTests\TimeoutCommandTests.cs" />
-  </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql " Version="3.*" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.*" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta0005" />
-    <PackageReference Include="NUnit" Version="3.7.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" PrivateAssets="All" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
