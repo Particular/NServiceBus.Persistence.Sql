@@ -8,7 +8,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NUnit.Framework;
     using NServiceBus.Persistence.Sql;
 
-    public class When_doing_request_response_between_sagas_first_handler_responding : NServiceBusAcceptanceTest
+    public class When_req_resp_between_sagas_first_handler_responding : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_the_first_handler()
@@ -33,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestResponseRequestingSaga1 : SqlSaga<RequestResponseRequestingSaga1.RequestResponseRequestingSagaData1>,
+            public class RequestingSaga1 : SqlSaga<RequestingSaga1.RequestResponseRequestingSagaData1>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -70,7 +70,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 }
             }
 
-            public class RequestResponseRespondingSaga1 : SqlSaga<RequestResponseRespondingSaga1.RequestResponseRespondingSagaData1>,
+            public class RespondingSaga1 : SqlSaga<RespondingSaga1.RequestResponseRespondingSagaData1>,
                 IAmStartedByMessages<RequestToRespondingSaga>
             {
                 public Context TestContext { get; set; }

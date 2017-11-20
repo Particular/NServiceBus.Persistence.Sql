@@ -8,15 +8,15 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using NUnit.Framework;
     using NServiceBus.Persistence.Sql;
 
-    public class When_doing_request_response_between_sagas_with_timeout : NServiceBusAcceptanceTest
+    public class When_req_resp_between_sagas_response_from_noninitiating : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_timeouts()
+        public async Task Should_autocorrelate_the_response_back()
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b.When(session => session.SendLocal(new InitiateRequestingSaga())))
                 .Done(c => c.DidRequestingSagaGetTheResponse)
-                .Run(TimeSpan.FromSeconds(15));
+                .Run();
 
             Assert.True(context.DidRequestingSagaGetTheResponse);
         }
@@ -33,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestResponseRequestingSaga3 : SqlSaga<RequestResponseRequestingSaga3.RequestResponseRequestingSagaData3>,
+            public class RequestingSaga2 : SqlSaga<RequestingSaga2.RequestResponseRequestingSagaData2>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -62,26 +62,29 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
-                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData3.CorrIdForResponse);
-
-                public class RequestResponseRequestingSagaData3 : ContainSagaData
+                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData2.CorrIdForResponse);
+                
+                public class RequestResponseRequestingSagaData2 : ContainSagaData
                 {
                     public virtual Guid CorrIdForResponse { get; set; } //wont be needed in the future
                 }
             }
 
-            public class RequestResponseRespondingSaga3 : SqlSaga<RequestResponseRespondingSaga3.RequestResponseRespondingSagaData3>,
+            public class RespondingSaga2 : SqlSaga<RespondingSaga2.RequestResponseRespondingSagaData2>,
                 IAmStartedByMessages<RequestToRespondingSaga>,
-                IHandleTimeouts<RequestResponseRespondingSaga3.DelayReply>
+                IHandleMessages<SendReplyFromNonInitiatingHandler>
             {
                 public Context TestContext { get; set; }
 
                 public Task Handle(RequestToRespondingSaga message, IMessageHandlerContext context)
                 {
-                    return RequestTimeout<DelayReply>(context, TimeSpan.FromMilliseconds(1));
+                    return context.SendLocal(new SendReplyFromNonInitiatingHandler
+                    {
+                        SagaIdSoWeCanCorrelate = Data.CorrIdForRequest
+                    });
                 }
 
-                public Task Timeout(DelayReply state, IMessageHandlerContext context)
+                public Task Handle(SendReplyFromNonInitiatingHandler message, IMessageHandlerContext context)
                 {
                     //reply to originator must be used here since the sender of the incoming message the timeoutmanager and not the requesting saga
                     return ReplyToOriginator(context, new ResponseFromOtherSaga //change this line to Bus.Reply(new ResponseFromOtherSaga  and see it fail
@@ -93,17 +96,15 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
+                    //this line is just needed so we can test the non initiating handler case
+                    mapper.ConfigureMapping<SendReplyFromNonInitiatingHandler>(m => m.SagaIdSoWeCanCorrelate);
                 }
 
-                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData3.CorrIdForRequest);
+                protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData2.CorrIdForRequest);
 
-                public class RequestResponseRespondingSagaData3 : ContainSagaData
+                public class RequestResponseRespondingSagaData2 : ContainSagaData
                 {
                     public virtual Guid CorrIdForRequest { get; set; }
-                }
-
-                public class DelayReply
-                {
                 }
             }
         }
@@ -126,6 +127,11 @@ namespace NServiceBus.AcceptanceTests.Sagas
         public class ResponseFromOtherSaga : IMessage
         {
             public Guid SomeCorrelationId { get; set; }
+        }
+
+        public class SendReplyFromNonInitiatingHandler : ICommand
+        {
+            public Guid SagaIdSoWeCanCorrelate { get; set; }
         }
     }
 }

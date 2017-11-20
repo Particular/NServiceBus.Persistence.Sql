@@ -173,9 +173,9 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_mapped_is_handled_by_a_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_a_base_class_message_starts_a_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_correlating_on_special_characters.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_first_handler_responding.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_response_from_noninitiating.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_with_timeout.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_req_resp_between_sagas_first_handler_responding.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_req_resp_between_sagas_response_from_noninitiating.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_req_resp_between_sagas_with_timeout.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_forgetting_to_set_a_corr_property.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_message_has_a_saga_id.cs" />
