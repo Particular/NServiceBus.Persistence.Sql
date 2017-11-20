@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
