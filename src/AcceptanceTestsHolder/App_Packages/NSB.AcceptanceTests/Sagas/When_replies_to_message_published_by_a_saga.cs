@@ -7,6 +7,7 @@
     using Features;
     using NUnit.Framework;
     using Routing;
+    using NServiceBus.Persistence.Sql;
 
     public class When_replies_to_message_published_by_a_saga : NServiceBusAcceptanceTest
     {
@@ -70,7 +71,7 @@
                 });
             }
 
-            public class ReplyToPubMsgSaga : Saga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
+            public class ReplyToPubMsgSaga : SqlSaga<ReplyToPubMsgSaga.ReplyToPubMsgSagaData>, IAmStartedByMessages<StartSaga>, IHandleMessages<DidSomethingResponse>
             {
                 public Context Context { get; set; }
 
@@ -90,10 +91,12 @@
                     return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReplyToPubMsgSagaData> mapper)
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
-                    mapper.ConfigureMapping<StartSaga>(m => m.DataId).ToSaga(s => s.DataId);
+                    mapper.ConfigureMapping<StartSaga>(m => m.DataId);
                 }
+
+                protected override string CorrelationPropertyName => nameof(ReplyToPubMsgSagaData.DataId);
 
                 public class ReplyToPubMsgSagaData : ContainSagaData
                 {

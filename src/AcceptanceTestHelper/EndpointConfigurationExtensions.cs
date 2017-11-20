@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NServiceBus;
-using NServiceBus.Configuration.AdvancedExtensibility;
+using NServiceBus.Configuration.AdvanceExtensibility;
 
 public static class EndpointConfigurationExtensions
 {

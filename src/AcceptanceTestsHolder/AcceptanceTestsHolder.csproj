@@ -176,7 +176,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_first_handler_responding.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_response_from_noninitiating.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_doing_request_response_between_sagas_with_timeout.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_finder_returns_existing_saga.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_forgetting_to_set_a_corr_property.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_handling_message_with_handler_and_timeout_handler.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Sagas\When_message_has_a_saga_id.cs" />
