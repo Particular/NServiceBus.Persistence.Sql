@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
+    <TargetFramework>net452</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -10,13 +10,9 @@
     <PackageReference Include="Npgsql " Version="3.*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+  <ItemGroup>
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
     <PackageReference Include="MySql.Data" Version="6.*" ExcludeAssets="contentFiles" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="System.Data.SqlClient" Version="4.*" />
   </ItemGroup>
 
 </Project>
