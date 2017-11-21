@@ -1,37 +1,36 @@
-﻿using System.IO;
-using System.Text;
-
-namespace NServiceBus.Persistence.Sql.ScriptBuilder
+﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System.IO;
+    using System.Text;
+
     public static class OutboxScriptBuilder
     {
-
-        public static void BuildCreateScript(TextWriter writer, BuildSqlVariant sqlVariant)
+        public static void BuildCreateScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
-            writer.Write(ResourceReader.ReadResource(sqlVariant, "Outbox.Create"));
+            writer.Write(ResourceReader.ReadResource(sqlDialect, "Outbox.Create"));
         }
 
-        public static string BuildCreateScript(BuildSqlVariant sqlVariant)
+        public static string BuildCreateScript(BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildCreateScript(stringWriter, sqlVariant);
+                BuildCreateScript(stringWriter, sqlDialect);
             }
             return stringBuilder.ToString();
         }
 
-        public static void BuildDropScript(TextWriter writer, BuildSqlVariant sqlVariant)
+        public static void BuildDropScript(TextWriter writer, BuildSqlDialect sqlDialect)
         {
-            writer.Write(ResourceReader.ReadResource(sqlVariant, "Outbox.Drop"));
+            writer.Write(ResourceReader.ReadResource(sqlDialect, "Outbox.Drop"));
         }
 
-        public static string BuildDropScript(BuildSqlVariant sqlVariant)
+        public static string BuildDropScript(BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildDropScript(stringWriter, sqlVariant);
+                BuildDropScript(stringWriter, sqlDialect);
             }
             return stringBuilder.ToString();
         }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     using System.IO;
     using System.Reflection;
+    using System;
+    using System.Diagnostics;
+    using Microsoft.Build.Framework;
+    using Microsoft.Build.Utilities;
 
     public class SqlPersistenceScriptBuilderTask : Task
     {
@@ -21,7 +20,6 @@ namespace NServiceBus.Persistence.Sql
         [Required]
         public string ProjectDirectory { get; set; }
 
-        [Required]
         public string SolutionDirectory { get; set; }
 
         static Version assemblyVersion= typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
@@ -36,11 +34,11 @@ namespace NServiceBus.Persistence.Sql
             try
             {
                 ValidateInputs();
-                Action<string, string> logError = (error, file) =>
-                {
-                    logger.LogError(error, file);
-                };
-                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory, logError);
+                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory,
+                    logError: (error, file) =>
+                    {
+                        logger.LogError(error, file);
+                    });
                 innerTask.Execute();
             }
             catch (ErrorsException exception)
@@ -75,7 +73,7 @@ namespace NServiceBus.Persistence.Sql
                 throw new ErrorsException($"ProjectDirectory '{ProjectDirectory}' does not exist.");
             }
 
-            if (!Directory.Exists(SolutionDirectory))
+            if (!string.IsNullOrWhiteSpace(SolutionDirectory) && !Directory.Exists(SolutionDirectory))
             {
                 throw new ErrorsException($"SolutionDirectory '{SolutionDirectory}' does not exist.");
             }

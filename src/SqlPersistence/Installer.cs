@@ -4,17 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Features;
 using NServiceBus.Installation;
 using NServiceBus.Logging;
-using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
 class Installer : INeedToInstallSomething
 {
+    InstallerSettings installerSettings;
     ReadOnlySettings settings;
     static ILog log = LogManager.GetLogger<Installer>();
-    InstallerSettings installerSettings;
 
     public Installer(ReadOnlySettings settings)
     {
@@ -29,29 +28,23 @@ class Installer : INeedToInstallSomething
             return;
         }
 
-        var connectionBuilder = installerSettings.ConnectionBuilder;
-        var sqlVariant = installerSettings.SqlVariant;
-        var schema = settings.GetSchema();
-        var scriptDirectory = installerSettings.ScriptDirectory;
-        var tablePrefix = installerSettings.TablePrefix;
+        installerSettings.Dialect.ValidateTablePrefix(installerSettings.TablePrefix);
 
-        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
-
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await installerSettings.ConnectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
-            await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
-            await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
-            await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
-            await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, schema, sqlVariant).ConfigureAwait(false);
+            await InstallOutbox(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallSagas(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallSubscriptions(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
+            await InstallTimeouts(installerSettings.ScriptDirectory, connection, transaction, installerSettings.TablePrefix, installerSettings.Dialect).ConfigureAwait(false);
 
             transaction.Commit();
         }
     }
-
-    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    
+    Task InstallOutbox(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.GetFeatureEnabled<StorageType.Outbox>())
+        if (!settings.IsFeatureActive(typeof(SqlOutboxFeature)))
         {
             return Task.FromResult(0);
         }
@@ -59,26 +52,17 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Outbox_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
-    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallSubscriptions(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.GetFeatureEnabled<StorageType.Subscriptions>())
+        if (!settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
         {
             return Task.FromResult(0);
         }
@@ -86,26 +70,17 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Subscription_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
-    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.GetFeatureEnabled<StorageType.Timeouts>())
+        if (!settings.IsFeatureActive(typeof(SqlTimeoutFeature)))
         {
             return Task.FromResult(0);
         }
@@ -113,54 +88,36 @@ class Installer : INeedToInstallSomething
         var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
         ScriptLocation.ValidateScriptExists(createScript);
         log.Info($"Executing '{createScript}'");
-        if (sqlVariant == SqlVariant.Oracle)
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix,
-                schema: schema);
-        }
+
+        return sqlDialect.ExecuteTableCommand(
+            connection: connection,
+            transaction: transaction,
+            script: File.ReadAllText(createScript),
+            tablePrefix: tablePrefix);
     }
 
-    Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, string schema, SqlVariant sqlVariant)
+    async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
     {
-        if (!settings.GetFeatureEnabled<StorageType.Sagas>())
+        if (!settings.IsFeatureActive(typeof(SqlSagaFeature)))
         {
-            return Task.FromResult(0);
+            return;
         }
 
         var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");
         if (!Directory.Exists(sagasDirectory))
         {
-            log.Info($"Diretory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
-            return Task.FromResult(0);
+            log.Info($"Directory '{sagasDirectory}' not found so no saga creation scripts will be executed.");
+            return;
         }
         var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
         log.Info($@"Executing saga creation scripts:
 {string.Join(Environment.NewLine, scriptFiles)}");
         var sagaScripts = scriptFiles
             .Select(File.ReadAllText);
-        if (sqlVariant == SqlVariant.Oracle)
+
+        foreach (var script in sagaScripts)
         {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                scripts: sagaScripts);
-        }
-        else
-        {
-            return connection.ExecuteTableCommand(
-                transaction: transaction,
-                scripts: sagaScripts,
-                tablePrefix: tablePrefix,
-                schema: schema);
+            await sqlDialect.ExecuteTableCommand(connection, transaction, script, tablePrefix).ConfigureAwait(false);
         }
     }
 }

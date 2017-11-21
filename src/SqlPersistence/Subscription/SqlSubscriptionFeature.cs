@@ -1,6 +1,5 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
@@ -14,16 +13,14 @@ class SqlSubscriptionFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        settings.EnableFeature<StorageType.Subscriptions>();
 
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
-        var sqlVariant = settings.GetSqlVariant();
-        var schema = settings.GetSchema();
+        var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
-        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlVariant, schema, cacheFor);
+        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlDialect, cacheFor);
 
-        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+        sqlDialect.ValidateTablePrefix(tablePrefix);
 
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }

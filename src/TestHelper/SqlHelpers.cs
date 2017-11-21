@@ -3,7 +3,6 @@ using System.Data.Common;
 
 public static class SqlHelpers
 {
-
     public static void ExecuteCommand(this DbConnection connection, string script, Func<Exception, bool> filter = null, string schema = null)
     {
         try
@@ -33,6 +32,10 @@ public static class SqlHelpers
                 if (command is System.Data.SqlClient.SqlCommand)
                 {
                     command.AddParameter("schema", schema ?? "dbo");
+                }
+                if (command is Npgsql.NpgsqlCommand)
+                {
+                    command.AddParameter("schema", schema ?? "public");
                 }
                 command.ExecuteNonQuery();
             }

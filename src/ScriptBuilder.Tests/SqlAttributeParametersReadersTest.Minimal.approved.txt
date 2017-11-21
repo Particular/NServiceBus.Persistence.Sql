@@ -1,0 +1,10 @@
+﻿{
+  "BuildDialects": [
+    "MsSqlServer"
+  ],
+  "ScriptPromotionPath": null,
+  "ProduceOutboxScripts": true,
+  "ProduceSubscriptionScripts": true,
+  "ProduceTimeoutScripts": true,
+  "ProduceSagaScripts": true
+}

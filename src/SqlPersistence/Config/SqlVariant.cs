@@ -1,8 +1,11 @@
+#pragma warning disable 1591
+
 namespace NServiceBus.Persistence.Sql
 {
-    /// <summary>
-    /// Allows for configuring which database engine to target. Used by <see cref="SqlPersistenceConfig.SqlVariant"/>.
-    /// </summary>
+    [ObsoleteEx(
+        TreatAsErrorFromVersion = "3.0",
+        RemoveInVersion = "4.0",
+        ReplacementTypeOrMember = "persistence.SqlDialect<SqlDialect.DialectType>()")]
     public enum SqlVariant
     {
         /// <summary>
@@ -21,3 +24,5 @@ namespace NServiceBus.Persistence.Sql
         Oracle
     }
 }
+
+#pragma warning restore 1591

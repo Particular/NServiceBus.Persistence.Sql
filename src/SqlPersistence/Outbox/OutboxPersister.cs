@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql;
@@ -15,16 +16,16 @@ using IsolationLevel = System.Data.IsolationLevel;
 class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
+    SqlDialect sqlDialect;
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
-    CommandBuilder commandBuilder;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, string schema, SqlVariant sqlVariant, int cleanupBatchSize = 10000)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
+        this.sqlDialect = sqlDialect;
         this.cleanupBatchSize = cleanupBatchSize;
-        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, schema, sqlVariant);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, sqlDialect);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
@@ -37,7 +38,7 @@ class OutboxPersister : IOutboxStorage
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.SetAsDispatched;
             command.AddParameter("MessageId", messageId);
@@ -53,7 +54,7 @@ class OutboxPersister : IOutboxStorage
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;
-            using (var command = commandBuilder.CreateCommand(connection))
+            using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = outboxCommands.Get;
                 command.Transaction = transaction;
@@ -97,12 +98,12 @@ class OutboxPersister : IOutboxStorage
 
     internal async Task Store(OutboxMessage message, DbTransaction transaction, DbConnection connection)
     {
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.Store;
             command.Transaction = transaction;
             command.AddParameter("MessageId", message.MessageId);
-            command.AddParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
+            command.AddJsonParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
@@ -116,7 +117,7 @@ class OutboxPersister : IOutboxStorage
             var continuePurging = true;
             while (continuePurging && !cancellationToken.IsCancellationRequested)
             {
-                using (var command = commandBuilder.CreateCommand(connection))
+                using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = outboxCommands.Cleanup;
                     command.AddParameter("DispatchedBefore", dateTime);

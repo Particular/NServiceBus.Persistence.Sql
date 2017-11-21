@@ -6,7 +6,6 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-
     public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         return Update(sagaData, session, GetConcurrency(context));
@@ -24,7 +23,7 @@ partial class SagaPersister
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
-            command.AddParameter("Data", sagaInfo.ToJson(sagaData));
+            command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("Concurrency", concurrency);
             AddTransitionalParameter(sagaData, sagaInfo, command);
             var affected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -34,5 +33,4 @@ partial class SagaPersister
             }
         }
     }
-
 }

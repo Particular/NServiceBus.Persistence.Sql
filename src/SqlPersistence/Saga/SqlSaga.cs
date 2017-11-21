@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using System.Reflection;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -21,7 +20,7 @@ namespace NServiceBus.Persistence.Sql
             var methodInfo = type.GetMethod("ConfigureHowToFindSaga", bindingFlags);
             if (methodInfo != null)
             {
-                throw new Exception($"SqlSaga should only override ConfigureMapping(IMessagePropertyMapper) overriden and not ConfigureHowToFindSaga({nameof(IConfigureHowToFindSagaWithMessage)}). Saga: {type.FullName}.");
+                throw new Exception($"SqlSaga should only override ConfigureMapping(IMessagePropertyMapper) overridden and not ConfigureHowToFindSaga({nameof(IConfigureHowToFindSagaWithMessage)}). Saga: {type.FullName}.");
             }
         }
 
@@ -57,7 +56,7 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public TSagaData Data
         {
-            get { return (TSagaData)Entity; }
+            get => (TSagaData)Entity;
             set
             {
                 Guard.AgainstNull(nameof(value), value);

@@ -1,7 +1,7 @@
-﻿using NServiceBus.Settings;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using Settings;
+
     public partial class SagaSettings
     {
         /// <summary>
@@ -16,6 +16,5 @@ namespace NServiceBus.Persistence.Sql
         {
             return settings.GetOrDefault<RetrieveVersionSpecificJsonSettings>();
         }
-
     }
 }

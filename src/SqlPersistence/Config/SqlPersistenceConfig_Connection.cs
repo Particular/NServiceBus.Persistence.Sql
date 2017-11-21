@@ -1,11 +1,11 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
-
 namespace NServiceBus
 {
+    using System;
+    using System.Data.Common;
+    using Configuration.AdvanceExtensibility;
+    using Persistence.Sql;
+    using Settings;
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>
@@ -21,8 +21,7 @@ namespace NServiceBus
 
         internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings)
         {
-            Func<DbConnection> value;
-            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out value))
+            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out Func<DbConnection> value))
             {
                 return value;
             }

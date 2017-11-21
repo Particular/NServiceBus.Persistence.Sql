@@ -1,8 +1,6 @@
 using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
-using System.Transactions;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -14,18 +12,19 @@ class StorageAdapter : ISynchronizedStorageAdapter
     static Task<CompletableSynchronizedStorageSession> EmptyResultTask = Task.FromResult(default(CompletableSynchronizedStorageSession));
 
     SagaInfoCache infoCache;
+    SqlDialect dialect;
     Func<DbConnection> connectionBuilder;
 
-    public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache)
+    public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
+        this.dialect = dialect;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
     {
-        var outboxTransaction = transaction as SqlOutboxTransaction;
-        if (outboxTransaction == null)
+        if (!(transaction is SqlOutboxTransaction outboxTransaction))
         {
             return EmptyResultTask;
         }
@@ -33,38 +32,9 @@ class StorageAdapter : ISynchronizedStorageAdapter
         return Task.FromResult(session);
     }
 
-    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        SqlConnection existingSqlConnection;
-        SqlTransaction existingSqlTransaction;
-        //SQL server transport in native TX mode
-        if (transportTransaction.TryGet(out existingSqlConnection) &&
-            transportTransaction.TryGet(out existingSqlTransaction))
-        {
-            return new StorageSession(existingSqlConnection, existingSqlTransaction, false, infoCache);
-        }
-
-        // Transport supports DTC and uses TxScope owned by the transport
-        Transaction transportTx;
-        var scopeTx = Transaction.Current;
-        if (transportTransaction.TryGet(out transportTx) &&
-            scopeTx != null &&
-            transportTx != scopeTx)
-        {
-            throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. "
-                + "This setup can result in inconsistent data because operations done via connections enlisted in the context scope won't be committed "
-                + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
-                + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
-        }
-        var ambientTransaction = transportTx ?? scopeTx;
-        if (ambientTransaction != null)
-        {
-            var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
-            connection.EnlistTransaction(ambientTransaction);
-            return new StorageSession(connection, null, true, infoCache);
-        }
-
-        //Other modes handled by creating a new session.
-        return null;
+        return dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder, 
+            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
     }
 }

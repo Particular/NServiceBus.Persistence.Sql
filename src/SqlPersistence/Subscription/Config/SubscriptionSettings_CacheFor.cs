@@ -1,12 +1,10 @@
-﻿using NServiceBus.Settings;
-using System;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using Settings;
+    using System;
 
     public partial class SubscriptionSettings
     {
-
         /// <summary>
         /// Cache subscriptions for a given <see cref="TimeSpan"/>.
         /// </summary>
@@ -26,8 +24,7 @@ namespace NServiceBus.Persistence.Sql
 
         internal static TimeSpan? GetCacheFor(ReadOnlySettings settings)
         {
-            TimeSpan cache;
-            if (settings.TryGet("SqlPersistence.Subscription.CacheFor", out cache))
+            if (settings.TryGet("SqlPersistence.Subscription.CacheFor", out TimeSpan cache))
             {
                 // since ReadOnlySettings.TryGet will return false if the underlying value is null
                 // we use TimeSpan.Zero as a marker for DisableCache

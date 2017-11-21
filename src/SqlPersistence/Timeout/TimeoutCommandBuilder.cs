@@ -1,223 +1,26 @@
-﻿using System;
-#pragma warning disable 1591
-
+﻿#pragma warning disable 1591
 namespace NServiceBus.Persistence.Sql
 {
+    using System;
+
     /// <summary>
     /// Not for public use.
     /// </summary>
     [Obsolete("Not for public use")]
+    [DoNotWarnAboutObsoleteUsage]
     public static class TimeoutCommandBuilder
     {
-
-        public static TimeoutCommands Build(SqlVariant sqlVariant, string tablePrefix, string schema)
+        public static TimeoutCommands Build(SqlDialect sqlDialect, string tablePrefix)
         {
-            switch (sqlVariant)
-            {
-                case SqlVariant.MySql:
-                    return BuildMySqlCommands($"`{tablePrefix}TimeoutData`");
-                case SqlVariant.MsSqlServer:
-                    return BuildSqlServerCommands($"[{schema}].[{tablePrefix}TimeoutData]");
-                case SqlVariant.Oracle:
-                    return string.IsNullOrEmpty(schema) ? BuildOracleCommands($"\"{tablePrefix.ToUpper()}TO\"") : BuildOracleCommands($"\"{schema}\".\"{tablePrefix.ToUpper()}TO\"");
-                default:
-                    throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
-            }
-        }
+            var tableName = sqlDialect.GetTimeoutTableName(tablePrefix);
 
-        static TimeoutCommands BuildMySqlCommands(string tableName)
-        {
-            var insertCommandText = $@"
-insert into {tableName}
-(
-    Id,
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers,
-    PersistenceVersion
-)
-values
-(
-    @Id,
-    @Destination,
-    @SagaId,
-    @State,
-    @Time,
-    @Headers,
-    @PersistenceVersion
-)";
-
-            var removeByIdCommandText = $@"
-delete from {tableName}
-where Id = @Id;";
-
-            var removeBySagaIdCommandText = $@"
-delete from {tableName}
-where SagaId = @SagaId";
-
-            var selectByIdCommandText = $@"
-select
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers
-from {tableName}
-where Id = @Id";
-
-            var rangeCommandText = $@"
-select Id, Time
-from {tableName}
-where Time > @StartTime and Time <= @EndTime";
-
-            var nextCommandText = $@"
-select Time from {tableName}
-where Time > @EndTime
-order by Time
-limit 1";
-            return new TimeoutCommands
-            (
-                next: nextCommandText,
-                range: rangeCommandText,
-                peek: selectByIdCommandText,
-                removeBySagaId: removeBySagaIdCommandText,
-                removeById: removeByIdCommandText,
-                add: insertCommandText
-            );
-        }
-
-        static TimeoutCommands BuildSqlServerCommands(string tableName)
-        {
-            var insertCommandText = $@"
-insert into {tableName}
-(
-    Id,
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers,
-    PersistenceVersion
-)
-values
-(
-    @Id,
-    @Destination,
-    @SagaId,
-    @State,
-    @Time,
-    @Headers,
-    @PersistenceVersion
-)";
-
-            var removeByIdCommandText = $@"
-delete from {tableName}
-where Id = @Id";
-
-
-            var removeBySagaIdCommandText = $@"
-delete from {tableName}
-where SagaId = @SagaId";
-
-            var selectByIdCommandText = $@"
-select
-    Destination,
-    SagaId,
-    State,
-    Time,
-    Headers
-from {tableName}
-where Id = @Id";
-
-            var rangeCommandText = $@"
-select Id, Time
-from {tableName}
-where Time > @StartTime and Time <= @EndTime";
-
-            var nextCommandText = $@"
-select top 1 Time from {tableName}
-where Time > @EndTime
-order by Time";
-
-            return new TimeoutCommands
-            (
-                next: nextCommandText,
-                range: rangeCommandText,
-                peek: selectByIdCommandText,
-                removeBySagaId: removeBySagaIdCommandText,
-                removeById: removeByIdCommandText,
-                add: insertCommandText
-            );
-        }
-
-        static TimeoutCommands BuildOracleCommands(string tableName)
-        {
-            var insertCommandText = $@"
-insert into {tableName}
-(
-    Id,
-    Destination,
-    SagaId,
-    State,
-    ExpireTime,
-    Headers,
-    PersistenceVersion
-)
-values
-(
-    :Id,
-    :Destination,
-    :SagaId,
-    :State,
-    :Time,
-    :Headers,
-    :PersistenceVersion
-)";
-
-            var removeByIdCommandText = $@"
-delete from {tableName}
-where Id = :Id";
-
-
-            var removeBySagaIdCommandText = $@"
-delete from {tableName}
-where SagaId = :SagaId";
-
-            var selectByIdCommandText = $@"
-select
-    Destination,
-    SagaId,
-    State,
-    ExpireTime,
-    Headers
-from {tableName}
-where Id = :Id";
-
-            var rangeCommandText = $@"
-select Id, ExpireTime
-from {tableName}
-where ExpireTime > :StartTime and ExpireTime <= :EndTime";
-
-            var nextCommandText = $@"
-select ExpireTime
-from
-(
-    select ExpireTime from {tableName}
-    where ExpireTime > :EndTime
-    order by ExpireTime
-) subquery
-where rownum <= 1";
-
-            return new TimeoutCommands
-            (
-                next: nextCommandText,
-                range: rangeCommandText,
-                peek: selectByIdCommandText,
-                removeBySagaId: removeBySagaIdCommandText,
-                removeById: removeByIdCommandText,
-                add: insertCommandText
+            return new TimeoutCommands(
+                removeById: sqlDialect.GetTimeoutRemoveByIdCommand(tableName),
+                next: sqlDialect.GetTimeoutNextCommand(tableName),
+                peek: sqlDialect.GetTimeoutPeekCommand(tableName),
+                add: sqlDialect.GetTimeoutInsertCommand(tableName),
+                removeBySagaId: sqlDialect.GetTimeoutRemoveBySagaIdCommand(tableName),
+                range: sqlDialect.GetTimeoutRangeCommand(tableName)
             );
         }
     }

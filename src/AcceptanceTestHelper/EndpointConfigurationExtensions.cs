@@ -7,11 +7,14 @@ using NServiceBus.Configuration.AdvanceExtensibility;
 
 public static class EndpointConfigurationExtensions
 {
-
     public static List<Type> ScannedTypes(this EndpointConfiguration configuration)
     {
         var field = typeof(EndpointConfiguration)
             .GetField("scannedTypes", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field == null)
+        {
+            throw new Exception("Could not extract field 'scannedTypes' from EndpointConfiguration.");
+        }
         return (List<Type>)field.GetValue(configuration);
     }
 
@@ -19,7 +22,6 @@ public static class EndpointConfigurationExtensions
     {
         return configuration.GetSettings().Get<bool>("Endpoint.SendOnly");
     }
-
 
     public static IEnumerable<Type> GetScannedSagaTypes(this EndpointConfiguration configuration)
     {

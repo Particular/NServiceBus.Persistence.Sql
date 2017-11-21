@@ -1,7 +1,8 @@
-﻿using NServiceBus.Features;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using Settings;
+    using Features;
+
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
     /// </summary>
@@ -12,15 +13,9 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public SqlPersistence()
         {
-            Defaults(s =>
-            {
-                // always enable these ones since they will only enable if the outbox or sagas are on
-                s.EnableFeatureByDefault<StorageSessionFeature>();
-                s.Set<EnabledStorageFeatures>(new EnabledStorageFeatures());
-                s.AddUnrecoverableException(typeof(SerializationException));
-            });
             Supports<StorageType.Outbox>(s =>
             {
+                EnableSession(s);
                 s.EnableFeatureByDefault<SqlOutboxFeature>();
             });
             Supports<StorageType.Timeouts>(s =>
@@ -30,6 +25,7 @@ namespace NServiceBus.Persistence.Sql
             Supports<StorageType.Sagas>(s =>
             {
                 s.EnableFeatureByDefault<SqlSagaFeature>();
+                EnableSession(s);
             });
             Supports<StorageType.Subscriptions>(s =>
             {
@@ -39,6 +35,11 @@ namespace NServiceBus.Persistence.Sql
             {
                 s.EnableFeatureByDefault<InstallerFeature>();
             });
+        }
+
+        static void EnableSession(SettingsHolder s)
+        {
+            s.EnableFeatureByDefault<StorageSessionFeature>();
         }
     }
 }

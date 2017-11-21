@@ -1,6 +1,5 @@
-﻿using System;
+﻿#if NET452
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ApprovalTests;
@@ -16,16 +15,8 @@ public class APIApprovals
     {
         var combine = Path.Combine(TestContext.CurrentContext.TestDirectory, "NServiceBus.Persistence.Sql.dll");
         var assembly = Assembly.LoadFile(combine);
-        var publicApi = Filter(ApiGenerator.GeneratePublicApi(assembly));
+        var publicApi = ApiGenerator.GeneratePublicApi(assembly);
         Approvals.Verify(publicApi);
     }
-
-    string Filter(string text)
-    {
-        return string.Join(Environment.NewLine, text.Split(new[]{Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
-            .Where(l => !l.StartsWith("[assembly: "))
-            .Where(l => !string.IsNullOrWhiteSpace(l))
-            );
-    }
-
 }
+#endif

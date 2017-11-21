@@ -17,8 +17,8 @@ class RuntimeSagaInfo
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    SqlDialect sqlDialect;
     ConcurrentDictionary<Version, JsonSerializer> deserializers;
-    CommandBuilder commandBuilder;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
     public readonly string SelectFromCommand;
@@ -32,10 +32,8 @@ class RuntimeSagaInfo
     public readonly string TransitionalCorrelationProperty;
     public readonly string GetByCorrelationPropertyCommand;
     public readonly string TableName;
-    public readonly Action<DbParameter, string, object> FillParameter;
 
     public RuntimeSagaInfo(
-        SagaCommandBuilder commandBuilder,
         Type sagaDataType,
         RetrieveVersionSpecificJsonSettings versionSpecificSettings,
         Type sagaType,
@@ -43,8 +41,7 @@ class RuntimeSagaInfo
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
-        string schema,
-        SqlVariant sqlVariant,
+        SqlDialect sqlDialect,
         Func<string, string> nameFilter)
     {
         this.sagaDataType = sagaDataType;
@@ -57,49 +54,25 @@ class RuntimeSagaInfo
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
-        this.commandBuilder = new CommandBuilder(sqlVariant);
+        this.sqlDialect = sqlDialect;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         ValidateIsSqlSaga();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(sagaType);
         var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
-        switch (sqlVariant)
-        {
-            case SqlVariant.MsSqlServer:
-                TableName = $"[{schema}].[{tablePrefix}{tableSuffix}]";
-                FillParameter = ParameterFiller.Fill;
-                break;
-            case SqlVariant.MySql:
-                TableName = $"`{tablePrefix}{tableSuffix}`";
-                FillParameter = ParameterFiller.Fill;
-                break;
-            case SqlVariant.Oracle:
-                if (tableSuffix.Length > 27)
-                {
-                    throw new Exception($"Saga '{tableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-                }
-                if (Encoding.UTF8.GetBytes(tableSuffix).Length != tableSuffix.Length)
-                {
-                    throw new Exception($"Saga '{tableSuffix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, change the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
-                }
-                TableName = string.IsNullOrEmpty(schema) ? tableSuffix.ToUpper() : $"\"{schema}\".\"{tableSuffix.ToUpper()}\"";
-                FillParameter = ParameterFiller.OracleFill;
-                break;
-            default:
-                throw new Exception($"Unknown SqlVariant: {sqlVariant}.");
-        }
+        TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
 
-        CompleteCommand = commandBuilder.BuildCompleteCommand(TableName);
-        SelectFromCommand = commandBuilder.BuildSelectFromCommand(TableName);
-        GetBySagaIdCommand = commandBuilder.BuildGetBySagaIdCommand(TableName);
-        SaveCommand = commandBuilder.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
-        UpdateCommand = commandBuilder.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        CompleteCommand = sqlDialect.BuildCompleteCommand(TableName);
+        SelectFromCommand = sqlDialect.BuildSelectFromCommand(TableName);
+        GetBySagaIdCommand = sqlDialect.BuildGetBySagaIdCommand(TableName);
+        SaveCommand = sqlDialect.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
+        UpdateCommand = sqlDialect.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
         CorrelationProperty = sqlSagaAttributeData.CorrelationProperty;
         HasCorrelationProperty = CorrelationProperty != null;
         if (HasCorrelationProperty)
         {
-            GetByCorrelationPropertyCommand = commandBuilder.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+            GetByCorrelationPropertyCommand = sqlDialect.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
         }
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;
@@ -120,10 +93,22 @@ class RuntimeSagaInfo
 
     public CommandWrapper CreateCommand(DbConnection connection)
     {
-        return commandBuilder.CreateCommand(connection);
+        return sqlDialect.CreateCommand(connection);
     }
 
     public string ToJson(IContainSagaData sagaData)
+    {
+        var builder = new StringBuilder();
+        using (var stringWriter = new StringWriter(builder))
+        {
+            ToJson(sagaData, stringWriter);
+            stringWriter.Flush();
+        }
+
+        return builder.ToString();
+    }
+
+    public void ToJson(IContainSagaData sagaData, TextWriter textWriter)
     {
         var originalMessageId = sagaData.OriginalMessageId;
         var originator = sagaData.Originator;
@@ -133,9 +118,7 @@ class RuntimeSagaInfo
         sagaData.Id = Guid.Empty;
         try
         {
-            var builder = new StringBuilder();
-            using (var stringWriter = new StringWriter(builder))
-            using (var writer = writerCreator(stringWriter))
+            using (var writer = writerCreator(textWriter))
             {
                 try
                 {
@@ -145,8 +128,9 @@ class RuntimeSagaInfo
                 {
                     throw new SerializationException(exception);
                 }
+
+                writer.Flush();
             }
-            return builder.ToString();
         }
         finally
         {
@@ -155,7 +139,6 @@ class RuntimeSagaInfo
             sagaData.Id = id;
         }
     }
-
 
     public TSagaData FromString<TSagaData>(TextReader textReader, Version storedSagaTypeVersion)
         where TSagaData : IContainSagaData
@@ -184,12 +167,13 @@ class RuntimeSagaInfo
         return deserializers.GetOrAdd(storedSagaTypeVersion, _ =>
         {
             var settings = versionSpecificSettings(sagaDataType, storedSagaTypeVersion);
-            if (settings != null)
+            if (settings == null)
             {
-                return JsonSerializer.Create(settings);
+                return jsonSerializer;
             }
-            return jsonSerializer;
+            var serializer = JsonSerializer.Create(settings);
+            sqlDialect.ValidateJsonSettings(serializer);
+            return serializer;
         });
     }
-
 }

@@ -17,8 +17,10 @@ class InstallerFeature : Feature
         }
 
         settings.ConnectionBuilder = context.Settings.GetConnectionBuilder();
-        settings.SqlVariant = context.Settings.GetSqlVariant();
+        settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
         settings.TablePrefix = context.Settings.GetTablePrefix();
+
+        settings.Dialect.ValidateTablePrefix(settings.TablePrefix);
     }
 }

@@ -1,9 +1,8 @@
-﻿using System;
-using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
+    using System;
+    using Persistence;
+    using Persistence.Sql;
     using System.Data.Common;
     using System.Threading.Tasks;
     using Extensibility;
@@ -25,8 +24,7 @@ namespace NServiceBus
 
         static StorageSession GetSqlStorageSession(this SynchronizedStorageSession session)
         {
-            var storageSession = session as StorageSession;
-            if (storageSession != null)
+            if (session is StorageSession storageSession)
             {
                 return storageSession;
             }
@@ -42,7 +40,7 @@ namespace NServiceBus
         /// <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
         /// <param name="appendParameters">Used to append <see cref="DbParameter"/>s used in the <paramref name="whereClause"/>.</param>
         public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
-            where TSagaData : IContainSagaData
+            where TSagaData : class, IContainSagaData
         {
             Guard.AgainstNull(nameof(session), session);
             Guard.AgainstNull(nameof(context), context);
@@ -50,12 +48,7 @@ namespace NServiceBus
             Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
             var writableContextBag = (ContextBag)context;
             var sqlSession = session.GetSqlStorageSession();
-            var sagaInfoCache = sqlSession.InfoCache;
-            if (sagaInfoCache == null)
-            {
-                throw new Exception($"{nameof(GetSagaData)} can only be executed when Sagas have been enabled on the endpoint.");
-            }
-            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sagaInfoCache);
+            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sqlSession.InfoCache);
         }
     }
 }

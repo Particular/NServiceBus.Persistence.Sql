@@ -1,18 +1,17 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Extensibility;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
 partial class SagaPersister : ISagaPersister
 {
     SagaInfoCache sagaInfoCache;
-    CommandBuilder commandBuilder;
+    SqlDialect sqlDialect;
 
-    public SagaPersister(SagaInfoCache sagaInfoCache, SqlVariant sqlVariant)
+    public SagaPersister(SagaInfoCache sagaInfoCache, SqlDialect sqlDialect)
     {
         this.sagaInfoCache = sagaInfoCache;
-        commandBuilder = new CommandBuilder(sqlVariant);
+        this.sqlDialect = sqlDialect;
     }
 
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, CommandWrapper command)
@@ -32,8 +31,7 @@ partial class SagaPersister : ISagaPersister
 
     static int GetConcurrency(ContextBag context)
     {
-        int concurrency;
-        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out concurrency))
+        if (!context.TryGet("NServiceBus.Persistence.Sql.Concurrency", out int concurrency))
         {
             throw new Exception("Cannot save saga because optimistic concurrency version is missing in the context.");
         }

@@ -5,7 +5,6 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-
     public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
     {
         return Complete(sagaData, session, GetConcurrency(context));
@@ -16,7 +15,7 @@ partial class SagaPersister
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         var sqlSession = session.SqlPersistenceSession();
 
-        using (var command = commandBuilder.CreateCommand(sqlSession.Connection))
+        using (var command = sqlDialect.CreateCommand(sqlSession.Connection))
         {
             command.CommandText = sagaInfo.CompleteCommand;
             command.Transaction = sqlSession.Transaction;

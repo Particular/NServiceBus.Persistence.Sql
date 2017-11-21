@@ -7,14 +7,17 @@ declare
   sqlStatement varchar2(500);
   dataType varchar2(30);
   n number(10);
+  currentSchema varchar2(500);
 begin
+select sys_context('USERENV','CURRENT_SCHEMA') into currentSchema from dual;
+
 
 /* CreateTable */
 
   select count(*) into n from user_tables where table_name = 'THESAGA';
   if(n = 0)
   then
- 
+
     sqlStatement :=
        'create table "THESAGA"
        (
@@ -37,7 +40,7 @@ begin
 
 /* AddProperty CorrelationProperty */
 
-select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
+select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 if(n = 0)
 then
   sqlStatement := 'alter table "THESAGA" add ( CORR_CORRELATIONPROPERTY NVARCHAR2(200) )';
@@ -59,11 +62,11 @@ select data_type ||
     end
   end into dataType
 from all_tab_columns
-where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
+where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 
 if(dataType <> 'NVARCHAR2(200)')
 then
-  raise_application_error(-20000, 'Incorrect Correlation Property data type');
+  raise_application_error(-20000, 'Incorrect data type for Correlation_CORR_CORRELATIONPROPERTY.  Expected "NVARCHAR2(200)" got "' || dataType || '".');
 end if;
 
 /* WriteCreateIndex CorrelationProperty */
@@ -83,7 +86,7 @@ end if;
 select count(*) into n
 from all_tab_columns
 where table_name = 'THESAGA' and column_name like 'CORR_%' and
-        column_name <> 'CORR_CORRELATIONPROPERTY';
+        column_name <> 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 
 if(n > 0)
 then
@@ -91,7 +94,7 @@ then
   select 'alter table "THESAGA" drop column ' || column_name into sqlStatement
   from all_tab_columns
   where table_name = 'THESAGA' and column_name like 'CORR_%' and
-        column_name <> 'CORR_CORRELATIONPROPERTY';
+        column_name <> 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 
   execute immediate sqlStatement;
 

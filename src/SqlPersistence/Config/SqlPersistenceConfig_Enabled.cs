@@ -1,10 +1,7 @@
-using NServiceBus.Persistence.Sql;
-
 namespace NServiceBus
 {
     using Configuration.AdvanceExtensibility;
-    using Persistence;
-    using Settings;
+    using Persistence.Sql;
 
     public static partial class SqlPersistenceConfig
     {
@@ -17,18 +14,6 @@ namespace NServiceBus
 
             var installerSettings = configuration.GetSettings().GetOrCreate<InstallerSettings>();
             installerSettings.Disabled = true;
-        }
-
-        internal static bool GetFeatureEnabled<TStorageType>(this ReadOnlySettings settings)
-            where TStorageType : StorageType
-        {
-            return settings.GetOrDefault<EnabledStorageFeatures>()?.IsEnabled<TStorageType>() ?? false;
-        }
-
-        internal static void EnableFeature<TStorageType>(this ReadOnlySettings settingsHolder)
-            where TStorageType : StorageType
-        {
-            settingsHolder.Get<EnabledStorageFeatures>().Enable<TStorageType>();
         }
     }
 }

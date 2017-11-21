@@ -1,33 +1,44 @@
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
 
-[TestFixture]
+#if RELEASE
+using NUnit.Framework;
+// So this test does not run on CI as server install does not support unicode
+[Explicit("MySqlUnicode")]
+#endif
 public class MySqlSagaPersisterTests: SagaPersisterTests
 {
-    public MySqlSagaPersisterTests() : base(BuildSqlVariant.MySql, null)
+    public MySqlSagaPersisterTests() : base(BuildSqlDialect.MySql, null)
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override bool SupportsSchemas() => false;
+
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return () =>
+        return x =>
         {
             var connection = MySqlConnectionBuilder.Build();
             connection.Open();
             return connection;
         };
     }
+
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select count(*)
+from information_schema.columns
+where table_schema = database() and
+      column_name = '{propertyName}' and
+      table_name = '{table}';
+";
+    }
+
     protected override bool IsConcurrencyException(Exception innerException)
     {
         return innerException.Message.Contains("Duplicate entry ");
     }
 
-    // So this test can be excluded if a target server install does not support unicode
-    [Category("MySqlUnicode")]
-    public override void SaveWithWeirdCharacters()
-    {
-        base.SaveWithWeirdCharacters();
-    }
 }

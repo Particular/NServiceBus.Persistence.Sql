@@ -1,7 +1,9 @@
 using System.IO;
 using System.Text;
+#if NET452
 using ApprovalTests;
 using ApprovalTests.Namers;
+#endif
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -9,47 +11,53 @@ using NUnit.Framework;
 public class SubscriptionScriptBuilderTest
 {
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void BuildCreateScript(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
+    public void BuildCreateScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildCreateScript(writer, sqlVariant);
+            SubscriptionScriptBuilder.BuildCreateScript(writer, sqlDialect);
         }
         var script = builder.ToString();
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVariant))
+#if NET452
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
+#endif
     }
 
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void BuildDropScript(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
+    public void BuildDropScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SubscriptionScriptBuilder.BuildDropScript(writer, sqlVariant);
+            SubscriptionScriptBuilder.BuildDropScript(writer, sqlDialect);
         }
         var script = builder.ToString();
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVariant))
+#if NET452
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
+#endif
     }
 }

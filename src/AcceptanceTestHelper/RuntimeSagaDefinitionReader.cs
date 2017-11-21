@@ -12,7 +12,7 @@ public static class RuntimeSagaDefinitionReader
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
     const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlVariant sqlVariant)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlDialect sqlDialect)
     {
         var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
         if (!sagaTypes.Any())
@@ -20,24 +20,27 @@ public static class RuntimeSagaDefinitionReader
             return Enumerable.Empty<SagaDefinition>();
         }
         var sagaAssembly = sagaTypes.First().Assembly;
-        //Validate the saga definitions using script builder compile-time validation
-        var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred));
-        var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
         var exceptions = new List<Exception>();
-        compileTimeReader.GetSagas((e, d) =>
+        //Validate the saga definitions using script builder compile-time validation
+        using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
         {
-            exceptions.Add(e);
-        });
+            var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
+
+            compileTimeReader.GetSagas((e, d) =>
+            {
+                exceptions.Add(e);
+            });
+        }
         if (exceptions.Any())
         {
             throw new AggregateException(exceptions);
         }
-        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlVariant));
+        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
     }
 
-    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlVariant sqlVariant)
+    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
     {
-        var saga = (Saga) FormatterServices.GetUninitializedObject(sagaType);
+        var saga = (Saga)FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
         methodInfo.Invoke(saga, new object[]
         {
@@ -66,7 +69,7 @@ public static class RuntimeSagaDefinitionReader
         var tableSuffixOverride = (string)sagaType.GetProperty("TableSuffix", AnyInstanceMember).GetValue(saga);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 
-        if (sqlVariant == BuildSqlVariant.Oracle)
+        if (sqlDialect == BuildSqlDialect.Oracle)
         {
             tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
         }

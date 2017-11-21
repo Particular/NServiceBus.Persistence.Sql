@@ -1,55 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard1.5</TargetFrameworks>
+    <TargetFramework>net452</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
-    <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
-    <NuSpecFileName>NServiceBus.Persistence.Sql.ScriptBuilder</NuSpecFileName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilder</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <OutputPath>..\..\binaries\</OutputPath>
     <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
-    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
-    <PackageReference Include="ILRepack" Version="2.0.13" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" CopyLocal="True" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
+    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Guard.cs" />
-    <Compile Include="..\CommonAssemblyInfo.cs" />
-    <None Remove="Outbox\*.sql" />
-    <None Remove="Subscription\*.sql" />
-    <None Remove="Timeout\*.sql" />
-    <EmbeddedResource Include="Outbox\*.sql" />
-    <EmbeddedResource Include="Subscription\*.sql" />
-    <EmbeddedResource Include="Timeout\*.sql" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="NuGetPackager" Version="0.6.1" />
+  <ItemGroup>
+    <None Remove="**\*.sql" />
+    <EmbeddedResource Include="**\*.sql" />
   </ItemGroup>
 
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
-       <Output TaskParameter="Include" ItemName="MonoCecilRef" />
-    </CreateItem>
-    <PropertyGroup>
-      <ScriptBuilderNetClassicDll>$(ProjectDir)bin\$(ConfigurationName)\net452\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetClassicDll>
-      <ScriptBuilderNetStandardDll>$(ProjectDir)bin\$(ConfigurationName)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilder.dll</ScriptBuilderNetStandardDll>
-      <CecilNetClassic>@(MonoCecilRef->'%(ResolvedPath)')\lib\net40\Mono.Cecil.dll</CecilNetClassic>
-      <CecilNetStandard>@(MonoCecilRef->'%(ResolvedPath)')\lib\netstandard1.3\Mono.Cecil.dll</CecilNetStandard>
-      <MergeOutputNetClassic>$(SolutionDir)..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetClassic>
-      <MergeOutputNetStandard>$(SolutionDir)..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilder.dll</MergeOutputNetStandard>
-    </PropertyGroup>
-    <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetClassic)&quot; &quot;$(ScriptBuilderNetClassicDll)&quot; &quot;$(CecilNetClassic)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <Exec Command="$(ILRepack) /out:&quot;$(MergeOutputNetStandard)&quot; &quot;$(ScriptBuilderNetStandardDll)&quot; &quot;$(CecilNetStandard)&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-  </Target>
+  <PropertyGroup>
+    <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
+    <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
+  </PropertyGroup>
+
 </Project>

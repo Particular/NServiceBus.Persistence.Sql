@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Threading;
@@ -14,11 +15,28 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
+    public static void AddParameter(this DbCommand command, string name, DateTime value)
+    {
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = name;
+        parameter.Value = value;
+        parameter.DbType = DbType.DateTime;
+        command.Parameters.Add(parameter);
+    }
+
     public static async Task<DbConnection> OpenConnection(this Func<DbConnection> connectionBuilder)
     {
         var connection = connectionBuilder();
-        await connection.OpenAsync().ConfigureAwait(false);
-        return connection;
+        try
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
     }
 
     public static void AddParameter(this DbCommand command, string name, Version value)

@@ -1,18 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <AssemblyName>ScriptBuilderTask.Tests.Target</AssemblyName>
-    <PackageId>ScriptBuilderTask.Tests.Target</PackageId>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 

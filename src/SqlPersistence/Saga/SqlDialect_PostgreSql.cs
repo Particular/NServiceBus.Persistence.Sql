@@ -1,0 +1,151 @@
+﻿#pragma warning disable 672 // overrides obsolete
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+namespace NServiceBus
+{
+    using System.Text;
+    using Logging;
+    using Newtonsoft.Json;
+    using Persistence.Sql;
+    using LogManager = LogManager;
+
+    public partial class SqlDialect
+    {
+        public partial class PostgreSql
+        {
+            static ILog log = LogManager.GetLogger<PostgreSql>();
+
+            public override string GetSagaTableName(string tablePrefix, string tableSuffix)
+            {
+                return $"\"{Schema}\".\"{tablePrefix}{tableSuffix}\"";
+            }
+
+            internal override void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            {
+                if (!IsTypeNameHandlingCorrect(jsonSerializer))
+                {
+                    throw new SerializationException("PostgreSQL does not guarantee that properties are stored in order. As such, when using any TypeNameHandling other than 'None', then the MetadataPropertyHandling must be set to 'ReadAhead'.");
+                }
+            }
+
+            static bool IsTypeNameHandlingCorrect(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            {
+                if (jsonSerializer.TypeNameHandling == TypeNameHandling.None)
+                {
+                    return true;
+                }
+                if (jsonSerializer.MetadataPropertyHandling == MetadataPropertyHandling.ReadAhead)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
+            {
+                var valuesBuilder = new StringBuilder();
+                var insertBuilder = new StringBuilder();
+
+                if (correlationProperty != null)
+                {
+                    insertBuilder.Append($",\r\n    \"Correlation_{correlationProperty}\"");
+                    valuesBuilder.Append(",\r\n    @CorrelationId");
+                }
+                if (transitionalCorrelationProperty != null)
+                {
+                    insertBuilder.Append($",\r\n    \"Correlation_{transitionalCorrelationProperty}\"");
+                    valuesBuilder.Append(",\r\n    @TransitionalCorrelationId");
+                }
+
+                return $@"
+insert into {tableName}
+(
+    ""Id"",
+    ""Metadata"",
+    ""Data"",
+    ""PersistenceVersion"",
+    ""SagaTypeVersion"",
+    ""Concurrency""{insertBuilder}
+)
+values
+(
+    @Id,
+    @Metadata,
+    @Data,
+    @PersistenceVersion,
+    @SagaTypeVersion,
+    1{valuesBuilder}
+)";
+            }
+
+            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
+            {
+                // no need to set CorrelationProperty since it is immutable
+                var correlationSet = "";
+                if (transitionalCorrelationProperty != null)
+                {
+                    correlationSet = $",\r\n    \"Correlation_{transitionalCorrelationProperty}\" = @TransitionalCorrelationId";
+                }
+
+                return $@"
+update {tableName}
+set
+    ""Data"" = @Data,
+    ""PersistenceVersion"" = @PersistenceVersion,
+    ""SagaTypeVersion"" = @SagaTypeVersion,
+    ""Concurrency"" = @Concurrency + 1{correlationSet}
+where
+    ""Id"" = @Id and ""Concurrency"" = @Concurrency
+";
+            }
+
+            public override string BuildGetBySagaIdCommand(string tableName)
+            {
+                return $@"
+select
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
+from {tableName}
+where ""Id"" = @Id
+";
+            }
+
+            public override string BuildGetByPropertyCommand(string propertyName, string tableName)
+            {
+                return $@"
+select
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
+from {tableName}
+where ""Correlation_{propertyName}"" = @propertyValue
+";
+            }
+
+            public override string BuildCompleteCommand(string tableName)
+            {
+                return $@"
+delete from {tableName}
+where ""Id"" = @Id and ""Concurrency"" = @Concurrency
+";
+            }
+
+            public override string BuildSelectFromCommand(string tableName)
+            {
+                return $@"
+select
+    ""Id"",
+    ""SagaTypeVersion"",
+    ""Concurrency"",
+    ""Metadata"",
+    ""Data""
+from {tableName}
+";
+            }
+        }
+    }
+}

@@ -8,14 +8,23 @@ static class ScriptLocation
 {
     public static string FindScriptDirectory(ReadOnlySettings settings)
     {
-        string scriptDirectory;
-        if (settings.TryGet("SqlPersistence.ScriptDirectory", out scriptDirectory))
+        var currentDirectory = GetCurrentDirectory(settings);
+        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", settings.GetSqlDialect().Name);
+    }
+
+    static string GetCurrentDirectory(ReadOnlySettings settings)
+    {
+        if (settings.TryGet("SqlPersistence.ScriptDirectory", out string scriptDirectory))
         {
             return scriptDirectory;
         }
-        var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-        var currentDirectory = Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", settings.GetSqlVariant().ToString());
+        var entryAssembly = Assembly.GetEntryAssembly();
+        if (entryAssembly == null)
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+        var codeBase = entryAssembly.CodeBase;
+        return Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
     }
 
     public static void ValidateScriptExists(string createScript)

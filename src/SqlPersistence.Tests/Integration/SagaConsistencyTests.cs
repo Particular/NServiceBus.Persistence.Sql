@@ -7,6 +7,7 @@ using NServiceBus.Configuration.AdvanceExtensibility;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
+using NServiceBus.Transport.SQLServer;
 using NUnit.Framework;
 
 [TestFixture]
@@ -29,9 +30,16 @@ public class SagaConsistencyTests
     [Test]
     public Task In_DTC_mode_enlists_in_the_ambient_transaction()
     {
+        Requires.DtcSupport();
         return RunTest(e =>
         {
-            var transport = e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
@@ -39,11 +47,17 @@ public class SagaConsistencyTests
     [Test]
     public Task In_DTC_SqlTransport_mode_does_not_escalate()
     {
+        Requires.DtcSupport();
         return RunTest(e =>
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.TransactionScope);
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             e.Pipeline.Register(new EscalationChecker(), "EscalationChecker");
         });
     }
@@ -55,7 +69,12 @@ public class SagaConsistencyTests
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
         });
     }
 
@@ -65,7 +84,13 @@ public class SagaConsistencyTests
         return RunTest(e =>
         {
             e.GetSettings().Set("DisableOutboxTransportCheck", true);
-            e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             e.EnableOutbox();
         });
     }
@@ -84,18 +109,24 @@ public class SagaConsistencyTests
             )
         );
 
-        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, BuildSqlVariant.MsSqlServer));
-        Execute(OutboxScriptBuilder.BuildDropScript(BuildSqlVariant.MsSqlServer));
-        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, BuildSqlVariant.MsSqlServer));
-        Execute(OutboxScriptBuilder.BuildCreateScript(BuildSqlVariant.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildDropScript(sagaDefinition, BuildSqlDialect.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer));
+        Execute(SagaScriptBuilder.BuildCreateScript(sagaDefinition, BuildSqlDialect.MsSqlServer));
+        Execute(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer));
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
         var typesToScan = TypeScanner.NestedTypes<SagaConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
         endpointConfiguration.DisableFeature<NServiceBus.Features.TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
-        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.SubscriptionSettings().DisableCache();
         persistence.DisableInstaller();

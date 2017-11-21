@@ -1,8 +1,9 @@
-﻿using System;
-using Newtonsoft.Json;
-
+﻿#pragma warning disable CS0419
 namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// A delegate used to configure how a specific saga data version will be serialized.
     /// <seealso cref="SagaSettings.JsonSettingsForVersion"/>
@@ -11,3 +12,4 @@ namespace NServiceBus.Persistence.Sql
     /// <param name="sagaVersion">The assembly version of the saga data being serialized.</param>
     public delegate JsonSerializerSettings RetrieveVersionSpecificJsonSettings(Type sagaDataType, Version sagaVersion);
 }
+#pragma warning restore CS0419

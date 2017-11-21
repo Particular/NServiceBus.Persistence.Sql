@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using System.Text;
+#if NET452
 using ApprovalTests;
 using ApprovalTests.Namers;
+#endif
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -9,10 +11,11 @@ using NUnit.Framework;
 public class SagaScriptBuilderTest
 {
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void CreateWithCorrelation(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
+    public void CreateWithCorrelation(BuildSqlDialect sqlDialect)
     {
         var saga = new SagaDefinition(
             name: "theSaga",
@@ -27,25 +30,28 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, sqlDialect, writer);
         }
         var script = builder.ToString();
 
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
-        using (ApprovalResults.ForScenario(sqlVariant))
+#if NET452
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
+#endif
     }
 
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void CreateWithCorrelationAndTransitional(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
+    public void CreateWithCorrelationAndTransitional(BuildSqlDialect sqlDialect)
     {
         var saga = new SagaDefinition(
             tableSuffix: "theSaga",
@@ -65,26 +71,29 @@ public class SagaScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            SagaScriptBuilder.BuildCreateScript(saga, sqlVariant, writer);
+            SagaScriptBuilder.BuildCreateScript(saga, sqlDialect, writer);
         }
         var script = builder.ToString();
 
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVariant))
+#if NET452
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
+#endif
     }
 
     [Test]
-    [TestCase(BuildSqlVariant.MsSqlServer)]
-    [TestCase(BuildSqlVariant.MySql)]
-    [TestCase(BuildSqlVariant.Oracle)]
-    public void BuildDropScript(BuildSqlVariant sqlVariant)
+    [TestCase(BuildSqlDialect.MsSqlServer)]
+    [TestCase(BuildSqlDialect.MySql)]
+    [TestCase(BuildSqlDialect.Oracle)]
+    [TestCase(BuildSqlDialect.PostgreSql)]
+    public void BuildDropScript(BuildSqlDialect sqlDialect)
     {
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
@@ -98,17 +107,19 @@ public class SagaScriptBuilderTest
                 tableSuffix: "theSaga",
                 name: "theSaga"
             );
-            SagaScriptBuilder.BuildDropScript(saga, sqlVariant, writer);
+            SagaScriptBuilder.BuildDropScript(saga, sqlDialect, writer);
         }
         var script = builder.ToString();
-        if (sqlVariant == BuildSqlVariant.MsSqlServer)
+        if (sqlDialect == BuildSqlDialect.MsSqlServer)
         {
             SqlValidator.Validate(script);
         }
 
-        using (ApprovalResults.ForScenario(sqlVariant))
+#if NET452
+        using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
+#endif
     }
 }

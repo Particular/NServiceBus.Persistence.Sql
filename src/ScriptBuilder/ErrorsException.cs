@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+
     public class ErrorsException : Exception
     {
         public string FileName { get; set; }

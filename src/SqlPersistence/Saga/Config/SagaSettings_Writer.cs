@@ -1,11 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-using NServiceBus.Settings;
-
+﻿#pragma warning disable CS0419
 namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+    using Settings;
+
     public partial class SagaSettings
     {
 
@@ -24,3 +25,4 @@ namespace NServiceBus.Persistence.Sql
 
     }
 }
+#pragma warning restore CS0419

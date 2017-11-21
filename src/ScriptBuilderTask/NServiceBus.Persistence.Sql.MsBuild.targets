@@ -1,0 +1,52 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <SqlPersistenceScriptBuilderTaskPath>$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+  </PropertyGroup>
+
+  <UsingTask
+    TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
+    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)" />
+
+  <Target Name="SqlPersistenceScriptBuilder"
+          AfterTargets="AfterCompile"
+          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+
+    <SqlPersistenceScriptBuilderTask
+      AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
+      IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
+      ProjectDirectory="$(ProjectDir)"
+      SolutionDirectory="$(SolutionDir)"/>
+
+  </Target>
+
+  <Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems"
+          BeforeTargets="GetCopyToOutputDirectoryItems"
+          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+
+    <PropertyGroup>
+      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
+    </ItemGroup>
+
+    <CreateItem Include="@(SqlPersistenceScripts)"
+                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
+    </CreateItem>
+
+    <CreateItem Include="@(SqlPersistenceScripts)"
+                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
+      <Output TaskParameter="Include" ItemName="AllItemsFullPathWithTargetPath" />
+    </CreateItem>
+
+  </Target>
+
+  <!--Support for ncrunch-->
+  <ItemGroup  Condition="'$(NCrunch)' == '1'">
+    <None Include="$(MSBuildThisFileDirectory)..\*.*" />
+  </ItemGroup>
+
+</Project>

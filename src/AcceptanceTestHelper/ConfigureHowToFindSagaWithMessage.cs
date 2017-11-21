@@ -5,7 +5,8 @@ using NServiceBus;
 
 class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage
 {
-    public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty) where TSagaEntity : IContainSagaData
+    public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
+        where TSagaEntity : IContainSagaData
     {
         var body = sagaEntityProperty.Body;
         var member = GetMemberExpression(body);
@@ -16,13 +17,11 @@ class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage
 
     MemberExpression GetMemberExpression(Expression body)
     {
-        var unaryExpression = body as UnaryExpression;
-        if (unaryExpression != null)
+        if (body is UnaryExpression unaryExpression)
         {
             return (MemberExpression)unaryExpression.Operand;
         }
-        var memberExpression = body as MemberExpression;
-        if (memberExpression != null)
+        if (body is MemberExpression memberExpression)
         {
             return memberExpression;
         }

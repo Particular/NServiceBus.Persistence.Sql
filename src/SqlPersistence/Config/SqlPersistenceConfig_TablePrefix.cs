@@ -1,9 +1,8 @@
-using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
-
 namespace NServiceBus
 {
+    using Configuration.AdvanceExtensibility;
+    using Persistence.Sql;
+    using Settings;
 
     public static partial class SqlPersistenceConfig
     {
@@ -21,8 +20,7 @@ namespace NServiceBus
 
         internal static string GetTablePrefix(this ReadOnlySettings settings)
         {
-            string tablePrefix;
-            if (settings.TryGet("SqlPersistence.TablePrefix", out tablePrefix))
+            if (settings.TryGet("SqlPersistence.TablePrefix", out string tablePrefix))
             {
                 return tablePrefix;
             }

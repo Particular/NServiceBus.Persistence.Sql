@@ -5,7 +5,6 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class SagaDefinitionReader
 {
-
     public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
         ValidateIsNotDirectSaga(type);
@@ -41,9 +40,8 @@ static class SagaDefinitionReader
 
     static string GetCorrelationPropertyName(TypeDefinition type)
     {
-        string value;
         var property = type.GetProperty("CorrelationPropertyName");
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out var value))
         {
             return value;
         }
@@ -56,13 +54,11 @@ When all messages are mapped using finders then use the following: protected ove
 
     static string GetTransitionalCorrelationPropertyName(TypeDefinition type)
     {
-        string value;
-        PropertyDefinition property;
-        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out property))
+        if (!type.TryGetProperty("TransitionalCorrelationPropertyName", out var property))
         {
             return null;
         }
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out var value))
         {
             return value;
         }
@@ -73,13 +69,11 @@ For example: protected override string TransitionalCorrelationPropertyName => na
 
     static string GetTableSuffix(TypeDefinition type)
     {
-        string value;
-        PropertyDefinition property;
-        if (!type.TryGetProperty("TableSuffix", out property))
+        if (!type.TryGetProperty("TableSuffix", out var property))
         {
             return null;
         }
-        if (property.TryGetPropertyAssignment(out value))
+        if (property.TryGetPropertyAssignment(out var value))
         {
             return value;
         }
@@ -128,8 +122,7 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
     {
         var baseType = (GenericInstanceType) sagaType.BaseType;
         var sagaDataReference = baseType.GenericArguments.Single();
-        var sagaDataType = sagaDataReference as TypeDefinition;
-        if (sagaDataType != null)
+        if (sagaDataReference is TypeDefinition sagaDataType)
         {
             return sagaDataType;
         }
@@ -164,5 +157,4 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
             type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(propertyType)
         );
     }
-
 }

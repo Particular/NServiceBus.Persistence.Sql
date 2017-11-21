@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
@@ -6,6 +7,7 @@ using NServiceBus.Persistence.Sql;
 class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
+    Func<ISqlStorageSession, Task> onSaveChangesCallback;
 
     public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
     {
@@ -17,19 +19,31 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         Transaction = transaction;
     }
 
-    internal SagaInfoCache InfoCache;
+    internal SagaInfoCache InfoCache { get; }
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }
-
-    public Task CompleteAsync()
+    public void OnSaveChanges(Func<ISqlStorageSession, Task> callback)
     {
+        Guard.AgainstNull(nameof(callback), callback);
+        if (onSaveChangesCallback != null)
+        {
+            throw new Exception("Save changes callback for this session has already been registered.");
+        }
+        onSaveChangesCallback = callback;
+    }
+
+    public async Task CompleteAsync()
+    {
+        if (onSaveChangesCallback != null)
+        {
+            await onSaveChangesCallback(this).ConfigureAwait(false);
+        }
         if (ownsTransaction)
         {
             Transaction?.Commit();
             Transaction?.Dispose();
             Connection.Dispose();
         }
-        return Task.FromResult(0);
     }
 
     public void Dispose()

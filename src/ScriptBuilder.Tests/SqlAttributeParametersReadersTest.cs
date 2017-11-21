@@ -1,40 +1,78 @@
-﻿using System.IO;
-using System.Linq;
-using Mono.Cecil;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 [TestFixture]
 public class SqlAttributeParametersReadersTest
 {
-
     [Test]
-    public void Variant()
+    public void Minimal()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
-        var assemblyResolver = new DefaultAssemblyResolver();
-        assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
-        var readerParameters = new ReaderParameters(ReadingMode.Deferred)
-        {
-            AssemblyResolver = assemblyResolver
-        };
-        var module = ModuleDefinition.ReadModule(path, readerParameters);
-        ObjectApprover.VerifyWithJson(SqlVariantReader.Read(module).ToList());
+        var result = SettingsAttributeReader.ReadFromAttribute(
+            new CustomAttributeMock(
+                new Dictionary<string, object>
+                {
+                    {
+                        //At least one is required
+                        "MsSqlServerScripts", true
+                    }
+                }));
+
+        Assert.IsNotNull(result);
+#if NET452
+        ObjectApprover.VerifyWithJson(result);
+#endif
     }
 
     [Test]
-    public void ScriptPromotionPath()
+    public void Defaults()
     {
-        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
-        var assemblyResolver = new DefaultAssemblyResolver();
-        assemblyResolver.AddSearchDirectory(TestContext.CurrentContext.TestDirectory);
-        var readerParameters = new ReaderParameters(ReadingMode.Deferred)
-        {
-            AssemblyResolver = assemblyResolver
-        };
-        var module = ModuleDefinition.ReadModule(path, readerParameters);
-        var tryRead = ScriptPromotionPathReader.TryRead(module, out path);
-        Assert.IsTrue(tryRead);
-        ObjectApprover.VerifyWithJson(path);
+        var result = SettingsAttributeReader.ReadFromAttribute(null);
+        Assert.IsNotNull(result);
+#if NET452
+        ObjectApprover.VerifyWithJson(result);
+#endif
     }
+
+    [Test]
+    public void NonDefaults()
+    {
+        var result = SettingsAttributeReader.ReadFromAttribute(
+            new CustomAttributeMock(
+                new Dictionary<string, object>
+                {
+                    {
+                        "ScriptPromotionPath", @"D:\scripts"
+                    },
+                    {
+                        "MsSqlServerScripts", true
+                    },
+                    {
+                        "MySqlScripts", true
+                    },
+                    {
+                        "OracleScripts", true
+                    },
+                    {
+                        "ProduceSagaScripts", false
+                    },
+                    {
+                        "ProduceTimeoutScripts", false
+                    },
+                    {
+                        "ProduceSubscriptionScripts", false
+                    },
+                    {
+                        "ProduceOutboxScripts", false
+                    }
+                }));
+        Assert.IsNotNull(result);
+#if NET452
+        ObjectApprover.VerifyWithJson(result);
+#endif
+    }
+
+
 }

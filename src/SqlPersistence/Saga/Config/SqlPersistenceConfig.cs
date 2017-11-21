@@ -1,12 +1,10 @@
-using NServiceBus.Configuration.AdvanceExtensibility;
-using NServiceBus.Persistence.Sql;
-
 namespace NServiceBus
 {
+    using Configuration.AdvanceExtensibility;
+    using Persistence.Sql;
 
     public static partial class SqlPersistenceConfig
     {
-
         /// <summary>
         /// Exposes saga specific settings.
         /// </summary>
@@ -14,6 +12,5 @@ namespace NServiceBus
         {
             return new SagaSettings(configuration.GetSettings());
         }
-
     }
 }

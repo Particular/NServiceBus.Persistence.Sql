@@ -1,12 +1,10 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Persistence;
 using NServiceBus.Timeout.Core;
 
 class SqlTimeoutFeature : Feature
 {
-
     SqlTimeoutFeature()
     {
         DependsOn<TimeoutManager>();
@@ -15,16 +13,14 @@ class SqlTimeoutFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        settings.EnableFeature<StorageType.Timeouts>();
-        var sqlVariant = settings.GetSqlVariant();
+        var sqlDialect = settings.GetSqlDialect();
         var connectionBuilder = settings.GetConnectionBuilder();
         var tablePrefix = settings.GetTablePrefix();
-        var schema= settings.GetSchema();
         var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
-        ConfigValidation.ValidateTableSettings(sqlVariant, tablePrefix, schema);
+        sqlDialect.ValidateTablePrefix(tablePrefix);
 
-        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlVariant, schema, timeoutsCleanupExecutionInterval);
+        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
     }

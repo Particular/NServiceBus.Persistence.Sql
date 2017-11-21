@@ -6,13 +6,12 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
 {
-
-    public SqlServerTimeoutPersisterTests() : base(BuildSqlVariant.MsSqlServer, "schema_name")
+    public SqlServerTimeoutPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return MsSqlConnectionBuilder.Build;
+        return x => MsSqlConnectionBuilder.Build();
     }
 }

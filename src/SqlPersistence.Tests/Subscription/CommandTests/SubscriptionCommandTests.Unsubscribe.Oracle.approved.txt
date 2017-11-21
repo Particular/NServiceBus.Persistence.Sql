@@ -1,0 +1,5 @@
+﻿
+delete from "THETABLEPREFIXSS"
+where
+    Subscriber = :Subscriber and
+    MessageType = :MessageType

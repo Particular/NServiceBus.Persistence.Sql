@@ -6,12 +6,12 @@ using NUnit.Framework;
 [TestFixture]
 public class SqlServerOutboxPersisterTests : OutboxPersisterTests
 {
-    public SqlServerOutboxPersisterTests() : base(BuildSqlVariant.MsSqlServer, "schema_name")
+    public SqlServerOutboxPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return MsSqlConnectionBuilder.Build;
+        return x => MsSqlConnectionBuilder.Build();
     }
 }

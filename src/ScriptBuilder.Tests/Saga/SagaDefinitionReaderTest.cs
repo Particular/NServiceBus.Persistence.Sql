@@ -1,14 +1,17 @@
-﻿using System.IO;
-using ApprovalTests;
+﻿using System;
+using System.IO;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+#if NET452
+using ApprovalTests;
 using ObjectApproval;
+#endif
 
 [TestFixture]
-public class SagaDefinitionReaderTest
+public class SagaDefinitionReaderTest: IDisposable
 {
     ModuleDefinition module;
 
@@ -23,12 +26,14 @@ public class SagaDefinitionReaderTest
     public void WithGeneric()
     {
         var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
-        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
         });
+        Assert.IsNotNull(exception.Message);
+#if NET452
         Approvals.Verify(exception.Message);
+#endif
     }
 
     public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
@@ -50,12 +55,14 @@ public class SagaDefinitionReaderTest
     public void Abstract()
     {
         var sagaType = module.GetTypeDefinition<AbstractSaga>();
-        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
         });
+        Assert.IsNotNull(exception.Message);
+#if NET452
         Approvals.Verify(exception.Message);
+#endif
     }
 
     abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
@@ -70,12 +77,14 @@ public class SagaDefinitionReaderTest
     public void NonSqlSaga()
     {
         var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
-        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
         });
+        Assert.IsNotNull(exception.Message);
+#if NET452
         Approvals.Verify(exception.Message);
+#endif
     }
 
     public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
@@ -93,9 +102,12 @@ public class SagaDefinitionReaderTest
     public void Simple()
     {
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+
+        Assert.IsNotNull(definition);
+#if NET452
         ObjectApprover.VerifyWithJson(definition);
+#endif
     }
 
     public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
@@ -119,12 +131,14 @@ public class SagaDefinitionReaderTest
     public void WithReadonlyProperty()
     {
         var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
-        SagaDefinition definition;
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
         });
+        Assert.IsNotNull(exception.Message);
+#if NET452
         Approvals.Verify(exception.Message);
+#endif
     }
 
     public class WithReadonlyPropertySaga : SqlSaga<WithReadonlyPropertySaga.SagaData>
@@ -145,9 +159,11 @@ public class SagaDefinitionReaderTest
     public void WithNoTransitionalCorrelation()
     {
         var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+#if NET452
         ObjectApprover.VerifyWithJson(definition);
+#endif
     }
 
     public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
@@ -168,9 +184,11 @@ public class SagaDefinitionReaderTest
     public void WithTableSuffix()
     {
         var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+#if NET452
         ObjectApprover.VerifyWithJson(definition);
+#endif
     }
 
     public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
@@ -192,9 +210,11 @@ public class SagaDefinitionReaderTest
     public void WithNoCorrelation()
     {
         var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+#if NET452
         ObjectApprover.VerifyWithJson(definition);
+#endif
     }
 
     public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
@@ -214,9 +234,11 @@ public class SagaDefinitionReaderTest
     public void WithStatementBodyProperty()
     {
         var sagaType = module.GetTypeDefinition<WithStatementBodyPropertySaga>();
-        SagaDefinition definition;
-        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out definition);
+        SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+#if NET452
         ObjectApprover.VerifyWithJson(definition);
+#endif
     }
 
     public class WithStatementBodyPropertySaga : SqlSaga<WithStatementBodyPropertySaga.SagaData>

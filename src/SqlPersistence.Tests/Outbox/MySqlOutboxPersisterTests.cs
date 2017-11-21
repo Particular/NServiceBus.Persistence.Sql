@@ -6,12 +6,14 @@ using NUnit.Framework;
 [TestFixture]
 public class MySqlOutboxPersisterTests : OutboxPersisterTests
 {
-    public MySqlOutboxPersisterTests() : base(BuildSqlVariant.MySql, null)
+    public MySqlOutboxPersisterTests() : base(BuildSqlDialect.MySql, null)
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override bool SupportsSchemas() => false;
+
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return MySqlConnectionBuilder.Build;
+        return x => MySqlConnectionBuilder.Build();
     }
 }

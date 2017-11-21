@@ -7,7 +7,6 @@ using NServiceBus.Sagas;
 
 partial class SagaPersister
 {
-
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
     {
         return Save(sagaData, session, correlationProperty?.Value);
@@ -18,7 +17,7 @@ partial class SagaPersister
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
 
-        using (var command = commandBuilder.CreateCommand(sqlSession.Connection))
+        using (var command = sqlDialect.CreateCommand(sqlSession.Connection))
         {
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
@@ -33,7 +32,7 @@ partial class SagaPersister
                 metadata.Add("Originator", sagaData.Originator);
             }
             command.AddParameter("Metadata", Serializer.Serialize(metadata));
-            command.AddParameter("Data", sagaInfo.ToJson(sagaData));
+            command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             if (correlationId != null)
@@ -44,5 +43,4 @@ partial class SagaPersister
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
-
 }

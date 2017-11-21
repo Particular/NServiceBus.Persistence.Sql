@@ -1,37 +1,49 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
 
 class CommandWrapper : IDisposable
 {
     protected DbCommand command;
+    List<CharArrayTextWriter> writers;
+    SqlDialect dialect;
     int disposeSignaled;
 
-    public CommandWrapper(DbCommand command)
+    public CommandWrapper(DbCommand command, SqlDialect dialect)
     {
         this.command = command;
+        this.dialect = dialect;
     }
 
     public DbCommand InnerCommand => command;
 
     public string CommandText
     {
-        get { return command.CommandText; }
-        set { command.CommandText = value; }
+        get => command.CommandText;
+        set => command.CommandText = value;
     }
 
     public DbTransaction Transaction
     {
-        get { return command.Transaction; }
-        set { command.Transaction = value; }
+        get => command.Transaction;
+        set => command.Transaction = value;
     }
 
-    public virtual void AddParameter(string name, object value)
+    public void AddParameter(string name, object value)
     {
         var parameter = command.CreateParameter();
-        ParameterFiller.Fill(parameter, name, value);
+        dialect.AddParameter(parameter, name, value);
+        command.Parameters.Add(parameter);
+    }
+
+    public void AddJsonParameter(string name, object value)
+    {
+        var parameter = command.CreateParameter();
+        dialect.AddJsonParameter(parameter, name, value);
         command.Parameters.Add(parameter);
     }
 
@@ -65,6 +77,14 @@ class CommandWrapper : IDisposable
         return command.ExecuteNonQueryEx(cancellationToken);
     }
 
+    public CharArrayTextWriter LeaseWriter()
+    {
+        var writer = CharArrayTextWriter.Lease();
+        writers = writers ?? new List<CharArrayTextWriter>();
+        writers.Add(writer);
+        return writer;
+    }
+
     public void Dispose()
     {
         if (Interlocked.Exchange(ref disposeSignaled, 1) != 0)
@@ -73,5 +93,14 @@ class CommandWrapper : IDisposable
         }
         var temp = Interlocked.Exchange(ref command, null);
         temp?.Dispose();
+
+        var tempWriters = Interlocked.Exchange(ref writers, null);
+        if (tempWriters != null)
+        {
+            foreach (var writer in tempWriters)
+            {
+                writer.Release();
+            }
+        }
     }
 }

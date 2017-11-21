@@ -36,5 +36,4 @@ static class SagaDefinitionValidator
             throw new ErrorsException($"The Saga '{sagaName}' has null CorrelationProperty is null and non null TransitionalCorrelationProperty. If TransitionalCorrelationProperty is defined then CorrelationProperty must also be defined.");
         }
     }
-
 }

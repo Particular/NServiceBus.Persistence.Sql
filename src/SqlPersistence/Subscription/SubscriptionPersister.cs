@@ -4,26 +4,23 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Extensibility;
+using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
+
 #pragma warning disable 618
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    Func<DbConnection> connectionBuilder;
-    TimeSpan? cacheFor;
-    SubscriptionCommands subscriptionCommands;
-    public ConcurrentDictionary<string, CacheItem> Cache;
-    CommandBuilder commandBuilder;
-
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlVariant sqlVariant, string schema, TimeSpan? cacheFor)
+    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
+        this.sqlDialect = sqlDialect;
         this.cacheFor = cacheFor;
-        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlVariant, tablePrefix, schema);
-        commandBuilder = new CommandBuilder(sqlVariant);
+        subscriptionCommands = SubscriptionCommandBuilder.Build(sqlDialect, tablePrefix);
         if (cacheFor != null)
         {
             Cache = new ConcurrentDictionary<string, CacheItem>();
@@ -32,52 +29,36 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        await Retry(async () =>
         {
-            command.CommandText = subscriptionCommands.Subscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
-        }
+            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var command = sqlDialect.CreateCommand(connection))
+            {
+                command.CommandText = subscriptionCommands.Subscribe;
+                command.AddParameter("MessageType", messageType.TypeName);
+                command.AddParameter("Subscriber", subscriber.TransportAddress);
+                command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
+                command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+                await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            }
+        }).ConfigureAwait(false);
         ClearForMessageType(messageType);
-    }
-
-    static object Nullable(object value)
-    {
-        return value ?? DBNull.Value;
     }
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        await Retry(async () =>
         {
-            command.CommandText = subscriptionCommands.Unsubscribe;
-            command.AddParameter("MessageType", messageType.TypeName);
-            command.AddParameter("Subscriber", subscriber.TransportAddress);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
-        }
-        ClearForMessageType(messageType);
-    }
-
-    void ClearForMessageType(MessageType messageType)
-    {
-        if (cacheFor == null)
-        {
-            return;
-        }
-        var keyPart = GetKeyPart(messageType);
-        foreach (var cacheKey in Cache.Keys)
-        {
-            if (cacheKey.Contains(keyPart))
+            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var command = sqlDialect.CreateCommand(connection))
             {
-                CacheItem cacheItem;
-                Cache.TryRemove(cacheKey, out cacheItem);
+                command.CommandText = subscriptionCommands.Unsubscribe;
+                command.AddParameter("MessageType", messageType.TypeName);
+                command.AddParameter("Subscriber", subscriber.TransportAddress);
+                await command.ExecuteNonQueryEx().ConfigureAwait(false);
             }
-        }
+        }).ConfigureAwait(false);
+        ClearForMessageType(messageType);
     }
 
     public Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageHierarchy, ContextBag context)
@@ -107,6 +88,51 @@ class SubscriptionPersister : ISubscriptionStorage
         return cacheItem.Subscribers;
     }
 
+    static object Nullable(object value)
+    {
+        return value ?? DBNull.Value;
+    }
+
+    static async Task Retry(Func<Task> action)
+    {
+        var attempts = 0;
+        while (true)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+                return;
+            }
+            catch (Exception ex)
+            {
+                attempts++;
+
+                if (attempts > 10)
+                {
+                    throw;
+                }
+                Log.Debug("Error while processing subscription change request. Retrying.", ex);
+                await Task.Delay(100).ConfigureAwait(false);
+            }
+        }
+    }
+
+    void ClearForMessageType(MessageType messageType)
+    {
+        if (cacheFor == null)
+        {
+            return;
+        }
+        var keyPart = GetKeyPart(messageType);
+        foreach (var cacheKey in Cache.Keys)
+        {
+            if (cacheKey.Contains(keyPart))
+            {
+                Cache.TryRemove(cacheKey, out CacheItem _);
+            }
+        }
+    }
+
     static string GetKey(List<MessageType> types)
     {
         var typeNames = types.Select(_ => _.TypeName);
@@ -118,17 +144,11 @@ class SubscriptionPersister : ISubscriptionStorage
         return $"{type.TypeName},";
     }
 
-    internal class CacheItem
-    {
-        public DateTime Stored;
-        public Task<IEnumerable<Subscriber>> Subscribers;
-    }
-
     async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-        using (var command = commandBuilder.CreateCommand(connection))
+        using (var command = sqlDialect.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
             {
@@ -157,5 +177,18 @@ class SubscriptionPersister : ISubscriptionStorage
                 return subscribers;
             }
         }
+    }
+
+    public ConcurrentDictionary<string, CacheItem> Cache;
+    Func<DbConnection> connectionBuilder;
+    SqlDialect sqlDialect;
+    TimeSpan? cacheFor;
+    SubscriptionCommands subscriptionCommands;
+    static ILog Log = LogManager.GetLogger<SubscriptionPersister>();
+
+    internal class CacheItem
+    {
+        public DateTime Stored;
+        public Task<IEnumerable<Subscriber>> Subscribers;
     }
 }

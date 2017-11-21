@@ -1,45 +1,41 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
-    <NuSpecFileName>NServiceBus.Persistence.Sql</NuSpecFileName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>$(ProjectDir)bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-    <NoWarn>CS0419</NoWarn>
-    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
+    <OutputPath>..\..\binaries\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.0.10" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
-    <PackageReference Include="NuGetPackager" Version="0.6.1" />
-    <PackageReference Include="Obsolete.Fody" Version="4.2.2" />
-    <Compile Include="..\CommonAssemblyInfo.cs" />
-    <Compile Include="..\Guard.cs" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
+    <PackageReference Include="NServiceBus" Version="6.0.0" />
+    <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Data" />
   </ItemGroup>
 
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
-    <MakeDir Directories="$(SolutionDir)..\binaries" />
-    <ItemGroup>
-      <Files Include="$(TargetDir)$(TargetName).*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)..\binaries" />
-    <MakeDir Directories="$(SolutionDir)ForIntegration" />
-    <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)ForIntegration" />
+  <ItemGroup>
+    <PackageReference Include="SourceLink.Create.GitHub" Version="2.5.0" PrivateAssets="All" />
+    <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Guard.cs" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>NServiceBus.Persistence.Sql</PackageId>
+    <Description>Sql persistence for NServiceBus</Description>
+  </PropertyGroup>
+
+  <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
+    <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
+    <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
+
 </Project>

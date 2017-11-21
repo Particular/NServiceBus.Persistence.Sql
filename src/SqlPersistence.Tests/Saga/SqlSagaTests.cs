@@ -1,3 +1,4 @@
+#if NET452
 using System;
 using ApprovalTests;
 using NServiceBus;
@@ -54,3 +55,4 @@ public class SqlSagaTests
         }
     }
 }
+#endif

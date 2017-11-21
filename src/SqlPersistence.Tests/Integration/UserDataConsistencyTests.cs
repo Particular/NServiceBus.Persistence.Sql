@@ -3,9 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Configuration.AdvanceExtensibility;
+using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Pipeline;
+using NServiceBus.Transport.SQLServer;
 using NUnit.Framework;
 
 [TestFixture]
@@ -40,9 +42,16 @@ end";
     [Test]
     public Task In_DTC_mode_enlists_in_the_ambient_transaction()
     {
+        Requires.DtcSupport();
         return RunTest(e =>
         {
-            var transport = e.UseTransport<MsmqTransport>();
+            var transport = e.UseTransport<SqlServerTransport>();
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
             transport.Transactions(TransportTransactionMode.TransactionScope);
         });
     }
@@ -54,18 +63,29 @@ end";
         {
             var transport = e.UseTransport<SqlServerTransport>();
             transport.Transactions(TransportTransactionMode.SendsAtomicWithReceive);
-            transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
         });
     }
 
     [Test]
     public Task In_outbox_mode_enlists_in_outbox_transaction()
     {
-        return RunTest(e =>
+        return RunTest(configuration =>
         {
-            e.GetSettings().Set("DisableOutboxTransportCheck", true);
-            e.UseTransport<MsmqTransport>();
-            e.EnableOutbox();
+            configuration.GetSettings().Set("DisableOutboxTransportCheck", true);
+            var transport = configuration.UseTransport<SqlServerTransport>();
+            transport.UseCustomSqlConnectionFactory(async () =>
+            {
+                var connection = MsSqlConnectionBuilder.Build();
+                await connection.OpenAsync().ConfigureAwait(false);
+                return connection;
+            });
+            configuration.EnableOutbox();
         });
     }
 
@@ -101,18 +121,26 @@ end";
         manualResetEvent.Reset();
         string message = null;
 
-        Execute(endpointName, OutboxScriptBuilder.BuildDropScript(BuildSqlVariant.MsSqlServer));
-        Execute(endpointName, OutboxScriptBuilder.BuildCreateScript(BuildSqlVariant.MsSqlServer));
+        Execute(endpointName, OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer));
+        Execute(endpointName, OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer));
         Execute(createUserDataTableText);
 
         var endpointConfiguration = EndpointConfigBuilder.BuildEndpoint(endpointName);
+        //Hack: enable outbox to force sql session since we have no saga
+        endpointConfiguration.EnableOutbox();
         var typesToScan = TypeScanner.NestedTypes<UserDataConsistencyTests>();
         endpointConfiguration.SetTypesToScan(typesToScan);
-        endpointConfiguration.DisableFeature<NServiceBus.Features.TimeoutManager>();
+        endpointConfiguration.DisableFeature<TimeoutManager>();
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         testCase(endpointConfiguration);
-        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();
@@ -127,14 +155,19 @@ end";
 
         var endpoint = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
         var dataId = Guid.NewGuid();
-        await endpoint.SendLocal(new FailingMessage
+
+        var failingMessage = new FailingMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
-        await endpoint.SendLocal(new CheckMessage
+        };
+        await endpoint.SendLocal(failingMessage).ConfigureAwait(false);
+
+        var checkMessage = new CheckMessage
         {
             EntityId = dataId
-        }).ConfigureAwait(false);
+        };
+        await endpoint.SendLocal(checkMessage).ConfigureAwait(false);
+
         manualResetEvent.WaitOne();
         await endpoint.Stop().ConfigureAwait(false);
 

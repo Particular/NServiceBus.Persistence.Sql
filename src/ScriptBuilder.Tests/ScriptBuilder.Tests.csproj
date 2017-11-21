@@ -1,32 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
-    <AssemblyName>ScriptBuilder.Tests</AssemblyName>
+    <TargetFramework>net452</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <WarningLevel>4</WarningLevel>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApprovalTests" Version="3.0.13" />
-    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
-    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.0.3660.1" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta5" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="NServiceBus" Version="6.3.2" />
-    <PackageReference Include="NUnit" Version="3.7.0" />
-    <PackageReference Include="ObjectApproval" Version="1.6.0" />
-    <PackageReference Include="PublicApiGenerator" Version="6.0.0" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
+    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.*" />
+    <PackageReference Include="ObjectApproval" Version="1.*" />
+    <PackageReference Include="PublicApiGenerator" Version="6.*" />
   </ItemGroup>
 
 </Project>

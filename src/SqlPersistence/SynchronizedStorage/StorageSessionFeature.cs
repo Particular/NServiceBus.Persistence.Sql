@@ -1,21 +1,96 @@
-﻿using System.Linq;
+﻿using System;
+using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.ObjectBuilder;
+using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
+using NServiceBus.Settings;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 class StorageSessionFeature : Feature
 {
-
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var connectionBuilder = context.Settings.GetConnectionBuilder();
+        var settings = context.Settings;
+        ValidateSagaOutboxCombo(settings);
+
+        var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
-        container.ConfigureComponent(builder => new SynchronizedStorage(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(builder => new StorageAdapter(connectionBuilder, GetInfoCache(builder)), DependencyLifecycle.SingleInstance);
+        var connectionBuilder = settings.GetConnectionBuilder();
+
+        var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
+        var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
+
+        SagaInfoCache infoCache = null;
+        if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
+        {
+            infoCache = BuildSagaInfoCache(sqlDialect, settings);
+            container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+            container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
+        }
+        if (isSagasEnabledForSqlPersistence)
+        {
+            var sagaPersister = new SagaPersister(infoCache, sqlDialect);
+            container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
+        }
     }
 
-    static SagaInfoCache GetInfoCache(IBuilder builder)
+    static void ValidateSagaOutboxCombo(ReadOnlySettings settings)
     {
-        return builder.BuildAll<SagaInfoCache>().SingleOrDefault();
+        var isOutboxEnabled = settings.IsFeatureActive(typeof(Outbox));
+        var isSagasEnabled = settings.IsFeatureActive(typeof(Sagas));
+        if (!isOutboxEnabled || !isSagasEnabled)
+        {
+            return;
+        }
+        var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
+        var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
+        if (isSagasEnabledForSqlPersistence && isOutboxEnabledForSqlPersistence)
+        {
+            return;
+        }
+        throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
+    }
+
+    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)
+    {
+        var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
+        var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
+        sqlDialect.ValidateJsonSettings(jsonSerializer);
+        var readerCreator = SagaSettings.GetReaderCreator(settings);
+        if (readerCreator == null)
+        {
+            readerCreator = reader => new JsonTextReader(reader);
+        }
+        var writerCreator = SagaSettings.GetWriterCreator(settings);
+        if (writerCreator == null)
+        {
+            writerCreator = writer => new JsonTextWriter(writer);
+        }
+        var nameFilter = SagaSettings.GetNameFilter(settings);
+        if (nameFilter == null)
+        {
+            nameFilter = sagaName => sagaName;
+        }
+        var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
+        var tablePrefix = settings.GetTablePrefix();
+        return new SagaInfoCache(
+            versionSpecificSettings: versionDeserializeBuilder,
+            jsonSerializer: jsonSerializer,
+            readerCreator: readerCreator,
+            writerCreator: writerCreator,
+            tablePrefix: tablePrefix,
+            sqlDialect: sqlDialect,
+            metadataCollection: settings.Get<SagaMetadataCollection>(),
+            nameFilter: nameFilter);
+    }
+
+    static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
+    {
+        if (jsonSerializerSettings == null)
+        {
+            return Serializer.JsonSerializer;
+        }
+        return JsonSerializer.Create(jsonSerializerSettings);
     }
 }

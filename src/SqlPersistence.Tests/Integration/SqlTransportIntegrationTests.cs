@@ -1,18 +1,20 @@
-﻿using System;
+//TODO: add tests for the new option to not reuse the connection
+
+using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Transport.SQLServer;
 using NUnit.Framework;
 
 [TestFixture]
 public class SqlTransportIntegrationTests : IDisposable
 {
-
     static ManualResetEvent ManualResetEvent = new ManualResetEvent(false);
-    BuildSqlVariant sqlVariant = BuildSqlVariant.MsSqlServer;
+    BuildSqlDialect sqlVariant = BuildSqlDialect.MsSqlServer;
     SqlConnection dbConnection;
     SagaDefinition sagaDefinition;
 
@@ -51,7 +53,9 @@ public class SqlTransportIntegrationTests : IDisposable
     }
 
     [Test]
+#if NET452
     [TestCase(TransportTransactionMode.TransactionScope)]
+#endif
     [TestCase(TransportTransactionMode.SendsAtomicWithReceive)]
     [TestCase(TransportTransactionMode.ReceiveOnly)]
     [TestCase(TransportTransactionMode.None)]
@@ -62,8 +66,14 @@ public class SqlTransportIntegrationTests : IDisposable
         endpointConfiguration.SetTypesToScan(typesToScan);
         var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
         transport.Transactions(transactionMode);
-        transport.ConnectionString(MsSqlConnectionBuilder.ConnectionString);
+        transport.UseCustomSqlConnectionFactory(async () =>
+        {
+            var connection = MsSqlConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        });
         var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+        persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.DisableInstaller();
         persistence.SubscriptionSettings().DisableCache();

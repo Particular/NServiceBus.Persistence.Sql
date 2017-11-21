@@ -4,50 +4,59 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
+#if NET452
 using ObjectApproval;
+#endif
 
 public abstract class TimeoutPersisterTests
 {
-    BuildSqlVariant sqlVariant;
+    BuildSqlDialect sqlDialect;
     string schema;
-    Func<DbConnection> dbConnection;
-    protected abstract Func<DbConnection> GetConnection();
+    Func<string, DbConnection> dbConnection;
+    static DateTime goodUtcNowValue = new DateTime(2017, 10, 24, 10, 54, 15, DateTimeKind.Utc);
+    protected abstract Func<string, DbConnection> GetConnection();
+    protected virtual bool SupportsSchemas() => true;
 
-    public TimeoutPersisterTests(BuildSqlVariant sqlVariant, string schema)
+    public TimeoutPersisterTests(BuildSqlDialect sqlDialect, string schema)
     {
-        this.sqlVariant = sqlVariant;
+        this.sqlDialect = sqlDialect;
         this.schema = schema;
         dbConnection = GetConnection();
     }
 
-    TimeoutPersister Setup(TimeSpan? cleanupInterval = null)
+    TimeoutPersister Setup(string theSchema, TimeSpan? cleanupInterval = null)
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection())
+        using (var connection = dbConnection(theSchema))
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: theSchema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: theSchema);
         }
 
-        var preventCleanupInterval = DateTime.UtcNow - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
+        var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
 
         return new TimeoutPersister(
-            connectionBuilder: dbConnection,
+            connectionBuilder: () => dbConnection(theSchema),
             tablePrefix: $"{name}_",
-            sqlVariant: sqlVariant.Convert(),
-            schema: schema, 
-            timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval);
+            sqlDialect: sqlDialect.Convert(theSchema),
+            timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,
+            utcNow: () => goodUtcNowValue);
     }
 
     [TearDown]
     public void TearDown()
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection())
+        using (var connection = dbConnection(null))
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: null);
+        }
+        using (var connection = dbConnection(schema))
+        {
+            connection.Open();
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
         }
     }
 
@@ -60,11 +69,11 @@ public abstract class TimeoutPersisterTests
     public void ExecuteCreateTwice()
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection())
+        using (var connection = dbConnection(schema))
         {
             connection.Open();
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
-            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlVariant), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
+            connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);
         }
     }
 
@@ -82,7 +91,7 @@ public abstract class TimeoutPersisterTests
                 {"HeaderKey", "HeaderValue"}
             }
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout, null).Await();
         Assert.IsTrue(persister.TryRemove(timeout.Id, null).Result);
         Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
@@ -103,7 +112,7 @@ public abstract class TimeoutPersisterTests
                 {"HeaderKey", "HeaderValue"}
             }
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout, null).Await();
         persister.RemoveTimeoutBy(sagaId, null).Await();
         Assert.IsFalse(persister.TryRemove(timeout.Id, null).Result);
@@ -121,10 +130,14 @@ public abstract class TimeoutPersisterTests
             Time = timeout1Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.Peek(timeout1.Id, null).Result;
+        Assert.IsNotNull(nextChunk);
+        Assert.AreEqual(DateTimeKind.Utc, nextChunk.Time.Kind);
+#if NET452
         ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
 
@@ -133,7 +146,7 @@ public abstract class TimeoutPersisterTests
     {
         var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
         var timeout1Time = startSlice.AddSeconds(1);
-        var timeout2Time = DateTime.UtcNow.AddSeconds(10);
+        var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
         {
             Destination = "theDestination",
@@ -148,12 +161,16 @@ public abstract class TimeoutPersisterTests
             Time = timeout2Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout1, null).Await();
         persister.Add(timeout2, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        Assert.IsNotNull(nextChunk);
+        Assert.AreEqual(DateTimeKind.Utc, nextChunk.NextTimeToQuery.Kind);
+#if NET452
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -168,10 +185,13 @@ public abstract class TimeoutPersisterTests
             Time = timeout1Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        Assert.IsNotNull(nextChunk);
+#if NET452
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -186,10 +206,13 @@ public abstract class TimeoutPersisterTests
             Time = timeout1Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup(TimeSpan.FromMinutes(2));
+        var persister = Setup(schema, TimeSpan.FromMinutes(2));
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        Assert.IsNotNull(nextChunk);
+#if NET452
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -204,7 +227,7 @@ public abstract class TimeoutPersisterTests
             Time = timeout1Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup(TimeSpan.FromMinutes(2));
+        var persister = Setup(schema, TimeSpan.FromMinutes(2));
         persister.Add(timeout1, null).Await();
 
         //Call once triggering clean-up mode
@@ -213,7 +236,10 @@ public abstract class TimeoutPersisterTests
         //Call again to check if clean-up mode is now disabled -- expect no results
         var nextChunk = persister.GetNextChunk(startSlice).Result;
 
-        ObjectApprover.VerifyWithJson(nextChunk.DueTimeouts, s => s.Replace(timeout1.Id, "theId"));
+        Assert.IsNotNull(nextChunk);
+#if NET452
+        ObjectApprover.VerifyWithJson(nextChunk, s => s.Replace(timeout1.Id, "theId"));
+#endif
     }
 
     [Test]
@@ -221,7 +247,7 @@ public abstract class TimeoutPersisterTests
     {
         var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, 42, DateTimeKind.Utc); // 42ms
         var timeout1Time = startSlice.AddSeconds(1);
-        var timeout2Time = DateTime.UtcNow.AddSeconds(10);
+        var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
         {
             Destination = "theDestination",
@@ -236,7 +262,7 @@ public abstract class TimeoutPersisterTests
             Time = timeout2Time,
             Headers = new Dictionary<string, string>()
         };
-        var persister = Setup();
+        var persister = Setup(schema);
         persister.Add(timeout1, null).Await();
         persister.Add(timeout2, null).Await();
         var nextChunk = persister.GetNextChunk(startSlice).Result;
@@ -247,4 +273,28 @@ public abstract class TimeoutPersisterTests
         Assert.That(nextChunk.DueTimeouts[0].DueTime, Is.EqualTo(timeout1Time).Within(TimeSpan.FromMilliseconds(43)));
     }
 
+    [Test]
+    public void UseConfiguredSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var timeout1Time = startSlice.AddSeconds(1);
+        var timeout1 = new TimeoutData
+        {
+            Destination = "theDestination",
+            State = new byte[] { 1 },
+            Time = timeout1Time,
+            Headers = new Dictionary<string, string>()
+        };
+        var defaultSchemaPersister = Setup(null);
+        var schemaPersister = Setup(schema);
+        defaultSchemaPersister.Add(timeout1, null).Await();
+
+        var result = schemaPersister.Peek(timeout1.Id, null).Result;
+        Assert.Null(result);
+    }
 }

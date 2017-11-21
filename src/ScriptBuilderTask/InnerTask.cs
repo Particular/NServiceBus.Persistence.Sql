@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -23,45 +21,33 @@ class InnerTask
 
     public void Execute()
     {
-        var moduleDefinition = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred));
-        var scriptPath = Path.Combine(intermediateDirectory, "NServiceBus.Persistence.Sql");
-        DirectoryExtensions.Delete(scriptPath);
-        foreach (var variant in SqlVariantReader.Read(moduleDefinition))
-        {
-            var variantPath = Path.Combine(scriptPath, variant.ToString());
-            Write(moduleDefinition, variant, variantPath);
-        }
-
-        PromoteFiles(moduleDefinition, scriptPath);
+        ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
-    void PromoteFiles(ModuleDefinition moduleDefinition, string scriptPath)
+    string FindPromotionPath(string promotionPath)
     {
-        string customPath;
-        if (!ScriptPromotionPathReader.TryRead(moduleDefinition, out customPath))
+        promotionPath = promotionPath
+            .Replace("$(ProjectDir)", projectDirectory);
+
+        if (!promotionPath.Contains("$(SolutionDir)"))
         {
-            return;
+            return promotionPath;
         }
-        var replicationPath = customPath
-            .Replace("$(ProjectDir)", projectDirectory)
+
+        if (string.IsNullOrWhiteSpace(solutionDirectory))
+        {
+            throw new ErrorsException(
+                @"The ScriptPromotionPath contains '$(SolutionDir)' but no SolutionDirectory was passed to the MSBuildTask. One possible cause of this is a csproj file is being build directly, rather than building the parent solution.
+Possible workarounds:
+
+ * Don't use '$(SolutionDir)' in the ScriptPromotionPath
+ * Build the solution rather than the project
+ * Add a property to the project that adds the SolutionDir property: <PropertyGroup><SolutionDir Condition=""$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"">..\</SolutionDir></PropertyGroup>");
+        }
+
+        promotionPath = promotionPath
             .Replace("$(SolutionDir)", solutionDirectory);
-        try
-        {
-            DirectoryExtensions.Delete(replicationPath);
-            DirectoryExtensions.DuplicateDirectory(scriptPath, replicationPath);
-        }
-        catch (Exception exception)
-        {
-            throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
-        }
-    }
 
-    void Write(ModuleDefinition moduleDefinition, BuildSqlVariant sqlVariant, string scriptPath)
-    {
-        Directory.CreateDirectory(scriptPath);
-        SagaWriter.WriteSagaScripts(scriptPath, moduleDefinition, sqlVariant, logError);
-        TimeoutWriter.WriteTimeoutScript(scriptPath, sqlVariant);
-        SubscriptionWriter.WriteSubscriptionScript(scriptPath, sqlVariant);
-        OutboxWriter.WriteOutboxScript(scriptPath, sqlVariant);
+        return promotionPath;
     }
 }

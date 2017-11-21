@@ -6,14 +6,13 @@ static class ResourceReader
 {
     static Assembly assembly = typeof(ResourceReader).GetTypeInfo().Assembly;
 
-    public static string ReadResource(BuildSqlVariant sqlVariant, string prefix)
+    public static string ReadResource(BuildSqlDialect sqlDialect, string prefix)
     {
-        var text = $"NServiceBus.Persistence.Sql.{prefix}_{sqlVariant}.sql";
+        var text = $"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlDialect}.sql";
         using (var stream = assembly.GetManifestResourceStream(text))
         using (var streamReader = new StreamReader(stream))
         {
             return streamReader.ReadToEnd();
         }
     }
-
 }

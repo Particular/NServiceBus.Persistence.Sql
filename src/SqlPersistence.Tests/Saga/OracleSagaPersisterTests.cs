@@ -2,22 +2,54 @@
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using Oracle.ManagedDataAccess.Client;
 
 [TestFixture]
 public class OracleSagaPersisterTests : SagaPersisterTests
 {
-    public OracleSagaPersisterTests() : base(BuildSqlVariant.Oracle, null)
+    public OracleSagaPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
     {
     }
 
-    protected override Func<DbConnection> GetConnection()
+    protected override bool SupportsSchemas() => true;
+
+    protected override Func<string, DbConnection> GetConnection()
     {
-        return () =>
+        return schema =>
         {
-            var connection = OracleConnectionBuilder.Build();
+            var key = schema == null
+                ? "OracleConnectionString"
+                : $"OracleConnectionString_{schema}";
+
+            var connectionString = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new Exception($"The tests require a connection string to be configured for the custom schema '{schema}'. The connection string for that schema needs to be added as '{key}' environment variable.");
+            }
+            var connection = new OracleConnection(connectionString);
             connection.Open();
             return connection;
         };
+    }
+
+    protected override string TestTableName(string testName, string tableSuffix)
+    {
+        return $"{tableSuffix.ToUpper()}";
+    }
+
+    protected override string CorrelationPropertyName(string propertyName)
+    {
+        return $"CORR_{propertyName.ToUpper()}";
+    }
+
+    protected override string GetPropertyWhereClauseExists(string schema, string table, string propertyName)
+    {
+        return $@"
+select count(*)
+from all_tab_columns
+where table_name = '{table}' and
+      column_name = '{propertyName}'
+";
     }
 
     protected override bool IsConcurrencyException(Exception innerException)
