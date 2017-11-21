@@ -1,8 +1,8 @@
 ﻿<Project>
 	<PropertyGroup>
-		<ScriptDirectory>
+		<SqlPersistenceScriptDirectory>
 			$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\
-		</ScriptDirectory>
+		</SqlPersistenceScriptDirectory>
 	</PropertyGroup>
 	<UsingTask TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask" AssemblyFile="$(MSBuildThisFileDirectory)..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
 	<Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
@@ -10,7 +10,7 @@
 	</Target>
 	<Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems" BeforeTargets="GetCopyToOutputDirectoryItems" Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
 		<ItemGroup>
-			<SqlPersistenceScripts Include="$(ScriptDirectory)**\*.sql" />
+			<SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
 		</ItemGroup>
 		<!-- <Message Text="SqlScripts: @(Scripts)"/> -->
 		<CreateItem Include="@(SqlPersistenceScripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
