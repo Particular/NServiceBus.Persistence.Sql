@@ -19,6 +19,7 @@
   </metadata>
   <files>
     <file src="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="netclassic" />
+    <file src="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="netstandard" />
     <file src="NServiceBus.Persistence.Sql.MsBuild.targets" target="build" />
   </files>
 </package>

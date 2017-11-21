@@ -6,12 +6,12 @@ namespace NServiceBus.AcceptanceTests.Sagas
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using NServiceBus.Persistence.Sql;
+    using Persistence.Sql;
 
-    public class When_req_resp_between_sagas_first_handler_responding : NServiceBusAcceptanceTest
+    public partial class When_doing_request_response_between_sagas : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga_from_the_first_handler()
+        public async Task Should_autocorrelate_the_response_back_to_the_requesting_saga()
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b.When(session => session.SendLocal(new InitiateRequestingSaga())))
@@ -33,7 +33,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
-            public class RequestingSaga1 : SqlSaga<RequestingSaga1.RequestResponseRequestingSagaData1>,
+            public class RequestResponseRequestingSaga1 : SqlSaga<RequestResponseRequestingSaga1.RequestResponseRequestingSagaData1>,
                 IAmStartedByMessages<InitiateRequestingSaga>,
                 IHandleMessages<ResponseFromOtherSaga>
             {
@@ -43,9 +43,11 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     return context.SendLocal(new RequestToRespondingSaga
                     {
-                        SomeIdThatTheResponseSagaCanCorrelateBackToUs = Data.CorrIdForResponse //wont be needed in the future
+                        SomeId = Guid.NewGuid()
                     });
                 }
+
+                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData1.CorrIdForResponse);
 
                 public Task Handle(ResponseFromOtherSaga message, IMessageHandlerContext context)
                 {
@@ -55,22 +57,19 @@ namespace NServiceBus.AcceptanceTests.Sagas
 
                     return Task.FromResult(0);
                 }
-
                 protected override void ConfigureMapping(IMessagePropertyMapper mapper)
                 {
                     mapper.ConfigureMapping<InitiateRequestingSaga>(m => m.Id);
                     mapper.ConfigureMapping<ResponseFromOtherSaga>(m => m.SomeCorrelationId);
                 }
 
-                protected override string CorrelationPropertyName => nameof(RequestResponseRequestingSagaData1.CorrIdForResponse);
-
                 public class RequestResponseRequestingSagaData1 : ContainSagaData
                 {
-                    public virtual Guid CorrIdForResponse { get; set; } //wont be needed in the future
+                    public virtual Guid CorrIdForResponse { get; set; }
                 }
             }
 
-            public class RespondingSaga1 : SqlSaga<RespondingSaga1.RequestResponseRespondingSagaData1>,
+            public class RequestResponseRespondingSaga1 : SqlSaga<RequestResponseRespondingSaga1.RequestResponseRespondingSagaData1>,
                 IAmStartedByMessages<RequestToRespondingSaga>
             {
                 public Context TestContext { get; set; }
@@ -78,17 +77,16 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 public Task Handle(RequestToRespondingSaga message, IMessageHandlerContext context)
                 {
                     // Both reply and reply to originator work here since the sender of the incoming message is the requesting saga
-                    // also note we don't set the correlation ID since auto correlation happens to work for this special case
+                    // we explicitly set the correlation ID to a non-existent saga since auto correlation happens to work for this special case
                     // where we reply from the first handler
-                    return context.Reply(new ResponseFromOtherSaga());
-                }
-
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-                {
-                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeIdThatTheResponseSagaCanCorrelateBackToUs);
+                    return context.Reply(new ResponseFromOtherSaga{SomeCorrelationId = Guid.NewGuid()});
                 }
 
                 protected override string CorrelationPropertyName => nameof(RequestResponseRespondingSagaData1.CorrIdForRequest);
+                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+                {
+                    mapper.ConfigureMapping<RequestToRespondingSaga>(m => m.SomeId);
+                }
 
                 public class RequestResponseRespondingSagaData1 : ContainSagaData
                 {
@@ -109,7 +107,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
 
         public class RequestToRespondingSaga : ICommand
         {
-            public Guid SomeIdThatTheResponseSagaCanCorrelateBackToUs { get; set; }
+            public Guid SomeId { get; set; }
         }
 
         public class ResponseFromOtherSaga : IMessage

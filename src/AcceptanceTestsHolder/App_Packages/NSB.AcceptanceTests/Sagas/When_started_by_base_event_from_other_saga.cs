@@ -7,7 +7,6 @@
     using Features;
     using NUnit.Framework;
     using Persistence.Sql;
-    using Routing;
 
     //Repro for #1323
     public class When_started_by_base_event_from_other_saga : NServiceBusAcceptanceTest
@@ -46,9 +45,9 @@
         {
             public Publisher()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<SagaContext>((args, context) =>
+                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<SagaContext>((s, context) =>
                 {
-                    context.AddTrace($"Subscription received for {args.SubscriberReturnAddress}");
+                    context.AddTrace($"Subscription received for {s.SubscriberEndpoint}");
                     context.IsEventSubscriptionReceived = true;
                 }));
             }
