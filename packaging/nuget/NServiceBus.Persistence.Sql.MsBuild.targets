@@ -22,7 +22,7 @@
 		<ItemGroup>
 			<SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
 		</ItemGroup>
-		<!-- <Message Text="SqlScripts: @(Scripts)"/> -->
+		<!-- <Message Text="SqlScripts: @(SqlPersistenceScripts)"/> -->
 		<CreateItem Include="@(SqlPersistenceScripts)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
 			<Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
 		</CreateItem>
