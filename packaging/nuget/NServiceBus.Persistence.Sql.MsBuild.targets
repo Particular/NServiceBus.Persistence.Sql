@@ -4,11 +4,21 @@
 			$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\
 		</SqlPersistenceScriptDirectory>
 	</PropertyGroup>
-	<UsingTask TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask" AssemblyFile="$(MSBuildThisFileDirectory)..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
-	<Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
-		<SqlPersistenceScriptBuilderTask AssemblyPath="$(ProjectDir)@(IntermediateAssembly)" IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)" />
+	<UsingTask 
+      TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask" 
+      AssemblyFile="$(MSBuildThisFileDirectory)..\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" />
+	<Target 
+      Name="SqlPersistenceScriptBuilder" 
+      AfterTargets="AfterCompile" 
+      Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+		<SqlPersistenceScriptBuilderTask 
+      AssemblyPath="$(ProjectDir)@(IntermediateAssembly)" 
+      IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)" />
 	</Target>
-	<Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems" BeforeTargets="GetCopyToOutputDirectoryItems" Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+	<Target 
+      Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems" 
+      BeforeTargets="GetCopyToOutputDirectoryItems" 
+      Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
 		<ItemGroup>
 			<SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
 		</ItemGroup>
