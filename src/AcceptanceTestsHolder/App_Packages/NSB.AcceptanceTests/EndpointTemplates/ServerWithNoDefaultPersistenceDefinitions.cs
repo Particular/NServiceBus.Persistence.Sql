@@ -6,6 +6,7 @@
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
     using Features;
+    using NServiceBus.Config.ConfigurationSource;
 
     public class ServerWithNoDefaultPersistenceDefinitions : IEndpointSetupTemplate
     {
@@ -19,7 +20,9 @@
             this.typesToInclude = typesToInclude;
         }
 
-        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, Action<EndpointConfiguration> configurationBuilderCustomization)
+#pragma warning disable CS0618
+        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, IConfigurationSource configSource, Action<EndpointConfiguration> configurationBuilderCustomization)
+#pragma warning restore CS0618
         {
             var types = endpointConfiguration.GetTypesScopedByTestClass();
 
@@ -27,6 +30,7 @@
 
             var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
             builder.TypesToIncludeInScan(typesToInclude);
+            builder.CustomConfigurationSource(configSource);
             builder.EnableInstallers();
 
             builder.DisableFeature<TimeoutManager>();

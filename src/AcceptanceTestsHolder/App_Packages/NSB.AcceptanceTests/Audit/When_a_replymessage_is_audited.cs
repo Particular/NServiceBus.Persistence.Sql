@@ -23,20 +23,18 @@
 
             Assert.True(context.MessageProcessed);
             Assert.True(context.MessageAudited);
-            Assert.AreEqual("SomeValue", context.HeaderValue);
         }
 
         public static byte Checksum(byte[] data)
         {
-            var longSum = data.Sum(x => (long)x);
-            return unchecked((byte)longSum);
+            var longSum = data.Sum(x => (long) x);
+            return unchecked((byte) longSum);
         }
 
         public class Context : ScenarioContext
         {
             public bool MessageAudited { get; set; }
             public bool MessageProcessed { get; set; }
-            public string HeaderValue { get; set; }
         }
 
         public class Server : EndpointConfigurationBuilder
@@ -77,7 +75,7 @@
 
                 public Task Handle(ResponseToBeAudited message, IMessageHandlerContext context)
                 {
-                    TestContext.HeaderValue = context.MessageHeaders["MyHeader"];
+                    Assert.AreEqual(context.MessageHeaders["MyHeader"], "SomeValue");
                     TestContext.MessageProcessed = true;
                     return Task.FromResult(0);
                 }
@@ -88,22 +86,23 @@
         {
             public AuditSpyEndpoint()
             {
-                EndpointSetup<DefaultServer, Context>((config, context) => config.RegisterMessageMutator(new BodySpy(context)));
+                EndpointSetup<DefaultServer>();
             }
 
-            class BodySpy : IMutateIncomingTransportMessages
+            class BodySpy : IMutateIncomingTransportMessages, INeedInitialization
             {
-                public BodySpy(Context testContext)
+                public Context Context { get; set; }
+
+                public Task MutateIncoming(MutateIncomingTransportMessageContext transportMessage)
                 {
-                    this.testContext = testContext;
-                }
-                public Task MutateIncoming(MutateIncomingTransportMessageContext context)
-                {
-                    testContext.MessageAudited = true;
+                    Context.MessageAudited = true;
                     return Task.FromResult(0);
                 }
 
-                Context testContext;
+                public void Customize(EndpointConfiguration configuration)
+                {
+                    configuration.RegisterComponents(c => c.ConfigureComponent<BodySpy>(DependencyLifecycle.InstancePerCall));
+                }
             }
 
             public class MessageToBeAuditedHandler : IHandleMessages<ResponseToBeAudited>

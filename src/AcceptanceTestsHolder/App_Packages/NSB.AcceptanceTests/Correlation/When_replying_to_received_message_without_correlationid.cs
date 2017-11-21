@@ -37,7 +37,8 @@
         {
             public CorrelationEndpoint()
             {
-                EndpointSetup<DefaultServer>(c => c.RegisterMessageMutator(new RemoveCorrelationIdMutator()));
+                EndpointSetup<DefaultServer>(c => c.RegisterComponents(
+                    components => { components.ConfigureComponent<RemoveCorrelationId>(DependencyLifecycle.InstancePerCall); }));
             }
 
             public class MyRequestHandler : IHandleMessages<MyRequest>
@@ -66,7 +67,7 @@
                 readonly Context context;
             }
 
-            class RemoveCorrelationIdMutator : IMutateIncomingTransportMessages
+            class RemoveCorrelationId : IMutateIncomingTransportMessages
             {
                 public Task MutateIncoming(MutateIncomingTransportMessageContext context)
                 {

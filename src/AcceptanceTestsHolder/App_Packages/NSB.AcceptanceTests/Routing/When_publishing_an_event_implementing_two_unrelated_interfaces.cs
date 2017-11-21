@@ -6,7 +6,6 @@
     using EndpointTemplates;
     using Features;
     using NUnit.Framework;
-    using Conventions = AcceptanceTesting.Customization.Conventions;
 
     public class When_publishing_an_event_implementing_two_unrelated_interfaces : NServiceBusAcceptanceTest
     {
@@ -56,9 +55,10 @@
             {
                 EndpointSetup<DefaultPublisher>(b =>
                 {
+                    b.UseSerialization<XmlSerializer>();
                     b.OnEndpointSubscribed<Context>((s, context) =>
                     {
-                        if (s.SubscriberEndpoint.Contains(Conventions.EndpointNamingConvention(typeof(Subscriber))))
+                        if (s.SubscriberReturnAddress.Contains("Subscriber"))
                         {
                             if (s.MessageType == typeof(IEventA).AssemblyQualifiedName)
                             {
@@ -80,6 +80,13 @@
             {
                 EndpointSetup<DefaultServer>(c =>
                     {
+                        c.UseSerialization<XmlSerializer>();
+                        c.Conventions().DefiningMessagesAs(t => t != typeof(CompositeEvent) && typeof(IMessage).IsAssignableFrom(t) &&
+                                                                typeof(IMessage) != t &&
+                                                                typeof(IEvent) != t &&
+                                                                typeof(ICommand) != t);
+
+                        c.Conventions().DefiningEventsAs(t => t != typeof(CompositeEvent) && typeof(IEvent).IsAssignableFrom(t) && typeof(IEvent) != t);
                         c.DisableFeature<AutoSubscribe>();
                     },
                     metadata =>

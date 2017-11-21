@@ -14,8 +14,7 @@ static class ScriptLocation
 
     static string GetCurrentDirectory(ReadOnlySettings settings)
     {
-		string scriptDirectory;
-        if (settings.TryGet("SqlPersistence.ScriptDirectory", out scriptDirectory))
+        if (settings.TryGet("SqlPersistence.ScriptDirectory", out string scriptDirectory))
         {
             return scriptDirectory;
         }

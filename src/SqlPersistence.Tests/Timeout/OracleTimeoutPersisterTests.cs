@@ -22,7 +22,7 @@ public class OracleTimeoutPersisterTests : TimeoutPersisterTests
             var connection = Environment.GetEnvironmentVariable(key);
             if (string.IsNullOrWhiteSpace(connection))
             {
-                throw new Exception($"{key} environment variable is empty");
+                throw new Exception($"The tests require a connection string to be configured for the custom schema '{schema}'. The connection string for that schema needs to be added as '{key}' environment variable.");
             }
             return new OracleConnection(connection);
         };

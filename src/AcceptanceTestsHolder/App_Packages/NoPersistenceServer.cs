@@ -5,8 +5,9 @@
     using System.Threading.Tasks;
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
     using Features;
+    using NServiceBus.Config.ConfigurationSource;
 
     public class NoPersistenceServer : IEndpointSetupTemplate
     {
@@ -21,7 +22,7 @@
         }
 
 #pragma warning disable CS0618
-        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, Action<EndpointConfiguration> configurationBuilderCustomization)
+        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, IConfigurationSource configSource, Action<EndpointConfiguration> configurationBuilderCustomization)
 #pragma warning restore CS0618
         {
             var types = endpointConfiguration.GetTypesScopedByTestClass();
@@ -31,6 +32,7 @@
             var configuration = new EndpointConfiguration(endpointConfiguration.EndpointName);
 
             configuration.TypesToIncludeInScan(typesToInclude);
+            configuration.CustomConfigurationSource(configSource);
             configuration.EnableInstallers();
 
             configuration.DisableFeature<TimeoutManager>();

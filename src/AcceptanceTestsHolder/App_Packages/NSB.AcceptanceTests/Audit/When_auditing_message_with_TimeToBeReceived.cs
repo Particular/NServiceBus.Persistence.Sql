@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.AcceptanceTests.Audit
 {
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
@@ -10,10 +9,6 @@
 
     public class When_auditing_message_with_TimeToBeReceived : NServiceBusAcceptanceTest
     {
-        // This test has repeatedly failed because the message took longer than the TTBR value to be received.
-        // We assume this could be due to the parallel test execution.
-        // If this test fails your build with this attribute set, please ping the NServiceBus maintainers.
-        [NonParallelizable]
         [Test]
         public async Task Should_not_honor_TimeToBeReceived_for_audit_message()
         {
@@ -28,8 +23,8 @@
 
         class Context : ScenarioContext
         {
-            public int AuditRetries;
             public bool IsMessageHandlingComplete { get; set; }
+            public DateTime? FirstTimeProcessedByAudit { get; set; }
             public bool TTBRHasExpiredAndMessageIsStillInAuditQueue { get; set; }
         }
 
@@ -61,7 +56,7 @@
         {
             public EndpointThatHandlesAuditMessages()
             {
-                EndpointSetup<DefaultServer>(c => c.Recoverability().Immediate(s => s.NumberOfRetries(10)));
+                EndpointSetup<DefaultServer>();
             }
 
             class AuditMessageHandler : IHandleMessages<MessageToBeAudited>
@@ -71,21 +66,28 @@
                     this.textContext = textContext;
                 }
 
-                public async Task Handle(MessageToBeAudited message, IMessageHandlerContext context)
+                public Task Handle(MessageToBeAudited message, IMessageHandlerContext context)
                 {
-                    if (textContext.AuditRetries > 0)
+                    var auditProcessingStarted = DateTime.Now;
+                    if (textContext.FirstTimeProcessedByAudit == null)
                     {
-                        textContext.TTBRHasExpiredAndMessageIsStillInAuditQueue = true;
-                        return;
+                        textContext.FirstTimeProcessedByAudit = auditProcessingStarted;
                     }
 
                     var ttbr = TimeSpan.Parse(context.MessageHeaders[Headers.TimeToBeReceived]);
-                    // wait longer than configured TTBR
-                    await Task.Delay(ttbr.Add(TimeSpan.FromSeconds(1)));
+                    var ttbrExpired = auditProcessingStarted > textContext.FirstTimeProcessedByAudit.Value + ttbr;
+                    if (ttbrExpired)
+                    {
+                        textContext.TTBRHasExpiredAndMessageIsStillInAuditQueue = true;
+                        var timeElapsedSinceFirstHandlingOfAuditMessage = auditProcessingStarted - textContext.FirstTimeProcessedByAudit.Value;
+                        Console.WriteLine("Audit message not removed because of TTBR({0}) after {1}. Succeeded.", ttbr, timeElapsedSinceFirstHandlingOfAuditMessage);
+                    }
+                    else
+                    {
+                        return context.HandleCurrentMessageLater();
+                    }
 
-                    // enforce message retry
-                    Interlocked.Increment(ref textContext.AuditRetries);
-                    throw new Exception("retry message");
+                    return Task.FromResult(0);
                 }
 
                 Context textContext;

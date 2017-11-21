@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
     using EndpointTemplates;
     using MessageInterfaces;
     using NServiceBus.Serialization;

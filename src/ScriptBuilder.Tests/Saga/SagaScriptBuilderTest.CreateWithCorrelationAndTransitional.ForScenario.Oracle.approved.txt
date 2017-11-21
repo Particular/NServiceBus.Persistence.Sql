@@ -7,7 +7,10 @@ declare
   sqlStatement varchar2(500);
   dataType varchar2(30);
   n number(10);
+  currentSchema varchar2(500);
 begin
+select sys_context('USERENV','CURRENT_SCHEMA') into currentSchema from dual;
+
 
 /* CreateTable */
 
@@ -37,7 +40,7 @@ begin
 
 /* AddProperty CorrelationProperty */
 
-select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
+select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 if(n = 0)
 then
   sqlStatement := 'alter table "THESAGA" add ( CORR_CORRELATIONPROPERTY NVARCHAR2(200) )';
@@ -59,7 +62,7 @@ select data_type ||
     end
   end into dataType
 from all_tab_columns
-where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY';
+where table_name = 'THESAGA' and column_name = 'CORR_CORRELATIONPROPERTY' and owner = currentSchema;
 
 if(dataType <> 'NVARCHAR2(200)')
 then
@@ -78,7 +81,7 @@ end if;
 
 /* AddProperty TransitionalProperty */
 
-select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY';
+select count(*) into n from all_tab_columns where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY' and owner = currentSchema;
 if(n = 0)
 then
   sqlStatement := 'alter table "THESAGA" add ( CORR_TRANSITIONALPROPERTY NVARCHAR2(200) )';
@@ -100,7 +103,7 @@ select data_type ||
     end
   end into dataType
 from all_tab_columns
-where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY';
+where table_name = 'THESAGA' and column_name = 'CORR_TRANSITIONALPROPERTY' and owner = currentSchema;
 
 if(dataType <> 'NVARCHAR2(200)')
 then
@@ -125,7 +128,7 @@ select count(*) into n
 from all_tab_columns
 where table_name = 'THESAGA' and column_name like 'CORR_%' and
         column_name <> 'CORR_CORRELATIONPROPERTY' and
-        column_name <> 'CORR_TRANSITIONALPROPERTY';
+        column_name <> 'CORR_TRANSITIONALPROPERTY' and owner = currentSchema;
 
 if(n > 0)
 then
@@ -134,7 +137,7 @@ then
   from all_tab_columns
   where table_name = 'THESAGA' and column_name like 'CORR_%' and
         column_name <> 'CORR_CORRELATIONPROPERTY' and
-        column_name <> 'CORR_TRANSITIONALPROPERTY';
+        column_name <> 'CORR_TRANSITIONALPROPERTY' and owner = currentSchema;
 
   execute immediate sqlStatement;
 

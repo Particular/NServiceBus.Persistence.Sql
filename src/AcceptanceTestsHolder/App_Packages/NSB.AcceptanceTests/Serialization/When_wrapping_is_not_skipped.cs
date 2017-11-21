@@ -14,7 +14,7 @@
         [Test]
         public async Task Should_wrap_xml_content()
         {
-            XNamespace ns = "demoNamespace";
+            XNamespace ns = "demoNamepsace";
             var xmlContent = new XDocument(new XElement(ns + "Document", new XElement(ns + "Value", "content")));
 
             var context = await Scenario.Define<Context>()
@@ -43,46 +43,46 @@
         {
             public WrappingEndpoint()
             {
-                EndpointSetup<DefaultServer,Context>((config,context) =>
+                EndpointSetup<DefaultServer>(c =>
                 {
-                    config.UseSerialization<XmlSerializer>(); // wrapping is enabled by default
-                    config.RegisterMessageMutator(new IncomingMutator(context));
+                    c.UseSerialization<XmlSerializer>(); // wrapping is enabled by default
+                    c.RegisterComponents(r => r.ConfigureComponent<IncomingMutator>(DependencyLifecycle.SingleInstance));
                 });
             }
 
             class RawXmlMessageHandler : IHandleMessages<MessageWithRawXml>
             {
-                public RawXmlMessageHandler(Context testContext)
+                public RawXmlMessageHandler(Context scenarioContext)
                 {
-                    this.testContext = testContext;
+                    this.scenarioContext = scenarioContext;
                 }
 
                 public Task Handle(MessageWithRawXml messageWithRawXml, IMessageHandlerContext context)
                 {
-                    testContext.MessageReceived = true;
-                    testContext.XmlPropertyValue = messageWithRawXml.Document;
+                    scenarioContext.MessageReceived = true;
+                    scenarioContext.XmlPropertyValue = messageWithRawXml.Document;
 
                     return Task.FromResult(0);
                 }
 
-                Context testContext;
+                Context scenarioContext;
             }
 
             public class IncomingMutator : IMutateIncomingTransportMessages
             {
-                public IncomingMutator(Context testContext)
+                public IncomingMutator(Context scenarioContext)
                 {
-                    this.testContext = testContext;
+                    this.scenarioContext = scenarioContext;
                 }
 
                 public Task MutateIncoming(MutateIncomingTransportMessageContext context)
                 {
-                    testContext.XmlMessage = XDocument.Parse(Encoding.UTF8.GetString(context.Body));
+                    scenarioContext.XmlMessage = XDocument.Parse(Encoding.UTF8.GetString(context.Body));
 
                     return Task.FromResult(0);
                 }
 
-                Context testContext;
+                Context scenarioContext;
             }
         }
 

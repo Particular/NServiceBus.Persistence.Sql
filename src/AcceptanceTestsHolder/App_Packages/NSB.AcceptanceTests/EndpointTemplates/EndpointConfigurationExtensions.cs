@@ -1,6 +1,6 @@
 ﻿namespace NServiceBus.AcceptanceTests
 {
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
 
     public static class EndpointConfigurationExtensions
     {

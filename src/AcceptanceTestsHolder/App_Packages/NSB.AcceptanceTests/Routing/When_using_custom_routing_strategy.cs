@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using Configuration.AdvancedExtensibility;
+    using Configuration.AdvanceExtensibility;
     using EndpointTemplates;
     using NServiceBus.Routing;
     using NUnit.Framework;
@@ -25,16 +25,16 @@
                         await session.Send(new MyCommand { Instance = Discriminator1 });
                         await session.Send(new MyCommand { Instance = Discriminator2 });
                         await session.Send(new MyCommand { Instance = Discriminator1 });
-                        await session.Send(new MyCommand { Instance = Discriminator1 });
+                        await session.Send(new MyCommand { Instance = Discriminator2 });
                     })
                 )
                 .WithEndpoint<Receiver>(b => b.CustomConfig(cfg => cfg.MakeInstanceUniquelyAddressable(Discriminator1)))
                 .WithEndpoint<Receiver>(b => b.CustomConfig(cfg => cfg.MakeInstanceUniquelyAddressable(Discriminator2)))
-                .Done(c => c.MessageDeliveredReceiver1 >= 3 && c.MessageDeliveredReceiver2 >=1)
+                .Done(c => c.MessageDeliveredReceiver1 >= 2 && c.MessageDeliveredReceiver2 >=2)
                 .Run();
 
-            Assert.AreEqual(3, ctx.MessageDeliveredReceiver1);
-            Assert.AreEqual(1, ctx.MessageDeliveredReceiver2);
+            Assert.AreEqual(2, ctx.MessageDeliveredReceiver1);
+            Assert.AreEqual(2, ctx.MessageDeliveredReceiver2);
         }
 
         static string Discriminator1 = "553E9649";
@@ -76,9 +76,15 @@
                 {
                 }
 
+                public override string SelectReceiver(string[] receiverAddresses)
+                {
+                    throw new NotImplementedException(); // should never be called
+                }
+
                 public override string SelectDestination(DistributionContext context)
                 {
-                    if (context.Message.Instance is MyCommand message)
+                    var message = context.Message.Instance as MyCommand;
+                    if (message != null)
                     {
                         var address = context.ToTransportAddress(new EndpointInstance(Endpoint, message.Instance));
                         return context.ReceiverAddresses.Single(a => a.Contains(address));
