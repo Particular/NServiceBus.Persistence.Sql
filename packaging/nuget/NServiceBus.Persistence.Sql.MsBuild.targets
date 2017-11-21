@@ -1,8 +1,6 @@
 ﻿<Project>
 	<PropertyGroup>
-		<SqlPersistenceScriptDirectory>
-			$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\
-		</SqlPersistenceScriptDirectory>
+		<SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
 	</PropertyGroup>
 	<UsingTask 
       TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask" 
