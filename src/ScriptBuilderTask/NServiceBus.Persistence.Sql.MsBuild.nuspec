@@ -3,7 +3,6 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>NServiceBus.Persistence.Sql.MsBuild</title>
     <authors>$authors$</authors>
     <owners>$owners$</owners>
     <developmentDependency>true</developmentDependency>
