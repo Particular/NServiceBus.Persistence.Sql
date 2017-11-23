@@ -26,6 +26,7 @@
             {
                 s.EnableFeatureByDefault<SqlSagaFeature>();
                 EnableSession(s);
+                s.AddUnrecoverableException(typeof(SerializationException));
             });
             Supports<StorageType.Subscriptions>(s =>
             {

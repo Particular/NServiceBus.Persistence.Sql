@@ -8,17 +8,21 @@
     <developmentDependency>true</developmentDependency>
     <licenseUrl>$licenseUrl$</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
-    <iconUrl>$iconUrl$</iconUrl>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <iconUrl>$iconUrl$</iconUrl>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql" version="[$version$, $version$]"/>
+      <dependency id="NServiceBus.Persistence.Sql"
+                  version="[$version$, $version$]"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="netclassic" />
+    <file src="..\..\binaries\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.???"
+          target="netclassic" />
+    <file src="..\..\binaries\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.???"
+          target="netstandard" />
     <file src="NServiceBus.Persistence.Sql.MsBuild.targets" target="build" />
   </files>
 </package>
