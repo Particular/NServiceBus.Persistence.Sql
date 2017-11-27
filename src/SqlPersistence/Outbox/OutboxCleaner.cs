@@ -7,11 +7,12 @@ using NServiceBus.Logging;
 
 class OutboxCleaner : FeatureStartupTask
 {
-    public OutboxCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
+    public OutboxCleaner(Func<DateTime, int, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, int cleanupBatchSize, IAsyncTimer timer)
     {
         this.cleanup = cleanup;
         this.timeToKeepDeduplicationData = timeToKeepDeduplicationData;
         this.frequencyToRunCleanup = frequencyToRunCleanup;
+        this.cleanupBatchSize = cleanupBatchSize;
         this.timer = timer;
         this.criticalError = criticalError;
     }
@@ -23,7 +24,7 @@ class OutboxCleaner : FeatureStartupTask
             callback: async (utcTime, token) =>
             {
                 var dateTime = utcTime - timeToKeepDeduplicationData;
-                await cleanup(dateTime, token).ConfigureAwait(false);
+                await cleanup(dateTime, cleanupBatchSize, token).ConfigureAwait(false);
                 cleanupFailures = 0;
             },
             interval: frequencyToRunCleanup,
@@ -48,9 +49,10 @@ class OutboxCleaner : FeatureStartupTask
 
     IAsyncTimer timer;
     Action<string, Exception> criticalError;
-    Func<DateTime, CancellationToken, Task> cleanup;
+    Func<DateTime, int, CancellationToken, Task> cleanup;
     TimeSpan timeToKeepDeduplicationData;
     TimeSpan frequencyToRunCleanup;
+    int cleanupBatchSize;
 
     static ILog log = LogManager.GetLogger<OutboxCleaner>();
 }
