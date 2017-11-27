@@ -32,8 +32,7 @@ public abstract class OutboxPersisterTests
         var persister = new OutboxPersister(
             connectionBuilder: dbConnection,
             tablePrefix: $"{GetTablePrefix()}_",
-            sqlDialect: sqlDialect.Convert(theSchema),
-            cleanupBatchSize: 5);
+            sqlDialect: sqlDialect.Convert(theSchema));
         using (var connection = GetConnection()(theSchema))
         {
             connection.Open();
@@ -191,7 +190,7 @@ public abstract class OutboxPersisterTests
             await Store(13, connection, persister).ConfigureAwait(false);
         }
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
+        await persister.RemoveEntriesOlderThan(dateTime, 10000, CancellationToken.None).ConfigureAwait(false);
         Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
         Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));

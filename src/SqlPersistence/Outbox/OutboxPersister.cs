@@ -17,14 +17,12 @@ class OutboxPersister : IOutboxStorage
 {
     Func<DbConnection> connectionBuilder;
     SqlDialect sqlDialect;
-    int cleanupBatchSize;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
+    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect)
     {
         this.connectionBuilder = connectionBuilder;
         this.sqlDialect = sqlDialect;
-        this.cleanupBatchSize = cleanupBatchSize;
         outboxCommands = OutboxCommandBuilder.Build(tablePrefix, sqlDialect);
     }
 
@@ -110,7 +108,7 @@ class OutboxPersister : IOutboxStorage
     }
 
 
-    public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
+    public async Task RemoveEntriesOlderThan(DateTime dateTime, int cleanupBatchSize, CancellationToken cancellationToken)
     {
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         {
