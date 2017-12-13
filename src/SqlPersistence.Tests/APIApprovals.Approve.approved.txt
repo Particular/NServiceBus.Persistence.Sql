@@ -71,7 +71,7 @@ namespace NServiceBus.Persistence.Sql
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
     [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
-        "n version 4.0.0.", true)]
+        "n version 5.0.0.", true)]
     public enum SqlVariant
     {
         MsSqlServer = 0,
@@ -197,7 +197,7 @@ namespace NServiceBus
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>().Schema(\"schema_name\")` inst" +
             "ead. The member currently throws a NotImplementedException. Will be removed in v" +
-            "ersion 4.0.0.", true)]
+            "ersion 5.0.0.", true)]
         public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle> dialectSettings, string schema) { }
@@ -205,7 +205,7 @@ namespace NServiceBus
         public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
             where T : NServiceBus.SqlDialect, new () { }
         [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. The member curren" +
-            "tly throws a NotImplementedException. Will be removed in version 4.0.0.", true)]
+            "tly throws a NotImplementedException. Will be removed in version 5.0.0.", true)]
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
