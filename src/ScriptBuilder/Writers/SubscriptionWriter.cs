@@ -15,7 +15,7 @@ class SubscriptionWriter
         File.Delete(dropPath);
         using (var writer = File.CreateText(dropPath))
         {
-            SubscriptionScriptBuilder.BuildCreateScript(writer, sqlDialect);
+            SubscriptionScriptBuilder.BuildDropScript(writer, sqlDialect);
         }
     }
 }
