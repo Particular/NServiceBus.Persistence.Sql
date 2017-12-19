@@ -10,8 +10,14 @@
         public bool SupportsNativeDeferral => false;
         public bool SupportsOutbox => true;
 
-        public IConfigureEndpointTestExecution CreateTransportConfiguration() => new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsNativeDeferral);
+        public IConfigureEndpointTestExecution CreateTransportConfiguration()
+        {
+            return new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsNativeDeferral);
+        }
 
-        public IConfigureEndpointTestExecution CreatePersistenceConfiguration() => new ConfigureEndpointSqlPersistence();
+        public IConfigureEndpointTestExecution CreatePersistenceConfiguration()
+        {
+            return new ConfigureEndpointSqlPersistence();
+        }
     }
 }
