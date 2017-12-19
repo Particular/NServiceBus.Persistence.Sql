@@ -32,10 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-beta0012\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.AcceptanceTesting.7.0.0-beta0013\lib\net452\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.7.0.0-beta0012\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.7.0.0-beta0013\lib\net452\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Transport.Msmq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceBus.Transport.Msmq.1.0.0-beta0006\lib\net452\NServiceBus.Transport.Msmq.dll</HintPath>
@@ -64,6 +64,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_audit_is_overridden_in_code.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_a_replymessage_is_audited.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointAcceptanceTestingTransport.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointInMemoryPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningPersistence.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\ConfigureEndpointLearningTransport.cs" />
