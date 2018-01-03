@@ -1172,15 +1172,17 @@ public abstract class SagaPersisterTests
         };
 
         using (var connection = GetConnection()(null))
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, false, null))
         {
-            SagaWithNoCorrelation.SagaData result;
-            using (var transaction = connection.BeginTransaction())
-            using (var storageSession = new StorageSession(connection, transaction, false, null))
-            {
-                await defaultSchemaPersister.Save(sagaData, storageSession, null).ConfigureAwait(false);
-                result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
-            }
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: null);
+            await defaultSchemaPersister.Save(sagaData, storageSession, null).ConfigureAwait(false);
+        }
+
+        using (var connection = GetConnection()(schema))
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, false, null))
+        {
+            var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
             Assert.IsNull(result);
         }
     }

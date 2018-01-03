@@ -6,10 +6,12 @@ using NServiceBus.Settings;
 
 static class ScriptLocation
 {
+    const string ScriptFolder = "NServiceBus.Persistence.Sql";
+
     public static string FindScriptDirectory(ReadOnlySettings settings)
     {
         var currentDirectory = GetCurrentDirectory(settings);
-        return Path.Combine(currentDirectory, "NServiceBus.Persistence.Sql", settings.GetSqlDialect().Name);
+        return Path.Combine(currentDirectory, ScriptFolder, settings.GetSqlDialect().Name);
     }
 
     static string GetCurrentDirectory(ReadOnlySettings settings)
@@ -21,7 +23,14 @@ static class ScriptLocation
         var entryAssembly = Assembly.GetEntryAssembly();
         if (entryAssembly == null)
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var scriptDir = Path.Combine(baseDir, ScriptFolder);
+            //if the app domain base dir contains the scripts folder, return it. Otherwise add "bin" to the base dir so that web apps work correctly
+            if (Directory.Exists(scriptDir))
+            {
+                return baseDir;
+            }
+            return Path.Combine(baseDir, "bin");
         }
         var codeBase = entryAssembly.CodeBase;
         return Directory.GetParent(new Uri(codeBase).LocalPath).FullName;
