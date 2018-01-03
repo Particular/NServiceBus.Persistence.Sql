@@ -9,7 +9,7 @@
     using NUnit.Framework;
 
     //note: this test will no longer be relevant in v7
-    public class When_requesting_immediate_dispatch_using_scope_suppress : NServiceBusAcceptanceTest
+    public partial class When_requesting_immediate_dispatch_using_scope_suppress : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_dispatch_immediately()
