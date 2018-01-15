@@ -41,6 +41,10 @@ namespace NServiceBus.Persistence.Sql
         public void ReaderCreator(System.Func<System.IO.TextReader, Newtonsoft.Json.JsonReader> readerCreator) { }
         public void WriterCreator(System.Func<System.Text.StringBuilder, Newtonsoft.Json.JsonWriter> writerCreator) { }
     }
+    public class static ScriptRunner
+    {
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
+    }
     public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
     {
         public SqlPersistence() { }
