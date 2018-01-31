@@ -8,15 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Npgsql " Version="3.*" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.*" />
     <PackageReference Include="MySql.Data" Version="6.*" ExcludeAssets="contentFiles" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="System.Data.SqlClient" Version="4.*" />
   </ItemGroup>
 
 </Project>
