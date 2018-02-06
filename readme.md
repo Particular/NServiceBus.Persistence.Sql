@@ -6,5 +6,5 @@ Add support for [NServiceBus](https://docs.particular.net/nservicebus/) to persi
 
 ## Documentation
 
-https://docs.particular.net/nservicebus/sql-persistence/
+https://docs.particular.net/persistence/sql/
 
