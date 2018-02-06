@@ -10,7 +10,7 @@
     using NUnit.Framework;
     using Persistence.Sql;
 
-    public class when_reply_from_saga_not_found_handler : NServiceBusAcceptanceTest
+    public class When_reply_from_saga_not_found_handler : NServiceBusAcceptanceTest
     {
         // related to NSB issue #2044
         [Test]
