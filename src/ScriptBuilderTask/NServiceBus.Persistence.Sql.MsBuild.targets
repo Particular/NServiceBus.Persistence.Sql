@@ -1,6 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
+    <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>
@@ -17,7 +18,7 @@
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
       IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
       ProjectDirectory="$(ProjectDir)"
-      SolutionDirectory="$(SolutionDir)"/>
+      SolutionDirectory="$(SqlPersistenceSolutionDir)"/>
 
   </Target>
 
