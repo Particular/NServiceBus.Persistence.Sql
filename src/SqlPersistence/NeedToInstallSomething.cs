@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using NServiceBus.Features;
 using NServiceBus.Installation;
 using NServiceBus.Persistence.Sql;
@@ -15,14 +15,14 @@ class NeedToInstallSomething : INeedToInstallSomething
         installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
-    public async Task Install(string identity)
+    public Task Install(string identity)
     {
         if (installerSettings == null || installerSettings.Disabled)
         {
-            return;
+            return Task.FromResult(0);
         }
 
-        await ScriptRunner.Install(
+        return ScriptRunner.Install(
             sqlDialect: installerSettings.Dialect,
             tablePrefix: installerSettings.TablePrefix,
             connectionBuilder: installerSettings.ConnectionBuilder,
