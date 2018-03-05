@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
@@ -21,7 +22,11 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             command.AddParameter("Id", sagaData.Id);
             command.AddParameter("Concurrency", concurrency);
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            var affected = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            if (affected != 1)
+            {
+                throw new Exception($"Optimistic concurrency violation when trying to complete saga {sagaInfo.SagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");
+            }
         }
     }
 }

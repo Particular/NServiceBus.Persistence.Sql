@@ -228,6 +228,47 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [Test]
+    public async Task CompleteFailsOnConcurrencyViolation()
+    {
+        var endpointName = nameof(Complete);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "TransitionalCorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        DropAndCreate(definition, endpointName, schema);
+        var id = Guid.NewGuid();
+        var sagaData = new SagaWithCorrelation.SagaData
+        {
+            Id = id,
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            CorrelationProperty = "theCorrelationProperty"
+        };
+
+        var persister = SetUp(endpointName, schema);
+
+        using (var connection = dbConnection())
+        using (var transaction = connection.BeginTransaction())
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
+        {
+            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+
+            const int invalidConcurrencyVersion = 42;
+            Assert.ThrowsAsync<Exception>(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion));
+        }
+    }
+
     public class SagaWithWeirdCharactersಠ_ಠ :
         SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>,
         IAmStartedByMessages<AMessage>
