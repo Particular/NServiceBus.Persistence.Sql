@@ -224,6 +224,22 @@ public abstract class SubscriptionPersisterTests
     }
 
     [Test]
+    public void Subscribe_version_migration()
+    {
+        var persister = Setup(schema);
+        var type1 = new MessageType("type1", new Version(0, 0, 0, 0));
+        //NSB 5.x: endpoint is null
+        persister.Subscribe(new Subscriber("e@machine1", null), type1, null).Await();
+        //NSB 6.x: same subscriber now mentions endpoint
+        persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
+        var result = persister.GetSubscribers(type1).Result.ToList();
+        Assert.IsNotEmpty(result);
+#if NET452
+        ObjectApprover.VerifyWithJson(result);
+#endif
+    }
+
+    [Test]
     public void Unsubscribe()
     {
         var persister = Setup(schema);
