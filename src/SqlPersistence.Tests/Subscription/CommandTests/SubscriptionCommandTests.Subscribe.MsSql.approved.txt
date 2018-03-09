@@ -3,8 +3,9 @@ declare @dummy int;
 merge [TheSchema].[TheTablePrefixSubscriptionData] with (holdlock, tablock) as target
 using(select @Endpoint as Endpoint, @Subscriber as Subscriber, @MessageType as MessageType) as source
 on target.Subscriber = source.Subscriber 
-    and target.MessageType = source.MessageType 
-    and ((target.Endpoint = source.Endpoint) or (target.Endpoint is null and source.endpoint is null))
+    and target.MessageType = source.MessageType
+when matched and source.Endpoint is not null and (target.Endpoint is null or target.Endpoint <> source.Endpoint) then
+update set Endpoint = @Endpoint, PersistenceVersion = @PersistenceVersion
 when not matched then
 insert
 (
