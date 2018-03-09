@@ -22,9 +22,14 @@ class StorageSessionFeature : Feature
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
 
         SagaInfoCache infoCache = null;
-        if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
+        if (isSagasEnabledForSqlPersistence)
         {
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
+        }
+
+        if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
+        {
+            //Info cache can be null if Outbox is enabled but Sagas are disabled.
             container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
             container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
         }
