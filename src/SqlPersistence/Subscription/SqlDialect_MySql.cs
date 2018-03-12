@@ -32,7 +32,7 @@ values
     @PersistenceVersion
 )
 on duplicate key update
-    Endpoint = @Endpoint,
+    Endpoint = coalesce(@Endpoint, Endpoint),
     PersistenceVersion = @PersistenceVersion
 ";
             }
