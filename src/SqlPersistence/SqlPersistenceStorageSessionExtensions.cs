@@ -46,8 +46,14 @@
             Guard.AgainstNull(nameof(context), context);
             Guard.AgainstNull(nameof(appendParameters), appendParameters);
             Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
+
             var writableContextBag = (ContextBag)context;
             var sqlSession = session.GetSqlStorageSession();
+
+            if (sqlSession.InfoCache == null)
+            {
+                throw new Exception("Cannot load saga data because the Sagas feature is disabled in the endpoint.");
+            }
             return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sqlSession.InfoCache);
         }
     }
