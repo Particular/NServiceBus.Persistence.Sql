@@ -240,6 +240,22 @@ public abstract class SubscriptionPersisterTests
     }
 
     [Test]
+    public void Subscribe_different_endpoint_name()
+    {
+        var persister = Setup(schema);
+        var type1 = new MessageType("type1", new Version(0, 0, 0, 0));
+        //NSB 6.x: old endpoint value
+        persister.Subscribe(new Subscriber("e@machine1", "e1"), type1, null).Await();
+        //NSB 6.x: same address, new endpoint value
+        persister.Subscribe(new Subscriber("e@machine1", "e2"), type1, null).Await();
+        var result = persister.GetSubscribers(type1).Result.ToList();
+        Assert.IsNotEmpty(result);
+#if NET452
+        ObjectApprover.VerifyWithJson(result);
+#endif
+    }
+
+    [Test]
     public void Subscribe_should_not_downgrade()
     {
         var persister = Setup(schema);
