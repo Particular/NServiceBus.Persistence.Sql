@@ -11,14 +11,11 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="[10.0.1, 11.0.0)" />
-    <PackageReference Include="NServiceBus" Version="[7.0.0-beta0012, 8.0.0)" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0-rc0001, 8.0.0)" />
     <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
   </ItemGroup>
 
   <ItemGroup>

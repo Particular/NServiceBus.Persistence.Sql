@@ -4,14 +4,15 @@
 
     public partial class TestSuiteConstraints
     {
-        public bool SupportsDtc => true;
+        public bool SupportsDtc => false;
         public bool SupportsCrossQueueTransactions => true;
         public bool SupportsNativePubSub => false;
         public bool SupportsNativeDeferral => false;
         public bool SupportsOutbox => true;
+
         public IConfigureEndpointTestExecution CreateTransportConfiguration()
         {
-            return new ConfigureEndpointMsmqTransport();
+            return new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsNativeDeferral);
         }
 
         public IConfigureEndpointTestExecution CreatePersistenceConfiguration()

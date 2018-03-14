@@ -34,7 +34,7 @@ values
     @PersistenceVersion
 )
 on conflict (""Id"") do update
-    set ""Endpoint"" = @Endpoint,
+    set ""Endpoint"" = coalesce(@Endpoint, {tableName}.""Endpoint""),
         ""PersistenceVersion"" = @PersistenceVersion
 ";
             }
