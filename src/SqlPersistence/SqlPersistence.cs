@@ -34,7 +34,10 @@
             });
             Defaults(s =>
             {
-                s.EnableFeatureByDefault<InstallerFeature>();
+                s.EnableFeatureByDefault<SqlOutboxInstallerFeature>();
+                s.EnableFeatureByDefault<SqlSagaInstallerFeature>();
+                s.EnableFeatureByDefault<SqlSubscriptionInstallerFeature>();
+                s.EnableFeatureByDefault<SqlTimeoutInstallerFeature>();
             });
         }
 

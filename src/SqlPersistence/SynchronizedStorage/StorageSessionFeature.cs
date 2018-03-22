@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data.Common;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
@@ -16,7 +18,8 @@ class StorageSessionFeature : Feature
 
         var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
-        var connectionBuilder = settings.GetConnectionBuilder();
+        var sagasConnectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
+        var outboxConnectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
 
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
@@ -27,8 +30,26 @@ class StorageSessionFeature : Feature
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
         }
 
+        if (isOutboxEnabledForSqlPersistence && isSagasEnabledForSqlPersistence)
+        {
+            if (sagasConnectionBuilder != outboxConnectionBuilder)
+            {
+                throw new Exception("ConnectionBuilder for Sagas and Outbox must be identical.");
+            }
+        }
+
         if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
         {
+            Func<DbConnection> connectionBuilder;
+            if (isOutboxEnabledForSqlPersistence)
+            {
+                connectionBuilder = outboxConnectionBuilder;
+            }
+            else
+            {
+                connectionBuilder = sagasConnectionBuilder;
+            }
+
             //Info cache can be null if Outbox is enabled but Sagas are disabled.
             container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
             container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);

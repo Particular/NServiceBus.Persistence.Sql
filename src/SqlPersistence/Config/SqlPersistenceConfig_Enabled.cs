@@ -12,8 +12,17 @@ namespace NServiceBus
         {
             Guard.AgainstNull(nameof(configuration), configuration);
 
-            var installerSettings = configuration.GetSettings().GetOrCreate<InstallerSettings>();
-            installerSettings.Disabled = true;
+            var outboxInstallerSettings = configuration.GetSettings().GetOrCreate<SqlOutboxInstallerSettings>();
+            outboxInstallerSettings.Disabled = true;
+
+            var sagaInstallerSettings = configuration.GetSettings().GetOrCreate<SqlSagaInstallerSettings>();
+            sagaInstallerSettings.Disabled = true;
+
+            var subscriptionInstallerSettings = configuration.GetSettings().GetOrCreate<SqlSubscriptionInstallerSettings>();
+            subscriptionInstallerSettings.Disabled = true;
+
+            var timeoutInstallerSettings = configuration.GetSettings().GetOrCreate<SqlTimeoutInstallerSettings>();
+            timeoutInstallerSettings.Disabled = true;
         }
     }
 }

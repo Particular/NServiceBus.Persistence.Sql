@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
@@ -14,7 +15,7 @@ class SqlSubscriptionFeature : Feature
     {
         var settings = context.Settings;
 
-        var connectionBuilder = settings.GetConnectionBuilder();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
