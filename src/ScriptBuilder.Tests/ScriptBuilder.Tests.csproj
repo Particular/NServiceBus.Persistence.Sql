@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
@@ -22,7 +21,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
     <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.*" />
-    <PackageReference Include="ObjectApproval" Version="1.*" />
+    <PackageReference Include="ObjectApproval" Version="2.*" />
     <PackageReference Include="PublicApiGenerator" Version="6.*" />
   </ItemGroup>
 
