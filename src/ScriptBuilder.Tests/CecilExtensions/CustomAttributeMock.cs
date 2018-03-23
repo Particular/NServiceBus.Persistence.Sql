@@ -32,10 +32,13 @@ public class CustomAttributeMock : ICustomAttribute
     public TypeReference AttributeType => throw new NotImplementedException();
     public bool HasFields => throw new NotImplementedException();
     public bool HasProperties => true;
+    public bool HasConstructorArguments => false;
     public Collection<CustomAttributeNamedArgument> Fields => throw new NotImplementedException();
 
     public Collection<CustomAttributeNamedArgument> Properties
     {
         get;
     }
+
+    public Collection<CustomAttributeArgument> ConstructorArguments => new Collection<CustomAttributeArgument>();
 }
