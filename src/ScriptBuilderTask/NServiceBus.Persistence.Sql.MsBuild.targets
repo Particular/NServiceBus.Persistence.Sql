@@ -34,15 +34,33 @@
       <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
     </ItemGroup>
 
-    <CreateItem Include="@(SqlPersistenceScripts)"
-                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
-      <Output TaskParameter="Include" ItemName="_SourceItemsToCopyToOutputDirectoryAlways" />
-    </CreateItem>
+    <ItemGroup>
+      <_SourceItemsToCopyToOutputDirectoryAlways Include="@(SqlPersistenceScripts)">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </_SourceItemsToCopyToOutputDirectoryAlways>
+    </ItemGroup>
 
-    <CreateItem Include="@(SqlPersistenceScripts)"
-                AdditionalMetadata="CopyToOutputDirectory=PreserveNewest;TargetPath=NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)">
-      <Output TaskParameter="Include" ItemName="AllItemsFullPathWithTargetPath" />
-    </CreateItem>
+  </Target>
+
+  <Target Name="AddSqlPersistenceScriptsToGetCopyToPublishDirectoryItems"
+          BeforeTargets="GetCopyToPublishDirectoryItems"
+          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+
+    <PropertyGroup>
+      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <SqlPersistenceScriptsForPublish Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_SourceItemsToCopyToPublishDirectoryAlways Include="@(SqlPersistenceScriptsForPublish)">
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </_SourceItemsToCopyToPublishDirectoryAlways>
+    </ItemGroup>
 
   </Target>
 
