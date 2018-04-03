@@ -32,7 +32,6 @@ public class CustomAttributeMock : ICustomAttribute
     public TypeReference AttributeType => throw new NotImplementedException();
     public bool HasFields => throw new NotImplementedException();
     public bool HasProperties => true;
-    public bool HasConstructorArguments => false;
     public Collection<CustomAttributeNamedArgument> Fields => throw new NotImplementedException();
 
     public Collection<CustomAttributeNamedArgument> Properties
@@ -40,5 +39,7 @@ public class CustomAttributeMock : ICustomAttribute
         get;
     }
 
-    public Collection<CustomAttributeArgument> ConstructorArguments { get; } = new Collection<CustomAttributeArgument>();
+    public bool HasConstructorArguments => throw new NotImplementedException();
+
+    public Collection<CustomAttributeArgument> ConstructorArguments => throw new NotImplementedException();
 }
