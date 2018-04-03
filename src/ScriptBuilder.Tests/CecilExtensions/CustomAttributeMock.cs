@@ -38,4 +38,8 @@ public class CustomAttributeMock : ICustomAttribute
     {
         get;
     }
+
+    public bool HasConstructorArguments => throw new NotImplementedException();
+
+    public Collection<CustomAttributeArgument> ConstructorArguments => throw new NotImplementedException();
 }
