@@ -3,7 +3,6 @@ using System.IO;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 #if NET452
 using ApprovalTests;
@@ -28,7 +27,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
@@ -57,7 +56,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<AbstractSaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
@@ -79,7 +78,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
@@ -133,7 +132,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out SagaDefinition _);
+            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
