@@ -24,7 +24,7 @@ public class OracleSagaPersisterTests : SagaPersisterTests
             var connectionString = Environment.GetEnvironmentVariable(key);
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new Exception($"The tests require a connection string to be configured for the custom schema '{schema}'. The connection string for that schema needs to be added as '{key}' environment variable.");
+                throw new Exception($"{key} environment variable is empty");
             }
             var connection = new OracleConnection(connectionString);
             connection.Open();

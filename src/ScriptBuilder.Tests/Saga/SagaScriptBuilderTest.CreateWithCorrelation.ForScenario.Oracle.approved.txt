@@ -9,7 +9,7 @@ declare
   n number(10);
   currentSchema varchar2(500);
 begin
-select sys_context('USERENV','CURRENT_SCHEMA') into currentSchema from dual;
+  select sys_context('USERENV','CURRENT_SCHEMA') into currentSchema from dual;
 
 
 /* CreateTable */

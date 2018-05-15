@@ -4,7 +4,7 @@ namespace NServiceBus.Persistence.Sql
 {
     [ObsoleteEx(
         TreatAsErrorFromVersion = "3.0",
-        RemoveInVersion = "4.0",
+        RemoveInVersion = "5.0",
         ReplacementTypeOrMember = "persistence.SqlDialect<SqlDialect.DialectType>()")]
     public enum SqlVariant
     {

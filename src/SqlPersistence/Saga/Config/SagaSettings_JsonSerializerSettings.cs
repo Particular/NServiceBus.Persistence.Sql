@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS0419
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     using Newtonsoft.Json;
     using Settings;
@@ -20,4 +19,3 @@ namespace NServiceBus.Persistence.Sql
         }
     }
 }
-#pragma warning restore CS0419

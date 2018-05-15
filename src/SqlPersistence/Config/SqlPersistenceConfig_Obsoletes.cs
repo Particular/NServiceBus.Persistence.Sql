@@ -9,7 +9,7 @@ namespace NServiceBus
     {
         [ObsoleteEx(
             TreatAsErrorFromVersion = "3.0",
-            RemoveInVersion = "4.0",
+            RemoveInVersion = "5.0",
             ReplacementTypeOrMember = "persistence.SqlDialect<SqlDialect.DialectType>()")]
         public static void SqlVariant(this PersistenceExtensions<SqlPersistence> configuration, SqlVariant sqlVariant)
         {
@@ -18,7 +18,7 @@ namespace NServiceBus
 
         [ObsoleteEx(
             TreatAsErrorFromVersion = "3.0",
-            RemoveInVersion = "4.0",
+            RemoveInVersion = "5.0",
             ReplacementTypeOrMember = "persistence.SqlDialect<SqlDialect.DialectType>().Schema(\"schema_name\")")]
         public static void Schema(this PersistenceExtensions<SqlPersistence> configuration, string schema)
         {

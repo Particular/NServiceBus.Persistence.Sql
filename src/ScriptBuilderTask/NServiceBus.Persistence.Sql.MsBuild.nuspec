@@ -8,14 +8,13 @@
     <developmentDependency>true</developmentDependency>
     <licenseUrl>$licenseUrl$</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
-    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <iconUrl>$iconUrl$</iconUrl>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="NServiceBus.Persistence.Sql"
-                  version="[$version$, $version$]"/>
+      <dependency id="NServiceBus.Persistence.Sql" version="[$version$, $version$]"/>
     </dependencies>
   </metadata>
   <files>
