@@ -19,13 +19,23 @@ namespace NServiceBus
                 .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }
 
-        internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings)
+        internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
         {
-            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out Func<DbConnection> value))
+            if (settings.TryGet($"SqlPersistence.ConnectionBuilder.{storageType.Name}", out Func<DbConnection> value))
+            {
+                return value;
+            }
+            if (settings.TryGet("SqlPersistence.ConnectionBuilder", out value))
             {
                 return value;
             }
             throw new Exception("ConnectionBuilder must be defined.");
+        }
+
+        internal static Func<DbConnection> GetConnectionBuilder<T>(this ReadOnlySettings settings)
+            where T : StorageType
+        {
+            return GetConnectionBuilder(settings, typeof(T));
         }
 
     }
