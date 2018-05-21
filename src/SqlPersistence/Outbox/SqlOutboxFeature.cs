@@ -17,6 +17,22 @@ class SqlOutboxFeature : Feature
         var sqlDialect = settings.GetSqlDialect();
         var outboxPersister = new OutboxPersister(connectionBuilder, tablePrefix, sqlDialect);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
-        context.RegisterStartupTask(b => new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, TimeSpan.FromDays(7), TimeSpan.FromMinutes(1), new AsyncTimer()));
+
+        if (settings.GetOrDefault<bool>(DisableCleanup))
+        {
+            return;
+        }
+
+        context.RegisterStartupTask(b =>
+        {
+            var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
+            var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
+
+            return new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer());
+        });
     }
+
+    internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
+    internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";
+    internal const string DisableCleanup = "Persistence.Sql.Outbox.DisableCleanup";
 }
