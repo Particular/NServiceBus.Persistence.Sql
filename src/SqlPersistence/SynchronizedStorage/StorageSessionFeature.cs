@@ -16,7 +16,7 @@ class StorageSessionFeature : Feature
 
         var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
-        var connectionBuilder = settings.GetConnectionBuilder();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
 
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
