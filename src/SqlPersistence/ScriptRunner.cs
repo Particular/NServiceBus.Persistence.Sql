@@ -70,6 +70,7 @@ namespace NServiceBus.Persistence.Sql
                 using (var transaction = connection.BeginTransaction())
                 {
                     await installAction(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
+                    transaction.Commit();
                 }
             }
         }
