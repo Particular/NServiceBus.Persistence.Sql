@@ -30,7 +30,7 @@
         /// <param name="configuration">The configuration being extended.</param>
         /// <param name="frequencyToRunDeduplicationDataCleanup">The frequency to run the deduplication data cleanup task. The time span cannot be negative or sero.</param>
         /// <returns>The configuration</returns>
-        public static void RunDeduplicationDataCeanupEvery(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
+        public static void RunDeduplicationDataCleanupEvery(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNegativeAndZero(nameof(frequencyToRunDeduplicationDataCleanup), frequencyToRunDeduplicationDataCleanup);
