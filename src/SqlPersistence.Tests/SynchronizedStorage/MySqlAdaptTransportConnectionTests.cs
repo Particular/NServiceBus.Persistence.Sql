@@ -1,4 +1,3 @@
-#if NET452
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -21,4 +20,3 @@ class MySqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
         };
     }
 }
-#endif
