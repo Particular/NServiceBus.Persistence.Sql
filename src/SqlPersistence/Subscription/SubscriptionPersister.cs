@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
@@ -31,6 +32,7 @@ class SubscriptionPersister : ISubscriptionStorage
     {
         await Retry(async () =>
         {
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
@@ -49,6 +51,7 @@ class SubscriptionPersister : ISubscriptionStorage
     {
         await Retry(async () =>
         {
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
@@ -147,6 +150,7 @@ class SubscriptionPersister : ISubscriptionStorage
     async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
+        using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
         using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
