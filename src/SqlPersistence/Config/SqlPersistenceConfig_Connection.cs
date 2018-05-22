@@ -29,7 +29,7 @@ namespace NServiceBus
             {
                 return value;
             }
-            throw new Exception("ConnectionBuilder must be defined.");
+            throw new Exception("The connection to the database must be specified using the ConnectionBuilder method.");
         }
 
         internal static Func<DbConnection> GetConnectionBuilder<T>(this ReadOnlySettings settings)
