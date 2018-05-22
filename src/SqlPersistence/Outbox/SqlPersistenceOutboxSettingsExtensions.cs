@@ -16,7 +16,7 @@
         /// <param name="timeToKeepDeduplicationData">The time to keep the deduplication data.
         /// The cleanup process removes entries older than the specified time to keep deduplication data. The time span cannot be negative or zero.</param>
         /// <returns>The configuration</returns>
-        public static void SetTimeToKeepDeduplicationData(this OutboxSettings configuration, TimeSpan timeToKeepDeduplicationData)
+        public static void KeepDeduplicationDataFor(this OutboxSettings configuration, TimeSpan timeToKeepDeduplicationData)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNegativeAndZero(nameof(timeToKeepDeduplicationData), timeToKeepDeduplicationData);
@@ -30,7 +30,7 @@
         /// <param name="configuration">The configuration being extended.</param>
         /// <param name="frequencyToRunDeduplicationDataCleanup">The frequency to run the deduplication data cleanup task. The time span cannot be negative or sero.</param>
         /// <returns>The configuration</returns>
-        public static void SetFrequencyToRunDeduplicationDataCleanup(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
+        public static void RunDeduplicationDataCeanupEvery(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNegativeAndZero(nameof(frequencyToRunDeduplicationDataCleanup), frequencyToRunDeduplicationDataCleanup);
