@@ -1,4 +1,3 @@
-#if NET452
 using System;
 using MySql.Data.MySqlClient;
 
@@ -14,4 +13,3 @@ public static class MySqlConnectionBuilder
         return new MySqlConnection(connection);
     }
 }
-#endif
