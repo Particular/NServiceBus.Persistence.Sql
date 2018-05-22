@@ -11,10 +11,6 @@
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.0.0" />
