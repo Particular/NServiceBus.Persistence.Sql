@@ -7,3 +7,4 @@ select
     Data
 from TheTableName
 where Id = :Id
+for update
