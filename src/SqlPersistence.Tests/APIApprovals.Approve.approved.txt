@@ -219,7 +219,7 @@ namespace NServiceBus
     {
         public static void DisableCleanup(this NServiceBus.Outbox.OutboxSettings configuration) { }
         public static void KeepDeduplicationDataFor(this NServiceBus.Outbox.OutboxSettings configuration, System.TimeSpan timeToKeepDeduplicationData) { }
-        public static void RunDeduplicationDataCeanupEvery(this NServiceBus.Outbox.OutboxSettings configuration, System.TimeSpan frequencyToRunDeduplicationDataCleanup) { }
+        public static void RunDeduplicationDataCleanupEvery(this NServiceBus.Outbox.OutboxSettings configuration, System.TimeSpan frequencyToRunDeduplicationDataCleanup) { }
     }
     public class static SqlPersistenceStorageSessionExtensions
     {
