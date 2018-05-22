@@ -26,13 +26,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <Compile Remove="Saga\MySqlSagaPersisterTests.cs" />
-    <Compile Remove="Outbox\MySqlOutboxPersisterTests.cs" />
-    <Compile Remove="Timeout\MySqlServerTimeoutPersisterTests.cs" />
-    <Compile Remove="Subscription\MySqlServerSubscriptionPersisterTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <Compile Remove="Saga\OracleSagaPersisterTests.cs" />
     <Compile Remove="Outbox\OracleOutboxPersisterTests.cs" />
     <Compile Remove="Timeout\OracleTimeoutPersisterTests.cs" />
