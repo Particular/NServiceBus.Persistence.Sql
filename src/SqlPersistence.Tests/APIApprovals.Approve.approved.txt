@@ -119,6 +119,10 @@ namespace NServiceBus.Persistence.Sql
         public string RemoveById { get; }
         public string RemoveBySagaId { get; }
     }
+    public class TimeoutSettings
+    {
+        public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+    }
 }
 namespace NServiceBus
 {
@@ -216,6 +220,7 @@ namespace NServiceBus
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
     }
     public class static SqlPersistenceStorageSessionExtensions
     {
