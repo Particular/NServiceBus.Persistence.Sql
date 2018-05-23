@@ -33,6 +33,9 @@
             var type = typeof(SqlDialectSettings<>).MakeGenericType(typeof(T));
             dialectSettings = (SqlDialectSettings<T>)Activator.CreateInstance(type);
             settings.Set("SqlPersistence.SqlDialect", dialectSettings);
+
+            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", dialectSettings.Dialect.ToString());
+
             return dialectSettings;
         }
     }
