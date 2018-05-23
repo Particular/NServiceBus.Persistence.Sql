@@ -22,6 +22,11 @@ class SqlSubscriptionFeature : Feature
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions", new
+        {
+            cacheFor
+        });
+
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }
 }

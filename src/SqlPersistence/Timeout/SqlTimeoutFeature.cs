@@ -20,6 +20,11 @@ class SqlTimeoutFeature : Feature
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Timeouts", new
+        {
+            timeoutsCleanupExecutionInterval
+        });
+
         var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
