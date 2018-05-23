@@ -14,7 +14,7 @@ class SqlTimeoutFeature : Feature
     {
         var settings = context.Settings;
         var sqlDialect = settings.GetSqlDialect();
-        var connectionBuilder = settings.GetConnectionBuilder();
+        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Timeouts>();
         var tablePrefix = settings.GetTablePrefix();
         var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
