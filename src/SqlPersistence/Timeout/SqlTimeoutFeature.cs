@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Timeout.Core;
@@ -17,22 +16,16 @@ class SqlTimeoutFeature : Feature
         var sqlDialect = settings.GetSqlDialect();
         var connectionBuilder = settings.GetConnectionBuilder<StorageType.Timeouts>();
         var tablePrefix = settings.GetTablePrefix();
-        var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
+        var TimeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("SqlPersistence.Timeout.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
-        var diagnostics = new Dictionary<string, object>
-        {
-            { nameof(timeoutsCleanupExecutionInterval), timeoutsCleanupExecutionInterval }
-        };
-        sqlDialect.AddExtraDiagnosticsInfo(diagnostics);
-
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Timeouts", new
         {
-            diagnostics
+            TimeoutsCleanupExecutionInterval
         });
 
-        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);
+        var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, TimeoutsCleanupExecutionInterval, () => DateTime.UtcNow);
         context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
         context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
     }
