@@ -33,7 +33,6 @@ class SqlOutboxFeature : Feature
             var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
             var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
 
-
             settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
             {
                 CleanupDisabled = false,
