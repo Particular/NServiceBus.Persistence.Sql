@@ -26,9 +26,9 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
-            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            internal override object GetDiagnosticsInfo()
             {
-                
+                return null;
             }
         }
     }

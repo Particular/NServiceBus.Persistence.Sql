@@ -69,9 +69,9 @@ namespace NServiceBus
                 }
             }
 
-            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            internal override object GetDiagnosticsInfo()
             {
-                diagnostics.Add("CustomSchema", string.IsNullOrEmpty(Schema));
+                return new { CustomSchema = string.IsNullOrEmpty(Schema)};
             }
 
             internal string Schema { get; set; }

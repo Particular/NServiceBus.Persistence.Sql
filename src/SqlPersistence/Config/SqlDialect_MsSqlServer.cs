@@ -53,10 +53,13 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
-            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            internal override object GetDiagnosticsInfo()
             {
-                diagnostics.Add("CustomSchema", string.IsNullOrEmpty(Schema));
-                diagnostics.Add(nameof(DoNotUseTransportConnection), DoNotUseTransportConnection);
+                return new
+                {
+                    CustomSchema = string.IsNullOrEmpty(Schema),
+                    DoNotUseTransportConnection
+                };
             }
 
             internal string Schema { get; set; }

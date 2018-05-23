@@ -34,6 +34,15 @@
             });
             Defaults(s =>
             {
+                var dialect = s.GetSqlDialect();
+                var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
+
+                s.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", new
+                {
+                    dialect.Name,
+                    diagnostics
+                });
+
                 s.EnableFeatureByDefault<InstallerFeature>();
             });
         }
