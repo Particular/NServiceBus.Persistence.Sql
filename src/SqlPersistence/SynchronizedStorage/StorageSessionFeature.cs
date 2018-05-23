@@ -51,7 +51,7 @@ class StorageSessionFeature : Feature
         {
             return;
         }
-        throw new Exception("Sql Persistence must be enable for either both Sagas and Outbox, or neither.");
+        throw new Exception("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.");
     }
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)

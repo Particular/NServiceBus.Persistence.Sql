@@ -8,7 +8,7 @@ using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_outbox_disabled_and_different_persistence_is_used_for_sagas : NServiceBusAcceptanceTest
+public class When_outbox_disabled_and_different_persistence_used_for_sagas : NServiceBusAcceptanceTest
 {
     [Test]
     public async Task Should_not_enable_synchronized_storage_session()

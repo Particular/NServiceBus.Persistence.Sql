@@ -1,14 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 [TestFixture]
-public class When_outbox_enabled_and_different_persistence_is_for_sagas : NServiceBusAcceptanceTest
+public class When_outbox_enabled_and_different_persistence_used_for_sagas : NServiceBusAcceptanceTest
 {
     [Test]
     public void Should_throw_exception_at_startup()
@@ -22,7 +21,7 @@ public class When_outbox_enabled_and_different_persistence_is_for_sagas : NServi
                 .ConfigureAwait(false);
         });
 
-        StringAssert.StartsWith("Sql Persistence must be enable for either both Sagas and Outbox, or neither.", ex.Message);
+        StringAssert.StartsWith("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.", ex.Message);
     }
 
     public class Context : ScenarioContext
