@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NServiceBus;
 using NServiceBus.Features;
 
@@ -20,7 +21,16 @@ class SqlOutboxFeature : Feature
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
         {
-            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new { CleanupDisabled = true });
+            var diagnostics = new Dictionary<string, object>
+            {
+                { "CleanupDisabled", true }
+            };
+            sqlDialect.AddExtraDiagnosticsInfo(diagnostics);
+            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
+            {
+                diagnostics
+            });
+
             return;
         }
 
@@ -29,11 +39,16 @@ class SqlOutboxFeature : Feature
             var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
             var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
 
+            var diagnostics = new Dictionary<string, object>
+            {
+                { "CleanupDisabled", false },
+                {nameof(timeToKeepDeduplicationData), timeToKeepDeduplicationData },
+                {nameof(frequencyToRunCleanup), frequencyToRunCleanup }
+            };
+            sqlDialect.AddExtraDiagnosticsInfo(diagnostics);
             settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
             {
-                CleanupDisabled = false,
-                timeToKeepDeduplicationData,
-                frequencyToRunCleanup
+                diagnostics
             });
 
             return new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer());

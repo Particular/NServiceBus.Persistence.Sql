@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Timeout.Core;
@@ -20,9 +21,15 @@ class SqlTimeoutFeature : Feature
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
+        var diagnostics = new Dictionary<string, object>
+        {
+            { nameof(timeoutsCleanupExecutionInterval), timeoutsCleanupExecutionInterval }
+        };
+        sqlDialect.AddExtraDiagnosticsInfo(diagnostics);
+
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Timeouts", new
         {
-            timeoutsCleanupExecutionInterval
+            diagnostics
         });
 
         var persister = new TimeoutPersister(connectionBuilder, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);

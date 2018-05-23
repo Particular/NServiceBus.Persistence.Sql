@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System.Collections.Generic;
     using System.Data.Common;
     using System.Threading.Tasks;
 
@@ -56,5 +57,7 @@ namespace NServiceBus
         internal virtual void ValidateTablePrefix(string tablePrefix)
         {
         }
+
+        internal abstract void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics);
     }
 }

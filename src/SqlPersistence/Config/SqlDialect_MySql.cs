@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System.Collections.Generic;
     using System.Data.Common;
 
     public abstract partial class SqlDialect
@@ -23,6 +24,11 @@ namespace NServiceBus
             {
                 var command = connection.CreateCommand();
                 return new CommandWrapper(command, this);
+            }
+
+            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            {
+                
             }
         }
     }

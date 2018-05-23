@@ -1,6 +1,7 @@
 namespace NServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.SqlClient;
 
@@ -50,6 +51,12 @@ namespace NServiceBus
             {
                 var command = connection.CreateCommand();
                 return new CommandWrapper(command, this);
+            }
+
+            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            {
+                diagnostics.Add("CustomSchema", string.IsNullOrEmpty(Schema));
+                diagnostics.Add(nameof(DoNotUseTransportConnection), DoNotUseTransportConnection);
             }
 
             internal string Schema { get; set; }

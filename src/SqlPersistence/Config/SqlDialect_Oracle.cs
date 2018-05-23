@@ -1,6 +1,7 @@
 namespace NServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
     using System.Reflection;
@@ -66,6 +67,11 @@ namespace NServiceBus
                 {
                     throw new Exception($"Table prefix '{tablePrefix}' contains non-ASCII characters, which is not supported by SQL persistence using Oracle. Change the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).");
                 }
+            }
+
+            internal override void AddExtraDiagnosticsInfo(Dictionary<string, object> diagnostics)
+            {
+                diagnostics.Add("CustomSchema", string.IsNullOrEmpty(Schema));
             }
 
             internal string Schema { get; set; }
