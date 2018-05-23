@@ -42,26 +42,26 @@ namespace NServiceBus.Persistence.Sql
 
             if (shouldInstallOutbox)
             {
-                await Execute<StorageType.Outbox>(InstallOutbox, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+                await ExecuteInSeparateConnection<StorageType.Outbox>(InstallOutbox, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
 
             if (shouldInstallSagas)
             {
-                await Execute<StorageType.Sagas>(InstallSagas, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+                await ExecuteInSeparateConnection<StorageType.Sagas>(InstallSagas, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
 
             if (shouldInstallSubscriptions)
             {
-                await Execute<StorageType.Subscriptions>(InstallSubscriptions, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+                await ExecuteInSeparateConnection<StorageType.Subscriptions>(InstallSubscriptions, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
 
             if (shouldInstallTimeouts)
             {
-                await Execute<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
         }
 
-        static async Task Execute<T>(Func<string, DbConnection, DbTransaction, string, SqlDialect, Task> installAction, string scriptDirectory, string tablePrefix, SqlDialect sqlDialect, Func<Type, DbConnection> connectionBuilder)
+        static async Task ExecuteInSeparateConnection<T>(Func<string, DbConnection, DbTransaction, string, SqlDialect, Task> installAction, string scriptDirectory, string tablePrefix, SqlDialect sqlDialect, Func<Type, DbConnection> connectionBuilder)
             where T : StorageType
         {
             using (var connection = connectionBuilder(typeof(T)))
