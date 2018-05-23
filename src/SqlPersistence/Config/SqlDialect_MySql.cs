@@ -1,6 +1,5 @@
 namespace NServiceBus
 {
-    using System.Collections.Generic;
     using System.Data.Common;
 
     public abstract partial class SqlDialect
@@ -26,7 +25,7 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
-            internal override object GetDiagnosticsInfo()
+            internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return null;
             }

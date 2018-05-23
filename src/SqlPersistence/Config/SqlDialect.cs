@@ -57,6 +57,6 @@ namespace NServiceBus
         {
         }
 
-        internal abstract object GetDiagnosticsInfo();
+        internal abstract object GetCustomDialectDiagnosticsInfo();
     }
 }

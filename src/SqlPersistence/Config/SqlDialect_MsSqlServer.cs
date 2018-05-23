@@ -1,7 +1,6 @@
 namespace NServiceBus
 {
     using System;
-    using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.SqlClient;
 
@@ -53,7 +52,7 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
-            internal override object GetDiagnosticsInfo()
+            internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return new
                 {

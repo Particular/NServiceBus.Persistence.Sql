@@ -1,7 +1,6 @@
 namespace NServiceBus
 {
     using System;
-    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
     using System.Reflection;
@@ -69,7 +68,7 @@ namespace NServiceBus
                 }
             }
 
-            internal override object GetDiagnosticsInfo()
+            internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return new { CustomSchema = string.IsNullOrEmpty(Schema)};
             }
