@@ -1,35 +1,48 @@
+using System;
 using System.Threading.Tasks;
 using NServiceBus.Features;
 using NServiceBus.Installation;
+using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
-class NeedToInstallSomething : INeedToInstallSomething
+class SqlPersistenceInstaller : INeedToInstallSomething
 {
+    static ILog log = LogManager.GetLogger<SqlPersistenceInstaller>();
+
     InstallerSettings installerSettings;
     ReadOnlySettings settings;
 
-    public NeedToInstallSomething(ReadOnlySettings settings)
+    public SqlPersistenceInstaller(ReadOnlySettings settings)
     {
         this.settings = settings;
         installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
-    public Task Install(string identity)
+    public async Task Install(string identity)
     {
         if (installerSettings == null || installerSettings.Disabled)
         {
-            return Task.FromResult(0);
+            return;
         }
-
-        return ScriptRunner.Install(
-            sqlDialect: installerSettings.Dialect,
-            tablePrefix: installerSettings.TablePrefix,
-            connectionBuilder: installerSettings.ConnectionBuilder,
-            scriptDirectory: installerSettings.ScriptDirectory,
-            shouldInstallOutbox: settings.IsFeatureActive(typeof(SqlOutboxFeature)),
-            shouldInstallSagas: settings.IsFeatureActive(typeof(SqlSagaFeature)),
-            shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
-            shouldInstallTimeouts: settings.IsFeatureActive(typeof(SqlTimeoutFeature)));
+        try
+        {
+            await ScriptRunner.Install(
+                    sqlDialect: installerSettings.Dialect,
+                    tablePrefix: installerSettings.TablePrefix,
+                    connectionBuilder: installerSettings.ConnectionBuilder,
+                    scriptDirectory: installerSettings.ScriptDirectory,
+                    shouldInstallOutbox: settings.IsFeatureActive(typeof(SqlOutboxFeature)),
+                    shouldInstallSagas: settings.IsFeatureActive(typeof(SqlSagaFeature)),
+                    shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
+                    shouldInstallTimeouts: settings.IsFeatureActive(typeof(SqlTimeoutFeature)))
+                .ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            //The NServiceBus host has an empty Try Catch block and does not log the exception so we need to log it here.
+            log.Error("Could not complete the schema update", e);
+            throw;
+        }
     }
 }
