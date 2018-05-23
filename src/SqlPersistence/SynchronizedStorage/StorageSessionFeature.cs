@@ -18,22 +18,19 @@ class StorageSessionFeature : Feature
         var container = context.Container;
         var connectionBuilder = settings.GetConnectionBuilder();
 
-        var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
-        var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
+        var sqlSagaPersistenceActivated = settings.IsFeatureActive(typeof(SqlSagaFeature));
 
         SagaInfoCache infoCache = null;
-        if (isSagasEnabledForSqlPersistence)
+        if (sqlSagaPersistenceActivated)
         {
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
         }
 
-        if (isOutboxEnabledForSqlPersistence || isSagasEnabledForSqlPersistence)
-        {
-            //Info cache can be null if Outbox is enabled but Sagas are disabled.
-            container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
-            container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
-        }
-        if (isSagasEnabledForSqlPersistence)
+        //Info cache can be null if Outbox is enabled but Sagas are disabled.
+        container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
+
+        if (sqlSagaPersistenceActivated)
         {
             var sagaPersister = new SagaPersister(infoCache, sqlDialect);
             container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
