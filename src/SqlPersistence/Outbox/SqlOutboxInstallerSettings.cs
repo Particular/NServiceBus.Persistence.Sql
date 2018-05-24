@@ -2,7 +2,7 @@ using System;
 using System.Data.Common;
 using NServiceBus;
 
-class InstallerSettings
+class SqlOutboxInstallerSettings
 {
     public bool Disabled { get; set; }
     public Func<DbConnection> ConnectionBuilder { get; set; }

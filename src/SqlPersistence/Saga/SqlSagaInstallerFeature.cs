@@ -1,22 +1,24 @@
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 
-class InstallerFeature : Feature
+class SqlSagaInstallerFeature : Feature
 {
-    public InstallerFeature()
+    public SqlSagaInstallerFeature()
     {
-        Defaults(s => s.SetDefault<InstallerSettings>(new InstallerSettings()));
+        Defaults(s => s.SetDefault<SqlSagaInstallerSettings>(new SqlSagaInstallerSettings()));
     }
 
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var settings = context.Settings.Get<InstallerSettings>();
+        var settings = context.Settings.Get<SqlSagaInstallerSettings>();
         if (settings.Disabled)
         {
             return;
         }
 
-        settings.ConnectionBuilder = context.Settings.GetConnectionBuilder();
+        settings.ConnectionBuilder = context.Settings.GetConnectionBuilder<StorageType.Sagas>();
+
         settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
         settings.TablePrefix = context.Settings.GetTablePrefix();
