@@ -8,7 +8,7 @@ namespace NServiceBus
         [Obsolete("Not for public use")]
         public abstract string GetSagaTableName(string tablePrefix, string tableSuffix);
         [Obsolete("Not for public use")]
-        public abstract string BuildSelectFromCommand(string tableName);
+        public abstract Func<string, string> BuildSelectFromCommand(string tableName);
         [Obsolete("Not for public use")]
         public abstract string BuildCompleteCommand(string tableName);
         [Obsolete("Not for public use")]

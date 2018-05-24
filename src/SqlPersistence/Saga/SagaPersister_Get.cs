@@ -20,9 +20,7 @@ partial class SagaPersister
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
-        var commandText = $@"
-{sagaInfo.SelectFromCommand}
-where {whereClause}";
+        var commandText = sagaInfo.SelectFromCommandBuilder(whereClause);
         return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters);
     }
 
