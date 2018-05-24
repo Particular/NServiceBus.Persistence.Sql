@@ -22,7 +22,12 @@ class SqlSubscriptionFeature : Feature
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
-        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions", new { cacheFor});
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions", 
+            new
+            {
+                EntriesCashedFor = cacheFor,
+                CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionBuilder.{typeof(StorageType.Subscriptions).Name}")
+            });
 
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
     }
