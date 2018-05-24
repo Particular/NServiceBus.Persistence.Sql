@@ -40,8 +40,7 @@ class SqlPersistenceInstaller : INeedToInstallSomething
         }
         catch (Exception e)
         {
-            //The NServiceBus host has an empty Try Catch block and does not log the exception so we need to log it here.
-            log.Error("Could not complete the schema update", e);
+            log.Error("Could not complete the installation. ", e);
             throw;
         }
     }
