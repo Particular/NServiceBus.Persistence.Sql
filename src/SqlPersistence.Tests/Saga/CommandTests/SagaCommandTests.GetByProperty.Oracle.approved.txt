@@ -7,3 +7,4 @@ select
     Data
 from TheTableName
 where CORR_THEPROPERTYNAME = :propertyValue
+for update

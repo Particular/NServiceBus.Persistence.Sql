@@ -6,4 +6,5 @@ select
     Metadata,
     Data
 from TheTableName
+with (updlock)
 where Correlation_ThePropertyName = @propertyValue

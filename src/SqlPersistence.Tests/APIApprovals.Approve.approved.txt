@@ -139,7 +139,7 @@ namespace NServiceBus
         [System.ObsoleteAttribute("Not for public use")]
         public abstract string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName);
         [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildSelectFromCommand(string tableName);
+        public abstract System.Func<string, string> BuildSelectFromCommand(string tableName);
         [System.ObsoleteAttribute("Not for public use")]
         public abstract string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName);
         [System.ObsoleteAttribute("Not for public use")]
@@ -152,7 +152,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -163,7 +163,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -174,7 +174,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -185,7 +185,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
