@@ -20,6 +20,11 @@ class SqlOutboxFeature : Feature
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
         {
+            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
+            {
+                CleanupDisabled = true
+            });
+
             return;
         }
 
@@ -27,6 +32,13 @@ class SqlOutboxFeature : Feature
         {
             var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
             var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
+
+            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
+            {
+                CleanupDisabled = false,
+                TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
+                FrequencyToRunDeduplicationDataCleanup = frequencyToRunCleanup
+            });
 
             return new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer());
         });
