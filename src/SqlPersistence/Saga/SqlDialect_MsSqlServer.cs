@@ -2,6 +2,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace NServiceBus
 {
+    using System;
     using System.Text;
 
     public partial class SqlDialect
@@ -88,6 +89,7 @@ select
     Metadata,
     Data
 from {tableName}
+with (updlock)
 where Id = @Id
 ";
             }
@@ -102,6 +104,7 @@ select
     Metadata,
     Data
 from {tableName}
+with (updlock)
 where Correlation_{propertyName} = @propertyValue
 ";
             }
@@ -114,9 +117,9 @@ where Id = @Id and Concurrency = @Concurrency
 ";
             }
 
-            public override string BuildSelectFromCommand(string tableName)
+            public override Func<string, string> BuildSelectFromCommand(string tableName)
             {
-                return $@"
+                return whereClause => $@"
 select
     Id,
     SagaTypeVersion,
@@ -124,6 +127,8 @@ select
     Metadata,
     Data
 from {tableName}
+with (updlock)
+where {whereClause}
 ";
             }
         }

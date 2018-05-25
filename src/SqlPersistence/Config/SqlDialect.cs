@@ -56,5 +56,7 @@ namespace NServiceBus
         internal virtual void ValidateTablePrefix(string tablePrefix)
         {
         }
+
+        internal abstract object GetCustomDialectDiagnosticsInfo();
     }
 }

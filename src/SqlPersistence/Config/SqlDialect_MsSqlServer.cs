@@ -52,6 +52,15 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
+            internal override object GetCustomDialectDiagnosticsInfo()
+            {
+                return new
+                {
+                    CustomSchema = string.IsNullOrEmpty(Schema),
+                    DoNotUseTransportConnection
+                };
+            }
+
             internal string Schema { get; set; }
         }
     }

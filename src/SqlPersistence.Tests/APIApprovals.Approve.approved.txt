@@ -45,6 +45,7 @@ namespace NServiceBus.Persistence.Sql
     public class static ScriptRunner
     {
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
     }
     public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
     {
@@ -99,6 +100,7 @@ namespace NServiceBus.Persistence.Sql
     public class SubscriptionSettings
     {
         public void CacheFor(System.TimeSpan timeSpan) { }
+        public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
     }
     [System.ObsoleteAttribute("Not for public use")]
@@ -117,6 +119,10 @@ namespace NServiceBus.Persistence.Sql
         public string RemoveById { get; }
         public string RemoveBySagaId { get; }
     }
+    public class TimeoutSettings
+    {
+        public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+    }
 }
 namespace NServiceBus
 {
@@ -133,7 +139,7 @@ namespace NServiceBus
         [System.ObsoleteAttribute("Not for public use")]
         public abstract string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName);
         [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildSelectFromCommand(string tableName);
+        public abstract System.Func<string, string> BuildSelectFromCommand(string tableName);
         [System.ObsoleteAttribute("Not for public use")]
         public abstract string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName);
         [System.ObsoleteAttribute("Not for public use")]
@@ -146,7 +152,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -157,7 +163,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -168,7 +174,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -179,7 +185,7 @@ namespace NServiceBus
             public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
             public override string BuildGetBySagaIdCommand(string tableName) { }
             public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override string BuildSelectFromCommand(string tableName) { }
+            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
             public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
             public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
@@ -214,6 +220,13 @@ namespace NServiceBus
         public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+    }
+    public class static SqlPersistenceOutboxSettingsExtensions
+    {
+        public static void DisableCleanup(this NServiceBus.Outbox.OutboxSettings configuration) { }
+        public static void KeepDeduplicationDataFor(this NServiceBus.Outbox.OutboxSettings configuration, System.TimeSpan timeToKeepDeduplicationData) { }
+        public static void RunDeduplicationDataCleanupEvery(this NServiceBus.Outbox.OutboxSettings configuration, System.TimeSpan frequencyToRunDeduplicationDataCleanup) { }
     }
     public class static SqlPersistenceStorageSessionExtensions
     {

@@ -68,6 +68,11 @@ namespace NServiceBus
                 }
             }
 
+            internal override object GetCustomDialectDiagnosticsInfo()
+            {
+                return new { CustomSchema = string.IsNullOrEmpty(Schema)};
+            }
+
             internal string Schema { get; set; }
 
             string SchemaPrefix => Schema != null ? $"\"{Schema.ToUpper()}\"." : "";

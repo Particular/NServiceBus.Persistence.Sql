@@ -24,6 +24,11 @@ namespace NServiceBus
                 var command = connection.CreateCommand();
                 return new CommandWrapper(command, this);
             }
+
+            internal override object GetCustomDialectDiagnosticsInfo()
+            {
+                return null;
+            }
         }
     }
 }
