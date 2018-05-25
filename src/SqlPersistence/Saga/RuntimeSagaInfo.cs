@@ -21,7 +21,7 @@ class RuntimeSagaInfo
     ConcurrentDictionary<Version, JsonSerializer> deserializers;
     public readonly Version CurrentVersion;
     public readonly string CompleteCommand;
-    public readonly string SelectFromCommand;
+    public readonly Func<string, string> SelectFromCommandBuilder;
     public readonly string GetBySagaIdCommand;
     public readonly string SaveCommand;
     public readonly string UpdateCommand;
@@ -63,7 +63,7 @@ class RuntimeSagaInfo
         TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
 
         CompleteCommand = sqlDialect.BuildCompleteCommand(TableName);
-        SelectFromCommand = sqlDialect.BuildSelectFromCommand(TableName);
+        SelectFromCommandBuilder = sqlDialect.BuildSelectFromCommand(TableName);
         GetBySagaIdCommand = sqlDialect.BuildGetBySagaIdCommand(TableName);
         SaveCommand = sqlDialect.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
         UpdateCommand = sqlDialect.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);

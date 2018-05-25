@@ -9,6 +9,9 @@ public class SetUpFixture
     [OneTimeSetUp]
     public void SetUp()
     {
+#if NET452
+        ObjectApproval.ObjectApprover.JsonSerializer.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
+#endif
         FixCurrentDirectory();
         using (var connection = MsSqlConnectionBuilder.Build())
         {

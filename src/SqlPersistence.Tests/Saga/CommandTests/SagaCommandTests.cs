@@ -55,7 +55,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildSelectFromCommand("TheTableName"));
+            Approvals.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"));
         }
     }
 

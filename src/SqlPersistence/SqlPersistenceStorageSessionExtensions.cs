@@ -28,7 +28,7 @@
             {
                 return storageSession;
             }
-            throw new Exception("The endpoint has not been configured to use SQL persistence.");
+            throw new Exception("Cannot access the SQL synchronized storage session. Either this endpoint has not been configured to use the SQL persistence or a different persistence type is used for sagas.");
         }
 
         /// <summary>

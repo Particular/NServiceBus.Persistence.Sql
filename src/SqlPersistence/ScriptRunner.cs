@@ -20,7 +20,18 @@ namespace NServiceBus.Persistence.Sql
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        {
+            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
+        }
+
+        /// <summary>
+        /// Executes the scripts produced by a Sql Persistence MSBuild task.
+        /// </summary>
+        /// <remarks>
+        /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
+        /// </remarks>
+        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
             Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
@@ -29,30 +40,38 @@ namespace NServiceBus.Persistence.Sql
             Guard.AgainstNullAndEmpty(nameof(scriptDirectory), scriptDirectory);
             sqlDialect.ValidateTablePrefix(tablePrefix);
 
-            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
-            using (var transaction = connection.BeginTransaction())
+            if (shouldInstallOutbox)
             {
-                if (shouldInstallOutbox)
-                {
-                    await InstallOutbox(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-                }
+                await ExecuteInSeparateConnection<StorageType.Outbox>(InstallOutbox, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+            }
 
-                if (shouldInstallSagas)
-                {
-                    await InstallSagas(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-                }
+            if (shouldInstallSagas)
+            {
+                await ExecuteInSeparateConnection<StorageType.Sagas>(InstallSagas, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+            }
 
-                if (shouldInstallSubscriptions)
-                {
-                    await InstallSubscriptions(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-                }
+            if (shouldInstallSubscriptions)
+            {
+                await ExecuteInSeparateConnection<StorageType.Subscriptions>(InstallSubscriptions, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+            }
 
-                if (shouldInstallTimeouts)
-                {
-                    await InstallTimeouts(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
-                }
+            if (shouldInstallTimeouts)
+            {
+                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+            }
+        }
 
-                transaction.Commit();
+        static async Task ExecuteInSeparateConnection<T>(Func<string, DbConnection, DbTransaction, string, SqlDialect, Task> installAction, string scriptDirectory, string tablePrefix, SqlDialect sqlDialect, Func<Type, DbConnection> connectionBuilder)
+            where T : StorageType
+        {
+            using (var connection = connectionBuilder(typeof(T)))
+            {
+                await connection.OpenAsync().ConfigureAwait(false);
+                using (var transaction = connection.BeginTransaction())
+                {
+                    await installAction(scriptDirectory, connection, transaction, tablePrefix, sqlDialect).ConfigureAwait(false);
+                    transaction.Commit();
+                }
             }
         }
 
