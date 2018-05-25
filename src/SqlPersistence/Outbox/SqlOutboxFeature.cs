@@ -28,20 +28,18 @@ class SqlOutboxFeature : Feature
             return;
         }
 
-        context.RegisterStartupTask(b =>
+        var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
+        var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
+
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
         {
-            var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
-            var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
-
-            settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Outbox", new
-            {
-                CleanupDisabled = false,
-                TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
-                FrequencyToRunDeduplicationDataCleanup = frequencyToRunCleanup
-            });
-
-            return new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer());
+            CleanupDisabled = false,
+            TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
+            FrequencyToRunDeduplicationDataCleanup = frequencyToRunCleanup
         });
+
+        context.RegisterStartupTask(b => 
+            new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
