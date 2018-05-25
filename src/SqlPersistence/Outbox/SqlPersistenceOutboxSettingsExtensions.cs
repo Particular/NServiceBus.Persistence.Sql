@@ -43,6 +43,8 @@
         /// </summary>
         public static void DisableCleanup(this OutboxSettings configuration)
         {
+            Guard.AgainstNull(nameof(configuration), configuration);
+
             configuration.GetSettings().Set(SqlOutboxFeature.DisableCleanup, true);
         }
     }
