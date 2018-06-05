@@ -24,16 +24,6 @@
             }
         }
 
-        void VerifyBase()
-        {
-            var baseTypeFullName = GetType().BaseType.FullName;
-            var fullName = typeof(SqlSaga<>).FullName;
-            if (!baseTypeFullName.StartsWith(fullName))
-            {
-                throw new Exception($"Implementations of {fullName} must inherit from it directly. Deep class hierarchies are not supported.");
-            }
-        }
-
         /// <summary>
         /// Gets the name of the correlation property for <typeparamref name="TSagaData"/>.
         /// </summary>
@@ -70,7 +60,6 @@
         protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
             VerifyNoConfigureHowToFindSaga();
-            VerifyBase();
             var propertyMapper = new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType());
             ConfigureMapping(propertyMapper);
         }

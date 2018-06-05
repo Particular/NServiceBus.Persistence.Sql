@@ -1,0 +1,15 @@
+﻿{
+  "HasUnmanagedCalls": false,
+  "HasUnexpectedCalls": false,
+  "HasBranchingLogic": false,
+  "SagaDefinition": {
+    "TableSuffix": "ConcatMsgPropertiesWithOtherMethods",
+    "CorrelationProperty": {
+      "Type": "String",
+      "Name": "Correlation"
+    },
+    "TransitionalCorrelationProperty": null,
+    "Name": "CoreSagaMetadataTests/ConcatMsgPropertiesWithOtherMethods"
+  },
+  "Exception": null
+}

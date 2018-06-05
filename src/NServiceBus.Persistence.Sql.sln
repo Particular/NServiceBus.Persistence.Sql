@@ -40,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlAcceptanceTests.SqlTransport", "MsSqlAcceptanceTests.SqlTransport\MsSqlAcceptanceTests.SqlTransport.csproj", "{0E98C052-F67F-4826-A344-7685504CA955}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBTestCode", "VBTestCode\VBTestCode.vbproj", "{86E76F2D-6743-442E-BDAD-80D6A872D4FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,10 @@ Global
 		{0E98C052-F67F-4826-A344-7685504CA955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E98C052-F67F-4826-A344-7685504CA955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E98C052-F67F-4826-A344-7685504CA955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86E76F2D-6743-442E-BDAD-80D6A872D4FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86E76F2D-6743-442E-BDAD-80D6A872D4FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86E76F2D-6743-442E-BDAD-80D6A872D4FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86E76F2D-6743-442E-BDAD-80D6A872D4FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
