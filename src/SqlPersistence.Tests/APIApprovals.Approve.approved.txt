@@ -76,6 +76,14 @@ namespace NServiceBus.Persistence.Sql
         protected override void ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    public sealed class SqlSagaAttribute : System.Attribute
+    {
+        public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
+        public string CorrelationProperty { get; }
+        public string TableSuffix { get; }
+        public string TransitionalCorrelationProperty { get; }
+    }
     [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
         "n version 5.0.0.", true)]
     public enum SqlVariant
