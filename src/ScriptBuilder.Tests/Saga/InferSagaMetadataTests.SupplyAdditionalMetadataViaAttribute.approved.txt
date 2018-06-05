@@ -1,0 +1,12 @@
+﻿{
+  "TableSuffix": "DifferentTableSuffix",
+  "CorrelationProperty": {
+    "Type": "String",
+    "Name": "Correlation"
+  },
+  "TransitionalCorrelationProperty": {
+    "Type": "String",
+    "Name": "TransitionalCorrId"
+  },
+  "Name": "InferSagaMetadataTests/MetadataInAttributeSaga"
+}

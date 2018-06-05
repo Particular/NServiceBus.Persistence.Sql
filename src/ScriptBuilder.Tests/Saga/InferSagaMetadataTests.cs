@@ -358,6 +358,30 @@ public class InferSagaMetadataTests
         }
     }
 
+    [Test]
+    public void SupplyAdditionalMetadataViaAttribute()
+    {
+        var dataType = module.GetTypeDefinition<MetadataInAttributeSaga>();
+        SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
+        ObjectApprover.VerifyWithJson(definition);
+    }
+
+    [SqlSaga(transitionalCorrelationProperty: "TransitionalCorrId", tableSuffix: "DifferentTableSuffix")]
+    public class MetadataInAttributeSaga : Saga<MetadataInAttributeSaga.SagaData>
+    {
+        public class SagaData : ContainSagaData
+        {
+            public string Correlation { get; set; }
+            public string TransitionalCorrId { get; set; }
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
+        }
+    }
+
+
     public class MessageA : ICommand
     {
         public string Correlation { get; set; }
