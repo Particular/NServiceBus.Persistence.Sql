@@ -1,13 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class SagaDefinitionReader
 {
-    public static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
+    public static bool TryGetSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
-        ValidateIsNotDirectSaga(type);
+        return TryGetSqlSagaDefinition(type, out definition)
+               || TryGetCoreSagaDefinition(type, out definition);
+    }
+
+    static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
+    { 
         if (!IsSqlSaga(type))
         {
             definition = null;
@@ -15,9 +21,14 @@ static class SagaDefinitionReader
         }
         CheckIsValidSaga(type);
 
+        if (type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute") != null)
+        {
+            throw new Exception("[SqlSaga] attribute is invalid on a class inheriting SqlSaga<T>. To provide CorrelationId, TransitionalCorrelationId, or TableSuffix override the corresponding properties on the SqlSaga<T> base class instead.");
+        }
+
         var correlation = GetCorrelationPropertyName(type);
         var transitional = GetTransitionalCorrelationPropertyName(type);
-        var tableSuffix = GetTableSuffix(type);
+        var tableSuffix = GetSqlSagaTableSuffix(type);
 
         SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional, tableSuffix);
 
@@ -36,6 +47,79 @@ static class SagaDefinitionReader
             name: type.FullName
         );
         return true;
+    }
+
+    static bool TryGetCoreSagaDefinition(TypeDefinition type, out SagaDefinition definition)
+    {
+        var baseType = type.BaseType as GenericInstanceType;
+        definition = null;
+
+        // Class must directly inherit from NServiceBus.Saga<T> so that no tricks can be pulled from an intermediate class
+        if (baseType == null || !baseType.FullName.StartsWith("NServiceBus.Saga") || baseType.GenericArguments.Count != 1)
+        {
+            return false;
+        }
+
+        CheckIsValidSaga(type);
+
+        string correlationId = null;
+        string transitionalId = null;
+        string tableSuffix = null;
+
+        var attribute = type.GetSingleAttribute("NServiceBus.Persistence.Sql.SqlSagaAttribute");
+        if (attribute != null)
+        {
+            var args = attribute.ConstructorArguments;
+            correlationId = (string)args[0].Value;
+            transitionalId = (string)args[1].Value;
+            tableSuffix = (string)args[2].Value;
+        }
+
+        var sagaDataType = GetSagaDataTypeFromSagaType(type);
+
+        if (correlationId == null)
+        {
+            correlationId = GetCoreSagaCorrelationId(type, sagaDataType);
+        }
+
+        SagaDefinitionValidator.ValidateSagaDefinition(correlationId, type.FullName, transitionalId, tableSuffix);
+
+        if (tableSuffix == null)
+        {
+            tableSuffix = type.Name;
+        }
+
+        definition = new SagaDefinition
+        (
+            correlationProperty: BuildConstraintProperty(sagaDataType, correlationId),
+            transitionalCorrelationProperty: BuildConstraintProperty(sagaDataType, transitionalId),
+            tableSuffix: tableSuffix,
+            name: type.FullName
+        );
+        return true;
+    }
+
+    static string GetCoreSagaCorrelationId(TypeDefinition type, TypeDefinition sagaDataType)
+    {
+        var instructions = InstructionAnalyzer.GetConfigureHowToFindSagaInstructions(type);
+
+        if (InstructionAnalyzer.ContainsBranchingLogic(instructions))
+        {
+            throw new ErrorsException("Looping & branching statements are not allowed in a ConfigureHowToFindSaga method.");
+        }
+
+        if (InstructionAnalyzer.CallsUnmanagedMethods(instructions))
+        {
+            throw new ErrorsException("Calling unmanaged code is not allowed in a ConfigureHowToFindSaga method.");
+        }
+
+        if (InstructionAnalyzer.CallsUnexpectedMethods(instructions))
+        {
+            throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method.");
+        }
+
+        var correlationId = InstructionAnalyzer.GetCorrelationId(instructions, sagaDataType.FullName);
+        return correlationId;
     }
 
     static string GetCorrelationPropertyName(TypeDefinition type)
@@ -67,7 +151,7 @@ When all messages are mapped using finders then use the following: protected ove
 For example: protected override string TransitionalCorrelationPropertyName => nameof(SagaData.TheProperty);");
     }
 
-    static string GetTableSuffix(TypeDefinition type)
+    static string GetSqlSagaTableSuffix(TypeDefinition type)
     {
         if (!type.TryGetProperty("TableSuffix", out var property))
         {
@@ -103,19 +187,6 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
         }
         return baseType.Scope.Name.StartsWith("NServiceBus.Persistence.Sql") &&
                baseType.FullName.StartsWith("NServiceBus.Persistence.Sql.SqlSaga");
-    }
-
-    static void ValidateIsNotDirectSaga(TypeDefinition type)
-    {
-        if (type.BaseType == null)
-        {
-            return;
-        }
-        var baseTypeFullName = type.BaseType.FullName;
-        if (baseTypeFullName.StartsWith("NServiceBus.Saga"))
-        {
-            throw new ErrorsException($"The type '{type.FullName}' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.");
-        }
     }
 
     static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
