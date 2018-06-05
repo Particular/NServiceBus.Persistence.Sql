@@ -5,7 +5,7 @@
     using EndpointTemplates;
     using NUnit.Framework;
 
-    class When_correlating_special_chars : NServiceBusAcceptanceTest
+    partial class When_correlating_special_chars : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Saga_persistence_and_correlation_should_work()
