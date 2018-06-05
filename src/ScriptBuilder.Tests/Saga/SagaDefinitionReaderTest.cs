@@ -73,31 +73,6 @@ public class SagaDefinitionReaderTest: IDisposable
     }
 
     [Test]
-    public void NonSqlSaga()
-    {
-        var sagaType = module.GetTypeDefinition<NonSqlSagaSaga>();
-        var exception = Assert.Throws<ErrorsException>(() =>
-        {
-            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
-        });
-        Assert.IsNotNull(exception.Message);
-#if NET452
-        Approvals.Verify(exception.Message);
-#endif
-    }
-
-    public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
-    }
-
-    [Test]
     public void Simple()
     {
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
