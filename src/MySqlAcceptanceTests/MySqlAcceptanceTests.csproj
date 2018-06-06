@@ -22,4 +22,13 @@
     <Compile Include="..\SharedAcceptanceTests\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="\**\DelayedDelivery\When_using_special_characters_in_headers.cs" />
+    <Compile Remove="\**\Outbox\When_headers_contain_special_characters.cs" />
+    <Compile Remove="\**\Sagas\When_correlating_on_special_characters.cs" />
+    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
+    <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
+    <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
+  </ItemGroup>
+
 </Project>
