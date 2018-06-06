@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\NoPersistenceServer.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_auditing_message_with_TimeToBeReceived.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Audit\When_audit_is_overridden_in_code.cs" />
@@ -212,8 +211,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_receiving_with_the_default_settings.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
-    <Compile Include="App_Packages\When_using_outbox_but_no_sagas.cs" />
-    <Compile Include="App_Packages\When_using_different_persistence.cs" />
     <Compile Include="Partials\When_Deferring_a_message.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="TestSuiteConstraints.cs" />
