@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Mono.Cecil;
-using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 #if NET452
