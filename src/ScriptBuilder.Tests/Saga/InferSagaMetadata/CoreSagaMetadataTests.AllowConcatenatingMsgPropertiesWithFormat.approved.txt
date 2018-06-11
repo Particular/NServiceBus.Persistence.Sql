@@ -5,5 +5,5 @@
     "Name": "Correlation"
   },
   "TransitionalCorrelationProperty": null,
-  "Name": "InferSagaMetadataTests/ConcatMsgPropertiesWithFormatSaga"
+  "Name": "CoreSagaMetadataTests/ConcatMsgPropertiesWithFormatSaga"
 }

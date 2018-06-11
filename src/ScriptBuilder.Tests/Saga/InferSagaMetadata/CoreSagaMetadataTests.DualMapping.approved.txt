@@ -1,9 +1,9 @@
 ﻿{
-  "TableSuffix": "SingleMappingSaga",
+  "TableSuffix": "DualMappingSaga",
   "CorrelationProperty": {
     "Type": "String",
     "Name": "Correlation"
   },
   "TransitionalCorrelationProperty": null,
-  "Name": "InferSagaMetadataTests/SingleMappingSaga"
+  "Name": "CoreSagaMetadataTests/DualMappingSaga"
 }

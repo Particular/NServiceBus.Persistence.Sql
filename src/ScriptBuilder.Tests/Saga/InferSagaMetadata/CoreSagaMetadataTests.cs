@@ -9,7 +9,7 @@ using ObjectApproval;
 #endif
 
 [TestFixture]
-public class InferSagaMetadataTests
+public class CoreSagaMetadataTests
 {
     ModuleDefinition module;
 
@@ -23,7 +23,7 @@ public class InferSagaMetadataTests
     }
 #endif
 
-    public InferSagaMetadataTests()
+    public CoreSagaMetadataTests()
     {
         var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         var readerParameters = new ReaderParameters(ReadingMode.Deferred);

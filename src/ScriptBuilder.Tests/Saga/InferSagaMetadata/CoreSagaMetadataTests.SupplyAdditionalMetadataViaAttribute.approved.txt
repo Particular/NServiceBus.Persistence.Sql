@@ -8,5 +8,5 @@
     "Type": "String",
     "Name": "TransitionalCorrId"
   },
-  "Name": "InferSagaMetadataTests/MetadataInAttributeSaga"
+  "Name": "CoreSagaMetadataTests/MetadataInAttributeSaga"
 }

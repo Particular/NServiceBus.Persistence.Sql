@@ -5,5 +5,5 @@
     "Name": "Correlation"
   },
   "TransitionalCorrelationProperty": null,
-  "Name": "InferSagaMetadataTests/SingleMappingValueTypeSaga"
+  "Name": "CoreSagaMetadataTests/SingleMappingValueTypeSaga"
 }
