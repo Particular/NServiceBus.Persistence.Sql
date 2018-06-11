@@ -103,9 +103,12 @@ static class SagaDefinitionReader
             throw new ErrorsException("Looping & branching statements are not allowed in a ConfigureHowToFindSaga method.");
         }
 
+        var correlationId = coreSagaCorrelationPropertyReader.GetCorrelationId();
+
+
         // -- Divider---------
 
-        string correlationId = null;
+
         var permissiveMode = true;
 
         var sagaDataTypeName = sagaDataType.FullName;
@@ -183,39 +186,6 @@ static class SagaDefinitionReader
 
                     // Any other callvirt is not OK, bail out
                     throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method. (OpCode: callvirt)");
-
-                case Code.Ldtoken:
-                    var methodDefinition = instruction.Operand as MethodDefinition;
-
-                    // Some Ldtokens have operands of type TypeDefinition, for loading types
-                    if (methodDefinition == null)
-                    {
-                        continue;
-                    }
-
-                    // The method being loaded may be on wrong type, like getter for the message property
-                    if (methodDefinition.DeclaringType.FullName != sagaDataTypeName)
-                    {
-                        continue;
-                    }
-
-                    // If we're not getting a property, we're doing something unexpected, so bail out
-                    if (!methodDefinition.Name.StartsWith("get_"))
-                    {
-                        throw new ErrorsException("ToSaga() expression in Saga's ConfigureHowToFindSaga method should point to a saga data property.");
-                    }
-
-                    // methodDefinition.Name is the IL for the property, i.e. "get_Correlation"
-                    var instanceCorrelation = methodDefinition.Name.Substring(4);
-                    if (correlationId == null)
-                    {
-                        correlationId = instanceCorrelation;
-                    }
-                    else if (instanceCorrelation != correlationId)
-                    {
-                        throw new ErrorsException("Saga can only have one correlation property identified by .ToSaga() expressions. Fix mappings in ConfigureHowToFindSaga to map to a single correlation property or decorate the saga with [SqlSaga] attribute.");
-                    }
-                    break;
             }
         }
         return correlationId;
