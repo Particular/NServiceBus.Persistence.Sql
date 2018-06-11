@@ -97,6 +97,14 @@ static class SagaDefinitionReader
 
     static string InferCorrelationId(TypeDefinition type, TypeDefinition sagaDataType)
     {
+        var coreSagaCorrelationPropertyReader = new CoreSagaCorrelationPropertyReader(type, sagaDataType);
+        if (coreSagaCorrelationPropertyReader.ContainsBranchingLogic())
+        {
+            throw new ErrorsException("Looping & branching statements are not allowed in a ConfigureHowToFindSaga method.");
+        }
+
+        // -- Divider---------
+
         string correlationId = null;
         var permissiveMode = true;
 
@@ -108,7 +116,7 @@ static class SagaDefinitionReader
         }
 
         //For debugging
-        //var il = String.Join(Environment.NewLine, configureMethod.Body.Instructions.Select(i => i.ToString()).ToArray());
+        var il = String.Join(Environment.NewLine, configureMethod.Body.Instructions.Select(i => $"{i}").ToArray());
 
         foreach (var instruction in configureMethod.Body.Instructions)
         {
@@ -206,14 +214,6 @@ static class SagaDefinitionReader
                     else if (instanceCorrelation != correlationId)
                     {
                         throw new ErrorsException("Saga can only have one correlation property identified by .ToSaga() expressions. Fix mappings in ConfigureHowToFindSaga to map to a single correlation property or decorate the saga with [SqlSaga] attribute.");
-                    }
-                    break;
-
-                default:
-                    // Any branching logic is not OK
-                    if (instruction.OpCode.FlowControl == FlowControl.Branch)
-                    {
-                        throw new ErrorsException("Branching statements are not allowed in a ConfigureHowToFindSaga method.");
                     }
                     break;
             }
