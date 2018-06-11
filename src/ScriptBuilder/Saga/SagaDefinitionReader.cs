@@ -103,6 +103,11 @@ static class SagaDefinitionReader
             throw new ErrorsException("Looping & branching statements are not allowed in a ConfigureHowToFindSaga method.");
         }
 
+        if (coreSagaCorrelationPropertyReader.CallsUnmanagedMethods())
+        {
+            throw new ErrorsException("Calling unmanaged code is not allowed in a ConfigureHowToFindSaga method.");
+        }
+
         var correlationId = coreSagaCorrelationPropertyReader.GetCorrelationId();
 
 
@@ -156,10 +161,6 @@ static class SagaDefinitionReader
 
                     // Any other method call is not OK, bail out
                     throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method. (OpCode: call)");
-
-                case Code.Calli:
-                    // Don't know of any valid uses for this call type, bail out
-                    throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method. (OpCode: calli)");
 
                 case Code.Callvirt:
                     var virtMethod = instruction.Operand as MethodReference;

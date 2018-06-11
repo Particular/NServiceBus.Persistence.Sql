@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
@@ -8,6 +9,7 @@ class CoreSagaCorrelationPropertyReader
 {
     string sagaDataTypeName;
     Collection<Instruction> instructions;
+    ILookup<Code, Instruction> instructionsLookup;
 
     public CoreSagaCorrelationPropertyReader(TypeDefinition type, TypeDefinition sagaDataType)
     {
@@ -19,6 +21,7 @@ class CoreSagaCorrelationPropertyReader
         }
 
         this.instructions = configureMethod.Body.Instructions;
+        this.instructionsLookup = instructions.ToLookup(instruction => instruction.OpCode.Code);
     }
 
     public bool ContainsBranchingLogic()
@@ -67,6 +70,13 @@ class CoreSagaCorrelationPropertyReader
         }
 
         return list.FirstOrDefault();
+    }
+
+    public bool CallsUnmanagedMethods()
+    {
+        // OpCode Calli is for calling into unmanaged code. Certainly don't need to be doing that inside
+        // a ConfigureHowToFindSaga method: https://msdn.microsoft.com/en-us/library/d81ee808.aspx
+        return instructionsLookup.Contains(Code.Calli);
     }
 
 }
