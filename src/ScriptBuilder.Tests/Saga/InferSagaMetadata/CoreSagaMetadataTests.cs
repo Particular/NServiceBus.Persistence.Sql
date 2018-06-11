@@ -9,7 +9,7 @@ using ObjectApproval;
 #endif
 
 [TestFixture]
-public class CoreSagaMetadataTests
+public partial class CoreSagaMetadataTests
 {
     ModuleDefinition module;
 
@@ -38,38 +38,12 @@ public class CoreSagaMetadataTests
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    public class SingleMappingSaga : Saga<SingleMappingSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
-    }
-
     [Test]
     public void SingleMappingValueType()
     {
         var dataType = module.GetTypeDefinition<SingleMappingValueTypeSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
-    }
-
-    public class SingleMappingValueTypeSaga : Saga<SingleMappingValueTypeSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public int Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
     }
 
     [Test]
@@ -80,49 +54,12 @@ public class CoreSagaMetadataTests
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    public class DualMappingSaga : Saga<DualMappingSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            mapper.ConfigureMapping<MessageB>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
-    }
-
     [Test]
     public void DontMapWithIntermediateBase()
     {
         var dataType = module.GetTypeDefinition<HasBaseSagaClass>();
         SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
         Assert.IsNull(definition);
-    }
-
-    public class HasBaseSagaClass : BaseSaga<HasBaseSagaClass.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            base.ConfigureHowToFindSaga(mapper);
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
-    }
-
-    public class BaseSaga<TSaga> : Saga<TSaga>
-        where TSaga : class, IContainSagaData, new()
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSaga> mapper)
-        {
-
-        }
     }
 
     [Test]
@@ -136,24 +73,6 @@ public class CoreSagaMetadataTests
 
     }
 
-    public class MethodCallInMappingSaga : Saga<MethodCallInMappingSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => MapInMethod(saga));
-        }
-
-        static object MapInMethod(SagaData data)
-        {
-            return data.Correlation;
-        }
-    }
-
     [Test]
     public void DontAllowPassingMapper()
     {
@@ -165,24 +84,6 @@ public class CoreSagaMetadataTests
 
     }
 
-    public class PassingMapperSaga : Saga<PassingMapperSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            PassTheMapper(mapper);
-        }
-
-        static void PassTheMapper(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
-    }
-
     [Test]
     public void DontMapConflictingCorrelationIds()
     {
@@ -191,22 +92,6 @@ public class CoreSagaMetadataTests
         {
             SagaDefinitionReader.TryGetSagaDefinition(dataType, out _);
         });
-
-    }
-
-    public class ConflictingCorrelationSaga : Saga<ConflictingCorrelationSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-            public string OtherProperty { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            mapper.ConfigureMapping<MessageB>(msg => msg.Correlation).ToSaga(saga => saga.OtherProperty);
-        }
     }
 
     [Test]
@@ -220,29 +105,6 @@ public class CoreSagaMetadataTests
 
     }
 
-    public class SwitchingLogicSaga : Saga<SwitchingLogicSaga.SagaData>
-    {
-        int number = 0;
-
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-            public string OtherProperty { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            if (number > 0)
-            {
-                mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            }
-            else
-            {
-                mapper.ConfigureMapping<MessageB>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            }
-        }
-    }
-
     [Test]
     public void DontMapDelegateCalls()
     {
@@ -254,45 +116,15 @@ public class CoreSagaMetadataTests
 
     }
 
-    public class DelegateCallingSaga : Saga<DelegateCallingSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            Action action = () => mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            action();
-        }
-    }
-
     [Test]
     public void DontAllowLooping()
     {
-        var dataType = module.GetTypeDefinition<LoopingSaga>();
+        var dataType = module.GetTypeDefinition<ForLoopSaga>();
         Assert.Throws<ErrorsException>(() =>
         {
             SagaDefinitionReader.TryGetSagaDefinition(dataType, out _);
         });
 
-    }
-
-    public class LoopingSaga : Saga<LoopingSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            for (var i = 0; i < 3; i++)
-            {
-                mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            }
-        }
     }
 
     [Test]
@@ -303,38 +135,12 @@ public class CoreSagaMetadataTests
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    public class ConcatMsgPropertiesSaga : Saga<ConcatMsgPropertiesSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageC>(msg => msg.Part1 + msg.Part2).ToSaga(saga => saga.Correlation);
-        }
-    }
-
     [Test]
     public void AllowConcatenatingMsgPropertiesWithFormat()
     {
         var dataType = module.GetTypeDefinition<ConcatMsgPropertiesWithFormatSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
         ObjectApprover.VerifyWithJson(definition);
-    }
-
-    public class ConcatMsgPropertiesWithFormatSaga : Saga<ConcatMsgPropertiesWithFormatSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageC>(msg => string.Format("{0}{1}", msg.Part1, msg.Part2)).ToSaga(saga => saga.Correlation);
-        }
     }
 
     [Test]
@@ -345,19 +151,6 @@ public class CoreSagaMetadataTests
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    public class ConcatMsgPropertiesWithInterpolationSaga : Saga<ConcatMsgPropertiesWithInterpolationSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageC>(msg => $"{msg.Part1}{msg.Part2}").ToSaga(saga => saga.Correlation);
-        }
-    }
-
     [Test]
     public void SupplyAdditionalMetadataViaAttribute()
     {
@@ -366,36 +159,9 @@ public class CoreSagaMetadataTests
         ObjectApprover.VerifyWithJson(definition);
     }
 
-    [SqlSaga(transitionalCorrelationProperty: "TransitionalCorrId", tableSuffix: "DifferentTableSuffix")]
-    public class MetadataInAttributeSaga : Saga<MetadataInAttributeSaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; set; }
-            public string TransitionalCorrId { get; set; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
-    }
+    
 
 
-    public class MessageA : ICommand
-    {
-        public string Correlation { get; set; }
-    }
 
-    public class MessageB : ICommand
-    {
-        public string Correlation { get; set; }
-    }
-
-    public class MessageC : ICommand
-    {
-        public string Part1 { get; set; }
-        public string Part2 { get; set; }
-    }
 
 }
