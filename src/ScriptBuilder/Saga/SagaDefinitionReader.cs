@@ -10,7 +10,7 @@ static class SagaDefinitionReader
     public static bool TryGetSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
         return TryGetSqlSagaDefinition(type, out definition)
-               || TryInferSagaDefinition(type, out definition);
+               || TryGetCoreSagaDefinition(type, out definition);
     }
 
     static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
@@ -45,7 +45,7 @@ static class SagaDefinitionReader
         return true;
     }
 
-    static bool TryInferSagaDefinition(TypeDefinition type, out SagaDefinition definition)
+    static bool TryGetCoreSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
         var baseType = type.BaseType as GenericInstanceType;
         definition = null;
