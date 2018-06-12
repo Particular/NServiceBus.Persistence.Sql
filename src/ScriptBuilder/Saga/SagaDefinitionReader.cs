@@ -73,7 +73,7 @@ static class SagaDefinitionReader
 
         if (correlationId == null)
         {
-            correlationId = InferCorrelationId(type, sagaDataType);
+            correlationId = GetCoreSagaCorrelationId(type, sagaDataType);
         }
 
         SagaDefinitionValidator.ValidateSagaDefinition(correlationId, type.FullName, transitionalId, tableSuffix);
@@ -93,25 +93,26 @@ static class SagaDefinitionReader
         return true;
     }
 
-    static string InferCorrelationId(TypeDefinition type, TypeDefinition sagaDataType)
+    static string GetCoreSagaCorrelationId(TypeDefinition type, TypeDefinition sagaDataType)
     {
-        var coreSagaCorrelationPropertyReader = new CoreSagaCorrelationPropertyReader(type, sagaDataType);
-        if (coreSagaCorrelationPropertyReader.ContainsBranchingLogic())
+        var instructions = InstructionAnalyzer.GetConfigureHowToFindSagaInstructions(type);
+
+        if (InstructionAnalyzer.ContainsBranchingLogic(instructions))
         {
             throw new ErrorsException("Looping & branching statements are not allowed in a ConfigureHowToFindSaga method.");
         }
 
-        if (coreSagaCorrelationPropertyReader.CallsUnmanagedMethods())
+        if (InstructionAnalyzer.CallsUnmanagedMethods(instructions))
         {
             throw new ErrorsException("Calling unmanaged code is not allowed in a ConfigureHowToFindSaga method.");
         }
 
-        if (coreSagaCorrelationPropertyReader.CallsUnexpectedMethods())
+        if (InstructionAnalyzer.CallsUnexpectedMethods(instructions))
         {
             throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method.");
         }
 
-        var correlationId = coreSagaCorrelationPropertyReader.GetCorrelationId();
+        var correlationId = InstructionAnalyzer.GetCorrelationId(instructions, sagaDataType.FullName);
         return correlationId;
     }
 

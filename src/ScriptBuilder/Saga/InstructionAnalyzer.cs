@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using NServiceBus.Persistence.Sql;
 
-class CoreSagaCorrelationPropertyReader
+static class InstructionAnalyzer
 {
-    string sagaDataTypeName;
-    Collection<Instruction> instructions;
     static HashSet<string> allowedMethods;
 
-    static CoreSagaCorrelationPropertyReader()
+    static InstructionAnalyzer()
     {
         allowedMethods = new HashSet<string>(new[]
         {
@@ -27,37 +24,24 @@ class CoreSagaCorrelationPropertyReader
         }, StringComparer.Ordinal);
     }
 
-    public CoreSagaCorrelationPropertyReader(TypeDefinition type, TypeDefinition sagaDataType)
+    public static IList<Instruction> GetConfigureHowToFindSagaInstructions(TypeDefinition sagaTypeDefinition)
     {
-        sagaDataTypeName = sagaDataType.FullName;
-        var configureMethod = type.Methods.FirstOrDefault(m => m.Name == "ConfigureHowToFindSaga");
+        var configureMethod = sagaTypeDefinition.Methods.FirstOrDefault(m => m.Name == "ConfigureHowToFindSaga");
         if (configureMethod == null)
         {
             throw new ErrorsException("Saga does not contain a ConfigureHowToFindSaga method.");
         }
 
-        this.instructions = configureMethod.Body.Instructions;
+        return configureMethod.Body.Instructions;
     }
 
-    public bool ContainsBranchingLogic()
+    public static bool ContainsBranchingLogic(IList<Instruction> instructions)
     {
         return instructions.Any(instruction => instruction.OpCode.FlowControl == FlowControl.Branch
             || instruction.OpCode.FlowControl == FlowControl.Cond_Branch);
     }
 
-    public string GetCorrelationId()
-    {
-        var list = GetPotentialCorrelationIds();
-
-        if (list.Length > 1)
-        {
-            throw new ErrorsException("Saga can only have one correlation property identified by .ToSaga() expressions. Fix mappings in ConfigureHowToFindSaga to map to a single correlation property or decorate the saga with [SqlSaga] attribute.");
-        }
-
-        return list.FirstOrDefault();
-    }
-
-    string[] GetPotentialCorrelationIds()
+    public static string GetCorrelationId(IList<Instruction> instructions, string sagaDataTypeName)
     {
         var loadInstructionsOnSagaData = instructions
             .Where(instruction => instruction.OpCode.Code == Code.Ldtoken)
@@ -84,17 +68,22 @@ class CoreSagaCorrelationPropertyReader
             .Distinct()
             .ToArray();
 
-        return correlationList;
+        if (correlationList.Length > 1)
+        {
+            throw new ErrorsException("Saga can only have one correlation property identified by .ToSaga() expressions. Fix mappings in ConfigureHowToFindSaga to map to a single correlation property or decorate the saga with [SqlSaga] attribute.");
+        }
+
+        return correlationList.FirstOrDefault();
     }
 
-    public bool CallsUnmanagedMethods()
+    public static bool CallsUnmanagedMethods(IList<Instruction> instructions)
     {
         // OpCode Calli is for calling into unmanaged code. Certainly don't need to be doing that inside
         // a ConfigureHowToFindSaga method: https://msdn.microsoft.com/en-us/library/d81ee808.aspx
         return instructions.Any(instruction => instruction.OpCode.Code == Code.Calli);
     }
 
-    public bool CallsUnexpectedMethods()
+    public static bool CallsUnexpectedMethods(IList<Instruction> instructions)
     {
         var methodRefs = instructions
             .Where(instruction => instruction.OpCode.Code == Code.Call || instruction.OpCode.Code == Code.Callvirt)
@@ -116,18 +105,31 @@ class CoreSagaCorrelationPropertyReader
                 IsToSaga = IsToSagaMethodCall(methodRef),
                 IsExpressionCall = IsExpressionCall(methodRef)
             })
-            .Reverse()
+            .Reverse()  // <----- Note on reversal below
             .ToArray();
+
+        /* The ability to do Call expressions is necessary on the message mapping side in order to be able to,
+         * for instance, concatenate 2 message properties together into one value to look up in the saga data,
+         * i.e. ConfigureMapping(msg => $"{msg.PropA}/{msg.PropB}), and honestly in the message mapping portion
+         * we don't really care. But in the saga data portion, we want to be more conservative. Because of the way
+         * IL works, you have to get your arguments set up before you invoke the method with the pointers to
+         * arguments stored in registers, so that means everything related to ConfigureMapping comes BEFORE that call,
+         * and everything relating to ToSaga (where the correlation id will come from) comes before THAT call. By
+         * reversing the order of the methods that are left, we can see ConfigureMapping and ToSaga as signposts to
+         * determine whether the upcoming calls are either allowed or not.
+         */
 
         var expressionCallsAllowed = false;
         foreach (var item in interestingCalls)
         {
             if (item.IsConfigureMapping)
             {
+                // This expression call (and those after) came before ConfigureMapping, meaning it's an argument of ConfigureMapping. It's OK.
                 expressionCallsAllowed = true;
             }
             else if (item.IsToSaga)
             {
+                // This expression call (and those after) came before ToSaga, meaning it's an argument of ToSaga. Don't allow it.
                 expressionCallsAllowed = false;
             }
 
@@ -151,14 +153,14 @@ class CoreSagaCorrelationPropertyReader
         public bool? ExpressionCallsAllowed { get; set; }
     }
 
-    bool IsConfigureMappingMethodCall(MethodReference methodRef)
+    static bool IsConfigureMappingMethodCall(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
         return methodRef.Name == "ConfigureMapping" 
                && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
     }
 
-    bool IsToSagaMethodCall(MethodReference methodRef)
+    static bool IsToSagaMethodCall(MethodReference methodRef)
     {
         // FullName would be NServiceBus.ToSagaExpression<SagaData,MessageType>
         // Don't validate the entire thing because we won't know the message type, and could be called multiple times
@@ -166,7 +168,7 @@ class CoreSagaCorrelationPropertyReader
                && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.ToSagaExpression`");
     }
 
-    bool IsExpressionCall(MethodReference methodRef)
+    static bool IsExpressionCall(MethodReference methodRef)
     {
         return methodRef.DeclaringType.FullName == "System.Linq.Expressions.Expression"
                && methodRef.Name == "Call";
