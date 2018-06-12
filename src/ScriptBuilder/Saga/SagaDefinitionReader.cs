@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -108,99 +106,14 @@ static class SagaDefinitionReader
             throw new ErrorsException("Calling unmanaged code is not allowed in a ConfigureHowToFindSaga method.");
         }
 
+        if (coreSagaCorrelationPropertyReader.CallsUnexpectedMethods())
+        {
+            throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method.");
+        }
+
         var correlationId = coreSagaCorrelationPropertyReader.GetCorrelationId();
-
-
-        // -- Divider---------
-
-
-        var permissiveMode = true;
-
-        var sagaDataTypeName = sagaDataType.FullName;
-        var configureMethod = type.Methods.FirstOrDefault(m => m.Name == "ConfigureHowToFindSaga");
-        if (configureMethod == null)
-        {
-            throw new ErrorsException("Saga does not contain a ConfigureHowToFindSaga method.");
-        }
-
-        //For debugging
-        var il = String.Join(Environment.NewLine, configureMethod.Body.Instructions.Select(i => $"{i}").ToArray());
-
-        foreach (var instruction in configureMethod.Body.Instructions)
-        {
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Call:
-                    var callMethod = instruction.Operand as MethodReference;
-                    if (callMethod == null)
-                    {
-                        throw new Exception("Can't determine method call type for MSIL instruction");
-                    }
-
-                    if (callMethod.DeclaringType.FullName == "System.Linq.Expressions.Expression")
-                    {
-                        if (validExpressionMethods.Contains(callMethod.Name))
-                        {
-                            continue;
-                        }
-                        if (permissiveMode && callMethod.Name == "Call")
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (callMethod.DeclaringType.FullName == "System.Type" && callMethod.Name == "GetTypeFromHandle")
-                    {
-                        continue;
-                    }
-
-                    if (callMethod.DeclaringType.FullName == "System.Reflection.MethodBase" && callMethod.Name == "GetMethodFromHandle")
-                    {
-                        continue;
-                    }
-
-                    // Any other method call is not OK, bail out
-                    throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method. (OpCode: call)");
-
-                case Code.Callvirt:
-                    var virtMethod = instruction.Operand as MethodReference;
-                    if (virtMethod == null)
-                    {
-                        throw new Exception("Can't determine method call type for IL instruction");
-                    }
-
-                    // Call to mapper.ConfigureMapping<T>() is OK
-                    if (virtMethod.Name == "ConfigureMapping" && virtMethod.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper"))
-                    {
-                        // Disable Expression.Call to be very conservative in the ToSaga() section
-                        permissiveMode = false;
-                        continue;
-                    }
-
-                    // Call for .ToSaga() is OK
-                    if (virtMethod.Name == "ToSaga" && virtMethod.DeclaringType.FullName.StartsWith("NServiceBus.ToSagaExpression"))
-                    {
-                        // Re-enable expression calls now that ToSaga() section is complete
-                        permissiveMode = true;
-                        continue;
-                    }
-
-                    // Any other callvirt is not OK, bail out
-                    throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method. (OpCode: callvirt)");
-            }
-        }
         return correlationId;
     }
-
-    static readonly string[] validExpressionMethods = new[]
-    {
-        "Convert",
-        "Parameter",
-        "Property",
-        "Lambda",
-        "Add",
-        "Constant"
-    };
 
     static string GetCorrelationPropertyName(TypeDefinition type)
     {

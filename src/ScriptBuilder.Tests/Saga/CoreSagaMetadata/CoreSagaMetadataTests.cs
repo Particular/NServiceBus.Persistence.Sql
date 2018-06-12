@@ -68,7 +68,6 @@ public partial class CoreSagaMetadataTests
         {
             SagaDefinitionReader.TryGetSagaDefinition(dataType, out var _);
         });
-
     }
 
     [Test]
