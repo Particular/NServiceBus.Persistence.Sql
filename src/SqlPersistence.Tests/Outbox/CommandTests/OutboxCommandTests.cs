@@ -1,4 +1,3 @@
-#if NET452
 #pragma warning disable 618
 using ApprovalTests;
 using ApprovalTests.Namers;
@@ -21,7 +20,7 @@ public abstract class OutboxCommandTests
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Get);
+            TestApprover.Verify(timeoutCommands.Get);
         }
     }
 
@@ -31,7 +30,7 @@ public abstract class OutboxCommandTests
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Cleanup);
+            TestApprover.Verify(timeoutCommands.Cleanup);
         }
     }
 
@@ -41,7 +40,7 @@ public abstract class OutboxCommandTests
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.SetAsDispatched);
+            TestApprover.Verify(timeoutCommands.SetAsDispatched);
         }
     }
 
@@ -51,7 +50,7 @@ public abstract class OutboxCommandTests
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Store);
+            TestApprover.Verify(timeoutCommands.Store);
         }
     }
 
@@ -94,4 +93,3 @@ public abstract class OutboxCommandTests
         }
     }
 }
-#endif

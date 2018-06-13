@@ -1,6 +1,4 @@
-#if NET452
 #pragma warning disable 618
-using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -21,7 +19,8 @@ public abstract class SubscriptionCommandTests
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.GetSubscribers);
+            // TODO: Not much point validating a type name
+            TestApprover.Verify(timeoutCommands.GetSubscribers.ToString());
         }
     }
 
@@ -31,7 +30,7 @@ public abstract class SubscriptionCommandTests
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Subscribe);
+            TestApprover.Verify(timeoutCommands.Subscribe);
         }
     }
 
@@ -41,7 +40,7 @@ public abstract class SubscriptionCommandTests
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Unsubscribe);
+            TestApprover.Verify(timeoutCommands.Unsubscribe);
         }
     }
 
@@ -84,4 +83,3 @@ public abstract class SubscriptionCommandTests
         }
     }
 }
-#endif

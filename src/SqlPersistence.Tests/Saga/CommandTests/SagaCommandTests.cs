@@ -1,6 +1,4 @@
-#if NET452
 #pragma warning disable 618
-using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus;
 using NUnit.Framework;
@@ -19,7 +17,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildCompleteCommand("TheTableName"));
+            TestApprover.Verify(sqlDialect.BuildCompleteCommand("TheTableName"));
         }
     }
 
@@ -28,7 +26,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"));
+            TestApprover.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"));
         }
     }
 
@@ -37,7 +35,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"));
+            TestApprover.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"));
         }
     }
 
@@ -46,7 +44,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"));
+            TestApprover.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"));
         }
     }
 
@@ -55,7 +53,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"));
+            TestApprover.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"));
         }
     }
 
@@ -64,7 +62,7 @@ public abstract class SagaCommandTests
     {
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"));
+            TestApprover.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"));
         }
     }
 
@@ -107,4 +105,3 @@ public abstract class SagaCommandTests
         }
     }
 }
-#endif

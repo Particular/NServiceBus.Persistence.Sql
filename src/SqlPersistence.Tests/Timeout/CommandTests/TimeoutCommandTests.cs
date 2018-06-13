@@ -1,6 +1,4 @@
-#if NET452
 #pragma warning disable 618
-using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -21,7 +19,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Add);
+            TestApprover.Verify(timeoutCommands.Add);
         }
     }
 
@@ -31,7 +29,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Next);
+            TestApprover.Verify(timeoutCommands.Next);
         }
     }
 
@@ -41,7 +39,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Peek);
+            TestApprover.Verify(timeoutCommands.Peek);
         }
     }
 
@@ -51,7 +49,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.Range);
+            TestApprover.Verify(timeoutCommands.Range);
         }
     }
 
@@ -61,7 +59,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.RemoveById);
+            TestApprover.Verify(timeoutCommands.RemoveById);
         }
     }
 
@@ -71,7 +69,7 @@ public abstract class TimeoutCommandTests
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
         using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
         {
-            Approvals.Verify(timeoutCommands.RemoveBySagaId);
+            TestApprover.Verify(timeoutCommands.RemoveBySagaId);
         }
     }
 
@@ -114,4 +112,3 @@ public abstract class TimeoutCommandTests
         }
     }
 }
-#endif
