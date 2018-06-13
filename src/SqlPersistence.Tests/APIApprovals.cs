@@ -13,7 +13,7 @@ public class APIApprovals
     {
         var combine = Path.Combine(TestContext.CurrentContext.TestDirectory, "NServiceBus.Persistence.Sql.dll");
         var assembly = Assembly.LoadFile(combine);
-        var publicApi = ApiGenerator.GeneratePublicApi(assembly);
+        var publicApi = ApiGenerator.GeneratePublicApi(assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute" });
         TestApprover.Verify(publicApi);
     }
 }

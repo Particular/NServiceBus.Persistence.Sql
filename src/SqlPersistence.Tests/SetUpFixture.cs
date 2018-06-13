@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Runtime.CompilerServices;
 using NUnit.Framework;
 
 [SetUpFixture]
@@ -10,7 +7,6 @@ public class SetUpFixture
     public void SetUp()
     {
         TestApprover.JsonSerializer.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
-        FixCurrentDirectory();
         using (var connection = MsSqlConnectionBuilder.Build())
         {
             connection.Open();
@@ -34,10 +30,5 @@ exec('create schema schema_name');";
                 command.ExecuteNonQuery();
             }
         }
-    }
-
-    void FixCurrentDirectory([CallerFilePath] string callerFilePath="")
-    {
-        Environment.CurrentDirectory = Directory.GetParent(callerFilePath).FullName;
     }
 }
