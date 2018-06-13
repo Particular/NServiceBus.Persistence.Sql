@@ -1,6 +1,4 @@
-﻿#if NET452
-using ApprovalTests;
-#endif
+﻿using ApprovalTests;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
@@ -19,9 +17,7 @@ public class SagaDefinitionValidatorTest
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Transitional", "saga1", "Transitional", "tableSuffix"));
         Assert.IsNotNull(errorsException.Message);
-#if NET452
         Approvals.Verify(errorsException.Message);
-#endif
     }
 
     [Test]
@@ -29,9 +25,7 @@ public class SagaDefinitionValidatorTest
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table[Suffix"));
         Assert.IsNotNull(errorsException.Message);
-#if NET452
         Approvals.Verify(errorsException.Message);
-#endif
     }
 
     [Test]
@@ -39,9 +33,7 @@ public class SagaDefinitionValidatorTest
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table]Suffix"));
         Assert.IsNotNull(errorsException.Message);
-#if NET452
         Approvals.Verify(errorsException.Message);
-#endif
     }
 
     [Test]
@@ -49,9 +41,7 @@ public class SagaDefinitionValidatorTest
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table`Suffix"));
         Assert.IsNotNull(errorsException.Message);
-#if NET452
         Approvals.Verify(errorsException.Message);
-#endif
     }
 
     [Test]
@@ -84,8 +74,6 @@ public class SagaDefinitionValidatorTest
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", "Transitional", "tableSuffix"));
         Assert.IsNotNull(errorsException.Message);
-#if NET452
         Approvals.Verify(errorsException.Message);
-#endif
     }
 }

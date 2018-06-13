@@ -1,9 +1,7 @@
 using System.IO;
 using System.Text;
-#if NET452
 using ApprovalTests;
 using ApprovalTests.Namers;
-#endif
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -27,12 +25,10 @@ public class TimeoutScriptBuilderTest
         {
             SqlValidator.Validate(script);
         }
-#if NET452
         using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
-#endif
     }
 
     [Test]
@@ -52,11 +48,9 @@ public class TimeoutScriptBuilderTest
         {
             SqlValidator.Validate(script);
         }
-#if NET452
         using (ApprovalResults.ForScenario(sqlDialect))
         {
             Approvals.Verify(script);
         }
-#endif
     }
 }

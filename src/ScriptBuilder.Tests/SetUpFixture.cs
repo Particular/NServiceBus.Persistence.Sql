@@ -9,9 +9,7 @@ public class SetUpFixture
     [OneTimeSetUp]
     public void SetUp()
     {
-#if NET452
-        ObjectApproval.ObjectApprover.JsonSerializer.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
-#endif
+        TestApprover.JsonSerializer.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
         FixCurrentDirectory();
     }
 
