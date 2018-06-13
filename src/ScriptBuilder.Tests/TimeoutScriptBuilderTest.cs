@@ -27,7 +27,7 @@ public class TimeoutScriptBuilderTest
         }
         using (ApprovalResults.ForScenario(sqlDialect))
         {
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
     }
 
@@ -50,7 +50,7 @@ public class TimeoutScriptBuilderTest
         }
         using (ApprovalResults.ForScenario(sqlDialect))
         {
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
     }
 }

@@ -28,7 +28,7 @@ public class SubscriptionScriptBuilderTest
 
         using (ApprovalResults.ForScenario(sqlDialect))
         {
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
     }
 
@@ -51,7 +51,7 @@ public class SubscriptionScriptBuilderTest
         }
         using (ApprovalResults.ForScenario(sqlDialect))
         {
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
     }
 }

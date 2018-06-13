@@ -27,7 +27,7 @@ public class SagaDefinitionReaderTest: IDisposable
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
-        Approvals.Verify(exception.Message);
+        TestApprover.Verify(exception.Message);
     }
 
     public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
@@ -54,7 +54,7 @@ public class SagaDefinitionReaderTest: IDisposable
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
-        Approvals.Verify(exception.Message);
+        TestApprover.Verify(exception.Message);
     }
 
     abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
@@ -74,7 +74,7 @@ public class SagaDefinitionReaderTest: IDisposable
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
-        Approvals.Verify(exception.Message);
+        TestApprover.Verify(exception.Message);
     }
 
     public class NonSqlSagaSaga : Saga<NonSqlSagaSaga.SagaData>
@@ -124,7 +124,7 @@ public class SagaDefinitionReaderTest: IDisposable
             SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
-        Approvals.Verify(exception.Message);
+        TestApprover.Verify(exception.Message);
     }
 
     public class WithReadonlyPropertySaga : SqlSaga<WithReadonlyPropertySaga.SagaData>
