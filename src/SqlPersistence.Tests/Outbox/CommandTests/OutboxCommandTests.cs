@@ -1,5 +1,4 @@
 #pragma warning disable 618
-using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
