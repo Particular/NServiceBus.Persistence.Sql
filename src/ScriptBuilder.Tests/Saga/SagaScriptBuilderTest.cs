@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using ApprovalTests;
 using ApprovalTests.Namers;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;

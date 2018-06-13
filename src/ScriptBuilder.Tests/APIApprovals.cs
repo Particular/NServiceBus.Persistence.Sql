@@ -1,8 +1,8 @@
-﻿using System.IO;
+﻿using NUnit.Framework;
+using PublicApiGenerator;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using NUnit.Framework;
-using PublicApiGenerator;
 
 [TestFixture]
 public class APIApprovals

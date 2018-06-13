@@ -4,7 +4,6 @@ using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
-using ApprovalTests;
 
 [TestFixture]
 public class SagaDefinitionReaderTest: IDisposable

@@ -1,5 +1,4 @@
-﻿using ApprovalTests;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
