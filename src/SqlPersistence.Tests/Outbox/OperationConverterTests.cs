@@ -1,8 +1,6 @@
-﻿#if NET452
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NServiceBus.Outbox;
 using NUnit.Framework;
-using ObjectApproval;
 
 
 [TestFixture]
@@ -31,7 +29,6 @@ public class OperationConverterTests
             )
         };
         var serializableOperations = operations.ToSerializable();
-        ObjectApprover.VerifyWithJson(serializableOperations);
+        TestApprover.VerifyWithJson(serializableOperations);
     }
 }
-#endif

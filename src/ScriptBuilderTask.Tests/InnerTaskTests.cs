@@ -2,9 +2,6 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-#if NET452
-using ObjectApproval;
-#endif
 
 [TestFixture]
 class InnerTaskTests
@@ -33,8 +30,6 @@ class InnerTaskTests
         var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories).Select(s => s.Replace(temp, "temp")).ToList();
         Assert.IsNotEmpty(files);
 
-#if NET452
-        ObjectApprover.VerifyWithJson(files);
-#endif
+        TestApprover.VerifyWithJson(files);
     }
 }
