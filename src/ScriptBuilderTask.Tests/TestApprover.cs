@@ -1,26 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using ApprovalTests;
 using ApprovalTests.Namers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using NUnit.Framework;
+using ObjectApproval;
 
 static class TestApprover
 {
-    public static JsonSerializer JsonSerializer { get; set; }
-
     static TestApprover()
     {
-        var settings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore
-        };
-        settings.Converters.Add(new StringEnumConverter());
-        JsonSerializer = JsonSerializer.Create(settings);
+        ObjectApprover.JsonSerializer.DefaultValueHandling = DefaultValueHandling.Include;
     }
 
     public static void Verify(string text)
@@ -32,40 +22,13 @@ static class TestApprover
 
     public static void VerifyWithJson(object target, Func<string, string> scrubber = null, JsonSerializerSettings jsonSerializerSettings = null)
     {
-        var formatJson = AsFormattedJson(target, jsonSerializerSettings);
         if (scrubber == null)
         {
             scrubber = s => s;
         }
 
-        Verify(scrubber(formatJson));
-    }
-
-    public static string AsFormattedJson(object target, JsonSerializerSettings jsonSerializerSettings = null)
-    {
-        var builder = new StringBuilder();
-        using (var stringWriter = new StringWriter(builder))
-        {
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                var jsonSerializer = GetJsonSerializer(jsonSerializerSettings);
-
-                jsonWriter.Formatting = jsonSerializer.Formatting;
-                jsonSerializer.Serialize(jsonWriter, target);
-            }
-
-            return stringWriter.ToString();
-        }
-    }
-
-    static JsonSerializer GetJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
-    {
-        if (jsonSerializerSettings == null)
-        {
-            return JsonSerializer;
-        }
-
-        return JsonSerializer.Create(jsonSerializerSettings);
+        var json = ObjectApprover.AsFormattedJson(target, jsonSerializerSettings);
+        Verify(scrubber(json));
     }
 
     class ApprovalNamer : UnitTestFrameworkNamer
