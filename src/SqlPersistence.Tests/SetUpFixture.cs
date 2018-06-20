@@ -6,7 +6,6 @@ public class SetUpFixture
     [OneTimeSetUp]
     public void SetUp()
     {
-        TestApprover.JsonSerializer.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
         using (var connection = MsSqlConnectionBuilder.Build())
         {
             connection.Open();
