@@ -71,7 +71,7 @@ public class When_outbox_disabled_and_different_persistence_used_for_sagas : NSe
 
             public Task Handle(DummyMessage message, IMessageHandlerContext context)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
