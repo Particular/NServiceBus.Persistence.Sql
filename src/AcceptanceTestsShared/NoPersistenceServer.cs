@@ -7,7 +7,7 @@
     using AcceptanceTesting.Support;
     using Configuration.AdvanceExtensibility;
     using Features;
-    using NServiceBus.Config.ConfigurationSource;
+    using Config.ConfigurationSource;
 
     public class NoPersistenceServer : IEndpointSetupTemplate
     {
