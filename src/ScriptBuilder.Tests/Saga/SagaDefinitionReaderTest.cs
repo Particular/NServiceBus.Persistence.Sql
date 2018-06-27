@@ -3,7 +3,6 @@ using System.IO;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 #if NET452
 using ApprovalTests;
@@ -11,7 +10,7 @@ using ObjectApproval;
 #endif
 
 [TestFixture]
-public class SagaDefinitionReaderTest: IDisposable
+public class SagaDefinitionReaderTest : IDisposable
 {
     ModuleDefinition module;
 
@@ -28,7 +27,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<WithGenericSaga<int>>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
@@ -57,7 +56,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<AbstractSaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
@@ -74,10 +73,6 @@ public class SagaDefinitionReaderTest: IDisposable
     }
 
     [Test]
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
-        TestApprover.Verify(exception.Message);
-        Approvals.Verify(exception.Message);
-#endif
     public void Simple()
     {
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
@@ -112,7 +107,7 @@ public class SagaDefinitionReaderTest: IDisposable
         var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
         var exception = Assert.Throws<ErrorsException>(() =>
         {
-            SagaDefinitionReader.TryGetSqlSagaDefinition(sagaType, out _);
+            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
         Assert.IsNotNull(exception.Message);
 #if NET452
