@@ -20,7 +20,7 @@ class AllSagaDefinitionReader
         {
             try
             {
-                if (SagaDefinitionReader.TryGetSqlSagaDefinition(type, out var definition))
+                if (SagaDefinitionReader.TryGetSagaDefinition(type, out var definition))
                 {
                     sagas.Add(definition);
                 }

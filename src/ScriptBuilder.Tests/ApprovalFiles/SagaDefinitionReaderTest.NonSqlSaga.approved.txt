@@ -1,1 +1,0 @@
-﻿The type 'SagaDefinitionReaderTest/NonSqlSagaSaga' inherits from NServiceBus.Saga which is not supported. Inherit from NServiceBus.Persistence.Sql.SqlSaga.

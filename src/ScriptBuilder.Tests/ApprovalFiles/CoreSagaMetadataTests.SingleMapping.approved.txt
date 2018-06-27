@@ -1,0 +1,15 @@
+﻿{
+  "HasUnmanagedCalls": false,
+  "HasUnexpectedCalls": false,
+  "HasBranchingLogic": false,
+  "SagaDefinition": {
+    "TableSuffix": "SingleMappingSaga",
+    "CorrelationProperty": {
+      "Type": "String",
+      "Name": "Correlation"
+    },
+    "TransitionalCorrelationProperty": null,
+    "Name": "CoreSagaMetadataTests/SingleMappingSaga"
+  },
+  "Exception": null
+}
