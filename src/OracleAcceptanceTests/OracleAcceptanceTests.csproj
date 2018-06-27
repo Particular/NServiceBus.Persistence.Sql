@@ -28,4 +28,9 @@
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="\**\SelfVerification\When_running_saga_tests.cs" />
+    <Compile Remove="\**\DelayedDelivery\When_Deferring_a_message.cs" />
+  </ItemGroup>
+
 </Project>

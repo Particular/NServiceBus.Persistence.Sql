@@ -35,6 +35,8 @@
     <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
     <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
     <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
+    <Compile Remove="\**\SelfVerification\When_running_saga_tests.cs" />
+    <Compile Remove="\**\DelayedDelivery\When_Deferring_a_message.cs" />
   </ItemGroup>
 
 </Project>
