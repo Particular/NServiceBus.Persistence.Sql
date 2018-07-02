@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Mono.Cecil;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 public static class RuntimeSagaDefinitionReader
@@ -40,6 +41,11 @@ public static class RuntimeSagaDefinitionReader
 
     public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
     {
+        if (SagaTypeHasIntermediateBaseClass(sagaType))
+        {
+            throw new Exception("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported.");
+        }
+
         var saga = (Saga)FormatterServices.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
         methodInfo.Invoke(saga, new object[]
@@ -53,10 +59,8 @@ public static class RuntimeSagaDefinitionReader
                 name: mapper.CorrelationProperty,
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
-        var transitionalCorrelationPropertyName = (string)sagaType
-            .GetProperty("TransitionalCorrelationPropertyName", AnyInstanceMember)
-            .GetValue(saga);
-
+        
+        var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, saga, "TransitionalCorrelationPropertyName", att => att.TransitionalCorrelationProperty);
 
         CorrelationProperty transitional = null;
         if (transitionalCorrelationPropertyName != null)
@@ -65,8 +69,8 @@ public static class RuntimeSagaDefinitionReader
             var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
             transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
         }
-
-        var tableSuffixOverride = (string)sagaType.GetProperty("TableSuffix", AnyInstanceMember).GetValue(saga);
+        
+        var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 
         if (sqlDialect == BuildSqlDialect.Oracle)
@@ -79,5 +83,37 @@ public static class RuntimeSagaDefinitionReader
             name: sagaType.FullName,
             correlationProperty: correlationProperty,
             transitionalCorrelationProperty: transitional);
+    }
+
+    static bool SagaTypeHasIntermediateBaseClass(Type sagaType)
+    {
+        var baseType = sagaType.BaseType;
+        if (!baseType.IsGenericType)
+        {
+            // Saga<T> and SqlSaga<T> are both generic types
+            return true;
+        }
+
+        var genericBase = baseType.GetGenericTypeDefinition();
+        return genericBase != typeof(Saga<>) && genericBase != typeof(SqlSaga<>);
+    }
+
+    static string GetSagaMetadataProperty(Type sagaType, Saga instance, string sqlSagaPropertyName, Func<SqlSagaAttribute, string> getSqlSagaAttributeValue)
+    {
+        if (sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
+        {
+            // ReSharper disable once PossibleNullReferenceException
+            return (string)sagaType
+                .GetProperty(sqlSagaPropertyName, AnyInstanceMember)
+                .GetValue(instance);
+        }
+
+        if (sagaType.IsSubclassOfRawGeneric(typeof(Saga<>)))
+        {
+            var attr = sagaType.GetCustomAttribute<SqlSagaAttribute>();
+            return (attr != null) ? getSqlSagaAttributeValue(attr) : null;
+        }
+
+        throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
     }
 }
