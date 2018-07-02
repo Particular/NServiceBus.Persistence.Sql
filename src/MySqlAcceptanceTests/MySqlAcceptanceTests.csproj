@@ -4,7 +4,6 @@
     <TargetFramework>net452</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>$(DefineConstants);MySQL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,14 +19,28 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="6.*" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="6.4.4" />
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\App_Packages\**\*.cs" />
-    <Compile Include="$(SolutionDir)\AcceptanceTestsHolder\Partials\*.cs" />
+    <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="\**\DelayedDelivery\When_using_special_characters_in_headers.cs" />
+    <Compile Remove="\**\Outbox\When_headers_contain_special_characters.cs" />
+    <Compile Remove="\**\Sagas\When_correlating_on_special_characters.cs" />
+    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
+    <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
+    <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
+    <Compile Remove="\**\SelfVerification\When_running_saga_tests.cs" />
+    <Compile Remove="\**\DelayedDelivery\When_Deferring_a_message.cs" />
+    <!-- Names too long for MySQL - other dialects will verify correctness -->
+    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas_with_timeout.cs" />
+    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas_first_handler_responding.cs" />
+    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas_response_from_noninitiating.cs" />
   </ItemGroup>
 
 </Project>

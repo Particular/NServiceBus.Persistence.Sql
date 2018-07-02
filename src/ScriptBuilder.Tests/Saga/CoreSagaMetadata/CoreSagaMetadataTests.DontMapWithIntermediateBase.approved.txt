@@ -1,0 +1,7 @@
+﻿{
+  "HasUnmanagedCalls": false,
+  "HasUnexpectedCalls": true,
+  "HasBranchingLogic": false,
+  "SagaDefinition": null,
+  "Exception": null
+}

@@ -1,11 +1,31 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using NServiceBus.Persistence.Sql;
+using NServiceBus.Sagas;
 
 static class SqlSagaTypeDataReader
 {
-    public static SqlSagaTypeData GetTypeData(Type sagaType)
+    public static SqlSagaTypeData GetTypeData(SagaMetadata metadata)
     {
+        var sagaType = metadata.SagaType;
+
+        if (sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
+        {
+            return GetTypeDataFromSqlSaga(sagaType);
+        }
+
+        if (sagaType.IsSubclassOfRawGeneric(typeof(NServiceBus.Saga<>)))
+        {
+            return GetTypeDataFromCoreSaga(metadata);
+        }
+
+        throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
+    }
+
+    static SqlSagaTypeData GetTypeDataFromSqlSaga(Type sagaType)
+    {     
         var instance = FormatterServices.GetUninitializedObject(sagaType);
 
         string transitionalCorrelationPropertyName = null;
@@ -32,6 +52,28 @@ static class SqlSagaTypeDataReader
             TableSuffix = tableName,
             CorrelationProperty = GetPropertyValue(correlationProperty, instance),
             TransitionalCorrelationProperty = transitionalCorrelationPropertyName
+        };
+    }
+
+    static SqlSagaTypeData GetTypeDataFromCoreSaga(SagaMetadata metadata)
+    {
+        var attribute = metadata.SagaType.GetCustomAttributes().OfType<SqlSagaAttribute>().FirstOrDefault();
+
+        var correlationProperty = attribute?.CorrelationProperty;
+
+        if (correlationProperty == null)
+        {
+            if (metadata.TryGetCorrelationProperty(out var property))
+            {
+                correlationProperty = property.Name;
+            }
+        }
+
+        return new SqlSagaTypeData
+        {
+            TableSuffix = attribute?.TableSuffix ?? metadata.SagaType.Name,
+            CorrelationProperty = correlationProperty,
+            TransitionalCorrelationProperty = attribute?.TransitionalCorrelationProperty
         };
     }
 

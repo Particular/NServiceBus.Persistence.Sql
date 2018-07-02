@@ -49,7 +49,7 @@ class SagaInfoCache
             {
                 throw new Exception($"The saga data '{sagaDataType.FullName}' is being used by both '{existing.SagaType}' and '{metadata.SagaType.FullName}'. Saga data can only be used by one saga.");
             }
-            var sagaInfo = BuildSagaInfo(sagaDataType, metadata.SagaType);
+            var sagaInfo = BuildSagaInfo(sagaDataType, metadata);
             cache[sagaDataType] = sagaInfo;
             if (sagaInfo.CorrelationProperty != null && !metadata.TryGetCorrelationProperty(out var _))
             {
@@ -67,12 +67,12 @@ class SagaInfoCache
         throw new Exception($"Could not find RuntimeSagaInfo for {sagaDataType.FullName}.");
     }
 
-    RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, Type sagaType)
+    RuntimeSagaInfo BuildSagaInfo(Type sagaDataType, SagaMetadata metadata)
     {
         return new RuntimeSagaInfo(
             sagaDataType: sagaDataType,
             versionSpecificSettings: versionSpecificSettings,
-            sagaType: sagaType,
+            metadata: metadata,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
             writerCreator: writerCreator,

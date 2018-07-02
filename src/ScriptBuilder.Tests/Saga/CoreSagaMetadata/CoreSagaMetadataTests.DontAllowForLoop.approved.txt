@@ -1,0 +1,7 @@
+﻿{
+  "HasUnmanagedCalls": false,
+  "HasUnexpectedCalls": false,
+  "HasBranchingLogic": true,
+  "SagaDefinition": null,
+  "Exception": "Looping & branching statements are not allowed in a ConfigureHowToFindSaga method."
+}
