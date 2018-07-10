@@ -25,7 +25,7 @@ public class SubscriptionScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -46,6 +46,6 @@ public class SubscriptionScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 }

@@ -25,7 +25,7 @@ public class OutboxScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -46,6 +46,6 @@ public class OutboxScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 }

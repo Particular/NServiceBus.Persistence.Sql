@@ -36,7 +36,7 @@ public class SagaScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class SagaScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -103,6 +103,6 @@ public class SagaScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-        Approver.Verify(script);
+        Approver.Verify(script, category: "ForScenario." + sqlDialect);
     }
 }
