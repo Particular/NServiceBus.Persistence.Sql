@@ -1,8 +1,8 @@
 #pragma warning disable 618
-using ApprovalTests.Namers;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using Particular.Approvals;
 
 public abstract class TimeoutCommandTests
 {
@@ -17,60 +17,48 @@ public abstract class TimeoutCommandTests
     public void Add()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.Add);
-        }
+
+        Approver.Verify(timeoutCommands.Add, category: GetType().Name);
     }
 
     [Test]
     public void Next()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.Next);
-        }
+
+        Approver.Verify(timeoutCommands.Next, category: GetType().Name);
     }
 
     [Test]
     public void Peek()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.Peek);
-        }
+
+        Approver.Verify(timeoutCommands.Peek, category: GetType().Name);
     }
 
     [Test]
     public void Range()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.Range);
-        }
+
+        Approver.Verify(timeoutCommands.Range, category: GetType().Name);
     }
 
     [Test]
     public void RemoveById()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.RemoveById);
-        }
+
+        Approver.Verify(timeoutCommands.RemoveById, category: GetType().Name);
     }
 
     [Test]
     public void RemoveBySagaId()
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(timeoutCommands.RemoveBySagaId);
-        }
+
+        Approver.Verify(timeoutCommands.RemoveBySagaId, category: GetType().Name);
     }
 
     [TestFixture]

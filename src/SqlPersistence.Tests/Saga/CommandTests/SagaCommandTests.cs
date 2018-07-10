@@ -1,7 +1,7 @@
 #pragma warning disable 618
-using ApprovalTests.Namers;
 using NServiceBus;
 using NUnit.Framework;
+using Particular.Approvals;
 
 public abstract class SagaCommandTests
 {
@@ -15,55 +15,37 @@ public abstract class SagaCommandTests
     [Test]
     public void Complete()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildCompleteCommand("TheTableName"));
-        }
+        Approver.Verify(sqlDialect.BuildCompleteCommand("TheTableName"), category: GetType().Name);
     }
 
     [Test]
     public void GetByProperty()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"));
-        }
+        Approver.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"), category: GetType().Name);
     }
 
     [Test]
     public void GetBySagaId()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"));
-        }
+        Approver.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"), category: GetType().Name);
     }
 
     [Test]
     public void Save()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"));
-        }
+        Approver.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"), category: GetType().Name);
     }
 
     [Test]
     public void SelectFrom()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"));
-        }
+        Approver.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"), category: GetType().Name);
     }
 
     [Test]
     public void Update()
     {
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            TestApprover.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"));
-        }
+        Approver.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"), category: GetType().Name);
     }
 
     [TestFixture]
