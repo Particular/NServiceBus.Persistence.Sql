@@ -18,7 +18,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Add, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Add, scenario: GetType().Name);
     }
 
     [Test]
@@ -26,7 +26,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Next, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Next, scenario: GetType().Name);
     }
 
     [Test]
@@ -34,7 +34,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Peek, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Peek, scenario: GetType().Name);
     }
 
     [Test]
@@ -42,7 +42,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Range, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Range, scenario: GetType().Name);
     }
 
     [Test]
@@ -50,7 +50,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.RemoveById, category: GetType().Name);
+        Approver.Verify(timeoutCommands.RemoveById, scenario: GetType().Name);
     }
 
     [Test]
@@ -58,7 +58,7 @@ public abstract class TimeoutCommandTests
     {
         var timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.RemoveBySagaId, category: GetType().Name);
+        Approver.Verify(timeoutCommands.RemoveBySagaId, scenario: GetType().Name);
     }
 
     [TestFixture]

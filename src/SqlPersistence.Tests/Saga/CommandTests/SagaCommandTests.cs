@@ -15,37 +15,37 @@ public abstract class SagaCommandTests
     [Test]
     public void Complete()
     {
-        Approver.Verify(sqlDialect.BuildCompleteCommand("TheTableName"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildCompleteCommand("TheTableName"), scenario: GetType().Name);
     }
 
     [Test]
     public void GetByProperty()
     {
-        Approver.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"), scenario: GetType().Name);
     }
 
     [Test]
     public void GetBySagaId()
     {
-        Approver.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"), scenario: GetType().Name);
     }
 
     [Test]
     public void Save()
     {
-        Approver.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildSaveCommand("CorrelationName", "TransitionalName", "TheTableName"), scenario: GetType().Name);
     }
 
     [Test]
     public void SelectFrom()
     {
-        Approver.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"), scenario: GetType().Name);
     }
 
     [Test]
     public void Update()
     {
-        Approver.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"), category: GetType().Name);
+        Approver.Verify(sqlDialect.BuildUpdateCommand("TransitionalName", "TheTableName"), scenario: GetType().Name);
     }
 
     [TestFixture]

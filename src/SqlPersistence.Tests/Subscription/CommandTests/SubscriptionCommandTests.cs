@@ -19,7 +19,7 @@ public abstract class SubscriptionCommandTests
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
         // TODO: Not much point validating a type name
-        Approver.Verify(timeoutCommands.GetSubscribers.ToString(), category: GetType().Name);
+        Approver.Verify(timeoutCommands.GetSubscribers.ToString(), scenario: GetType().Name);
     }
 
     [Test]
@@ -27,7 +27,7 @@ public abstract class SubscriptionCommandTests
     {
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Subscribe, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Subscribe, scenario: GetType().Name);
     }
 
     [Test]
@@ -35,7 +35,7 @@ public abstract class SubscriptionCommandTests
     {
         var timeoutCommands = SubscriptionCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Unsubscribe, category: GetType().Name);
+        Approver.Verify(timeoutCommands.Unsubscribe, scenario: GetType().Name);
     }
 
     [TestFixture]
