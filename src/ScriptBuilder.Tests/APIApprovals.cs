@@ -3,7 +3,6 @@ using Particular.Approvals;
 using PublicApiGenerator;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 [TestFixture]
 public class APIApprovals
