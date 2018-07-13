@@ -11,6 +11,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NUnit.Framework;
 using NServiceBus.Extensibility;
+using Particular.Approvals;
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 
@@ -312,7 +313,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = SaveAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     void DropAndCreate(SagaDefinition definition, string endpointName, string theSchema)
@@ -439,7 +440,7 @@ public abstract class SagaPersisterTests
             var id = Guid.NewGuid();
             var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
             Assert.IsNotNull(result);
-            TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+            Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
         });
 
         if (SupportsUnicodeIdentifiers)
@@ -491,7 +492,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = SaveWithSpaceAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     async Task<SagaWithSpaceInName.SagaData> SaveWithSpaceAsync(Guid id, string endpointName)
@@ -587,7 +588,7 @@ public abstract class SagaPersisterTests
         {
             var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             Assert.IsNotNull(sagaData);
-            TestApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
+            Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.AreEqual(2, sagaData.Version);
         }
     }
@@ -647,7 +648,7 @@ public abstract class SagaPersisterTests
         {
             var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
             Assert.IsNotNull(sagaData);
-            TestApprover.VerifyWithJson(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
+            Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.AreEqual(2, sagaData.Version);
         }
     }
@@ -804,7 +805,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = GetByIdAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     async Task<SagaWithCorrelation.SagaData> GetByIdAsync(Guid id, string endpointName)
@@ -947,7 +948,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = GetByStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     async Task<SagaWithStringCorrelation.SagaData> GetByStringMappingAsync(Guid id, string endpointName)
@@ -1008,7 +1009,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = GetByNonStringMappingAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     async Task<NonStringCorrelationSaga.SagaData> GetByNonStringMappingAsync(Guid id, string endpointName)
@@ -1117,7 +1118,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = SaveWithNoCorrelationAsync(id, endpointName).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result, s => s.Replace(id.ToString(), "theSagaId"));
+        Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
     async Task<SagaWithNoCorrelation.SagaData> SaveWithNoCorrelationAsync(Guid id, string endpointName)
