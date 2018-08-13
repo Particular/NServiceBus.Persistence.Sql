@@ -36,7 +36,7 @@
     <PackageReference Include="NuGetPackager" Version="0.6.1" />
   </ItemGroup>
 
-  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages">
+  <Target Name="BeforeBuildPackages" BeforeTargets="BuildPackages" DependsOnTargets="RunResolvePackageDependencies">
     <CreateItem Include="@(PackageDefinitions)" Condition="'%(Name)' == 'Mono.Cecil'">
        <Output TaskParameter="Include" ItemName="MonoCecilRef" />
     </CreateItem>
