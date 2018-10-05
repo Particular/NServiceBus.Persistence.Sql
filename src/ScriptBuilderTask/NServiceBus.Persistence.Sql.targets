@@ -8,11 +8,12 @@
 
   <UsingTask
     TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
-    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)" />
+    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
+    Condition="'$(SqlPersistenceGenerateScripts)' != 'false'"/>
 
   <Target Name="SqlPersistenceScriptBuilder"
           AfterTargets="AfterCompile"
-          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
 
     <SqlPersistenceScriptBuilderTask
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
@@ -24,7 +25,7 @@
 
   <Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems"
           BeforeTargets="GetCopyToOutputDirectoryItems"
-          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
 
     <PropertyGroup>
       <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
@@ -45,7 +46,7 @@
 
   <Target Name="AddSqlPersistenceScriptsToGetCopyToPublishDirectoryItems"
           BeforeTargets="GetCopyToPublishDirectoryItems"
-          Condition="('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true')">
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
 
     <PropertyGroup>
       <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
