@@ -32,6 +32,12 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.MsBuild.targets" Pack="true" PackagePath="build\NServiceBus.Persistence.Sql.targets" Visible="false" />
+    <None Include="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
+    <None Include="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
+  </ItemGroup>
+
   <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
     <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
     <RemoveDir Directories="$(NuGetPackageRoot)NServiceBus.Persistence.Sql.MsBuild\$(PackageVersion)" ContinueOnError="WarnAndContinue" />
