@@ -25,6 +25,7 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql</PackageId>
     <Description>Sql persistence for NServiceBus</Description>
+    <NoWarn>$(NoWarn);NU5100</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
