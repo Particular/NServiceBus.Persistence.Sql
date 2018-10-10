@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.*" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.2.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -37,7 +37,7 @@
 
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
-    <Description>MsBuild Task for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
+    <Description>This package is deprecated and should no longer be referenced. The functionality was merged into the NServiceBus.Persistence.Sql package.</Description>
     <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
