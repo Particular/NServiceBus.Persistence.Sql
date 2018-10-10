@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using Particular.Approvals;
 
 public abstract class OutboxPersisterTests
 {
@@ -81,7 +82,7 @@ public abstract class OutboxPersisterTests
     {
         var persister = Setup(schema);
         var result = StoreDispatchAndGetAsync(persister).GetAwaiter().GetResult();
-        TestApprover.VerifyWithJson(result);
+        Approver.Verify(result);
 
         Assert.AreEqual(1, result.Item1.TransportOperations.Length);
         Assert.AreEqual(0, result.Item2.TransportOperations.Length);
@@ -129,7 +130,7 @@ public abstract class OutboxPersisterTests
         var persister = Setup(schema);
         var result = StoreAndGetAsync(persister).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        TestApprover.VerifyWithJson(result);
+        Approver.Verify(result);
     }
 
     async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister)

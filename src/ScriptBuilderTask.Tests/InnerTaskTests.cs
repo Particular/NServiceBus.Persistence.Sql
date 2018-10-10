@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using Particular.Approvals;
 
 [TestFixture]
 class InnerTaskTests
@@ -30,6 +31,6 @@ class InnerTaskTests
         var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories).Select(s => s.Replace(temp, "temp")).ToList();
         Assert.IsNotEmpty(files);
 
-        TestApprover.VerifyWithJson(files);
+        Approver.Verify(files);
     }
 }

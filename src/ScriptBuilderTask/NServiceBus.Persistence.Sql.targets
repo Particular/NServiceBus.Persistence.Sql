@@ -1,0 +1,73 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+  </PropertyGroup>
+
+  <UsingTask
+    TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
+    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
+    Condition="'$(SqlPersistenceGenerateScripts)' != 'false'"/>
+
+  <Target Name="SqlPersistenceScriptBuilder"
+          AfterTargets="AfterCompile"
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
+
+    <SqlPersistenceScriptBuilderTask
+      AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
+      IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
+      ProjectDirectory="$(ProjectDir)"
+      SolutionDirectory="$(SqlPersistenceSolutionDir)"/>
+
+  </Target>
+
+  <Target Name="AddSqlPersistenceScriptsToGetCopyToOutputDirectoryItems"
+          BeforeTargets="GetCopyToOutputDirectoryItems"
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
+
+    <PropertyGroup>
+      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_SourceItemsToCopyToOutputDirectoryAlways Include="@(SqlPersistenceScripts)">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </_SourceItemsToCopyToOutputDirectoryAlways>
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="AddSqlPersistenceScriptsToGetCopyToPublishDirectoryItems"
+          BeforeTargets="GetCopyToPublishDirectoryItems"
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
+
+    <PropertyGroup>
+      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <SqlPersistenceScriptsForPublish Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_SourceItemsToCopyToPublishDirectoryAlways Include="@(SqlPersistenceScriptsForPublish)">
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </_SourceItemsToCopyToPublishDirectoryAlways>
+    </ItemGroup>
+
+  </Target>
+
+  <!--Support for ncrunch-->
+  <ItemGroup  Condition="'$(NCrunch)' == '1'">
+    <None Include="$(MSBuildThisFileDirectory)..\*.*" />
+  </ItemGroup>
+
+</Project>
