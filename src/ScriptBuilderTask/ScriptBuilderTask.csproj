@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.*" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="0.2.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -34,19 +33,6 @@
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.6.85" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <PackageId>NServiceBus.Persistence.Sql.MsBuild</PackageId>
-    <Description>This package is deprecated and should no longer be referenced. The functionality was merged into the NServiceBus.Persistence.Sql package.</Description>
-    <NuSpecFile>$(MSBuildThisFileDirectory)$(PackageId).nuspec</NuSpecFile>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-  </PropertyGroup>
-
-  <Target Name="SetPackageDependencies" BeforeTargets="GenerateNuspec">
-    <PropertyGroup>
-      <NuspecProperties>id=$(PackageId);version=$(PackageVersion);authors=$(Authors);owners=$(Authors);licenseUrl=$(PackageLicenseUrl);requireLicenseAcceptance=$(PackageRequireLicenseAcceptance);iconUrl=$(PackageIconUrl);projectUrl=$(PackageProjectUrl);description=$(Description);copyright=$(Copyright);tags=$(PackageTags)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 
   <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
     <PropertyGroup>
