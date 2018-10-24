@@ -40,7 +40,7 @@ static class ScriptLocation
     {
         if (!File.Exists(createScript))
         {
-            throw new Exception($"Expected '{createScript}' to exist. It is possible it was not deployed with the endpoint or NServiceBus.Persistence.Sql.MsBuild nuget was not included in the project.");
+            throw new Exception($"Expected '{createScript}' to exist. It is possible it was not deployed with the endpoint.");
         }
     }
 }
