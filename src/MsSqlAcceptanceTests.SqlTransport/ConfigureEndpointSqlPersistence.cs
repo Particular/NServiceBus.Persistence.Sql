@@ -18,7 +18,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var tablePrefix = TableNameCleaner.Clean(endpointName);
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlConnectionBuilder.Build, BuildSqlDialect.MsSqlServer, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(context => MsSqlConnectionBuilder.Build());
+        persistence.ConnectionBuilder(MsSqlConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();

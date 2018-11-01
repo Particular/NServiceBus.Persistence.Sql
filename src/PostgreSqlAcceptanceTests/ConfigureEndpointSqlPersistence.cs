@@ -27,7 +27,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(context => PostgreSqlConnectionBuilder.Build());
+        persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
         var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
         persistence.TablePrefix($"{tablePrefix}_");
         sqlDialect.JsonBParameterModifier(parameter =>
