@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus.Extensibility;
 
 static class Extensions
 {
@@ -24,9 +25,9 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
-    public static async Task<DbConnection> OpenConnection(this Func<DbConnection> connectionBuilder)
+    public static async Task<DbConnection> OpenConnection(this Func<ContextBag,DbConnection> connectionBuilder, ContextBag contextBag)
     {
-        var connection = connectionBuilder();
+        var connection = connectionBuilder(contextBag);
         try
         {
             await connection.OpenAsync().ConfigureAwait(false);

@@ -27,13 +27,13 @@ class SqlServerAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
         var transportTransaction = new TransportTransaction();
 
-        var transportConnection = dbConnection();
+        var transportConnection = dbConnection(null);
         var transaction = transportConnection.BeginTransaction();
 
         transportTransaction.Set("System.Data.SqlClient.SqlConnection", transportConnection);
         transportTransaction.Set("System.Data.SqlClient.SqlTransaction", transaction);
 
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), () => throw new Exception("Should not be called"),
+        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), context => throw new Exception("Should not be called"),
             (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
 
         Assert.IsNotNull(result);

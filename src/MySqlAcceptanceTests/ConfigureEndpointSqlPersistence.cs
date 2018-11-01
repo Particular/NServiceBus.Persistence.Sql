@@ -18,7 +18,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 35));
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlDialect.MySql);
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
+        persistence.ConnectionBuilder(context => MySqlConnectionBuilder.Build());
         persistence.SqlDialect<SqlDialect.MySql>();
         persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();

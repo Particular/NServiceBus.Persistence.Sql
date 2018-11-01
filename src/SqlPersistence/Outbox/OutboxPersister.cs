@@ -15,12 +15,12 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    Func<DbConnection> connectionBuilder;
+    Func<ContextBag, DbConnection> connectionBuilder;
     SqlDialect sqlDialect;
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
+    public OutboxPersister(Func<ContextBag, DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
     {
         this.connectionBuilder = connectionBuilder;
         this.sqlDialect = sqlDialect;
@@ -30,14 +30,14 @@ class OutboxPersister : IOutboxStorage
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
+        var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         return new SqlOutboxTransaction(transaction, connection);
     }
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.SetAsDispatched;
@@ -50,7 +50,7 @@ class OutboxPersister : IOutboxStorage
     public async Task<OutboxMessage> Get(string messageId, ContextBag context)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;
@@ -112,7 +112,7 @@ class OutboxPersister : IOutboxStorage
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection(null).ConfigureAwait(false))
         {
             var continuePurging = true;
             while (continuePurging && !cancellationToken.IsCancellationRequested)

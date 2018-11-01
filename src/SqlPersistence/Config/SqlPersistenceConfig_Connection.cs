@@ -3,6 +3,7 @@ namespace NServiceBus
     using System;
     using System.Data.Common;
     using Configuration.AdvancedExtensibility;
+    using Extensibility;
     using Persistence.Sql;
     using Settings;
 
@@ -11,7 +12,7 @@ namespace NServiceBus
         /// <summary>
         /// Configures how <see cref="DbConnection"/>s are constructed.
         /// </summary>
-        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
+        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<ContextBag, DbConnection> connectionBuilder)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
@@ -19,9 +20,9 @@ namespace NServiceBus
                 .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }
 
-        internal static Func<DbConnection> GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
+        internal static Func<ContextBag, DbConnection> GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
         {
-            if (settings.TryGet($"SqlPersistence.ConnectionBuilder.{storageType.Name}", out Func<DbConnection> value))
+            if (settings.TryGet($"SqlPersistence.ConnectionBuilder.{storageType.Name}", out Func<ContextBag, DbConnection> value))
             {
                 return value;
             }
@@ -32,7 +33,7 @@ namespace NServiceBus
             throw new Exception($"Couldn't find connection string for {storageType}. The connection to the database must be specified using the ConnectionBuilder method.");
         }
 
-        internal static Func<DbConnection> GetConnectionBuilder<T>(this ReadOnlySettings settings)
+        internal static Func<ContextBag, DbConnection> GetConnectionBuilder<T>(this ReadOnlySettings settings)
             where T : StorageType
         {
             return GetConnectionBuilder(settings, typeof(T));

@@ -26,7 +26,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, OracleConnectionBuilder.Build, BuildSqlDialect.Oracle, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.Oracle>();
-        persistence.ConnectionBuilder(OracleConnectionBuilder.Build);
+        persistence.ConnectionBuilder(context => OracleConnectionBuilder.Build());
         persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();

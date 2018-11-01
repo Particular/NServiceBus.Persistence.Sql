@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
@@ -10,9 +11,9 @@ public abstract class TimeoutPersisterTests
 {
     BuildSqlDialect sqlDialect;
     string schema;
-    Func<string, DbConnection> dbConnection;
+    Func<string, ContextBag, DbConnection> dbConnection;
     static DateTime goodUtcNowValue = new DateTime(2017, 10, 24, 10, 54, 15, DateTimeKind.Utc);
-    protected abstract Func<string, DbConnection> GetConnection();
+    protected abstract Func<string, ContextBag, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
 
     public TimeoutPersisterTests(BuildSqlDialect sqlDialect, string schema)
@@ -25,7 +26,7 @@ public abstract class TimeoutPersisterTests
     TimeoutPersister Setup(string theSchema, TimeSpan? cleanupInterval = null)
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection(theSchema))
+        using (var connection = dbConnection(theSchema, null))
         {
             connection.Open();
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: theSchema);
@@ -33,9 +34,9 @@ public abstract class TimeoutPersisterTests
         }
 
         var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
-
+        
         return new TimeoutPersister(
-            connectionBuilder: () => dbConnection(theSchema),
+            connectionBuilder: context => dbConnection(theSchema, null),
             tablePrefix: $"{name}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,
@@ -46,12 +47,12 @@ public abstract class TimeoutPersisterTests
     public void TearDown()
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection(null))
+        using (var connection = dbConnection(null, null))
         {
             connection.Open();
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: null);
         }
-        using (var connection = dbConnection(schema))
+        using (var connection = dbConnection(schema, null))
         {
             connection.Open();
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), name, schema: schema);
@@ -67,7 +68,7 @@ public abstract class TimeoutPersisterTests
     public void ExecuteCreateTwice()
     {
         var name = GetTablePrefix();
-        using (var connection = dbConnection(schema))
+        using (var connection = dbConnection(schema, null))
         {
             connection.Open();
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: schema);

@@ -13,9 +13,9 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
-    Func<DbConnection> connectionBuilder;
+    Func<ContextBag, DbConnection> connectionBuilder;
 
-    public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
+    public StorageAdapter(Func<ContextBag, DbConnection> connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;

@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
@@ -11,9 +12,9 @@ public class OracleTimeoutPersisterTests : TimeoutPersisterTests
     {
     }
 
-    protected override Func<string, DbConnection> GetConnection()
+    protected override Func<string, ContextBag, DbConnection> GetConnection()
     {
-        return schema =>
+        return (schema, context) =>
         {
             var key = schema == null
                 ? "OracleConnectionString"

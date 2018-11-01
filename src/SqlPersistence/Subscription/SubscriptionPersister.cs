@@ -16,7 +16,7 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
+    public SubscriptionPersister(Func<ContextBag, DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
         this.connectionBuilder = connectionBuilder;
         this.sqlDialect = sqlDialect;
@@ -33,7 +33,7 @@ class SubscriptionPersister : ISubscriptionStorage
         await Retry(async () =>
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = subscriptionCommands.Subscribe;
@@ -52,7 +52,7 @@ class SubscriptionPersister : ISubscriptionStorage
         await Retry(async () =>
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = subscriptionCommands.Unsubscribe;
@@ -70,7 +70,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
         if (cacheFor == null)
         {
-            return GetSubscriptions(types);
+            return GetSubscriptions(types, context);
         }
 
         var key = GetKey(types);
@@ -79,13 +79,13 @@ class SubscriptionPersister : ISubscriptionStorage
             valueFactory: _ => new CacheItem
             {
                 Stored = DateTime.UtcNow,
-                Subscribers = GetSubscriptions(types)
+                Subscribers = GetSubscriptions(types, context)
             });
 
         var age = DateTime.UtcNow - cacheItem.Stored;
         if (age >= cacheFor)
         {
-            cacheItem.Subscribers = GetSubscriptions(types);
+            cacheItem.Subscribers = GetSubscriptions(types, context);
             cacheItem.Stored = DateTime.UtcNow;
         }
         return cacheItem.Subscribers;
@@ -147,11 +147,11 @@ class SubscriptionPersister : ISubscriptionStorage
         return $"{type.TypeName},";
     }
 
-    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
+    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy, ContextBag context)
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection(context).ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
@@ -184,7 +184,7 @@ class SubscriptionPersister : ISubscriptionStorage
     }
 
     public ConcurrentDictionary<string, CacheItem> Cache;
-    Func<DbConnection> connectionBuilder;
+    Func<ContextBag, DbConnection> connectionBuilder;
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;

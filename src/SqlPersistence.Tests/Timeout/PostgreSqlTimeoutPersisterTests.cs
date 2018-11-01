@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using NServiceBus.Extensibility;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
@@ -10,8 +11,8 @@ public class PostgreSqlTimeoutPersisterTests : TimeoutPersisterTests
     {
     }
 
-    protected override Func<string, DbConnection> GetConnection()
+    protected override Func<string, ContextBag, DbConnection> GetConnection()
     {
-        return x => PostgreSqlConnectionBuilder.Build();
+        return (x, context) => PostgreSqlConnectionBuilder.Build();
     }
 }
