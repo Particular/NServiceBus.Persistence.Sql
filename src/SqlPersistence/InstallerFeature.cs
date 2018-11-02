@@ -16,7 +16,7 @@ class InstallerFeature : Feature
             return;
         }
 
-        settings.ConnectionBuilder = (storageType, contextBag) => context.Settings.GetConnectionBuilder(storageType)(contextBag);
+        settings.ConnectionBuilder = (storageType) => context.Settings.GetConnectionBuilder(storageType)(null);
         settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
         settings.TablePrefix = context.Settings.GetTablePrefix();

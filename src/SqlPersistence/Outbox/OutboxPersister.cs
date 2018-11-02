@@ -112,7 +112,7 @@ class OutboxPersister : IOutboxStorage
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {
-        using (var connection = await connectionBuilder.OpenConnection(null).ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         {
             var continuePurging = true;
             while (continuePurging && !cancellationToken.IsCancellationRequested)

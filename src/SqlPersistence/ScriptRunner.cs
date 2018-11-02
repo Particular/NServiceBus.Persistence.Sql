@@ -22,9 +22,9 @@ namespace NServiceBus.Persistence.Sql
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<ContextBag, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
-            return Install(sqlDialect, tablePrefix, x => connectionBuilder(null), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
+            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace NServiceBus.Persistence.Sql
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, ContextBag, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
             Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
@@ -63,10 +63,10 @@ namespace NServiceBus.Persistence.Sql
             }
         }
 
-        static async Task ExecuteInSeparateConnection<T>(Func<string, DbConnection, DbTransaction, string, SqlDialect, Task> installAction, string scriptDirectory, string tablePrefix, SqlDialect sqlDialect, Func<Type, ContextBag, DbConnection> connectionBuilder)
+        static async Task ExecuteInSeparateConnection<T>(Func<string, DbConnection, DbTransaction, string, SqlDialect, Task> installAction, string scriptDirectory, string tablePrefix, SqlDialect sqlDialect, Func<Type, DbConnection> connectionBuilder)
             where T : StorageType
         {
-            using (var connection = connectionBuilder(typeof(T), null))
+            using (var connection = connectionBuilder(typeof(T)))
             {
                 await connection.OpenAsync().ConfigureAwait(false);
                 using (var transaction = connection.BeginTransaction())

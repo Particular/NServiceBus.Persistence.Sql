@@ -25,7 +25,7 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
-    public static async Task<DbConnection> OpenConnection(this Func<ContextBag,DbConnection> connectionBuilder, ContextBag contextBag)
+    public static async Task<DbConnection> OpenConnection(this Func<ContextBag,DbConnection> connectionBuilder, ContextBag contextBag = null)
     {
         var connection = connectionBuilder(contextBag);
         try

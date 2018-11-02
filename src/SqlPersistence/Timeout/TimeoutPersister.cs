@@ -119,7 +119,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         }
 
         DateTime nextTimeToRunQuery;
-        using (var connection = await connectionBuilder.OpenConnection(null).ConfigureAwait(false))
+        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
         {
             using (var command = connection.CreateCommand())
             {
