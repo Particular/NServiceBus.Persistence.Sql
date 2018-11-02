@@ -7,8 +7,6 @@ using NServiceBus.Logging;
 
 namespace NServiceBus.Persistence.Sql
 {
-    using Extensibility;
-
     /// <summary>
     /// Executes the scripts produced by a Sql Persistence MSBuild task.
     /// </summary>

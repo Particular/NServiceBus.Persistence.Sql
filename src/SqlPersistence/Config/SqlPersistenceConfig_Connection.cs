@@ -12,23 +12,23 @@ namespace NServiceBus
         /// <summary>
         /// Configures how <see cref="DbConnection"/>s are constructed.
         /// </summary>
-        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<ContextBag, DbConnection> connectionBuilder)
-        {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
-            configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
-        }
-
-        /// <summary>
-        /// Configures how <see cref="DbConnection"/>s are constructed.
-        /// </summary>
         public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
             configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionBuilder", (Func<ContextBag, DbConnection>)(context => connectionBuilder()));
+        }
+
+        /// <summary>
+        /// Configures how <see cref="DbConnection"/>s are constructed.
+        /// </summary>
+        public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<ContextBag, DbConnection> connectionBuilder)
+        {
+            Guard.AgainstNull(nameof(configuration), configuration);
+            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
+            configuration.GetSettings()
+                .Set("SqlPersistence.ConnectionBuilder", connectionBuilder);
         }
 
         internal static Func<ContextBag, DbConnection> GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
