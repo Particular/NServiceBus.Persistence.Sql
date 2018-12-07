@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET461
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
