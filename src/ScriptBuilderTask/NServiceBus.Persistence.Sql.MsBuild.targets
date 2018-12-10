@@ -1,7 +1,0 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <Target Name="PersistenceSqlMsBuildPackageRemovalWarning" BeforeTargets="Build">
-    <Warning Text="The NServiceBus.Persistence.Sql.MsBuild package is deprecated and should be removed from the project. The functionality was merged into the NServiceBus.Persistence.Sql package." />
-  </Target>
-
-</Project>
