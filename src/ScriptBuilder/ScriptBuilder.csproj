@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.10.0-*" />
-    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.2.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
