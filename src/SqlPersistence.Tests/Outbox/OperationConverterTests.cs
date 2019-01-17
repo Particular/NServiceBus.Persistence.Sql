@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NServiceBus.Outbox;
 using NUnit.Framework;
-using ObjectApproval;
+using Particular.Approvals;
 
 
 [TestFixture]
@@ -31,7 +31,7 @@ public class OperationConverterTests
             )
         };
         var serializableOperations = operations.ToSerializable();
-        ObjectApprover.VerifyWithJson(serializableOperations);
+        Approver.Verify(serializableOperations);
     }
 }
 #endif

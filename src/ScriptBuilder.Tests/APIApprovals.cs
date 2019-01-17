@@ -1,22 +1,18 @@
-﻿#if NET452
+﻿using NUnit.Framework;
+using Particular.Approvals;
+using PublicApiGenerator;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using ApprovalTests;
-using NUnit.Framework;
-using PublicApiGenerator;
 
 [TestFixture]
 public class APIApprovals
 {
     [Test]
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public void Approve()
     {
         var combine = Path.Combine(TestContext.CurrentContext.TestDirectory, "NServiceBus.Persistence.Sql.ScriptBuilder.dll");
         var assembly = Assembly.LoadFile(combine);
-        var publicApi = ApiGenerator.GeneratePublicApi(assembly);
-        Approvals.Verify(publicApi);
+        var publicApi = ApiGenerator.GeneratePublicApi(assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute" });
+        Approver.Verify(publicApi);
     }
 }
-#endif

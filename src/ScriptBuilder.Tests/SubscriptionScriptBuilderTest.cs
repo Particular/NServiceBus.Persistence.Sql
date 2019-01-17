@@ -1,11 +1,8 @@
 using System.IO;
 using System.Text;
-#if NET452
-using ApprovalTests;
-using ApprovalTests.Namers;
-#endif
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using Particular.Approvals;
 
 [TestFixture]
 public class SubscriptionScriptBuilderTest
@@ -28,12 +25,7 @@ public class SubscriptionScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-#if NET452
-        using (ApprovalResults.ForScenario(sqlDialect))
-        {
-            Approvals.Verify(script);
-        }
-#endif
+        Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -53,11 +45,7 @@ public class SubscriptionScriptBuilderTest
         {
             SqlValidator.Validate(script);
         }
-#if NET452
-        using (ApprovalResults.ForScenario(sqlDialect))
-        {
-            Approvals.Verify(script);
-        }
-#endif
+
+        Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 }
