@@ -3,7 +3,7 @@ using System.IO;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
-using ObjectApproval;
+using Particular.Approvals;
 
 [TestFixture]
 public partial class CoreSagaMetadataTests
@@ -148,8 +148,8 @@ public partial class CoreSagaMetadataTests
         {
             results.Exception = x.Message;
         }
-       
-        ObjectApprover.VerifyWithJson(results);
+
+        Approver.Verify(results);
     }
 
     class SagaInspectionResults

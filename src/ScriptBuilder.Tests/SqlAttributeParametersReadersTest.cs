@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-#if NET452
-using ObjectApproval;
-#endif
+using Particular.Approvals;
 
 [TestFixture]
 public class SqlAttributeParametersReadersTest
@@ -21,9 +19,8 @@ public class SqlAttributeParametersReadersTest
                 }));
 
         Assert.IsNotNull(result);
-#if NET452
-        ObjectApprover.VerifyWithJson(result);
-#endif
+
+        Approver.Verify(result);
     }
 
     [Test]
@@ -31,9 +28,8 @@ public class SqlAttributeParametersReadersTest
     {
         var result = SettingsAttributeReader.ReadFromAttribute(null);
         Assert.IsNotNull(result);
-#if NET452
-        ObjectApprover.VerifyWithJson(result);
-#endif
+
+        Approver.Verify(result);
     }
 
     [Test]
@@ -69,9 +65,8 @@ public class SqlAttributeParametersReadersTest
                     }
                 }));
         Assert.IsNotNull(result);
-#if NET452
-        ObjectApprover.VerifyWithJson(result);
-#endif
+
+        Approver.Verify(result);
     }
 
 

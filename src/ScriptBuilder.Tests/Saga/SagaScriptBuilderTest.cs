@@ -1,11 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-#if NET452
-using ApprovalTests;
-using ApprovalTests.Namers;
-#endif
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
+using Particular.Approvals;
 
 [TestFixture]
 public class SagaScriptBuilderTest
@@ -38,12 +35,8 @@ public class SagaScriptBuilderTest
         {
             SqlValidator.Validate(script);
         }
-#if NET452
-        using (ApprovalResults.ForScenario(sqlDialect))
-        {
-            Approvals.Verify(script);
-        }
-#endif
+
+        Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -80,12 +73,7 @@ public class SagaScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-#if NET452
-        using (ApprovalResults.ForScenario(sqlDialect))
-        {
-            Approvals.Verify(script);
-        }
-#endif
+        Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 
     [Test]
@@ -115,11 +103,6 @@ public class SagaScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
-#if NET452
-        using (ApprovalResults.ForScenario(sqlDialect))
-        {
-            Approvals.Verify(script);
-        }
-#endif
+        Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 }
