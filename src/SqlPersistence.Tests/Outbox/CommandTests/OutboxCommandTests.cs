@@ -1,10 +1,8 @@
-#if NET452
 #pragma warning disable 618
-using ApprovalTests;
-using ApprovalTests.Namers;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using Particular.Approvals;
 
 public abstract class OutboxCommandTests
 {
@@ -19,40 +17,32 @@ public abstract class OutboxCommandTests
     public void Get()
     {
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            Approvals.Verify(timeoutCommands.Get);
-        }
+
+        Approver.Verify(timeoutCommands.Get, scenario: GetType().Name);
     }
 
     [Test]
     public void Cleanup()
     {
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            Approvals.Verify(timeoutCommands.Cleanup);
-        }
+
+        Approver.Verify(timeoutCommands.Cleanup, scenario: GetType().Name);
     }
 
     [Test]
     public void SetAsDispatched()
     {
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            Approvals.Verify(timeoutCommands.SetAsDispatched);
-        }
+
+        Approver.Verify(timeoutCommands.SetAsDispatched, scenario: GetType().Name);
     }
 
     [Test]
     public void Store()
     {
         var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
-        using (NamerFactory.AsEnvironmentSpecificTest(() => GetType().Name))
-        {
-            Approvals.Verify(timeoutCommands.Store);
-        }
+
+        Approver.Verify(timeoutCommands.Store, scenario: GetType().Name);
     }
 
     [TestFixture]
@@ -94,4 +84,3 @@ public abstract class OutboxCommandTests
         }
     }
 }
-#endif

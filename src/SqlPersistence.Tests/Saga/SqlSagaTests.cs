@@ -1,9 +1,8 @@
-#if NET452
 using System;
-using ApprovalTests;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using Particular.Approvals;
 
 [TestFixture]
 public class SqlSagaTests
@@ -16,7 +15,7 @@ public class SqlSagaTests
         {
             sagaWithBadOverride.VerifyNoConfigureHowToFindSaga();
         });
-        Approvals.Verify(exception.Message);
+        Approver.Verify(exception.Message);
     }
 
     public class SagaWithBadOverride : SqlSaga<SagaWithBadOverride.SagaData>
@@ -55,4 +54,3 @@ public class SqlSagaTests
         }
     }
 }
-#endif
