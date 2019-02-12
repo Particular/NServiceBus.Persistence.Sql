@@ -1,7 +1,9 @@
 ﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Mono.Cecil;
 
     public static class ScriptWriter
@@ -52,8 +54,30 @@
             foreach (var dialect in Enum.GetNames(typeof(BuildSqlDialect)))
             {
                 var dialectDirectory = Path.Combine(scriptPath, dialect);
-                DirectoryExtensions.Delete(dialectDirectory);
+                if (!Directory.Exists(dialectDirectory))
+                {
+                    continue;
+                }
+                foreach (var file in GetKnownScripts(dialectDirectory))
+                {
+                    File.Delete(file);
+                }
+                var sagaDirectory = Path.Combine(dialectDirectory, "Sagas");
+                if (!Directory.Exists(sagaDirectory))
+                {
+                    continue;
+                }
+                foreach (var file in GetKnownScripts(sagaDirectory))
+                {
+                    File.Delete(file);
+                }
             }
+        }
+
+        static IEnumerable<string> GetKnownScripts(string dialectDirectory)
+        {
+            return Directory.EnumerateFiles(dialectDirectory, "*_Drop.sql")
+                .Concat(Directory.EnumerateFiles(dialectDirectory, "*_Create.sql"));
         }
 
         static void Promote(string replicationPath, string scriptPath)
