@@ -11,7 +11,7 @@ using NServiceBus.Persistence.Sql;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
-    Func<DbConnection> connectionBuilder;
+    ConnectionManager connectionManager;
     SqlDialect sqlDialect;
     TimeoutCommands timeoutCommands;
     TimeSpan timeoutsCleanupExecutionInterval;
@@ -19,9 +19,9 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
+    public TimeoutPersister(ConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
     {
-        this.connectionBuilder = connectionBuilder;
+        this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         this.utcNow = utcNow;
@@ -32,7 +32,8 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
         var guid = sqlDialect.ConvertTimeoutId(timeoutId);
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        var messageHandlerContext = context.Get<IMessageHandlerContext>();
+        using (var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.Peek;
@@ -74,7 +75,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task Add(TimeoutData timeout, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.Add;
@@ -95,7 +96,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task<bool> TryRemove(string timeoutId, ContextBag context)
     {
         var guid = sqlDialect.ConvertTimeoutId(timeoutId);
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.RemoveById;
@@ -119,7 +120,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         }
 
         DateTime nextTimeToRunQuery;
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         {
             using (var command = connection.CreateCommand())
             {
@@ -156,7 +157,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
     {
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = timeoutCommands.RemoveBySagaId;

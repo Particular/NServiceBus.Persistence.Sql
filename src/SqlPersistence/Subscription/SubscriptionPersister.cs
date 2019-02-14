@@ -16,9 +16,9 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(Func<DbConnection> connectionBuilder, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
+    public SubscriptionPersister(ConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
-        this.connectionBuilder = connectionBuilder;
+        this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.cacheFor = cacheFor;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlDialect, tablePrefix);
@@ -33,7 +33,7 @@ class SubscriptionPersister : ISubscriptionStorage
         await Retry(async () =>
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = subscriptionCommands.Subscribe;
@@ -52,7 +52,7 @@ class SubscriptionPersister : ISubscriptionStorage
         await Retry(async () =>
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+            using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
             using (var command = sqlDialect.CreateCommand(connection))
             {
                 command.CommandText = subscriptionCommands.Unsubscribe;
@@ -151,7 +151,7 @@ class SubscriptionPersister : ISubscriptionStorage
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
@@ -184,7 +184,7 @@ class SubscriptionPersister : ISubscriptionStorage
     }
 
     public ConcurrentDictionary<string, CacheItem> Cache;
-    Func<DbConnection> connectionBuilder;
+    ConnectionManager connectionManager;
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;

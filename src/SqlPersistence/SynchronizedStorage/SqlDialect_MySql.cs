@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Extensibility;
     using Persistence;
+    using Persistence.Sql;
     using Transport;
 
     public partial class SqlDialect
@@ -13,7 +14,7 @@
         {
             static Task<CompletableSynchronizedStorageSession> result = Task.FromResult((CompletableSynchronizedStorageSession)null);
 
-            internal override Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, Func<DbConnection> connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, ConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
             {
                 // MySQL does not support DTC so we should not enlist if transport has such a transaction.
                 return result;

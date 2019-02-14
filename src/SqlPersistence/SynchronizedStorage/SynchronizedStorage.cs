@@ -1,23 +1,24 @@
-﻿using System;
-using System.Data.Common;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
-    Func<DbConnection> connectionBuilder;
+    ConnectionManager connectionManager;
     SagaInfoCache infoCache;
 
-    public SynchronizedStorage(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache)
+    public SynchronizedStorage(ConnectionManager connectionManager, SagaInfoCache infoCache)
     {
-        this.connectionBuilder = connectionBuilder;
+        this.connectionManager = connectionManager;
         this.infoCache = infoCache;
     }
 
     public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
     {
-        var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
+        var messageHandlerContext = contextBag.Get<IMessageHandlerContext>();
+        var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         return new StorageSession(connection, transaction, true, infoCache);
     }

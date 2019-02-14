@@ -16,7 +16,7 @@ class StorageSessionFeature : Feature
 
         var sqlDialect = settings.GetSqlDialect();
         var container = context.Container;
-        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Sagas>();
+        var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
 
         var sqlSagaPersistenceActivated = settings.IsFeatureActive(typeof(SqlSagaFeature));
 
@@ -27,8 +27,8 @@ class StorageSessionFeature : Feature
         }
 
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        container.ConfigureComponent(() => new SynchronizedStorage(connectionBuilder, infoCache), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(() => new StorageAdapter(connectionBuilder, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
 
         if (sqlSagaPersistenceActivated)
         {

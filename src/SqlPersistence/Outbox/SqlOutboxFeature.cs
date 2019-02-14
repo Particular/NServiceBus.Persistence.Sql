@@ -12,10 +12,10 @@ class SqlOutboxFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
+        var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
-        var outboxPersister = new OutboxPersister(connectionBuilder, tablePrefix, sqlDialect);
+        var outboxPersister = new OutboxPersister(connectionManager, tablePrefix, sqlDialect);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -38,7 +38,7 @@ class SqlOutboxFeature : Feature
             FrequencyToRunDeduplicationDataCleanup = frequencyToRunCleanup
         });
 
-        context.RegisterStartupTask(b => 
+        context.RegisterStartupTask(b =>
             new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
 

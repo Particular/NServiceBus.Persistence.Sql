@@ -1,10 +1,9 @@
-using System;
-using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
@@ -13,9 +12,9 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
-    Func<DbConnection> connectionBuilder;
+    ConnectionManager connectionBuilder;
 
-    public StorageAdapter(Func<DbConnection> connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
+    public StorageAdapter(ConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
@@ -34,7 +33,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        return dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder, 
+        return dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
     }
 }

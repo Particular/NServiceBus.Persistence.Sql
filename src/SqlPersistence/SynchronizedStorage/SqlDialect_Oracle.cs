@@ -6,13 +6,14 @@
     using System.Transactions;
     using Extensibility;
     using Persistence;
+    using Persistence.Sql;
     using Transport;
 
     public partial class SqlDialect
     {
         public partial class Oracle
         {
-            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, Func<DbConnection> connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, ConnectionManager connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
             {
                 // Oracle supports DTC so we should enlist in the transport's TransactionScope if present
                 var scopeTx = Transaction.Current;
@@ -31,7 +32,9 @@
                     //Other modes handled by creating a new session.
                     return null;
                 }
-                var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
+
+                var messageHandlerContext = context.Get<IMessageHandlerContext>();
+                var connection = await connectionBuilder.OpenConnection(messageHandlerContext).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
                 return storageSessionFactory(connection, null, true);
             }
