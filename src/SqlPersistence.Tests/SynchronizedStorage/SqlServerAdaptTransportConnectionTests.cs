@@ -2,6 +2,7 @@ using System;
 using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Transport;
 using NUnit.Framework;
@@ -27,13 +28,15 @@ class SqlServerAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
         var transportTransaction = new TransportTransaction();
 
-        var transportConnection = dbConnection();
+        var transportConnection = connectionManager.BuildNonContextual();
         var transaction = transportConnection.BeginTransaction();
 
         transportTransaction.Set("System.Data.SqlClient.SqlConnection", transportConnection);
         transportTransaction.Set("System.Data.SqlClient.SqlTransaction", transaction);
 
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), () => throw new Exception("Should not be called"),
+        var altConnectionManager = ConnectionManager.BuildSingleTenant(() => throw new Exception("Should not be called"));
+
+        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager,
             (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
 
         Assert.IsNotNull(result);

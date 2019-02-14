@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -30,7 +31,7 @@ public abstract class SubscriptionPersisterTests
         dbConnection = GetConnection();
         tablePrefix = GetTablePrefix();
         var persister = new SubscriptionPersister(
-            connectionManager: () => dbConnection(theSchema),
+            connectionManager: ConnectionManager.BuildSingleTenant(() => dbConnection(theSchema)),
             tablePrefix: $"{tablePrefix}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             cacheFor: TimeSpan.FromSeconds(10)

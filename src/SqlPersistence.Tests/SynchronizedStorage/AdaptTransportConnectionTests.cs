@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Transport;
 using NUnit.Framework;
@@ -10,7 +11,7 @@ using NUnit.Framework;
 abstract class AdaptTransportConnectionTests
 {
     protected BuildSqlDialect sqlDialect;
-    protected Func<DbConnection> dbConnection;
+    protected ConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
 
@@ -19,7 +20,7 @@ abstract class AdaptTransportConnectionTests
     protected AdaptTransportConnectionTests(BuildSqlDialect sqlDialect)
     {
         this.sqlDialect = sqlDialect;
-        dbConnection = () => GetConnection()(null);
+        connectionManager = ConnectionManager.BuildSingleTenant(() => GetConnection()(null));
     }
 
     [Test]
@@ -35,7 +36,7 @@ abstract class AdaptTransportConnectionTests
             transportTransaction.Set(Transaction.Current);
             using (new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
-                var ex = Assert.ThrowsAsync<Exception>(() => sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), dbConnection,
+                var ex = Assert.ThrowsAsync<Exception>(() => sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
                     (conn, tx, arg3) => new StorageSession(conn, tx, false, null)));
 
                 StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", ex.Message);
@@ -47,7 +48,7 @@ abstract class AdaptTransportConnectionTests
     public async Task It_returns_null_if_there_is_no_transaction_scope()
     {
         var transportTransaction = new TransportTransaction();
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), dbConnection,
+        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
             (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
 
         Assert.IsNull(result);

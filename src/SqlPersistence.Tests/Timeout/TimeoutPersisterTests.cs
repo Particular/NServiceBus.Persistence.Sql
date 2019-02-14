@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Timeout.Core;
 using NUnit.Framework;
@@ -35,7 +36,7 @@ public abstract class TimeoutPersisterTests
         var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
 
         return new TimeoutPersister(
-            connectionManager: () => dbConnection(theSchema),
+            connectionManager: ConnectionManager.BuildSingleTenant(() => dbConnection(theSchema)),
             tablePrefix: $"{name}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,
