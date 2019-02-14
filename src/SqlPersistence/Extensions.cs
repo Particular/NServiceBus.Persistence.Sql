@@ -110,6 +110,12 @@ static class Extensions
 
     public static IMessageHandlerContext GetMessageHandlerContext(this ContextBag context)
     {
+        if (context == null)
+        {
+            // Tests pass a null context
+            return null;
+        }
+
         var messageHandlerContext = context.Get<IMessageHandlerContext>();
         return messageHandlerContext;
     }
