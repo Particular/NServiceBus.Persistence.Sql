@@ -32,8 +32,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
     {
         var guid = sqlDialect.ConvertTimeoutId(timeoutId);
-        var messageHandlerContext = context.Get<IMessageHandlerContext>();
-        using (var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenConnection(context.GetMessageHandlerContext()).ConfigureAwait(false))
         using (var command = connection.CreateCommand())
         {
             command.CommandText = timeoutCommands.Peek;

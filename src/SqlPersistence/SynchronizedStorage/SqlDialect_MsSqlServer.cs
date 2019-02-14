@@ -45,8 +45,7 @@
                     return null;
                 }
 
-                var messageHandlerContext = context.Get<IMessageHandlerContext>();
-                var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false);
+                var connection = await connectionManager.OpenConnection(context.GetMessageHandlerContext()).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
                 return storageSessionFactory(connection, null, true);
             }

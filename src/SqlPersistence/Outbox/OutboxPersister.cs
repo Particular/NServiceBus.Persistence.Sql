@@ -30,16 +30,14 @@ class OutboxPersister : IOutboxStorage
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var messageHandlerContext = context.Get<IMessageHandlerContext>();
-        var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false);
+        var connection = await connectionManager.OpenConnection(context.GetMessageHandlerContext()).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         return new SqlOutboxTransaction(transaction, connection);
     }
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
     {
-        var messageHandlerContext = context.Get<IMessageHandlerContext>();
-        using (var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenConnection(context.GetMessageHandlerContext()).ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.SetAsDispatched;
@@ -51,9 +49,8 @@ class OutboxPersister : IOutboxStorage
 
     public async Task<OutboxMessage> Get(string messageId, ContextBag context)
     {
-        var messageHandlerContext = context.Get<IMessageHandlerContext>();
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionManager.OpenConnection(messageHandlerContext).ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenConnection(context.GetMessageHandlerContext()).ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
         {
             OutboxMessage result;

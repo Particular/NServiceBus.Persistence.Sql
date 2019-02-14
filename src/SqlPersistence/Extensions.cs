@@ -4,6 +4,8 @@ using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Extensibility;
 
 static class Extensions
 {
@@ -83,6 +85,7 @@ static class Extensions
             throw new Exception(message, exception);
         }
     }
+
     public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic)
     {
         while (toCheck != null && toCheck != typeof(object))
@@ -103,5 +106,11 @@ static class Extensions
             toCheck = toCheck.BaseType;
         }
         return false;
+    }
+
+    public static IMessageHandlerContext GetMessageHandlerContext(this ContextBag context)
+    {
+        var messageHandlerContext = context.Get<IMessageHandlerContext>();
+        return messageHandlerContext;
     }
 }
