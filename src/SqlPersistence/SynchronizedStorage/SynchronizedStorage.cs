@@ -2,7 +2,6 @@
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 
 class SynchronizedStorage : ISynchronizedStorage
 {

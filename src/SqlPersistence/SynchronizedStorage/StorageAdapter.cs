@@ -3,7 +3,6 @@ using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter

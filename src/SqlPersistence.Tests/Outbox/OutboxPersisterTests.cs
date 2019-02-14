@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Outbox;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using Particular.Approvals;

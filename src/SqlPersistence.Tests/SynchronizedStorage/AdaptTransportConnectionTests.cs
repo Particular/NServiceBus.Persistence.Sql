@@ -3,7 +3,6 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Transport;
 using NUnit.Framework;
