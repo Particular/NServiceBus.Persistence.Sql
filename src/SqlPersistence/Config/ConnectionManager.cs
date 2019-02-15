@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
-using NServiceBus.Pipeline;
 
 class ConnectionManager
 {
-    Func<IIncomingContext, string> captureTenantId;
+    Func<IReadOnlyDictionary<string, string>, string> captureTenantId;
     Func<string, DbConnection> buildConnectionFromTenantData;
 
-    public ConnectionManager(Func<IIncomingContext, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
+    public ConnectionManager(Func<IReadOnlyDictionary<string, string>, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
     {
         this.captureTenantId = captureTenantId;
         this.buildConnectionFromTenantData = buildConnectionFromTenantData;
@@ -19,15 +19,15 @@ class ConnectionManager
         return new ConnectionManager(context => null, _ => connectionBuilder());
     }
 
-    public DbConnection Build(IIncomingContext context, out string tenantId)
+    public DbConnection Build(IReadOnlyDictionary<string, string> messageHeaders, out string tenantId)
     {
-        tenantId = captureTenantId(context);
+        tenantId = captureTenantId(messageHeaders);
         return buildConnectionFromTenantData(tenantId);
     }
 
-    public DbConnection Build(IIncomingContext context)
+    public DbConnection Build(IReadOnlyDictionary<string, string> messageHeaders)
     {
-        return Build(context, out _);
+        return Build(messageHeaders, out _);
     }
 
     public DbConnection Build(string tenantId)
@@ -40,9 +40,9 @@ class ConnectionManager
         return buildConnectionFromTenantData(null);
     }
 
-    public Task<DbConnection> OpenConnection(IIncomingContext context)
+    public Task<DbConnection> OpenConnection(IReadOnlyDictionary<string, string> messageHeaders)
     {
-        var connection = Build(context);
+        var connection = Build(messageHeaders);
         return OpenConnection(connection);
     }
 

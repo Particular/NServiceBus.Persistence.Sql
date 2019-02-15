@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
@@ -108,18 +109,28 @@ static class Extensions
         return false;
     }
 
-    public static IIncomingContext GetIncomingContext(this ContextBag context)
+    public static IReadOnlyDictionary<string, string> GetMessageHeaders(this ContextBag context)
     {
+        if (context is ITransportReceiveContext transportReceiveContext)
+        {
+            return transportReceiveContext.Message.Headers;
+        }
+
+        if (context is IIncomingContext incomingContext)
+        {
+            return incomingContext.MessageHeaders;
+        }
+
         if (context == null)
         {
             // Tests pass a null context
             return null;
         }
 
-        if (context is IIncomingContext incomingContext)
-        {
-            return incomingContext;
-        }
+        //if (context.GetType() == typeof(ContextBag))
+        //{
+        //    return null;
+        //}
 
         throw new Exception("Can't find incoming context");
     }
