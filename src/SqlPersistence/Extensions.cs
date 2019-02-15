@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Pipeline;
 
@@ -109,7 +108,7 @@ static class Extensions
         return false;
     }
 
-    public static IIncomingContext GetMessageHandlerContext(this ContextBag context)
+    public static IIncomingContext GetIncomingContext(this ContextBag context)
     {
         if (context == null)
         {
