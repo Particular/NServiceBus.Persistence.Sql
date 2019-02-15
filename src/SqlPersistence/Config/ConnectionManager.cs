@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Data.Common;
 using System.Threading.Tasks;
-using NServiceBus;
+using NServiceBus.Pipeline;
 
 class ConnectionManager
 {
-    Func<IMessageHandlerContext, string> captureTenantId;
+    Func<IIncomingContext, string> captureTenantId;
     Func<string, DbConnection> buildConnectionFromTenantData;
 
-    public ConnectionManager(Func<IMessageHandlerContext, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
+    public ConnectionManager(Func<IIncomingContext, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
     {
         this.captureTenantId = captureTenantId;
         this.buildConnectionFromTenantData = buildConnectionFromTenantData;
@@ -19,13 +19,13 @@ class ConnectionManager
         return new ConnectionManager(context => null, _ => connectionBuilder());
     }
 
-    public DbConnection Build(IMessageHandlerContext context, out string tenantId)
+    public DbConnection Build(IIncomingContext context, out string tenantId)
     {
         tenantId = captureTenantId(context);
         return buildConnectionFromTenantData(tenantId);
     }
 
-    public DbConnection Build(IMessageHandlerContext context)
+    public DbConnection Build(IIncomingContext context)
     {
         return Build(context, out _);
     }
@@ -40,7 +40,7 @@ class ConnectionManager
         return buildConnectionFromTenantData(null);
     }
 
-    public Task<DbConnection> OpenConnection(IMessageHandlerContext context)
+    public Task<DbConnection> OpenConnection(IIncomingContext context)
     {
         var connection = Build(context);
         return OpenConnection(connection);

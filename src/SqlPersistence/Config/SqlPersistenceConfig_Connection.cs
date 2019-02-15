@@ -4,6 +4,7 @@ namespace NServiceBus
     using System.Data.Common;
     using Configuration.AdvancedExtensibility;
     using Persistence.Sql;
+    using Pipeline;
     using Settings;
 
     public static partial class SqlPersistenceConfig
@@ -26,7 +27,7 @@ namespace NServiceBus
         /// <param name="configuration"></param>
         /// <param name="captureTenantId"></param>
         /// <param name="buildConnectionFromTenantData"></param>
-        public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IMessageHandlerContext, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
+        public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IIncomingContext, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
         {
             Guard.AgainstNull(nameof(configuration), configuration);
             Guard.AgainstNull(nameof(captureTenantId), captureTenantId);
@@ -46,7 +47,7 @@ namespace NServiceBus
         /// <param name="buildConnectionFromTenantData"></param>
         public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, string tenantIdHeaderName, Func<string, DbConnection> buildConnectionFromTenantData)
         {
-            var captureTenantId = new Func<IMessageHandlerContext, string>(context =>
+            var captureTenantId = new Func<IIncomingContext, string>(context =>
             {
                 if (context.MessageHeaders.TryGetValue(tenantIdHeaderName, out var tenantId))
                 {

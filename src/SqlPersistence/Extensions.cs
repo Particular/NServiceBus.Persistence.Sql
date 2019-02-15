@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
+using NServiceBus.Pipeline;
 
 static class Extensions
 {
@@ -108,7 +109,7 @@ static class Extensions
         return false;
     }
 
-    public static IMessageHandlerContext GetMessageHandlerContext(this ContextBag context)
+    public static IIncomingContext GetMessageHandlerContext(this ContextBag context)
     {
         if (context == null)
         {
@@ -116,7 +117,11 @@ static class Extensions
             return null;
         }
 
-        var messageHandlerContext = context.Get<IMessageHandlerContext>();
-        return messageHandlerContext;
+        if (context is IIncomingContext incomingContext)
+        {
+            return incomingContext;
+        }
+
+        throw new Exception("Can't find incoming context");
     }
 }
