@@ -57,13 +57,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         public EndpointWithOutboxCleanupEnabled()
         {
-            EndpointSetup<DefaultServer>(c =>
-            {
-                var persistence = c.UsePersistence<SqlPersistence>();
-                persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.Build());
-
-                c.EnableOutbox();
-            });
+            EndpointSetup<DefaultServer>(c => ConfigureMultiTenant(c, true, true));
         }
     }
 
@@ -71,14 +65,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         public MultiTenantEndpoint()
         {
-            EndpointSetup<DefaultServer>(c =>
-            {
-                var persistence = c.UsePersistence<SqlPersistence>();
-                persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.Build());
-
-                var outbox = c.EnableOutbox();
-                outbox.DisableCleanup();
-            });
+            EndpointSetup<DefaultServer>(c => ConfigureMultiTenant(c, true, false));
         }
     }
 
@@ -86,13 +73,26 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         public MultiTenantEndpointNoOutbox()
         {
-            EndpointSetup<DefaultServer>(c =>
-            {
-                var persistence = c.UsePersistence<SqlPersistence>();
-                persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.Build());
+            EndpointSetup<DefaultServer>(c => ConfigureMultiTenant(c, false));
+        }
+    }
 
-                c.DisableFeature<Outbox>();
-            });
+    static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)
+    {
+        var persistence = c.UsePersistence<SqlPersistence>();
+        persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.Build());
+
+        if (useOutbox)
+        {
+            var outbox = c.EnableOutbox();
+            if (!cleanOutbox)
+            {
+                outbox.DisableCleanup();
+            }
+        }
+        else
+        {
+            c.DisableFeature<Outbox>();
         }
     }
 
