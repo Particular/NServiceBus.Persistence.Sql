@@ -51,8 +51,9 @@ namespace NServiceBus
 
             var connectionBuilder = new ConnectionManager(captureTenantId, buildConnectionFromTenantData);
 
-            configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionManager", connectionBuilder);
+            var settings = configuration.GetSettings();
+            settings.Set("SqlPersistence.ConnectionManager", connectionBuilder);
+            settings.Set("SqlPersistence.MultiTenant", true);
         }
 
         internal static ConnectionManager GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
