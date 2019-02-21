@@ -25,24 +25,6 @@ namespace NServiceBus
         /// Configures how <see cref="DbConnection"/>s are constructed, allowing for selecting a different database per tenant in a multi-tenant system.
         /// </summary>
         /// <param name="configuration"></param>
-        /// <param name="captureTenantId"></param>
-        /// <param name="buildConnectionFromTenantData"></param>
-        public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IReadOnlyDictionary<string, string>, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
-        {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNull(nameof(captureTenantId), captureTenantId);
-            Guard.AgainstNull(nameof(buildConnectionFromTenantData), buildConnectionFromTenantData);
-
-            var connectionBuilder = new ConnectionManager(captureTenantId, buildConnectionFromTenantData);
-
-            configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionManager", connectionBuilder);
-        }
-
-        /// <summary>
-        /// Configures how <see cref="DbConnection"/>s are constructed, allowing for selecting a different database per tenant in a multi-tenant system.
-        /// </summary>
-        /// <param name="configuration"></param>
         /// <param name="tenantIdHeaderName"></param>
         /// <param name="buildConnectionFromTenantData"></param>
         public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, string tenantIdHeaderName, Func<string, DbConnection> buildConnectionFromTenantData)
@@ -58,6 +40,19 @@ namespace NServiceBus
             });
 
             MultiTenantConnectionBuilder(configuration, captureTenantId, buildConnectionFromTenantData);
+        }
+
+        // Possible future API, or if IReadOnlyDictionary<string, string> is replaced by a message headers abstraction
+        static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IReadOnlyDictionary<string, string>, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
+        {
+            Guard.AgainstNull(nameof(configuration), configuration);
+            Guard.AgainstNull(nameof(captureTenantId), captureTenantId);
+            Guard.AgainstNull(nameof(buildConnectionFromTenantData), buildConnectionFromTenantData);
+
+            var connectionBuilder = new ConnectionManager(captureTenantId, buildConnectionFromTenantData);
+
+            configuration.GetSettings()
+                .Set("SqlPersistence.ConnectionManager", connectionBuilder);
         }
 
         internal static ConnectionManager GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
