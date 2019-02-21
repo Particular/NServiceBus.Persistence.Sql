@@ -34,7 +34,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         var exception = Assert.ThrowsAsync<Exception>(async () =>
         {
             await Scenario.Define<Context>()
-                .WithEndpoint<MultiTenantEndpoint>(b => b.CustomConfig(c => ConfigureMultiTenant(c, true, true)))
+                .WithEndpoint<MultiTenantHandlerEndpoint>(b => b.CustomConfig(c => ConfigureMultiTenant(c, true, true)))
                 .Done(c => c.EndpointsStarted)
                 .Run()
                 .ConfigureAwait(false);
@@ -46,43 +46,44 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     }
 
     [Test]
-    public async Task Should_run_when_Outbox_cleanup_disabled()
+    public async Task Handler_with_Outbox_enabled()
     {
-        var context = await Scenario.Define<Context>()
-            .WithEndpoint<MultiTenantEndpoint>(b =>
-            {
-                b.CustomConfig(c => ConfigureMultiTenant(c, true, false));
-                SendMultiTenantMessages(b);
-            })
-            .Done(c => c.TenantADbName != null && c.TenantBDbName != null && c.SagaTenantADbName != null && c.SagaTenantBDbName != null)
-            .Run(TimeSpan.FromSeconds(30))
-            .ConfigureAwait(false);
-
-        Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
-        Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-        Assert.AreEqual("nservicebus_tenanta", context.SagaTenantADbName);
-        Assert.AreEqual("nservicebus_tenantb", context.SagaTenantBDbName);
-
-        context.Cleanup();
+        await RunTest<MultiTenantHandlerEndpoint>(true);
     }
 
     [Test]
-    public async Task Should_run_when_Outbox_is_disabled()
+    public async Task Saga_with_Outbox_enabled()
+    {
+        await RunTest<MultiTenantSagaEndpoint>(true);
+    }
+
+    [Test]
+    public async Task Handler_with_Outbox_disabled()
+    {
+        await RunTest<MultiTenantHandlerEndpoint>(false);
+    }
+
+    [Test]
+    public async Task Saga_with_Outbox_disabled()
+    {
+        await RunTest<MultiTenantSagaEndpoint>(false);
+    }
+
+    private async Task RunTest<TEndpointType>(bool useOutbox)
+        where TEndpointType : EndpointConfigurationBuilder
     {
         var context = await Scenario.Define<Context>()
-            .WithEndpoint<MultiTenantEndpoint>(b =>
+            .WithEndpoint<TEndpointType>(b =>
             {
-                b.CustomConfig((cfg, ctx) => ConfigureMultiTenant(cfg, false));
+                b.CustomConfig((cfg, ctx) => ConfigureMultiTenant(cfg, useOutbox, false));
                 SendMultiTenantMessages(b);
             })
-            .Done(c => c.TenantADbName != null && c.TenantBDbName != null && c.SagaTenantADbName != null && c.SagaTenantBDbName != null)
+            .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
             .Run(TimeSpan.FromSeconds(30))
             .ConfigureAwait(false);
 
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-        Assert.AreEqual("nservicebus_tenanta", context.SagaTenantADbName);
-        Assert.AreEqual("nservicebus_tenantb", context.SagaTenantBDbName);
 
         context.Cleanup();
     }
@@ -117,29 +118,28 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         builder.When(async (session, context) =>
         {
+            var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlConnectionBuilder.MultiTenant.Setup("TenantB");
-            var helperA = new ConfigureEndpointHelper(cfg, "UsingMultiTenant_MultiTenantEndpoint", () => MsSqlConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
-            var helperB = new ConfigureEndpointHelper(cfg, "UsingMultiTenant_MultiTenantEndpoint", () => MsSqlConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
+            var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
+            var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
             context.Cleanup = () =>
             {
                 helperA.Cleanup();
                 helperB.Cleanup();
             };
 
-            await SendTenantMessage<HandlerMessage>(session, "TenantA");
-            await SendTenantMessage<HandlerMessage>(session, "TenantB");
-            await SendTenantMessage<SagaMessage>(session, "TenantA");
-            await SendTenantMessage<SagaMessage>(session, "TenantB");
+            await SendTenantMessage(session, "TenantA");
+            await SendTenantMessage(session, "TenantB");
         });
     }
 
-    static Task SendTenantMessage<T>(IMessageSession session, string tenantId) where T : TestMessage, new()
+    static Task SendTenantMessage(IMessageSession session, string tenantId)
     {
         var sendOptions = new SendOptions();
         sendOptions.SetHeader("TenantId", tenantId);
         sendOptions.RouteToThisEndpoint();
-        return session.Send(new T {TenantId = tenantId}, sendOptions);
+        return session.Send(new TestMessage { TenantId = tenantId}, sendOptions);
     }
 
     public class Context : ScenarioContext
@@ -147,19 +147,17 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         // The EndpointsStarted flag is set by acceptance framework
         public string TenantADbName { get; set; }
         public string TenantBDbName { get; set; }
-        public string SagaTenantADbName { get; set; }
-        public string SagaTenantBDbName { get; set; }
         internal Action Cleanup { get; set; }
     }
 
-    public class MultiTenantEndpoint : EndpointConfigurationBuilder
+    public class MultiTenantHandlerEndpoint : EndpointConfigurationBuilder
     {
-        public MultiTenantEndpoint()
+        public MultiTenantHandlerEndpoint()
         {
             EndpointSetup<DefaultServer>();
         }
 
-        public class TestHandler : IHandleMessages<HandlerMessage>
+        public class TestHandler : IHandleMessages<TestMessage>
         {
             Context testContext;
 
@@ -168,7 +166,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 this.testContext = testContext;
             }
 
-            public Task Handle(HandlerMessage message, IMessageHandlerContext context)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 var session = context.SynchronizedStorageSession.SqlPersistenceSession();
                 var dbName = session.Connection.Database;
@@ -185,9 +183,17 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 return Task.FromResult(0);
             }
         }
+    }
+
+    public class MultiTenantSagaEndpoint : EndpointConfigurationBuilder
+    {
+        public MultiTenantSagaEndpoint()
+        {
+            EndpointSetup<DefaultServer>();
+        }
 
         public class TestSaga : Saga<TestSaga.TestSagaData>,
-            IAmStartedByMessages<SagaMessage>
+            IAmStartedByMessages<TestMessage>
         {
             Context testContext;
 
@@ -198,21 +204,21 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
             {
-                mapper.ConfigureMapping<SagaMessage>(msg => msg.TenantId).ToSaga(saga => saga.TenantId);
+                mapper.ConfigureMapping<TestMessage>(msg => msg.TenantId).ToSaga(saga => saga.TenantId);
             }
 
-            public Task Handle(SagaMessage message, IMessageHandlerContext context)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 var session = context.SynchronizedStorageSession.SqlPersistenceSession();
                 var dbName = session.Connection.Database;
 
                 if (message.TenantId == "TenantA")
                 {
-                    testContext.SagaTenantADbName = dbName;
+                    testContext.TenantADbName = dbName;
                 }
                 else if (message.TenantId == "TenantB")
                 {
-                    testContext.SagaTenantBDbName = dbName;
+                    testContext.TenantBDbName = dbName;
                 }
 
                 return Task.FromResult(0);
@@ -225,11 +231,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         }
     }
 
-
-    public class HandlerMessage : TestMessage { }
-    public class SagaMessage : TestMessage { }
-
-    public abstract class TestMessage : IMessage
+    public class TestMessage : IMessage
     {
         public string TenantId { get; set; }
     }
