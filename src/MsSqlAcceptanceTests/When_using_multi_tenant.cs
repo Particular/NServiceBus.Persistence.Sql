@@ -14,14 +14,14 @@ using NUnit.Framework;
 [TestFixture]
 public class When_using_multi_tenant : NServiceBusAcceptanceTest
 {
-    [SetUp]
+    [OneTimeSetUp]
     public void SetUpTenantDatabases()
     {
         MsSqlConnectionBuilder.MultiTenant.Setup("TenantA");
         MsSqlConnectionBuilder.MultiTenant.Setup("TenantB");
     }
 
-    [TearDown]
+    [OneTimeTearDown]
     public void TearDownTenantDatabases()
     {
         MsSqlConnectionBuilder.MultiTenant.TearDown("TenantA");
