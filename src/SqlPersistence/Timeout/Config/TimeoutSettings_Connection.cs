@@ -12,7 +12,7 @@ namespace NServiceBus.Persistence.Sql
         {
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
             settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Timeouts).Name}",
-                ConnectionManager.BuildSingleTenant(connectionBuilder));
+                new SingleTenantConnectionManager(connectionBuilder));
         }
     }
 }

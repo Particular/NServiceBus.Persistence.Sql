@@ -18,7 +18,7 @@ namespace NServiceBus
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
 
             configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionManager", ConnectionManager.BuildSingleTenant(connectionBuilder));
+                .Set("SqlPersistence.ConnectionManager", new SingleTenantConnectionManager(connectionBuilder));
         }
 
         /// <summary>
@@ -49,11 +49,11 @@ namespace NServiceBus
             Guard.AgainstNull(nameof(captureTenantId), captureTenantId);
             Guard.AgainstNull(nameof(buildConnectionFromTenantData), buildConnectionFromTenantData);
 
-            var connectionBuilder = new ConnectionManager(captureTenantId, buildConnectionFromTenantData);
+            var connectionManager = new MultiTenantConnectionManager(captureTenantId, buildConnectionFromTenantData);
 
             var settings = configuration.GetSettings();
-            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Outbox).Name}", connectionBuilder);
-            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Sagas).Name}", connectionBuilder);
+            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Outbox).Name}", connectionManager);
+            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Sagas).Name}", connectionManager);
             settings.Set("SqlPersistence.MultiTenant", true);
         }
 

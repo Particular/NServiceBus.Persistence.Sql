@@ -21,7 +21,7 @@ public abstract class OutboxPersisterTests
     {
         this.sqlDialect = sqlDialect;
         this.schema = schema;
-        connectionManager = ConnectionManager.BuildSingleTenant(() => GetConnection()(schema));
+        connectionManager = new SingleTenantConnectionManager(() => GetConnection()(schema));
     }
 
 

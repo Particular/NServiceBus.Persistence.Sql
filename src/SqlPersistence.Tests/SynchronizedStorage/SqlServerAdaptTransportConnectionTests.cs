@@ -33,7 +33,7 @@ class SqlServerAdaptTransportConnectionTests : AdaptTransportConnectionTests
         transportTransaction.Set("System.Data.SqlClient.SqlConnection", transportConnection);
         transportTransaction.Set("System.Data.SqlClient.SqlTransaction", transaction);
 
-        var altConnectionManager = ConnectionManager.BuildSingleTenant(() => throw new Exception("Should not be called"));
+        var altConnectionManager = new SingleTenantConnectionManager(() => throw new Exception("Should not be called"));
 
         var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager,
             (conn, tx, arg3) => new StorageSession(conn, tx, false, null));

@@ -19,7 +19,7 @@ abstract class AdaptTransportConnectionTests
     protected AdaptTransportConnectionTests(BuildSqlDialect sqlDialect)
     {
         this.sqlDialect = sqlDialect;
-        connectionManager = ConnectionManager.BuildSingleTenant(() => GetConnection()(null));
+        connectionManager = new SingleTenantConnectionManager(() => GetConnection()(null));
     }
 
     [Test]
