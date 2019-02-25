@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Pipeline;
+using NServiceBus.Settings;
 
 static class Extensions
 {
@@ -133,5 +134,10 @@ static class Extensions
         //}
 
         throw new Exception("Can't find incoming context");
+    }
+
+    public static bool EndpointIsMultiTenant(this ReadOnlySettings settings)
+    {
+        return settings.GetOrDefault<bool>("SqlPersistence.MultiTenant");
     }
 }

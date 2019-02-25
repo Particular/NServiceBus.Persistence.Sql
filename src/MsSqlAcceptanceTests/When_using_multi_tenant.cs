@@ -90,8 +90,8 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)
     {
-        // Undo the default call to ConnectionBuilder
-        c.GetSettings().Set("SqlPersistence.ConnectionManager", null);
+        // Settings already configured with a normal connection builder for subscriptions/timeouts
+        // this is expected and required if using a transport without pubsub and timeouts built in
 
         var persistence = c.UsePersistence<SqlPersistence>();
         persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.MultiTenant.Build(tenantId));

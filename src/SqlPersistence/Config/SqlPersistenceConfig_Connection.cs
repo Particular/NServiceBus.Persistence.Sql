@@ -52,7 +52,8 @@ namespace NServiceBus
             var connectionBuilder = new ConnectionManager(captureTenantId, buildConnectionFromTenantData);
 
             var settings = configuration.GetSettings();
-            settings.Set("SqlPersistence.ConnectionManager", connectionBuilder);
+            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Outbox).Name}", connectionBuilder);
+            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Sagas).Name}", connectionBuilder);
             settings.Set("SqlPersistence.MultiTenant", true);
         }
 
@@ -66,7 +67,15 @@ namespace NServiceBus
             {
                 return value;
             }
-            throw new Exception($"Couldn't find connection string for {storageType}. The connection to the database must be specified using the ConnectionBuilder method.");
+
+            var exceptionMessage = $"Couldn't find connection string for {storageType.Name}. The connection to the database must be specified using the `{nameof(ConnectionBuilder)}` method.";
+
+            if (settings.EndpointIsMultiTenant())
+            {
+                exceptionMessage += $" When in multi-tenant mode with `{nameof(MultiTenantConnectionBuilder)}`, you must still use `{nameof(ConnectionBuilder)}` to provide a database connection for subscriptions/timeouts on message transports that don't support those features natively.";
+            }
+
+            throw new Exception(exceptionMessage);
         }
 
         // TODO: RENAME to GetConnectionManager
