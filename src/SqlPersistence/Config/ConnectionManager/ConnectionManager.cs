@@ -17,7 +17,7 @@ abstract class ConnectionManager
         }
         catch
         {
-            connection.Dispose();
+            connection?.Dispose();
             throw;
         }
     }
