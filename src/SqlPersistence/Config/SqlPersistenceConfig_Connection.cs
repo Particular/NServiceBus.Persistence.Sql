@@ -84,7 +84,6 @@ namespace NServiceBus
             throw new Exception(exceptionMessage);
         }
 
-        // TODO: RENAME to GetConnectionManager
         internal static ConnectionManager GetConnectionBuilder<T>(this ReadOnlySettings settings)
             where T : StorageType
         {
