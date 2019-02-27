@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Pipeline;
 using NServiceBus.Settings;
+using NServiceBus.Transport;
 
 static class Extensions
 {
@@ -110,30 +111,20 @@ static class Extensions
         return false;
     }
 
-    public static IReadOnlyDictionary<string, string> GetMessageHeaders(this ContextBag context)
+    public static IncomingMessage GetIncomingMessage(this ContextBag context)
     {
-        if (context is ITransportReceiveContext transportReceiveContext)
-        {
-            return transportReceiveContext.Message.Headers;
-        }
-
-        if (context is IIncomingContext incomingContext)
-        {
-            return incomingContext.MessageHeaders;
-        }
-
         if (context == null)
         {
             // Tests pass a null context
             return null;
         }
 
-        //if (context.GetType() == typeof(ContextBag))
-        //{
-        //    return null;
-        //}
+        if (context.TryGet(out IncomingMessage message))
+        {
+            return message;
+        }
 
-        throw new Exception("Can't find incoming context");
+        throw new Exception("Can't find message headers from context.");
     }
 
     public static bool EndpointIsMultiTenant(this ReadOnlySettings settings)

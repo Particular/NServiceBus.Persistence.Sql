@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using NServiceBus.Transport;
 
 class MultiTenantConnectionManager : ConnectionManager
 {
-    Func<IReadOnlyDictionary<string, string>, string> captureTenantId;
+    Func<IncomingMessage, string> captureTenantId;
     Func<string, DbConnection> buildConnectionFromTenantData;
 
-    public MultiTenantConnectionManager(Func<IReadOnlyDictionary<string, string>, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
+    public MultiTenantConnectionManager(Func<IncomingMessage, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
     {
         this.captureTenantId = captureTenantId;
         this.buildConnectionFromTenantData = buildConnectionFromTenantData;
@@ -19,9 +19,9 @@ class MultiTenantConnectionManager : ConnectionManager
         throw new NotImplementedException();
     }
 
-    public override Task<DbConnection> OpenConnection(IReadOnlyDictionary<string, string> messageHeaders)
+    public override Task<DbConnection> OpenConnection(IncomingMessage incomingMessage)
     {
-        var tenantId = captureTenantId(messageHeaders);
+        var tenantId = captureTenantId(incomingMessage);
         var connection = buildConnectionFromTenantData(tenantId);
         return OpenConnection(connection);
     }

@@ -9,6 +9,7 @@ using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Transport;
 using NUnit.Framework;
 
 [TestFixture]
@@ -76,7 +77,52 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             .WithEndpoint<TEndpointType>(b =>
             {
                 b.CustomConfig((cfg, ctx) => ConfigureMultiTenant(cfg, useOutbox, false));
-                SendMultiTenantMessages(b);
+                SetupTenantDatabases(b);
+                b.When(async session =>
+                {
+                    await SendTenantMessage(session, "TenantA");
+                    await SendTenantMessage(session, "TenantB");
+                });
+            })
+            .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
+            .Run(TimeSpan.FromSeconds(30))
+            .ConfigureAwait(false);
+
+        Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
+        Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
+
+        context.Cleanup();
+    }
+
+    [Test]
+    public async Task Use_multiple_tenant_headers()
+    {
+        var context = await Scenario.Define<Context>()
+            .WithEndpoint<MultiTenantSagaEndpoint>(b =>
+            {
+                b.CustomConfig((cfg, ctx) =>
+                {
+                    var captureTenantId = new Func<IncomingMessage, string>(msg =>
+                    {
+                        if (msg.Headers.TryGetValue("TenantHeader1", out var tenantId) || msg.Headers.TryGetValue("TenantHeader2", out tenantId))
+                        {
+                            return tenantId;
+                        }
+
+                        return null;
+                    });
+
+                    var persistence = cfg.UsePersistence<SqlPersistence>();
+                    persistence.MultiTenantConnectionBuilder(captureTenantId, tenantId => MsSqlConnectionBuilder.MultiTenant.Build(tenantId));
+
+                    cfg.EnableOutbox().DisableCleanup();
+                });
+                SetupTenantDatabases(b);
+                b.When(async session =>
+                {
+                    await SendTenantMessage(session, "TenantA", "TenantHeader1");
+                    await SendTenantMessage(session, "TenantB", "TenantHeader2");
+                });
             })
             .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
             .Run(TimeSpan.FromSeconds(30))
@@ -110,13 +156,13 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         }
     }
 
-    static void SendMultiTenantMessages(EndpointBehaviorBuilder<Context> builder)
+    static void SetupTenantDatabases(EndpointBehaviorBuilder<Context> builder)
     {
         EndpointConfiguration cfg = null;
 
         builder.CustomConfig(c => cfg = c);
 
-        builder.When(async (session, context) =>
+        builder.When((session, context) =>
         {
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlConnectionBuilder.MultiTenant.Setup("TenantA");
@@ -128,16 +174,14 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 helperA.Cleanup();
                 helperB.Cleanup();
             };
-
-            await SendTenantMessage(session, "TenantA");
-            await SendTenantMessage(session, "TenantB");
+            return Task.FromResult(0);
         });
     }
 
-    static Task SendTenantMessage(IMessageSession session, string tenantId)
+    static Task SendTenantMessage(IMessageSession session, string tenantId, string tenantHeaderName = "TenantId")
     {
         var sendOptions = new SendOptions();
-        sendOptions.SetHeader("TenantId", tenantId);
+        sendOptions.SetHeader(tenantHeaderName, tenantId);
         sendOptions.RouteToThisEndpoint();
         return session.Send(new TestMessage { TenantId = tenantId}, sendOptions);
     }

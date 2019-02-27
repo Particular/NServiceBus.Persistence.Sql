@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using NServiceBus.Transport;
 
 class SingleTenantConnectionManager : ConnectionManager
 {
@@ -22,7 +22,7 @@ class SingleTenantConnectionManager : ConnectionManager
         return connectionBuilder();
     }
 
-    public override Task<DbConnection> OpenConnection(IReadOnlyDictionary<string, string> messageHeaders)
+    public override Task<DbConnection> OpenConnection(IncomingMessage incomingMessage)
     {
         return OpenConnection(connectionBuilder());
     }

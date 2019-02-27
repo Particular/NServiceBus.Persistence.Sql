@@ -210,6 +210,7 @@ namespace NServiceBus
         public static void DoNotUseSqlServerTransportConnection(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings) { }
         public static void JsonBParameterModifier(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.PostgreSql> dialectSettings, System.Action<System.Data.Common.DbParameter> modifier) { }
         public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tenantIdHeaderName, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
+        public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<NServiceBus.Transport.IncomingMessage, string> captureTenantId, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>().Schema(\"schema_name\")` inst" +
             "ead. The member currently throws a NotImplementedException. Will be removed in v" +

@@ -44,7 +44,7 @@
                     return null;
                 }
 
-                var connection = await connectionManager.OpenConnection(context.GetMessageHeaders()).ConfigureAwait(false);
+                var connection = await connectionManager.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
                 return storageSessionFactory(connection, null, true);
             }
