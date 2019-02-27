@@ -18,7 +18,7 @@ namespace NServiceBus
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
 
             configuration.GetSettings()
-                .Set("SqlPersistence.ConnectionManager", new SingleTenantConnectionManager(connectionBuilder));
+                .Set("SqlPersistence.ConnectionManager", new ConnectionManager(connectionBuilder));
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace NServiceBus
             settings.Set("SqlPersistence.MultiTenant", true);
         }
 
-        internal static ConnectionManager GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
+        internal static IConnectionManager GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
         {
-            if (settings.TryGet($"SqlPersistence.ConnectionManager.{storageType.Name}", out ConnectionManager value))
+            if (settings.TryGet($"SqlPersistence.ConnectionManager.{storageType.Name}", out IConnectionManager value))
             {
                 return value;
             }
@@ -83,7 +83,7 @@ namespace NServiceBus
             throw new Exception(exceptionMessage);
         }
 
-        internal static ConnectionManager GetConnectionBuilder<T>(this ReadOnlySettings settings)
+        internal static IConnectionManager GetConnectionBuilder<T>(this ReadOnlySettings settings)
             where T : StorageType
         {
             return GetConnectionBuilder(settings, typeof(T));

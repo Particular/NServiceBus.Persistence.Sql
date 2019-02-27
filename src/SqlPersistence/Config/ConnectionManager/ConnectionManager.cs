@@ -1,8 +1,23 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using NServiceBus.Transport;
 
-abstract class ConnectionManager
+class ConnectionManager : IConnectionManager
 {
-    public abstract DbConnection BuildNonContextual();
-    public abstract DbConnection Build(IncomingMessage incomingMessage);
+    Func<DbConnection> connectionBuilder;
+
+    public ConnectionManager(Func<DbConnection> connectionBuilder)
+    {
+        this.connectionBuilder = connectionBuilder;
+    }
+
+    public DbConnection BuildNonContextual()
+    {
+        return connectionBuilder();
+    }
+
+    public DbConnection Build(IncomingMessage incomingMessage)
+    {
+        return connectionBuilder();
+    }
 }

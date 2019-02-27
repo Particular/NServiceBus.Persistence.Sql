@@ -2,7 +2,7 @@
 using System.Data.Common;
 using NServiceBus.Transport;
 
-class MultiTenantConnectionManager : ConnectionManager
+class MultiTenantConnectionManager : IConnectionManager
 {
     Func<IncomingMessage, string> captureTenantId;
     Func<string, DbConnection> buildConnectionFromTenantData;
@@ -13,12 +13,12 @@ class MultiTenantConnectionManager : ConnectionManager
         this.buildConnectionFromTenantData = buildConnectionFromTenantData;
     }
 
-    public override DbConnection BuildNonContextual()
+    public DbConnection BuildNonContextual()
     {
         throw new NotImplementedException();
     }
 
-    public override DbConnection Build(IncomingMessage incomingMessage)
+    public DbConnection Build(IncomingMessage incomingMessage)
     {
         var tenantId = captureTenantId(incomingMessage);
         return buildConnectionFromTenantData(tenantId);

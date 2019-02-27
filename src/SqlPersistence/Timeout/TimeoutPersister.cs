@@ -11,7 +11,7 @@ using NServiceBus.Persistence.Sql;
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
 {
-    ConnectionManager connectionManager;
+    IConnectionManager connectionManager;
     SqlDialect sqlDialect;
     TimeoutCommands timeoutCommands;
     TimeSpan timeoutsCleanupExecutionInterval;
@@ -19,7 +19,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     DateTime lastTimeoutsCleanupExecution;
     DateTime oldestSupportedTimeout;
 
-    public TimeoutPersister(ConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
+    public TimeoutPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;

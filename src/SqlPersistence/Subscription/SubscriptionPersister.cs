@@ -15,7 +15,7 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(ConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
+    public SubscriptionPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
@@ -183,7 +183,7 @@ class SubscriptionPersister : ISubscriptionStorage
     }
 
     public ConcurrentDictionary<string, CacheItem> Cache;
-    ConnectionManager connectionManager;
+    IConnectionManager connectionManager;
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;

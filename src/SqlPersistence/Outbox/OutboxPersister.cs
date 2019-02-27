@@ -15,12 +15,12 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    ConnectionManager connectionManager;
+    IConnectionManager connectionManager;
     SqlDialect sqlDialect;
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
 
-    public OutboxPersister(ConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
+    public OutboxPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;

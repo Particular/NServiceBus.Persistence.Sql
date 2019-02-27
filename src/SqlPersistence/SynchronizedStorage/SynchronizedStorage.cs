@@ -4,10 +4,10 @@ using NServiceBus.Persistence;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
-    ConnectionManager connectionManager;
+    IConnectionManager connectionManager;
     SagaInfoCache infoCache;
 
-    public SynchronizedStorage(ConnectionManager connectionManager, SagaInfoCache infoCache)
+    public SynchronizedStorage(IConnectionManager connectionManager, SagaInfoCache infoCache)
     {
         this.connectionManager = connectionManager;
         this.infoCache = infoCache;

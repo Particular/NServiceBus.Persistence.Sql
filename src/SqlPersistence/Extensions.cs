@@ -27,13 +27,13 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
-    public static Task<DbConnection> OpenNonContextualConnection(this ConnectionManager connectionManager)
+    public static Task<DbConnection> OpenNonContextualConnection(this IConnectionManager connectionManager)
     {
         var connection = connectionManager.BuildNonContextual();
         return OpenConnection(connection);
     }
 
-    public static Task<DbConnection> OpenConnection(this ConnectionManager connectionManager, IncomingMessage incomingMessage)
+    public static Task<DbConnection> OpenConnection(this IConnectionManager connectionManager, IncomingMessage incomingMessage)
     {
         var connection = connectionManager.Build(incomingMessage);
         return OpenConnection(connection);

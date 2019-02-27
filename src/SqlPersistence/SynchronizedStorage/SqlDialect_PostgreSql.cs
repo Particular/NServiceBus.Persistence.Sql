@@ -12,7 +12,7 @@
     {
         public partial class PostgreSql
         {
-            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, ConnectionManager connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
             {
                 // Transport supports DTC and uses TxScope owned by the transport
                 var scopeTx = Transaction.Current;

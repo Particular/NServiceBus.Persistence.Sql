@@ -12,7 +12,7 @@ public abstract class OutboxPersisterTests
 {
     BuildSqlDialect sqlDialect;
     string schema;
-    ConnectionManager connectionManager;
+    IConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
@@ -21,7 +21,7 @@ public abstract class OutboxPersisterTests
     {
         this.sqlDialect = sqlDialect;
         this.schema = schema;
-        connectionManager = new SingleTenantConnectionManager(() => GetConnection()(schema));
+        connectionManager = new ConnectionManager(() => GetConnection()(schema));
     }
 
 

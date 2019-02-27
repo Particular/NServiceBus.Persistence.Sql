@@ -10,7 +10,7 @@ using NUnit.Framework;
 abstract class AdaptTransportConnectionTests
 {
     protected BuildSqlDialect sqlDialect;
-    protected ConnectionManager connectionManager;
+    protected IConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
 
@@ -19,7 +19,7 @@ abstract class AdaptTransportConnectionTests
     protected AdaptTransportConnectionTests(BuildSqlDialect sqlDialect)
     {
         this.sqlDialect = sqlDialect;
-        connectionManager = new SingleTenantConnectionManager(() => GetConnection()(null));
+        connectionManager = new ConnectionManager(() => GetConnection()(null));
     }
 
     [Test]
