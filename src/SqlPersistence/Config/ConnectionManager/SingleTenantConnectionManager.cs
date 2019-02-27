@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 using NServiceBus.Transport;
 
 class SingleTenantConnectionManager : ConnectionManager
@@ -12,18 +11,13 @@ class SingleTenantConnectionManager : ConnectionManager
         this.connectionBuilder = connectionBuilder;
     }
 
-    public override Task<DbConnection> OpenNonContextualConnection()
-    {
-        return OpenConnection(connectionBuilder());
-    }
-
     public override DbConnection BuildNonContextual()
     {
         return connectionBuilder();
     }
 
-    public override Task<DbConnection> OpenConnection(IncomingMessage incomingMessage)
+    public override DbConnection Build(IncomingMessage incomingMessage)
     {
-        return OpenConnection(connectionBuilder());
+        return connectionBuilder();
     }
 }

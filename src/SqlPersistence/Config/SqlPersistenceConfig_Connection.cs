@@ -1,7 +1,6 @@
 namespace NServiceBus
 {
     using System;
-    using System.Collections.Generic;
     using System.Data.Common;
     using Configuration.AdvancedExtensibility;
     using Persistence.Sql;

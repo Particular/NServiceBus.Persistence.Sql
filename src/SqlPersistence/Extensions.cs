@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
-using NServiceBus.Pipeline;
 using NServiceBus.Settings;
 using NServiceBus.Transport;
 
@@ -27,6 +25,32 @@ static class Extensions
         parameter.Value = value;
         parameter.DbType = DbType.DateTime;
         command.Parameters.Add(parameter);
+    }
+
+    public static Task<DbConnection> OpenNonContextualConnection(this ConnectionManager connectionManager)
+    {
+        var connection = connectionManager.BuildNonContextual();
+        return OpenConnection(connection);
+    }
+
+    public static Task<DbConnection> OpenConnection(this ConnectionManager connectionManager, IncomingMessage incomingMessage)
+    {
+        var connection = connectionManager.Build(incomingMessage);
+        return OpenConnection(connection);
+    }
+
+    static async Task<DbConnection> OpenConnection(DbConnection connection)
+    {
+        try
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+            return connection;
+        }
+        catch
+        {
+            connection?.Dispose();
+            throw;
+        }
     }
 
     public static void AddParameter(this DbCommand command, string name, Version value)

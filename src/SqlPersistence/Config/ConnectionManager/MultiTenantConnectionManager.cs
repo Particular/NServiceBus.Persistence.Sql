@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 using NServiceBus.Transport;
 
 class MultiTenantConnectionManager : ConnectionManager
@@ -19,15 +18,9 @@ class MultiTenantConnectionManager : ConnectionManager
         throw new NotImplementedException();
     }
 
-    public override Task<DbConnection> OpenConnection(IncomingMessage incomingMessage)
+    public override DbConnection Build(IncomingMessage incomingMessage)
     {
         var tenantId = captureTenantId(incomingMessage);
-        var connection = buildConnectionFromTenantData(tenantId);
-        return OpenConnection(connection);
-    }
-
-    public override Task<DbConnection> OpenNonContextualConnection()
-    {
-        throw new NotImplementedException();
+        return buildConnectionFromTenantData(tenantId);
     }
 }
