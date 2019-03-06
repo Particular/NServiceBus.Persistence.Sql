@@ -4,6 +4,9 @@ using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus.Extensibility;
+using NServiceBus.Settings;
+using NServiceBus.Transport;
 
 static class Extensions
 {
@@ -24,9 +27,20 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
-    public static async Task<DbConnection> OpenConnection(this Func<DbConnection> connectionBuilder)
+    public static Task<DbConnection> OpenNonContextualConnection(this IConnectionManager connectionManager)
     {
-        var connection = connectionBuilder();
+        var connection = connectionManager.BuildNonContextual();
+        return OpenConnection(connection);
+    }
+
+    public static Task<DbConnection> OpenConnection(this IConnectionManager connectionManager, IncomingMessage incomingMessage)
+    {
+        var connection = connectionManager.Build(incomingMessage);
+        return OpenConnection(connection);
+    }
+
+    static async Task<DbConnection> OpenConnection(DbConnection connection)
+    {
         try
         {
             await connection.OpenAsync().ConfigureAwait(false);
@@ -34,7 +48,7 @@ static class Extensions
         }
         catch
         {
-            connection.Dispose();
+            connection?.Dispose();
             throw;
         }
     }
@@ -98,6 +112,7 @@ static class Extensions
             throw new Exception(message, exception);
         }
     }
+
     public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic)
     {
         while (toCheck != null && toCheck != typeof(object))
@@ -118,5 +133,26 @@ static class Extensions
             toCheck = toCheck.BaseType;
         }
         return false;
+    }
+
+    public static IncomingMessage GetIncomingMessage(this ContextBag context)
+    {
+        if (context == null)
+        {
+            // Tests pass a null context
+            return null;
+        }
+
+        if (context.TryGet(out IncomingMessage message))
+        {
+            return message;
+        }
+
+        throw new Exception("Can't find message headers from context.");
+    }
+
+    public static bool EndpointIsMultiTenant(this ReadOnlySettings settings)
+    {
+        return settings.GetOrDefault<bool>("SqlPersistence.MultiTenant");
     }
 }

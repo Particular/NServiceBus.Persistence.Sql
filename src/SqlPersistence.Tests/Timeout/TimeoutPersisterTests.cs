@@ -35,7 +35,7 @@ public abstract class TimeoutPersisterTests
         var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
 
         return new TimeoutPersister(
-            connectionBuilder: () => dbConnection(theSchema),
+            connectionManager: new ConnectionManager(() => dbConnection(theSchema)),
             tablePrefix: $"{name}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,

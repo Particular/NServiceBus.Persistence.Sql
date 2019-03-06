@@ -14,19 +14,19 @@ class SqlSubscriptionFeature : Feature
     {
         var settings = context.Settings;
 
-        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Subscriptions>();
+        var connectionManager = settings.GetConnectionBuilder<StorageType.Subscriptions>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
-        var persister = new SubscriptionPersister(connectionBuilder, tablePrefix, sqlDialect, cacheFor);
+        var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor);
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
-        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions", 
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions",
             new
             {
                 EntriesCashedFor = cacheFor,
-                CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionBuilder.{typeof(StorageType.Subscriptions).Name}")
+                CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{typeof(StorageType.Subscriptions).Name}")
             });
 
         context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);

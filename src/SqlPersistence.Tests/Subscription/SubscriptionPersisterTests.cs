@@ -30,7 +30,7 @@ public abstract class SubscriptionPersisterTests
         dbConnection = GetConnection();
         tablePrefix = GetTablePrefix();
         var persister = new SubscriptionPersister(
-            connectionBuilder: () => dbConnection(theSchema),
+            connectionManager: new ConnectionManager(() => dbConnection(theSchema)),
             tablePrefix: $"{tablePrefix}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             cacheFor: TimeSpan.FromSeconds(10)

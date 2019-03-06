@@ -10,7 +10,7 @@ using NUnit.Framework;
 abstract class AdaptTransportConnectionTests
 {
     protected BuildSqlDialect sqlDialect;
-    protected Func<DbConnection> dbConnection;
+    protected IConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
 
@@ -19,7 +19,7 @@ abstract class AdaptTransportConnectionTests
     protected AdaptTransportConnectionTests(BuildSqlDialect sqlDialect)
     {
         this.sqlDialect = sqlDialect;
-        dbConnection = () => GetConnection()(null);
+        connectionManager = new ConnectionManager(() => GetConnection()(null));
     }
 
     [Test]
@@ -35,7 +35,7 @@ abstract class AdaptTransportConnectionTests
             transportTransaction.Set(Transaction.Current);
             using (new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
-                var ex = Assert.ThrowsAsync<Exception>(() => sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), dbConnection,
+                var ex = Assert.ThrowsAsync<Exception>(() => sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
                     (conn, tx, arg3) => new StorageSession(conn, tx, false, null)));
 
                 StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", ex.Message);
@@ -47,7 +47,7 @@ abstract class AdaptTransportConnectionTests
     public async Task It_returns_null_if_there_is_no_transaction_scope()
     {
         var transportTransaction = new TransportTransaction();
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), dbConnection,
+        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
             (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
 
         Assert.IsNull(result);

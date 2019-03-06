@@ -12,7 +12,7 @@
     {
         public partial class PostgreSql
         {
-            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, Func<DbConnection> connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
             {
                 // Transport supports DTC and uses TxScope owned by the transport
                 var scopeTx = Transaction.Current;
@@ -31,7 +31,8 @@
                     //Other modes handled by creating a new session.
                     return null;
                 }
-                var connection = await connectionBuilder.OpenConnection().ConfigureAwait(false);
+
+                var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
                 return storageSessionFactory(connection, null, true);
             }
