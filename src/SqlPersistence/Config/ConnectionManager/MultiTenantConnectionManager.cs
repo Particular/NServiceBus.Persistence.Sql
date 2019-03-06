@@ -21,6 +21,12 @@ class MultiTenantConnectionManager : IConnectionManager
     public DbConnection Build(IncomingMessage incomingMessage)
     {
         var tenantId = captureTenantId(incomingMessage);
+
+        if (string.IsNullOrWhiteSpace(tenantId))
+        {
+            throw new Exception(@"This endpoint attempted to process a message in multi-tenant mode and was unable to determine the tenant id from the incoming message. As a result SQL Persistence cannot determine which tenant database to use. Either: 1) The message lacks a tenant id and is invalid. 2) The lambda provided to determine the tenant id from an incoming message contains a bug. 3) Either this endpoint or another upstream endpoint is not configured to use a custom behavior for relaying tenant information from incoming to outgoing messages, or that behavior contains a bug.");
+        }
+
         return buildConnectionFromTenantData(tenantId);
     }
 }

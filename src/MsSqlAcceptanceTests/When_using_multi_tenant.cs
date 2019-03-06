@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -44,6 +45,28 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         var msg = exception.Message;
 
         Assert.That(msg.Contains("EnableOutbox") && msg.Contains("DisableCleanup"));
+    }
+
+    [Test]
+    public async Task Should_throw_if_no_tenant_id()
+    {
+
+        var context = await Scenario.Define<Context>()
+            .WithEndpoint<MultiTenantHandlerEndpoint>(b =>
+            {
+                b.DoNotFailOnErrorMessages();
+                b.CustomConfig(c => ConfigureMultiTenant(c, true, false));
+                b.When(session => session.SendLocal(new TestMessage { TenantId = "TenantIdButNotInHeader" }));
+            })
+            .Done(c => c.FailedMessages.Any())
+            .Run()
+            .ConfigureAwait(false);
+
+        var failed = context.FailedMessages.Values.FirstOrDefault()?.FirstOrDefault();
+        var exception = failed.Exception;
+        var msg = exception.Message;
+
+        Assert.That(msg.Contains("unable to determine the tenant id"));
     }
 
     [Test]
@@ -183,7 +206,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         var sendOptions = new SendOptions();
         sendOptions.SetHeader(tenantHeaderName, tenantId);
         sendOptions.RouteToThisEndpoint();
-        return session.Send(new TestMessage { TenantId = tenantId}, sendOptions);
+        return session.Send(new TestMessage { TenantId = tenantId }, sendOptions);
     }
 
     public class Context : ScenarioContext
