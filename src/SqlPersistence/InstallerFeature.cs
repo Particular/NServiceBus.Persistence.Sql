@@ -20,6 +20,7 @@ class InstallerFeature : Feature
         settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
         settings.TablePrefix = context.Settings.GetTablePrefix();
+        settings.IsMultiTenant = context.Settings.EndpointIsMultiTenant();
 
         settings.Dialect.ValidateTablePrefix(settings.TablePrefix);
     }

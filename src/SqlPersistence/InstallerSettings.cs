@@ -9,4 +9,5 @@ class InstallerSettings
     public SqlDialect Dialect { get; set; }
     public string ScriptDirectory { get; set; }
     public string TablePrefix { get; set; }
+    public bool IsMultiTenant { get; set; }
 }
