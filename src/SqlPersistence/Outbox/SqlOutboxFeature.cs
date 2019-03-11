@@ -12,10 +12,10 @@ class SqlOutboxFeature : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var connectionBuilder = settings.GetConnectionBuilder<StorageType.Outbox>();
+        var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
-        var outboxPersister = new OutboxPersister(connectionBuilder, tablePrefix, sqlDialect);
+        var outboxPersister = new OutboxPersister(connectionManager, tablePrefix, sqlDialect);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -28,6 +28,11 @@ class SqlOutboxFeature : Feature
             return;
         }
 
+        if (settings.EndpointIsMultiTenant())
+        {
+            throw new Exception($"{nameof(SqlPersistenceConfig.MultiTenantConnectionBuilder)} can only be used with the Outbox feature if Outbox cleanup is handled by an external process (i.e. SQL Agent) and the endpoint is configured to disable Outbox cleanup using endpointConfiguration.EnableOutbox().{nameof(SqlPersistenceOutboxSettingsExtensions.DisableCleanup)}(). See the SQL Persistence documentation for more information on how to clean up Outbox tables from a scheduled task.");
+        }
+
         var frequencyToRunCleanup = settings.GetOrDefault<TimeSpan?>(FrequencyToRunDeduplicationDataCleanup) ?? TimeSpan.FromMinutes(1);
         var timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>(TimeToKeepDeduplicationData) ?? TimeSpan.FromDays(7);
 
@@ -38,7 +43,7 @@ class SqlOutboxFeature : Feature
             FrequencyToRunDeduplicationDataCleanup = frequencyToRunCleanup
         });
 
-        context.RegisterStartupTask(b => 
+        context.RegisterStartupTask(b =>
             new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
 

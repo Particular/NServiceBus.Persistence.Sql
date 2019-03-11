@@ -12,7 +12,7 @@ public abstract class OutboxPersisterTests
 {
     BuildSqlDialect sqlDialect;
     string schema;
-    Func<DbConnection> dbConnection;
+    IConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
@@ -21,14 +21,14 @@ public abstract class OutboxPersisterTests
     {
         this.sqlDialect = sqlDialect;
         this.schema = schema;
-        dbConnection = () => GetConnection()(schema);
+        connectionManager = new ConnectionManager(() => GetConnection()(schema));
     }
 
 
     OutboxPersister Setup(string theSchema)
     {
         var persister = new OutboxPersister(
-            connectionBuilder: dbConnection,
+            connectionManager: connectionManager,
             tablePrefix: $"{GetTablePrefix()}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             cleanupBatchSize: 5);
@@ -69,7 +69,7 @@ public abstract class OutboxPersisterTests
     [Test]
     public void ExecuteCreateTwice()
     {
-        using (var connection = dbConnection())
+        using (var connection = connectionManager.BuildNonContextual())
         {
             connection.Open();
             connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: schema);
@@ -111,7 +111,7 @@ public abstract class OutboxPersisterTests
         };
         var messageId = "a";
 
-        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
             await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
@@ -156,7 +156,7 @@ public abstract class OutboxPersisterTests
         };
 
         var messageId = "a";
-        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         using (var transaction = connection.BeginTransaction())
         {
             await persister.Store(new OutboxMessage(messageId, operations), transaction, connection).ConfigureAwait(false);
@@ -169,7 +169,7 @@ public abstract class OutboxPersisterTests
     public async Task StoreAndCleanup()
     {
         var persister = Setup(schema);
-        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         {
             for (var i = 0; i < 13; i++)
             {
@@ -180,7 +180,7 @@ public abstract class OutboxPersisterTests
         await Task.Delay(1000).ConfigureAwait(false);
         var dateTime = DateTime.UtcNow;
         await Task.Delay(1000).ConfigureAwait(false);
-        using (var connection = await dbConnection.OpenConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         {
             await Store(13, connection, persister).ConfigureAwait(false);
         }

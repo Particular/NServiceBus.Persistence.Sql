@@ -16,10 +16,11 @@ class InstallerFeature : Feature
             return;
         }
 
-        settings.ConnectionBuilder = storageType => context.Settings.GetConnectionBuilder(storageType)();
+        settings.ConnectionBuilder = storageType => context.Settings.GetConnectionBuilder(storageType).BuildNonContextual();
         settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
         settings.TablePrefix = context.Settings.GetTablePrefix();
+        settings.IsMultiTenant = context.Settings.EndpointIsMultiTenant();
 
         settings.Dialect.ValidateTablePrefix(settings.TablePrefix);
     }
