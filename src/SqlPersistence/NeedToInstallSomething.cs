@@ -33,7 +33,7 @@ class SqlPersistenceInstaller : INeedToInstallSomething
                     connectionBuilder: installerSettings.ConnectionBuilder,
                     scriptDirectory: installerSettings.ScriptDirectory,
                     shouldInstallOutbox: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlOutboxFeature)),
-                    shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
+                    shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlSagaFeature)),
                     shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
                     shouldInstallTimeouts: settings.IsFeatureActive(typeof(SqlTimeoutFeature)))
                 .ConfigureAwait(false);
