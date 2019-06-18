@@ -14,7 +14,7 @@
     <PackageReference Include="NServiceBus" Version="[6.2.0, 7.0.0)" />
     <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="0.2.1" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.3.0" PrivateAssets="All" />
     <Reference Include="System.Transactions" />
   </ItemGroup>
 
