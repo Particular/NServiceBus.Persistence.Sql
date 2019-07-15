@@ -16,8 +16,6 @@ public class SetUpFixture
         }
     }
 
-    
-
     [OneTimeTearDown]
     public void TearDown()
     {
