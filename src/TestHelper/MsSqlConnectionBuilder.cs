@@ -8,10 +8,14 @@ public static class MsSqlConnectionBuilder
     public static SqlConnection Build()
     {
         var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+
         if (string.IsNullOrWhiteSpace(connection))
         {
-            return new SqlConnection(ConnectionString);
+            SetCollationToCaseSensitive(ConnectionString);
+            return new SqlConnection(connection);
         }
+
+        SetCollationToCaseSensitive(connection);
         return new SqlConnection(connection);
     }
 
@@ -21,6 +25,15 @@ public static class MsSqlConnectionBuilder
         {
             connection.Open();
             return Version.Parse(connection.ServerVersion).Major >= 13;
+        }
+    }
+
+    static void SetCollationToCaseSensitive(string connectionString)
+    {
+        using (var connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            connection.ExecuteCommand($"ALTER DATABASE [{connection.Database}] COLLATE SQL_Latin1_General_CP1_CS_AS;");
         }
     }
 
