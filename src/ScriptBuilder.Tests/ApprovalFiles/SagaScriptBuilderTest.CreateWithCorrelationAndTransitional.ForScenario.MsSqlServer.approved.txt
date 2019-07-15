@@ -54,7 +54,7 @@ end
 declare @dataType_CorrelationProperty nvarchar(max);
 set @dataType_CorrelationProperty = (
   select data_type
-  from information_schema.columns
+  from INFORMATION_SCHEMA.COLUMNS
   where
     table_name = @tableNameWithoutSchema and
     table_schema = @schema and
@@ -107,7 +107,7 @@ end
 declare @dataType_TransitionalProperty nvarchar(max);
 set @dataType_TransitionalProperty = (
   select data_type
-  from information_schema.columns
+  from INFORMATION_SCHEMA.COLUMNS
   where
     table_name = @tableNameWithoutSchema and
     table_schema = @schema and
@@ -160,7 +160,7 @@ declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
     select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
-    from information_schema.columns
+    from INFORMATION_SCHEMA.COLUMNS
     where
         table_name = @tableNameWithoutSchema and
         table_schema = @schema and
