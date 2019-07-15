@@ -5,18 +5,22 @@ public static class MsSqlConnectionBuilder
 {
     const string ConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
 
-    public static SqlConnection Build()
+
+    static string GetConnectionString()
     {
         var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
 
         if (string.IsNullOrWhiteSpace(connection))
         {
-            SetCollationToCaseSensitive(ConnectionString);
-            return new SqlConnection(connection);
+            return ConnectionString;
         }
 
-        SetCollationToCaseSensitive(connection);
-        return new SqlConnection(connection);
+        return connection;
+    }
+
+    public static SqlConnection Build()
+    {
+        return new SqlConnection(GetConnectionString());
     }
 
     public static bool IsSql2016OrHigher()
@@ -28,12 +32,29 @@ public static class MsSqlConnectionBuilder
         }
     }
 
-    static void SetCollationToCaseSensitive(string connectionString)
+    public static void CreateDbIfNotExists()
     {
-        using (var connection = new SqlConnection(connectionString))
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        var databaseName = connectionStringBuilder.InitialCatalog;
+
+        connectionStringBuilder.InitialCatalog = "master";
+
+        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
         {
             connection.Open();
-            connection.ExecuteCommand($"ALTER DATABASE [{connection.Database}] COLLATE SQL_Latin1_General_CP1_CS_AS;");
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = string.Format("select * from master.dbo.sysdatabases where name='{0}'", databaseName);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // exists
+                        return;
+                }
+
+                command.CommandText = string.Format("CREATE DATABASE {0}", databaseName);
+                command.ExecuteNonQuery();
+            }
         }
     }
 
@@ -46,7 +67,7 @@ public static class MsSqlConnectionBuilder
             using (var conn = MsSqlConnectionBuilder.Build())
             {
                 conn.Open();
-                conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName}; ALTER DATABASE [{dbName}] COLLATE SQL_Latin1_General_CP1_CS_AS;");
+                conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') begin create database {dbName}; ALTER DATABASE [{dbName}] COLLATE SQL_Latin1_General_CP1_CS_AS; end;");
             }
         }
 
@@ -83,6 +104,4 @@ public static class MsSqlConnectionBuilder
             return connection;
         }
     }
-
-
 }
