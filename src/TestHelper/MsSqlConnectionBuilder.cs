@@ -33,7 +33,7 @@ public static class MsSqlConnectionBuilder
             using (var conn = MsSqlConnectionBuilder.Build())
             {
                 conn.Open();
-                conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
+                conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName}; ALTER DATABASE [{dbName}] COLLATE SQL_Latin1_General_CP1_CS_AS;");
             }
         }
 
