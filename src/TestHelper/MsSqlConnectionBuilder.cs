@@ -7,12 +7,7 @@ public static class MsSqlConnectionBuilder
 
     public static SqlConnection Build()
     {
-        var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
-        if (string.IsNullOrWhiteSpace(connection))
-        {
-            return new SqlConnection(ConnectionString);
-        }
-        return new SqlConnection(connection);
+        return new SqlConnection(GetConnectionString());
     }
 
     public static bool IsSql2016OrHigher()
@@ -40,12 +35,7 @@ public static class MsSqlConnectionBuilder
         public static void TearDown(string tenantId)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
-
-            using (var conn = MsSqlConnectionBuilder.Build())
-            {
-                conn.Open();
-                conn.ExecuteCommand($"use master; if exists (select * from sysdatabases where name = '{dbName}') begin alter database {dbName} set SINGLE_USER with rollback immediate; drop database {dbName}; end;");
-            }
+            DropDatabase(dbName);
         }
 
         public static SqlConnection Build(string tenantId)
@@ -71,5 +61,83 @@ public static class MsSqlConnectionBuilder
         }
     }
 
+    public static void DropDbIfCollationIncorrect()
+    {
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        var databaseName = connectionStringBuilder.InitialCatalog;
 
+        connectionStringBuilder.InitialCatalog = "master";
+
+        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
+        {
+            connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = $"SELECT * FROM sys.databases WHERE name = '{databaseName}' AND COALESCE(collation_name, '') <> 'SQL_Latin1_General_CP1_CS_AS'";
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // The database collation is wront, drop so that it will be recreated
+                    {
+                        DropDatabase(databaseName);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void CreateDbIfNotExists()
+    {
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        var databaseName = connectionStringBuilder.InitialCatalog;
+
+        connectionStringBuilder.InitialCatalog = "master";
+
+        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
+        {
+            connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = $"select * from master.dbo.sysdatabases where name='{databaseName}'";
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // exists
+                        return;
+                }
+
+                command.CommandText = $"CREATE DATABASE {databaseName} COLLATE SQL_Latin1_General_CP1_CS_AS";
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
+    static string GetConnectionString()
+    {
+        var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+
+        if (string.IsNullOrWhiteSpace(connection))
+        {
+            return ConnectionString;
+        }
+
+        return connection;
+    }
+
+    static void DropDatabase(string databaseName)
+    {
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+
+        connectionStringBuilder.InitialCatalog = "master";
+
+        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
+        {
+            connection.Open();
+            using (var dropCommand = connection.CreateCommand())
+            {
+                dropCommand.CommandText = $"use master; if exists(select * from sysdatabases where name = '{databaseName}') begin alter database {databaseName} set SINGLE_USER with rollback immediate; drop database {databaseName}; end; ";
+                dropCommand.ExecuteNonQuery();
+            }
+        }
+    }
 }
