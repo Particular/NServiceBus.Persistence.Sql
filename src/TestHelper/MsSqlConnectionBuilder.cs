@@ -7,12 +7,7 @@ public static class MsSqlConnectionBuilder
 
     public static SqlConnection Build()
     {
-        var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
-        if (string.IsNullOrWhiteSpace(connection))
-        {
-            return new SqlConnection(ConnectionString);
-        }
-        return new SqlConnection(connection);
+        return new SqlConnection(GetConnectionString());
     }
 
     public static bool IsSql2016OrHigher()
@@ -22,6 +17,45 @@ public static class MsSqlConnectionBuilder
             connection.Open();
             return Version.Parse(connection.ServerVersion).Major >= 13;
         }
+    }
+
+    public static void DropAndCreateDb()
+    {
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        var databaseName = connectionStringBuilder.InitialCatalog;
+
+        connectionStringBuilder.InitialCatalog = "master";
+
+        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
+        {
+            connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = $@"use master;
+if exists(select * from sysdatabases where name = '{databaseName}')
+begin
+    alter database {databaseName} set SINGLE_USER with rollback immediate;
+    drop database {databaseName};
+end;
+
+CREATE DATABASE {databaseName};";
+
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
+    static string GetConnectionString()
+    {
+        var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+
+        if (string.IsNullOrWhiteSpace(connection))
+        {
+            return ConnectionString;
+        }
+
+        return connection;
     }
 
     public static class MultiTenant
