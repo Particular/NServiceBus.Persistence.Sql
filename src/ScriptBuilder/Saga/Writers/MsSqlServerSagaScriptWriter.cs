@@ -67,7 +67,7 @@ end
 declare @dataType_{name} nvarchar(max);
 set @dataType_{name} = (
   select data_type
-  from information_schema.columns
+  from INFORMATION_SCHEMA.COLUMNS
   where
     table_name = @tableNameWithoutSchema and
     table_schema = @schema and
@@ -122,7 +122,7 @@ declare @dropPropertiesQuery nvarchar(max);
 select @dropPropertiesQuery =
 (
     select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
-    from information_schema.columns
+    from INFORMATION_SCHEMA.COLUMNS
     where
         table_name = @tableNameWithoutSchema and
         table_schema = @schema and
