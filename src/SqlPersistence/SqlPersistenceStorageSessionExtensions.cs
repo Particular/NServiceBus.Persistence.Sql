@@ -22,7 +22,16 @@
             return GetSqlStorageSession(session);
         }
 
-        static StorageSession GetSqlStorageSession(this SynchronizedStorageSession session)
+        static ISqlStorageSession GetSqlStorageSession(this SynchronizedStorageSession session)
+        {
+            if (session is ISqlStorageSession storageSession)
+            {
+                return storageSession;
+            }
+            throw new Exception("Cannot access the SQL synchronized storage session. Either this endpoint has not been configured to use the SQL persistence or a different persistence type is used for sagas.");
+        }
+
+        static StorageSession GetInternalSqlStorageSession(this SynchronizedStorageSession session)
         {
             if (session is StorageSession storageSession)
             {
@@ -48,7 +57,7 @@
             Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
 
             var writableContextBag = (ContextBag)context;
-            var sqlSession = session.GetSqlStorageSession();
+            var sqlSession = session.GetInternalSqlStorageSession();
 
             if (sqlSession.InfoCache == null)
             {
