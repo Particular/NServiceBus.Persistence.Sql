@@ -103,7 +103,9 @@ public static class MsSqlConnectionBuilder
                 using (var reader = command.ExecuteReader())
                 {
                     if (reader.HasRows) // exists
+                    {
                         return;
+                    }
                 }
 
                 command.CommandText = $"CREATE DATABASE {databaseName} COLLATE SQL_Latin1_General_CP1_CS_AS";
