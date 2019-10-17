@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="buildTransitive" Visible="false" />
     <None Include="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
     <None Include="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
   </ItemGroup>
