@@ -154,16 +154,12 @@ public partial class CoreSagaMetadataTests
 
     class SagaInspectionResults
     {
+        // ReSharper disable NotAccessedField.Local
         public bool HasUnmanagedCalls;
         public bool HasUnexpectedCalls;
         public bool HasBranchingLogic;
-        // ReSharper disable NotAccessedField.Local
         public SagaDefinition SagaDefinition;
         public string Exception;
         // ReSharper restore NotAccessedField.Local
     }
-
-
-
-
 }
