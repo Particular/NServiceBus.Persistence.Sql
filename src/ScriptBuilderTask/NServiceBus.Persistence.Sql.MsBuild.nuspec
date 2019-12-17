@@ -6,8 +6,8 @@
     <authors>$authors$</authors>
     <owners>$owners$</owners>
     <developmentDependency>true</developmentDependency>
-    <licenseUrl>$licenseUrl$</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
+    <license type="file">LICENSE.md</license>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <iconUrl>$iconUrl$</iconUrl>
     <description>$description$</description>
@@ -22,5 +22,6 @@
     <file src="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="netclassic" />
     <file src="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" target="netstandard" />
     <file src="NServiceBus.Persistence.Sql.MsBuild.targets" target="build" />
+    <file src="..\..\LICENSE.md" />
   </files>
 </package>
