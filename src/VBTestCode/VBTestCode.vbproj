@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <LangVersion>latest</LangVersion>
     <TargetFrameworks>net452;netcoreapp2.1</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
@@ -8,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.*" />
+    <PackageReference Include="NServiceBus" Version="7.1.0" />
   </ItemGroup>
 
 </Project>
