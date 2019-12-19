@@ -83,7 +83,7 @@ namespace NServiceBus.Persistence.Sql
     }
     [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
         "n version 5.0.0.", true)]
-    public enum SqlVariant
+    public enum SqlVariant : int
     {
         MsSqlServer = 0,
         MySql = 1,
@@ -127,6 +127,13 @@ namespace NServiceBus.Persistence.Sql
     public class TimeoutSettings
     {
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+    }
+}
+namespace NServiceBus.Persistence.Sql.SynchronizedStorage
+{
+    public class static SqlStorageSessionTupleExtensions
+    {
+        public static void Deconstruct(this NServiceBus.Persistence.Sql.ISqlStorageSession session, out System.Data.Common.DbConnection connection, out System.Data.Common.DbTransaction transaction) { }
     }
 }
 namespace NServiceBus
