@@ -83,7 +83,7 @@ namespace NServiceBus.Persistence.Sql
     }
     [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
         "n version 5.0.0.", true)]
-    public enum SqlVariant : int
+    public enum SqlVariant
     {
         MsSqlServer = 0,
         MySql = 1,
