@@ -129,6 +129,13 @@ namespace NServiceBus.Persistence.Sql
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
     }
 }
+namespace NServiceBus.Persistence.Sql.SynchronizedStorage
+{
+    public class static SqlStorageSessionTupleExtensions
+    {
+        public static void Deconstruct(this NServiceBus.Persistence.Sql.ISqlStorageSession session, out System.Data.Common.DbConnection connection, out System.Data.Common.DbTransaction transaction) { }
+    }
+}
 namespace NServiceBus
 {
     public abstract class SqlDialect
