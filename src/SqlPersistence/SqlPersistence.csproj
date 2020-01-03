@@ -16,7 +16,8 @@
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.5.0" PrivateAssets="All" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
-  </ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.0" Condition="$(TargetFramework)=='netstandard2.0'" />
+ </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Guard.cs" />

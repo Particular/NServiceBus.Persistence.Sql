@@ -34,11 +34,18 @@ namespace NServiceBus
                 //TODO: do ArraySegment fro outbox
                 if (value is ArraySegment<char> charSegment)
                 {
-                    var sqlParameter = (SqlParameter)parameter;
-
-                    sqlParameter.Value = charSegment.Array;
-                    sqlParameter.Offset = charSegment.Offset;
-                    sqlParameter.Size = charSegment.Count;
+                    if (parameter is SqlParameter sqlParameter) {
+                        sqlParameter.Value = charSegment.Array;
+                        sqlParameter.Offset = charSegment.Offset;
+                        sqlParameter.Size = charSegment.Count;
+                    }
+                    #if NETSTANDARD2_0
+                    else if (parameter is Microsoft.Data.SqlClient.SqlParameter msSqlParameter) {
+                        msSqlParameter.Value = charSegment.Array;
+                        msSqlParameter.Offset = charSegment.Offset;
+                        msSqlParameter.Size = charSegment.Count;
+                    }
+                    #endif
                 }
                 else
                 {
