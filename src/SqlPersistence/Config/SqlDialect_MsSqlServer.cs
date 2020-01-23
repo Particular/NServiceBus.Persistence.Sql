@@ -2,7 +2,6 @@ namespace NServiceBus
 {
     using System;
     using System.Data.Common;
-    using System.Data.SqlClient;
 
     public abstract partial class SqlDialect
     {
@@ -31,14 +30,10 @@ namespace NServiceBus
 
             internal override void SetParameterValue(DbParameter parameter, object value)
             {
-                //TODO: do ArraySegment fro outbox
                 if (value is ArraySegment<char> charSegment)
                 {
-                    var sqlParameter = (SqlParameter)parameter;
-
-                    sqlParameter.Value = charSegment.Array;
-                    sqlParameter.Offset = charSegment.Offset;
-                    sqlParameter.Size = charSegment.Count;
+                    parameter.Value = charSegment.Array;
+                    parameter.Size = charSegment.Count;
                 }
                 else
                 {
