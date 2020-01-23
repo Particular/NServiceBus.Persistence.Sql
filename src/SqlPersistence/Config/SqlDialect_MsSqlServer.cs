@@ -2,7 +2,6 @@ namespace NServiceBus
 {
     using System;
     using System.Data.Common;
-    using System.Data.SqlClient;
 
     public abstract partial class SqlDialect
     {
@@ -34,11 +33,9 @@ namespace NServiceBus
                 //TODO: do ArraySegment fro outbox
                 if (value is ArraySegment<char> charSegment)
                 {
-                    var sqlParameter = (SqlParameter)parameter;
-
-                    sqlParameter.Value = charSegment.Array;
-                    sqlParameter.Offset = charSegment.Offset;
-                    sqlParameter.Size = charSegment.Count;
+                    parameter.Value = charSegment.Array;
+                    ((dynamic)parameter).Offset = charSegment.Offset; // to support Microsoft.Data.SqlParameter
+                    parameter.Size = charSegment.Count;
                 }
                 else
                 {
