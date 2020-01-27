@@ -6,7 +6,6 @@
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\binaries\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,8 +29,8 @@
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build" Visible="false" />
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="buildTransitive" Visible="false" />
-    <None Include="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
-    <None Include="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
   </ItemGroup>
 
   <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
