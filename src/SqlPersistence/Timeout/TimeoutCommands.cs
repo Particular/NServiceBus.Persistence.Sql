@@ -1,14 +1,6 @@
-﻿#pragma warning disable 1591
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
-    using System;
-
-    /// <summary>
-    /// Not for public use.
-    /// </summary>
-    [Obsolete("Not for public use")]
-    [DoNotWarnAboutObsoleteUsage]
-    public class TimeoutCommands
+    class TimeoutCommands
     {
         public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range)
         {

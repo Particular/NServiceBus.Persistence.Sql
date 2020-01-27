@@ -1,14 +1,7 @@
 ﻿#pragma warning disable 1591
 namespace NServiceBus.Persistence.Sql
 {
-    using System;
-
-    /// <summary>
-    /// Not for public use.
-    /// </summary>
-    [Obsolete("Not for public use")]
-    [DoNotWarnAboutObsoleteUsage]
-    public class OutboxCommands
+    class OutboxCommands
     {
         public string Store { get; }
         public string Get { get; }

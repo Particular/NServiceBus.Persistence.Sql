@@ -1,16 +1,10 @@
-﻿#pragma warning disable 1591
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     using System;
     using System.Collections.Generic;
     using Unicast.Subscriptions;
 
-    /// <summary>
-    /// Not for public use.
-    /// </summary>
-    [Obsolete("Not for public use")]
-    [DoNotWarnAboutObsoleteUsage]
-    public class SubscriptionCommands
+    class SubscriptionCommands
     {
         public string Subscribe { get; }
         public string Unsubscribe { get; }

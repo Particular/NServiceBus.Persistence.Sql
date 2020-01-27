@@ -1,14 +1,6 @@
-﻿#pragma warning disable 1591
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
-    using System;
-
-    /// <summary>
-    /// Not for public use.
-    /// </summary>
-    [Obsolete("Not for public use")]
-    [DoNotWarnAboutObsoleteUsage]
-    public static class TimeoutCommandBuilder
+    static class TimeoutCommandBuilder
     {
         public static TimeoutCommands Build(SqlDialect sqlDialect, string tablePrefix)
         {
