@@ -1,4 +1,4 @@
-#if NET452
+#if NETFRAMEWORK
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ public static class SqlValidator
 {
     public static void Validate(string sql)
     {
-#if NET452
+#if NETFRAMEWORK
         var parser = new TSql140Parser(false);
         IList<ParseError> errors;
         using (var reader = new StringReader(sql))

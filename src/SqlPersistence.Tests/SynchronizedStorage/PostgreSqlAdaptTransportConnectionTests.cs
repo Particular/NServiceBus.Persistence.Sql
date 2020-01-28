@@ -1,4 +1,4 @@
-#if NET452
+#if NETFRAMEWORK
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
