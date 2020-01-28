@@ -12,7 +12,7 @@
     public class When_invoking_a_saga : NServiceBusAcceptanceTest
     {
         [Test]
-#if NET452
+#if NETFRAMEWORK
         [TestCase(TransportTransactionMode.TransactionScope)] //Uses TransactionScope to ensure exactly-once
 #endif
         [TestCase(TransportTransactionMode.SendsAtomicWithReceive)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
