@@ -1,7 +1,7 @@
 using System;
 using System.Data.SqlClient;
 
-public static class MsSqlConnectionBuilder
+public static class MsSqlSystemDataClientConnectionBuilder
 {
     const string ConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
 
@@ -25,7 +25,7 @@ public static class MsSqlConnectionBuilder
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
-            using (var conn = MsSqlConnectionBuilder.Build())
+            using (var conn = MsSqlSystemDataClientConnectionBuilder.Build())
             {
                 conn.Open();
                 conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");

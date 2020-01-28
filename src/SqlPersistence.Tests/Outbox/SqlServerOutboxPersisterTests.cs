@@ -12,6 +12,6 @@ public class SqlServerOutboxPersisterTests : OutboxPersisterTests
 
     protected override Func<string, DbConnection> GetConnection()
     {
-        return x => MsSqlConnectionBuilder.Build();
+        return x => MsSqlSystemDataClientConnectionBuilder.Build();
     }
 }

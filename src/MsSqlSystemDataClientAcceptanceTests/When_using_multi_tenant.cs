@@ -19,15 +19,15 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     [OneTimeSetUp]
     public void SetUpTenantDatabases()
     {
-        MsSqlConnectionBuilder.MultiTenant.Setup("TenantA");
-        MsSqlConnectionBuilder.MultiTenant.Setup("TenantB");
+        MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
+        MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
     }
 
     [OneTimeTearDown]
     public void TearDownTenantDatabases()
     {
-        MsSqlConnectionBuilder.MultiTenant.TearDown("TenantA");
-        MsSqlConnectionBuilder.MultiTenant.TearDown("TenantB");
+        MsSqlSystemDataClientConnectionBuilder.MultiTenant.TearDown("TenantA");
+        MsSqlSystemDataClientConnectionBuilder.MultiTenant.TearDown("TenantB");
     }
 
     [Test]
@@ -136,7 +136,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     });
 
                     var persistence = cfg.UsePersistence<SqlPersistence>();
-                    persistence.MultiTenantConnectionBuilder(captureTenantId, tenantId => MsSqlConnectionBuilder.MultiTenant.Build(tenantId));
+                    persistence.MultiTenantConnectionBuilder(captureTenantId, tenantId => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId));
 
                     cfg.EnableOutbox().DisableCleanup();
                 });
@@ -163,7 +163,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         // this is expected and required if using a transport without pubsub and timeouts built in
 
         var persistence = c.UsePersistence<SqlPersistence>();
-        persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlConnectionBuilder.MultiTenant.Build(tenantId));
+        persistence.MultiTenantConnectionBuilder("TenantId", tenantId => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId));
 
         if (useOutbox)
         {
@@ -188,10 +188,10 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         builder.When((session, context) =>
         {
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
-            MsSqlConnectionBuilder.MultiTenant.Setup("TenantA");
-            MsSqlConnectionBuilder.MultiTenant.Setup("TenantB");
-            var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
-            var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
+            MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
+            MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
+            var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
+            var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
             context.Cleanup = () =>
             {
                 helperA.Cleanup();

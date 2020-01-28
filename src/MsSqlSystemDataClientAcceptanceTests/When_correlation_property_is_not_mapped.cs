@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -10,36 +11,35 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_starter_message_has_finder : NServiceBusAcceptanceTest
+public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
 {
     [Test]
-    public async Task Should_correlate_the_following_message_correctly()
+    public void Should_throw_validation_exception()
     {
-        if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
+        if (!MsSqlSystemDataClientConnectionBuilder.IsSql2016OrHigher())
         {
             return;
         }
-        var context = await Scenario.Define<Context>()
-            .WithEndpoint<SagaEndpoint>(b => b
-                .When(session =>
-                {
-                    var startSagaMessage = new StartSagaMessage
+        var exception = Assert.ThrowsAsync<Exception>(async () =>
+            await Scenario.Define<Context>()
+                .WithEndpoint<SagaEndpoint>(b => b
+                    .When(session =>
                     {
-                        Property = "Test"
-                    };
-                    return session.SendLocal(startSagaMessage);
-                }))
-            .Done(c => c.HandledOtherMessage)
-            .Run()
-            .ConfigureAwait(false);
+                        var startSagaMessage = new StartSagaMessage
+                        {
+                            Property = "Test"
+                        };
+                        return session.SendLocal(startSagaMessage);
+                    }))
+                .Done(c => c.StartSagaFinderUsed)
+                .Run());
 
-        Assert.True(context.StartSagaFinderUsed);
+        Assert.AreEqual("The saga 'When_correlation_property_is_not_mapped+SagaEndpoint+TestSaga' defines a correlation property 'Property' which is not mapped to any message. Either map it or remove it from the saga definition.", exception.Message);
     }
 
     public class Context : ScenarioContext
     {
         public bool StartSagaFinderUsed { get; set; }
-        public bool HandledOtherMessage { get; set; }
     }
 
     public class SagaEndpoint : EndpointConfigurationBuilder
@@ -72,24 +72,11 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
         }
 
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
-            IAmStartedByMessages<StartSagaMessage>,
-            IHandleMessages<SomeOtherMessage>
+            IAmStartedByMessages<StartSagaMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context TestContext { get; set; }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;
-                return context.SendLocal(new SomeOtherMessage
-                {
-                    Property = Data.Property
-                });
-            }
-
-            public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
-            {
-                TestContext.HandledOtherMessage = true;
                 return Task.FromResult(0);
             }
 
@@ -97,7 +84,6 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
-                mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
             }
 
             public class SagaData : ContainSagaData
@@ -108,11 +94,6 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
     }
 
     public class StartSagaMessage : IMessage
-    {
-        public string Property { get; set; }
-    }
-
-    public class SomeOtherMessage : IMessage
     {
         public string Property { get; set; }
     }

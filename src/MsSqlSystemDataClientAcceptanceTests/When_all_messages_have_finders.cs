@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -11,12 +10,12 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTest
+public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 {
     [Test]
     public async Task Should_use_existing_saga()
     {
-        if (!MsSqlConnectionBuilder.IsSql2016OrHigher())
+        if (!MsSqlSystemDataClientConnectionBuilder.IsSql2016OrHigher())
         {
             return;
         }
@@ -34,13 +33,15 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.FinderUsed);
+        Assert.True(context.StartSagaFinderUsed);
+        Assert.True(context.SomeOtherFinderUsed);
     }
 
     public class Context : ScenarioContext
     {
-        public bool FinderUsed { get; set; }
+        public bool StartSagaFinderUsed { get; set; }
         public bool HandledOtherMessage { get; set; }
+        public bool SomeOtherFinderUsed { get; set; }
     }
 
     public class SagaEndpoint : EndpointConfigurationBuilder
@@ -50,14 +51,36 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             EndpointSetup<DefaultServer>();
         }
 
-        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
+        public class FindByStartSagaMessage : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
+        {
+            // ReSharper disable once MemberCanBePrivate.Global
+            public Context Context { get; set; }
+
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+            {
+                Context.StartSagaFinderUsed = true;
+
+                return session.GetSagaData<TestSaga.SagaData>(
+                    context: context,
+                    whereClause: "json_value(Data,'$.Property') = @propertyValue",
+                    appendParameters: (builder, append) =>
+                    {
+                        var parameter = builder();
+                        parameter.ParameterName = "propertyValue";
+                        parameter.Value = "Test";
+                        append(parameter);
+                    });
+            }
+        }
+
+        public class FindBySomeOtherMessage : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
         {
             // ReSharper disable once MemberCanBePrivate.Global
             public Context Context { get; set; }
 
             public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.FinderUsed = true;
+                Context.SomeOtherFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
@@ -76,15 +99,16 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
+            // ReSharper disable once MemberCanBePrivate.Global
             public Context TestContext { get; set; }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
-                var otherMessage = new SomeOtherMessage
+                Data.Property = message.Property;
+                return context.SendLocal(new SomeOtherMessage
                 {
-                    SagaId = Data.Id
-                };
-                return context.SendLocal(otherMessage);
+                    Property = Data.Property
+                });
             }
 
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
@@ -93,11 +117,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 return Task.FromResult(0);
             }
 
-            protected override string CorrelationPropertyName => nameof(SagaData.Property);
+            protected override string CorrelationPropertyName => null;
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
-                mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
             }
 
             public class SagaData : ContainSagaData
@@ -114,6 +137,6 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
     public class SomeOtherMessage : IMessage
     {
-        public Guid SagaId { get; set; }
+        public string Property { get; set; }
     }
 }

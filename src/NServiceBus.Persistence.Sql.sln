@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 15.0.26403.0
@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilder", "ScriptBuil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptBuilder.Tests", "ScriptBuilder.Tests\ScriptBuilder.Tests.csproj", "{F5D5557D-0A16-490A-A0DB-B8865CB4D77E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlAcceptanceTests", "MsSqlAcceptanceTests\MsSqlAcceptanceTests.csproj", "{D7439DC8-6400-4740-855B-BF68AA7C6B05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlSystemDataClientAcceptanceTests", "MsSqlSystemDataClientAcceptanceTests\MsSqlSystemDataClientAcceptanceTests.csproj", "{D7439DC8-6400-4740-855B-BF68AA7C6B05}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{8E942C0C-AAAB-4962-87F6-3D0F584003F2}"
 EndProject

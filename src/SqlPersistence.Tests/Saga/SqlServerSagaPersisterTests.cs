@@ -14,7 +14,7 @@ public class SqlServerSagaPersisterTests: SagaPersisterTests
     {
         return x =>
         {
-            var connection = MsSqlConnectionBuilder.Build();
+            var connection = MsSqlSystemDataClientConnectionBuilder.Build();
             connection.Open();
             return connection;
         };

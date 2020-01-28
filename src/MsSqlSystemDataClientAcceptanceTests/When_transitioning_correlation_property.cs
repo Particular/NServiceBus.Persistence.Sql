@@ -20,7 +20,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
         var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
         var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
 
-        using (var connection = MsSqlConnectionBuilder.Build())
+        using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
         {
             await connection.OpenAsync().ConfigureAwait(false);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
