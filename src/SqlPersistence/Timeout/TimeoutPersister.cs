@@ -6,7 +6,6 @@ using NServiceBus.Timeout.Core;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
-using NServiceBus.Persistence.Sql;
 #pragma warning disable 618
 
 class TimeoutPersister : IPersistTimeouts, IQueryTimeouts

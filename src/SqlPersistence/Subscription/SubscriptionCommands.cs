@@ -1,20 +1,17 @@
-﻿namespace NServiceBus.Persistence.Sql
+﻿using System;
+using System.Collections.Generic;
+using NServiceBus.Unicast.Subscriptions;
+
+class SubscriptionCommands
 {
-    using System;
-    using System.Collections.Generic;
-    using Unicast.Subscriptions;
+    public string Subscribe { get; }
+    public string Unsubscribe { get; }
+    public Func<List<MessageType>, string> GetSubscribers { get; }
 
-    class SubscriptionCommands
+    public SubscriptionCommands(string subscribe, string unsubscribe, Func<List<MessageType>, string> getSubscribers)
     {
-        public string Subscribe { get; }
-        public string Unsubscribe { get; }
-        public Func<List<MessageType>, string> GetSubscribers { get; }
-
-        public SubscriptionCommands(string subscribe, string unsubscribe, Func<List<MessageType>, string> getSubscribers)
-        {
-            Subscribe = subscribe;
-            Unsubscribe = unsubscribe;
-            GetSubscribers = getSubscribers;
-        }
+        Subscribe = subscribe;
+        Unsubscribe = unsubscribe;
+        GetSubscribers = getSubscribers;
     }
 }

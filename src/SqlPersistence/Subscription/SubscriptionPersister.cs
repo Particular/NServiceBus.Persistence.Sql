@@ -7,7 +7,6 @@ using System.Transactions;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
