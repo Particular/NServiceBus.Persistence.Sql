@@ -34,7 +34,7 @@ end";
         [TestCase(TransportTransactionMode.ReceiveOnly)] //Uses the Outbox to ensure exactly-once
         public async Task Should_rollback_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode)
         {
-            using (var connection = MsSqlConnectionBuilder.Build())
+            using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
             {
                 await connection.OpenAsync().ConfigureAwait(false);
                 using (var command = connection.CreateCommand())

@@ -17,7 +17,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
         transportConfig.UseCustomSqlConnectionFactory(async () =>
         {
-            var conn = MsSqlConnectionBuilder.Build();
+            var conn = MsSqlSystemDataClientConnectionBuilder.Build();
             await conn.OpenAsync().ConfigureAwait(false);
             return conn;
         });
@@ -37,7 +37,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
     public Task Cleanup()
     {
-        using (var conn = MsSqlConnectionBuilder.Build())
+        using (var conn = MsSqlSystemDataClientConnectionBuilder.Build())
         {
             conn.Open();
 
