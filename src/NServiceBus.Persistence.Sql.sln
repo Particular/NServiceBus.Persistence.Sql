@@ -1,6 +1,7 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -39,7 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\GitVersion.yml = ..\GitVersion.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlAcceptanceTests.SqlTransport", "MsSqlAcceptanceTests.SqlTransport\MsSqlAcceptanceTests.SqlTransport.csproj", "{0E98C052-F67F-4826-A344-7685504CA955}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlSystemDataClientSqlTransportAcceptanceTests", "MsSqlSystemDataClientSqlTransportAcceptanceTests\MsSqlSystemDataClientSqlTransportAcceptanceTests.csproj", "{0E98C052-F67F-4826-A344-7685504CA955}"
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "VBTestCode", "VBTestCode\VBTestCode.vbproj", "{86E76F2D-6743-442E-BDAD-80D6A872D4FA}"
 EndProject
