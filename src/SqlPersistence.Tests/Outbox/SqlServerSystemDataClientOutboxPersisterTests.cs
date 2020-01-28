@@ -4,9 +4,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class SqlServerTimeoutPersisterTests : TimeoutPersisterTests
+public class SqlServerSystemDataClientOutboxPersisterTests : OutboxPersisterTests
 {
-    public SqlServerTimeoutPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
+    public SqlServerSystemDataClientOutboxPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }
 

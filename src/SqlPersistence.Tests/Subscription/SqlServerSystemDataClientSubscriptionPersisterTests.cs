@@ -4,9 +4,9 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class SqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
+public class SqlServerSystemDataClientSubscriptionPersisterTests : SubscriptionPersisterTests
 {
-    public SqlServerSubscriptionPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
+    public SqlServerSystemDataClientSubscriptionPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {
     }
 
