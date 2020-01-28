@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.2.0" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="5.0.2" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
   </ItemGroup>
