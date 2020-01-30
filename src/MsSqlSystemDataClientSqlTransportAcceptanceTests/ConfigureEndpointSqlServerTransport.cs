@@ -6,7 +6,7 @@ using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Transport;
-using NServiceBus.Transport.SQLServer;
+using NServiceBus.Transport.SqlServer;
 
 public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecution
 {

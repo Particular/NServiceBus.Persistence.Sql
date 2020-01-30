@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Transport;
-using NServiceBus.Transport.SQLServer;
+using NServiceBus.Transport.SqlServer;
 
 public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecution
 {
@@ -17,7 +17,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
         transportConfig.UseCustomSqlConnectionFactory(async () =>
         {
-            var conn = MsSqlSystemDataClientConnectionBuilder.Build();
+            var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await conn.OpenAsync().ConfigureAwait(false);
             return conn;
         });
@@ -27,7 +27,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
     public Task Cleanup()
     {
-        using (var conn = MsSqlSystemDataClientConnectionBuilder.Build())
+        using (var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build())
         {
             conn.Open();
 
