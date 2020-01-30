@@ -1,6 +1,5 @@
 #pragma warning disable 618
 using NServiceBus;
-using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 using Particular.Approvals;
 

@@ -9,7 +9,7 @@ namespace NServiceBus
     {
         public partial class Oracle
         {
-            public override string GetSagaTableName(string tablePrefix, string tableSuffix)
+            internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
             {
                 if (tableSuffix.Length > 27)
                 {
@@ -22,7 +22,7 @@ namespace NServiceBus
                 return $"{SchemaPrefix}\"{tableSuffix.ToUpper()}\"";
             }
 
-            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
+            internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
             {
                 var valuesBuilder = new StringBuilder();
                 var insertBuilder = new StringBuilder();
@@ -59,7 +59,7 @@ values
 )";
             }
 
-            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
+            internal override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName)
             {
                 // no need to set CorrelationProperty since it is immutable
                 var correlationSet = "";
@@ -80,7 +80,7 @@ where
 ";
             }
 
-            public override string BuildGetBySagaIdCommand(string tableName)
+            internal override string BuildGetBySagaIdCommand(string tableName)
             {
                 return $@"
 select
@@ -95,7 +95,7 @@ for update
 ";
             }
 
-            public override string BuildGetByPropertyCommand(string propertyName, string tableName)
+            internal override string BuildGetByPropertyCommand(string propertyName, string tableName)
             {
                 return $@"
 select
@@ -110,7 +110,7 @@ for update
 ";
             }
 
-            public override string BuildCompleteCommand(string tableName)
+            internal override string BuildCompleteCommand(string tableName)
             {
                 return $@"
 delete from {tableName}
@@ -118,7 +118,7 @@ where Id = :Id and Concurrency = :Concurrency
 ";
             }
 
-            public override Func<string, string> BuildSelectFromCommand(string tableName)
+            internal override Func<string, string> BuildSelectFromCommand(string tableName)
             {
                 return whereClause => $@"
 select

@@ -1,6 +1,8 @@
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"AcceptanceTestHelper, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlAcceptanceTests.SqlTransport, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlMicrosoftDataClientAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlMicrosoftDataClientSqlTransportAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlSystemDataClientAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MsSqlSystemDataClientSqlTransportAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"MySqlAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"OracleAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"PostgreSqlAcceptanceTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100B915C96048D09107F927B2BB769F052E3B35127227CBDB037BE5257342CF4A34ED0C4CC1C7B147D72AB71461C919EA096D21A50D857CFCB2472CD98A5FD1F493D98AE283A95BBD9BF0B838E8F039E51CF50320EB512B7AFDAFEE56262BE5888E673B043D64A9F362C10F0C624D4ACDA0FBFD21BCCE52750DB9E50189F6434DBB")]
@@ -16,20 +18,6 @@ namespace NServiceBus.Persistence.Sql
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
         void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.Tasks.Task> callback);
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class static OutboxCommandBuilder
-    {
-        public static NServiceBus.Persistence.Sql.OutboxCommands Build(string tablePrefix, NServiceBus.SqlDialect sqlDialect) { }
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class OutboxCommands
-    {
-        public OutboxCommands(string store, string get, string setAsDispatched, string cleanup) { }
-        public string Cleanup { get; }
-        public string Get { get; }
-        public string SetAsDispatched { get; }
-        public string Store { get; }
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
     public class SagaSettings
@@ -81,48 +69,11 @@ namespace NServiceBus.Persistence.Sql
         public string TableSuffix { get; }
         public string TransitionalCorrelationProperty { get; }
     }
-    [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. Will be removed i" +
-        "n version 5.0.0.", true)]
-    public enum SqlVariant
-    {
-        MsSqlServer = 0,
-        MySql = 1,
-        Oracle = 2,
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class static SubscriptionCommandBuilder
-    {
-        public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.SqlDialect sqlDialect, string tablePrefix) { }
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class SubscriptionCommands
-    {
-        public SubscriptionCommands(string subscribe, string unsubscribe, System.Func<System.Collections.Generic.List<NServiceBus.Unicast.Subscriptions.MessageType>, string> getSubscribers) { }
-        public System.Func<System.Collections.Generic.List<NServiceBus.Unicast.Subscriptions.MessageType>, string> GetSubscribers { get; }
-        public string Subscribe { get; }
-        public string Unsubscribe { get; }
-    }
     public class SubscriptionSettings
     {
         public void CacheFor(System.TimeSpan timeSpan) { }
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class static TimeoutCommandBuilder
-    {
-        public static NServiceBus.Persistence.Sql.TimeoutCommands Build(NServiceBus.SqlDialect sqlDialect, string tablePrefix) { }
-    }
-    [System.ObsoleteAttribute("Not for public use")]
-    public class TimeoutCommands
-    {
-        public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range) { }
-        public string Add { get; }
-        public string Next { get; }
-        public string Peek { get; }
-        public string Range { get; }
-        public string RemoveById { get; }
-        public string RemoveBySagaId { get; }
     }
     public class TimeoutSettings
     {
@@ -141,64 +92,22 @@ namespace NServiceBus
     public abstract class SqlDialect
     {
         protected SqlDialect() { }
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildCompleteCommand(string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildGetByPropertyCommand(string correlationProperty, string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildGetBySagaIdCommand(string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract System.Func<string, string> BuildSelectFromCommand(string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName);
-        [System.ObsoleteAttribute("Not for public use")]
-        public abstract string GetSagaTableName(string tablePrefix, string tableSuffix);
         public override string ToString() { }
         public class MsSqlServer : NServiceBus.SqlDialect
         {
             public MsSqlServer() { }
-            public override string BuildCompleteCommand(string tableName) { }
-            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
-            public override string BuildGetBySagaIdCommand(string tableName) { }
-            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
-            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
-            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class MySql : NServiceBus.SqlDialect
         {
             public MySql() { }
-            public override string BuildCompleteCommand(string tableName) { }
-            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
-            public override string BuildGetBySagaIdCommand(string tableName) { }
-            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
-            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
-            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class Oracle : NServiceBus.SqlDialect
         {
             public Oracle() { }
-            public override string BuildCompleteCommand(string tableName) { }
-            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
-            public override string BuildGetBySagaIdCommand(string tableName) { }
-            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
-            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
-            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
         public class PostgreSql : NServiceBus.SqlDialect
         {
             public PostgreSql() { }
-            public override string BuildCompleteCommand(string tableName) { }
-            public override string BuildGetByPropertyCommand(string propertyName, string tableName) { }
-            public override string BuildGetBySagaIdCommand(string tableName) { }
-            public override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName) { }
-            public override System.Func<string, string> BuildSelectFromCommand(string tableName) { }
-            public override string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName) { }
-            public override string GetSagaTableName(string tablePrefix, string tableSuffix) { }
         }
     }
     public abstract class SqlDialectSettings
@@ -219,18 +128,11 @@ namespace NServiceBus
         public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tenantIdHeaderName, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
         public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<NServiceBus.Transport.IncomingMessage, string> captureTenantId, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
         public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>().Schema(\"schema_name\")` inst" +
-            "ead. The member currently throws a NotImplementedException. Will be removed in v" +
-            "ersion 5.0.0.", true)]
-        public static void Schema(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle> dialectSettings, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.PostgreSql> dialectSettings, string schema) { }
         public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
             where T : NServiceBus.SqlDialect, new () { }
-        [System.ObsoleteAttribute("Use `persistence.SqlDialect<SqlDialect.DialectType>()` instead. The member curren" +
-            "tly throws a NotImplementedException. Will be removed in version 5.0.0.", true)]
-        public static void SqlVariant(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, NServiceBus.Persistence.Sql.SqlVariant sqlVariant) { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
         public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }

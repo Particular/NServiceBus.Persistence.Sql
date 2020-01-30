@@ -1,27 +1,18 @@
-﻿#pragma warning disable 1591
-namespace NServiceBus.Persistence.Sql
+﻿using NServiceBus;
+
+static class SubscriptionCommandBuilder
 {
-    using System;
-
-    /// <summary>
-    /// Not for public use.
-    /// </summary>
-    [Obsolete("Not for public use")]
-    [DoNotWarnAboutObsoleteUsage]
-    public static class SubscriptionCommandBuilder
+    public static SubscriptionCommands Build(SqlDialect sqlDialect, string tablePrefix)
     {
-        public static SubscriptionCommands Build(SqlDialect sqlDialect, string tablePrefix)
-        {
-            var tableName = sqlDialect.GetSubscriptionTableName(tablePrefix);
+        var tableName = sqlDialect.GetSubscriptionTableName(tablePrefix);
 
-            var subscribeCommand = sqlDialect.GetSubscriptionSubscribeCommand(tableName);
-            var unsubscribeCommand = sqlDialect.GetSubscriptionUnsubscribeCommand(tableName);
-            var getSubscribers = sqlDialect.GetSubscriptionQueryFactory(tableName);
+        var subscribeCommand = sqlDialect.GetSubscriptionSubscribeCommand(tableName);
+        var unsubscribeCommand = sqlDialect.GetSubscriptionUnsubscribeCommand(tableName);
+        var getSubscribers = sqlDialect.GetSubscriptionQueryFactory(tableName);
 
-            return new SubscriptionCommands(
-                subscribe: subscribeCommand,
-                unsubscribe: unsubscribeCommand,
-                getSubscribers: getSubscribers);
-        }
+        return new SubscriptionCommands(
+            subscribe: subscribeCommand,
+            unsubscribe: unsubscribeCommand,
+            getSubscribers: getSubscribers);
     }
 }

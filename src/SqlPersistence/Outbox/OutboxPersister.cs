@@ -9,7 +9,6 @@ using System.Transactions;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
-using NServiceBus.Persistence.Sql;
 using IsolationLevel = System.Data.IsolationLevel;
 #pragma warning disable 618
 

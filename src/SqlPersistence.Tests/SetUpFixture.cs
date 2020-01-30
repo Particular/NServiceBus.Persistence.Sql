@@ -6,7 +6,7 @@ public class SetUpFixture
     [OneTimeSetUp]
     public void SetUp()
     {
-        using (var connection = MsSqlConnectionBuilder.Build())
+        using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
         {
             connection.Open();
             using (var command = connection.CreateCommand())

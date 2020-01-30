@@ -6,7 +6,6 @@
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\binaries\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +14,6 @@
     <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.5.0" PrivateAssets="All" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,8 +29,8 @@
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build" Visible="false" />
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="buildTransitive" Visible="false" />
-    <None Include="..\..\binaries\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
-    <None Include="..\..\binaries\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
   </ItemGroup>
 
   <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">
@@ -41,7 +39,7 @@
     <WriteLinesToFile Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;IntegrationVersion&gt;$(PackageVersion)&lt;/IntegrationVersion&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" File="..\Integration\Directory.Build.props" Overwrite="true" />
   </Target>
 
-  <!-- Workaround for https://github.com/Microsoft/msbuild/issues/3626 -->
+  <!-- Workaround for https://github.com/microsoft/msbuild/issues/4303 -->
   <PropertyGroup>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
   </PropertyGroup>
