@@ -13,7 +13,7 @@
     {
         [Test]
 #if NETFRAMEWORK
-        [TestCase(TransportTransactionMode.TransactionScope)] //Uses TransactionScope to ensure exactly-once
+        [TestCase(TransportTransactionMode.TransactionScope, Ignore = "Currently not support because using System.Data.SqlClient in conjunction with Microsoft.Data.SqlClient causes a DTC escalation.")] //Uses TransactionScope to ensure exactly-once
 #endif
         [TestCase(TransportTransactionMode.SendsAtomicWithReceive)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
         [TestCase(TransportTransactionMode.ReceiveOnly)] //Uses the Outbox to ensure exactly-once
