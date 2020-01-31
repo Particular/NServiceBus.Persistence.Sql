@@ -24,7 +24,7 @@ class OutboxPersister : IOutboxStorage
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.cleanupBatchSize = cleanupBatchSize;
-        outboxCommands = OutboxCommandBuilder.Build(tablePrefix, sqlDialect);
+        outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)

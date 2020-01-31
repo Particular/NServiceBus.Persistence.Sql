@@ -1,4 +1,5 @@
-﻿class TimeoutCommands
+﻿// used by docs engine to create scripts
+class TimeoutCommands
 {
     public TimeoutCommands(string removeById, string next, string peek, string add, string removeBySagaId, string range)
     {

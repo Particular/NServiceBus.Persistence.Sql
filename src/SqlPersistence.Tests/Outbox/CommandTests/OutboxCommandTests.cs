@@ -15,7 +15,7 @@ public abstract class OutboxCommandTests
     [Test]
     public void Get()
     {
-        var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
+        var timeoutCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
         Approver.Verify(timeoutCommands.Get, scenario: GetType().Name);
     }
@@ -23,7 +23,7 @@ public abstract class OutboxCommandTests
     [Test]
     public void Cleanup()
     {
-        var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
+        var timeoutCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
         Approver.Verify(timeoutCommands.Cleanup, scenario: GetType().Name);
     }
@@ -31,7 +31,7 @@ public abstract class OutboxCommandTests
     [Test]
     public void SetAsDispatched()
     {
-        var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
+        var timeoutCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
         Approver.Verify(timeoutCommands.SetAsDispatched, scenario: GetType().Name);
     }
@@ -39,7 +39,7 @@ public abstract class OutboxCommandTests
     [Test]
     public void Store()
     {
-        var timeoutCommands = OutboxCommandBuilder.Build("TheTablePrefix", sqlDialect);
+        var timeoutCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
         Approver.Verify(timeoutCommands.Store, scenario: GetType().Name);
     }

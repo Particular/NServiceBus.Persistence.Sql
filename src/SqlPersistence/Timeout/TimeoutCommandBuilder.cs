@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 
+// used by docs engine to create scripts
 static class TimeoutCommandBuilder
 {
     public static TimeoutCommands Build(SqlDialect sqlDialect, string tablePrefix)
