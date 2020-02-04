@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NServiceBus.Unicast.Subscriptions;
 
+// used by docs engine to create scripts
 class SubscriptionCommands
 {
     public string Subscribe { get; }

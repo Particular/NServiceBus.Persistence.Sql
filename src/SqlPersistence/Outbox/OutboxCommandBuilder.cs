@@ -1,8 +1,9 @@
 ﻿using NServiceBus;
 
+// used by docs engine to create scripts
 static class OutboxCommandBuilder
 {
-    public static OutboxCommands Build(string tablePrefix, SqlDialect sqlDialect)
+    public static OutboxCommands Build(SqlDialect sqlDialect, string tablePrefix)
     {
         var tableName = sqlDialect.GetOutboxTableName(tablePrefix);
 

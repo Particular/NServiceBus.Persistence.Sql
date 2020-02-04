@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 
+// used by docs engine to create scripts
 static class SubscriptionCommandBuilder
 {
     public static SubscriptionCommands Build(SqlDialect sqlDialect, string tablePrefix)
