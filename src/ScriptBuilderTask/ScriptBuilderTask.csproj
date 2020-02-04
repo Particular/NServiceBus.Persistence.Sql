@@ -30,7 +30,7 @@
     <PackageReference Include="Microsoft.Build" Version="15.6.85" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Framework" Version="15.6.85" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.6.85" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.4.0" PrivateAssets="All" />
   </ItemGroup>
 
   <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release'">
