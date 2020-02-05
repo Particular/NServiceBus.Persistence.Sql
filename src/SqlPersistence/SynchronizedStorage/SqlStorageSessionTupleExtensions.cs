@@ -1,7 +1,7 @@
-﻿using System.Data.Common;
-    
-namespace NServiceBus.Persistence.Sql.SynchronizedStorage
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System.Data.Common;
+
     /// <summary>
     /// Tuple deconstructor extension method for <see cref="ISqlStorageSession"/>.
     /// </summary>

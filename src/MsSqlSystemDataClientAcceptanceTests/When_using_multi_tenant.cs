@@ -8,7 +8,6 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Features;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Transport;
 using NUnit.Framework;

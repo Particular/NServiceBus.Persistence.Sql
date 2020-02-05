@@ -3,7 +3,6 @@ namespace NServiceBus
     using System;
     using System.Data.Common;
     using Configuration.AdvancedExtensibility;
-    using Persistence.Sql;
     using Settings;
     using Transport;
 

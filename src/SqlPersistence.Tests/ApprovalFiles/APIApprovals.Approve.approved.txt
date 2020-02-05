@@ -32,10 +32,6 @@ namespace NServiceBus.Persistence.Sql
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
     }
-    public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
-    {
-        public SqlPersistence() { }
-    }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
     public sealed class SqlPersistenceSettingsAttribute : System.Attribute
     {
@@ -69,6 +65,10 @@ namespace NServiceBus.Persistence.Sql
         public string TableSuffix { get; }
         public string TransitionalCorrelationProperty { get; }
     }
+    public class static SqlStorageSessionTupleExtensions
+    {
+        public static void Deconstruct(this NServiceBus.Persistence.Sql.ISqlStorageSession session, out System.Data.Common.DbConnection connection, out System.Data.Common.DbTransaction transaction) { }
+    }
     public class SubscriptionSettings
     {
         public void CacheFor(System.TimeSpan timeSpan) { }
@@ -78,13 +78,6 @@ namespace NServiceBus.Persistence.Sql
     public class TimeoutSettings
     {
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
-    }
-}
-namespace NServiceBus.Persistence.Sql.SynchronizedStorage
-{
-    public class static SqlStorageSessionTupleExtensions
-    {
-        public static void Deconstruct(this NServiceBus.Persistence.Sql.ISqlStorageSession session, out System.Data.Common.DbConnection connection, out System.Data.Common.DbTransaction transaction) { }
     }
 }
 namespace NServiceBus
@@ -119,23 +112,27 @@ namespace NServiceBus
     {
         public SqlDialectSettings() { }
     }
+    public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
+    {
+        public SqlPersistence() { }
+    }
     public class static SqlPersistenceConfig
     {
-        public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
-        public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
+        public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void DoNotUseSqlServerTransportConnection(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings) { }
         public static void JsonBParameterModifier(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.PostgreSql> dialectSettings, System.Action<System.Data.Common.DbParameter> modifier) { }
-        public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tenantIdHeaderName, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
-        public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, System.Func<NServiceBus.Transport.IncomingMessage, string> captureTenantId, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
-        public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tenantIdHeaderName, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
+        public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, System.Func<NServiceBus.Transport.IncomingMessage, string> captureTenantId, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
+        public static NServiceBus.Persistence.Sql.SagaSettings SagaSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle> dialectSettings, string schema) { }
         public static void Schema(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.PostgreSql> dialectSettings, string schema) { }
-        public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration)
+        public static NServiceBus.SqlDialectSettings<T> SqlDialect<T>(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration)
             where T : NServiceBus.SqlDialect, new () { }
-        public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
-        public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration, string tablePrefix) { }
-        public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.Persistence.Sql.SqlPersistence> configuration) { }
+        public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
+        public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tablePrefix) { }
+        public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
     }
     public class static SqlPersistenceOutboxSettingsExtensions
     {
