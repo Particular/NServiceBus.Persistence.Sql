@@ -1,4 +1,4 @@
-﻿using NServiceBus.Persistence.Sql;
+﻿using NServiceBus;
 using NUnit.Framework;
 using Particular.Approvals;
 using PublicApiGenerator;

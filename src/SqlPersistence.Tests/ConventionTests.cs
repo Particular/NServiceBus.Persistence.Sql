@@ -1,5 +1,5 @@
 using System;
-using NServiceBus.Persistence.Sql;
+using NServiceBus;
 using NUnit.Framework;
 
 [TestFixture]

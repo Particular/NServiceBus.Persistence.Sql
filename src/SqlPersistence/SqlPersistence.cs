@@ -1,7 +1,9 @@
-﻿namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus
 {
     using Settings;
     using Features;
+    using Persistence;
+    using Persistence.Sql;
 
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
