@@ -26,6 +26,10 @@ public class ConventionTests
             {
                 continue;
             }
+            if (type.Name == "ProcessedByFody")
+            {
+                continue;
+            }
             throw new Exception($"Type {type.Name} should have no namespace.");
         }
     }
