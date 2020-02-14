@@ -52,7 +52,7 @@ values
                 return $@"
 delete top (@BatchSize) from {tableName}
 where Dispatched = 'true' and
-      DispatchedAt < @DispatchedBefore";
+      CreateTime < @DispatchedBefore";
             }
         }
     }

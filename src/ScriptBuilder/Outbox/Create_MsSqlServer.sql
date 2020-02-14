@@ -12,9 +12,10 @@ set @createTable = '
     create table ' + @tableName + '(
         MessageId nvarchar(200) not null primary key nonclustered,
         Dispatched bit not null default 0,
-        DispatchedAt datetime,
+        DispatchedAt datetime2,
         PersistenceVersion varchar(23) not null,
-        Operations nvarchar(max) not null
+        Operations nvarchar(max) not null,
+        CreateTime datetime2 not null default sysdatetime()
     )
 ';
 exec(@createTable);
@@ -34,4 +35,20 @@ begin
   create index Index_DispatchedAt
   on ' + @tableName + '(DispatchedAt) where Dispatched = 1;';
   exec(@createDispatchedAtIndex);
+end
+
+if not exists
+(
+    select *
+    from sys.indexes
+    where
+        name = 'Index_CreateTime' and
+        object_id = object_id(@tableName)
+)
+begin
+  declare @createCreateTimeIndex nvarchar(max);
+  set @createCreateTimeIndex = '
+  create clustered index Index_CreateTime
+  on ' + @tableName + '(CreateTime)';
+  exec(@createCreateTimeIndex);
 end
