@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <SourcePackageVersion>7.1.0</SourcePackageVersion>
+    <SourcePackageVersion>7.2.3</SourcePackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
