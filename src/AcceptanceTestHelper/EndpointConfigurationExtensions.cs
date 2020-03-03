@@ -10,7 +10,7 @@ public static class EndpointConfigurationExtensions
     public static List<Type> ScannedTypes(this EndpointConfiguration configuration)
     {
         var field = typeof(EndpointConfiguration)
-            .GetField("scannedTypes", BindingFlags.Instance | BindingFlags.NonPublic);
+            .GetField("ScannedTypes", BindingFlags.Instance | BindingFlags.NonPublic);
         if (field == null)
         {
             throw new Exception("Could not extract field 'scannedTypes' from EndpointConfiguration.");
