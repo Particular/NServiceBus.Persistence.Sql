@@ -13,13 +13,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.1.12" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.2.3" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="..\AcceptanceTestsShared\**\When_different_persistence_is_for_outbox.cs" />
+    <Compile Remove="..\AcceptanceTestsShared\**\When_outbox_enabled_and_different_persistence_is_for_sagas.cs"  />
   </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.1.12" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.2.3" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
   </ItemGroup>
@@ -29,6 +29,8 @@
     <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
     <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
     <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
+    <Compile Remove="\**\When_different_persistence_is_for_outbox.cs" />
+    <Compile Remove="\**\When_outbox_enabled_and_different_persistence_is_for_sagas.cs"  />
   </ItemGroup>
 
 </Project>
