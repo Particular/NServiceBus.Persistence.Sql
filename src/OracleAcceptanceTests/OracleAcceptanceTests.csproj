@@ -21,4 +21,9 @@
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="..\AcceptanceTestsShared\**\When_different_persistence_is_for_outbox.cs" />
+    <Compile Remove="..\AcceptanceTestsShared\**\When_outbox_enabled_and_different_persistence_is_for_sagas.cs"  />
+  </ItemGroup>
+
 </Project>
