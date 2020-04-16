@@ -11,6 +11,6 @@
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.60" />
     <PackageReference Include="MySql.Data" Version="8.0.18" ExcludeAssets="contentFiles" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.2" />
   </ItemGroup>
 </Project>
