@@ -1,4 +1,3 @@
-#if NETFRAMEWORK
 using System;
 using Oracle.ManagedDataAccess.Client;
 
@@ -29,4 +28,3 @@ public static class OracleConnectionBuilder
         return new OracleConnection(connection);
     }
 }
-#endif
