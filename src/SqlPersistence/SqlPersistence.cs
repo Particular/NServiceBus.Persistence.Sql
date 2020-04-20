@@ -36,6 +36,13 @@
             });
             Defaults(s =>
             {
+                var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultApplied";
+
+                if (s.HasSetting(defaultsAppliedSettingsKey))
+                {
+                    return;
+                }
+
                 var dialect = s.GetSqlDialect();
                 var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
 
@@ -46,6 +53,8 @@
                 });
 
                 s.EnableFeatureByDefault<InstallerFeature>();
+
+                s.Set(defaultsAppliedSettingsKey, true);
             });
         }
 
