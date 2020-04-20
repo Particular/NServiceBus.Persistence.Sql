@@ -36,7 +36,7 @@
             });
             Defaults(s =>
             {
-                var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultApplied";
+                var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultsApplied";
 
                 if (s.HasSetting(defaultsAppliedSettingsKey))
                 {
