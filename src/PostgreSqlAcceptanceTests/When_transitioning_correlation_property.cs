@@ -15,12 +15,12 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
     [Test]
     public async Task Should_remove_old_property_after_phase_three()
     {
-        var dialect = BuildSqlDialect.MsSqlServer;
+        var dialect = BuildSqlDialect.PostgreSql;
         var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
         var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
         var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
 
-        using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
+        using (var connection = PostgreSqlConnectionBuilder.Build())
         {
             await connection.OpenAsync().ConfigureAwait(false);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
@@ -46,7 +46,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
     {
         using (var command = connection.CreateCommand())
         {
-            command.CommandText = "SELECT * FROM _TransitioningCorrelationPropertySaga";
+            command.CommandText = "select * from \"public\".\"_TransitioningCorrelationPropertySaga\"";
             command.CommandType = CommandType.Text;
 
             using (var reader = command.ExecuteReader())
