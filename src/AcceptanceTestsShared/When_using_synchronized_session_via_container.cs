@@ -40,9 +40,9 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {
             Context context;
-            SqlStorageSession storageSession;
+            ISqlStorageSession storageSession;
 
-            public MyMessageHandler(SqlStorageSession storageSession, Context context)
+            public MyMessageHandler(ISqlStorageSession storageSession, Context context)
             {
                 this.storageSession = storageSession;
                 this.context = context;

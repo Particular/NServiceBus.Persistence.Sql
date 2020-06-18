@@ -1,17 +1,18 @@
 ﻿using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
     IConnectionManager connectionManager;
     SagaInfoCache infoCache;
+    CurrentSessionHolder currentSessionHolder;
 
-    public SynchronizedStorage(IConnectionManager connectionManager, SagaInfoCache infoCache)
+    public SynchronizedStorage(IConnectionManager connectionManager, SagaInfoCache infoCache, CurrentSessionHolder currentSessionHolder)
     {
         this.connectionManager = connectionManager;
         this.infoCache = infoCache;
+        this.currentSessionHolder = currentSessionHolder;
     }
 
     public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
@@ -19,7 +20,8 @@ class SynchronizedStorage : ISynchronizedStorage
         var connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage()).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         var session = new StorageSession(connection, transaction, true, infoCache);
-        contextBag.RegisterSession(session);
+
+        currentSessionHolder.SetCurrentSession(session);
         return session;
     }
 }

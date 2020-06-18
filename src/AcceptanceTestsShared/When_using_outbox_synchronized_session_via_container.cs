@@ -41,9 +41,9 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {
             Context context;
-            SqlStorageSession storageSession;
+            ISqlStorageSession storageSession;
 
-            public MyMessageHandler(SqlStorageSession storageSession, Context context)
+            public MyMessageHandler(ISqlStorageSession storageSession, Context context)
             {
                 this.storageSession = storageSession;
                 this.context = context;

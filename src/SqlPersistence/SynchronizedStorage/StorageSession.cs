@@ -8,6 +8,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
     Func<ISqlStorageSession, Task> onSaveChangesCallback;
+    Action disposedCallback = () => { };
 
     public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
     {
@@ -53,5 +54,12 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
             Transaction?.Dispose();
             Connection?.Dispose();
         }
+
+        disposedCallback();
+    }
+
+    public void OnDisposed(Action callback)
+    {
+        disposedCallback = callback;
     }
 }

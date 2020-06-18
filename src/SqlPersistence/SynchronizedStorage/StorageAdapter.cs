@@ -1,11 +1,8 @@
-using System;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
-using NServiceBus.ObjectBuilder;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
@@ -14,13 +11,15 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
+    CurrentSessionHolder currentSessionHolder;
     IConnectionManager connectionBuilder;
 
-    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
+    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect, CurrentSessionHolder currentSessionHolder)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
         this.dialect = dialect;
+        this.currentSessionHolder = currentSessionHolder;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -30,7 +29,9 @@ class StorageAdapter : ISynchronizedStorageAdapter
             return EmptyResultTask;
         }
         var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
-        context.RegisterSession(session);
+
+        currentSessionHolder.SetCurrentSession(session);
+
         return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
 
@@ -40,7 +41,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
         if (session != null)
         {
-            context.RegisterSession(session);
+            currentSessionHolder.SetCurrentSession(session);
         }
         return session;
     }
