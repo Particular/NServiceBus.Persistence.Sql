@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data.Common;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -19,13 +20,13 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.SessionInjected);
+        Assert.True(context.RepositoryHasConnection);
     }
 
     public class Context : ScenarioContext
     {
         public bool Done { get; set; }
-        public bool SessionInjected { get; set; }
+        public bool RepositoryHasConnection { get; set; }
     }
 
     public class Endpoint : EndpointConfigurationBuilder
@@ -35,27 +36,49 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
             EndpointSetup<DefaultServer>(c =>
             {
                 c.EnableOutbox();
+                c.RegisterComponents(cc =>
+                {
+                    cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
+                    cc.ConfigureComponent(b => b.Build<ISqlStorageSession>().Connection, DependencyLifecycle.InstancePerUnitOfWork);
+                });
             });
         }
 
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {
             Context context;
-            ISqlStorageSession storageSession;
+            MyRepository repository;
 
-            public MyMessageHandler(ISqlStorageSession storageSession, Context context)
+            public MyMessageHandler(MyRepository repository, Context context)
             {
-                this.storageSession = storageSession;
                 this.context = context;
+                this.repository = repository;
             }
 
 
             public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
             {
+                repository.DoSomething();
                 context.Done = true;
-                context.SessionInjected = storageSession != null;
                 return Task.CompletedTask;
             }
+        }
+    }
+
+    public class MyRepository
+    {
+        DbConnection connection;
+        Context context;
+
+        public MyRepository(DbConnection connection, Context context)
+        {
+            this.connection = connection;
+            this.context = context;
+        }
+
+        public void DoSomething()
+        {
+            context.RepositoryHasConnection = connection != null;
         }
     }
 

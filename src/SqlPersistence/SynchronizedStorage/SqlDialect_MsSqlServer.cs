@@ -5,7 +5,6 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
-    using Persistence;
     using Transport;
 
     public partial class SqlDialect
