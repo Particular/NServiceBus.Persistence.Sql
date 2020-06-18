@@ -1,0 +1,5 @@
+
+update `TheTablePrefixOutboxData`
+set
+    Operations = @Operations
+where MessageId = @MessageId

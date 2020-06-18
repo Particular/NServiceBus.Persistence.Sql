@@ -1,0 +1,13 @@
+
+insert into [TheSchema].[TheTablePrefixOutboxData]
+(
+    MessageId,
+    Operations,
+    PersistenceVersion
+)
+values
+(
+    @MessageId,
+    '[]',
+    @PersistenceVersion
+)

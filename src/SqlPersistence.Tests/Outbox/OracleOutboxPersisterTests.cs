@@ -4,10 +4,14 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
 
-[TestFixture]
+[TestFixture(false, false)]
+[TestFixture(true, false)]
+[TestFixture(false, true)]
+[TestFixture(true, true)]
 public class OracleOutboxPersisterTests : OutboxPersisterTests
 {
-    public OracleOutboxPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
+    public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+        : base(BuildSqlDialect.Oracle, "Particular2", pessimistic, transactionScope)
     {
     }
 

@@ -1,0 +1,13 @@
+
+insert into "THETABLEPREFIXOD"
+(
+    MessageId,
+    Operations,
+    PersistenceVersion
+)
+values
+(
+    :MessageId,
+    '[]',
+    :PersistenceVersion
+)

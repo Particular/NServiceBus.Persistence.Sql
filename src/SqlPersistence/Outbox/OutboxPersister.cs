@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,20 +17,22 @@ class OutboxPersister : IOutboxStorage
     SqlDialect sqlDialect;
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
+    Func<ISqlOutboxTransaction> outboxTransactionFactory;
 
-    public OutboxPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, int cleanupBatchSize = 10000)
+    public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands, Func<ISqlOutboxTransaction> outboxTransactionFactory, int cleanupBatchSize = 10000)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
+        this.outboxCommands = outboxCommands;
+        this.outboxTransactionFactory = outboxTransactionFactory;
         this.cleanupBatchSize = cleanupBatchSize;
-        outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
     }
 
     public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
-        var connection = await connectionManager.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false);
-        var transaction = connection.BeginTransaction();
-        return new SqlOutboxTransaction(transaction, connection);
+        var transaction = outboxTransactionFactory();
+        await transaction.Begin(context).ConfigureAwait(false);
+        return transaction;
     }
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
@@ -89,25 +90,9 @@ class OutboxPersister : IOutboxStorage
 
     public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context)
     {
-        var sqlOutboxTransaction = (SqlOutboxTransaction)outboxTransaction;
-        var transaction = sqlOutboxTransaction.Transaction;
-        var connection = sqlOutboxTransaction.Connection;
-        return Store(message, transaction, connection);
+        var sqlOutboxTransaction = (ISqlOutboxTransaction)outboxTransaction;
+        return sqlOutboxTransaction.Complete(message, context);
     }
-
-    internal async Task Store(OutboxMessage message, DbTransaction transaction, DbConnection connection)
-    {
-        using (var command = sqlDialect.CreateCommand(connection))
-        {
-            command.CommandText = outboxCommands.Store;
-            command.Transaction = transaction;
-            command.AddParameter("MessageId", message.MessageId);
-            command.AddJsonParameter("Operations", Serializer.Serialize(message.TransportOperations.ToSerializable()));
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
-        }
-    }
-
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
     {

@@ -15,7 +15,30 @@ class SqlOutboxFeature : Feature
         var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
-        var outboxPersister = new OutboxPersister(connectionManager, tablePrefix, sqlDialect);
+
+        var pessimisticMode = context.Settings.GetOrDefault<bool>(ConcurrencyMode);
+        var transactionScopeMode = context.Settings.GetOrDefault<bool>(TransactionMode);
+
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
+
+        OutboxBehavior behavior;
+        if (pessimisticMode)
+        {
+            behavior = new PessimisticOutboxBehavior(sqlDialect, outboxCommands);
+        }
+        else
+        {
+            behavior = new OptimisticOutboxBehavior(sqlDialect, outboxCommands);
+        }
+
+        ISqlOutboxTransaction transactionFactory()
+        {
+            return transactionScopeMode
+                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
+                : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+        }
+
+        var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -50,4 +73,6 @@ class SqlOutboxFeature : Feature
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
     internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";
     internal const string DisableCleanup = "Persistence.Sql.Outbox.DisableCleanup";
+    internal const string ConcurrencyMode = "Persistence.Sql.Outbox.PessimisticMode";
+    internal const string TransactionMode = "Persistence.Sql.Outbox.TransactionScopeMode";
 }

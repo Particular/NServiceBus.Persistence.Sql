@@ -1,0 +1,5 @@
+
+update "THETABLEPREFIXOD"
+set
+    Operations = :Operations
+where MessageId = :MessageId
