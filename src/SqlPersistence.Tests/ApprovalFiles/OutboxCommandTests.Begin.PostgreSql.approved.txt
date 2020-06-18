@@ -8,6 +8,6 @@ insert into "public"."TheTablePrefixOutboxData"
 values
 (
     @MessageId,
-    '[]'s,
+    '[]',
     @PersistenceVersion
 )
