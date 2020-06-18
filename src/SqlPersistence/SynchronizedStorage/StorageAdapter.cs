@@ -1,8 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
+using NServiceBus.ObjectBuilder;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
@@ -26,13 +29,20 @@ class StorageAdapter : ISynchronizedStorageAdapter
         {
             return EmptyResultTask;
         }
-        CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
-        return Task.FromResult(session);
+        var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
+        context.RegisterSession(session);
+        return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
 
-    public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        return dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
+        var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
+        if (session != null)
+        {
+            context.RegisterSession(session);
+        }
+        return session;
     }
 }
+

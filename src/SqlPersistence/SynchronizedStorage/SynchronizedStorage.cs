@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 
 class SynchronizedStorage : ISynchronizedStorage
 {
@@ -17,6 +18,8 @@ class SynchronizedStorage : ISynchronizedStorage
     {
         var connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage()).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
-        return new StorageSession(connection, transaction, true, infoCache);
+        var session = new StorageSession(connection, transaction, true, infoCache);
+        contextBag.RegisterSession(session);
+        return session;
     }
 }

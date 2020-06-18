@@ -30,6 +30,8 @@ class StorageSessionFeature : Feature
         container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache), DependencyLifecycle.SingleInstance);
         container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
 
+        container.ConfigureComponent(b => new SqlStorageSession(), DependencyLifecycle.InstancePerUnitOfWork);
+
         if (sqlSagaPersistenceActivated)
         {
             var sagaPersister = new SagaPersister(infoCache, sqlDialect);
