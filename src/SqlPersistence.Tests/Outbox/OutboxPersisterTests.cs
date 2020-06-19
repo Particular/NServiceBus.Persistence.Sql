@@ -17,7 +17,6 @@ public abstract class OutboxPersisterTests
     string schema;
     bool pessimistic;
     bool transactionScope;
-    IConnectionManager connectionManager;
 
     protected abstract Func<string, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
@@ -28,7 +27,6 @@ public abstract class OutboxPersisterTests
         this.schema = schema;
         this.pessimistic = pessimistic;
         this.transactionScope = transactionScope;
-        connectionManager = new ConnectionManager(() => GetConnection()(schema));
     }
 
 
@@ -37,6 +35,7 @@ public abstract class OutboxPersisterTests
         var dialect = sqlDialect.Convert(theSchema);
         var outboxCommands = OutboxCommandBuilder.Build(dialect, $"{GetTablePrefix()}_");
 
+        var connectionManager = new ConnectionManager(() => GetConnection()(schema));
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
             sqlDialect: dialect,
@@ -95,6 +94,8 @@ public abstract class OutboxPersisterTests
     [Test]
     public void ExecuteCreateTwice()
     {
+        var connectionManager = new ConnectionManager(() => GetConnection()(schema));
+
         using (var connection = connectionManager.BuildNonContextual())
         {
             connection.Open();
