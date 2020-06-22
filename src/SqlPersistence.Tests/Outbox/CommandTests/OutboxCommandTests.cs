@@ -39,9 +39,25 @@ public abstract class OutboxCommandTests
     [Test]
     public void Store()
     {
-        var timeoutCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
 
-        Approver.Verify(timeoutCommands.Store, scenario: GetType().Name);
+        Approver.Verify(outboxCommands.OptimisticStore, scenario: GetType().Name);
+    }
+
+    [Test]
+    public void Begin()
+    {
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
+
+        Approver.Verify(outboxCommands.PessimisticBegin, scenario: GetType().Name);
+    }
+
+    [Test]
+    public void Complete()
+    {
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "TheTablePrefix");
+
+        Approver.Verify(outboxCommands.PessimisticComplete, scenario: GetType().Name);
     }
 
     [TestFixture]

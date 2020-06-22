@@ -3,34 +3,59 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Transport;
 using NUnit.Framework;
 using Particular.Approvals;
+using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
 public abstract class OutboxPersisterTests
 {
     BuildSqlDialect sqlDialect;
     string schema;
-    IConnectionManager connectionManager;
+    bool pessimistic;
+    bool transactionScope;
 
     protected abstract Func<string, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
 
-    public OutboxPersisterTests(BuildSqlDialect sqlDialect, string schema)
+    public OutboxPersisterTests(BuildSqlDialect sqlDialect, string schema, bool pessimistic, bool transactionScope)
     {
         this.sqlDialect = sqlDialect;
         this.schema = schema;
-        connectionManager = new ConnectionManager(() => GetConnection()(schema));
+        this.pessimistic = pessimistic;
+        this.transactionScope = transactionScope;
     }
 
 
     OutboxPersister Setup(string theSchema)
     {
+        var dialect = sqlDialect.Convert(theSchema);
+        var outboxCommands = OutboxCommandBuilder.Build(dialect, $"{GetTablePrefix()}_");
+
+        var connectionManager = new ConnectionManager(() => GetConnection()(theSchema));
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
-            tablePrefix: $"{GetTablePrefix()}_",
-            sqlDialect: sqlDialect.Convert(theSchema),
+            sqlDialect: dialect,
+            outboxCommands,
+            () =>
+            {
+                ConcurrencyControlStrategy behavior;
+                if (pessimistic)
+                {
+                    behavior = new PessimisticConcurrencyControlStrategy(dialect, outboxCommands);
+                }
+                else
+                {
+                    behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
+                }
+
+                return transactionScope 
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager) 
+                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+            },
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))
         {
@@ -69,6 +94,8 @@ public abstract class OutboxPersisterTests
     [Test]
     public void ExecuteCreateTwice()
     {
+        var connectionManager = new ConnectionManager(() => GetConnection()(schema));
+
         using (var connection = connectionManager.BuildNonContextual())
         {
             connection.Open();
@@ -111,15 +138,16 @@ public abstract class OutboxPersisterTests
         };
         var messageId = "a";
 
-        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
-        using (var transaction = connection.BeginTransaction())
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
-            transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
+            await transaction.Commit();
         }
-        var beforeDispatch = await persister.Get(messageId, null).ConfigureAwait(false);
-        await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
-        var afterDispatch = await persister.Get(messageId, null).ConfigureAwait(false);
+
+        var beforeDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
+        var afterDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
 
         return Tuple.Create(beforeDispatch, afterDispatch);
     }
@@ -156,34 +184,36 @@ public abstract class OutboxPersisterTests
         };
 
         var messageId = "a";
-        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
-        using (var transaction = connection.BeginTransaction())
+
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, connection).ConfigureAwait(false);
-            transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
+            await transaction.Commit();
         }
-        return await persister.Get(messageId, null).ConfigureAwait(false);
+        return await persister.Get(messageId, contextBag).ConfigureAwait(false);
+    }
+
+    static ContextBag CreateContextBag(string messageId)
+    {
+        var contextBag = new ContextBag();
+        contextBag.Set(new IncomingMessage(messageId, new Dictionary<string, string>(), new byte[0]));
+        return contextBag;
     }
 
     [Test]
     public async Task StoreAndCleanup()
     {
         var persister = Setup(schema);
-        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
+        for (var i = 0; i < 13; i++)
         {
-            for (var i = 0; i < 13; i++)
-            {
-                await Store(i, connection, persister).ConfigureAwait(false);
-            }
+            await Store(i, persister).ConfigureAwait(false);
         }
 
         await Task.Delay(1000).ConfigureAwait(false);
         var dateTime = DateTime.UtcNow;
         await Task.Delay(1000).ConfigureAwait(false);
-        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
-        {
-            await Store(13, connection, persister).ConfigureAwait(false);
-        }
+        await Store(13, persister).ConfigureAwait(false);
 
         await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
         Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
@@ -191,7 +221,7 @@ public abstract class OutboxPersisterTests
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
-    async Task Store(int i, DbConnection connection, OutboxPersister persister)
+    async Task Store(int i, OutboxPersister persister)
     {
         var operations = new[]
         {
@@ -216,14 +246,13 @@ public abstract class OutboxPersisterTests
             )
         };
         var messageId = "MessageId" + i;
-        var outboxMessage = new OutboxMessage(messageId, operations);
-
-        using (var transaction = connection.BeginTransaction())
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            await persister.Store(outboxMessage, transaction, connection).ConfigureAwait(false);
-            transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
+            await transaction.Commit();
         }
-        await persister.SetAsDispatched(messageId, null).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
     }
 
     [Test]
@@ -257,17 +286,14 @@ public abstract class OutboxPersisterTests
             )
         };
         var messageId = "a";
-
-        using (var connection = GetConnection()(null))
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await defaultSchemaPersister.BeginTransaction(contextBag))
         {
-            await connection.OpenAsync().ConfigureAwait(false);
-            using (var transaction = connection.BeginTransaction())
-            {
-                await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, connection).ConfigureAwait(false);
-                transaction.Commit();
-            }
+            await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
+            await transaction.Commit();
         }
-        var result = await schemaPersister.Get(messageId, null).ConfigureAwait(false);
+
+        var result = await schemaPersister.Get(messageId, contextBag).ConfigureAwait(false);
         Assert.IsNull(result);
     }
 }

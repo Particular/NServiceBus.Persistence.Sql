@@ -15,7 +15,30 @@ class SqlOutboxFeature : Feature
         var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
-        var outboxPersister = new OutboxPersister(connectionManager, tablePrefix, sqlDialect);
+
+        var pessimisticMode = context.Settings.GetOrDefault<bool>(ConcurrencyMode);
+        var transactionScopeMode = context.Settings.GetOrDefault<bool>(TransactionMode);
+
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
+
+        ConcurrencyControlStrategy concurrencyControlStrategy;
+        if (pessimisticMode)
+        {
+            concurrencyControlStrategy = new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
+        }
+        else
+        {
+            concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
+        }
+
+        ISqlOutboxTransaction transactionFactory()
+        {
+            return transactionScopeMode
+                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager)
+                : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager);
+        }
+
+        var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
         context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -50,4 +73,6 @@ class SqlOutboxFeature : Feature
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
     internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";
     internal const string DisableCleanup = "Persistence.Sql.Outbox.DisableCleanup";
+    internal const string ConcurrencyMode = "Persistence.Sql.Outbox.PessimisticMode";
+    internal const string TransactionMode = "Persistence.Sql.Outbox.TransactionScopeMode";
 }

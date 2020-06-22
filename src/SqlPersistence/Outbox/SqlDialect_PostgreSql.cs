@@ -30,7 +30,7 @@ from {tableName}
 where ""MessageId"" = @MessageId";
             }
 
-            internal override string GetOutboxStoreCommand(string tableName)
+            internal override string GetOutboxOptimisticStoreCommand(string tableName)
             {
                 return $@"
 insert into {tableName}
@@ -45,6 +45,32 @@ values
     @Operations,
     @PersistenceVersion
 )";
+            }
+
+            internal override string GetOutboxPessimisticBeginCommand(string tableName)
+            {
+                return $@"
+insert into {tableName}
+(
+    ""MessageId"",
+    ""Operations"",
+    ""PersistenceVersion""
+)
+values
+(
+    @MessageId,
+    '[]',
+    @PersistenceVersion
+)";
+            }
+
+            internal override string GetOutboxPessimisticCompleteCommand(string tableName)
+            {
+                return $@"
+update {tableName}
+set
+    ""Operations"" = @Operations
+where ""MessageId"" = @MessageId";
             }
 
             internal override string GetOutboxCleanupCommand(string tableName)

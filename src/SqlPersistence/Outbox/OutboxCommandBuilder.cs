@@ -7,7 +7,9 @@ static class OutboxCommandBuilder
     {
         var tableName = sqlDialect.GetOutboxTableName(tablePrefix);
 
-        var storeCommandText = sqlDialect.GetOutboxStoreCommand(tableName);
+        var optimisticStoreCommandText = sqlDialect.GetOutboxOptimisticStoreCommand(tableName);
+        var pessimisticBeginCommandText = sqlDialect.GetOutboxPessimisticBeginCommand(tableName);
+        var pessimisticCompleteCommandText = sqlDialect.GetOutboxPessimisticCompleteCommand(tableName);
 
         var cleanupCommand = sqlDialect.GetOutboxCleanupCommand(tableName);
 
@@ -16,9 +18,11 @@ static class OutboxCommandBuilder
         var setAsDispatchedCommand = sqlDialect.GetOutboxSetAsDispatchedCommand(tableName);
 
         return new OutboxCommands(
-            store: storeCommandText,
-            get: getCommandText,
-            setAsDispatched: setAsDispatchedCommand,
-            cleanup: cleanupCommand);
+            optimisticStoreCommandText, 
+            pessimisticBeginCommandText, 
+            pessimisticCompleteCommandText, 
+            getCommandText, 
+            setAsDispatchedCommand, 
+            cleanupCommand);
     }
 }

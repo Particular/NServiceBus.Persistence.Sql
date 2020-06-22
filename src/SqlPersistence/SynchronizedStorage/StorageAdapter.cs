@@ -22,7 +22,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
     {
-        if (!(transaction is SqlOutboxTransaction outboxTransaction))
+        if (!(transaction is ISqlOutboxTransaction outboxTransaction))
         {
             return EmptyResultTask;
         }
