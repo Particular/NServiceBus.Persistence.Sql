@@ -35,7 +35,7 @@ public abstract class OutboxPersisterTests
         var dialect = sqlDialect.Convert(theSchema);
         var outboxCommands = OutboxCommandBuilder.Build(dialect, $"{GetTablePrefix()}_");
 
-        var connectionManager = new ConnectionManager(() => GetConnection()(schema));
+        var connectionManager = new ConnectionManager(() => GetConnection()(theSchema));
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
             sqlDialect: dialect,
