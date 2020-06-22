@@ -62,8 +62,8 @@
         }
 
         /// <summary>
-        /// Configures the outbox to use TransactionScope instead of native NHibernate transactions. This allows extending the
-        /// scope of the outbox transaction (and synchronized storage session it protects) to other databases provided that
+        /// Configures the outbox to use TransactionScope instead of SqlTransaction. This allows wrapping the
+        /// the outbox transaction (and synchronized storage session it manages) and other database transactions in a single scope - provided that
         /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
         /// </summary>
         public static void UseTransactionScope(this OutboxSettings outboxSettings)
