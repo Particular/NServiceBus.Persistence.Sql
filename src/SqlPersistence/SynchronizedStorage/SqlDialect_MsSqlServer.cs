@@ -5,14 +5,13 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
-    using Persistence;
     using Transport;
 
     public partial class SqlDialect
     {
         public partial class MsSqlServer
         {
-            internal override async Task<CompletableSynchronizedStorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
             {
                 if (DoNotUseTransportConnection)
                 {

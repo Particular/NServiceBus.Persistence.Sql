@@ -11,13 +11,15 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
+    CurrentSessionHolder currentSessionHolder;
     IConnectionManager connectionBuilder;
 
-    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
+    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect, CurrentSessionHolder currentSessionHolder)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
         this.dialect = dialect;
+        this.currentSessionHolder = currentSessionHolder;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -26,13 +28,22 @@ class StorageAdapter : ISynchronizedStorageAdapter
         {
             return EmptyResultTask;
         }
-        CompletableSynchronizedStorageSession session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
-        return Task.FromResult(session);
+        var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
+
+        currentSessionHolder.SetCurrentSession(session);
+
+        return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
 
-    public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
-        return dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
+        var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
+        if (session != null)
+        {
+            currentSessionHolder.SetCurrentSession(session);
+        }
+        return session;
     }
 }
+

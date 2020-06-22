@@ -6,7 +6,6 @@ namespace NServiceBus.Persistence.Sql
 
     /// <summary>
     /// Exposes the current <see cref="DbTransaction"/> and <see cref="DbConnection"/>.
-    /// <seealso cref="SqlPersistenceStorageSessionExtensions.SqlPersistenceSession"/>
     /// </summary>
     public interface ISqlStorageSession
     {

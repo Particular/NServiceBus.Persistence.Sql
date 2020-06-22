@@ -26,9 +26,14 @@ class StorageSessionFeature : Feature
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
         }
 
+        var sessionHolder = new CurrentSessionHolder();
+
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache, sessionHolder), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder), DependencyLifecycle.SingleInstance);
+
+        container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
+        context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
 
         if (sqlSagaPersistenceActivated)
         {
