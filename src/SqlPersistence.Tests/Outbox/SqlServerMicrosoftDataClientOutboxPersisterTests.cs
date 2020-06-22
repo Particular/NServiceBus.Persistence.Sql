@@ -3,10 +3,14 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture]
+[TestFixture(false, false)]
+[TestFixture(true, false)]
+[TestFixture(false, true)]
+[TestFixture(true, true)]
 public class SqlServerMicrosoftDataClientOutboxPersisterTests : OutboxPersisterTests
 {
-    public SqlServerMicrosoftDataClientOutboxPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
+    public SqlServerMicrosoftDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+        : base(BuildSqlDialect.MsSqlServer, "schema_name", pessimistic, transactionScope)
     {
     }
 

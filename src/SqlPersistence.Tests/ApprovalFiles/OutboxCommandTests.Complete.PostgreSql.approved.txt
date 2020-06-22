@@ -1,0 +1,5 @@
+
+update "public"."TheTablePrefixOutboxData"
+set
+    "Operations" = @Operations
+where "MessageId" = @MessageId
