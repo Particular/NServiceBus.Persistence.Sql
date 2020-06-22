@@ -26,6 +26,8 @@ class StorageSessionFeature : Feature
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
         }
 
+        var sessionHolder = new CurrentSessionHolder();
+
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
         container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache, sessionHolder), DependencyLifecycle.SingleInstance);
         container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder), DependencyLifecycle.SingleInstance);
@@ -98,6 +100,4 @@ class StorageSessionFeature : Feature
         }
         return JsonSerializer.Create(jsonSerializerSettings);
     }
-
-    CurrentSessionHolder sessionHolder = new CurrentSessionHolder();
 }

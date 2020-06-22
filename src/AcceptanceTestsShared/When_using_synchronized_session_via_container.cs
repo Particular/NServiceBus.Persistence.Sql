@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data.Common;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -15,17 +16,20 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         // The EndpointsStarted flag is set by acceptance framework
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-            .Done(c => c.Done)
+            .Done(c => c.ConnectionInjectedToFirstHandler != null && c.ConnectionInjectedToSecondHandler != null)
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.SessionInjected);
+        Assert.IsNotNull(context.ConnectionInjectedToFirstHandler);
+        Assert.IsNotNull(context.ConnectionInjectedToSecondHandler);
+        Assert.AreSame(context.ConnectionInjectedToFirstHandler, context.ConnectionInjectedToSecondHandler);
     }
 
     public class Context : ScenarioContext
     {
         public bool Done { get; set; }
-        public bool SessionInjected { get; set; }
+        public DbConnection ConnectionInjectedToFirstHandler { get; set; }
+        public DbConnection ConnectionInjectedToSecondHandler { get; set; }
     }
 
     public class Endpoint : EndpointConfigurationBuilder
@@ -52,7 +56,27 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
             public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
             {
                 context.Done = true;
-                context.SessionInjected = storageSession != null;
+                context.ConnectionInjectedToFirstHandler = storageSession.Connection;
+                return Task.CompletedTask;
+            }
+        }
+
+        public class MyOtherMessageHandler : IHandleMessages<MyMessage>
+        {
+            Context context;
+            ISqlStorageSession storageSession;
+
+            public MyOtherMessageHandler(ISqlStorageSession storageSession, Context context)
+            {
+                this.storageSession = storageSession;
+                this.context = context;
+            }
+
+
+            public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
+            {
+                context.Done = true;
+                context.ConnectionInjectedToSecondHandler = storageSession.Connection;
                 return Task.CompletedTask;
             }
         }
