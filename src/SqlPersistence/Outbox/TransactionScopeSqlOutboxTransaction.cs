@@ -10,15 +10,15 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     static ILog Log = LogManager.GetLogger<TransactionScopeSqlOutboxTransaction>();
 
     IConnectionManager connectionManager;
-    OutboxBehavior behavior;
+    ConcurrencyControlStrategy concurrencyControlStrategy;
     TransactionScope transactionScope;
     Transaction ambientTransaction;
     bool commit;
 
-    public TransactionScopeSqlOutboxTransaction(OutboxBehavior behavior, IConnectionManager connectionManager)
+    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, IConnectionManager connectionManager)
     {
         this.connectionManager = connectionManager;
-        this.behavior = behavior;
+        this.concurrencyControlStrategy = concurrencyControlStrategy;
     }
 
     public DbTransaction Transaction => null;
@@ -31,12 +31,12 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
         Connection.EnlistTransaction(ambientTransaction);
-        await behavior.Begin(incomingMessage.MessageId, Connection, null).ConfigureAwait(false);
+        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, null).ConfigureAwait(false);
     }
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context)
     {
-        return behavior.Complete(outboxMessage, Connection, null, context);
+        return concurrencyControlStrategy.Complete(outboxMessage, Connection, null, context);
     }
 
     public void BeginSynchronizedSession(ContextBag context)

@@ -42,14 +42,14 @@ public abstract class OutboxPersisterTests
             outboxCommands,
             () =>
             {
-                OutboxBehavior behavior;
+                ConcurrencyControlStrategy behavior;
                 if (pessimistic)
                 {
-                    behavior = new PessimisticOutboxBehavior(dialect, outboxCommands);
+                    behavior = new PessimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
                 else
                 {
-                    behavior = new OptimisticOutboxBehavior(dialect, outboxCommands);
+                    behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
 
                 return transactionScope 

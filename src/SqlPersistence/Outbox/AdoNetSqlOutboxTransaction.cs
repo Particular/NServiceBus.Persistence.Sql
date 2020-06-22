@@ -9,12 +9,12 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     static ILog Log = LogManager.GetLogger<AdoNetSqlOutboxTransaction>();
 
     IConnectionManager connectionManager;
-    OutboxBehavior behavior;
+    ConcurrencyControlStrategy concurrencyControlStrategy;
 
-    public AdoNetSqlOutboxTransaction(OutboxBehavior behavior, IConnectionManager connectionManager)
+    public AdoNetSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, IConnectionManager connectionManager)
     {
         this.connectionManager = connectionManager;
-        this.behavior = behavior;
+        this.concurrencyControlStrategy = concurrencyControlStrategy;
     }
 
     public DbTransaction Transaction { get; private set; }
@@ -25,12 +25,12 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
         Transaction = Connection.BeginTransaction();
-        await behavior.Begin(incomingMessage.MessageId, Connection, Transaction).ConfigureAwait(false);
+        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction).ConfigureAwait(false);
     }
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context)
     {
-        return behavior.Complete(outboxMessage, Connection, Transaction, context);
+        return concurrencyControlStrategy.Complete(outboxMessage, Connection, Transaction, context);
     }
 
     public void BeginSynchronizedSession(ContextBag context)

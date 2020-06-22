@@ -21,21 +21,21 @@ class SqlOutboxFeature : Feature
 
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
 
-        OutboxBehavior behavior;
+        ConcurrencyControlStrategy concurrencyControlStrategy;
         if (pessimisticMode)
         {
-            behavior = new PessimisticOutboxBehavior(sqlDialect, outboxCommands);
+            concurrencyControlStrategy = new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
         }
         else
         {
-            behavior = new OptimisticOutboxBehavior(sqlDialect, outboxCommands);
+            concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
         }
 
         ISqlOutboxTransaction transactionFactory()
         {
             return transactionScopeMode
-                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
-                : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager)
+                : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager);
         }
 
         var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
