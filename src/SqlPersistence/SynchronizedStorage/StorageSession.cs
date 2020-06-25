@@ -7,7 +7,7 @@ using NServiceBus.Persistence.Sql;
 class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
-    Func<ISqlStorageSession, Task> onSaveChangesCallback;
+    Func<ISqlStorageSession, Task> onSaveChangesCallback = s => Task.CompletedTask;
     Action disposedCallback = () => { };
 
     public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
@@ -26,19 +26,17 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
     public void OnSaveChanges(Func<ISqlStorageSession, Task> callback)
     {
         Guard.AgainstNull(nameof(callback), callback);
-        if (onSaveChangesCallback != null)
+        var oldCallback = onSaveChangesCallback;
+        onSaveChangesCallback = async s =>
         {
-            throw new Exception("Save changes callback for this session has already been registered.");
-        }
-        onSaveChangesCallback = callback;
+            await oldCallback(s).ConfigureAwait(false);
+            await callback(s).ConfigureAwait(false);
+        };
     }
 
     public async Task CompleteAsync()
     {
-        if (onSaveChangesCallback != null)
-        {
-            await onSaveChangesCallback(this).ConfigureAwait(false);
-        }
+        await onSaveChangesCallback(this).ConfigureAwait(false);
         if (ownsTransaction)
         {
             Transaction?.Commit();
