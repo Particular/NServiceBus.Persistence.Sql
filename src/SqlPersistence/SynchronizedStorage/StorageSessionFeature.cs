@@ -32,7 +32,7 @@ class StorageSessionFeature : Feature
         container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache, sessionHolder), DependencyLifecycle.SingleInstance);
         container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder), DependencyLifecycle.SingleInstance);
 
-        container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
+        container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
         context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
 
         if (sqlSagaPersistenceActivated)
