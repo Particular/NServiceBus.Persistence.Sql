@@ -26,6 +26,7 @@ namespace NServiceBus.Persistence.Sql
         public void JsonSettingsForVersion(NServiceBus.Persistence.Sql.RetrieveVersionSpecificJsonSettings builder) { }
         public void ReaderCreator(System.Func<System.IO.TextReader, Newtonsoft.Json.JsonReader> readerCreator) { }
         public void WriterCreator(System.Func<System.Text.StringBuilder, Newtonsoft.Json.JsonWriter> writerCreator) { }
+		public void UseOptimisticConcurrency() { }
     }
     public class static ScriptRunner
     {

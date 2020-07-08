@@ -8,9 +8,9 @@
         /// <summary>
         /// The <see cref="JsonSerializerSettings"/> to use for serializing sagas.
         /// </summary>
-        public void UseOptimisticConcurrency(bool useOptimisticConcurrency)
+        public void UseOptimisticConcurrency()
         {
-            settings.Set("SqlPersistence.Saga.UseOptimisticConcurrency", useOptimisticConcurrency);
+            settings.Set("SqlPersistence.Saga.UseOptimisticConcurrency", true);
         }
 
         internal static bool GetUsesOptimisticConcurrency(ReadOnlySettings settings)
