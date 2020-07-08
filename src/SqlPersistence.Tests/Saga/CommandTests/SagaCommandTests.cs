@@ -21,13 +21,13 @@ public abstract class SagaCommandTests
     [Test]
     public void GetByProperty()
     {
-        Approver.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName"), scenario: GetType().Name);
+        Approver.Verify(sqlDialect.BuildGetByPropertyCommand("ThePropertyName", "TheTableName", true), scenario: GetType().Name);
     }
 
     [Test]
     public void GetBySagaId()
     {
-        Approver.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName"), scenario: GetType().Name);
+        Approver.Verify(sqlDialect.BuildGetBySagaIdCommand("TheTableName", true), scenario: GetType().Name);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public abstract class SagaCommandTests
     [Test]
     public void SelectFrom()
     {
-        Approver.Verify(sqlDialect.BuildSelectFromCommand("TheTableName")("1 = 1"), scenario: GetType().Name);
+        Approver.Verify(sqlDialect.BuildSelectFromCommand("TheTableName", true)("1 = 1"), scenario: GetType().Name);
     }
 
     [Test]

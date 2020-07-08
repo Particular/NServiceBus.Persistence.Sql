@@ -81,12 +81,15 @@ class StorageSessionFeature : Feature
         }
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix();
+        var usesOptimisticConcurrency = SagaSettings.GetUsesOptimisticConcurrency(settings);
+
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
+            usesOptimisticConcurrency: usesOptimisticConcurrency,
             sqlDialect: sqlDialect,
             metadataCollection: settings.Get<SagaMetadataCollection>(),
             nameFilter: nameFilter);

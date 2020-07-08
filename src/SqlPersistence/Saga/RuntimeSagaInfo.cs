@@ -42,6 +42,7 @@ class RuntimeSagaInfo
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
+        bool usesOptimisticConcurrency,
         SqlDialect sqlDialect,
         Func<string, string> nameFilter)
     {
@@ -63,8 +64,8 @@ class RuntimeSagaInfo
         TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
 
         CompleteCommand = sqlDialect.BuildCompleteCommand(TableName);
-        SelectFromCommandBuilder = sqlDialect.BuildSelectFromCommand(TableName);
-        GetBySagaIdCommand = sqlDialect.BuildGetBySagaIdCommand(TableName);
+        SelectFromCommandBuilder = sqlDialect.BuildSelectFromCommand(TableName, usesOptimisticConcurrency);
+        GetBySagaIdCommand = sqlDialect.BuildGetBySagaIdCommand(TableName, usesOptimisticConcurrency);
         SaveCommand = sqlDialect.BuildSaveCommand(sqlSagaAttributeData.CorrelationProperty, sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
         UpdateCommand = sqlDialect.BuildUpdateCommand(sqlSagaAttributeData.TransitionalCorrelationProperty, TableName);
 
@@ -72,7 +73,7 @@ class RuntimeSagaInfo
         HasCorrelationProperty = CorrelationProperty != null;
         if (HasCorrelationProperty)
         {
-            GetByCorrelationPropertyCommand = sqlDialect.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName);
+            GetByCorrelationPropertyCommand = sqlDialect.BuildGetByPropertyCommand(sqlSagaAttributeData.CorrelationProperty, TableName, usesOptimisticConcurrency);
         }
 
         TransitionalCorrelationProperty = sqlSagaAttributeData.TransitionalCorrelationProperty;

@@ -96,6 +96,7 @@ public class CharArrayTextWriterPerformanceTests
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: "some",
+            usesOptimisticConcurrency: true,
             sqlDialect: dialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);

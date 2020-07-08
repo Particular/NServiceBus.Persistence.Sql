@@ -18,6 +18,7 @@ class SagaInfoCache
     Func<TextWriter, JsonWriter> writerCreator;
     Func<string, string> nameFilter;
     string tablePrefix;
+    bool usesOptimisticConcurrency;
     SqlDialect sqlDialect;
 
     public SagaInfoCache(
@@ -26,6 +27,7 @@ class SagaInfoCache
         Func<TextReader, JsonReader> readerCreator,
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
+        bool usesOptimisticConcurrency,
         SqlDialect sqlDialect,
         SagaMetadataCollection metadataCollection,
         Func<string, string> nameFilter)
@@ -35,6 +37,7 @@ class SagaInfoCache
         this.readerCreator = readerCreator;
         this.jsonSerializer = jsonSerializer;
         this.tablePrefix = tablePrefix;
+        this.usesOptimisticConcurrency = usesOptimisticConcurrency;
         this.sqlDialect = sqlDialect;
         this.nameFilter = nameFilter;
         Initialize(metadataCollection);
@@ -77,6 +80,7 @@ class SagaInfoCache
             readerCreator: readerCreator,
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
+            usesOptimisticConcurrency: usesOptimisticConcurrency,
             sqlDialect: sqlDialect,
             nameFilter: nameFilter);
     }

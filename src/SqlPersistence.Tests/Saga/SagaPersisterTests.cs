@@ -44,6 +44,7 @@ public abstract class SagaPersisterTests
             readerCreator: reader => new JsonTextReader(reader),
             writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: $"{endpointName}_",
+            usesOptimisticConcurrency: true,
             sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);

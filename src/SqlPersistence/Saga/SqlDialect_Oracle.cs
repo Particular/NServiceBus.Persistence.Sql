@@ -80,7 +80,7 @@ where
 ";
             }
 
-            internal override string BuildGetBySagaIdCommand(string tableName)
+            internal override string BuildGetBySagaIdCommand(string tableName, bool usesOptimisticConcurrency)
             {
                 return $@"
 select
@@ -91,11 +91,11 @@ select
     Data
 from {tableName}
 where Id = :Id
-for update
+{(usesOptimisticConcurrency ? "" : "for update")}
 ";
             }
 
-            internal override string BuildGetByPropertyCommand(string propertyName, string tableName)
+            internal override string BuildGetByPropertyCommand(string propertyName, string tableName, bool usesOptimisticConcurrency)
             {
                 return $@"
 select
@@ -106,7 +106,7 @@ select
     Data
 from {tableName}
 where {CorrelationPropertyName(propertyName)} = :propertyValue
-for update
+{(usesOptimisticConcurrency ? "" : "for update")}
 ";
             }
 
@@ -118,7 +118,7 @@ where Id = :Id and Concurrency = :Concurrency
 ";
             }
 
-            internal override Func<string, string> BuildSelectFromCommand(string tableName)
+            internal override Func<string, string> BuildSelectFromCommand(string tableName, bool usesOptimisticConcurrency)
             {
                 return whereClause => $@"
 select
@@ -129,7 +129,7 @@ select
     Data
 from {tableName}
 where {whereClause}
-for update
+{(usesOptimisticConcurrency ? "" : "for update")}
 ";
             }
 
