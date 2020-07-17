@@ -4,7 +4,16 @@
     <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(SqlPersistenceGenerateScripts)' != 'false'">
+    <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
+    <ContentWithTargetPath Include="@(SqlPersistenceScripts)">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
 
   <UsingTask
     TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
@@ -20,18 +29,6 @@
       IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
       ProjectDirectory="$(ProjectDir)"
       SolutionDirectory="$(SqlPersistenceSolutionDir)" />
-
-  <PropertyGroup>
-    <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
-  </PropertyGroup>
-
-    <ItemGroup>
-      <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
-      <ContentWithTargetPath Include="@(SqlPersistenceScripts)">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
-      </ContentWithTargetPath>
-    </ItemGroup>
 
   </Target>
 
