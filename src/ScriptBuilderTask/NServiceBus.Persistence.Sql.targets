@@ -35,8 +35,8 @@
     <ItemGroup>
       <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
       <ContentWithTargetPath Include="@(SqlPersistenceScripts)">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
       </ContentWithTargetPath>
     </ItemGroup>
