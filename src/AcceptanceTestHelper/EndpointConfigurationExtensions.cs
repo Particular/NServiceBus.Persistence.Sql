@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using NServiceBus;
 using NServiceBus.Configuration.AdvancedExtensibility;
 
 public static class EndpointConfigurationExtensions
 {
-    public static List<Type> ScannedTypes(this EndpointConfiguration configuration)
+    public static List<Type> UserProvidedTypes(this EndpointConfiguration configuration)
     {
-        var field = typeof(EndpointConfiguration)
-            .GetField("ScannedTypes", BindingFlags.Instance | BindingFlags.NonPublic);
-        if (field == null)
+        var scannerConfigurationTypeName = "NServiceBus.AssemblyScanningComponent+Configuration";
+        var userProvidedTypesPropertyName = "UserProvidedTypes";
+
+        var scannerConfiguration = configuration.GetSettings().Get(scannerConfigurationTypeName);
+
+        var property = scannerConfiguration.GetType().GetProperty(userProvidedTypesPropertyName);
+        if (property == null)
         {
-            throw new Exception("Could not extract field 'scannedTypes' from EndpointConfiguration.");
+            throw new Exception($"Could not extract field '{userProvidedTypesPropertyName}' from {scannerConfigurationTypeName}.");
         }
-        return (List<Type>)field.GetValue(configuration);
+        return (List<Type>)property.GetValue(scannerConfiguration);
     }
 
     public static bool IsSendOnly(this EndpointConfiguration configuration)
@@ -25,7 +28,7 @@ public static class EndpointConfigurationExtensions
 
     public static IEnumerable<Type> GetScannedSagaTypes(this EndpointConfiguration configuration)
     {
-        return configuration.ScannedTypes()
+        return configuration.UserProvidedTypes()
             .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type));
     }
 }
