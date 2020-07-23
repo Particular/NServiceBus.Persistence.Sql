@@ -21,14 +21,22 @@
       ProjectDirectory="$(ProjectDir)"
       SolutionDirectory="$(SqlPersistenceSolutionDir)" />
 
-  <PropertyGroup>
-    <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
-  </PropertyGroup>
+  </Target>
+
+  <Target Name="SqlPersistenceAddScriptsToContent"
+          BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems"
+          AfterTargets="SqlPersistenceScriptBuilder"
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
+
+    <PropertyGroup>
+      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+    </PropertyGroup>
 
     <ItemGroup>
       <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
       <ContentWithTargetPath Include="@(SqlPersistenceScripts)">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
       </ContentWithTargetPath>
     </ItemGroup>
