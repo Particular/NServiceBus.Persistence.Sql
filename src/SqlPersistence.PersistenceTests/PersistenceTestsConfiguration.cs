@@ -132,29 +132,30 @@
 
         static string GetTablePrefix(Type declaringTypeName)
         {
-            return declaringTypeName.Name
-                .Replace("When_", "")
-                .Replace("saga", "sg")
-                .Replace("complete", "cpl")
-                .Replace("completing", "cpl")
-                .Replace("timeout", "to")
-                .Replace("transaction", "tx")
-                .Replace("request", "req")
-                .Replace("the", "")
-                .Replace("with", "w")
-                .Replace("value", "val")
-                .Replace("different", "dif")
-                .Replace("correlation", "cor")
-                .Replace("without", "wo")
-                .Replace("pessimistic", "psm")
-                .Replace("optimistic", "opt")
-                .Replace("unique", "uq")
-                .Replace("concurrent", "cnc")
-                .Replace("property", "prp")
-                .Replace("update", "upd")
-                .Replace("updating", "upd")
-                .Replace("persisting", "prs")
-                .Replace("_", "");
+            return "";
+            //return declaringTypeName.Name
+            //    .Replace("When_", "")
+            //    .Replace("saga", "sg")
+            //    .Replace("complete", "cpl")
+            //    .Replace("completing", "cpl")
+            //    .Replace("timeout", "to")
+            //    .Replace("transaction", "tx")
+            //    .Replace("request", "req")
+            //    .Replace("the", "")
+            //    .Replace("with", "w")
+            //    .Replace("value", "val")
+            //    .Replace("different", "dif")
+            //    .Replace("correlation", "cor")
+            //    .Replace("without", "wo")
+            //    .Replace("pessimistic", "psm")
+            //    .Replace("optimistic", "opt")
+            //    .Replace("unique", "uq")
+            //    .Replace("concurrent", "cnc")
+            //    .Replace("property", "prp")
+            //    .Replace("update", "upd")
+            //    .Replace("updating", "upd")
+            //    .Replace("persisting", "prs")
+            //    .Replace("_", "");
         }
 
         static string ShortenSagaName(string sagaName)
