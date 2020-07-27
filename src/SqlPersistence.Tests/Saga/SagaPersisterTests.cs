@@ -46,7 +46,7 @@ public abstract class SagaPersisterTests
             tablePrefix: $"{endpointName}_",
             sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
-            nameFilter: sagaName => sagaName);
+            nameFilter: (type, sagaName) => sagaName);
         return new SagaPersister(infoCache, runtimeSqlDialect);
     }
 

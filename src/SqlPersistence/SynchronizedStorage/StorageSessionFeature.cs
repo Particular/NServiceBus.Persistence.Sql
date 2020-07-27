@@ -88,8 +88,8 @@ class StorageSessionFeature : Feature
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
-            metadataCollection: settings.Get<SagaMetadataCollection>(),
-            nameFilter: nameFilter);
+            metadataCollection: settings.Get<SagaMetadataCollection>(), 
+            (type, name) => nameFilter(name));
     }
 
     static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)

@@ -16,7 +16,7 @@ class SagaInfoCache
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
-    Func<string, string> nameFilter;
+    Func<Type, string, string> nameFilter;
     string tablePrefix;
     SqlDialect sqlDialect;
 
@@ -28,7 +28,7 @@ class SagaInfoCache
         string tablePrefix,
         SqlDialect sqlDialect,
         SagaMetadataCollection metadataCollection,
-        Func<string, string> nameFilter)
+        Func<Type, string, string> nameFilter)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;

@@ -30,7 +30,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         }
         var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
 
-        currentSessionHolder.SetCurrentSession(session);
+        currentSessionHolder?.SetCurrentSession(session);
 
         return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
@@ -41,7 +41,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
         if (session != null)
         {
-            currentSessionHolder.SetCurrentSession(session);
+            currentSessionHolder?.SetCurrentSession(session);
         }
         return session;
     }
