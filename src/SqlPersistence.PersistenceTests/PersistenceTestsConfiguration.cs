@@ -37,13 +37,20 @@
                 var npgsqlParameter = (NpgsqlParameter)parameter;
                 npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
             };
-            SagaVariants = new[]
+
+            var variants = new List<object>
             {
                 CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build),
                 CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build),
                 CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql, MySqlConnectionBuilder.Build),
-                CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build),
             };
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
+            {
+                variants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build));
+            }
+
+            SagaVariants = variants.ToArray();
             OutboxVariants = SagaVariants;
         }
 
