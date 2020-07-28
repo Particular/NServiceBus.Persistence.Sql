@@ -43,7 +43,7 @@ class RuntimeSagaInfo
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
         SqlDialect sqlDialect,
-        Func<Type, string, string> nameFilter)
+        Func<string, string> nameFilter)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -58,7 +58,7 @@ class RuntimeSagaInfo
         this.sqlDialect = sqlDialect;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(metadata);
-        var tableSuffix = nameFilter(sagaDataType, sqlSagaAttributeData.TableSuffix);
+        var tableSuffix = nameFilter(sqlSagaAttributeData.TableSuffix);
 
         TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix);
 

@@ -72,7 +72,7 @@
                 "PersistenceTests_",
                 dialect,
                 SagaMetadataCollection,
-                (type, name) => type.DeclaringType != null ? GetTablePrefix(type.DeclaringType) + "_" + ShortenSagaName(name) : ShortenSagaName(name));
+                name => ShortenSagaName(name));
 
             var connectionManager = new ConnectionManager(connectionFactory);
             SagaIdGenerator = new DefaultSagaIdGenerator();
@@ -108,16 +108,7 @@
                         correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String); 
                     }
 
-                    string tableName;
-                    if (saga.SagaEntityType.DeclaringType != null)
-                    {
-                        tableName = GetTablePrefix(saga.SagaType.DeclaringType) + "_" + ShortenSagaName(saga.SagaType.Name);
-                    }
-                    else
-                    {
-                        tableName = ShortenSagaName(saga.SagaType.Name);
-                    }
-
+                    var tableName = ShortenSagaName(saga.SagaType.Name);
                     var definition = new SagaDefinition(tableName, saga.EntityName, correlationProperty);
 
                     connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, buildDialect), "PersistenceTests");
@@ -128,34 +119,6 @@
                 connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(buildDialect), "PersistenceTests");
             }
             return Task.CompletedTask;
-        }
-
-        static string GetTablePrefix(Type declaringTypeName)
-        {
-            return "";
-            //return declaringTypeName.Name
-            //    .Replace("When_", "")
-            //    .Replace("saga", "sg")
-            //    .Replace("complete", "cpl")
-            //    .Replace("completing", "cpl")
-            //    .Replace("timeout", "to")
-            //    .Replace("transaction", "tx")
-            //    .Replace("request", "req")
-            //    .Replace("the", "")
-            //    .Replace("with", "w")
-            //    .Replace("value", "val")
-            //    .Replace("different", "dif")
-            //    .Replace("correlation", "cor")
-            //    .Replace("without", "wo")
-            //    .Replace("pessimistic", "psm")
-            //    .Replace("optimistic", "opt")
-            //    .Replace("unique", "uq")
-            //    .Replace("concurrent", "cnc")
-            //    .Replace("property", "prp")
-            //    .Replace("update", "upd")
-            //    .Replace("updating", "upd")
-            //    .Replace("persisting", "prs")
-            //    .Replace("_", "");
         }
 
         static string ShortenSagaName(string sagaName)

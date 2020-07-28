@@ -98,7 +98,7 @@ public class CharArrayTextWriterPerformanceTests
             tablePrefix: "some",
             sqlDialect: dialect,
             metadataCollection: sagaMetadataCollection,
-            nameFilter: (type, sagaName) => sagaName);
+            nameFilter: sagaName => sagaName);
         return infoCache.GetInfo(typeof(TSagaData));
     }
 }
