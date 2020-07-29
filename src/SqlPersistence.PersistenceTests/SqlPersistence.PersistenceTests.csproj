@@ -23,4 +23,8 @@
     <PackageReference Include="PublicApiGenerator" Version="9.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+  </ItemGroup>
+
 </Project>
