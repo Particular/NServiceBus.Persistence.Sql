@@ -20,8 +20,6 @@
         public bool SupportsDtc => false; // TODO: verify if this is true
         public bool SupportsOutbox => true;
         public bool SupportsFinders => true;  // TODO: verify if we actually need this as we think it should only be invoked by core
-        public bool SupportsSubscriptions => true;
-        public bool SupportsTimeouts => true;
         public bool SupportsPessimisticConcurrency => true;
         public ISagaIdGenerator SagaIdGenerator { get; private set; }
         public ISagaPersister SagaStorage { get; private set; }
@@ -112,7 +110,7 @@
                     if (saga.TryGetCorrelationProperty(out var propertyMetadata))
                     {
                         //TODO: Hard-code correlation property to string
-                        correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String); 
+                        correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String);
                     }
 
                     var tableName = ShortenSagaName(saga.SagaType.Name);
