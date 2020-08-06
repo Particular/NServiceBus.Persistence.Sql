@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
@@ -24,6 +24,8 @@
 
   <ItemGroup>
     <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+    <!---  Remove this exclusion once PR is merged: https://github.com/Particular/NServiceBus/pull/5707-->
+    <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
   </ItemGroup>
 
 </Project>
