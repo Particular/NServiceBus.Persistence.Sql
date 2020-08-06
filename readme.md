@@ -29,7 +29,11 @@ Add an environment variable called `MySQLConnectionString` with the connection s
 
 **For Postgres**
 
+`docker run -d --name PostgresDb -v my_dbdata:/var/lib/postgresql/data -p 54320:5432 -e POSTGRES_PASSWORD=super-secret-password postgres:11`
+
 Add an environment variable called `PostgreSqlConnectionString` with the connection string:
+
+`User ID=postgres;Password=super-secret-password;Host=localhost;Port=54320;Database=nservicebus;Pooling=true;`
 
 **For Oracle**
 
