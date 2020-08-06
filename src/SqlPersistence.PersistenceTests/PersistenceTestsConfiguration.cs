@@ -19,7 +19,7 @@
     {
         public bool SupportsDtc => false; // TODO: this should actually be set to true, tests still failing
         public bool SupportsOutbox => true;
-        public bool SupportsFinders => true;
+        public bool SupportsFinders => false;
         public bool SupportsPessimisticConcurrency { get; set; }
 
         public ISagaIdGenerator SagaIdGenerator { get; private set; }
