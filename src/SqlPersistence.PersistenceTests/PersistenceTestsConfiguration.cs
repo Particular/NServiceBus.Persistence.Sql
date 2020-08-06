@@ -17,10 +17,11 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => false; // TODO: verify if this is true
+        public bool SupportsDtc => false; // TODO: this should actually be set to true, tests still failing
         public bool SupportsOutbox => true;
-        public bool SupportsFinders => true;  // TODO: verify if we actually need this as we think it should only be invoked by core
-        public bool SupportsPessimisticConcurrency => true;
+        public bool SupportsFinders => true;
+        public bool SupportsPessimisticConcurrency { get; set; }
+
         public ISagaIdGenerator SagaIdGenerator { get; private set; }
         public ISagaPersister SagaStorage { get; private set; }
         public ISynchronizedStorage SynchronizedStorage { get; private set; }
@@ -36,7 +37,7 @@
                 npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
             };
 
-            var variants = new List<object>
+            var outboxVariants = new List<object>
             {
                 CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build),
                 CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build),
@@ -45,16 +46,26 @@
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
             {
-                variants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build));
+                outboxVariants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build));
             }
 
-            SagaVariants = variants.ToArray();
-            OutboxVariants = SagaVariants;
+            var sagaVariants = new List<object>() {outboxVariants};
+
+            sagaVariants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build, true));
+            sagaVariants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build, true));
+            sagaVariants.Add(CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql, MySqlConnectionBuilder.Build, true));
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
+            {
+                sagaVariants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build, true));
+            }
+
+            SagaVariants = sagaVariants.ToArray();
+            OutboxVariants = outboxVariants.ToArray();
         }
 
-        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, Func<DbConnection> connectionFactory)
+        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, Func<DbConnection> connectionFactory, bool usePessimisticMode = false)
         {
-            return new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, connectionFactory)));
+            return new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, connectionFactory, usePessimisticMode)));
         }
 
         public Task Configure()
@@ -63,6 +74,7 @@
             var dialect = variant.Dialect;
             var buildDialect = variant.BuildDialect;
             var connectionFactory = variant.ConnectionFactory;
+            var pessimisticMode = variant.UsePessimisticMode;
 
             if (SessionTimeout.HasValue)
             {
@@ -85,6 +97,7 @@
             SynchronizedStorage = new SynchronizedStorage(connectionManager, infoCache, null);
             SynchronizedStorageAdapter = new StorageAdapter(connectionManager, infoCache, dialect, null);
             OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, false);
+            SupportsPessimisticConcurrency = pessimisticMode;
 
             GetContextBagForSagaStorage = () =>
             {
