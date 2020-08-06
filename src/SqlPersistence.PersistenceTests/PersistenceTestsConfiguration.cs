@@ -49,7 +49,7 @@
                 outboxVariants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build));
             }
 
-            var sagaVariants = new List<object>() {outboxVariants};
+            var sagaVariants = new List<object>(outboxVariants);
 
             sagaVariants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build, true));
             sagaVariants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build, true));
