@@ -119,7 +119,6 @@
                     CorrelationProperty correlationProperty = null;
                     if (saga.TryGetCorrelationProperty(out var propertyMetadata))
                     {
-                        //TODO: Hard-code correlation property to string
                         correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String);
                     }
 
