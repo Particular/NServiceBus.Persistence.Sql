@@ -17,7 +17,7 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => false; // TODO: this should actually be set to true, tests still failing
+        public bool SupportsDtc => false;
 
         public bool SupportsOutbox => true;
 
