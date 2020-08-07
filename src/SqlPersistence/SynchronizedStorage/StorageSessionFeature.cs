@@ -88,7 +88,7 @@ class StorageSessionFeature : Feature
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
-            metadataCollection: settings.Get<SagaMetadataCollection>(), 
+            metadataCollection: settings.Get<SagaMetadataCollection>(),
             name => nameFilter(name));
     }
 
