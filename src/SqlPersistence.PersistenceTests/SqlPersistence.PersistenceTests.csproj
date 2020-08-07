@@ -23,13 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
-    <!---  Remove this exclusion once PR is merged: https://github.com/Particular/NServiceBus/pull/5707-->
+    <!---  Remove this exclusion once PR is merged: https://github.com/Particular/NServiceBus/pull/5707 and remove When_worker_tries_to_complete_saga_update_by_another_pessimistic_tweaked.cs-->
     <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
-    <Compile Remove="\**\When_updating_saga_concurrently_on_same_thread.cs"/>
-    <Compile Remove="\**\When_updating_saga_concurrently_on_different_threads.cs"/>
-    <Compile Remove="\**\When_updating_saga_concurrently_twice_on_the_same_thread.cs"/>
-    <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_optimistic.cs"/>
+
+    <!--<Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />-->
   </ItemGroup>
 
 </Project>
