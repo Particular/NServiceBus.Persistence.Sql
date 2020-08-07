@@ -21,7 +21,7 @@ class SynchronizedStorage : ISynchronizedStorage
         var transaction = connection.BeginTransaction();
         var session = new StorageSession(connection, transaction, true, infoCache);
 
-        currentSessionHolder.SetCurrentSession(session);
+        currentSessionHolder?.SetCurrentSession(session);
         return session;
     }
 }
