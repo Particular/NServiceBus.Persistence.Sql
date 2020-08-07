@@ -4,6 +4,9 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
+    /// <summary>
+    /// Remove once Sources package contains https://github.com/Particular/NServiceBus/pull/5707
+    /// </summary>
     public class When_worker_tries_to_complete_saga_update_by_another_pessimistic_tweaked : SagaPersisterTests
     {
         [Test]
