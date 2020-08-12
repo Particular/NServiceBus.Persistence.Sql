@@ -21,7 +21,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
                 .ConfigureAwait(false);
         });
 
-        StringAssert.StartsWith("Sagas and the Outbox need to use the same type of persistence. Saga persistence is configured to use InMemoryPersistence. Outbox persistence is configured to use SqlPersistence.", ex.Message);
+        StringAssert.StartsWith("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.", ex.Message);
     }
 
     public class Context : ScenarioContext
