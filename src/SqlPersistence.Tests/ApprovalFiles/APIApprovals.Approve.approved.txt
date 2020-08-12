@@ -89,7 +89,8 @@ namespace NServiceBus.Persistence.Sql
         MySql = 1,
         Oracle = 2,
     }
-    [System.ObsoleteAttribute("Not for public use")]
+    [System.ObsoleteAttribute("Not for public use. Will be treated as an error from version 5.0.0. Will be remov" +
+        "ed in version 6.0.0.", false)]
     public class static SubscriptionCommandBuilder
     {
         public static NServiceBus.Persistence.Sql.SubscriptionCommands Build(NServiceBus.SqlDialect sqlDialect, string tablePrefix) { }
