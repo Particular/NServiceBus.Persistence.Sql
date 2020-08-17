@@ -5,7 +5,7 @@ class InstallerFeature : Feature
 {
     public InstallerFeature()
     {
-        Defaults(s => s.SetDefault<InstallerSettings>(new InstallerSettings()));
+        Defaults(s => s.SetDefault(new InstallerSettings()));
     }
 
     protected override void Setup(FeatureConfigurationContext context)

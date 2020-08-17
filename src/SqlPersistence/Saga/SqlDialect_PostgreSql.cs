@@ -20,7 +20,7 @@ namespace NServiceBus
                 return $"\"{Schema}\".\"{tablePrefix}{tableSuffix}\"";
             }
 
-            internal override void ValidateJsonSettings(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            internal override void ValidateJsonSettings(JsonSerializer jsonSerializer)
             {
                 if (!IsTypeNameHandlingCorrect(jsonSerializer))
                 {
@@ -28,7 +28,7 @@ namespace NServiceBus
                 }
             }
 
-            static bool IsTypeNameHandlingCorrect(Newtonsoft.Json.JsonSerializer jsonSerializer)
+            static bool IsTypeNameHandlingCorrect(JsonSerializer jsonSerializer)
             {
                 if (jsonSerializer.TypeNameHandling == TypeNameHandling.None)
                 {
