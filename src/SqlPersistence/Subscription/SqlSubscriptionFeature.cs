@@ -5,11 +5,6 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SqlSubscriptionFeature : Feature
 {
-    SqlSubscriptionFeature()
-    {
-        DependsOn<MessageDrivenSubscriptions>();
-    }
-
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;

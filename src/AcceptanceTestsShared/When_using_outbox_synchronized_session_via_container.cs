@@ -6,6 +6,7 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
 [TestFixture]
 public class When_using_outbox_synchronized_session_via_container : NServiceBusAcceptanceTest
@@ -39,7 +40,7 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
                 c.RegisterComponents(cc =>
                 {
                     cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
-                    cc.ConfigureComponent(b => b.Build<ISqlStorageSession>().Connection, DependencyLifecycle.InstancePerUnitOfWork);
+                    cc.ConfigureComponent(b => b.GetService<ISqlStorageSession>().Connection, DependencyLifecycle.InstancePerUnitOfWork);
                 });
             });
         }

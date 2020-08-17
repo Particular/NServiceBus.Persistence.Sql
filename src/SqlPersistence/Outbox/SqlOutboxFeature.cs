@@ -1,6 +1,7 @@
 ﻿using System;
 using NServiceBus;
 using NServiceBus.Features;
+using Microsoft.Extensions.DependencyInjection;
 
 class SqlOutboxFeature : Feature
 {
@@ -67,7 +68,7 @@ class SqlOutboxFeature : Feature
         });
 
         context.RegisterStartupTask(b =>
-            new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.Build<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
+            new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
