@@ -102,7 +102,7 @@ static class InstructionAnalyzer
             .Select(methodRef => new MethodRefClassifier
             {
                 MethodRef = methodRef,
-                IsConfigureMapping = IsConfigureMappingMethodCall(methodRef),
+                IsConfigureMapping = IsConfigureMappingMethodCall(methodRef) || IsConfigureHeaderMapping(methodRef),
                 IsToSaga = IsToSagaMethodCall(methodRef),
                 IsExpressionCall = IsExpressionCall(methodRef)
             })
@@ -154,6 +154,13 @@ static class InstructionAnalyzer
         public bool? ExpressionCallsAllowed { get; set; }
     }
 
+    static bool IsConfigureHeaderMapping(MethodReference methodRef)
+    {
+        // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
+        return methodRef.Name == "ConfigureHeaderMapping" 
+               && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
+    }
+
     static bool IsConfigureMappingMethodCall(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
@@ -165,8 +172,11 @@ static class InstructionAnalyzer
     {
         // FullName would be NServiceBus.ToSagaExpression<SagaData,MessageType>
         // Don't validate the entire thing because we won't know the message type, and could be called multiple times
+        var sagaExpression = "NServiceBus.ToSagaExpression`";
+        var sagaExpressionInterface = "NServiceBus.IToSagaExpression`";
+            
         return methodRef.Name == "ToSaga"
-               && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.ToSagaExpression`");
+               && (methodRef.DeclaringType.FullName.StartsWith(sagaExpression) || methodRef.DeclaringType.FullName.StartsWith(sagaExpressionInterface));
     }
 
     static bool IsExpressionCall(MethodReference methodRef)
