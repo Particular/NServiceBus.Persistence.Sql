@@ -32,6 +32,7 @@ class OutboxPersister : IOutboxStorage
     {
         var transaction = outboxTransactionFactory();
         transaction.Prepare(context);
+        // we always need to avoid using async/await in here so that the transaction scope can float!
         return transaction.Begin(context);
     }
 
