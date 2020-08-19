@@ -24,6 +24,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public DbTransaction Transaction => null;
     public DbConnection Connection { get; private set; }
 
+    // Prepare is deliberately kept sync to allow floating of TxScope where needed
     public void Prepare(ContextBag context)
     {
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
