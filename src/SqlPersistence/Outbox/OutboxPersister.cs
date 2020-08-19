@@ -28,11 +28,11 @@ class OutboxPersister : IOutboxStorage
         this.cleanupBatchSize = cleanupBatchSize;
     }
 
-    public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
+    public Task<OutboxTransaction> BeginTransaction(ContextBag context)
     {
         var transaction = outboxTransactionFactory();
-        await transaction.Begin(context).ConfigureAwait(false);
-        return transaction;
+        transaction.Prepare(context);
+        return transaction.Begin(context);
     }
 
     public async Task SetAsDispatched(string messageId, ContextBag context)

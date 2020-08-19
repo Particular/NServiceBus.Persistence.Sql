@@ -24,14 +24,19 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public DbTransaction Transaction => null;
     public DbConnection Connection { get; private set; }
 
-    public async Task Begin(ContextBag context)
+    public void Prepare(ContextBag context)
     {
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
         ambientTransaction = System.Transactions.Transaction.Current;
+    }
+
+    public async Task<OutboxTransaction> Begin(ContextBag context)
+    {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
         Connection.EnlistTransaction(ambientTransaction);
         await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, null).ConfigureAwait(false);
+        return this;
     }
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context)

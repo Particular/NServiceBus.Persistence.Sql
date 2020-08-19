@@ -20,12 +20,18 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     public DbTransaction Transaction { get; private set; }
     public DbConnection Connection { get; private set; }
 
-    public async Task Begin(ContextBag context)
+    public void Prepare(ContextBag context)
+    {
+        //NOOP
+    }
+
+    public async Task<OutboxTransaction> Begin(ContextBag context)
     {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
         Transaction = Connection.BeginTransaction();
         await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction).ConfigureAwait(false);
+        return this;
     }
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context)
