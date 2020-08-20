@@ -161,6 +161,26 @@ public abstract class OutboxPersisterTests
         Approver.Verify(result);
     }
 
+    [Test]
+    public async Task TransactionScope()
+    {
+        if (!transactionScope)
+        {
+            Assert.Ignore();
+        }
+        var persister = Setup(schema);
+
+        var messageId = "a";
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await persister.BeginTransaction(contextBag))
+        {
+            var ambientTransaction = System.Transactions.Transaction.Current;
+            Assert.IsNotNull(ambientTransaction);
+
+            await transaction.Commit();
+        }
+    }
+
     async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister)
     {
         var operations = new[]
