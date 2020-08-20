@@ -102,8 +102,8 @@ static class InstructionAnalyzer
             .Select(methodRef => new MethodRefClassifier
             {
                 MethodRef = methodRef,
-                IsConfigureMapping = IsConfigureMappingMethodCall(methodRef) || IsConfigureHeaderMapping(methodRef) || IsToMessageMethodCall(methodRef),
-                IsToSaga = IsToSagaMethodCall(methodRef) || IsMapSagaMappingMethodCall(methodRef),
+                IsConfigureMapping = IsMessageMapping(methodRef),
+                IsToSaga = IsSagaMapping(methodRef),
                 IsExpressionCall = IsExpressionCall(methodRef)
             })
             .Reverse()  // <----- Note on reversal below
@@ -154,6 +154,16 @@ static class InstructionAnalyzer
         public bool? ExpressionCallsAllowed { get; set; }
     }
 
+    static bool IsMessageMapping(MethodReference methodRef) =>
+        IsConfigureMappingMethodCall(methodRef) 
+        || IsConfigureHeaderMapping(methodRef) 
+        || IsToMessageMethodCall(methodRef) 
+        || IsToMessageHeaderMethodCall(methodRef);
+
+    static bool IsSagaMapping(MethodReference methodRef) => 
+        IsToSagaMethodCall(methodRef) 
+        || IsMapSagaMappingMethodCall(methodRef);
+
     static bool IsConfigureHeaderMapping(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
@@ -193,6 +203,16 @@ static class InstructionAnalyzer
         var expression = "NServiceBus.CorrelatedSagaPropertyMapper`";
 
         return methodRef.Name == "ToMessage"
+               && methodRef.DeclaringType.FullName.StartsWith(expression);
+    }
+
+    static bool IsToMessageHeaderMethodCall(MethodReference methodRef)
+    {
+        // FullName would be NServiceBus.CorrelatedSagaPropertyMapper<SagaData>
+        // Don't validate the entire thing because we won't know the message type, and could be called multiple times
+        var expression = "NServiceBus.CorrelatedSagaPropertyMapper`";
+
+        return methodRef.Name == "ToMessageHeader"
                && methodRef.DeclaringType.FullName.StartsWith(expression);
     }
 

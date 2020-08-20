@@ -138,6 +138,12 @@ public partial class CoreSagaMetadataTests
         TestSagaDefinition<HeaderMappingSaga>();
     }
 
+    [Test]
+    public void TestReverseHeaderMapping()
+    {
+        TestSagaDefinition<ReverseHeaderMappingSaga>();
+    }
+
     private void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
     {
         moduleToUse = moduleToUse ?? module;
