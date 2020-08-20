@@ -40,7 +40,9 @@ class OutboxPersister : IOutboxStorage
     {
         try
         {
-            return await transaction.Begin(context).ConfigureAwait(false);
+            await transaction.Begin(context).ConfigureAwait(false);
+
+            return transaction;
         }
         catch (Exception e)
         {
