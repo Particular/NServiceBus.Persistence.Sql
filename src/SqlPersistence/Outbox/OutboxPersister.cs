@@ -33,7 +33,24 @@ class OutboxPersister : IOutboxStorage
         var transaction = outboxTransactionFactory();
         transaction.Prepare(context);
         // we always need to avoid using async/await in here so that the transaction scope can float!
-        return transaction.Begin(context);
+        return BeginTransactionInternal(transaction, context);
+    }
+
+    private static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context)
+    {
+        try
+        {
+            return await transaction.Begin(context).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            // A method that returns something that is disposable should not throw during the creation
+            // of the disposable resource. If it does the compiler generated code will not dispose anything
+            // therefore we need to dispose here to prevent the connection being returned to the pool being
+            // in a zombie state.
+            transaction.Dispose();
+            throw new Exception("Error while opening outbox transaction", e);
+        }
     }
 
     public async Task SetAsDispatched(string messageId, ContextBag context)
