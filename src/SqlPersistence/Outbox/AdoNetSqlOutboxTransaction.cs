@@ -20,6 +20,11 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     public DbTransaction Transaction { get; private set; }
     public DbConnection Connection { get; private set; }
 
+    public void Prepare(ContextBag context)
+    {
+        //NOOP
+    }
+
     public async Task Begin(ContextBag context)
     {
         var incomingMessage = context.GetIncomingMessage();

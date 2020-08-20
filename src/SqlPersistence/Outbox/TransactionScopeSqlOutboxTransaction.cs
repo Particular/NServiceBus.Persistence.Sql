@@ -24,10 +24,15 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public DbTransaction Transaction => null;
     public DbConnection Connection { get; private set; }
 
-    public async Task Begin(ContextBag context)
+    // Prepare is deliberately kept sync to allow floating of TxScope where needed
+    public void Prepare(ContextBag context)
     {
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
         ambientTransaction = System.Transactions.Transaction.Current;
+    }
+
+    public async Task Begin(ContextBag context)
+    {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
         Connection.EnlistTransaction(ambientTransaction);
