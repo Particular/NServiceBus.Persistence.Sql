@@ -3,10 +3,19 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NServiceBus;
 
-class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage
+class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
 {
     public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
         where TSagaEntity : IContainSagaData
+    {
+        var body = sagaEntityProperty.Body;
+        var member = GetMemberExpression(body);
+        var property = (PropertyInfo)member.Member;
+        CorrelationProperty = property.Name;
+        CorrelationType = property.PropertyType;
+    }
+
+    public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, string headerName) where TSagaEntity : IContainSagaData
     {
         var body = sagaEntityProperty.Body;
         var member = GetMemberExpression(body);
