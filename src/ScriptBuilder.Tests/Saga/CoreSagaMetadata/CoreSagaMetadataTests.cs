@@ -126,6 +126,24 @@ public partial class CoreSagaMetadataTests
         TestSagaDefinition<VBTestCode.VBMultiTestSaga>(vbModule);
     }
 
+    [Test]
+    public void TestReverseMapping()
+    {
+        TestSagaDefinition<ReverseMappingSaga>();
+    }
+
+    [Test]
+    public void TestHeaderMapping()
+    {
+        TestSagaDefinition<HeaderMappingSaga>();
+    }
+
+    [Test]
+    public void TestReverseHeaderMapping()
+    {
+        TestSagaDefinition<ReverseHeaderMappingSaga>();
+    }
+
     private void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
     {
         moduleToUse = moduleToUse ?? module;
