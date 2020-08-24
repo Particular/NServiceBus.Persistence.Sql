@@ -5,7 +5,9 @@ class InstallerFeature : Feature
 {
     public InstallerFeature()
     {
+        // ReSharper disable RedundantTypeArgumentsOfMethod
         Defaults(s => s.SetDefault<InstallerSettings>(new InstallerSettings()));
+        // ReSharper restore RedundantTypeArgumentsOfMethod
     }
 
     protected override void Setup(FeatureConfigurationContext context)
