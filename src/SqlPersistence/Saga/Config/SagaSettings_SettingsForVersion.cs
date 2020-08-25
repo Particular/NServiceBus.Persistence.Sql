@@ -9,7 +9,9 @@
         /// </summary>
         public void JsonSettingsForVersion(RetrieveVersionSpecificJsonSettings builder)
         {
+            // ReSharper disable RedundantTypeArgumentsOfMethod
             settings.Set<RetrieveVersionSpecificJsonSettings>(builder);
+            // ReSharper restore RedundantTypeArgumentsOfMethod
         }
 
         internal static RetrieveVersionSpecificJsonSettings GetVersionSettings(ReadOnlySettings settings)
