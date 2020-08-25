@@ -5,19 +5,19 @@ namespace NServiceBus
 
     public partial class SqlDialect
     {
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string GetSagaTableName(string tablePrefix, string tableSuffix);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract Func<string, string> BuildSelectFromCommand(string tableName);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string BuildCompleteCommand(string tableName);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string BuildGetBySagaIdCommand(string tableName);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string BuildGetByPropertyCommand(string correlationProperty, string tableName);
-        [Obsolete("Not for public use")]
+        [Obsolete("Not for public use"), DoNotWarnAboutObsoleteUsage]
         public abstract string BuildUpdateCommand(string transitionalCorrelationProperty, string tableName);
 
         internal virtual object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
