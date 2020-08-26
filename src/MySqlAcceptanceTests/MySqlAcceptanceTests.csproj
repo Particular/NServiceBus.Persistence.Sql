@@ -29,8 +29,6 @@
     <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
     <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
     <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
-    <Compile Remove="\**\When_different_persistence_is_for_outbox.cs" />
-    <Compile Remove="\**\When_outbox_enabled_and_different_persistence_is_for_sagas.cs"  />
   </ItemGroup>
 
 </Project>
