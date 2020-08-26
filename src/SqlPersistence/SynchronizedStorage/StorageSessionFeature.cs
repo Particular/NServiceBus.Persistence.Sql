@@ -52,13 +52,11 @@ class StorageSessionFeature : Feature
         }
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
-        var bothActivated = isOutboxEnabled && isSagasEnabled;
-        var bothSqlActivated = isSagasEnabledForSqlPersistence && isOutboxEnabledForSqlPersistence;
-
-        if (bothActivated && !bothSqlActivated) //must match when both activated
+        if (isSagasEnabledForSqlPersistence && isOutboxEnabledForSqlPersistence)
         {
-            throw new Exception("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.");
-        }        
+            return;
+        }
+        throw new Exception("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.");
     }
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)
