@@ -43,19 +43,25 @@ public class When_outbox_disabled_and_different_persistence_used_for_sagas : NSe
 
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {
-            public Context Context { get; set; }
+            Context testContext;
+
+            public MyMessageHandler(Context context)
+            {
+                testContext = context;
+            }
+
             public Task Handle(MyMessage message, IMessageHandlerContext context)
             {
                 try
                 {
                     var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-                    Context.SessionCreated = session != null;
+                    testContext.SessionCreated = session != null;
                 }
                 catch (Exception e)
                 {
-                    Context.ExceptionMessage = e.Message;
+                    testContext.ExceptionMessage = e.Message;
                 }
-                Context.Done = true;
+                testContext.Done = true;
                 return Task.FromResult(0);
             }
         }

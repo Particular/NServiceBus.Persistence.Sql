@@ -47,12 +47,16 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
         public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
+            Context testContext;
+
+            public CustomFinder(Context context)
+            {
+                testContext = context;
+            }
 
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.FinderUsed = true;
+                testContext.FinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
@@ -70,11 +74,16 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
         public class TestSaga : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>
         {
-            public Context TestContext { get; set; }
+            Context testContext;
+
+            public TestSaga(Context context)
+            {
+                testContext = context;
+            }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
-                TestContext.HandledOtherMessage = true;
+                testContext.HandledOtherMessage = true;
                 return Task.FromResult(0);
             }
 

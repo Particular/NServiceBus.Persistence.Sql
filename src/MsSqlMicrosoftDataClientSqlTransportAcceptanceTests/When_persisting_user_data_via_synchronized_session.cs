@@ -114,11 +114,16 @@ end";
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
             {
-                public Context TestContext { get; set; }
+                Context testContext;
+
+                public MyMessageHandler(Context context)
+                {
+                    testContext = context;
+                }
 
                 public async Task Handle(MyMessage message, IMessageHandlerContext context)
                 {
-                    if (message.Id != TestContext.TestRunId)
+                    if (message.Id != testContext.TestRunId)
                     {
                         return;
                     }
@@ -143,8 +148,8 @@ end";
                         count = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
                     }
 
-                    TestContext.RecordCount = count;
-                    TestContext.InvocationCount++;
+                    testContext.RecordCount = count;
+                    testContext.InvocationCount++;
 
                     await context.SendLocal(new ReplyMessage
                     {
@@ -155,13 +160,18 @@ end";
 
             public class Handler : IHandleMessages<ReplyMessage>
             {
-                public Context TestContext { get; set; }
+                Context testContext;
+
+                public Handler(Context context)
+                {
+                    testContext = context;
+                }
 
                 public Task Handle(ReplyMessage message, IMessageHandlerContext context)
                 {
-                    if (TestContext.TestRunId == message.Id)
+                    if (testContext.TestRunId == message.Id)
                     {
-                        TestContext.ReplyReceived = true;
+                        testContext.ReplyReceived = true;
                     }
 
                     return Task.FromResult(0);
@@ -170,15 +180,20 @@ end";
 
             class BehaviorThatThrowsAfterFirstMessage : Behavior<IIncomingLogicalMessageContext>
             {
-                public Context TestContext { get; set; }
+                Context testContext;
+
+                public BehaviorThatThrowsAfterFirstMessage(Context context)
+                {
+                    testContext = context;
+                }
 
                 public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
                 {
                     await next();
 
-                    if (TestContext.InvocationCount == 1)
+                    if (testContext.InvocationCount == 1)
                     {
-                        TestContext.TransactionEscalatedToDTC = Transaction.Current.TransactionInformation.DistributedIdentifier != Guid.Empty;
+                        testContext.TransactionEscalatedToDTC = Transaction.Current.TransactionInformation.DistributedIdentifier != Guid.Empty;
 
                         throw new SimulatedException();
                     }
