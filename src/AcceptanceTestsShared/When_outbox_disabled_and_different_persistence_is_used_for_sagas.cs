@@ -8,6 +8,7 @@ using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 [TestFixture]
+[Ignore("Not a supported scenario in v8. Works by accident in v7.")]
 public class When_outbox_disabled_and_different_persistence_used_for_sagas : NServiceBusAcceptanceTest
 {
     [Test]
