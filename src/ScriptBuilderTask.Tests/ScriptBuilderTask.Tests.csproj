@@ -19,4 +19,8 @@
     <PackageReference Include="Particular.Approvals" Version="0.2.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.0.3811.1" />
+  </ItemGroup>
+  
 </Project>
