@@ -1,12 +1,10 @@
-﻿#pragma warning disable 1591
+﻿#pragma warning disable 1591, CS0618
 namespace NServiceBus.Persistence.Sql
 {
-    using System;
-
     /// <summary>
     /// Not for public use.
     /// </summary>
-    [Obsolete("Not for public use")]
+    [ObsoleteEx(Message = "Not for public use")]
     [DoNotWarnAboutObsoleteUsage]
     public static class SubscriptionCommandBuilder
     {

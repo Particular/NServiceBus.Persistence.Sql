@@ -7,7 +7,9 @@ class SqlSubscriptionFeature : Feature
 {
     SqlSubscriptionFeature()
     {
+#pragma warning disable 618
         DependsOn<MessageDrivenSubscriptions>();
+#pragma warning restore 618
     }
 
     protected override void Setup(FeatureConfigurationContext context)

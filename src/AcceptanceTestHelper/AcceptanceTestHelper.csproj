@@ -12,4 +12,8 @@
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NServiceBus" Version="7.4.1" />
+  </ItemGroup>
+
 </Project>
