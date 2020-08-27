@@ -46,7 +46,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
                 {
                     c.ConfigureComponent(b =>
                     {
-                        var session = b.GetService<ISqlStorageSession>();
+                        var session = b.GetRequiredService<ISqlStorageSession>();
                         return new DataContext(session.Connection);
                     }, DependencyLifecycle.InstancePerUnitOfWork);
                 });

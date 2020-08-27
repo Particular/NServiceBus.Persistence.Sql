@@ -68,7 +68,7 @@ class SqlOutboxFeature : Feature
         });
 
         context.RegisterStartupTask(b =>
-            new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
+            new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetRequiredService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
