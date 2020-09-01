@@ -47,12 +47,16 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
 
         public class FindByStartSagaMessage : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
+            Context testContext;
+
+            public FindByStartSagaMessage(Context context)
+            {
+                testContext = context;
+            }
 
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.StartSagaFinderUsed = true;
+                testContext.StartSagaFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,

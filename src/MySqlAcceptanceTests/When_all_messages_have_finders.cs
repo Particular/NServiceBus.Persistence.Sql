@@ -49,12 +49,16 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
         public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
+            Context testContext;
+
+            public CustomFinder(Context context)
+            {
+                testContext = context;
+            }
 
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.StartSagaFinderUsed = true;
+                testContext.StartSagaFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
@@ -71,12 +75,16 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
         public class FindBySomeOtherMessage : IFindSagas<TestSaga.SagaData>.Using<SomeOtherMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context Context { get; set; }
+            Context testContext;
+
+            public FindBySomeOtherMessage(Context context)
+            {
+                testContext = context;
+            }
 
             public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
             {
-                Context.SomeOtherFinderUsed = true;
+                testContext.SomeOtherFinderUsed = true;
 
                 return session.GetSagaData<TestSaga.SagaData>(
                     context: context,
@@ -95,8 +103,12 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            // ReSharper disable once MemberCanBePrivate.Global
-            public Context TestContext { get; set; }
+            Context testContext;
+
+            public TestSaga(Context context)
+            {
+                testContext = context;
+            }
 
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
@@ -109,7 +121,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
             {
-                TestContext.HandledOtherMessage = true;
+                testContext.HandledOtherMessage = true;
                 return Task.FromResult(0);
             }
 

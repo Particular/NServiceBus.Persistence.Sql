@@ -41,12 +41,18 @@ public class When_sagas_and_outbox_are_disabled : NServiceBusAcceptanceTest
 
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {
-            public Context Context { get; set; }
+            Context testContext;
+
+            public MyMessageHandler(Context context)
+            {
+                testContext = context;
+            }
+
             public Task Handle(MyMessage message, IMessageHandlerContext context)
             {
                 var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-                Context.SessionCreated = session != null;
-                Context.Done = true;
+                testContext.SessionCreated = session != null;
+                testContext.Done = true;
 
                 return Task.FromResult(0);
             }

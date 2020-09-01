@@ -6,6 +6,7 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
 [TestFixture]
 public class When_using_synchronized_session_via_container : NServiceBusAcceptanceTest
@@ -45,7 +46,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
                 {
                     c.ConfigureComponent(b =>
                     {
-                        var session = b.Build<ISqlStorageSession>();
+                        var session = b.GetRequiredService<ISqlStorageSession>();
                         return new DataContext(session.Connection);
                     }, DependencyLifecycle.InstancePerUnitOfWork);
                 });

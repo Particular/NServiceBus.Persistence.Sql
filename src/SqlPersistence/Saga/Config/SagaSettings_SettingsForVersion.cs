@@ -9,7 +9,7 @@
         /// </summary>
         public void JsonSettingsForVersion(RetrieveVersionSpecificJsonSettings builder)
         {
-            settings.Set<RetrieveVersionSpecificJsonSettings>(builder);
+            settings.Set(builder);
         }
 
         internal static RetrieveVersionSpecificJsonSettings GetVersionSettings(ReadOnlySettings settings)
