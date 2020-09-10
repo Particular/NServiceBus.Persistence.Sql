@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
@@ -15,7 +17,7 @@ class StorageSessionFeature : Feature
         ValidateSagaOutboxCombo(settings);
 
         var sqlDialect = settings.GetSqlDialect();
-        var container = context.Container;
+        var services = context.Services;
         var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
 
         var sqlSagaPersistenceActivated = settings.IsFeatureActive(typeof(SqlSagaFeature));
@@ -29,16 +31,16 @@ class StorageSessionFeature : Feature
         var sessionHolder = new CurrentSessionHolder();
 
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache, sessionHolder), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder), DependencyLifecycle.SingleInstance);
+        services.AddSingleton<ISynchronizedStorage>(new SynchronizedStorage(connectionManager, infoCache, sessionHolder));
+        services.AddSingleton<ISynchronizedStorageAdapter>(new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder));
 
-        container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
+        services.AddTransient(_ => sessionHolder.Current);
         context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
 
         if (sqlSagaPersistenceActivated)
         {
             var sagaPersister = new SagaPersister(infoCache, sqlDialect);
-            container.ConfigureComponent<ISagaPersister>(() => sagaPersister, DependencyLifecycle.SingleInstance);
+            services.AddSingleton<ISagaPersister>(sagaPersister);
         }
     }
 

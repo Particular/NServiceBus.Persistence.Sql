@@ -44,11 +44,11 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
             {
                 config.RegisterComponents(c =>
                 {
-                    c.ConfigureComponent(b =>
+                    c.AddScoped(b =>
                     {
                         var session = b.GetRequiredService<ISqlStorageSession>();
                         return new DataContext(session.Connection);
-                    }, DependencyLifecycle.InstancePerUnitOfWork);
+                    });
                 });
             });
         }

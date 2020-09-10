@@ -1,4 +1,5 @@
-﻿using NServiceBus;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -31,6 +32,6 @@ class SqlSubscriptionFeature : Feature
                 CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{typeof(StorageType.Subscriptions).Name}")
             });
 
-        context.Container.RegisterSingleton(typeof (ISubscriptionStorage), persister);
+        context.Services.AddSingleton(typeof(ISubscriptionStorage), persister);
     }
 }

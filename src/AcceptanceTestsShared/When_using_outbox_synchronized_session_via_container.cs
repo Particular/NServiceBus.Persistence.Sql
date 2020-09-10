@@ -39,8 +39,8 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
                 c.EnableOutbox();
                 c.RegisterComponents(cc =>
                 {
-                    cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
-                    cc.ConfigureComponent(b => b.GetRequiredService<ISqlStorageSession>().Connection, DependencyLifecycle.InstancePerUnitOfWork);
+                    cc.AddScoped<MyRepository>();
+                    cc.AddScoped(b => b.GetRequiredService<ISqlStorageSession>().Connection);
                 });
             });
         }
