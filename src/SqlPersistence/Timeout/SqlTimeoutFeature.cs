@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Timeout.Core;
@@ -27,7 +28,7 @@ class SqlTimeoutFeature : Feature
         });
 
         var persister = new TimeoutPersister(connectionManager, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);
-        context.Container.RegisterSingleton(typeof(IPersistTimeouts), persister);
-        context.Container.RegisterSingleton(typeof(IQueryTimeouts), persister);
+        context.Services.AddSingleton(typeof(IPersistTimeouts), persister);
+        context.Services.AddSingleton(typeof(IQueryTimeouts), persister);
     }
 }

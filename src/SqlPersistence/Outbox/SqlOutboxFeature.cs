@@ -2,6 +2,7 @@
 using NServiceBus;
 using NServiceBus.Features;
 using Microsoft.Extensions.DependencyInjection;
+using NServiceBus.Outbox;
 
 class SqlOutboxFeature : Feature
 {
@@ -40,7 +41,7 @@ class SqlOutboxFeature : Feature
         }
 
         var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
-        context.Container.ConfigureComponent(b => outboxPersister, DependencyLifecycle.InstancePerCall);
+        context.Services.AddTransient<IOutboxStorage>(_ => outboxPersister);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
         {
