@@ -102,7 +102,6 @@ public static class RuntimeSagaDefinitionReader
     {
         if (sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
         {
-            // ReSharper disable once PossibleNullReferenceException
             return (string)sagaType
                 .GetProperty(sqlSagaPropertyName, AnyInstanceMember)
                 .GetValue(instance);

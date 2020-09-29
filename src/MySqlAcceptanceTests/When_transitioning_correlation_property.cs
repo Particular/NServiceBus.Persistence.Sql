@@ -23,7 +23,6 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             connection.Open();
 
             //HACK: Thread Sleeps required since information_schema.statistics takes some time to update
-
             var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
             Thread.Sleep(200);

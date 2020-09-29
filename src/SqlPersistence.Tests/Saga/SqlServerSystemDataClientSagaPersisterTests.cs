@@ -4,7 +4,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
 [TestFixture]
-public class SqlServerSystemDataClientSagaPersisterTests: SagaPersisterTests
+public class SqlServerSystemDataClientSagaPersisterTests : SagaPersisterTests
 {
     public SqlServerSystemDataClientSagaPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
     {

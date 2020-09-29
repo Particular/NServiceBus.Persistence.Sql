@@ -1,4 +1,3 @@
-
 class Requires
 {
     public static void DtcSupport()

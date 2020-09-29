@@ -23,7 +23,7 @@ namespace NServiceBus
         /// <summary>
         /// Configures how <see cref="DbConnection"/>s are constructed, allowing for selecting a different database per tenant in a multi-tenant system.
         /// </summary>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">The persistence configuration object</param>
         /// <param name="tenantIdHeaderName">The name of the message header that identifies the tenant id in each message.</param>
         /// <param name="buildConnectionFromTenantData">Using a tenant id, builds a database connection for that tenant database.</param>
         public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, string tenantIdHeaderName, Func<string, DbConnection> buildConnectionFromTenantData)
@@ -44,7 +44,7 @@ namespace NServiceBus
         /// <summary>
         /// Configures how <see cref="DbConnection"/>s are constructed, allowing for selecting a different database per tenant in a multi-tenant system.
         /// </summary>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">The persistence configuration object</param>
         /// <param name="captureTenantId">Determines the the TenantId based on the incoming message, with the ability to consider multiple message headers or transition from one header to another.</param>
         /// <param name="buildConnectionFromTenantData">Using a tenant id, builds a database connection for that tenant database.</param>
         public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IncomingMessage, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)

@@ -18,6 +18,7 @@
     <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.561" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Particular.CodeRules" Version="0.7.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +26,10 @@
     <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
 
     <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TestSuppressions.cs" Link="TestSuppressions.cs" />
   </ItemGroup>
 
 </Project>

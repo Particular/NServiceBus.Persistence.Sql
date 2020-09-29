@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Particular.Approvals;
 
 [TestFixture]
-public class SagaDefinitionReaderTest: IDisposable
+public class SagaDefinitionReaderTest : IDisposable
 {
     ModuleDefinition module;
 
