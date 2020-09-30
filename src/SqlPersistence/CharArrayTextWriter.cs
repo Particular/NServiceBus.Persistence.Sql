@@ -8,47 +8,47 @@ sealed class CharArrayTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
-    char[] _chars = new char[InitialSize];
-    int _next;
-    int _length = InitialSize;
+    char[] chars = new char[InitialSize];
+    int next;
+    int length = InitialSize;
 
     public override Encoding Encoding => EncodingValue;
 
     public override void Write(char value)
     {
         Ensure(1);
-        _chars[_next] = value;
-        _next += 1;
+        chars[next] = value;
+        next += 1;
     }
 
     void Ensure(int i)
     {
-        var required = _next + i;
-        if (required < _length)
+        var required = next + i;
+        if (required < length)
         {
             return;
         }
 
-        while (required >= _length)
+        while (required >= length)
         {
-            _length *= 2;
+            length *= 2;
         }
-        Array.Resize(ref _chars, _length);
+        Array.Resize(ref chars, length);
     }
 
     public override void Write(char[] buffer, int index, int count)
     {
         Ensure(count);
-        Array.Copy(buffer, index, _chars, _next, count);
-        _next += count;
+        Array.Copy(buffer, index, chars, next, count);
+        next += count;
     }
 
     public override void Write(string value)
     {
         var length = value.Length;
         Ensure(length);
-        value.CopyTo(0, _chars, _next, length);
-        _next += length;
+        value.CopyTo(0, chars, next, length);
+        next += length;
     }
 
     public override Task WriteAsync(char value)
@@ -113,13 +113,13 @@ sealed class CharArrayTextWriter : TextWriter
 
     public ArraySegment<char> ToCharSegment()
     {
-        return new ArraySegment<char>(_chars, 0, _next);
+        return new ArraySegment<char>(chars, 0, next);
     }
 
     void Clear()
     {
-        _next = 0;
+        next = 0;
     }
 
-    public int Size => _next;
+    public int Size => next;
 }

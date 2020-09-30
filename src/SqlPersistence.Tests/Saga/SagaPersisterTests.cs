@@ -12,8 +12,6 @@ using NServiceBus.Sagas;
 using NUnit.Framework;
 using NServiceBus.Extensibility;
 using Particular.Approvals;
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
 
 public abstract class SagaPersisterTests
 {

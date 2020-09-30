@@ -12,7 +12,7 @@ public partial class CoreSagaMetadataTests
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
             var i = 0;
-            while(i < 3)
+            while (i < 3)
             {
                 mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
                 i++;

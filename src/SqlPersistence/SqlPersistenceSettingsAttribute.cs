@@ -1,5 +1,4 @@
-﻿// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
     using System;
 

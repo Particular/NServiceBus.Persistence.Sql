@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
     using System;
+
     /// <summary>
     /// Not for public use.
     /// </summary>

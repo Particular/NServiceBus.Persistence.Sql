@@ -1,5 +1,4 @@
-﻿
-using NServiceBus.Persistence.Sql;
+﻿using NServiceBus.Persistence.Sql;
 
 [assembly: SqlPersistenceSettings(
     MsSqlServerScripts = true,
