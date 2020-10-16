@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+using SagaSettings = NServiceBus.Persistence.Sql.SagaSettings;
 
 class StorageSessionFeature : Feature
 {

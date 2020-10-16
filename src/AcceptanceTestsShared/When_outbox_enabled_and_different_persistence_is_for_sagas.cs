@@ -38,7 +38,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
             EndpointSetup<DefaultServer>(c =>
             {
                 c.EnableOutbox();
-                c.UsePersistence<InMemoryPersistence, StorageType.Sagas>();
+                c.UsePersistence<LearningPersistence, StorageType.Sagas>();
             });
         }
         
