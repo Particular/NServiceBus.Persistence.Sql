@@ -30,7 +30,7 @@ public class When_using_different_persistence : NServiceBusAcceptanceTest
     {
         public InMemoryPersistenceEndpoint()
         {
-            EndpointSetup<NoPersistenceServer>(c => c.UsePersistence<LearningPersistence>());
+            EndpointSetup<NoPersistenceServer>(c => c.UsePersistence<AcceptanceTestingPersistence>());
         }
     }
 
