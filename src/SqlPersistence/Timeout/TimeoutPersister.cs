@@ -15,8 +15,8 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     TimeoutCommands timeoutCommands;
     TimeSpan timeoutsCleanupExecutionInterval;
     Func<DateTime> utcNow;
-    DateTime lastTimeoutsCleanupExecution;
-    DateTime oldestSupportedTimeout;
+    DateTimeOffset lastTimeoutsCleanupExecution;
+    DateTimeOffset oldestSupportedTimeout;
 
     public TimeoutPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
     {
@@ -104,7 +104,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         }
     }
 
-    public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
+    public async Task<TimeoutsChunk> GetNextChunk(DateTimeOffset startSlice)
     {
         var list = new List<TimeoutsChunk.Timeout>();
         var now = utcNow();

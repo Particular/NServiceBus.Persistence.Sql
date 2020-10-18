@@ -132,7 +132,6 @@ public abstract class TimeoutPersisterTests
         persister.Add(timeout1, null).Await();
         var nextChunk = persister.Peek(timeout1.Id, null).Result;
         Assert.IsNotNull(nextChunk);
-        Assert.AreEqual(DateTimeKind.Utc, nextChunk.Time.Kind);
         Approver.Verify(nextChunk, s => s.Replace(timeout1.Id, "theId"));
     }
 
@@ -163,7 +162,6 @@ public abstract class TimeoutPersisterTests
         var nextChunk = persister.GetNextChunk(startSlice).Result;
         Assert.That(nextChunk.NextTimeToQuery, Is.EqualTo(timeout2Time).Within(TimeSpan.FromSeconds(1)));
         Assert.IsNotNull(nextChunk);
-        Assert.AreEqual(DateTimeKind.Utc, nextChunk.NextTimeToQuery.Kind);
         Approver.Verify(nextChunk, s => s.Replace(timeout1.Id, "theId"));
     }
 
