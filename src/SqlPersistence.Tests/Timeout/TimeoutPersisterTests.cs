@@ -11,7 +11,7 @@ public abstract class TimeoutPersisterTests
     BuildSqlDialect sqlDialect;
     string schema;
     Func<string, DbConnection> dbConnection;
-    static DateTime goodUtcNowValue = new DateTime(2017, 10, 24, 10, 54, 15, DateTimeKind.Utc);
+    static DateTimeOffset goodUtcNowValue = new DateTimeOffset(2017, 10, 24, 10, 54, 15, TimeSpan.Zero);
     protected abstract Func<string, DbConnection> GetConnection();
     protected virtual bool SupportsSchemas() => true;
 
@@ -32,14 +32,14 @@ public abstract class TimeoutPersisterTests
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), name, schema: theSchema);
         }
 
-        var preventCleanupInterval = goodUtcNowValue - new DateTime() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
+        var preventCleanupInterval = goodUtcNowValue - new DateTimeOffset() + TimeSpan.FromDays(1); //Prevents entering cleanup mode right away (load timeouts from beginning of time)
 
         return new TimeoutPersister(
             connectionManager: new ConnectionManager(() => dbConnection(theSchema)),
             tablePrefix: $"{name}_",
             sqlDialect: sqlDialect.Convert(theSchema),
             timeoutsCleanupExecutionInterval: cleanupInterval ?? preventCleanupInterval,
-            utcNow: () => goodUtcNowValue);
+            now: () => goodUtcNowValue);
     }
 
     [TearDown]
@@ -83,7 +83,7 @@ public abstract class TimeoutPersisterTests
             Destination = "theDestination",
             SagaId = new Guid("ec1be111-39e5-403c-9960-f91282269455"),
             State = new byte[] { 1 },
-            Time = new DateTime(2000, 1, 1),
+            Time = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero),
             Headers = new Dictionary<string, string>
             {
                 {"HeaderKey", "HeaderValue"}
@@ -104,7 +104,7 @@ public abstract class TimeoutPersisterTests
             Destination = "theDestination",
             SagaId = sagaId,
             State = new byte[] { 1 },
-            Time = new DateTime(2000, 1, 1),
+            Time = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero),
             Headers = new Dictionary<string, string>
             {
                 {"HeaderKey", "HeaderValue"}
@@ -119,7 +119,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void Peek()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice.AddSeconds(1);
         var timeout1 = new TimeoutData
         {
@@ -139,7 +139,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void GetNextChunk()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice.AddSeconds(1);
         var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
@@ -168,7 +168,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void GetNextChunk_LowerBound()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice;
         var timeout1 = new TimeoutData
         {
@@ -187,7 +187,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void GetNextChunk_Cleanup()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice.AddYears(-10);
         var timeout1 = new TimeoutData
         {
@@ -206,7 +206,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void GetNextChunk_CleanupOnce()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice.AddYears(-10);
         var timeout1 = new TimeoutData
         {
@@ -231,7 +231,7 @@ public abstract class TimeoutPersisterTests
     [Test]
     public void FractionalSeconds()
     {
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, 42, DateTimeKind.Utc); // 42ms
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, 42, TimeSpan.Zero); // 42ms
         var timeout1Time = startSlice.AddSeconds(1);
         var timeout2Time = goodUtcNowValue.AddSeconds(10);
         var timeout1 = new TimeoutData
@@ -267,7 +267,7 @@ public abstract class TimeoutPersisterTests
             Assert.Ignore();
         }
 
-        var startSlice = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+        var startSlice = new DateTimeOffset(2000, 1, 1, 1, 1, 1, TimeSpan.Zero);
         var timeout1Time = startSlice.AddSeconds(1);
         var timeout1 = new TimeoutData
         {
