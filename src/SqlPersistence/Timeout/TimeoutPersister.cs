@@ -83,7 +83,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             command.AddParameter("Destination", timeout.Destination);
             command.AddParameter("SagaId", timeout.SagaId);
             command.AddParameter("State", timeout.State);
-            command.AddParameter("Time", timeout.Time);
+            command.AddParameter("Time", timeout.Time.UtcDateTime);
             command.AddParameter("Headers", Serializer.Serialize(timeout.Headers));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
