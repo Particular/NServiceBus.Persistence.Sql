@@ -2,8 +2,8 @@
   "DueTimeouts": [
     {
       "Id": "theId",
-      "DueTime": "2000-01-01T01:01:02Z"
+      "DueTime": "2000-01-01T01:01:02+00:00"
     }
   ],
-  "NextTimeToQuery": "2017-10-24T10:54:25Z"
+  "NextTimeToQuery": "2017-10-24T10:54:25+00:00"
 }

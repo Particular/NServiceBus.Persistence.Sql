@@ -1,4 +1,4 @@
 ﻿{
   "DueTimeouts": [],
-  "NextTimeToQuery": "2017-10-24T11:04:15Z"
+  "NextTimeToQuery": "2017-10-24T11:04:15+00:00"
 }

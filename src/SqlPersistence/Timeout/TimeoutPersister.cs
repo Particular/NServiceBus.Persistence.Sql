@@ -14,18 +14,18 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     SqlDialect sqlDialect;
     TimeoutCommands timeoutCommands;
     TimeSpan timeoutsCleanupExecutionInterval;
-    Func<DateTime> utcNow;
-    DateTime lastTimeoutsCleanupExecution;
-    DateTime oldestSupportedTimeout;
+    Func<DateTimeOffset> now;
+    DateTimeOffset lastTimeoutsCleanupExecution;
+    DateTimeOffset oldestSupportedTimeout;
 
-    public TimeoutPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTime> utcNow)
+    public TimeoutPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan timeoutsCleanupExecutionInterval, Func<DateTimeOffset> now)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
-        this.utcNow = utcNow;
+        this.now = now;
         timeoutCommands = TimeoutCommandBuilder.Build(sqlDialect, tablePrefix);
-        oldestSupportedTimeout = sqlDialect.OldestSupportedTimeout;
+        oldestSupportedTimeout = new DateTimeOffset(sqlDialect.OldestSupportedTimeout, TimeSpan.Zero);
     }
 
     public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
@@ -56,7 +56,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
                     Destination = destination,
                     SagaId = sagaId,
                     State = value,
-                    Time = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc),
+                    Time = new DateTimeOffset(dateTime, TimeSpan.Zero),
                     Headers = headers,
                 };
             }
@@ -83,7 +83,7 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             command.AddParameter("Destination", timeout.Destination);
             command.AddParameter("SagaId", timeout.SagaId);
             command.AddParameter("State", timeout.State);
-            command.AddParameter("Time", timeout.Time);
+            command.AddParameter("Time", timeout.Time.UtcDateTime);
             command.AddParameter("Headers", Serializer.Serialize(timeout.Headers));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
@@ -104,33 +104,33 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
         }
     }
 
-    public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
+    public async Task<TimeoutsChunk> GetNextChunk(DateTimeOffset startSlice)
     {
         var list = new List<TimeoutsChunk.Timeout>();
-        var now = utcNow();
+        var current = now();
 
         //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
         //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeout storage race-condition
-        if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < now)
+        if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < current)
         {
-            lastTimeoutsCleanupExecution = now;
+            lastTimeoutsCleanupExecution = current;
             startSlice = oldestSupportedTimeout;
         }
 
-        DateTime nextTimeToRunQuery;
+        DateTimeOffset nextTimeToRunQuery;
         using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
         {
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.Range;
-                command.AddParameter("StartTime", startSlice);
-                command.AddParameter("EndTime", now);
+                command.AddParameter("StartTime", startSlice.UtcDateTime);
+                command.AddParameter("EndTime", current.UtcDateTime);
                 using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                     {
                         var id = await reader.GetGuidAsync(0).ConfigureAwait(false);
-                        list.Add(new TimeoutsChunk.Timeout(id.ToString(), DateTime.SpecifyKind(reader.GetDateTime(1), DateTimeKind.Utc)));
+                        list.Add(new TimeoutsChunk.Timeout(id.ToString(), new DateTimeOffset(reader.GetDateTime(1), TimeSpan.Zero)));
                     }
                 }
             }
@@ -138,19 +138,20 @@ class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = timeoutCommands.Next;
-                command.AddParameter("EndTime", now);
+                command.AddParameter("EndTime", now().UtcDateTime);
                 var executeScalar = await command.ExecuteScalarAsync().ConfigureAwait(false);
                 if (executeScalar == null)
                 {
-                    nextTimeToRunQuery = now.AddMinutes(10);
+                    nextTimeToRunQuery = current.AddMinutes(10);
                 }
                 else
                 {
-                    nextTimeToRunQuery = (DateTime)executeScalar;
+                    nextTimeToRunQuery = new DateTimeOffset((DateTime)executeScalar, TimeSpan.Zero);
                 }
             }
         }
-        return new TimeoutsChunk(list.ToArray(), DateTime.SpecifyKind(nextTimeToRunQuery, DateTimeKind.Utc));
+
+        return new TimeoutsChunk(list.ToArray(), nextTimeToRunQuery);
     }
 
     public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)

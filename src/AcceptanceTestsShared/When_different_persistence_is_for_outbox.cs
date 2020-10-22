@@ -38,7 +38,7 @@ public class When_different_persistence_used_for_outbox : NServiceBusAcceptanceT
             EndpointSetup<DefaultServer>(c =>
             {
                 c.EnableOutbox();
-                c.UsePersistence<InMemoryPersistence, StorageType.Outbox>();
+                c.UsePersistence<AcceptanceTestingPersistence, StorageType.Outbox>();
             });
         }
 
