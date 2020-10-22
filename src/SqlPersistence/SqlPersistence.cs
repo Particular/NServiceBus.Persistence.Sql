@@ -20,10 +20,6 @@
                 EnableSession(s);
                 s.EnableFeatureByDefault<SqlOutboxFeature>();
             });
-            Supports<StorageType.Timeouts>(s =>
-            {
-                s.EnableFeatureByDefault<SqlTimeoutFeature>();
-            });
             Supports<StorageType.Sagas>(s =>
             {
                 EnableSession(s);

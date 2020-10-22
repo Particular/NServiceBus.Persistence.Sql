@@ -20,9 +20,9 @@ namespace NServiceBus.Persistence.Sql
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true)
         {
-            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
+            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace NServiceBus.Persistence.Sql
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true)
         {
             Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
             Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
@@ -53,11 +53,6 @@ namespace NServiceBus.Persistence.Sql
             if (shouldInstallSubscriptions)
             {
                 await ExecuteInSeparateConnection<StorageType.Subscriptions>(InstallSubscriptions, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
-            }
-
-            if (shouldInstallTimeouts)
-            {
-                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
         }
 
@@ -100,20 +95,7 @@ namespace NServiceBus.Persistence.Sql
                 script: File.ReadAllText(createScript),
                 tablePrefix: tablePrefix);
         }
-
-        static Task InstallTimeouts(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
-        {
-            var createScript = Path.Combine(scriptDirectory, "Timeout_Create.sql");
-            ScriptLocation.ValidateScriptExists(createScript);
-            log.Info($"Executing '{createScript}'");
-
-            return sqlDialect.ExecuteTableCommand(
-                connection: connection,
-                transaction: transaction,
-                script: File.ReadAllText(createScript),
-                tablePrefix: tablePrefix);
-        }
-
+        
         static async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
         {
             var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");

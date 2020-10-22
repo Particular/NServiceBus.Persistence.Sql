@@ -7,6 +7,7 @@
         public bool SupportsDtc => false;
         public bool SupportsCrossQueueTransactions => true;
         public bool SupportsNativePubSub => false;
+        public bool SupportsDelayedDelivery => true;
         public bool SupportsNativeDeferral => false;
         public bool SupportsOutbox => true;
 

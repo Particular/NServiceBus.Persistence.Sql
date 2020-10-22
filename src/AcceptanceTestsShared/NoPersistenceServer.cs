@@ -33,8 +33,6 @@
             configuration.TypesToIncludeInScan(typesToInclude);
             configuration.EnableInstallers();
 
-            configuration.DisableFeature<TimeoutManager>();
-
             var recoverability = configuration.Recoverability();
             recoverability.Delayed(delayed => delayed.NumberOfRetries(0));
             recoverability.Immediate(immediate => immediate.NumberOfRetries(0));
