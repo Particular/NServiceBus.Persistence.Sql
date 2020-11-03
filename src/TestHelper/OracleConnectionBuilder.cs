@@ -10,8 +10,7 @@ public static class OracleConnectionBuilder
 
     public static OracleConnection Build(bool disableMetadataPooling)
     {
-        //var connection = Environment.GetEnvironmentVariable("OracleConnectionString");
-        var connection = "User Id=system;Password=super-secret-password;Data Source=localhost:1521/XEPDB1;";
+        var connection = Environment.GetEnvironmentVariable("OracleConnectionString");
         
         if (string.IsNullOrWhiteSpace(connection))
         {
