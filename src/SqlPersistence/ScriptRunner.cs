@@ -10,7 +10,7 @@ namespace NServiceBus.Persistence.Sql
     /// <summary>
     /// Executes the scripts produced by a Sql Persistence MSBuild task.
     /// </summary>
-    public static class ScriptRunner
+    public static partial class ScriptRunner
     {
         static ILog log = Logging.LogManager.GetLogger(nameof(ScriptRunner));
 

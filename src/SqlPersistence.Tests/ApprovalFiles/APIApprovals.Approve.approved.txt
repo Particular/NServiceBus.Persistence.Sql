@@ -30,8 +30,8 @@ namespace NServiceBus.Persistence.Sql
     }
     public class static ScriptRunner
     {
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True) { }
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True) { }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
     public sealed class SqlPersistenceSettingsAttribute : System.Attribute
@@ -76,8 +76,12 @@ namespace NServiceBus.Persistence.Sql
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
     }
+    [System.ObsoleteAttribute("Will be removed in version 8.0.0.", true)]
     public class TimeoutSettings
     {
+        public TimeoutSettings() { }
+        [System.ObsoleteAttribute("The member currently throws a NotImplementedException. Will be removed in version" +
+            " 8.0.0.", true)]
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
     }
 }
@@ -117,6 +121,7 @@ namespace NServiceBus
     {
         public SqlPersistence() { }
     }
+    [System.ObsoleteAttribute("Will be removed in version 8.0.0.", true)]
     public class static SqlPersistenceConfig
     {
         public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
@@ -133,6 +138,8 @@ namespace NServiceBus
             where T : NServiceBus.SqlDialect, new () { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tablePrefix) { }
+        [System.ObsoleteAttribute("The member currently throws a NotImplementedException. Will be removed in version" +
+            " 8.0.0.", true)]
         public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
     }
     public class static SqlPersistenceOutboxSettingsExtensions
