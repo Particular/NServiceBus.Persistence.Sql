@@ -19,19 +19,17 @@ namespace NServiceBus.Persistence.Sql
     
     
     [ObsoleteEx(
-        Message = "Timeout manager is removed. Timeout storage configuration can be removed.",
+        Message = "Timeout manager is removed.",
         TreatAsErrorFromVersion = "7",
-        RemoveInVersion = "8",
-        ReplacementTypeOrMember = "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True)"
+        RemoveInVersion = "8"
         )]
     partial class ScriptRunner
     {
         [ObsoleteEx(
-            Message = "Timeout manager is removed. Timeout storage configuration can be removed.",
+            Message = "Timeout manager is removed.",
             TreatAsErrorFromVersion = "7",
             RemoveInVersion = "8",
-            ReplacementTypeOrMember =
-                "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
+            ReplacementTypeOrMember = "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
         )]
         public static System.Threading.Tasks.Task Install(
             NServiceBus.SqlDialect sqlDialect,
@@ -47,11 +45,10 @@ namespace NServiceBus.Persistence.Sql
         }
 
         [ObsoleteEx(
-            Message = "Timeout manager is removed. Timeout storage configuration can be removed.",
+            Message = "Timeout manager is removed.",
             TreatAsErrorFromVersion = "7",
             RemoveInVersion = "8",
-            ReplacementTypeOrMember =
-                "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
+            ReplacementTypeOrMember = "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
         )]
         public static System.Threading.Tasks.Task Install(
             NServiceBus.SqlDialect sqlDialect, 
@@ -74,12 +71,12 @@ namespace NServiceBus
     using System;
     using Persistence.Sql;
 
-    [ObsoleteEx(
-        Message = "Timeout manager is removed. Timeout storage configuration can be removed.",
-        TreatAsErrorFromVersion = "7",
-        RemoveInVersion = "8")]
     public static partial class SqlPersistenceConfig
     {
+        [ObsoleteEx(
+            Message = "Timeout manager is removed. Timeout storage configuration can be removed.",
+            TreatAsErrorFromVersion = "7",
+            RemoveInVersion = "8")]
         public static TimeoutSettings TimeoutSettings(this PersistenceExtensions<SqlPersistence> configuration)
         {
             throw new NotImplementedException();
