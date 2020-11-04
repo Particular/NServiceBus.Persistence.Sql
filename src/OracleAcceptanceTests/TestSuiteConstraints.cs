@@ -8,12 +8,11 @@
         public bool SupportsCrossQueueTransactions => true;
         public bool SupportsNativePubSub => false;
         public bool SupportsDelayedDelivery => true;
-        public bool SupportsNativeDeferral => false;
         public bool SupportsOutbox => true;
 
         public IConfigureEndpointTestExecution CreateTransportConfiguration()
         {
-            return new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsNativeDeferral);
+            return new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsDelayedDelivery);
         }
 
         public IConfigureEndpointTestExecution CreatePersistenceConfiguration()
