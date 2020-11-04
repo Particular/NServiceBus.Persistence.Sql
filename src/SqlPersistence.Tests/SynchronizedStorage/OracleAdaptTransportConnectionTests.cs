@@ -1,21 +1,24 @@
-#if NETFRAMEWORK
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-
-class OracleAdaptTransportConnectionTests : AdaptTransportConnectionTests
+namespace Oracle
 {
-    public OracleAdaptTransportConnectionTests() : base(BuildSqlDialect.Oracle)
-    {
-    }
+#if NETFRAMEWORK
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-    protected override Func<string, DbConnection> GetConnection()
+    class OracleAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
-        return x =>
+        public OracleAdaptTransportConnectionTests() : base(BuildSqlDialect.Oracle)
         {
-            var connection = OracleConnectionBuilder.Build();
-            return connection;
-        };
+        }
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x =>
+            {
+                var connection = OracleConnectionBuilder.Build();
+                return connection;
+            };
+        }
     }
-}
 #endif
+}

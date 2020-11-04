@@ -1,21 +1,24 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
-
-[TestFixture(false, false)]
-[TestFixture(true, false)]
-[TestFixture(false, true)]
-[TestFixture(true, true)]
-public class SqlServerSystemDataClientOutboxPersisterTests : OutboxPersisterTests
+namespace SqlServerSystemData
 {
-    public SqlServerSystemDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope) 
-        : base(BuildSqlDialect.MsSqlServer, "schema_name", pessimistic, transactionScope)
-    {
-    }
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NUnit.Framework;
 
-    protected override Func<string, DbConnection> GetConnection()
+    [TestFixture(false, false)]
+    [TestFixture(true, false)]
+    [TestFixture(false, true)]
+    [TestFixture(true, true)]
+    public class SqlServerSystemDataClientOutboxPersisterTests : OutboxPersisterTests
     {
-        return x => MsSqlSystemDataClientConnectionBuilder.Build();
+        public SqlServerSystemDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope)
+            : base(BuildSqlDialect.MsSqlServer, "schema_name", pessimistic, transactionScope)
+        {
+        }
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x => MsSqlSystemDataClientConnectionBuilder.Build();
+        }
     }
 }

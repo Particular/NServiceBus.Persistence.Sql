@@ -1,43 +1,47 @@
-using System;
-using System.Data.Common;
-using System.Threading.Tasks;
-using NServiceBus.Extensibility;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NServiceBus.Transport;
-using NUnit.Framework;
-
-class SqlServerMicrosoftDataClientAdaptTransportConnectionTests : AdaptTransportConnectionTests
+namespace SqlServerMicrosoftData
 {
-    public SqlServerMicrosoftDataClientAdaptTransportConnectionTests() : base(BuildSqlDialect.MsSqlServer)
-    {
-    }
+    using System;
+    using System.Data.Common;
+    using System.Threading.Tasks;
+    using NServiceBus.Extensibility;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NServiceBus.Transport;
+    using NUnit.Framework;
 
-    protected override Func<string, DbConnection> GetConnection()
+    class SqlServerMicrosoftDataClientAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
-        return x =>
+        public SqlServerMicrosoftDataClientAdaptTransportConnectionTests() : base(BuildSqlDialect.MsSqlServer)
         {
-            var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            connection.Open();
-            return connection;
-        };
-    }
+        }
 
-    [Test]
-    public async Task Adapts_transport_connection()
-    {
-        var transportTransaction = new TransportTransaction();
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x =>
+            {
+                var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+                connection.Open();
+                return connection;
+            };
+        }
 
-        var transportConnection = connectionManager.BuildNonContextual();
-        var transaction = transportConnection.BeginTransaction();
+        [Test]
+        public async Task Adapts_transport_connection()
+        {
+            var transportTransaction = new TransportTransaction();
 
-        transportTransaction.Set("System.Data.SqlClient.SqlConnection", transportConnection);
-        transportTransaction.Set("System.Data.SqlClient.SqlTransaction", transaction);
+            var transportConnection = connectionManager.BuildNonContextual();
+            var transaction = transportConnection.BeginTransaction();
 
-        var altConnectionManager = new ConnectionManager(() => throw new Exception("Should not be called"));
+            transportTransaction.Set("System.Data.SqlClient.SqlConnection", transportConnection);
+            transportTransaction.Set("System.Data.SqlClient.SqlTransaction", transaction);
 
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager,
-            (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
+            var altConnectionManager = new ConnectionManager(() => throw new Exception("Should not be called"));
 
-        Assert.IsNotNull(result);
+            var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(),
+                altConnectionManager,
+                (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
+
+            Assert.IsNotNull(result);
+        }
     }
 }

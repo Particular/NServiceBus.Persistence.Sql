@@ -1,37 +1,41 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
-using Oracle.ManagedDataAccess.Client;
-
-[TestFixture]
-public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
+namespace Oracle
 {
-    public OracleSubscriptionPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
-    {
-    }
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NUnit.Framework;
+    using Oracle.ManagedDataAccess.Client;
 
-    protected override bool SupportsSchemas() => true;
-
-    protected override Func<string, DbConnection> GetConnection()
+    [TestFixture]
+    public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
     {
-        return schema =>
+        public OracleSubscriptionPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
         {
-            var key = schema == null
-                ? "OracleConnectionString"
-                : $"OracleConnectionString_{schema}";
+        }
 
-            var connection = Environment.GetEnvironmentVariable(key);
-            if (string.IsNullOrWhiteSpace(connection))
+        protected override bool SupportsSchemas() => true;
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return schema =>
             {
-                throw new Exception($"{key} environment variable is empty");
-            }
-            return new OracleConnection(connection);
-        };
-    }
+                var key = schema == null
+                    ? "OracleConnectionString"
+                    : $"OracleConnectionString_{schema}";
 
-    protected override string GetTablePrefix()
-    {
-        return "Subscription Tests";
+                var connection = Environment.GetEnvironmentVariable(key);
+                if (string.IsNullOrWhiteSpace(connection))
+                {
+                    throw new Exception($"{key} environment variable is empty");
+                }
+
+                return new OracleConnection(connection);
+            };
+        }
+
+        protected override string GetTablePrefix()
+        {
+            return "Subscription Tests";
+        }
     }
 }

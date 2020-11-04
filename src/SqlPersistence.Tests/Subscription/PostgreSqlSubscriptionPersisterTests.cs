@@ -1,17 +1,21 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
-
-[TestFixture]
-public class PostgreSqlSubscriptionPersisterTests : SubscriptionPersisterTests
+namespace PostgreSql
 {
-    public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
-    {
-    }
 
-    protected override Func<string, DbConnection> GetConnection()
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class PostgreSqlSubscriptionPersisterTests : SubscriptionPersisterTests
     {
-        return x => PostgreSqlConnectionBuilder.Build();
+        public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
+        {
+        }
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x => PostgreSqlConnectionBuilder.Build();
+        }
     }
 }
