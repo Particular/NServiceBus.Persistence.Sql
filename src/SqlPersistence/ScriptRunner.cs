@@ -95,7 +95,7 @@ namespace NServiceBus.Persistence.Sql
                 script: File.ReadAllText(createScript),
                 tablePrefix: tablePrefix);
         }
-        
+
         static async Task InstallSagas(string scriptDirectory, DbConnection connection, DbTransaction transaction, string tablePrefix, SqlDialect sqlDialect)
         {
             var sagasDirectory = Path.Combine(scriptDirectory, "Sagas");

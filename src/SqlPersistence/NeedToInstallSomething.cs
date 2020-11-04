@@ -34,8 +34,7 @@ class SqlPersistenceInstaller : INeedToInstallSomething
                     scriptDirectory: installerSettings.ScriptDirectory,
                     shouldInstallOutbox: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlOutboxFeature)),
                     shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlSagaFeature)),
-                    shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature))
-                    )
+                    shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
                 .ConfigureAwait(false);
         }
         catch (Exception e)
