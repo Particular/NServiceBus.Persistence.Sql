@@ -16,30 +16,16 @@ namespace NServiceBus.Persistence.Sql
             throw new NotImplementedException();
         }
     }
-    
-    
-    [ObsoleteEx(
-        Message = "Timeout manager is removed.",
-        TreatAsErrorFromVersion = "7",
-        RemoveInVersion = "8"
-        )]
+
     partial class ScriptRunner
     {
         [ObsoleteEx(
             Message = "Timeout manager is removed.",
             TreatAsErrorFromVersion = "7",
             RemoveInVersion = "8",
-            ReplacementTypeOrMember = "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
+            ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)"
         )]
-        public static System.Threading.Tasks.Task Install(
-            NServiceBus.SqlDialect sqlDialect,
-            string tablePrefix,
-            System.Func<System.Data.Common.DbConnection> connectionBuilder,
-            string scriptDirectory,
-            bool shouldInstallOutbox = true,
-            bool shouldInstallSagas = true,
-            bool shouldInstallSubscriptions = true,
-            bool shouldInstallTimeouts = true)
+        public static System.Threading.Tasks.Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             throw new NotImplementedException();
         }
@@ -48,18 +34,9 @@ namespace NServiceBus.Persistence.Sql
             Message = "Timeout manager is removed.",
             TreatAsErrorFromVersion = "7",
             RemoveInVersion = "8",
-            ReplacementTypeOrMember = "public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True)"
+            ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)"
         )]
-        public static System.Threading.Tasks.Task Install(
-            NServiceBus.SqlDialect sqlDialect, 
-            string tablePrefix,
-            System.Func<System.Type, 
-            System.Data.Common.DbConnection> connectionBuilder, 
-            string scriptDirectory,
-            bool shouldInstallOutbox = true, 
-            bool shouldInstallSagas = true, 
-            bool shouldInstallSubscriptions = true,
-            bool shouldInstallTimeouts = true)
+        public static System.Threading.Tasks.Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             throw new NotImplementedException();
         }
