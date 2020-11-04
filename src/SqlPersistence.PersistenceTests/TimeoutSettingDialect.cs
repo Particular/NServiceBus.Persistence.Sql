@@ -19,48 +19,6 @@
             this.commandTimeout = commandTimeout;
         }
 
-        internal override DateTime OldestSupportedTimeout => impl.OldestSupportedTimeout;
-
-        internal override string GetTimeoutTableName(string tablePrefix)
-        {
-            return impl.GetTimeoutTableName(tablePrefix);
-        }
-
-        internal override string GetTimeoutInsertCommand(string tableName)
-        {
-            return impl.GetTimeoutInsertCommand(tableName);
-        }
-
-        internal override string GetTimeoutRemoveByIdCommand(string tableName)
-        {
-            return impl.GetTimeoutRemoveByIdCommand(tableName);
-        }
-
-        internal override string GetTimeoutRemoveBySagaIdCommand(string tableName)
-        {
-            return impl.GetTimeoutRemoveBySagaIdCommand(tableName);
-        }
-
-        internal override string GetTimeoutPeekCommand(string tableName)
-        {
-            return impl.GetTimeoutPeekCommand(tableName);
-        }
-
-        internal override string GetTimeoutRangeCommand(string tableName)
-        {
-            return impl.GetTimeoutRangeCommand(tableName);
-        }
-
-        internal override string GetTimeoutNextCommand(string tableName)
-        {
-            return impl.GetTimeoutNextCommand(tableName);
-        }
-
-        internal override object ConvertTimeoutId(string timeoutId)
-        {
-            return impl.ConvertTimeoutId(timeoutId);
-        }
-
         internal override Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
         {
             return impl.TryAdaptTransportConnection(transportTransaction, context, connectionManager, storageSessionFactory);

@@ -1,9 +1,9 @@
 ﻿namespace NServiceBus
 {
-    using Settings;
     using Features;
     using Persistence;
     using Persistence.Sql;
+    using Settings;
 
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
@@ -19,10 +19,6 @@
             {
                 EnableSession(s);
                 s.EnableFeatureByDefault<SqlOutboxFeature>();
-            });
-            Supports<StorageType.Timeouts>(s =>
-            {
-                s.EnableFeatureByDefault<SqlTimeoutFeature>();
             });
             Supports<StorageType.Sagas>(s =>
             {
