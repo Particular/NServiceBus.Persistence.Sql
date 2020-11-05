@@ -1,22 +1,25 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-
-class MySqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
+namespace MySql
 {
-    public MySqlAdaptTransportConnectionTests() : base(BuildSqlDialect.MySql)
-    {
-    }
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-    protected override bool SupportsDistributedTransactions => false;
-
-    protected override Func<string, DbConnection> GetConnection()
+    class MySqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
-        return x =>
+        public MySqlAdaptTransportConnectionTests() : base(BuildSqlDialect.MySql)
         {
-            var connection = MySqlConnectionBuilder.Build();
-            connection.Open();
-            return connection;
-        };
+        }
+
+        protected override bool SupportsDistributedTransactions => false;
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x =>
+            {
+                var connection = MySqlConnectionBuilder.Build();
+                connection.Open();
+                return connection;
+            };
+        }
     }
 }

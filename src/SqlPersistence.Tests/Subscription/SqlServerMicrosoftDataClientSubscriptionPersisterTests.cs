@@ -1,17 +1,21 @@
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
-
-[TestFixture]
-public class SqlServerMicrosoftDataClientSubscriptionPersisterTests : SubscriptionPersisterTests
+namespace SqlServerMicrosoftData
 {
-    public SqlServerMicrosoftDataClientSubscriptionPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
-    {
-    }
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NUnit.Framework;
 
-    protected override Func<string, DbConnection> GetConnection()
+    [TestFixture]
+    public class SqlServerMicrosoftDataClientSubscriptionPersisterTests : SubscriptionPersisterTests
     {
-        return x => MsSqlMicrosoftDataClientConnectionBuilder.Build();
+        public SqlServerMicrosoftDataClientSubscriptionPersisterTests() : base(BuildSqlDialect.MsSqlServer,
+            "schema_name")
+        {
+        }
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x => MsSqlMicrosoftDataClientConnectionBuilder.Build();
+        }
     }
 }
