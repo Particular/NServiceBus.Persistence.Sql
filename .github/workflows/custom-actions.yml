@@ -1,0 +1,19 @@
+name: Testing Custom Actions
+
+on: 
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Test custom actions'  
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Custom windows acion
+      uses: ./custom-windows-action
+      id: custom
+      with:
+        who-to-greet: 'Yves'

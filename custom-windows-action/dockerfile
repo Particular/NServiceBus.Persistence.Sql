@@ -1,0 +1,8 @@
+# Container image that runs your code
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Use powershell as default
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"] 
+
+# say hello from powershell
+ENTRYPOINT Write-output "hello from powershell"
