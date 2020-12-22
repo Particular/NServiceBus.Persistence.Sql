@@ -19,7 +19,15 @@ class SqlOutboxFeature : Feature
         var sqlDialect = settings.GetSqlDialect();
 
         var pessimisticMode = context.Settings.GetOrDefault<bool>(ConcurrencyMode);
-        var transactionScopeMode = context.Settings.GetOrDefault<bool>(TransactionMode);
+        var transactionScopeMode = context.Settings.GetOrDefault<bool>(UseTransactionScope);
+
+        var adoTransactionIsolationLevel = context.Settings.GetOrDefault<System.Data.IsolationLevel>(AdoTransactionIsolationLevel);
+        if (adoTransactionIsolationLevel == default)
+        {
+            //Default to Read Committed
+            adoTransactionIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+        }
+        var transactionScopeIsolationLevel = context.Settings.GetOrDefault<System.Transactions.IsolationLevel>(TransactionScopeIsolationLevel);
 
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
 
@@ -36,8 +44,8 @@ class SqlOutboxFeature : Feature
         ISqlOutboxTransaction transactionFactory()
         {
             return transactionScopeMode
-                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager)
-                : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager);
+                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel)
+                : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
         }
 
         var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
@@ -76,5 +84,7 @@ class SqlOutboxFeature : Feature
     internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";
     internal const string DisableCleanup = "Persistence.Sql.Outbox.DisableCleanup";
     internal const string ConcurrencyMode = "Persistence.Sql.Outbox.PessimisticMode";
-    internal const string TransactionMode = "Persistence.Sql.Outbox.TransactionScopeMode";
+    internal const string UseTransactionScope = "Persistence.Sql.Outbox.TransactionScopeMode";
+    internal const string AdoTransactionIsolationLevel = "Persistence.Sql.Outbox.AdoTransactionIsolationLevel";
+    internal const string TransactionScopeIsolationLevel = "Persistence.Sql.Outbox.TransactionScopeIsolationLevel";
 }

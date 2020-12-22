@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.PersistenceTesting
+﻿using System.Transactions;
+
+namespace NServiceBus.PersistenceTesting
 {
     using System;
     using System.Collections.Generic;
@@ -161,8 +163,8 @@
             ISqlOutboxTransaction transactionFactory()
             {
                 return transactionScopeMode
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager)
-                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager);
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted)
+                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             }
 
             var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
