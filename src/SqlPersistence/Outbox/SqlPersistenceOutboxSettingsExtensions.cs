@@ -106,7 +106,7 @@ namespace NServiceBus
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
             outboxSettings.GetSettings().Set(SqlOutboxFeature.UseTransactionScope, true);
-            outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeIsolationLevel, true);
+            outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeIsolationLevel, isolationLevel);
         }
     }
 }
