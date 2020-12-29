@@ -93,9 +93,10 @@
 
             var connectionManager = new ConnectionManager(connectionFactory);
             SagaIdGenerator = new DefaultSagaIdGenerator();
-            SagaStorage = new SagaPersister(infoCache, dialect);
-            SynchronizedStorage = new SynchronizedStorage(connectionManager, infoCache, null);
-            SynchronizedStorageAdapter = new StorageAdapter(connectionManager, infoCache, dialect, null);
+            var isSequentialAccessSupported = !dialect.IsEncrypted(connectionManager);
+            SagaStorage = new SagaPersister(infoCache, dialect, isSequentialAccessSupported);
+            SynchronizedStorage = new SynchronizedStorage(connectionManager, infoCache, null, isSequentialAccessSupported);
+            SynchronizedStorageAdapter = new StorageAdapter(connectionManager, infoCache, dialect, null, isSequentialAccessSupported);
             OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, false);
             SupportsPessimisticConcurrency = pessimisticMode;
 
@@ -168,7 +169,7 @@
                     : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             }
 
-            var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
+            var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory, sqlDialect.IsEncrypted(connectionManager));
             return outboxPersister;
         }
 

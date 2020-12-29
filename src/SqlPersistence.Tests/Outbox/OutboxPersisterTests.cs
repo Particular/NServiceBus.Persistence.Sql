@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
 using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -40,8 +41,8 @@ public abstract class OutboxPersisterTests
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
             sqlDialect: dialect,
-            outboxCommands,
-            () =>
+            outboxCommands: outboxCommands,
+            outboxTransactionFactory: () =>
             {
                 ConcurrencyControlStrategy behavior;
                 if (pessimistic)
@@ -57,6 +58,7 @@ public abstract class OutboxPersisterTests
                     ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
+            isSequentialAccessSupported: !dialect.IsEncrypted(connectionManager),
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))
         {

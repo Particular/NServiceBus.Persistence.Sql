@@ -78,8 +78,15 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             var dbCommand = command.InnerCommand;
             appendParameters(dbCommand.CreateParameter, parameter => dbCommand.Parameters.Add(parameter));
+
+            var storageSession = session as StorageSession;
+            var behavior = CommandBehavior.SingleRow;
+            if (storageSession != null && storageSession.IsSequentialAccessSupported)
+            {
+                behavior |= CommandBehavior.SequentialAccess;
+            }
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
+            using (var dataReader = await command.ExecuteReaderAsync(behavior).ConfigureAwait(false))
             {
                 if (!await dataReader.ReadAsync().ConfigureAwait(false))
                 {

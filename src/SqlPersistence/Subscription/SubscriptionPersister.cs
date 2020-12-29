@@ -14,11 +14,13 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
+    public SubscriptionPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect,
+        TimeSpan? cacheFor, bool isSequentialAccessSupported)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.cacheFor = cacheFor;
+        this.isSequentialAccessSupported = isSequentialAccessSupported;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlDialect, tablePrefix);
         if (cacheFor != null)
         {
@@ -186,6 +188,7 @@ class SubscriptionPersister : ISubscriptionStorage
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;
+    bool isSequentialAccessSupported;
     static ILog Log = LogManager.GetLogger<SubscriptionPersister>();
 
     internal class CacheItem

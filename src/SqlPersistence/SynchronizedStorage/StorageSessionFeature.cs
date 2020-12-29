@@ -29,17 +29,19 @@ class StorageSessionFeature : Feature
         }
 
         var sessionHolder = new CurrentSessionHolder();
+        var isConnectionEncrypted = sqlDialect.IsEncrypted(connectionManager);
+        var isSequentialAccessSupported = !isConnectionEncrypted;
 
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        services.AddSingleton<ISynchronizedStorage>(new SynchronizedStorage(connectionManager, infoCache, sessionHolder));
-        services.AddSingleton<ISynchronizedStorageAdapter>(new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder));
+        services.AddSingleton<ISynchronizedStorage>(new SynchronizedStorage(connectionManager, infoCache, sessionHolder, isSequentialAccessSupported));
+        services.AddSingleton<ISynchronizedStorageAdapter>(new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder, isSequentialAccessSupported));
 
         services.AddTransient(_ => sessionHolder.Current);
         context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
 
         if (sqlSagaPersistenceActivated)
         {
-            var sagaPersister = new SagaPersister(infoCache, sqlDialect);
+            var sagaPersister = new SagaPersister(infoCache, sqlDialect, isSequentialAccessSupported);
             services.AddSingleton<ISagaPersister>(sagaPersister);
         }
     }

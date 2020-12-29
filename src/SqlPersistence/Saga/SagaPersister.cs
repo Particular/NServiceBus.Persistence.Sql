@@ -7,11 +7,13 @@ partial class SagaPersister : ISagaPersister
 {
     SagaInfoCache sagaInfoCache;
     SqlDialect sqlDialect;
+    bool isSequentialAccessSupported;
 
-    public SagaPersister(SagaInfoCache sagaInfoCache, SqlDialect sqlDialect)
+    public SagaPersister(SagaInfoCache sagaInfoCache, SqlDialect sqlDialect, bool isSequentialAccessSupported)
     {
         this.sagaInfoCache = sagaInfoCache;
         this.sqlDialect = sqlDialect;
+        this.isSequentialAccessSupported = isSequentialAccessSupported;
     }
 
     static void AddTransitionalParameter(IContainSagaData sagaData, RuntimeSagaInfo sagaInfo, CommandWrapper command)

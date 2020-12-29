@@ -13,13 +13,15 @@ class StorageAdapter : ISynchronizedStorageAdapter
     SqlDialect dialect;
     CurrentSessionHolder currentSessionHolder;
     IConnectionManager connectionBuilder;
+    bool isSequentialAccessSupported;
 
-    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect, CurrentSessionHolder currentSessionHolder)
+    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect, CurrentSessionHolder currentSessionHolder, bool isSequentialAccessSupported)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
         this.dialect = dialect;
         this.currentSessionHolder = currentSessionHolder;
+        this.isSequentialAccessSupported = isSequentialAccessSupported;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -28,7 +30,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         {
             return EmptyResultTask;
         }
-        var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
+        var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache, isSequentialAccessSupported);
 
         currentSessionHolder?.SetCurrentSession(session);
 
@@ -38,7 +40,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
         var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
-            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache)).ConfigureAwait(false);
+            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache, isSequentialAccessSupported)).ConfigureAwait(false);
         if (session != null)
         {
             currentSessionHolder?.SetCurrentSession(session);
