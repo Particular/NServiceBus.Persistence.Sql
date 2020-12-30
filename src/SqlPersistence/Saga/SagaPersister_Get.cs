@@ -81,7 +81,7 @@ partial class SagaPersister
 
             var storageSession = session as StorageSession;
             var behavior = CommandBehavior.SingleRow;
-            if (storageSession != null && !storageSession.Connection.IsEncrypted())
+            if ((storageSession != null && !storageSession.Connection.IsEncrypted()) || storageSession == null)
             {
                 behavior |= CommandBehavior.SequentialAccess;
             }

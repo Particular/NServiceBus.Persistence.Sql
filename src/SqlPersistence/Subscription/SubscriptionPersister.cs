@@ -161,13 +161,7 @@ class SubscriptionPersister : ISubscriptionStorage
             }
 
             command.CommandText = getSubscribersCommand;
-            var behavior = CommandBehavior.SingleRow;
-            if (!connection.IsEncrypted())
-            {
-                behavior |= CommandBehavior.SequentialAccess;
-            }
-
-            using (var reader = await command.ExecuteReaderAsync(behavior).ConfigureAwait(false))
+            using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
             {
                 var subscribers = new List<Subscriber>();
                 while (await reader.ReadAsync().ConfigureAwait(false))
