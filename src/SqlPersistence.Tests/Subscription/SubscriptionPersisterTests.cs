@@ -35,8 +35,7 @@ public abstract class SubscriptionPersisterTests
             connectionManager: new ConnectionManager(() => dbConnection(theSchema)),
             tablePrefix: $"{tablePrefix}_",
             sqlDialect: dialect,
-            cacheFor: TimeSpan.FromSeconds(10),
-            isSequentialAccessSupported: !dialect.IsEncrypted(dbConnection(null)));
+            cacheFor: TimeSpan.FromSeconds(10));
 
         using (var connection = dbConnection(theSchema))
         {

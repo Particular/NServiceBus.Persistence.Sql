@@ -5,20 +5,14 @@
 
     static class ConnectionExtensions
     {
-        public static bool IsEncrypted(this SqlDialect dialect, IConnectionManager connectionManager)
+        public static bool IsEncrypted(this IConnectionManager connectionManager)
         {
-            if (dialect.Name != nameof(SqlDialect.MsSqlServer))
-                return false;
-
             var connectionString = connectionManager.BuildNonContextual().ConnectionString;
             return IsConnectionEncrypted(connectionString);
         }
 
-        public static bool IsEncrypted(this SqlDialect dialect, DbConnection dbConnection)
+        public static bool IsEncrypted(this DbConnection dbConnection)
         {
-            if (dialect.Name != nameof(SqlDialect.MsSqlServer))
-                return false;
-
             var connectionString = dbConnection.ConnectionString;
             return IsConnectionEncrypted(connectionString);
         }

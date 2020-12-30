@@ -39,7 +39,7 @@ namespace SqlServerMicrosoftData
 
             var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(),
                 altConnectionManager,
-                (conn, tx, arg3) => new StorageSession(conn, tx, false, null, false));
+                (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
 
             Assert.IsNotNull(result);
         }

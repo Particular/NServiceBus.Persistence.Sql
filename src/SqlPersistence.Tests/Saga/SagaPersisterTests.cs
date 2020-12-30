@@ -45,7 +45,7 @@ public abstract class SagaPersisterTests
             sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);
-        return new SagaPersister(infoCache, runtimeSqlDialect, !runtimeSqlDialect.IsEncrypted(dbConnection()));
+        return new SagaPersister(infoCache, runtimeSqlDialect);
     }
 
     IEnumerable<Type> GetSagasAndFinders()
@@ -216,7 +216,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
             await persister.Complete(sagaData, storageSession, 1).ConfigureAwait(false);
@@ -256,7 +256,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
 
@@ -329,7 +329,7 @@ public abstract class SagaPersisterTests
         var callbackInvoked = false;
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             storageSession.OnSaveChanges(s =>
             {
@@ -369,7 +369,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
             storageSession.OnSaveChanges(s =>
@@ -390,7 +390,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
             Assert.IsNull(savedEntity.Data);
@@ -411,7 +411,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
@@ -465,7 +465,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ").ConfigureAwait(false);
             return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
@@ -506,7 +506,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "property value").ConfigureAwait(false);
             return (await persister.Get<SagaWithSpaceInName.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
@@ -564,7 +564,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
@@ -572,7 +572,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
@@ -582,7 +582,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             Assert.IsNotNull(sagaData);
@@ -624,7 +624,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
             storageSession.CompleteAsync().GetAwaiter().GetResult();
@@ -632,7 +632,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
@@ -642,7 +642,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
             Assert.IsNotNull(sagaData);
@@ -768,7 +768,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData1, storageSession, "theProperty").ConfigureAwait(false);
             await storageSession.CompleteAsync().ConfigureAwait(false);
@@ -776,7 +776,7 @@ public abstract class SagaPersisterTests
 
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
             sagaData.Data.SimpleProperty = "UpdatedValue";
@@ -820,7 +820,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theCorrelationProperty").ConfigureAwait(false);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
@@ -961,7 +961,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, "theCorrelationProperty").ConfigureAwait(false);
             return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession).ConfigureAwait(false)).Data;
@@ -1022,7 +1022,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, 666).ConfigureAwait(false);
             return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession).ConfigureAwait(false)).Data;
@@ -1069,7 +1069,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var data = new SagaWithCorrelation.SagaData
             {
@@ -1084,7 +1084,7 @@ public abstract class SagaPersisterTests
         }
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             var data = new SagaWithCorrelation.SagaData
             {
@@ -1132,7 +1132,7 @@ public abstract class SagaPersisterTests
         var persister = SetUp(endpointName, schema);
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, true, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData, storageSession, null).ConfigureAwait(false);
             return (await persister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
@@ -1192,14 +1192,14 @@ public abstract class SagaPersisterTests
 
         using (var connection = GetConnection()(null))
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, false, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, false, null))
         {
             await defaultSchemaPersister.Save(sagaData, storageSession, null).ConfigureAwait(false);
         }
 
         using (var connection = GetConnection()(schema))
         using (var transaction = connection.BeginTransaction())
-        using (var storageSession = new StorageSession(connection, transaction, false, null, false))
+        using (var storageSession = new StorageSession(connection, transaction, false, null))
         {
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
             Assert.IsNull(result);

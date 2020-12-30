@@ -17,17 +17,15 @@ class OutboxPersister : IOutboxStorage
     int cleanupBatchSize;
     OutboxCommands outboxCommands;
     Func<ISqlOutboxTransaction> outboxTransactionFactory;
-    bool isSequentialAccessSupported;
 
     public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
-        Func<ISqlOutboxTransaction> outboxTransactionFactory, bool isSequentialAccessSupported,
+        Func<ISqlOutboxTransaction> outboxTransactionFactory,
         int cleanupBatchSize = 10000)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.outboxCommands = outboxCommands;
         this.outboxTransactionFactory = outboxTransactionFactory;
-        this.isSequentialAccessSupported = isSequentialAccessSupported;
         this.cleanupBatchSize = cleanupBatchSize;
     }
 
@@ -85,7 +83,7 @@ class OutboxPersister : IOutboxStorage
 
                 // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed, but SequentialAccess is unsupported for SQL Server AlwaysEncrypted
                 var behavior = CommandBehavior.SingleRow;
-                if (isSequentialAccessSupported)
+                if (!connection.IsEncrypted())
                 {
                     behavior |= CommandBehavior.SequentialAccess;
                 }

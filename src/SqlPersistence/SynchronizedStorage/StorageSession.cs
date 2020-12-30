@@ -10,7 +10,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
     Func<ISqlStorageSession, Task> onSaveChangesCallback = s => Task.CompletedTask;
     Action disposedCallback = () => { };
 
-    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache, bool isSequentialAccessSupported)
+    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
     {
         Guard.AgainstNull(nameof(connection), connection);
 
@@ -18,10 +18,8 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         this.ownsTransaction = ownsTransaction;
         InfoCache = infoCache;
         Transaction = transaction;
-        IsSequentialAccessSupported = isSequentialAccessSupported;
     }
 
-    public bool IsSequentialAccessSupported { get; }
     internal SagaInfoCache InfoCache { get; }
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }

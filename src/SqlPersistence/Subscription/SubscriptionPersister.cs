@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -14,13 +15,11 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SubscriptionPersister : ISubscriptionStorage
 {
-    public SubscriptionPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect,
-        TimeSpan? cacheFor, bool isSequentialAccessSupported)
+    public SubscriptionPersister(IConnectionManager connectionManager, string tablePrefix, SqlDialect sqlDialect, TimeSpan? cacheFor)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.cacheFor = cacheFor;
-        this.isSequentialAccessSupported = isSequentialAccessSupported;
         subscriptionCommands = SubscriptionCommandBuilder.Build(sqlDialect, tablePrefix);
         if (cacheFor != null)
         {
@@ -160,8 +159,15 @@ class SubscriptionPersister : ISubscriptionStorage
                 var paramName = $"type{i}";
                 command.AddParameter(paramName, messageType.TypeName);
             }
+
             command.CommandText = getSubscribersCommand;
-            using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
+            var behavior = CommandBehavior.SingleRow;
+            if (!connection.IsEncrypted())
+            {
+                behavior |= CommandBehavior.SequentialAccess;
+            }
+
+            using (var reader = await command.ExecuteReaderAsync(behavior).ConfigureAwait(false))
             {
                 var subscribers = new List<Subscriber>();
                 while (await reader.ReadAsync().ConfigureAwait(false))
@@ -188,7 +194,7 @@ class SubscriptionPersister : ISubscriptionStorage
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;
-    bool isSequentialAccessSupported;
+
     static ILog Log = LogManager.GetLogger<SubscriptionPersister>();
 
     internal class CacheItem

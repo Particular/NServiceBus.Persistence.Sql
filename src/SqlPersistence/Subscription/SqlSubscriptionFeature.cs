@@ -21,9 +21,7 @@ class SqlSubscriptionFeature : Feature
         var tablePrefix = settings.GetTablePrefix();
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
-        var isConnectionEncrypted = sqlDialect.IsEncrypted(connectionManager);
-        var isSequentialAccessSupported = !isConnectionEncrypted;
-        var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor, isSequentialAccessSupported);
+        var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor);
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 

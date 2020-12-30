@@ -58,7 +58,6 @@ public abstract class OutboxPersisterTests
                     ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
-            isSequentialAccessSupported: !dialect.IsEncrypted(connectionManager),
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))
         {

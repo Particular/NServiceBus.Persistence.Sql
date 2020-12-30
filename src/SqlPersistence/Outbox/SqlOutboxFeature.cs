@@ -48,8 +48,7 @@ class SqlOutboxFeature : Feature
                 : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
         }
 
-        var isSequentialAccessSupported = !sqlDialect.IsEncrypted(connectionManager);
-        var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory, isSequentialAccessSupported);
+        var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
         context.Services.AddTransient<IOutboxStorage>(_ => outboxPersister);
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
