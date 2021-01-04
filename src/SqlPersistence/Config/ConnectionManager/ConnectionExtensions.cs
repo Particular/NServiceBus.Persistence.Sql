@@ -1,35 +1,32 @@
-﻿namespace NServiceBus
+﻿using System;
+using System.Data.Common;
+
+static class ConnectionExtensions
 {
-    using System;
-    using System.Data.Common;
-
-    static class ConnectionExtensions
+    public static bool IsEncrypted(this IConnectionManager connectionManager)
     {
-        public static bool IsEncrypted(this IConnectionManager connectionManager)
+        var connectionString = connectionManager.BuildNonContextual().ConnectionString;
+        return IsConnectionEncrypted(connectionString);
+    }
+
+    public static bool IsEncrypted(this DbConnection dbConnection)
+    {
+        var connectionString = dbConnection.ConnectionString;
+        return IsConnectionEncrypted(connectionString);
+    }
+
+    private static bool IsConnectionEncrypted(string connectionString)
+    {
+        var parser = new DbConnectionStringBuilder
         {
-            var connectionString = connectionManager.BuildNonContextual().ConnectionString;
-            return IsConnectionEncrypted(connectionString);
+            ConnectionString = connectionString
+        };
+
+        if (parser.TryGetValue("Column Encryption Setting", out var enabled))
+        {
+            return ((string) enabled).Equals("enabled", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public static bool IsEncrypted(this DbConnection dbConnection)
-        {
-            var connectionString = dbConnection.ConnectionString;
-            return IsConnectionEncrypted(connectionString);
-        }
-
-        private static bool IsConnectionEncrypted(string connectionString)
-        {
-            var parser = new DbConnectionStringBuilder
-            {
-                ConnectionString = connectionString
-            };
-
-            if (parser.TryGetValue("Column Encryption Setting", out var enabled))
-            {
-                return ((string) enabled).Equals("enabled", StringComparison.InvariantCultureIgnoreCase);
-            }
-
-            return false;
-        }
+        return false;
     }
 }
