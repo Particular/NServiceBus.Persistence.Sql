@@ -3,12 +3,6 @@ using System.Data.Common;
 
 static class ConnectionExtensions
 {
-    public static bool IsEncrypted(this IConnectionManager connectionManager)
-    {
-        var connectionString = connectionManager.BuildNonContextual().ConnectionString;
-        return IsConnectionEncrypted(connectionString);
-    }
-
     public static bool IsEncrypted(this DbConnection dbConnection)
     {
         var connectionString = dbConnection.ConnectionString;

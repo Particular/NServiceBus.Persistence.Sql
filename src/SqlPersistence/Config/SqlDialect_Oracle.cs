@@ -68,6 +68,11 @@ namespace NServiceBus
                 }
             }
 
+            internal override CommandBehavior GetBehavior(DbConnection connection)
+            {
+                return CommandBehavior.SingleRow | CommandBehavior.SequentialAccess;
+            }
+
             internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return new { CustomSchema = string.IsNullOrEmpty(Schema) };

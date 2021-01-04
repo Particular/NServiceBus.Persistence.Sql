@@ -92,6 +92,11 @@ dialect.JsonBParameterModifier(
                 };
             }
 
+            internal override CommandBehavior GetBehavior(DbConnection connection)
+            {
+                return CommandBehavior.SingleRow | CommandBehavior.SequentialAccess;
+            }
+
             internal string Schema { get; set; }
         }
     }

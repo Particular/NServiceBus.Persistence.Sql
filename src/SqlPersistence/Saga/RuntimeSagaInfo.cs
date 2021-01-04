@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Text;
@@ -149,6 +150,10 @@ class RuntimeSagaInfo
         }
     }
 
+    public CommandBehavior GetBehavior(DbConnection connection)
+    {
+        return sqlDialect.GetBehavior(connection);
+    }
 
     JsonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {

@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System.Data;
     using System.Data.Common;
 
     public abstract partial class SqlDialect
@@ -28,6 +29,11 @@ namespace NServiceBus
             internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return null;
+            }
+
+            internal override CommandBehavior GetBehavior(DbConnection connection)
+            {
+                return CommandBehavior.SingleRow | CommandBehavior.SequentialAccess;
             }
         }
     }

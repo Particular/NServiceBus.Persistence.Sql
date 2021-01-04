@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
 
@@ -52,6 +53,8 @@ namespace NServiceBus
                 await command.ExecuteNonQueryEx().ConfigureAwait(false);
             }
         }
+
+        internal abstract CommandBehavior GetBehavior(DbConnection connection);
 
         internal virtual void ValidateTablePrefix(string tablePrefix)
         {
