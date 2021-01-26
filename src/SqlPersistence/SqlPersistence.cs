@@ -44,7 +44,7 @@
 
                 s.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", new
                 {
-                    Name = dialect.Name,
+                    dialect.Name,
                     CustomDiagnostics = diagnostics
                 });
 

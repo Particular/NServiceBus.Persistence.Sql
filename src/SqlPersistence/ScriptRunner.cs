@@ -1,18 +1,18 @@
-﻿using System;
-using System.Data.Common;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using NServiceBus.Logging;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+    using System.Data.Common;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using NServiceBus.Logging;
+
     /// <summary>
     /// Executes the scripts produced by a Sql Persistence MSBuild task.
     /// </summary>
     public static partial class ScriptRunner
     {
-        static ILog log = Logging.LogManager.GetLogger(nameof(ScriptRunner));
+        static ILog log = LogManager.GetLogger(nameof(ScriptRunner));
 
         /// <summary>
         /// Executes the scripts produced by a Sql Persistence MSBuild task.

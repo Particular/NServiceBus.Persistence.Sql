@@ -155,33 +155,33 @@ static class InstructionAnalyzer
     }
 
     static bool IsMessageMapping(MethodReference methodRef) =>
-        IsConfigureMappingMethodCall(methodRef) 
-        || IsConfigureHeaderMapping(methodRef) 
-        || IsToMessageMethodCall(methodRef) 
+        IsConfigureMappingMethodCall(methodRef)
+        || IsConfigureHeaderMapping(methodRef)
+        || IsToMessageMethodCall(methodRef)
         || IsToMessageHeaderMethodCall(methodRef);
 
-    static bool IsSagaMapping(MethodReference methodRef) => 
-        IsToSagaMethodCall(methodRef) 
+    static bool IsSagaMapping(MethodReference methodRef) =>
+        IsToSagaMethodCall(methodRef)
         || IsMapSagaMappingMethodCall(methodRef);
 
     static bool IsConfigureHeaderMapping(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "ConfigureHeaderMapping" 
+        return methodRef.Name == "ConfigureHeaderMapping"
                && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
     }
 
     static bool IsConfigureMappingMethodCall(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "ConfigureMapping" 
+        return methodRef.Name == "ConfigureMapping"
                && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
     }
 
     static bool IsMapSagaMappingMethodCall(MethodReference methodRef)
     {
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "MapSaga" 
+        return methodRef.Name == "MapSaga"
                && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
     }
 
@@ -191,7 +191,7 @@ static class InstructionAnalyzer
         // Don't validate the entire thing because we won't know the message type, and could be called multiple times
         var sagaExpression = "NServiceBus.ToSagaExpression`";
         var sagaExpressionInterface = "NServiceBus.IToSagaExpression`";
-            
+
         return methodRef.Name == "ToSaga"
                && (methodRef.DeclaringType.FullName.StartsWith(sagaExpression) || methodRef.DeclaringType.FullName.StartsWith(sagaExpressionInterface));
     }

@@ -1,7 +1,7 @@
-using NUnit.Framework;
-
 namespace PostgreSql
 {
+    using NUnit.Framework;
+
     [SetUpFixture]
     public class SetUpFixture
     {
@@ -23,6 +23,8 @@ namespace PostgreSql
 
 namespace SqlServerSystemData
 {
+    using NUnit.Framework;
+
     [SetUpFixture]
     public class SetUpFixture
     {
@@ -49,6 +51,8 @@ exec('create schema schema_name');";
 
 namespace SqlServerMicrosoftData
 {
+    using NUnit.Framework;
+
     [SetUpFixture]
     public class SetUpFixture
     {
@@ -75,6 +79,8 @@ exec('create schema schema_name');";
 
 namespace MySql
 {
+    using NUnit.Framework;
+
     [SetUpFixture]
     public class SetUpFixture
     {
@@ -91,6 +97,8 @@ namespace MySql
 
 namespace Oracle
 {
+    using NUnit.Framework;
+
     [SetUpFixture]
     public class SetUpFixture
     {

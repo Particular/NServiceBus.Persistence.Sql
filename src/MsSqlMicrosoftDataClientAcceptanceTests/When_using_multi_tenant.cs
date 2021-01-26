@@ -92,7 +92,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         await RunTest<MultiTenantSagaEndpoint>(false);
     }
 
-    private async Task RunTest<TEndpointType>(bool useOutbox)
+    async Task RunTest<TEndpointType>(bool useOutbox)
         where TEndpointType : EndpointConfigurationBuilder
     {
         var context = await Scenario.Define<Context>()

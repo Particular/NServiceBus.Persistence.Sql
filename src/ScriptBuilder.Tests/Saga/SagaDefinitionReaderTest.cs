@@ -204,8 +204,9 @@ public class SagaDefinitionReaderTest : IDisposable
 
         protected override string CorrelationPropertyName
         {
-            //Explicitly not use expression body
+#pragma warning disable IDE0025 // Use expression body for properties
             get { return null; }
+#pragma warning restore IDE0025 // Use expression body for properties
         }
 
         protected override void ConfigureMapping(IMessagePropertyMapper mapper)

@@ -56,8 +56,8 @@ namespace NServiceBus
             var connectionManager = new MultiTenantConnectionManager(captureTenantId, buildConnectionFromTenantData);
 
             var settings = configuration.GetSettings();
-            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Outbox).Name}", connectionManager);
-            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Sagas).Name}", connectionManager);
+            settings.Set($"SqlPersistence.ConnectionManager.{nameof(StorageType.Outbox)}", connectionManager);
+            settings.Set($"SqlPersistence.ConnectionManager.{nameof(StorageType.Sagas)}", connectionManager);
             settings.Set("SqlPersistence.MultiTenant", true);
         }
 

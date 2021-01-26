@@ -25,7 +25,7 @@ static class SqlSagaTypeDataReader
     }
 
     static SqlSagaTypeData GetTypeDataFromSqlSaga(Type sagaType)
-    {     
+    {
         var instance = FormatterServices.GetUninitializedObject(sagaType);
 
         string transitionalCorrelationPropertyName = null;
@@ -79,7 +79,7 @@ static class SqlSagaTypeDataReader
 
     static string GetPropertyValue(PropertyInfo property, object instance)
     {
-        return (string) property.GetMethod.Invoke(instance, null);
+        return (string)property.GetMethod.Invoke(instance, null);
     }
 
     static PropertyInfo GetProperty(Type sagaType, string propertyName)

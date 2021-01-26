@@ -22,7 +22,7 @@
 
         public string SolutionDirectory { get; set; }
 
-        static Version assemblyVersion= typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
+        static Version assemblyVersion = typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
 
         public override bool Execute()
         {

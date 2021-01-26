@@ -29,7 +29,7 @@ class SqlSubscriptionFeature : Feature
             new
             {
                 EntriesCashedFor = cacheFor,
-                CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{typeof(StorageType.Subscriptions).Name}")
+                CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{nameof(StorageType.Subscriptions)}")
             });
 
         context.Services.AddSingleton(typeof(ISubscriptionStorage), persister);
