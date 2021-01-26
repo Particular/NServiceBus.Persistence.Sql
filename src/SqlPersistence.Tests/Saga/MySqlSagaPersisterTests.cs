@@ -7,7 +7,7 @@ using NUnit.Framework;
 // So this test does not run on CI as server install does not support unicode
 [Explicit("MySqlUnicode")]
 #endif
-public class MySqlSagaPersisterTests: SagaPersisterTests
+public class MySqlSagaPersisterTests : SagaPersisterTests
 {
     public MySqlSagaPersisterTests() : base(BuildSqlDialect.MySql, null)
     {

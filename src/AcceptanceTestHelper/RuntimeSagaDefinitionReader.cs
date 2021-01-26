@@ -59,7 +59,7 @@ public static class RuntimeSagaDefinitionReader
                 name: mapper.CorrelationProperty,
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
-        
+
         var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, saga, "TransitionalCorrelationPropertyName", att => att.TransitionalCorrelationProperty);
 
         CorrelationProperty transitional = null;
@@ -69,7 +69,7 @@ public static class RuntimeSagaDefinitionReader
             var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
             transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
         }
-        
+
         var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 

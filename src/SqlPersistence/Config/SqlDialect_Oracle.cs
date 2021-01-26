@@ -70,7 +70,7 @@ namespace NServiceBus
 
             internal override object GetCustomDialectDiagnosticsInfo()
             {
-                return new { CustomSchema = string.IsNullOrEmpty(Schema)};
+                return new { CustomSchema = string.IsNullOrEmpty(Schema) };
             }
 
             internal string Schema { get; set; }

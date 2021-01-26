@@ -92,7 +92,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         await RunTest<MultiTenantSagaEndpoint>(false);
     }
 
-    private async Task RunTest<TEndpointType>(bool useOutbox)
+    async Task RunTest<TEndpointType>(bool useOutbox)
         where TEndpointType : EndpointConfigurationBuilder
     {
         var context = await Scenario.Define<Context>()
@@ -113,7 +113,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
 
-        context.Cleanup();
+        await context.Cleanup();
     }
 
     [Test]
@@ -153,7 +153,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
 
-        context.Cleanup();
+        await context.Cleanup();
     }
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)
@@ -191,10 +191,10 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
             var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
             var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
-            context.Cleanup = () =>
+            context.Cleanup = async () =>
             {
-                helperA.Cleanup();
-                helperB.Cleanup();
+                await helperA.Cleanup();
+                await helperB.Cleanup();
             };
             return Task.FromResult(0);
         });
@@ -213,7 +213,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         // The EndpointsStarted flag is set by acceptance framework
         public string TenantADbName { get; set; }
         public string TenantBDbName { get; set; }
-        internal Action Cleanup { get; set; }
+        internal Func<Task> Cleanup { get; set; }
     }
 
     public class MultiTenantHandlerEndpoint : EndpointConfigurationBuilder

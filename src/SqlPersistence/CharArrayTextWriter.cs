@@ -9,7 +9,9 @@ sealed class CharArrayTextWriter : TextWriter
     internal const int InitialSize = 4096;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
     char[] _chars = new char[InitialSize];
+#pragma warning disable IDE0032 // Use auto property
     int _next;
+#pragma warning restore IDE0032 // Use auto property
     int _length = InitialSize;
 
     public override Encoding Encoding => EncodingValue;
@@ -121,5 +123,7 @@ sealed class CharArrayTextWriter : TextWriter
         _next = 0;
     }
 
+#pragma warning disable IDE0032 // Use auto property
     public int Size => _next;
+#pragma warning restore IDE0032 // Use auto property
 }

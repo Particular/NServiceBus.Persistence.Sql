@@ -38,7 +38,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
     {
         var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
-            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache));
+            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache)).ConfigureAwait(false);
         if (session != null)
         {
             currentSessionHolder.SetCurrentSession(session);

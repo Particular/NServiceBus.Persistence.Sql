@@ -52,8 +52,8 @@ public abstract class OutboxPersisterTests
                     behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
 
-                return transactionScope 
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager) 
+                return transactionScope
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
             },
             cleanupBatchSize: 5);

@@ -36,7 +36,7 @@ class OutboxPersister : IOutboxStorage
         return BeginTransactionInternal(transaction, context);
     }
 
-    private static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context)
+    static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context)
     {
         try
         {

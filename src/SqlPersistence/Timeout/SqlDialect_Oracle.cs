@@ -15,7 +15,7 @@
 
             internal override string GetTimeoutTableName(string tablePrefix)
             {
-               return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}TO\"";
+                return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}TO\"";
             }
 
             internal override string GetTimeoutInsertCommand(string tableName)

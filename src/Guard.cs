@@ -23,13 +23,13 @@ static class Guard
     {
         if (value.Contains("]") || value.Contains("[") || value.Contains("`"))
         {
-            throw new ArgumentException($"The argument '{value}' contains a ']', '[' or '`'. Names and schemas automatically quoted.");
+            throw new ArgumentException($"The argument '{argumentName}' contains a ']', '[' or '`'. Names and schemas automatically quoted.");
         }
     }
 
     public static void AgainstEmpty(string argumentName, string value)
     {
-        if (value !=null && string.IsNullOrWhiteSpace(value))
+        if (value != null && string.IsNullOrWhiteSpace(value))
         {
             throw new ArgumentNullException(argumentName);
         }

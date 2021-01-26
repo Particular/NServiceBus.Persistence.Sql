@@ -21,8 +21,9 @@
                     return "bigint";
                 case CorrelationPropertyType.Guid:
                     return "uniqueidentifier";
+                default:
+                    throw new Exception($"Could not convert {propertyType}.");
             }
-            throw new Exception($"Could not convert {propertyType}.");
         }
     }
 }

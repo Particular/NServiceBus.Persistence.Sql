@@ -37,7 +37,7 @@
 
             WriteComment(writer, "CreateTable");
             sqlDialectWriter.WriteCreateTable();
-            if(saga.CorrelationProperty != null)
+            if (saga.CorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
                 sqlDialectWriter.AddProperty(saga.CorrelationProperty);

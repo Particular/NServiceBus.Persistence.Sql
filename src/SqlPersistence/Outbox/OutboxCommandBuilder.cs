@@ -18,11 +18,11 @@ static class OutboxCommandBuilder
         var setAsDispatchedCommand = sqlDialect.GetOutboxSetAsDispatchedCommand(tableName);
 
         return new OutboxCommands(
-            optimisticStoreCommandText, 
-            pessimisticBeginCommandText, 
-            pessimisticCompleteCommandText, 
-            getCommandText, 
-            setAsDispatchedCommand, 
+            optimisticStoreCommandText,
+            pessimisticBeginCommandText,
+            pessimisticCompleteCommandText,
+            getCommandText,
+            setAsDispatchedCommand,
             cleanupCommand);
     }
 }

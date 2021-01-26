@@ -65,7 +65,7 @@ public class OutboxCleanerTests
 
         for (var i = 0; i < 100; i++)
         {
-            if (i%9 == 0) //Succeed every 9th attempt
+            if (i % 9 == 0) //Succeed every 9th attempt
             {
                 await timer.Tick(DateTime.UtcNow, CancellationToken.None).ConfigureAwait(false);
             }

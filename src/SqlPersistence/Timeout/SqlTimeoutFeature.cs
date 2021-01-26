@@ -23,7 +23,7 @@ class SqlTimeoutFeature : Feature
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Timeouts", new
         {
             TimeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval,
-            CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{typeof(StorageType.Timeouts).Name}")
+            CustomConnectionBuilder = settings.HasSetting($"SqlPersistence.ConnectionManager.{nameof(StorageType.Timeouts)}")
         });
 
         var persister = new TimeoutPersister(connectionManager, tablePrefix, sqlDialect, timeoutsCleanupExecutionInterval, () => DateTime.UtcNow);

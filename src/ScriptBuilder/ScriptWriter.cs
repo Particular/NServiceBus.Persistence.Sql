@@ -8,7 +8,7 @@
 
     public static class ScriptWriter
     {
-        public static void Write(string assemblyPath, string targetDirectory, Action<string, string> logError, Func<string,string> promotionPathFinder)
+        public static void Write(string assemblyPath, string targetDirectory, Action<string, string> logError, Func<string, string> promotionPathFinder)
         {
             var scriptPath = Path.Combine(targetDirectory, "NServiceBus.Persistence.Sql");
             PurgeDialectDirs(scriptPath);

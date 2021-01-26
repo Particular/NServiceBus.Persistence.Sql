@@ -15,7 +15,7 @@ public class CharArrayTextWriterPerformanceTests
     [TestCaseSource(nameof(Dialects))]
     public void PerfTest(SqlDialect dialect)
     {
-        var sagaInfo = BuildSagaInfo<S,S.SagaData>(dialect);
+        var sagaInfo = BuildSagaInfo<S, S.SagaData>(dialect);
         var data = new S.SagaData
         {
             StringProperty = "Some bigger test",
