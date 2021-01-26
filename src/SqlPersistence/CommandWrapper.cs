@@ -69,7 +69,8 @@ class CommandWrapper : IDisposable
 
     public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior)
     {
-        return command.ExecuteReaderAsync(behavior);
+        var resultingBehavior = dialect.ModifyBehavior(command.Connection, behavior);
+        return command.ExecuteReaderAsync(resultingBehavior);
     }
 
     public Task<int> ExecuteNonQueryEx(CancellationToken cancellationToken)

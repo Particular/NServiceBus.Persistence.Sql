@@ -68,9 +68,9 @@ namespace NServiceBus
                 }
             }
 
-            internal override CommandBehavior GetBehavior(DbConnection connection)
+            internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
             {
-                return CommandBehavior.SingleRow | CommandBehavior.SequentialAccess;
+                return baseBehavior;
             }
 
             internal override object GetCustomDialectDiagnosticsInfo()

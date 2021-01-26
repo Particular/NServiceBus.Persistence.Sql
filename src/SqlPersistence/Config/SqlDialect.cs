@@ -54,7 +54,7 @@ namespace NServiceBus
             }
         }
 
-        internal abstract CommandBehavior GetBehavior(DbConnection connection);
+        internal abstract CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior);
 
         internal virtual void ValidateTablePrefix(string tablePrefix)
         {

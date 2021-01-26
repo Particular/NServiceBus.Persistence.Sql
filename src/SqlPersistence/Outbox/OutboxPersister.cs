@@ -82,8 +82,7 @@ class OutboxPersister : IOutboxStorage
                 command.AddParameter("MessageId", messageId);
 
                 // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed, but SequentialAccess is unsupported for SQL Server AlwaysEncrypted
-                var behavior = sqlDialect.GetBehavior(connection);
-                using (var dataReader = await command.ExecuteReaderAsync(behavior).ConfigureAwait(false))
+                using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow).ConfigureAwait(false))
                 {
                     if (!await dataReader.ReadAsync().ConfigureAwait(false))
                     {

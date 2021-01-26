@@ -132,9 +132,9 @@
             return commandWrapper;
         }
 
-        internal override CommandBehavior GetBehavior(DbConnection connection)
+        internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
         {
-            return impl.GetBehavior(connection);
+            return impl.ModifyBehavior(connection, baseBehavior);
         }
 
         internal override object GetCustomDialectDiagnosticsInfo()

@@ -150,11 +150,6 @@ class RuntimeSagaInfo
         }
     }
 
-    public CommandBehavior GetBehavior(DbConnection connection)
-    {
-        return sqlDialect.GetBehavior(connection);
-    }
-
     JsonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionSpecificSettings == null)

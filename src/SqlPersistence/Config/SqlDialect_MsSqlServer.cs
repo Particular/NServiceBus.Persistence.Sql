@@ -48,7 +48,7 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
-            internal override CommandBehavior GetBehavior(DbConnection connection)
+            internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
             {
                 if (!hasConnectionBeenInspectedForEncryption)
                 {
@@ -56,13 +56,12 @@ namespace NServiceBus
                     hasConnectionBeenInspectedForEncryption = true;
                 }
 
-                var behavior = CommandBehavior.SingleRow;
-                if (!isConnectionEncrypted)
+                if (isConnectionEncrypted)
                 {
-                    behavior |= CommandBehavior.SequentialAccess;
+                    baseBehavior &= ~CommandBehavior.SequentialAccess; //Remove sequential access
                 }
 
-                return behavior;
+                return baseBehavior;
             }
 
             internal override object GetCustomDialectDiagnosticsInfo()
