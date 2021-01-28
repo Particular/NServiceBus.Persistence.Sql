@@ -1,21 +1,15 @@
-﻿using System.IO;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
+﻿using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SubscriptionWriter
+class SubscriptionWriter : ScriptWriter
 {
-    public static void WriteSubscriptionScript(string scriptPath, BuildSqlDialect sqlDialect)
+    public SubscriptionWriter(bool clean, bool overwrite, string scriptPath)
+        : base(clean, overwrite, scriptPath)
     {
-        var createPath = Path.Combine(scriptPath, "Subscription_Create.sql");
-        File.Delete(createPath);
-        using (var writer = File.CreateText(createPath))
-        {
-            SubscriptionScriptBuilder.BuildCreateScript(writer, sqlDialect);
-        }
-        var dropPath = Path.Combine(scriptPath, "Subscription_Drop.sql");
-        File.Delete(dropPath);
-        using (var writer = File.CreateText(dropPath))
-        {
-            SubscriptionScriptBuilder.BuildDropScript(writer, sqlDialect);
-        }
+    }
+
+    public override void WriteScripts(BuildSqlDialect dialect)
+    {
+        WriteScript("Subscription_Create.sql", writer => SubscriptionScriptBuilder.BuildCreateScript(writer, dialect));
+        WriteScript("Subscription_Drop.sql", writer => SubscriptionScriptBuilder.BuildDropScript(writer, dialect));
     }
 }

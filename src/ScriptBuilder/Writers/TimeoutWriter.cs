@@ -1,21 +1,16 @@
-using System.IO;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class TimeoutWriter
+class TimeoutWriter : ScriptWriter
 {
-    public static void WriteTimeoutScript(string scriptPath, BuildSqlDialect sqlDialect)
+    public TimeoutWriter(bool clean, bool overwrite, string scriptPath)
+        : base(clean, overwrite, scriptPath)
     {
-        var createPath = Path.Combine(scriptPath, "Timeout_Create.sql");
-        File.Delete(createPath);
-        using (var writer = File.CreateText(createPath))
-        {
-            TimeoutScriptBuilder.BuildCreateScript(writer, sqlDialect);
-        }
-        var dropPath = Path.Combine(scriptPath, "Timeout_Drop.sql");
-        File.Delete(dropPath);
-        using (var writer = File.CreateText(dropPath))
-        {
-            TimeoutScriptBuilder.BuildDropScript(writer, sqlDialect);
-        }
+    }
+
+    public override void WriteScripts(BuildSqlDialect dialect)
+    {
+        WriteScript("Timeout_Create.sql", writer => TimeoutScriptBuilder.BuildCreateScript(writer, dialect));
+
+        WriteScript("Timeout_Drop.sql", writer => TimeoutScriptBuilder.BuildDropScript(writer, dialect));
     }
 }

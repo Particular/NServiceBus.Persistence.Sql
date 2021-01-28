@@ -21,20 +21,11 @@ public static class RuntimeSagaDefinitionReader
             return Enumerable.Empty<SagaDefinition>();
         }
         var sagaAssembly = sagaTypes.First().Assembly;
-        var exceptions = new List<Exception>();
         //Validate the saga definitions using script builder compile-time validation
         using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
         {
             var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
-
-            compileTimeReader.GetSagas((e, d) =>
-            {
-                exceptions.Add(e);
-            });
-        }
-        if (exceptions.Any())
-        {
-            throw new AggregateException(exceptions);
+            compileTimeReader.GetSagas();
         }
         return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
     }
