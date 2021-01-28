@@ -1,0 +1,3 @@
+@setx SQLServerConnectionString "Server=localhost;User Id=sa;Password=NServiceBusPwd!;Database=nservicebus;"
+@setx MySQLConnectionString "Server=localhost;Port=3306;Database=NServiceBus;Uid=nsbuser;Pwd=nsbuser-super-secret-pwd;AllowUserVariables=True;AutoEnlist=false"
+@setx PostgreSqlConnectionString "User ID=postgres;Password=super-secret-password;Host=localhost;Port=54320;Database=nservicebus;Pooling=true;"
