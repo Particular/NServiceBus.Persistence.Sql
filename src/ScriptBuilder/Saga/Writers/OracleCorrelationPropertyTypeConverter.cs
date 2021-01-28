@@ -19,8 +19,10 @@
                     return "NUMBER(19)";
                 case CorrelationPropertyType.Guid:
                     return "VARCHAR2(38)";
+                case CorrelationPropertyType.DateTimeOffset:
+                default:
+                    throw new Exception($"Could not convert {propertyType}.");
             }
-            throw new Exception($"Could not convert {propertyType}.");
         }
     }
 }

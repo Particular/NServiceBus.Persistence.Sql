@@ -5,9 +5,9 @@ namespace MySql
     using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 #if RELEASE
-using NUnit.Framework;
-// So this test does not run on CI as server install does not support unicode
-[Explicit("MySqlUnicode")]
+    using NUnit.Framework;
+    // So this test does not run on CI as server install does not support unicode
+    [Explicit("MySqlUnicode")]
 #endif
     public class MySqlSagaPersisterTests : SagaPersisterTests
     {

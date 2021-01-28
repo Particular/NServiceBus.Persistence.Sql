@@ -1,10 +1,9 @@
-﻿using System.Transactions;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
-    using Configuration.AdvancedExtensibility;
     using System;
-    using Outbox;
+    using System.Transactions;
+    using NServiceBus.Configuration.AdvancedExtensibility;
+    using NServiceBus.Outbox;
 
     /// <summary>
     /// Contains extensions methods which allow to configure SQL persistence specific outbox configuration

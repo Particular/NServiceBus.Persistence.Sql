@@ -6,7 +6,7 @@ using Mono.Collections.Generic;
 
 public class CustomAttributeMock : ICustomAttribute
 {
-    public CustomAttributeMock(Dictionary<string,object> dictionary)
+    public CustomAttributeMock(Dictionary<string, object> dictionary)
     {
         Properties = new Collection<CustomAttributeNamedArgument>(BuildProperties(dictionary).ToArray());
     }

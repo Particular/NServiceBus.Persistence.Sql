@@ -1,7 +1,6 @@
-using Oracle.ManagedDataAccess.Client;
-
 namespace Oracle
 {
+    using Oracle.ManagedDataAccess.Client;
     using System;
     using System.Data.Common;
     using NServiceBus.Persistence.Sql.ScriptBuilder;

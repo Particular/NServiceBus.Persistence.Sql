@@ -18,7 +18,7 @@ class SqlSagaFeature : Feature
         var customSagaWriter = SagaSettings.GetWriterCreator(settings);
         var customSagaReader = SagaSettings.GetReaderCreator(settings);
 
-        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Sagas", new 
+        settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Sagas", new
         {
             CustomJsonSettings = customJsonSettings != null,
             VersionSpecificJsonSettings = versionSpecificJsonSettings != null,

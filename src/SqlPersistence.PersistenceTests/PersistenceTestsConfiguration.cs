@@ -1,21 +1,20 @@
-﻿using System.Transactions;
-
-namespace NServiceBus.PersistenceTesting
+﻿namespace NServiceBus.PersistenceTesting
 {
+    using System.Transactions;
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Threading.Tasks;
-    using Extensibility;
+    using NServiceBus.Extensibility;
     using Newtonsoft.Json;
     using Npgsql;
     using NpgsqlTypes;
     using NServiceBus.Outbox;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence;
-    using Persistence.Sql.ScriptBuilder;
-    using Transport;
+    using NServiceBus.Persistence;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NServiceBus.Transport;
 
     public partial class PersistenceTestsConfiguration
     {
@@ -39,11 +38,13 @@ namespace NServiceBus.PersistenceTesting
 
         static PersistenceTestsConfiguration()
         {
-            var postgreSql = new SqlDialect.PostgreSql();
-            postgreSql.JsonBParameterModifier = parameter =>
+            var postgreSql = new SqlDialect.PostgreSql
             {
-                var npgsqlParameter = (NpgsqlParameter)parameter;
-                npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                JsonBParameterModifier = parameter =>
+                {
+                    var npgsqlParameter = (NpgsqlParameter)parameter;
+                    npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                }
             };
 
             var variants = new List<object>
