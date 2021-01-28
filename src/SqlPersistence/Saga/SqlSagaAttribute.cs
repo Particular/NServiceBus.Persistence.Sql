@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace NServiceBus.Persistence.Sql
+﻿namespace NServiceBus.Persistence.Sql
 {
+    using System;
+
     /// <summary>
     /// Exposes extra configuration options for storing <see cref="Saga{TSagaData}"/>.
     /// </summary>

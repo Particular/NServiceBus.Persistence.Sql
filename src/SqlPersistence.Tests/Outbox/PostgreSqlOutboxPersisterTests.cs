@@ -9,7 +9,7 @@ using NUnit.Framework;
 [TestFixture(true, true)]
 public class PostgreSqlOutboxPersisterTests : OutboxPersisterTests
 {
-    public PostgreSqlOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+    public PostgreSqlOutboxPersisterTests(bool pessimistic, bool transactionScope)
         : base(BuildSqlDialect.PostgreSql, "SchemaName", pessimistic, transactionScope)
     {
     }

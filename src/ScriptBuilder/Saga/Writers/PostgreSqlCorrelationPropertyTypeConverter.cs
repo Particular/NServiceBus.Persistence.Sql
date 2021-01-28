@@ -18,8 +18,10 @@
                     return "integer";
                 case CorrelationPropertyType.Guid:
                     return "uuid";
+                case CorrelationPropertyType.DateTimeOffset:
+                default:
+                    throw new Exception($"Could not convert {propertyType}.");
             }
-            throw new Exception($"Could not convert {propertyType}.");
         }
     }
 }

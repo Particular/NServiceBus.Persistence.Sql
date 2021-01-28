@@ -1,9 +1,9 @@
 ﻿namespace NServiceBus
 {
-    using Settings;
     using Features;
     using Persistence;
     using Persistence.Sql;
+    using Settings;
 
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
@@ -48,7 +48,7 @@
 
                 s.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", new
                 {
-                    Name = dialect.Name,
+                    dialect.Name,
                     CustomDiagnostics = diagnostics
                 });
 

@@ -42,6 +42,6 @@ static class CorrelationPropertyTypeReader
         {
             return CorrelationPropertyType.String;
         }
-        throw new ErrorsException($"Could not convert '{fullName}' to {typeof(CorrelationPropertyType).Name}.");
+        throw new ErrorsException($"Could not convert '{fullName}' to {nameof(CorrelationPropertyType)}.");
     }
 }

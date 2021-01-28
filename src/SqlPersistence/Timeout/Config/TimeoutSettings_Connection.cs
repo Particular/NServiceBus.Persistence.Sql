@@ -11,7 +11,7 @@ namespace NServiceBus.Persistence.Sql
         public void ConnectionBuilder(Func<DbConnection> connectionBuilder)
         {
             Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
-            settings.Set($"SqlPersistence.ConnectionManager.{typeof(StorageType.Timeouts).Name}",
+            settings.Set($"SqlPersistence.ConnectionManager.{nameof(StorageType.Timeouts)}",
                 new ConnectionManager(connectionBuilder));
         }
     }

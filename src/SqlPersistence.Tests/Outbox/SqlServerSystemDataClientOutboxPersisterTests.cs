@@ -9,7 +9,7 @@ using NUnit.Framework;
 [TestFixture(true, true)]
 public class SqlServerSystemDataClientOutboxPersisterTests : OutboxPersisterTests
 {
-    public SqlServerSystemDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+    public SqlServerSystemDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope)
         : base(BuildSqlDialect.MsSqlServer, "schema_name", pessimistic, transactionScope)
     {
     }

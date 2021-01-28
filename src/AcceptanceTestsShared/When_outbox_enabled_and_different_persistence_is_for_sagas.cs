@@ -41,7 +41,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
                 c.UsePersistence<InMemoryPersistence, StorageType.Sagas>();
             });
         }
-        
+
         //This saga is not used but required to activate the saga feature
         public class DummySaga : SqlSaga<DummySagaData>, IAmStartedByMessages<DummyMessage>
         {

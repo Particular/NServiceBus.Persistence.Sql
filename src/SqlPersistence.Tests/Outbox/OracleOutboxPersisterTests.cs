@@ -10,7 +10,7 @@ using Oracle.ManagedDataAccess.Client;
 [TestFixture(true, true)]
 public class OracleOutboxPersisterTests : OutboxPersisterTests
 {
-    public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+    public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope)
         : base(BuildSqlDialect.Oracle, "Particular2", pessimistic, transactionScope)
     {
     }

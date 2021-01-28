@@ -9,7 +9,7 @@ using NUnit.Framework;
 [TestFixture(true, true)]
 public class MySqlOutboxPersisterTests : OutboxPersisterTests
 {
-    public MySqlOutboxPersisterTests(bool pessimistic, bool transactionScope) 
+    public MySqlOutboxPersisterTests(bool pessimistic, bool transactionScope)
         : base(BuildSqlDialect.MySql, null, pessimistic, transactionScope)
     {
     }

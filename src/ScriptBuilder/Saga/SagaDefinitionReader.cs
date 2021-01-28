@@ -13,7 +13,7 @@ static class SagaDefinitionReader
     }
 
     static bool TryGetSqlSagaDefinition(TypeDefinition type, out SagaDefinition definition)
-    { 
+    {
         if (!IsSqlSaga(type))
         {
             definition = null;
@@ -51,11 +51,10 @@ static class SagaDefinitionReader
 
     static bool TryGetCoreSagaDefinition(TypeDefinition type, out SagaDefinition definition)
     {
-        var baseType = type.BaseType as GenericInstanceType;
         definition = null;
 
         // Class must directly inherit from NServiceBus.Saga<T> so that no tricks can be pulled from an intermediate class
-        if (baseType == null || !baseType.FullName.StartsWith("NServiceBus.Saga") || baseType.GenericArguments.Count != 1)
+        if (!(type.BaseType is GenericInstanceType baseType) || !baseType.FullName.StartsWith("NServiceBus.Saga") || baseType.GenericArguments.Count != 1)
         {
             return false;
         }
@@ -191,7 +190,7 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
 
     static TypeDefinition GetSagaDataTypeFromSagaType(TypeDefinition sagaType)
     {
-        var baseType = (GenericInstanceType) sagaType.BaseType;
+        var baseType = (GenericInstanceType)sagaType.BaseType;
         var sagaDataReference = baseType.GenericArguments.Single();
         if (sagaDataReference is TypeDefinition sagaDataType)
         {

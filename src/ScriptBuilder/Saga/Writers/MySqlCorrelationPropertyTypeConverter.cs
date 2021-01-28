@@ -18,8 +18,10 @@
                     return "bigint(20)";
                 case CorrelationPropertyType.Guid:
                     return "varchar(38) character set ascii";
+                case CorrelationPropertyType.DateTimeOffset:
+                default:
+                    throw new Exception($"Could not convert {propertyType}.");
             }
-            throw new Exception($"Could not convert {propertyType}.");
         }
     }
 }

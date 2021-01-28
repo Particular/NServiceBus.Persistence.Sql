@@ -11,7 +11,7 @@
         {
             internal override string GetSubscriptionTableName(string tablePrefix)
             {
-               return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}SS\"";
+                return $"{SchemaPrefix}\"{tablePrefix.ToUpper()}SS\"";
             }
 
             internal override string GetSubscriptionSubscribeCommand(string tableName)
