@@ -9,7 +9,7 @@ static class ConnectionExtensions
         return IsConnectionEncrypted(connectionString);
     }
 
-    private static bool IsConnectionEncrypted(string connectionString)
+    static bool IsConnectionEncrypted(string connectionString)
     {
         var parser = new DbConnectionStringBuilder
         {
@@ -18,7 +18,7 @@ static class ConnectionExtensions
 
         if (parser.TryGetValue("Column Encryption Setting", out var enabled))
         {
-            return ((string) enabled).Equals("enabled", StringComparison.InvariantCultureIgnoreCase);
+            return ((string)enabled).Equals("enabled", StringComparison.InvariantCultureIgnoreCase);
         }
 
         return false;
