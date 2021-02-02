@@ -1,5 +1,5 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:1) || 'OD';
+  tableName varchar2(30) := UPPER(:tablePrefix) || 'OD';
   dropTable varchar2(50);
   n number(10);
 begin

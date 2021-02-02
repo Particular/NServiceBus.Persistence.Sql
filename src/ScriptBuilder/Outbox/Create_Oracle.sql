@@ -1,5 +1,5 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:1) || 'OD';
+  tableName varchar2(30) := UPPER(:tablePrefix) || 'OD';
   pkName varchar2(30) := tableName || '_PK';
   indexName varchar2(30) := tableName || '_IX';
   createTable varchar2(500);
