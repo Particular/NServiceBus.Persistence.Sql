@@ -1,5 +1,5 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:1) || 'TO';
+  tableName varchar2(30) := UPPER(:tablePrefix) || 'TO';
   timeIndex varchar2(30) := tableName || '_TK';
   sagaIndex varchar2(30) := tableName || '_SK';
   sqlStatement varchar2(500);
