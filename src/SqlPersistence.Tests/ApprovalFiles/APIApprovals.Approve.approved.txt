@@ -129,6 +129,7 @@ namespace NServiceBus
         public static void ConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public static void DisableInstaller(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void DoNotUseSqlServerTransportConnection(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.MsSqlServer> dialectSettings) { }
+        public static void EnableLongTableNames(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.Oracle> dialectSettings) { }
         public static void JsonBParameterModifier(this NServiceBus.SqlDialectSettings<NServiceBus.SqlDialect.PostgreSql> dialectSettings, System.Action<System.Data.Common.DbParameter> modifier) { }
         public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, System.Func<NServiceBus.Transport.IncomingMessage, string> captureTenantId, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }
         public static void MultiTenantConnectionBuilder(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tenantIdHeaderName, System.Func<string, System.Data.Common.DbConnection> buildConnectionFromTenantData) { }

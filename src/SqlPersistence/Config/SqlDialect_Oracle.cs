@@ -58,9 +58,14 @@ namespace NServiceBus
 
             internal override void ValidateTablePrefix(string tablePrefix)
             {
-                if (tablePrefix.Length > 25)
+                const int suffixLength = 5;
+                var lengthLimit = TableNameMax - suffixLength;
+                if (tablePrefix.Length > lengthLimit)
                 {
-                    throw new Exception($"Table prefix '{tablePrefix}' contains more than 25 characters, which is not supported by SQL persistence using Oracle. Shorten the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).");
+                    var recourse = EnableLongTableNames
+                        ? $"Shorten the endpoint name or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix)."
+                        : $"Shorten the endpoint name, enable long table names with {nameof(SqlDialectSettings<Oracle>)}.{nameof(SqlPersistenceConfig.EnableLongTableNames)}(), or specify a custom tablePrefix using endpointConfiguration.{nameof(SqlPersistenceConfig.TablePrefix)}(tablePrefix).";
+                    throw new Exception($"Table prefix '{tablePrefix}' contains more than {lengthLimit} characters, which is not supported by SQL persistence using Oracle. {recourse}");
                 }
                 if (Encoding.UTF8.GetBytes(tablePrefix).Length != tablePrefix.Length)
                 {
@@ -78,9 +83,15 @@ namespace NServiceBus
                 return new { CustomSchema = string.IsNullOrEmpty(Schema) };
             }
 
+            internal bool EnableLongTableNames { get; set; }
             internal string Schema { get; set; }
 
             string SchemaPrefix => Schema != null ? $"\"{Schema.ToUpper()}\"." : "";
+
+            int TableNameMax => EnableLongTableNames ? LongTableNameMax : ShortTableNameMax;
+
+            const int ShortTableNameMax = 30;
+            const int LongTableNameMax = 128;
         }
     }
 }
