@@ -1,6 +1,6 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:tablePrefix) || 'OD';
-  dropTable varchar2(50);
+  tableName varchar2(128) := UPPER(:tablePrefix) || 'OD';
+  dropTable varchar2(150);
   n number(10);
 begin
   select count(*) into n from user_tables where table_name = tableName;
