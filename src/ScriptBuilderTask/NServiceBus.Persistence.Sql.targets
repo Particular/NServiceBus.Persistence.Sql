@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
-    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
-    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\..\build\netcoreapp2.1\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\..\build\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>
 
   <UsingTask
