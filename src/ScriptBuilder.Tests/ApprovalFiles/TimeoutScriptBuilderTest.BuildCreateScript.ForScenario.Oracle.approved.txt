@@ -1,8 +1,8 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:tablePrefix) || 'TO';
-  timeIndex varchar2(30) := tableName || '_TK';
-  sagaIndex varchar2(30) := tableName || '_SK';
-  sqlStatement varchar2(500);
+  tableName varchar2(128) := UPPER(:tablePrefix) || 'TO';
+  timeIndex varchar2(128) := tableName || '_TK';
+  sagaIndex varchar2(128) := tableName || '_SK';
+  sqlStatement varchar2(750);
   n number(10);
 begin
   select count(*) into n from user_tables where table_name = tableName;

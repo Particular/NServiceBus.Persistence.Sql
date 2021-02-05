@@ -1,9 +1,9 @@
 ﻿declare
-  tableName varchar2(30) := UPPER(:tablePrefix) || 'OD';
-  pkName varchar2(30) := tableName || '_PK';
-  indexName varchar2(30) := tableName || '_IX';
-  createTable varchar2(500);
-  createIndex varchar2(500);
+  tableName varchar2(128) := UPPER(:tablePrefix) || 'OD';
+  pkName varchar2(128) := tableName || '_PK';
+  indexName varchar2(128) := tableName || '_IX';
+  createTable varchar2(750);
+  createIndex varchar2(750);
   n number(10);
 begin
   select count(*) into n from user_tables where table_name = tableName;
