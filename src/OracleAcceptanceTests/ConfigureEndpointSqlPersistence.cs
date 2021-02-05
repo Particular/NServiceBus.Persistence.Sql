@@ -20,11 +20,12 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             endpointName = endpointName.Substring(lastDot + 1) + Math.Abs(endpointName.GetHashCode());
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 24));
+        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 124));
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, OracleConnectionBuilder.Build, BuildSqlDialect.Oracle, FilterTableExists);
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.SqlDialect<SqlDialect.Oracle>();
+        var oracle = persistence.SqlDialect<SqlDialect.Oracle>();
+        oracle.EnableLongTableNames();
         persistence.ConnectionBuilder(OracleConnectionBuilder.Build);
         persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
