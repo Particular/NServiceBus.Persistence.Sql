@@ -92,6 +92,11 @@ dialect.JsonBParameterModifier(
                 };
             }
 
+            internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
+            {
+                return baseBehavior;
+            }
+
             internal string Schema { get; set; }
         }
     }
