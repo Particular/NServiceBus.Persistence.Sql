@@ -158,6 +158,7 @@ class SubscriptionPersister : ISubscriptionStorage
                 var paramName = $"type{i}";
                 command.AddParameter(paramName, messageType.TypeName);
             }
+
             command.CommandText = getSubscribersCommand;
             using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
             {
@@ -186,6 +187,7 @@ class SubscriptionPersister : ISubscriptionStorage
     SqlDialect sqlDialect;
     TimeSpan? cacheFor;
     SubscriptionCommands subscriptionCommands;
+
     static ILog Log = LogManager.GetLogger<SubscriptionPersister>();
 
     internal class CacheItem

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
     using Extensibility;
@@ -129,6 +130,11 @@
             var commandWrapper = impl.CreateCommand(connection);
             commandWrapper.InnerCommand.CommandTimeout = commandTimeout;
             return commandWrapper;
+        }
+
+        internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
+        {
+            return impl.ModifyBehavior(connection, baseBehavior);
         }
 
         internal override object GetCustomDialectDiagnosticsInfo()

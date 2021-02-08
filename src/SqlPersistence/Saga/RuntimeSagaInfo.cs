@@ -149,7 +149,6 @@ class RuntimeSagaInfo
         }
     }
 
-
     JsonSerializer GetDeserialize(Version storedSagaTypeVersion)
     {
         if (versionSpecificSettings == null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
 using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -40,8 +41,8 @@ public abstract class OutboxPersisterTests
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
             sqlDialect: dialect,
-            outboxCommands,
-            () =>
+            outboxCommands: outboxCommands,
+            outboxTransactionFactory: () =>
             {
                 ConcurrencyControlStrategy behavior;
                 if (pessimistic)
