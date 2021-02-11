@@ -14,9 +14,9 @@ class OracleSagaScriptWriter : ISagaScriptWriter
     {
         writer = textWriter;
         this.saga = saga;
-        if (saga.TableSuffix.Length > 27)
+        if (saga.TableSuffix.Length > 127)
         {
-            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 27 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
+            throw new Exception($"Saga '{saga.TableSuffix}' contains more than 127 characters, which is not supported by SQL persistence using Oracle. Either disable Oracle script generation using the SqlPersistenceSettings assembly attribute, shorten the name of the saga, or specify an alternate table name by overriding the SqlSaga's TableSuffix property.");
         }
         if (Encoding.UTF8.GetBytes(saga.TableSuffix).Length != saga.TableSuffix.Length)
         {

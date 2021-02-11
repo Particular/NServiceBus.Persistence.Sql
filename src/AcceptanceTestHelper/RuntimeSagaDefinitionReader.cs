@@ -73,11 +73,6 @@ public static class RuntimeSagaDefinitionReader
         var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 
-        if (sqlDialect == BuildSqlDialect.Oracle)
-        {
-            tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
-        }
-
         return new SagaDefinition(
             tableSuffix: tableSuffix,
             name: sagaType.FullName,
