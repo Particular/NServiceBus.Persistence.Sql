@@ -32,7 +32,7 @@
                         }
                         else
                         {
-                            c.ConfigureTransport().Transactions(transactionMode);
+                            c.ConfigureTransport().TransportTransactionMode = transactionMode;
                         }
                     }))
                 .Done(c => c.ReplyReceived)

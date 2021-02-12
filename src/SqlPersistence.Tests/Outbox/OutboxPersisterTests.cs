@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using NServiceBus;
 using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -123,12 +122,12 @@ public abstract class OutboxPersisterTests
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {
@@ -176,7 +175,7 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            var ambientTransaction = System.Transactions.Transaction.Current;
+            var ambientTransaction = Transaction.Current;
             Assert.IsNotNull(ambientTransaction);
 
             await transaction.Commit();
@@ -189,12 +188,12 @@ public abstract class OutboxPersisterTests
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {
@@ -249,12 +248,12 @@ public abstract class OutboxPersisterTests
         {
             new TransportOperation(
                 messageId: "OperationId" + i,
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[]
                 {
                     0x20
@@ -292,12 +291,12 @@ public abstract class OutboxPersisterTests
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {
