@@ -24,7 +24,7 @@ static class OperationConverter
                 body: operation.Body,
                 headers: operation.Headers,
                 messageId: operation.MessageId,
-                properties: new DispatchProperties(operation.Options)
+                properties: new DispatchProperties(operation.Options ?? new Dictionary<string, string>())
             ));
     }
 }
