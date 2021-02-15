@@ -4,22 +4,20 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
-using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Transport;
 
 public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecution
 {
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
-        queueBindings = configuration.GetSettings().Get<QueueBindings>();
-
-        var transportConfig = configuration.UseTransport<SqlServerTransport>();
-        transportConfig.UseCustomSqlConnectionFactory(async () =>
+        transport = new TestingSqlServerTransport(async () =>
         {
             var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await conn.OpenAsync().ConfigureAwait(false);
             return conn;
         });
+
+        configuration.UseTransport(transport);
 
         return Task.FromResult(0);
     }
@@ -30,7 +28,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         {
             conn.Open();
 
-            var queueAddresses = queueBindings.ReceivingAddresses.Select(QueueAddress.Parse).ToList();
+            var queueAddresses = transport.ReceivingAddresses.Select(QueueAddress.Parse).ToList();
             foreach (var address in queueAddresses)
             {
                 TryDeleteTable(conn, address);
@@ -59,7 +57,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         }
     }
 
-    QueueBindings queueBindings;
+    TestingSqlServerTransport transport;
 
     class QueueAddress
     {
@@ -160,6 +158,27 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
             return quotedString
                 .Substring(prefix.Length, quotedString.Length - prefix.Length - suffix.Length).Replace(suffix + suffix, suffix);
+        }
+    }
+
+    class TestingSqlServerTransport : SqlServerTransport
+    {
+        public TestingSqlServerTransport(string connectionString) : base(connectionString)
+        {
+        }
+
+        public TestingSqlServerTransport(Func<Task<SqlConnection>> connectionFactory) : base(connectionFactory)
+        {
+        }
+
+        public string[] ReceivingAddresses { get; private set; }
+
+        public override Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
+            string[] sendingAddresses)
+        {
+            ReceivingAddresses = receivers.Select(r => r.ReceiveAddress).ToArray();
+
+            return base.Initialize(hostSettings, receivers, sendingAddresses);
         }
     }
 }

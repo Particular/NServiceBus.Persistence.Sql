@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using NServiceBus.Outbox;
+using NServiceBus.Transport;
 using NUnit.Framework;
 using Particular.Approvals;
+using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
 [TestFixture]
 public class OperationConverterTests
@@ -13,12 +14,12 @@ public class OperationConverterTests
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {

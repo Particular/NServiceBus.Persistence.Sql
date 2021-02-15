@@ -20,7 +20,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())).CustomConfig(cfg =>
             {
-                cfg.ConfigureTransport().Transactions(transactionMode);
+                cfg.ConfigureTransport().TransportTransactionMode = transactionMode;
             }))
             .Done(c => c.Done)
             .Run()

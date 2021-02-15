@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NServiceBus.Transport;
 using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
 static class OperationConverter
@@ -23,7 +24,7 @@ static class OperationConverter
                 body: operation.Body,
                 headers: operation.Headers,
                 messageId: operation.MessageId,
-                options: operation.Options
+                properties: new DispatchProperties(operation.Options ?? new Dictionary<string, string>())
             ));
     }
 }
