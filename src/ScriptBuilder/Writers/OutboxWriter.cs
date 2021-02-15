@@ -1,21 +1,16 @@
-using System.IO;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class OutboxWriter
+class OutboxWriter : ScriptWriter
 {
-    public static void WriteOutboxScript(string scriptPath, BuildSqlDialect sqlDialect)
+    public OutboxWriter(bool clean, bool overwrite, string scriptPath)
+        : base(clean, overwrite, scriptPath)
     {
-        var createPath = Path.Combine(scriptPath, "Outbox_Create.sql");
-        File.Delete(createPath);
-        using (var writer = File.CreateText(createPath))
-        {
-            OutboxScriptBuilder.BuildCreateScript(writer, sqlDialect);
-        }
-        var dropPath = Path.Combine(scriptPath, "Outbox_Drop.sql");
-        File.Delete(dropPath);
-        using (var writer = File.CreateText(dropPath))
-        {
-            OutboxScriptBuilder.BuildDropScript(writer, sqlDialect);
-        }
+    }
+
+    public override void WriteScripts(BuildSqlDialect dialect)
+    {
+        WriteScript("Outbox_Create.sql", writer => OutboxScriptBuilder.BuildCreateScript(writer, dialect));
+
+        WriteScript("Outbox_Drop.sql", writer => OutboxScriptBuilder.BuildDropScript(writer, dialect));
     }
 }
