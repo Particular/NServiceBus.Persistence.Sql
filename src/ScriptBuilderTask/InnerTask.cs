@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class InnerTask
 {
@@ -21,13 +21,13 @@ class InnerTask
 
     public void Execute()
     {
-        ScriptWriter.Write(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
+        ScriptGenerator.Generate(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
     }
 
     string FindPromotionPath(string promotionPath)
     {
         promotionPath = promotionPath
-            .Replace("$(ProjectDir)", projectDirectory);
+            .Replace("$(ProjectDir)", GetFullPathWithEndingSlashes(projectDirectory));
 
         if (!promotionPath.Contains("$(SolutionDir)"))
         {
@@ -46,8 +46,13 @@ Possible workarounds:
         }
 
         promotionPath = promotionPath
-            .Replace("$(SolutionDir)", solutionDirectory);
+            .Replace("$(SolutionDir)", GetFullPathWithEndingSlashes(solutionDirectory));
 
         return promotionPath;
+    }
+
+    static string GetFullPathWithEndingSlashes(string input)
+    {
+        return input.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
     }
 }
