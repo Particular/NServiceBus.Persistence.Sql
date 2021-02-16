@@ -70,10 +70,6 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect, System.IO.TextWriter writer) { }
         public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
-    public class static ScriptWriter
-    {
-        public static void Write(string assemblyPath, string targetDirectory, System.Action<string, string> logError, System.Func<string, string> promotionPathFinder) { }
-    }
     public class static SubscriptionScriptBuilder
     {
         public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
@@ -88,4 +84,19 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
         public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
     }
+}
+public class ScriptGenerator
+{
+    public ScriptGenerator(string assemblyPath, string destinationDirectory, bool clean = True, bool overwrite = True, System.Collections.Generic.IReadOnlyList<NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect> dialectOptions = null, System.Func<string, string> promotionFinder = null, System.Action<string, string> logError = null) { }
+    public static void Generate(string assemblyPath, string targetDirectory, System.Action<string, string> logError, System.Func<string, string> promotionPathFinder) { }
+    public void Generate() { }
+}
+public abstract class ScriptWriter
+{
+    protected ScriptWriter(bool clean, bool overwrite, string scriptPath) { }
+    protected bool Clean { get; }
+    protected bool Overwrite { get; }
+    protected string ScriptPath { get; }
+    protected void WriteScript(string fileName, System.Action<System.IO.StreamWriter> action) { }
+    public abstract void WriteScripts(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect dialect);
 }

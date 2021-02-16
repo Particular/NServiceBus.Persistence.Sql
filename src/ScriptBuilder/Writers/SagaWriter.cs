@@ -3,40 +3,43 @@ using System.IO;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SagaWriter
+class SagaWriter : ScriptWriter
 {
-    public static void WriteSagaScripts(string scriptPath, ModuleDefinition moduleDefinition, BuildSqlDialect sqlDialect, Action<string, string> logError)
+    ModuleDefinition moduleDefinition;
+    Action<string, string> logError;
+    string sagaPath;
+
+    public SagaWriter(bool clean, bool overwrite, string scriptPath,
+        ModuleDefinition moduleDefinition, Action<string, string> logError = null)
+        : base(clean, overwrite, scriptPath)
     {
+        this.moduleDefinition = moduleDefinition;
+        this.logError = logError;
+        this.sagaPath = Path.Combine(scriptPath, "Sagas");
+    }
+
+    public override void WriteScripts(BuildSqlDialect dialect)
+    {
+        Directory.CreateDirectory(sagaPath);
+
         var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
-        var sagasScriptPath = Path.Combine(scriptPath, "Sagas");
-        Directory.CreateDirectory(sagasScriptPath);
+
         var index = 0;
-        foreach (var saga in metaDataReader.GetSagas(
-            logError: (exception, type) =>
-            {
-                logError($"Error in '{type.FullName}'. Error:{exception.Message}", type.GetFileName());
-            }))
+        foreach (var saga in metaDataReader.GetSagas(logError))
         {
             var sagaFileName = saga.TableSuffix;
-            var maximumNameLength = 244 - sagasScriptPath.Length;
+            var maximumNameLength = 244 - ScriptPath.Length;
             if (sagaFileName.Length > maximumNameLength)
             {
                 sagaFileName = $"{sagaFileName.Substring(0, maximumNameLength)}_{index}";
                 index++;
             }
-            var createPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Create.sql");
-            File.Delete(createPath);
-            using (var writer = File.CreateText(createPath))
-            {
-                SagaScriptBuilder.BuildCreateScript(saga, sqlDialect, writer);
-            }
 
-            var dropPath = Path.Combine(sagasScriptPath, $"{sagaFileName}_Drop.sql");
-            File.Delete(dropPath);
-            using (var writer = File.CreateText(dropPath))
-            {
-                SagaScriptBuilder.BuildDropScript(saga, sqlDialect, writer);
-            }
+            var createPath = Path.Combine(sagaPath, $"{sagaFileName}_Create.sql");
+            WriteScript(createPath, writer => SagaScriptBuilder.BuildCreateScript(saga, dialect, writer));
+
+            var dropPath = Path.Combine(sagaPath, $"{sagaFileName}_Drop.sql");
+            WriteScript(dropPath, writer => SagaScriptBuilder.BuildDropScript(saga, dialect, writer));
         }
     }
 }

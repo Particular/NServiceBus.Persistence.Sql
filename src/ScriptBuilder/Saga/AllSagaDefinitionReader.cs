@@ -6,16 +6,18 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class AllSagaDefinitionReader
 {
-    ModuleDefinition module;
+    readonly ModuleDefinition module;
 
     public AllSagaDefinitionReader(ModuleDefinition module)
     {
         this.module = module;
     }
 
-    public IEnumerable<SagaDefinition> GetSagas(Action<ErrorsException, TypeDefinition> logError)
+    public IList<SagaDefinition> GetSagas(Action<string, string> logger = null)
     {
         var sagas = new List<SagaDefinition>();
+        var errors = new List<Exception>();
+
         foreach (var type in module.AllClasses())
         {
             try
@@ -27,12 +29,16 @@ class AllSagaDefinitionReader
             }
             catch (ErrorsException exception)
             {
-                logError(exception, type);
+                logger?.Invoke(exception.Message, type.FullName);
+                errors.Add(new Exception($"Error in '{type.FullName}' (Filename='{type.GetFileName()}'). Error: {exception.Message}", exception));
             }
         }
+
+        if (errors.Count > 0 && logger == null)
+        {
+            throw new AggregateException(errors);
+        }
+
         return sagas;
     }
-
-
-
 }

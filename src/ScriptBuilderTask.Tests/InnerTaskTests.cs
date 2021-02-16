@@ -12,11 +12,11 @@ class InnerTaskTests
     {
         var testDirectory = TestContext.CurrentContext.TestDirectory;
         var temp = Path.Combine(testDirectory, "InnerTaskTemp");
-        if (!Directory.Exists(temp))
+        if (Directory.Exists(temp))
         {
-            return;
+            Directory.Delete(temp, true);
         }
-        Directory.Delete(temp, true);
+
         var intermediatePath = Path.Combine(temp, "IntermediatePath");
         Directory.CreateDirectory(temp);
         Directory.CreateDirectory(intermediatePath);
@@ -26,9 +26,12 @@ class InnerTaskTests
             intermediateDirectory: intermediatePath,
             projectDirectory: "TheProjectDir",
             solutionDirectory: Path.Combine(temp, "PromotePath"),
-            logError: (error, s1) => throw new Exception(error));
+            logError: (error, type) => throw new Exception(error));
         innerTask.Execute();
-        var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories).Select(s => s.Replace(temp, "temp")).ToList();
+        var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories)
+                        .Select(s => s.Replace(temp, "temp").ConvertPathSeparators("/"))
+                        .OrderBy(f => f) // Deterministic order
+                        .ToList();
         Assert.IsNotEmpty(files);
 
         Approver.Verify(files);

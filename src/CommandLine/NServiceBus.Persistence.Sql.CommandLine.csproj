@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ToolCommandName>sql-persistence</ToolCommandName>
+    <PackAsTool>True</PackAsTool>
+    <Description>.NET Core global tool to generate scripts for NServiceBus Sql persistence</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+  </ItemGroup>
+
+</Project>
