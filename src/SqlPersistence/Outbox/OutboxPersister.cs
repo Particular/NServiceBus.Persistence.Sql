@@ -19,7 +19,9 @@ class OutboxPersister : IOutboxStorage
     OutboxCommands outboxCommands;
     Func<ISqlOutboxTransaction> outboxTransactionFactory;
 
-    public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands, Func<ISqlOutboxTransaction> outboxTransactionFactory, int cleanupBatchSize = 10000)
+    public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
+        Func<ISqlOutboxTransaction> outboxTransactionFactory,
+        int cleanupBatchSize = 10000)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
@@ -79,8 +81,9 @@ class OutboxPersister : IOutboxStorage
                 command.CommandText = outboxCommands.Get;
                 command.Transaction = transaction;
                 command.AddParameter("MessageId", messageId);
-                // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-                using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
+
+                // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed, but SequentialAccess is unsupported for SQL Server AlwaysEncrypted
+                using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow).ConfigureAwait(false))
                 {
                     if (!await dataReader.ReadAsync().ConfigureAwait(false))
                     {
