@@ -11,10 +11,16 @@
 
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+	<PackageReference Include="Particular.Packaging" Version="0.9.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
   </ItemGroup>
+  
+  <PropertyGroup>
+    <PackageId>NServiceBus.Persistence.Sql.CommandLine</PackageId>
+    <Description>Dotnet tool for generating deployment scripts for the NServiceBus.Persistence.Sql package</Description>
+  </PropertyGroup>
 
 </Project>
