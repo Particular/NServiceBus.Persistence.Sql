@@ -25,7 +25,7 @@ public class ScriptGenerator
         this.assemblyPath = assemblyPath;
         this.overwrite = overwrite;
         this.clean = clean;
-        this.dialectOptions = dialectOptions;
+        this.dialectOptions = dialectOptions ?? new List<BuildSqlDialect>();
         this.logError = logError;
         this.promotionFinder = promotionFinder;
         this.scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
@@ -95,7 +95,7 @@ public class ScriptGenerator
 
     bool ShouldGenerateDialect(BuildSqlDialect dialect)
     {
-        return dialectOptions == null || (dialectOptions.Count > 0 && dialectOptions.Contains(dialect));
+        return dialectOptions.Count == 0 || dialectOptions.Contains(dialect);
     }
 
     void CreateDialectDirectory(string dialectPath) => Directory.CreateDirectory(dialectPath);
