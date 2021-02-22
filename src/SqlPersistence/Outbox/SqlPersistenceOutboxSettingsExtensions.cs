@@ -1,7 +1,7 @@
-﻿using System.Transactions;
-
+﻿
 namespace NServiceBus
 {
+    using System.Transactions;
     using Configuration.AdvancedExtensibility;
     using System;
     using Outbox;

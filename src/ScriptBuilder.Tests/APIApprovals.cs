@@ -1,5 +1,4 @@
-﻿using NServiceBus.Persistence.Sql.ScriptBuilder;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Particular.Approvals;
 using PublicApiGenerator;
 
@@ -9,10 +8,7 @@ public class APIApprovals
     [Test]
     public void Approve()
     {
-        var publicApi = typeof(ScriptWriter).Assembly.GeneratePublicApi(new ApiGeneratorOptions
-        {
-            ExcludeAttributes = new[] { "System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute" }
-        });
+        var publicApi = ApiGenerator.GeneratePublicApi(typeof(ScriptWriter).Assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute" });
         Approver.Verify(publicApi);
     }
 }
