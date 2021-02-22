@@ -54,9 +54,9 @@ public abstract class OutboxPersisterTests
                     behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
 
-                return transactionScope
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
-                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+                return transactionScope 
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted) 
+                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))

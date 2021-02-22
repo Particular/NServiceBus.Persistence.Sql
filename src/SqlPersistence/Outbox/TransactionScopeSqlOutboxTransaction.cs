@@ -10,14 +10,17 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     static ILog Log = LogManager.GetLogger<TransactionScopeSqlOutboxTransaction>();
 
     IConnectionManager connectionManager;
+    IsolationLevel isolationLevel;
     ConcurrencyControlStrategy concurrencyControlStrategy;
     TransactionScope transactionScope;
     Transaction ambientTransaction;
     bool commit;
 
-    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, IConnectionManager connectionManager)
+    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
+        IConnectionManager connectionManager, IsolationLevel isolationLevel)
     {
         this.connectionManager = connectionManager;
+        this.isolationLevel = isolationLevel;
         this.concurrencyControlStrategy = concurrencyControlStrategy;
     }
 
@@ -27,7 +30,12 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     // Prepare is deliberately kept sync to allow floating of TxScope where needed
     public void Prepare(ContextBag context)
     {
-        transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
+        var options = new TransactionOptions
+        {
+            IsolationLevel = isolationLevel
+        };
+
+        transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);
         ambientTransaction = System.Transactions.Transaction.Current;
     }
 

@@ -1,4 +1,6 @@
-﻿namespace NServiceBus
+﻿using System.Transactions;
+
+namespace NServiceBus
 {
     using Configuration.AdvancedExtensibility;
     using System;
@@ -62,13 +64,51 @@
         }
 
         /// <summary>
+        /// Configures the outbox to use specific transaction level.
+        /// Only levels Read Committed, Repeatable Read and Serializable are supported.
+        /// </summary>
+        public static void TransactionIsolationLevel(this OutboxSettings outboxSettings, System.Data.IsolationLevel isolationLevel)
+        {
+            if (isolationLevel == System.Data.IsolationLevel.Chaos
+                || isolationLevel == System.Data.IsolationLevel.ReadUncommitted
+                || isolationLevel == System.Data.IsolationLevel.Snapshot
+                || isolationLevel == System.Data.IsolationLevel.Unspecified)
+            {
+                throw new Exception($"Isolation level {isolationLevel} is not supported.");
+            }
+            outboxSettings.GetSettings().Set(SqlOutboxFeature.AdoTransactionIsolationLevel, isolationLevel);
+        }
+
+        /// <summary>
+        /// Configures the outbox to use TransactionScope instead of SqlTransaction. This allows wrapping the
+        /// the outbox transaction (and synchronized storage session it manages) and other database transactions in a single scope - provided that
+        /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
+        ///
+        /// Uses the default isolation level (Serializable).
+        /// </summary>
+        public static void UseTransactionScope(this OutboxSettings outboxSettings)
+        {
+            UseTransactionScope(outboxSettings, IsolationLevel.Serializable);
+        }
+
+        /// <summary>
         /// Configures the outbox to use TransactionScope instead of SqlTransaction. This allows wrapping the
         /// the outbox transaction (and synchronized storage session it manages) and other database transactions in a single scope - provided that
         /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
         /// </summary>
-        public static void UseTransactionScope(this OutboxSettings outboxSettings)
+        /// <param name="outboxSettings">Outbox settings.</param>
+        /// <param name="isolationLevel">Isolation level to use. Only levels Read Committed, Repeatable Read and Serializable are supported.</param>
+        public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel)
         {
-            outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionMode, true);
+            if (isolationLevel == IsolationLevel.Chaos
+                || isolationLevel == IsolationLevel.ReadUncommitted
+                || isolationLevel == IsolationLevel.Snapshot
+                || isolationLevel == IsolationLevel.Unspecified)
+            {
+                throw new Exception($"Isolation level {isolationLevel} is not supported.");
+            }
+            outboxSettings.GetSettings().Set(SqlOutboxFeature.UseTransactionScope, true);
+            outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeIsolationLevel, isolationLevel);
         }
     }
 }
