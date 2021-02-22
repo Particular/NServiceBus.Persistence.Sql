@@ -86,7 +86,7 @@ where Dispatched = 'true' and
                 //We need to ensure the outbox content is at lest 8000 bytes long because otherwise SQL Server will attempt to
                 //store is inside the data page which will result in low space utilization.
 
-                //We tried using *varchar values of of the row* table option but while it did improve situation on on-premises 
+                //We tried using *varchar values out of the row* table option but while it did improve situation on on-premises 
                 //SQL Server it didn't work as expected in SQL Azure where it caused LOB pages to be allocated (one for each record) 
                 //but never deallocated after the messages data is supposed to be removed.
 
