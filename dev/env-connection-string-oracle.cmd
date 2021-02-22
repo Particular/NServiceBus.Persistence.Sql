@@ -1,0 +1,1 @@
+@setx OracleConnectionString "User Id=system;Password=super-secret-password;Data Source=localhost:1521/XEPDB1;"

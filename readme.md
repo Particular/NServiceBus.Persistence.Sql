@@ -39,4 +39,10 @@ Add an environment variable called `PostgreSqlConnectionString` with the connect
 
 **For Oracle**
 
+NOTE: Requires [building your own docker image](/dev/oracle-docker-image.md)
+
+`docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=super-secret-password -e ORACLE_CHARACTERSET=AL32UTF8 oracle/database:18.4.0-xe`
+
 Add an environment variable called `OracleConnectionString` with the connection string:
+
+`User Id=system;Password=super-secret-password;Data Source=localhost:1521/XEPDB1;`
