@@ -29,12 +29,15 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
 
     public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context)
     {
+        string json = Serializer.Serialize(outboxMessage.TransportOperations.ToSerializable());
+        json = sqlDialect.AddOutboxPadding(json);
+
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.PessimisticComplete;
             command.Transaction = transaction;
             command.AddParameter("MessageId", outboxMessage.MessageId);
-            command.AddJsonParameter("Operations", Serializer.Serialize(outboxMessage.TransportOperations.ToSerializable()));
+            command.AddJsonParameter("Operations", json);
             await command.ExecuteNonQueryEx().ConfigureAwait(false);
         }
     }
