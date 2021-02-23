@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
@@ -9,11 +10,14 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     static ILog Log = LogManager.GetLogger<AdoNetSqlOutboxTransaction>();
 
     IConnectionManager connectionManager;
+    IsolationLevel isolationLevel;
     ConcurrencyControlStrategy concurrencyControlStrategy;
 
-    public AdoNetSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, IConnectionManager connectionManager)
+    public AdoNetSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
+        IConnectionManager connectionManager, IsolationLevel isolationLevel)
     {
         this.connectionManager = connectionManager;
+        this.isolationLevel = isolationLevel;
         this.concurrencyControlStrategy = concurrencyControlStrategy;
     }
 
@@ -29,7 +33,7 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
-        Transaction = Connection.BeginTransaction();
+        Transaction = Connection.BeginTransaction(isolationLevel);
         await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction).ConfigureAwait(false);
     }
 

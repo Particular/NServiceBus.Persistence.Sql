@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using NServiceBus;
 using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -55,8 +54,8 @@ public abstract class OutboxPersisterTests
                 }
 
                 return transactionScope
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
-                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
+                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))
@@ -176,7 +175,7 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            var ambientTransaction = System.Transactions.Transaction.Current;
+            var ambientTransaction = Transaction.Current;
             Assert.IsNotNull(ambientTransaction);
 
             await transaction.Commit();
