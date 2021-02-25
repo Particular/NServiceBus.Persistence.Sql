@@ -46,3 +46,7 @@ NOTE: Requires [building your own docker image](/dev/oracle-docker-image.md)
 Add an environment variable called `OracleConnectionString` with the connection string:
 
 `User Id=system;Password=super-secret-password;Data Source=localhost:1521/XEPDB1;`
+
+## Smoke testing SQL Always Encrypted
+
+
