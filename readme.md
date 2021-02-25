@@ -49,4 +49,25 @@ Add an environment variable called `OracleConnectionString` with the connection 
 
 ## Smoke testing SQL Always Encrypted
 
+In the Azure Portal, set up a dedicated resource group for testing purposes, that's cleaned up when the tests are completed.
 
+1. Create a [SQL database](https://portal.azure.com/#create/Microsoft.SQLDatabase)
+2. Once deployed, access the SQL Server and go to "Firewalls and virtual networks" and add a rule that allows access from your local IP address
+3. Choose / download a sample that you want to smoke test, for example the [SQL persistence simple saga sample](https://docs.particular.net/samples/sql-persistence/simple/)
+   - Remove all endpoints except for SQL Server
+   - Adjust the connection string to point to the database you created
+   - Remove the call to `MarkAsComplete()`. That will keep the saga alive so that you can inspect the data in the table
+4. Run the sample first with installers enabled
+5. Check the database. You should see a table for the saga data, with one row in it.
+6. Now we will encrypt some of the columns of the table
+   - Right click on the table, and click 'Encrypt columns'
+   - Choose the columns you want to encrypt, the ´Data´-column should be sufficient
+   - Encryption type: Deterministic
+   - Encryption key: a new one
+   - Select Windows certificate store as a key store provider, under Current user
+   - Choose 'Proceed to finish now'
+   - Query the data to verify that the Data column's content is now encrypted
+8. Adjust to connection string in the sample 
+   - include `Column Encryption Setting=Enabled;`
+   - Using a connecting builder, set `ColumnEncryptionSetting = SqlConnectionColumnEncryptionSetting.Enabled`
+11. Rerun the sample, everything should work as expected
