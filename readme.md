@@ -67,7 +67,7 @@ In the Azure Portal, set up a dedicated resource group for testing purposes, tha
    - Select Windows certificate store as a key store provider, under Current user
    - Choose 'Proceed to finish now'
    - Query the data to verify that the Data column's content is now encrypted
-8. Adjust to connection string in the sample 
+7. Adjust to connection string in the sample 
    - include `Column Encryption Setting=Enabled;`
    - Using a connecting builder, set `ColumnEncryptionSetting = SqlConnectionColumnEncryptionSetting.Enabled`
-11. Rerun the sample, everything should work as expected
+8. Rerun the sample, everything should work as expected
