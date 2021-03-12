@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Features;
 using NServiceBus.Installation;
@@ -19,7 +20,7 @@ class SqlPersistenceInstaller : INeedToInstallSomething
         installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
-    public async Task Install(string identity)
+    public async Task Install(string identity, CancellationToken cancellationToken)
     {
         if (installerSettings == null || installerSettings.Disabled)
         {

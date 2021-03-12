@@ -29,7 +29,7 @@ class OutboxPersister : IOutboxStorage
         this.cleanupBatchSize = cleanupBatchSize;
     }
 
-    public Task<OutboxTransaction> BeginTransaction(ContextBag context)
+    public Task<OutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
     {
         var transaction = outboxTransactionFactory();
         transaction.Prepare(context);
@@ -56,7 +56,7 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
-    public async Task SetAsDispatched(string messageId, ContextBag context)
+    public async Task SetAsDispatched(string messageId, ContextBag context, CancellationToken cancellationToken = default)
     {
         using (var connection = await connectionManager.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
@@ -64,11 +64,11 @@ class OutboxPersister : IOutboxStorage
             command.CommandText = outboxCommands.SetAsDispatched;
             command.AddParameter("MessageId", messageId);
             command.AddParameter("DispatchedAt", DateTime.UtcNow);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
 
-    public async Task<OutboxMessage> Get(string messageId, ContextBag context)
+    public async Task<OutboxMessage> Get(string messageId, ContextBag context, CancellationToken cancellationToken = default)
     {
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
         using (var connection = await connectionManager.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false))
@@ -84,7 +84,7 @@ class OutboxPersister : IOutboxStorage
                 // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed, but SequentialAccess is unsupported for SQL Server AlwaysEncrypted
                 using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow).ConfigureAwait(false))
                 {
-                    if (!await dataReader.ReadAsync().ConfigureAwait(false))
+                    if (!await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false))
                     {
                         return null;
                     }
@@ -110,7 +110,7 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
-    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context)
+    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         var sqlOutboxTransaction = (ISqlOutboxTransaction)outboxTransaction;
         return sqlOutboxTransaction.Complete(message, context);

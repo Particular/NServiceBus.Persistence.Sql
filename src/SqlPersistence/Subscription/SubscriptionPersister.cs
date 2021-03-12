@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
@@ -9,8 +10,6 @@ using NServiceBus.Extensibility;
 using NServiceBus.Logging;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
-
-#pragma warning disable 618
 
 class SubscriptionPersister : ISubscriptionStorage
 {
@@ -26,7 +25,7 @@ class SubscriptionPersister : ISubscriptionStorage
         }
     }
 
-    public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
+    public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
     {
         await Retry(async () =>
         {
@@ -45,7 +44,7 @@ class SubscriptionPersister : ISubscriptionStorage
         ClearForMessageType(messageType);
     }
 
-    public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
+    public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
     {
         await Retry(async () =>
         {
@@ -62,7 +61,7 @@ class SubscriptionPersister : ISubscriptionStorage
         ClearForMessageType(messageType);
     }
 
-    public Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageHierarchy, ContextBag context)
+    public Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageHierarchy, ContextBag context, CancellationToken cancellationToken)
     {
         var types = messageHierarchy.ToList();
 

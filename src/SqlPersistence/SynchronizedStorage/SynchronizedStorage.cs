@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
 
@@ -15,7 +16,7 @@ class SynchronizedStorage : ISynchronizedStorage
         this.currentSessionHolder = currentSessionHolder;
     }
 
-    public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
+    public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken)
     {
         var connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage()).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();

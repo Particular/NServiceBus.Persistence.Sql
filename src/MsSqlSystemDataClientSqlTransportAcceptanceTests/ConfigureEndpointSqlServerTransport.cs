@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
@@ -10,10 +11,10 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 {
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
-        transport = new TestingSqlServerTransport(async () =>
+        transport = new TestingSqlServerTransport(async ct =>
         {
             var conn = MsSqlSystemDataClientConnectionBuilder.Build();
-            await conn.OpenAsync().ConfigureAwait(false);
+            await conn.OpenAsync(ct).ConfigureAwait(false);
             return conn;
         });
 
@@ -167,18 +168,18 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         {
         }
 
-        public TestingSqlServerTransport(Func<Task<SqlConnection>> connectionFactory) : base(connectionFactory)
+        public TestingSqlServerTransport(Func<CancellationToken, Task<SqlConnection>> connectionFactory) : base(connectionFactory)
         {
         }
 
         public string[] ReceiveAddresses { get; private set; }
 
         public override Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
-            string[] sendingAddresses)
+            string[] sendingAddresses, CancellationToken cancellationToken)
         {
             ReceiveAddresses = receivers.Select(r => r.ReceiveAddress).ToArray();
 
-            return base.Initialize(hostSettings, receivers, sendingAddresses);
+            return base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
         }
     }
 }

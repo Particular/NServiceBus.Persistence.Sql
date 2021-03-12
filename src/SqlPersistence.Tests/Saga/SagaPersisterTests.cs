@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
@@ -336,7 +337,7 @@ public abstract class SagaPersisterTests
                 callbackInvoked = true;
                 return Task.FromResult(0);
             });
-            await storageSession.CompleteAsync();
+            await storageSession.CompleteAsync(CancellationToken.None);
         }
         Assert.IsTrue(callbackInvoked);
     }
@@ -378,7 +379,7 @@ public abstract class SagaPersisterTests
             });
             try
             {
-                await storageSession.CompleteAsync();
+                await storageSession.CompleteAsync(CancellationToken.None);
             }
             catch (Exception)
             {
@@ -567,7 +568,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
-            storageSession.CompleteAsync().GetAwaiter().GetResult();
+            storageSession.CompleteAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         using (var connection = dbConnection())
@@ -577,7 +578,7 @@ public abstract class SagaPersisterTests
             var sagaData = persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
             persister.Update(sagaData.Data, storageSession, sagaData.Version).GetAwaiter().GetResult();
-            storageSession.CompleteAsync().GetAwaiter().GetResult();
+            storageSession.CompleteAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         using (var connection = dbConnection())
@@ -627,7 +628,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             persister.Save(sagaData1, storageSession, "theProperty").GetAwaiter().GetResult();
-            storageSession.CompleteAsync().GetAwaiter().GetResult();
+            storageSession.CompleteAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         using (var connection = dbConnection())
@@ -637,7 +638,7 @@ public abstract class SagaPersisterTests
             var sagaData = persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession).GetAwaiter().GetResult();
             sagaData.Data.SimpleProperty = "UpdatedValue";
             persister.Update(sagaData.Data, storageSession, sagaData.Version).GetAwaiter().GetResult();
-            storageSession.CompleteAsync().GetAwaiter().GetResult();
+            storageSession.CompleteAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         using (var connection = dbConnection())
@@ -771,7 +772,7 @@ public abstract class SagaPersisterTests
         using (var storageSession = new StorageSession(connection, transaction, true, null))
         {
             await persister.Save(sagaData1, storageSession, "theProperty").ConfigureAwait(false);
-            await storageSession.CompleteAsync().ConfigureAwait(false);
+            await storageSession.CompleteAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         using (var connection = dbConnection())
@@ -1080,7 +1081,7 @@ public abstract class SagaPersisterTests
                 SimpleProperty = "theSimpleProperty"
             };
             await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
-            await storageSession.CompleteAsync().ConfigureAwait(false);
+            await storageSession.CompleteAsync(CancellationToken.None).ConfigureAwait(false);
         }
         using (var connection = dbConnection())
         using (var transaction = connection.BeginTransaction())
@@ -1097,7 +1098,7 @@ public abstract class SagaPersisterTests
             var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
             {
                 await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
-                await storageSession.CompleteAsync().ConfigureAwait(false);
+                await storageSession.CompleteAsync(CancellationToken.None).ConfigureAwait(false);
             });
             var innerException = throwsAsync.InnerException;
             Assert.IsTrue(IsConcurrencyException(innerException));
@@ -1208,7 +1209,7 @@ public abstract class SagaPersisterTests
 
     public class CustomFinder : IFindSagas<SagaWithNoCorrelation.SagaData>.Using<AMessage>
     {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken)
         {
             return null;
         }

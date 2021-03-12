@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
@@ -34,7 +35,7 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
         };
     }
 
-    public async Task CompleteAsync()
+    public async Task CompleteAsync(CancellationToken cancellationToken)
     {
         await onSaveChangesCallback(this).ConfigureAwait(false);
         if (ownsTransaction)
