@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -54,7 +55,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
                 testContext = context;
             }
 
-            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken)
             {
                 testContext.StartSagaFinderUsed = true;
 

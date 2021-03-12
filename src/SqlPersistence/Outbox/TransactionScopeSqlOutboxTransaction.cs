@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
@@ -77,7 +78,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
         }
     }
 
-    public Task Commit()
+    public Task Commit(CancellationToken cancellationToken = default)
     {
         commit = true;
         return Task.FromResult(0);

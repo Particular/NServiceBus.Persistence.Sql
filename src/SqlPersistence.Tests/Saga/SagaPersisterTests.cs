@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NServiceBus;
+using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NUnit.Framework;
-using NServiceBus.Extensibility;
 using Particular.Approvals;
 
 public abstract class SagaPersisterTests
@@ -1208,7 +1209,7 @@ public abstract class SagaPersisterTests
 
     public class CustomFinder : IFindSagas<SagaWithNoCorrelation.SagaData>.Using<AMessage>
     {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken)
         {
             return null;
         }

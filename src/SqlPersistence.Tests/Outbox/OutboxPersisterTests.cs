@@ -143,7 +143,7 @@ public abstract class OutboxPersisterTests
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
             await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await transaction.Commit(default);
         }
 
         var beforeDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
@@ -178,7 +178,7 @@ public abstract class OutboxPersisterTests
             var ambientTransaction = Transaction.Current;
             Assert.IsNotNull(ambientTransaction);
 
-            await transaction.Commit();
+            await transaction.Commit(default);
         }
     }
 
@@ -210,7 +210,7 @@ public abstract class OutboxPersisterTests
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
             await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await transaction.Commit(default);
         }
         return await persister.Get(messageId, contextBag).ConfigureAwait(false);
     }
@@ -271,7 +271,7 @@ public abstract class OutboxPersisterTests
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
             await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await transaction.Commit(default);
         }
         await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
     }
@@ -311,7 +311,7 @@ public abstract class OutboxPersisterTests
         using (var transaction = await defaultSchemaPersister.BeginTransaction(contextBag))
         {
             await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await transaction.Commit(default);
         }
 
         var result = await schemaPersister.Get(messageId, contextBag).ConfigureAwait(false);

@@ -15,7 +15,7 @@ public class OutboxCleanerTests
         {
             cutOffTime = time;
             return Task.FromResult(0);
-        }, (m, e) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+        }, (m, e, _) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
@@ -32,7 +32,7 @@ public class OutboxCleanerTests
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
-            (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+            (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
@@ -59,7 +59,7 @@ public class OutboxCleanerTests
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
-            (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+            (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
@@ -80,14 +80,14 @@ public class OutboxCleanerTests
 
     class TestableCleaner : OutboxCleaner
     {
-        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
+        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception, CancellationToken> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
             : base(cleanup, criticalError, timeToKeepDeduplicationData, frequencyToRunCleanup, timer)
         {
         }
 
-        public Task Start()
+        public Task Start(CancellationToken cancellationToken = default)
         {
-            return OnStart(null);
+            return OnStart(null, cancellationToken);
         }
     }
 

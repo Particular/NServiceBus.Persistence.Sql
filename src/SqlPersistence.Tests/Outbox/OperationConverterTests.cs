@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using NServiceBus.Transport;
+using NServiceBus.Outbox;
 using NUnit.Framework;
 using Particular.Approvals;
-using TransportOperation = NServiceBus.Outbox.TransportOperation;
+using DispatchProperties = NServiceBus.Transport.DispatchProperties;
 
 [TestFixture]
 public class OperationConverterTests

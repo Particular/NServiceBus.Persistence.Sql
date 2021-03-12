@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -22,7 +23,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         this.currentSessionHolder = currentSessionHolder;
     }
 
-    public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
+    public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         if (!(transaction is ISqlOutboxTransaction outboxTransaction))
         {
@@ -35,7 +36,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
 
-    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache)).ConfigureAwait(false);

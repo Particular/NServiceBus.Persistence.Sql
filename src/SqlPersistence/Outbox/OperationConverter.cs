@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NServiceBus.Transport;
+using DispatchProperties = NServiceBus.Transport.DispatchProperties;
 using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
 static class OperationConverter
@@ -24,7 +24,7 @@ static class OperationConverter
                 body: operation.Body,
                 headers: operation.Headers,
                 messageId: operation.MessageId,
-                properties: new DispatchProperties(operation.Options ?? new Dictionary<string, string>())
+                properties: new DispatchProperties(operation.Options)
             ));
     }
 }

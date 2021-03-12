@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
@@ -59,7 +60,7 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
         Connection?.Dispose();
     }
 
-    public Task Commit()
+    public Task Commit(CancellationToken cancellationToken = default)
     {
         Transaction.Commit();
         return Task.FromResult(0);

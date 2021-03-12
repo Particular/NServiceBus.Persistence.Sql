@@ -52,30 +52,25 @@ class CommandWrapper : IDisposable
         AddParameter(name, value.ToString());
     }
 
-    public Task ExecuteNonQueryEx()
-    {
-        return command.ExecuteNonQueryEx();
-    }
-
-    public Task<int> ExecuteNonQueryAsync()
-    {
-        return command.ExecuteNonQueryAsync();
-    }
-
-    public Task<DbDataReader> ExecuteReaderAsync()
-    {
-        return command.ExecuteReaderAsync();
-    }
-
-    public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior)
-    {
-        var resultingBehavior = dialect.ModifyBehavior(command.Connection, behavior);
-        return command.ExecuteReaderAsync(resultingBehavior);
-    }
-
-    public Task<int> ExecuteNonQueryEx(CancellationToken cancellationToken)
+    public Task<int> ExecuteNonQueryEx(CancellationToken cancellationToken = default)
     {
         return command.ExecuteNonQueryEx(cancellationToken);
+    }
+
+    public Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken = default)
+    {
+        return command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public Task<DbDataReader> ExecuteReaderAsync(CancellationToken cancellationToken = default)
+    {
+        return command.ExecuteReaderAsync(cancellationToken);
+    }
+
+    public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken = default)
+    {
+        var resultingBehavior = dialect.ModifyBehavior(command.Connection, behavior);
+        return command.ExecuteReaderAsync(resultingBehavior, cancellationToken);
     }
 
     public CharArrayTextWriter LeaseWriter()

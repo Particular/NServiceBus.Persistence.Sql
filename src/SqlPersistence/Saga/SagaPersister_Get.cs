@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -24,7 +25,7 @@ partial class SagaPersister
         return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters);
     }
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
+    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(propertyName, propertyValue, session).ConfigureAwait(false);
@@ -47,7 +48,7 @@ partial class SagaPersister
             });
     }
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(sagaId, session).ConfigureAwait(false);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -6,7 +7,7 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
+    public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
     {
         return Complete(sagaData, session, GetConcurrency(context));
     }
