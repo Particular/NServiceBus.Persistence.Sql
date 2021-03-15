@@ -53,6 +53,7 @@ end";
                     {
                         if (transactionMode == TransportTransactionMode.ReceiveOnly)
                         {
+                            c.ConfigureTransport().TransportTransactionMode = transactionMode;
                             c.EnableOutbox();
                         }
                         else
