@@ -70,7 +70,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 
@@ -96,7 +96,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 

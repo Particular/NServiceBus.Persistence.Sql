@@ -72,7 +72,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 

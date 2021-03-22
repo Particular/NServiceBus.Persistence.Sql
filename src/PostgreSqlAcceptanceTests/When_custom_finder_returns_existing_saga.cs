@@ -69,7 +69,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 

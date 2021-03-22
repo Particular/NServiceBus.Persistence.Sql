@@ -68,7 +68,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 
