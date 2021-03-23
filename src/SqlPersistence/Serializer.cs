@@ -13,7 +13,7 @@ static class Serializer
         var settings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.Ignore
+            DefaultValueHandling = DefaultValueHandling.Include // or just remove as Include is the default
         };
         JsonSerializer = JsonSerializer.Create(settings);
     }
