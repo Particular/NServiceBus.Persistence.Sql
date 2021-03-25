@@ -10,3 +10,5 @@ Here is a summary of the process:
 4. Invoke `$/OracleDatabase/SingleInstance/dockerfiles/buildContainerImage.sh` (git bash or WSL) as `./buildContainerImage.sh -x -v 18.4.0` (build express image)
 
 NOTE: This image is Oracle Database 18c Express Edition. This is different from the one on the build server, which is 11g.
+
+Now you should have an image called 'oracle/database:18.4.0-xe'. 
