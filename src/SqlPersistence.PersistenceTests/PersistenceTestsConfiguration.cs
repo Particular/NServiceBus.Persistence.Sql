@@ -15,6 +15,7 @@
     using NServiceBus.Persistence;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NServiceBus.Transport;
+    using System.Threading;
 
     public partial class PersistenceTestsConfiguration
     {
@@ -68,7 +69,7 @@
             return new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, connectionFactory, usePessimisticMode)));
         }
 
-        public Task Configure()
+        public Task Configure(CancellationToken cancellationToken = default)
         {
             var variant = (SqlTestVariant)Variant.Values[0];
             var dialect = variant.Dialect;
@@ -172,7 +173,7 @@
             return outboxPersister;
         }
 
-        public Task Cleanup()
+        public Task Cleanup(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
