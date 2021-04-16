@@ -236,7 +236,7 @@ public abstract class OutboxPersisterTests
         await Task.Delay(1000).ConfigureAwait(false);
         await Store(13, persister).ConfigureAwait(false);
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
+        await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
         Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
         Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));

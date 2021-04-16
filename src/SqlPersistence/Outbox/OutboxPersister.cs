@@ -116,7 +116,7 @@ class OutboxPersister : IOutboxStorage
         return sqlOutboxTransaction.Complete(message, context);
     }
 
-    public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken)
+    public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken = default)
     {
         using (var connection = await connectionManager.OpenNonContextualConnection(cancellationToken).ConfigureAwait(false))
         {

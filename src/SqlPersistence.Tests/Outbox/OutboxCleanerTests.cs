@@ -20,7 +20,7 @@ public class OutboxCleanerTests
         await cleaner.Start().ConfigureAwait(false);
 
         var now = new DateTime(2017, 3, 31, 0, 0, 0);
-        await timer.Tick(now, CancellationToken.None).ConfigureAwait(false);
+        await timer.Tick(now).ConfigureAwait(false);
 
         var expected = new DateTime(2017, 3, 24, 0, 0, 0);
         Assert.AreEqual(expected, cutOffTime);
@@ -67,7 +67,7 @@ public class OutboxCleanerTests
         {
             if (i % 9 == 0) //Succeed every 9th attempt
             {
-                await timer.Tick(DateTime.UtcNow, CancellationToken.None).ConfigureAwait(false);
+                await timer.Tick(DateTime.UtcNow).ConfigureAwait(false);
             }
             else
             {
@@ -93,7 +93,7 @@ public class OutboxCleanerTests
 
     class FakeTimer : IAsyncTimer
     {
-        public Task Tick(DateTime utcTime, CancellationToken token)
+        public Task Tick(DateTime utcTime, CancellationToken token = default)
         {
             return callback(utcTime, token);
         }
