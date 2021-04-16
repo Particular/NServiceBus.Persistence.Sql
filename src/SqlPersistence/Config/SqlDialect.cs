@@ -2,6 +2,7 @@ namespace NServiceBus
 {
     using System.Data;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -40,7 +41,7 @@ namespace NServiceBus
         internal abstract void SetParameterValue(DbParameter parameter, object value);
 
         internal abstract CommandWrapper CreateCommand(DbConnection connection);
-        internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script, string tablePrefix)
+        internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script, string tablePrefix, CancellationToken cancellationToken = default)
         {
             //TODO: catch DbException "Parameter XXX must be defined" for mysql
             // throw and hint to add 'Allow User Variables=True' to connection string
@@ -50,7 +51,7 @@ namespace NServiceBus
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", tablePrefix);
                 AddCreationScriptParameters(command);
-                await command.ExecuteNonQueryEx().ConfigureAwait(false);
+                _ = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿#pragma warning disable 1591
+#pragma warning disable PS0018 // A task-returning method should have a CancellationToken parameter unless it has a parameter implementing ICancellableContext
 
 namespace NServiceBus.Persistence.Sql
 {

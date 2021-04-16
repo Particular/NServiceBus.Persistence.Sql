@@ -60,7 +60,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 testContext = context;
             }
 
-            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken)
+            public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.FinderUsed = true;
 

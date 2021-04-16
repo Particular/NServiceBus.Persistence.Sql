@@ -16,7 +16,7 @@ class OutboxCleaner : FeatureStartupTask
         this.criticalError = criticalError;
     }
 
-    protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken)
+    protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken = default)
     {
         var cleanupFailures = 0;
         timer.Start(
@@ -38,13 +38,11 @@ class OutboxCleaner : FeatureStartupTask
                 }
             },
             delayStrategy: Task.Delay);
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
-    protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken)
-    {
-        return timer.Stop();
-    }
+    protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken = default) =>
+        timer.Stop(cancellationToken);
 
     IAsyncTimer timer;
     Action<string, Exception, CancellationToken> criticalError;

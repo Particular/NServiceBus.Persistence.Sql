@@ -39,7 +39,7 @@ static class Extensions
         return OpenConnection(connection, cancellationToken);
     }
 
-    static async Task<DbConnection> OpenConnection(DbConnection connection, CancellationToken cancellationToken = default)
+    static async Task<DbConnection> OpenConnection(DbConnection connection, CancellationToken cancellationToken)
     {
         try
         {

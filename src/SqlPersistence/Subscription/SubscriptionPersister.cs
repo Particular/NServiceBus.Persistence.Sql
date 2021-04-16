@@ -27,37 +27,43 @@ class SubscriptionPersister : ISubscriptionStorage
 
     public async Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
     {
-        await Retry(async () =>
-        {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
-            using (var command = sqlDialect.CreateCommand(connection))
+        await Retry(
+            async token =>
             {
-                command.CommandText = subscriptionCommands.Subscribe;
-                command.AddParameter("MessageType", messageType.TypeName);
-                command.AddParameter("Subscriber", subscriber.TransportAddress);
-                command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
-                command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-                await command.ExecuteNonQueryEx().ConfigureAwait(false);
-            }
-        }).ConfigureAwait(false);
+                using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+                using (var connection = await connectionManager.OpenNonContextualConnection(token).ConfigureAwait(false))
+                using (var command = sqlDialect.CreateCommand(connection))
+                {
+                    command.CommandText = subscriptionCommands.Subscribe;
+                    command.AddParameter("MessageType", messageType.TypeName);
+                    command.AddParameter("Subscriber", subscriber.TransportAddress);
+                    command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
+                    command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+                    _ = await command.ExecuteNonQueryEx(token).ConfigureAwait(false);
+                }
+            },
+            cancellationToken).ConfigureAwait(false);
+
         ClearForMessageType(messageType);
     }
 
     public async Task Unsubscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
     {
-        await Retry(async () =>
-        {
-            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-            using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
-            using (var command = sqlDialect.CreateCommand(connection))
+        await Retry(
+            async token =>
             {
-                command.CommandText = subscriptionCommands.Unsubscribe;
-                command.AddParameter("MessageType", messageType.TypeName);
-                command.AddParameter("Subscriber", subscriber.TransportAddress);
-                await command.ExecuteNonQueryEx().ConfigureAwait(false);
-            }
-        }).ConfigureAwait(false);
+                using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+                using (var connection = await connectionManager.OpenNonContextualConnection(token).ConfigureAwait(false))
+                using (var command = sqlDialect.CreateCommand(connection))
+                {
+                    command.CommandText = subscriptionCommands.Unsubscribe;
+                    command.AddParameter("MessageType", messageType.TypeName);
+                    command.AddParameter("Subscriber", subscriber.TransportAddress);
+                    _ = await command.ExecuteNonQueryEx(token).ConfigureAwait(false);
+                }
+            },
+            cancellationToken).ConfigureAwait(false);
+
         ClearForMessageType(messageType);
     }
 
@@ -67,7 +73,7 @@ class SubscriptionPersister : ISubscriptionStorage
 
         if (cacheFor == null)
         {
-            return GetSubscriptions(types);
+            return GetSubscriptions(types, cancellationToken);
         }
 
         var key = GetKey(types);
@@ -76,15 +82,17 @@ class SubscriptionPersister : ISubscriptionStorage
             valueFactory: _ => new CacheItem
             {
                 Stored = DateTime.UtcNow,
-                Subscribers = GetSubscriptions(types)
+                Subscribers = GetSubscriptions(types, cancellationToken)
             });
 
         var age = DateTime.UtcNow - cacheItem.Stored;
+
         if (age >= cacheFor)
         {
-            cacheItem.Subscribers = GetSubscriptions(types);
+            cacheItem.Subscribers = GetSubscriptions(types, cancellationToken);
             cacheItem.Stored = DateTime.UtcNow;
         }
+
         return cacheItem.Subscribers;
     }
 
@@ -93,14 +101,17 @@ class SubscriptionPersister : ISubscriptionStorage
         return value ?? DBNull.Value;
     }
 
-    static async Task Retry(Func<Task> action)
+    static async Task Retry(Func<CancellationToken, Task> action, CancellationToken cancellationToken)
     {
         var attempts = 0;
+
         while (true)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
-                await action().ConfigureAwait(false);
+                await action(cancellationToken).ConfigureAwait(false);
                 return;
             }
             catch (Exception ex)
@@ -111,8 +122,10 @@ class SubscriptionPersister : ISubscriptionStorage
                 {
                     throw;
                 }
+
                 Log.Debug("Error while processing subscription change request. Retrying.", ex);
-                await Task.Delay(100).ConfigureAwait(false);
+
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
             }
         }
     }
@@ -144,11 +157,11 @@ class SubscriptionPersister : ISubscriptionStorage
         return $"{type.TypeName},";
     }
 
-    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy)
+    async Task<IEnumerable<Subscriber>> GetSubscriptions(List<MessageType> messageHierarchy, CancellationToken cancellationToken)
     {
         var getSubscribersCommand = subscriptionCommands.GetSubscribers(messageHierarchy);
         using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-        using (var connection = await connectionManager.OpenNonContextualConnection().ConfigureAwait(false))
+        using (var connection = await connectionManager.OpenNonContextualConnection(cancellationToken).ConfigureAwait(false))
         using (var command = sqlDialect.CreateCommand(connection))
         {
             for (var i = 0; i < messageHierarchy.Count; i++)
@@ -159,14 +172,14 @@ class SubscriptionPersister : ISubscriptionStorage
             }
 
             command.CommandText = getSubscribersCommand;
-            using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
+            using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
             {
                 var subscribers = new List<Subscriber>();
-                while (await reader.ReadAsync().ConfigureAwait(false))
+                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     var address = reader.GetString(0);
                     string endpoint;
-                    if (await reader.IsDBNullAsync(1).ConfigureAwait(false))
+                    if (await reader.IsDBNullAsync(1, cancellationToken).ConfigureAwait(false))
                     {
                         endpoint = null;
                     }

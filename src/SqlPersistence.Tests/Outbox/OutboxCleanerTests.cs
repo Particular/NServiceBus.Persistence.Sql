@@ -93,15 +93,13 @@ public class OutboxCleanerTests
 
     class FakeTimer : IAsyncTimer
     {
-        public Task Tick(DateTime utcTime, CancellationToken token = default)
+        public Task Tick(DateTime utcTime, CancellationToken cancellationToken = default)
         {
-            return callback(utcTime, token);
+            return callback(utcTime, cancellationToken);
         }
 
-        public void OnError(Exception error)
-        {
+        public void OnError(Exception error) =>
             errorCallback(error);
-        }
 
         public void Start(Func<DateTime, CancellationToken, Task> callback, TimeSpan interval, Action<Exception> errorCallback, Func<TimeSpan, CancellationToken, Task> delayStrategy)
         {
@@ -109,10 +107,7 @@ public class OutboxCleanerTests
             this.errorCallback = errorCallback;
         }
 
-        public Task Stop()
-        {
-            return Task.FromResult(0);
-        }
+        public Task Stop(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         Func<DateTime, CancellationToken, Task> callback;
         Action<Exception> errorCallback;

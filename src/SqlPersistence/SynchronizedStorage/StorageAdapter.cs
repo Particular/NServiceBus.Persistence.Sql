@@ -38,12 +38,18 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
     {
-        var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
-            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache)).ConfigureAwait(false);
+        var session = await dialect.TryAdaptTransportConnection(
+            transportTransaction,
+            context,
+            connectionBuilder,
+            (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache),
+            cancellationToken).ConfigureAwait(false);
+
         if (session != null)
         {
             currentSessionHolder?.SetCurrentSession(session);
         }
+
         return session;
     }
 }

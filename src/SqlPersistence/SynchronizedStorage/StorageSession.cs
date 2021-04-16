@@ -8,7 +8,7 @@ using NServiceBus.Persistence.Sql;
 class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
-    Func<ISqlStorageSession, Task> onSaveChangesCallback = s => Task.CompletedTask;
+    Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
     Action disposedCallback = () => { };
 
     public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
@@ -24,20 +24,29 @@ class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
     internal SagaInfoCache InfoCache { get; }
     public DbTransaction Transaction { get; }
     public DbConnection Connection { get; }
-    public void OnSaveChanges(Func<ISqlStorageSession, Task> callback)
+
+    public void OnSaveChanges(Func<ISqlStorageSession, CancellationToken, Task> callback)
     {
         Guard.AgainstNull(nameof(callback), callback);
+
         var oldCallback = onSaveChangesCallback;
-        onSaveChangesCallback = async s =>
+
+        onSaveChangesCallback = async (session, cancellationToken) =>
         {
-            await oldCallback(s).ConfigureAwait(false);
-            await callback(s).ConfigureAwait(false);
+            await oldCallback(session, cancellationToken).ConfigureAwait(false);
+            await callback(session, cancellationToken).ConfigureAwait(false);
         };
     }
 
+    [ObsoleteEx(Message = "Use the overload that supports cancellation.", TreatAsErrorFromVersion = "7", RemoveInVersion = "8")]
+#pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
+    public void OnSaveChanges(Func<ISqlStorageSession, Task> callback) => throw new NotImplementedException();
+#pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
+
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
     {
-        await onSaveChangesCallback(this).ConfigureAwait(false);
+        await onSaveChangesCallback(this, cancellationToken).ConfigureAwait(false);
+
         if (ownsTransaction)
         {
             Transaction?.Commit();

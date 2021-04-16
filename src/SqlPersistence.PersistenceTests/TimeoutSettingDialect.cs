@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using Extensibility;
     using Transport;
@@ -20,10 +21,12 @@
             this.commandTimeout = commandTimeout;
         }
 
-        internal override Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
-        {
-            return impl.TryAdaptTransportConnection(transportTransaction, context, connectionManager, storageSessionFactory);
-        }
+        internal override Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction,
+            ContextBag context,
+            IConnectionManager connectionManager,
+            Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
+            CancellationToken cancellationToken = default) =>
+            impl.TryAdaptTransportConnection(transportTransaction, context, connectionManager, storageSessionFactory, cancellationToken);
 
         internal override string GetSubscriptionTableName(string tablePrefix)
         {

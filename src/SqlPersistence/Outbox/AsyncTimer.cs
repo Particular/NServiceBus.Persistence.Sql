@@ -31,7 +31,7 @@ class AsyncTimer : IAsyncTimer
         });
     }
 
-    public Task Stop()
+    public Task Stop(CancellationToken cancellationToken = default)
     {
         if (tokenSource == null)
         {

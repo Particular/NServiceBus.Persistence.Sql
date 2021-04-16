@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -15,12 +16,9 @@ class OptimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
         this.outboxCommands = outboxCommands;
     }
 
-    public override Task Begin(string messageId, DbConnection connection, DbTransaction transaction)
-    {
-        return Task.FromResult(0);
-    }
+    public override Task Begin(string messageId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-    public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context)
+    public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         string json = Serializer.Serialize(outboxMessage.TransportOperations.ToSerializable());
         json = sqlDialect.AddOutboxPadding(json);
@@ -32,7 +30,7 @@ class OptimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
             command.AddParameter("MessageId", outboxMessage.MessageId);
             command.AddJsonParameter("Operations", json);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
 }

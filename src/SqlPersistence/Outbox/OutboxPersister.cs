@@ -34,14 +34,14 @@ class OutboxPersister : IOutboxStorage
         var transaction = outboxTransactionFactory();
         transaction.Prepare(context);
         // we always need to avoid using async/await in here so that the transaction scope can float!
-        return BeginTransactionInternal(transaction, context);
+        return BeginTransactionInternal(transaction, context, cancellationToken);
     }
 
-    static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context)
+    static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken)
     {
         try
         {
-            await transaction.Begin(context).ConfigureAwait(false);
+            await transaction.Begin(context, cancellationToken).ConfigureAwait(false);
 
             return transaction;
         }
@@ -110,11 +110,8 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
-    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context, CancellationToken cancellationToken = default)
-    {
-        var sqlOutboxTransaction = (ISqlOutboxTransaction)outboxTransaction;
-        return sqlOutboxTransaction.Complete(message, context);
-    }
+    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context, CancellationToken cancellationToken = default) =>
+        ((ISqlOutboxTransaction)outboxTransaction).Complete(message, context, cancellationToken);
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken = default)
     {
