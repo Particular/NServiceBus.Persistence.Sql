@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Logging;
@@ -29,18 +30,16 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
         //NOOP
     }
 
-    public async Task Begin(ContextBag context)
+    public async Task Begin(ContextBag context, CancellationToken cancellationToken = default)
     {
         var incomingMessage = context.GetIncomingMessage();
-        Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
+        Connection = await connectionManager.OpenConnection(incomingMessage, cancellationToken).ConfigureAwait(false);
         Transaction = Connection.BeginTransaction(isolationLevel);
-        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction).ConfigureAwait(false);
+        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction, cancellationToken).ConfigureAwait(false);
     }
 
-    public Task Complete(OutboxMessage outboxMessage, ContextBag context)
-    {
-        return concurrencyControlStrategy.Complete(outboxMessage, Connection, Transaction, context);
-    }
+    public Task Complete(OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default) =>
+        concurrencyControlStrategy.Complete(outboxMessage, Connection, Transaction, context, cancellationToken);
 
     public void BeginSynchronizedSession(ContextBag context)
     {
@@ -59,7 +58,7 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
         Connection?.Dispose();
     }
 
-    public Task Commit()
+    public Task Commit(CancellationToken cancellationToken = default)
     {
         Transaction.Commit();
         return Task.FromResult(0);

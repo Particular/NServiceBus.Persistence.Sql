@@ -28,11 +28,11 @@ end";
 
         [Test]
 #if NETFRAMEWORK
-        [TestCase(TransportTransactionMode.TransactionScope)] //Uses TransactionScope to ensure exactly-once
+        [TestCase(TransportTransactionMode.TransactionScope, false)] //Uses TransactionScope to ensure exactly-once
 #endif
-        [TestCase(TransportTransactionMode.SendsAtomicWithReceive)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
-        [TestCase(TransportTransactionMode.ReceiveOnly)] //Uses the Outbox to ensure exactly-once
-        public async Task Should_rollback_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode)
+        [TestCase(TransportTransactionMode.SendsAtomicWithReceive, false)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
+        [TestCase(TransportTransactionMode.ReceiveOnly, true)] //Uses the Outbox to ensure exactly-once
+        public async Task Should_rollback_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode, bool enableOutbox)
         {
             using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
             {
@@ -51,13 +51,10 @@ end";
                         Id = ctx.TestRunId
                     })).DoNotFailOnErrorMessages().CustomConfig(c =>
                     {
-                        if (transactionMode == TransportTransactionMode.ReceiveOnly)
+                        c.ConfigureTransport().TransportTransactionMode = transactionMode;
+                        if (enableOutbox)
                         {
                             c.EnableOutbox();
-                        }
-                        else
-                        {
-                            c.ConfigureTransport().TransportTransactionMode = transactionMode;
                         }
                     }))
                 .Done(c => c.ReplyReceived)

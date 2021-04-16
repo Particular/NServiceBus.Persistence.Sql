@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
     using McMaster.Extensions.CommandLineUtils;
 
@@ -12,7 +13,8 @@
             CommandOption outputPath,
             CommandOption<bool> overwriteOption,
             CommandOption<bool> cleanOption,
-            CommandOption<DialectTypes> dialectOption)
+            CommandOption<DialectTypes> dialectOption,
+            CancellationToken cancellationToken = default)
         {
             var output = outputPath.HasValue() ? outputPath.Value() : Directory.GetCurrentDirectory();
 

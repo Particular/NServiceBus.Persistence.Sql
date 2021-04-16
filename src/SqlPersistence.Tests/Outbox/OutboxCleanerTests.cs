@@ -15,12 +15,12 @@ public class OutboxCleanerTests
         {
             cutOffTime = time;
             return Task.FromResult(0);
-        }, (m, e) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+        }, (m, e, _) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
         var now = new DateTime(2017, 3, 31, 0, 0, 0);
-        await timer.Tick(now, CancellationToken.None).ConfigureAwait(false);
+        await timer.Tick(now).ConfigureAwait(false);
 
         var expected = new DateTime(2017, 3, 24, 0, 0, 0);
         Assert.AreEqual(expected, cutOffTime);
@@ -32,7 +32,7 @@ public class OutboxCleanerTests
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
-            (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+            (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
@@ -59,7 +59,7 @@ public class OutboxCleanerTests
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
         var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
-            (m, e) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
+            (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
 
@@ -67,7 +67,7 @@ public class OutboxCleanerTests
         {
             if (i % 9 == 0) //Succeed every 9th attempt
             {
-                await timer.Tick(DateTime.UtcNow, CancellationToken.None).ConfigureAwait(false);
+                await timer.Tick(DateTime.UtcNow).ConfigureAwait(false);
             }
             else
             {
@@ -80,28 +80,26 @@ public class OutboxCleanerTests
 
     class TestableCleaner : OutboxCleaner
     {
-        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
+        public TestableCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception, CancellationToken> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
             : base(cleanup, criticalError, timeToKeepDeduplicationData, frequencyToRunCleanup, timer)
         {
         }
 
-        public Task Start()
+        public Task Start(CancellationToken cancellationToken = default)
         {
-            return OnStart(null);
+            return OnStart(null, cancellationToken);
         }
     }
 
     class FakeTimer : IAsyncTimer
     {
-        public Task Tick(DateTime utcTime, CancellationToken token)
+        public Task Tick(DateTime utcTime, CancellationToken cancellationToken = default)
         {
-            return callback(utcTime, token);
+            return callback(utcTime, cancellationToken);
         }
 
-        public void OnError(Exception error)
-        {
+        public void OnError(Exception error) =>
             errorCallback(error);
-        }
 
         public void Start(Func<DateTime, CancellationToken, Task> callback, TimeSpan interval, Action<Exception> errorCallback, Func<TimeSpan, CancellationToken, Task> delayStrategy)
         {
@@ -109,10 +107,7 @@ public class OutboxCleanerTests
             this.errorCallback = errorCallback;
         }
 
-        public Task Stop()
-        {
-            return Task.FromResult(0);
-        }
+        public Task Stop(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         Func<DateTime, CancellationToken, Task> callback;
         Action<Exception> errorCallback;

@@ -18,7 +18,9 @@ namespace NServiceBus.Persistence.Sql
     {
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
+        [System.Obsolete("Use the overload that supports cancellation. Will be removed in version 8.0.0.", true)]
         void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.Tasks.Task> callback);
+        void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
     public class SagaSettings
@@ -30,12 +32,12 @@ namespace NServiceBus.Persistence.Sql
     }
     public static class ScriptRunner
     {
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true) { }
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true) { }
         [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
         [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
+        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
     public sealed class SqlPersistenceSettingsAttribute : System.Attribute
@@ -157,7 +159,7 @@ namespace NServiceBus
     }
     public static class SqlPersistenceStorageSessionExtensions
     {
-        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, System.Threading.CancellationToken cancellationToken = default)
             where TSagaData :  class, NServiceBus.IContainSagaData { }
         public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }

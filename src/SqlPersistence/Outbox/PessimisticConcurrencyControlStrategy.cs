@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -15,19 +16,21 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
         this.outboxCommands = outboxCommands;
     }
 
-    public override async Task Begin(string messageId, DbConnection connection, DbTransaction transaction)
+    public override async Task Begin(string messageId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
     {
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.PessimisticBegin;
             command.Transaction = transaction;
+
             command.AddParameter("MessageId", messageId);
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
+
+            _ = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
 
-    public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context)
+    public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         string json = Serializer.Serialize(outboxMessage.TransportOperations.ToSerializable());
         json = sqlDialect.AddOutboxPadding(json);
@@ -36,9 +39,11 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
         {
             command.CommandText = outboxCommands.PessimisticComplete;
             command.Transaction = transaction;
+
             command.AddParameter("MessageId", outboxMessage.MessageId);
             command.AddJsonParameter("Operations", json);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
+
+            _ = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
 }

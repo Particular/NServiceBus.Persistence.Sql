@@ -15,15 +15,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.842" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.940" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!---  Remove this exclusion once PR is merged: https://github.com/Particular/NServiceBus/pull/5707 and remove When_worker_tries_to_complete_saga_update_by_another_pessimistic_tweaked.cs-->
-    <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
-
     <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
   </ItemGroup>
 

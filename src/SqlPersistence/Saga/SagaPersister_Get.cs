@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -9,29 +10,29 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
-        var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache).ConfigureAwait(false);
+        var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache)
+    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
         var commandText = sagaInfo.SelectFromCommandBuilder(whereClause);
-        return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters);
+        return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters, cancellationToken);
     }
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
+    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
-        var result = await Get<TSagaData>(propertyName, propertyValue, session).ConfigureAwait(false);
+        var result = await Get<TSagaData>(propertyName, propertyValue, session, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -44,17 +45,17 @@ partial class SagaPersister
                 var parameter = parameterBuilder();
                 sqlDialect.AddParameter(parameter, "propertyValue", propertyValue);
                 append(parameter);
-            });
+            }, cancellationToken);
     }
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
-        var result = await Get<TSagaData>(sagaId, session).ConfigureAwait(false);
+        var result = await Get<TSagaData>(sagaId, session, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -64,10 +65,10 @@ partial class SagaPersister
                 var parameter = parameterBuilder();
                 sqlDialect.AddParameter(parameter, "Id", sagaId);
                 append(parameter);
-            });
+            }, cancellationToken);
     }
 
-    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters)
+    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters, CancellationToken cancellationToken)
         where TSagaData : class, IContainSagaData
     {
         var sqlSession = session.SqlPersistenceSession();
@@ -80,17 +81,17 @@ partial class SagaPersister
             appendParameters(dbCommand.CreateParameter, parameter => dbCommand.Parameters.Add(parameter));
 
             // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed
-            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess).ConfigureAwait(false))
+            using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow | CommandBehavior.SequentialAccess, cancellationToken).ConfigureAwait(false))
             {
-                if (!await dataReader.ReadAsync().ConfigureAwait(false))
+                if (!await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     return default;
                 }
 
-                var id = await dataReader.GetGuidAsync(0).ConfigureAwait(false);
-                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1).ConfigureAwait(false);
+                var id = await dataReader.GetGuidAsync(0, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1, cancellationToken).ConfigureAwait(false);
                 var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
-                var concurrency = await dataReader.GetFieldValueAsync<int>(2).ConfigureAwait(false);
+                var concurrency = await dataReader.GetFieldValueAsync<int>(2, cancellationToken).ConfigureAwait(false);
                 ReadMetadata(dataReader, out var originator, out var originalMessageId);
                 using (var textReader = dataReader.GetTextReader(4))
                 {

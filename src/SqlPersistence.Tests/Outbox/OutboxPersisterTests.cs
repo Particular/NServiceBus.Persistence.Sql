@@ -116,7 +116,7 @@ public abstract class OutboxPersisterTests
         Assert.AreEqual(0, result.Item2.TransportOperations.Length);
     }
 
-    async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister)
+    static async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new List<TransportOperation>
         {
@@ -140,15 +140,15 @@ public abstract class OutboxPersisterTests
         var messageId = "a";
 
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
 
-        var beforeDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
-        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
-        var afterDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
+        var beforeDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        var afterDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
 
         return Tuple.Create(beforeDispatch, afterDispatch);
     }
@@ -182,7 +182,7 @@ public abstract class OutboxPersisterTests
         }
     }
 
-    async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister)
+    static async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new[]
         {
@@ -207,12 +207,12 @@ public abstract class OutboxPersisterTests
         var messageId = "a";
 
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
-        return await persister.Get(messageId, contextBag).ConfigureAwait(false);
+        return await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
     }
 
     static ContextBag CreateContextBag(string messageId)
@@ -236,13 +236,13 @@ public abstract class OutboxPersisterTests
         await Task.Delay(1000).ConfigureAwait(false);
         await Store(13, persister).ConfigureAwait(false);
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
+        await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
         Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
         Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
-    async Task Store(int i, OutboxPersister persister)
+    static async Task Store(int i, OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new[]
         {
@@ -268,12 +268,12 @@ public abstract class OutboxPersisterTests
         };
         var messageId = "MessageId" + i;
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
-        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
     }
 
     [Test]

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Features;
 using NServiceBus.Installation;
@@ -19,7 +20,7 @@ class SqlPersistenceInstaller : INeedToInstallSomething
         installerSettings = settings.GetOrDefault<InstallerSettings>();
     }
 
-    public async Task Install(string identity)
+    public async Task Install(string identity, CancellationToken cancellationToken = default)
     {
         if (installerSettings == null || installerSettings.Disabled)
         {
@@ -34,7 +35,8 @@ class SqlPersistenceInstaller : INeedToInstallSomething
                     scriptDirectory: installerSettings.ScriptDirectory,
                     shouldInstallOutbox: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlOutboxFeature)),
                     shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlSagaFeature)),
-                    shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
+                    shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
+                    cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (Exception e)

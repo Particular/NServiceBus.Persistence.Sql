@@ -28,20 +28,20 @@ class AsyncTimer : IAsyncTimer
                     errorCallback(ex);
                 }
             }
-        }, CancellationToken.None);
+        });
     }
 
-    public Task Stop()
+    public Task Stop(CancellationToken cancellationToken = default)
     {
         if (tokenSource == null)
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         tokenSource.Cancel();
         tokenSource.Dispose();
 
-        return task ?? Task.FromResult(0);
+        return task ?? Task.CompletedTask;
     }
 
     Task task;

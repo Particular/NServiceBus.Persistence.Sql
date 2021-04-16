@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -7,12 +8,12 @@ using NServiceBus.Sagas;
 
 partial class SagaPersister
 {
-    public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
+    public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
     {
-        return Save(sagaData, session, correlationProperty?.Value);
+        return Save(sagaData, session, correlationProperty?.Value, cancellationToken);
     }
 
-    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, object correlationId)
+    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
@@ -40,7 +41,7 @@ partial class SagaPersister
                 command.AddParameter("CorrelationId", correlationId);
             }
             AddTransitionalParameter(sagaData, sagaInfo, command);
-            await command.ExecuteNonQueryEx().ConfigureAwait(false);
+            await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
 }

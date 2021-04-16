@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
@@ -90,7 +89,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine3", null), type2, null).Await();
-        var result = persister.GetSubscribers(type1, type2).Result.OrderBy(s => s.TransportAddress);
+        var result = persister.GetSubscribers(new[] { type1, type2 }).Result.OrderBy(s => s.TransportAddress);
         Assert.IsNotEmpty(result);
         Approver.Verify(result);
     }
@@ -192,10 +191,10 @@ public abstract class SubscriptionPersisterTests
         persister.GetSubscribers(type1).Await();
         persister.GetSubscribers(type2).Await();
         persister.GetSubscribers(type3).Await();
-        persister.GetSubscribers(type1, type2).Await();
-        persister.GetSubscribers(type2, type3).Await();
-        persister.GetSubscribers(type1, type3).Await();
-        persister.GetSubscribers(type1, type2, type3).Await();
+        persister.GetSubscribers(new[] { type1, type2 }).Await();
+        persister.GetSubscribers(new[] { type2, type3 }).Await();
+        persister.GetSubscribers(new[] { type1, type3 }).Await();
+        persister.GetSubscribers(new[] { type1, type2, type3 }).Await();
         persister.Unsubscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         VerifyCache(persister.Cache);
     }
@@ -211,7 +210,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
-        var result = persister.GetSubscribers(type1, type2).Result.ToList();
+        var result = persister.GetSubscribers(new[] { type1, type2 }).Result.ToList();
         Assert.IsNotEmpty(result);
         Approver.Verify(result);
     }
@@ -272,7 +271,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(address2, message2, null).Await();
         persister.Subscribe(address2, message1, null).Await();
         persister.Unsubscribe(address1, message2, null).Await();
-        var result = persister.GetSubscribers(message2, message1).Result.ToList();
+        var result = persister.GetSubscribers(new[] { message2, message1 }).Result.ToList();
         Assert.IsNotEmpty(result);
         Approver.Verify(result);
     }

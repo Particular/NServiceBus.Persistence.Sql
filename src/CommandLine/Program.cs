@@ -1,9 +1,7 @@
 ﻿namespace NServiceBus.Persistence.Sql.CommandLine
 {
     using System;
-    using System.Collections.Generic;
     using McMaster.Extensions.CommandLineUtils;
-    using ScriptBuilder;
 
     class Program
     {
@@ -28,10 +26,8 @@
                 var overwriteOption = cmd.Option<bool>("--overwrite", "Overwrites existing files in the output if they match the files to be generated.", CommandOptionType.SingleOrNoValue);
                 var dialectOption = cmd.Option<DialectTypes>("--dialect", "Specifies a dialect to generate", CommandOptionType.SingleOrNoValue);
 
-                cmd.OnExecuteAsync(async ct =>
-                {
-                    await Generator.Run(assemblyPath, outputOption, overwriteOption, cleanOption, dialectOption);
-                });
+                cmd.OnExecuteAsync(async cancellationToken =>
+                    await Generator.Run(assemblyPath, outputOption, overwriteOption, cleanOption, dialectOption, cancellationToken));
             });
 
             app.OnExecute(() =>
