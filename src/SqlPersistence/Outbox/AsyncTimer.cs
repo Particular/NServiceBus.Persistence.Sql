@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus.Logging;
 
 class AsyncTimer : IAsyncTimer
 {
@@ -19,16 +20,24 @@ class AsyncTimer : IAsyncTimer
                     await delayStrategy(interval, token).ConfigureAwait(false);
                     await callback(utcNow, token).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
                     // noop
+                    if (token.IsCancellationRequested)
+                    {
+                        log.Debug("Timer execution cancelled.", ex);
+                    }
+                    else
+                    {
+                        log.Warn("Operation cancelled thrown.", ex);
+                    }
                 }
                 catch (Exception ex)
                 {
                     errorCallback(ex);
                 }
             }
-        });
+        }, CancellationToken.None);
     }
 
     public Task Stop(CancellationToken cancellationToken = default)
@@ -46,4 +55,5 @@ class AsyncTimer : IAsyncTimer
 
     Task task;
     CancellationTokenSource tokenSource;
+    ILog log = LogManager.GetLogger<AsyncTimer>();
 }
