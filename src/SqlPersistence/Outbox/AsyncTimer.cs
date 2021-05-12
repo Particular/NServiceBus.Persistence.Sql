@@ -22,7 +22,6 @@ class AsyncTimer : IAsyncTimer
                 }
                 catch (OperationCanceledException ex)
                 {
-                    // noop
                     if (token.IsCancellationRequested)
                     {
                         log.Debug("Timer execution cancelled.", ex);
