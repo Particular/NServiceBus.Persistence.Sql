@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using Extensibility;
     using Persistence;
@@ -49,7 +50,8 @@
         /// <param name="context">Used to append a concurrency value that can be verified when the SagaData is persisted.</param>
         /// <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
         /// <param name="appendParameters">Used to append <see cref="DbParameter" />s used in the <paramref name="whereClause" />.</param>
-        public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+        public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, CancellationToken cancellationToken = default)
             where TSagaData : class, IContainSagaData
         {
             Guard.AgainstNull(nameof(session), session);
@@ -65,7 +67,7 @@
                 throw new Exception("Cannot load saga data because the Sagas feature is disabled in the endpoint.");
             }
 
-            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sqlSession.InfoCache);
+            return SagaPersister.GetByWhereClause<TSagaData>(whereClause, session, writableContextBag, appendParameters, sqlSession.InfoCache, cancellationToken);
         }
     }
 }

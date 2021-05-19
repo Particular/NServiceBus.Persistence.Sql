@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -9,12 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="[12.0.1, 13.0.0)" />
-    <PackageReference Include="NServiceBus" Version="[8.0.0-alpha.631, 9.0.0)" />
-    <PackageReference Include="Fody" Version="6.2.6" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="[13.0.1, 14.0.0)" />
+    <PackageReference Include="NServiceBus" Version="[8.0.0-alpha.940, 9.0.0)" />
+    <PackageReference Include="Fody" Version="6.5.1" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="5.2.1" PrivateAssets="All" />
-    <PackageReference Include="Particular.CodeRules" Version="0.7.0" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="0.9.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="1.2.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,13 +23,12 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql</PackageId>
     <Description>Sql persistence for NServiceBus</Description>
-    <NoWarn>$(NoWarn);NU5100</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build;buildTransitive" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\netcoreapp2.1;buildTransitive\net472;buildTransitive\netcoreapp2.1;" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net46\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netcoreapp2.1\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\netcoreapp2.1" Visible="false" />
   </ItemGroup>
 
   <Target Name="PreparePackagesForIntegrationSolution" BeforeTargets="GenerateNuspec">

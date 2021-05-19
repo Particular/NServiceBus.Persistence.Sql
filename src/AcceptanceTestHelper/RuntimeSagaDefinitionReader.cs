@@ -21,20 +21,11 @@ public static class RuntimeSagaDefinitionReader
             return Enumerable.Empty<SagaDefinition>();
         }
         var sagaAssembly = sagaTypes.First().Assembly;
-        var exceptions = new List<Exception>();
         //Validate the saga definitions using script builder compile-time validation
         using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
         {
             var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
-
-            compileTimeReader.GetSagas((e, d) =>
-            {
-                exceptions.Add(e);
-            });
-        }
-        if (exceptions.Any())
-        {
-            throw new AggregateException(exceptions);
+            compileTimeReader.GetSagas();
         }
         return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
     }
@@ -59,7 +50,7 @@ public static class RuntimeSagaDefinitionReader
                 name: mapper.CorrelationProperty,
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
-        
+
         var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, saga, "TransitionalCorrelationPropertyName", att => att.TransitionalCorrelationProperty);
 
         CorrelationProperty transitional = null;
@@ -69,7 +60,7 @@ public static class RuntimeSagaDefinitionReader
             var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
             transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
         }
-        
+
         var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 

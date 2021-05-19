@@ -22,7 +22,7 @@ public partial class CoreSagaMetadataTests
 }
 /* IL:
 PassingMapperSaga.ConfigureHowToFindSaga:
-IL_0000:  ldarg.1     
+IL_0000:  ldarg.1
 IL_0001:  call        UserQuery+PassingMapperSaga.PassTheMapper
-IL_0006:  ret  
+IL_0006:  ret
 */

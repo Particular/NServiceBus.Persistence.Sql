@@ -7,8 +7,9 @@
         public bool SupportsDtc => false;
         public bool SupportsCrossQueueTransactions => true;
         public bool SupportsNativePubSub => false;
-        public bool SupportsNativeDeferral => false;
+        public bool SupportsDelayedDelivery => true;
         public bool SupportsOutbox => true;
+        public bool SupportsPurgeOnStartup => true;
 
         public IConfigureEndpointTestExecution CreateTransportConfiguration()
         {

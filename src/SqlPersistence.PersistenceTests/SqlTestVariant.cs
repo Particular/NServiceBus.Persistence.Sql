@@ -16,7 +16,7 @@
 
         public SqlDialect Dialect { get; }
         public BuildSqlDialect BuildDialect { get; }
-        public  Func<DbConnection> ConnectionFactory { get; }
+        public Func<DbConnection> ConnectionFactory { get; }
         public bool UsePessimisticMode { get; set; }
 
         public override string ToString()

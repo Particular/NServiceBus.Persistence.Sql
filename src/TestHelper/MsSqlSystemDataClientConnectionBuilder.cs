@@ -128,9 +128,10 @@ public static class MsSqlSystemDataClientConnectionBuilder
 
     static void DropDatabase(string databaseName)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
-
-        connectionStringBuilder.InitialCatalog = "master";
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString())
+        {
+            InitialCatalog = "master"
+        };
 
         using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
         {

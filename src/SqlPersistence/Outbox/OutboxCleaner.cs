@@ -7,7 +7,7 @@ using NServiceBus.Logging;
 
 class OutboxCleaner : FeatureStartupTask
 {
-    public OutboxCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
+    public OutboxCleaner(Func<DateTime, CancellationToken, Task> cleanup, Action<string, Exception, CancellationToken> criticalError, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunCleanup, IAsyncTimer timer)
     {
         this.cleanup = cleanup;
         this.timeToKeepDeduplicationData = timeToKeepDeduplicationData;
@@ -16,7 +16,7 @@ class OutboxCleaner : FeatureStartupTask
         this.criticalError = criticalError;
     }
 
-    protected override Task OnStart(IMessageSession session)
+    protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken = default)
     {
         var cleanupFailures = 0;
         timer.Start(
@@ -33,21 +33,19 @@ class OutboxCleaner : FeatureStartupTask
                 cleanupFailures++;
                 if (cleanupFailures >= 10)
                 {
-                    criticalError("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception);
+                    criticalError("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with the database.", exception, cancellationToken);
                     cleanupFailures = 0;
                 }
             },
             delayStrategy: Task.Delay);
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
-    protected override Task OnStop(IMessageSession session)
-    {
-        return timer.Stop();
-    }
+    protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken = default) =>
+        timer.Stop(cancellationToken);
 
     IAsyncTimer timer;
-    Action<string, Exception> criticalError;
+    Action<string, Exception, CancellationToken> criticalError;
     Func<DateTime, CancellationToken, Task> cleanup;
     TimeSpan timeToKeepDeduplicationData;
     TimeSpan frequencyToRunCleanup;

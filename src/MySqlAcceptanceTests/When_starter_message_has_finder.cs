@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -54,7 +55,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                 testContext = context;
             }
 
-            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context)
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.StartSagaFinderUsed = true;
 
@@ -67,7 +68,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                         parameter.ParameterName = "propertyValue";
                         parameter.Value = "Test";
                         append(parameter);
-                    });
+                    }, cancellationToken);
             }
         }
 

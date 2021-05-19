@@ -1,19 +1,21 @@
 ﻿namespace NServiceBus.PersistenceTesting
 {
+    using System.Transactions;
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Threading.Tasks;
-    using Extensibility;
+    using NServiceBus.Extensibility;
     using Newtonsoft.Json;
     using Npgsql;
     using NpgsqlTypes;
     using NServiceBus.Outbox;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence;
-    using Persistence.Sql.ScriptBuilder;
-    using Transport;
+    using NServiceBus.Persistence;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NServiceBus.Transport;
+    using System.Threading;
 
     public partial class PersistenceTestsConfiguration
     {
@@ -37,11 +39,13 @@
 
         static PersistenceTestsConfiguration()
         {
-            var postgreSql = new SqlDialect.PostgreSql();
-            postgreSql.JsonBParameterModifier = parameter =>
+            var postgreSql = new SqlDialect.PostgreSql
             {
-                var npgsqlParameter = (NpgsqlParameter)parameter;
-                npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                JsonBParameterModifier = parameter =>
+                {
+                    var npgsqlParameter = (NpgsqlParameter)parameter;
+                    npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+                }
             };
 
             var variants = new List<object>
@@ -65,7 +69,7 @@
             return new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, connectionFactory, usePessimisticMode)));
         }
 
-        public Task Configure()
+        public Task Configure(CancellationToken cancellationToken = default)
         {
             var variant = (SqlTestVariant)Variant.Values[0];
             var dialect = variant.Dialect;
@@ -161,15 +165,15 @@
             ISqlOutboxTransaction transactionFactory()
             {
                 return transactionScopeMode
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager)
-                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager);
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted)
+                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             }
 
             var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
             return outboxPersister;
         }
 
-        public Task Cleanup()
+        public Task Cleanup(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

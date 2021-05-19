@@ -27,23 +27,23 @@ static class Extensions
         command.Parameters.Add(parameter);
     }
 
-    public static Task<DbConnection> OpenNonContextualConnection(this IConnectionManager connectionManager)
+    public static Task<DbConnection> OpenNonContextualConnection(this IConnectionManager connectionManager, CancellationToken cancellationToken = default)
     {
         var connection = connectionManager.BuildNonContextual();
-        return OpenConnection(connection);
+        return OpenConnection(connection, cancellationToken);
     }
 
-    public static Task<DbConnection> OpenConnection(this IConnectionManager connectionManager, IncomingMessage incomingMessage)
+    public static Task<DbConnection> OpenConnection(this IConnectionManager connectionManager, IncomingMessage incomingMessage, CancellationToken cancellationToken = default)
     {
         var connection = connectionManager.Build(incomingMessage);
-        return OpenConnection(connection);
+        return OpenConnection(connection, cancellationToken);
     }
 
-    static async Task<DbConnection> OpenConnection(DbConnection connection)
+    static async Task<DbConnection> OpenConnection(DbConnection connection, CancellationToken cancellationToken)
     {
         try
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             return connection;
         }
         catch
@@ -58,31 +58,31 @@ static class Extensions
         command.AddParameter(name, value.ToString());
     }
 
-    public static async Task<bool> GetBoolAsync(this DbDataReader reader, int position)
+    public static async Task<bool> GetBoolAsync(this DbDataReader reader, int position, CancellationToken cancellationToken = default)
     {
         var type = reader.GetFieldType(position);
         // MySql stores bools as ints
         if (type == typeof(ulong))
         {
-            return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position).ConfigureAwait(false));
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position, cancellationToken).ConfigureAwait(false));
         }
         // In Oracle we store bools as NUMBER(1,0) (short).
         if (type == typeof(short))
         {
-            return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position).ConfigureAwait(false));
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position, cancellationToken).ConfigureAwait(false));
         }
-        return await reader.GetFieldValueAsync<bool>(position).ConfigureAwait(false);
+        return await reader.GetFieldValueAsync<bool>(position, cancellationToken).ConfigureAwait(false);
     }
 
-    public static async Task<Guid> GetGuidAsync(this DbDataReader reader, int position)
+    public static async Task<Guid> GetGuidAsync(this DbDataReader reader, int position, CancellationToken cancellationToken = default)
     {
         var type = reader.GetFieldType(position);
         // MySql stores Guids as strings
         if (type == typeof(string))
         {
-            return new Guid(await reader.GetFieldValueAsync<string>(position).ConfigureAwait(false));
+            return new Guid(await reader.GetFieldValueAsync<string>(position, cancellationToken).ConfigureAwait(false));
         }
-        return await reader.GetFieldValueAsync<Guid>(position).ConfigureAwait(false);
+        return await reader.GetFieldValueAsync<Guid>(position, cancellationToken).ConfigureAwait(false);
     }
 
     internal static Func<T, object> GetPropertyAccessor<T>(this Type sagaDataType, string propertyName)
@@ -95,12 +95,7 @@ static class Extensions
         return data => propertyInfo.GetValue(data);
     }
 
-    public static Task ExecuteNonQueryEx(this DbCommand command)
-    {
-        return ExecuteNonQueryEx(command, CancellationToken.None);
-    }
-
-    public static async Task<int> ExecuteNonQueryEx(this DbCommand command, CancellationToken cancellationToken)
+    public static async Task<int> ExecuteNonQueryEx(this DbCommand command, CancellationToken cancellationToken = default)
     {
         try
         {

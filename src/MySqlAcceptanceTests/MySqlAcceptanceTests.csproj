@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
@@ -12,11 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.631" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.940" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Particular.CodeRules" Version="0.7.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,11 +29,6 @@
     <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
     <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
     <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\AcceptanceTestSuppressions.cs" Link="AcceptanceTestSuppressions.cs" />
-    <Compile Include="..\TestSuppressions.cs" Link="TestSuppressions.cs" />
   </ItemGroup>
 
 </Project>

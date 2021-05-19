@@ -1,21 +1,24 @@
-#if NETFRAMEWORK
-using System;
-using System.Data.Common;
-using NServiceBus.Persistence.Sql.ScriptBuilder;
-
-class PostgreSqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
+namespace PostgreSql
 {
-    public PostgreSqlAdaptTransportConnectionTests() : base(BuildSqlDialect.PostgreSql)
-    {
-    }
+#if NETFRAMEWORK
+    using System;
+    using System.Data.Common;
+    using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-    protected override Func<string, DbConnection> GetConnection()
+    class PostgreSqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
-        return x =>
+        public PostgreSqlAdaptTransportConnectionTests() : base(BuildSqlDialect.PostgreSql)
         {
-            var connection = PostgreSqlConnectionBuilder.Build();
-            return connection;
-        };
+        }
+
+        protected override Func<string, DbConnection> GetConnection()
+        {
+            return x =>
+            {
+                var connection = PostgreSqlConnectionBuilder.Build();
+                return connection;
+            };
+        }
     }
-}
 #endif
+}

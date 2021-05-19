@@ -11,6 +11,7 @@ public static class OracleConnectionBuilder
     public static OracleConnection Build(bool disableMetadataPooling)
     {
         var connection = Environment.GetEnvironmentVariable("OracleConnectionString");
+
         if (string.IsNullOrWhiteSpace(connection))
         {
             throw new Exception("OracleConnectionString environment variable is empty");

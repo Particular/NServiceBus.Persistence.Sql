@@ -17,7 +17,7 @@ public class OutboxScriptBuilderTest
         var builder = new StringBuilder();
         using (var writer = new StringWriter(builder))
         {
-            OutboxScriptBuilder.BuildCreateScript(writer,sqlDialect);
+            OutboxScriptBuilder.BuildCreateScript(writer, sqlDialect);
         }
         var script = builder.ToString();
         if (sqlDialect == BuildSqlDialect.MsSqlServer)

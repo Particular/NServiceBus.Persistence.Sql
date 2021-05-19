@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -39,8 +40,8 @@ public abstract class OutboxPersisterTests
         var persister = new OutboxPersister(
             connectionManager: connectionManager,
             sqlDialect: dialect,
-            outboxCommands,
-            () =>
+            outboxCommands: outboxCommands,
+            outboxTransactionFactory: () =>
             {
                 ConcurrencyControlStrategy behavior;
                 if (pessimistic)
@@ -52,9 +53,9 @@ public abstract class OutboxPersisterTests
                     behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
 
-                return transactionScope 
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager) 
-                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
+                return transactionScope
+                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
+                    : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
             cleanupBatchSize: 5);
         using (var connection = GetConnection()(theSchema))
@@ -115,18 +116,18 @@ public abstract class OutboxPersisterTests
         Assert.AreEqual(0, result.Item2.TransportOperations.Length);
     }
 
-    async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister)
+    static async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new List<TransportOperation>
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {
@@ -139,15 +140,15 @@ public abstract class OutboxPersisterTests
         var messageId = "a";
 
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
 
-        var beforeDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
-        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
-        var afterDispatch = await persister.Get(messageId, contextBag).ConfigureAwait(false);
+        var beforeDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        var afterDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
 
         return Tuple.Create(beforeDispatch, afterDispatch);
     }
@@ -174,25 +175,25 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            var ambientTransaction = System.Transactions.Transaction.Current;
+            var ambientTransaction = Transaction.Current;
             Assert.IsNotNull(ambientTransaction);
 
             await transaction.Commit();
         }
     }
 
-    async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister)
+    static async Task<OutboxMessage> StoreAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new[]
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {
@@ -206,12 +207,12 @@ public abstract class OutboxPersisterTests
         var messageId = "a";
 
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
-        return await persister.Get(messageId, contextBag).ConfigureAwait(false);
+        return await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
     }
 
     static ContextBag CreateContextBag(string messageId)
@@ -235,24 +236,24 @@ public abstract class OutboxPersisterTests
         await Task.Delay(1000).ConfigureAwait(false);
         await Store(13, persister).ConfigureAwait(false);
 
-        await persister.RemoveEntriesOlderThan(dateTime, CancellationToken.None).ConfigureAwait(false);
+        await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
         Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
         Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
-    async Task Store(int i, OutboxPersister persister)
+    static async Task Store(int i, OutboxPersister persister, CancellationToken cancellationToken = default)
     {
         var operations = new[]
         {
             new TransportOperation(
                 messageId: "OperationId" + i,
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[]
                 {
                     0x20
@@ -267,12 +268,12 @@ public abstract class OutboxPersisterTests
         };
         var messageId = "MessageId" + i;
         var contextBag = CreateContextBag(messageId);
-        using (var transaction = await persister.BeginTransaction(contextBag))
+        using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag).ConfigureAwait(false);
-            await transaction.Commit();
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await transaction.Commit(cancellationToken);
         }
-        await persister.SetAsDispatched(messageId, contextBag).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
     }
 
     [Test]
@@ -290,12 +291,12 @@ public abstract class OutboxPersisterTests
         {
             new TransportOperation(
                 messageId: "Id1",
-                options: new Dictionary<string, string>
+                properties: new DispatchProperties(new Dictionary<string, string>
                 {
                     {
                         "OptionKey1", "OptionValue1"
                     }
-                },
+                }),
                 body: new byte[] {0x20, 0x21},
                 headers: new Dictionary<string, string>
                 {

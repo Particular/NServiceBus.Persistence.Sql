@@ -5,5 +5,5 @@ using System.Threading.Tasks;
 interface IAsyncTimer
 {
     void Start(Func<DateTime, CancellationToken, Task> callback, TimeSpan interval, Action<Exception> errorCallback, Func<TimeSpan, CancellationToken, Task> delayStrategy);
-    Task Stop();
+    Task Stop(CancellationToken cancellationToken = default);
 }

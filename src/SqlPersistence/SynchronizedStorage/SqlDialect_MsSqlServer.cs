@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
@@ -11,14 +12,19 @@
     {
         public partial class MsSqlServer
         {
-            internal override async Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionManager, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<StorageSession> TryAdaptTransportConnection(
+                TransportTransaction transportTransaction,
+                ContextBag context,
+                IConnectionManager connectionManager,
+                Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
+                CancellationToken cancellationToken = default)
             {
                 if (DoNotUseTransportConnection)
                 {
                     return null;
                 }
 
-                //SQL server transport in native TX mode
+                // SQL server transport in native TX mode
                 if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
                     transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
                 {
@@ -27,6 +33,7 @@
 
                 // Transport supports DTC and uses TxScope owned by the transport
                 var scopeTx = Transaction.Current;
+
                 if (transportTransaction.TryGet(out Transaction transportTx) &&
                     scopeTx != null &&
                     transportTx != scopeTx)
@@ -36,15 +43,18 @@
                                         + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
                                         + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
                 }
+
                 var ambientTransaction = transportTx ?? scopeTx;
+
                 if (ambientTransaction == null)
                 {
-                    //Other modes handled by creating a new session.
+                    // Other modes handled by creating a new session.
                     return null;
                 }
 
-                var connection = await connectionManager.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false);
+                var connection = await connectionManager.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
+
                 return storageSessionFactory(connection, null, true);
             }
 

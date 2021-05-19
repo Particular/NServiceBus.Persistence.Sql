@@ -9,5 +9,6 @@
         internal abstract string GetOutboxPessimisticBeginCommand(string tableName);
         internal abstract string GetOutboxPessimisticCompleteCommand(string tableName);
         internal abstract string GetOutboxCleanupCommand(string tableName);
+        internal virtual string AddOutboxPadding(string json) => json;
     }
 }

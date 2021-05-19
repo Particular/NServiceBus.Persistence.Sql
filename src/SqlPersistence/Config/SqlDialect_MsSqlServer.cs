@@ -1,6 +1,7 @@
 namespace NServiceBus
 {
     using System;
+    using System.Data;
     using System.Data.Common;
 
     public abstract partial class SqlDialect
@@ -47,6 +48,22 @@ namespace NServiceBus
                 return new CommandWrapper(command, this);
             }
 
+            internal override CommandBehavior ModifyBehavior(DbConnection connection, CommandBehavior baseBehavior)
+            {
+                if (!hasConnectionBeenInspectedForEncryption)
+                {
+                    isConnectionEncrypted = connection.IsEncrypted();
+                    hasConnectionBeenInspectedForEncryption = true;
+                }
+
+                if (isConnectionEncrypted)
+                {
+                    baseBehavior &= ~CommandBehavior.SequentialAccess; //Remove sequential access
+                }
+
+                return baseBehavior;
+            }
+
             internal override object GetCustomDialectDiagnosticsInfo()
             {
                 return new
@@ -57,6 +74,8 @@ namespace NServiceBus
             }
 
             internal string Schema { get; set; }
+            bool hasConnectionBeenInspectedForEncryption;
+            bool isConnectionEncrypted;
         }
     }
 }

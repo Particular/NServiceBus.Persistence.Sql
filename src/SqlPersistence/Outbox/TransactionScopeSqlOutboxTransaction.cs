@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
@@ -10,14 +11,17 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     static ILog Log = LogManager.GetLogger<TransactionScopeSqlOutboxTransaction>();
 
     IConnectionManager connectionManager;
+    IsolationLevel isolationLevel;
     ConcurrencyControlStrategy concurrencyControlStrategy;
     TransactionScope transactionScope;
     Transaction ambientTransaction;
     bool commit;
 
-    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, IConnectionManager connectionManager)
+    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
+        IConnectionManager connectionManager, IsolationLevel isolationLevel)
     {
         this.connectionManager = connectionManager;
+        this.isolationLevel = isolationLevel;
         this.concurrencyControlStrategy = concurrencyControlStrategy;
     }
 
@@ -27,22 +31,25 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     // Prepare is deliberately kept sync to allow floating of TxScope where needed
     public void Prepare(ContextBag context)
     {
-        transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
+        var options = new TransactionOptions
+        {
+            IsolationLevel = isolationLevel
+        };
+
+        transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);
         ambientTransaction = System.Transactions.Transaction.Current;
     }
 
-    public async Task Begin(ContextBag context)
+    public async Task Begin(ContextBag context, CancellationToken cancellationToken = default)
     {
         var incomingMessage = context.GetIncomingMessage();
-        Connection = await connectionManager.OpenConnection(incomingMessage).ConfigureAwait(false);
+        Connection = await connectionManager.OpenConnection(incomingMessage, cancellationToken).ConfigureAwait(false);
         Connection.EnlistTransaction(ambientTransaction);
-        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, null).ConfigureAwait(false);
+        await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, null, cancellationToken).ConfigureAwait(false);
     }
 
-    public Task Complete(OutboxMessage outboxMessage, ContextBag context)
-    {
-        return concurrencyControlStrategy.Complete(outboxMessage, Connection, null, context);
-    }
+    public Task Complete(OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default) =>
+        concurrencyControlStrategy.Complete(outboxMessage, Connection, null, context, cancellationToken);
 
     public void BeginSynchronizedSession(ContextBag context)
     {
@@ -69,7 +76,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
         }
     }
 
-    public Task Commit()
+    public Task Commit(CancellationToken cancellationToken = default)
     {
         commit = true;
         return Task.FromResult(0);

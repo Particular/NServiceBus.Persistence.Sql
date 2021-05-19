@@ -144,9 +144,13 @@ public partial class CoreSagaMetadataTests
         TestSagaDefinition<ReverseHeaderMappingSaga>();
     }
 
-    private void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
+    void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
     {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0054 //False positive
         moduleToUse = moduleToUse ?? module;
+#pragma warning restore IDE0054 //False positive
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         var dataType = moduleToUse.GetTypeDefinition<TSagaType>();
         var instructions = InstructionAnalyzer.GetConfigureHowToFindSagaInstructions(dataType);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -45,19 +46,22 @@ public class ConfigureEndpointHelper
         }
     }
 
-    public Task Cleanup()
+    public Task Cleanup(CancellationToken cancellationToken = default)
     {
         using (var connection = connectionBuilder())
         {
             connection.Open();
+
             foreach (var definition in sagaDefinitions)
             {
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix, exceptionFilter);
             }
+
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
         }
-        return Task.FromResult(0);
+
+        return Task.CompletedTask;
     }
 }

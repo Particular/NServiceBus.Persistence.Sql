@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard1.5</TargetFrameworks>
+    <!-- TFMs needed to support VS 2017 and .NET Core 2.1 SDK -->
+    <TargetFrameworks>net46;netcoreapp2.1</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilder</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -11,9 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.10.0" />
-    <PackageReference Include="Particular.CodeRules" Version="0.7.0" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="0.9.0" PrivateAssets="All" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.3" />
+    <PackageReference Include="Particular.Packaging" Version="1.2.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientAcc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

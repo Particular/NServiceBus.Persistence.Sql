@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
@@ -11,10 +12,16 @@
     {
         public partial class Oracle
         {
-            internal override async Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction, ContextBag context, IConnectionManager connectionBuilder, Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory)
+            internal override async Task<StorageSession> TryAdaptTransportConnection(
+                TransportTransaction transportTransaction,
+                ContextBag context,
+                IConnectionManager connectionBuilder,
+                Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
+                CancellationToken cancellationToken = default)
             {
                 // Oracle supports DTC so we should enlist in the transport's TransactionScope if present
                 var scopeTx = Transaction.Current;
+
                 if (transportTransaction.TryGet(out Transaction transportTx) &&
                     scopeTx != null &&
                     transportTx != scopeTx)
@@ -24,15 +31,18 @@
                                         + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
                                         + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
                 }
+
                 var ambientTransaction = transportTx ?? scopeTx;
+
                 if (ambientTransaction == null)
                 {
-                    //Other modes handled by creating a new session.
+                    // Other modes handled by creating a new session.
                     return null;
                 }
 
-                var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage()).ConfigureAwait(false);
+                var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
+
                 return storageSessionFactory(connection, null, true);
             }
         }
