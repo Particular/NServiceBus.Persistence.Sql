@@ -7,7 +7,7 @@ public static class CecilTestExtensions
 {
     static CecilTestExtensions()
     {
-        var path = new Uri(typeof(string).Assembly.CodeBase).LocalPath;
+        var path = new Uri(typeof(string).Assembly.Location).LocalPath;
         var parameters = new ReaderParameters(ReadingMode.Immediate)
         {
             ReadWrite = false
