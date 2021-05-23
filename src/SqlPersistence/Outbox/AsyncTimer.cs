@@ -10,21 +10,33 @@ class AsyncTimer : IAsyncTimer
         tokenSource = new CancellationTokenSource();
         var token = tokenSource.Token;
 
-        task = Task.Run(async () =>
-        {
-            while (!token.IsCancellationRequested)
+        task = Task.Run(
+            async () =>
             {
                 try
                 {
-                    var utcNow = DateTime.UtcNow;
-                    await delayStrategy(interval, token).ConfigureAwait(false);
-                    await callback(utcNow, token).ConfigureAwait(false);
+                    while (true)
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        var utcNow = DateTime.UtcNow;
+
+                        try
+                        {
+                            await delayStrategy(interval, token).ConfigureAwait(false);
+                            await callback(utcNow, token).ConfigureAwait(false);
+                        }
+                        catch (Exception ex) when (!(ex is OperationCanceledException))
+                        {
+                            errorCallback(ex);
+                        }
+                    }
                 }
                 catch (OperationCanceledException ex)
                 {
                     if (token.IsCancellationRequested)
                     {
-                        log.Debug("Timer execution cancelled.", ex);
+                        log.Debug("Timer execution canceled.", ex);
                     }
                     else
                     {
@@ -33,10 +45,10 @@ class AsyncTimer : IAsyncTimer
                 }
                 catch (Exception ex)
                 {
-                    errorCallback(ex);
+                    log.Debug("Timer execution failed.", ex);
                 }
-            }
-        }, CancellationToken.None);
+            },
+            CancellationToken.None);
     }
 
     public Task Stop(CancellationToken cancellationToken = default)
@@ -54,5 +66,5 @@ class AsyncTimer : IAsyncTimer
 
     Task task;
     CancellationTokenSource tokenSource;
-    ILog log = LogManager.GetLogger<AsyncTimer>();
+    readonly ILog log = LogManager.GetLogger<AsyncTimer>();
 }

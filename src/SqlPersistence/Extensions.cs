@@ -46,7 +46,18 @@ static class Extensions
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             return connection;
         }
-        catch
+        catch (OperationCanceledException)
+        {
+            // copy the general catch but don't let another exception mask the OCE
+            try
+            {
+                connection?.Dispose();
+            }
+            catch { }
+
+            throw;
+        }
+        catch (Exception)
         {
             connection?.Dispose();
             throw;
@@ -101,10 +112,10 @@ static class Extensions
         {
             return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception exception)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
             var message = $"Failed to ExecuteNonQuery. CommandText:{Environment.NewLine}{command.CommandText}";
-            throw new Exception(message, exception);
+            throw new Exception(message, ex);
         }
     }
 
