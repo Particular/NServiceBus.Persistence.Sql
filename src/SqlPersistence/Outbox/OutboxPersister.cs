@@ -12,11 +12,11 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 class OutboxPersister : IOutboxStorage
 {
-    IConnectionManager connectionManager;
-    SqlDialect sqlDialect;
-    int cleanupBatchSize;
-    OutboxCommands outboxCommands;
-    Func<ISqlOutboxTransaction> outboxTransactionFactory;
+    readonly IConnectionManager connectionManager;
+    readonly SqlDialect sqlDialect;
+    readonly int cleanupBatchSize;
+    readonly OutboxCommands outboxCommands;
+    readonly Func<ISqlOutboxTransaction> outboxTransactionFactory;
 
     public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
         Func<ISqlOutboxTransaction> outboxTransactionFactory,
@@ -45,14 +45,25 @@ class OutboxPersister : IOutboxStorage
 
             return transaction;
         }
-        catch (Exception e)
+        catch (OperationCanceledException)
+        {
+            // copy the general catch but don't let another exception mask the OCE
+            try
+            {
+                transaction.Dispose();
+            }
+            catch { }
+
+            throw;
+        }
+        catch (Exception ex)
         {
             // A method that returns something that is disposable should not throw during the creation
             // of the disposable resource. If it does the compiler generated code will not dispose anything
             // therefore we need to dispose here to prevent the connection being returned to the pool being
             // in a zombie state.
             transaction.Dispose();
-            throw new Exception("Error while opening outbox transaction", e);
+            throw new Exception("Error while opening outbox transaction", ex);
         }
     }
 
@@ -118,8 +129,10 @@ class OutboxPersister : IOutboxStorage
         using (var connection = await connectionManager.OpenNonContextualConnection(cancellationToken).ConfigureAwait(false))
         {
             var continuePurging = true;
-            while (continuePurging && !cancellationToken.IsCancellationRequested)
+            while (continuePurging)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = outboxCommands.Cleanup;

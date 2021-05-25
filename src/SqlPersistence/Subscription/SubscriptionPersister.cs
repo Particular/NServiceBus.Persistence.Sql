@@ -114,7 +114,7 @@ class SubscriptionPersister : ISubscriptionStorage
                 await action(cancellationToken).ConfigureAwait(false);
                 return;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 attempts++;
 
@@ -195,12 +195,12 @@ class SubscriptionPersister : ISubscriptionStorage
     }
 
     public ConcurrentDictionary<string, CacheItem> Cache;
-    IConnectionManager connectionManager;
-    SqlDialect sqlDialect;
+    readonly IConnectionManager connectionManager;
+    readonly SqlDialect sqlDialect;
     TimeSpan? cacheFor;
-    SubscriptionCommands subscriptionCommands;
+    readonly SubscriptionCommands subscriptionCommands;
 
-    static ILog Log = LogManager.GetLogger<SubscriptionPersister>();
+    static readonly ILog Log = LogManager.GetLogger<SubscriptionPersister>();
 
     internal class CacheItem
     {

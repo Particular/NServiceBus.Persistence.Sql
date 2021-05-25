@@ -52,7 +52,7 @@ public class AsyncTimerTests
     public async Task Stop_cancels_token_while_waiting()
     {
         var timer = new AsyncTimer();
-        var waitCancelled = false;
+        var waitCanceled = false;
         var delayStarted = new TaskCompletionSource<bool>();
 
         timer.Start((time, token) =>
@@ -70,20 +70,20 @@ public class AsyncTimerTests
             }
             catch (OperationCanceledException)
             {
-                waitCancelled = true;
+                waitCanceled = true;
             }
         });
         await delayStarted.Task.ConfigureAwait(false);
         await timer.Stop().ConfigureAwait(false);
 
-        Assert.IsTrue(waitCancelled);
+        Assert.IsTrue(waitCanceled);
     }
 
     [Test]
     public async Task Stop_cancels_token_while_in_callback()
     {
         var timer = new AsyncTimer();
-        var callbackCancelled = false;
+        var callbackCanceled = false;
         var callbackStarted = new TaskCompletionSource<bool>();
         var stopInitiated = new TaskCompletionSource<bool>();
 
@@ -93,7 +93,7 @@ public class AsyncTimerTests
             await stopInitiated.Task.ConfigureAwait(false);
             if (token.IsCancellationRequested)
             {
-                callbackCancelled = true;
+                callbackCanceled = true;
             }
         }, TimeSpan.Zero, e =>
         {
@@ -104,7 +104,7 @@ public class AsyncTimerTests
         var stopTask = timer.Stop();
         stopInitiated.SetResult(true);
         await stopTask.ConfigureAwait(false);
-        Assert.IsTrue(callbackCancelled);
+        Assert.IsTrue(callbackCanceled);
     }
 
     [Test]
