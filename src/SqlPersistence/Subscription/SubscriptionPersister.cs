@@ -114,7 +114,7 @@ class SubscriptionPersister : ISubscriptionStorage
                 await action(cancellationToken).ConfigureAwait(false);
                 return;
             }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
+            catch (Exception ex) when (!ex.IsCausedBy(cancellationToken))
             {
                 attempts++;
 

@@ -13,58 +13,48 @@ class AsyncTimer : IAsyncTimer
         task = Task.Run(
             async () =>
             {
-                try
+                while (!token.IsCancellationRequested)
                 {
-                    while (true)
+                    try
                     {
-                        token.ThrowIfCancellationRequested();
-
                         var utcNow = DateTime.UtcNow;
-
+                        await delayStrategy(interval, token).ConfigureAwait(false);
+                        await callback(utcNow, token).ConfigureAwait(false);
+                    }
+                    catch (Exception ex) when (ex.IsCausedBy(token))
+                    {
+                        // private token, timer is being stopped, log the exception in case the stack trace is ever needed for debugging
+                        log.Debug("Operation canceled while stopping timer.", ex);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
                         try
-                        {
-                            await delayStrategy(interval, token).ConfigureAwait(false);
-                            await callback(utcNow, token).ConfigureAwait(false);
-                        }
-                        catch (Exception ex) when (!(ex is OperationCanceledException))
                         {
                             errorCallback(ex);
                         }
+                        catch (Exception errorCallBackEx)
+                        {
+                            log.Error("Error call back failed. Stopping timer.", errorCallBackEx);
+                            break;
+                        }
                     }
-                }
-                catch (OperationCanceledException ex)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        log.Debug("Timer execution canceled.", ex);
-                    }
-                    else
-                    {
-                        log.Warn("OperationCanceledException thrown.", ex);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Debug("Timer execution failed.", ex);
                 }
             },
             CancellationToken.None);
     }
 
-    public Task Stop(CancellationToken cancellationToken = default)
+    public async Task Stop(CancellationToken cancellationToken = default)
     {
-        if (tokenSource == null)
-        {
-            return Task.CompletedTask;
-        }
+        tokenSource?.Cancel();
 
-        tokenSource.Cancel();
-        tokenSource.Dispose();
+        await (task ?? Task.CompletedTask).ConfigureAwait(false);
 
-        return task ?? Task.CompletedTask;
+        tokenSource?.Dispose();
     }
 
     Task task;
     CancellationTokenSource tokenSource;
-    readonly ILog log = LogManager.GetLogger<AsyncTimer>();
+
+    static readonly ILog log = LogManager.GetLogger<AsyncTimer>();
 }

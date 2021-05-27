@@ -68,7 +68,7 @@ public class AsyncTimerTests
             {
                 await Task.Delay(delayTime, token).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
+            catch (Exception ex) when (ex.IsCausedBy(token))
             {
                 waitCanceled = true;
             }
