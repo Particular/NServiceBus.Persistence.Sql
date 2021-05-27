@@ -46,7 +46,7 @@ static class Extensions
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             return connection;
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (ex.IsCausedBy(cancellationToken))
         {
             // copy the general catch but don't let another exception mask the OCE
             try
@@ -112,7 +112,7 @@ static class Extensions
         {
             return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex) when (!ex.IsCausedBy(cancellationToken))
         {
             var message = $"Failed to ExecuteNonQuery. CommandText:{Environment.NewLine}{command.CommandText}";
             throw new Exception(message, ex);

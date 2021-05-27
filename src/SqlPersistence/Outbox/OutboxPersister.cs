@@ -45,7 +45,7 @@ class OutboxPersister : IOutboxStorage
 
             return transaction;
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (ex.IsCausedBy(cancellationToken))
         {
             // copy the general catch but don't let another exception mask the OCE
             try
