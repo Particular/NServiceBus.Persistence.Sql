@@ -164,9 +164,12 @@
 
             ISqlOutboxTransaction transactionFactory()
             {
-                return transactionScopeMode
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted)
-                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
+                if (transactionScopeMode)
+                {
+                    return new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted);
+                }
+
+                return new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             }
 
             var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
