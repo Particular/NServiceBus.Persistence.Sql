@@ -22,11 +22,4 @@
     <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <Compile Remove="Saga\OracleSagaPersisterTests.cs" />
-    <Compile Remove="Outbox\OracleOutboxPersisterTests.cs" />
-    <Compile Remove="Timeout\OracleTimeoutPersisterTests.cs" />
-    <Compile Remove="Subscription\OracleSubscriptionPersisterTests.cs" />
-  </ItemGroup>
-
 </Project>
