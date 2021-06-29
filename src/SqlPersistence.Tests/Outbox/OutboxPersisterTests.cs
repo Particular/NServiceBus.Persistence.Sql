@@ -53,7 +53,7 @@ public abstract class OutboxPersisterTests
                 }
 
                 return transactionScope
-                    ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
+                    ? new TransactionScopeSqlOutboxTransaction(behavior, connectionManager)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager);
             },
             cleanupBatchSize: 5);
