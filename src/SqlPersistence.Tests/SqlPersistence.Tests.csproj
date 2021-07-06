@@ -5,6 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,13 +20,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="Particular.Approvals" Version="0.3.0" />
     <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <Compile Remove="Saga\OracleSagaPersisterTests.cs" />
-    <Compile Remove="Outbox\OracleOutboxPersisterTests.cs" />
-    <Compile Remove="Timeout\OracleTimeoutPersisterTests.cs" />
-    <Compile Remove="Subscription\OracleSubscriptionPersisterTests.cs" />
   </ItemGroup>
 
 </Project>

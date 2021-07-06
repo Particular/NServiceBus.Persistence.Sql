@@ -105,9 +105,12 @@ namespace Oracle
         [OneTimeSetUp]
         public void Setup()
         {
-            using (var connection = OracleConnectionBuilder.Build())
+            if (OnlyOnWindowsAttribute.IsOnWindows)
             {
-                connection.Open();
+                using (var connection = OracleConnectionBuilder.Build())
+                {
+                    connection.Open();
+                }
             }
         }
     }
