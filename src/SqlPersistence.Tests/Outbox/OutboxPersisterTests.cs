@@ -53,7 +53,7 @@ public abstract class OutboxPersisterTests
                     behavior = new OptimisticConcurrencyControlStrategy(dialect, outboxCommands);
                 }
 
-		        return transactionScope
+                return transactionScope
                     ? new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
