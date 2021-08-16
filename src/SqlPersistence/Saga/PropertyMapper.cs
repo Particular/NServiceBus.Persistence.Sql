@@ -22,7 +22,7 @@ class PropertyMapper<TSagaData> : IMessagePropertyMapper
     {
         if (sagaEntityProperty == null)
         {
-            throw new Exception($"The saga '{sagaType.FullName}' has not defined a CorrelationPropertyName, so it is expected that a {nameof(IFindSagas<TSagaData>)} will be defined for all messages the saga handles.");
+            throw new Exception($"The saga '{sagaType.FullName}' has not defined a CorrelationPropertyName, so it is expected that a {nameof(ISagaFinder<TSagaData, TMessage>)} will be defined for all messages the saga handles.");
         }
         Guard.AgainstNull(nameof(messageProperty), messageProperty);
         sagaMessageFindingConfiguration.ConfigureMapping(sagaEntityProperty, messageProperty);

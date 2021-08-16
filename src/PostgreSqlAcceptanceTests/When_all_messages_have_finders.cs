@@ -46,7 +46,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             EndpointSetup<DefaultServer>();
         }
 
-        public class CustomFinder : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
+        public class CustomFinder : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
             Context testContext;
 
@@ -55,7 +55,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                 testContext = context;
             }
 
-            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken = default)
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.FinderUsed = true;
 

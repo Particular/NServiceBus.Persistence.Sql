@@ -6,7 +6,7 @@
 
     public static partial class SqlPersistenceConfig
     {
-        internal static SqlDialect GetSqlDialect(this ReadOnlySettings settings)
+        internal static SqlDialect GetSqlDialect(this IReadOnlySettings settings)
         {
             if (settings.TryGet("SqlPersistence.SqlDialect", out SqlDialectSettings value))
             {

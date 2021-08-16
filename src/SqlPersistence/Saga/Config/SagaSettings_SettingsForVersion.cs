@@ -12,7 +12,7 @@
             settings.Set(builder);
         }
 
-        internal static RetrieveVersionSpecificJsonSettings GetVersionSettings(ReadOnlySettings settings)
+        internal static RetrieveVersionSpecificJsonSettings GetVersionSettings(IReadOnlySettings settings)
         {
             return settings.GetOrDefault<RetrieveVersionSpecificJsonSettings>();
         }

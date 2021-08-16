@@ -10,14 +10,14 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken = default)
+    internal static async Task<TSagaData> GetByWhereClause<TSagaData>(string whereClause, ISynchronizedStorageSession session, ContextBag context, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var result = await GetByWhereClause<TSagaData>(whereClause, session, appendParameters, sagaInfoCache, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, SynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken)
+    static Task<Concurrency<TSagaData>> GetByWhereClause<TSagaData>(string whereClause, ISynchronizedStorageSession session, ParameterAppender appendParameters, SagaInfoCache sagaInfoCache, CancellationToken cancellationToken)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -25,14 +25,14 @@ partial class SagaPersister
         return GetSagaData<TSagaData>(session, commandText, sagaInfo, appendParameters, cancellationToken);
     }
 
-    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    public async Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(propertyName, propertyValue, session, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, CancellationToken cancellationToken = default)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(string propertyName, object propertyValue, ISynchronizedStorageSession session, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -48,14 +48,14 @@ partial class SagaPersister
             }, cancellationToken);
     }
 
-    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    public async Task<TSagaData> Get<TSagaData>(Guid sagaId, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var result = await Get<TSagaData>(sagaId, session, cancellationToken).ConfigureAwait(false);
         return SetConcurrency(result, context);
     }
 
-    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, CancellationToken cancellationToken = default)
+    internal Task<Concurrency<TSagaData>> Get<TSagaData>(Guid sagaId, ISynchronizedStorageSession session, CancellationToken cancellationToken = default)
         where TSagaData : class, IContainSagaData
     {
         var sagaInfo = sagaInfoCache.GetInfo(typeof(TSagaData));
@@ -68,7 +68,7 @@ partial class SagaPersister
             }, cancellationToken);
     }
 
-    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(SynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters, CancellationToken cancellationToken)
+    static async Task<Concurrency<TSagaData>> GetSagaData<TSagaData>(ISynchronizedStorageSession session, string commandText, RuntimeSagaInfo sagaInfo, ParameterAppender appendParameters, CancellationToken cancellationToken)
         where TSagaData : class, IContainSagaData
     {
         var sqlSession = session.SqlPersistenceSession();

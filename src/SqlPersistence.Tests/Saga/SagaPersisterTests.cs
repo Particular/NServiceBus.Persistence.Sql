@@ -1212,9 +1212,9 @@ public abstract class SagaPersisterTests
         }
     }
 
-    public class CustomFinder : IFindSagas<SagaWithNoCorrelation.SagaData>.Using<AMessage>
+    public class CustomFinder : ISagaFinder<SagaWithNoCorrelation.SagaData, AMessage>
     {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
+        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);

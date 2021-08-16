@@ -17,7 +17,7 @@ namespace NServiceBus
                 .Set("SqlPersistence.TablePrefix", tablePrefix);
         }
 
-        internal static string GetTablePrefix(this ReadOnlySettings settings)
+        internal static string GetTablePrefix(this IReadOnlySettings settings)
         {
             if (settings.TryGet("SqlPersistence.TablePrefix", out string tablePrefix))
             {

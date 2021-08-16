@@ -7,10 +7,10 @@ using NServiceBus.Persistence;
 
 partial class SagaPersister
 {
-    public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default) =>
+    public Task Complete(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default) =>
         Complete(sagaData, session, GetConcurrency(context), cancellationToken);
 
-    internal async Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, int concurrency, CancellationToken cancellationToken = default)
+    internal async Task Complete(IContainSagaData sagaData, ISynchronizedStorageSession session, int concurrency, CancellationToken cancellationToken = default)
     {
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
         var sqlSession = session.SqlPersistenceSession();

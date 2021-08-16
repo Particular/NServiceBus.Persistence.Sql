@@ -44,7 +44,7 @@ class StorageSessionFeature : Feature
         }
     }
 
-    static void ValidateSagaOutboxCombo(ReadOnlySettings settings)
+    static void ValidateSagaOutboxCombo(IReadOnlySettings settings)
     {
         var isOutboxEnabled = settings.IsFeatureActive(typeof(Outbox));
         var isSagasEnabled = settings.IsFeatureActive(typeof(Sagas));
@@ -61,7 +61,7 @@ class StorageSessionFeature : Feature
         throw new Exception("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.");
     }
 
-    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, ReadOnlySettings settings)
+    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)
     {
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);

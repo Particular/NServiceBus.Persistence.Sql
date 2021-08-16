@@ -8,9 +8,9 @@ using NServiceBus.Settings;
 class SqlPersistenceInstaller : INeedToInstallSomething
 {
     readonly InstallerSettings installerSettings;
-    readonly ReadOnlySettings settings;
+    readonly IReadOnlySettings settings;
 
-    public SqlPersistenceInstaller(ReadOnlySettings settings)
+    public SqlPersistenceInstaller(IReadOnlySettings settings)
     {
         this.settings = settings;
         installerSettings = settings.GetOrDefault<InstallerSettings>();

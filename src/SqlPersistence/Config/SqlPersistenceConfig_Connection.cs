@@ -61,7 +61,7 @@ namespace NServiceBus
             settings.Set("SqlPersistence.MultiTenant", true);
         }
 
-        internal static IConnectionManager GetConnectionBuilder(this ReadOnlySettings settings, Type storageType)
+        internal static IConnectionManager GetConnectionBuilder(this IReadOnlySettings settings, Type storageType)
         {
             if (settings.TryGet($"SqlPersistence.ConnectionManager.{storageType.Name}", out IConnectionManager value))
             {
@@ -82,7 +82,7 @@ namespace NServiceBus
             throw new Exception(exceptionMessage);
         }
 
-        internal static IConnectionManager GetConnectionBuilder<T>(this ReadOnlySettings settings)
+        internal static IConnectionManager GetConnectionBuilder<T>(this IReadOnlySettings settings)
             where T : StorageType
         {
             return GetConnectionBuilder(settings, typeof(T));

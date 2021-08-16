@@ -159,9 +159,9 @@ namespace NServiceBus
     }
     public static class SqlPersistenceStorageSessionExtensions
     {
-        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, System.Threading.CancellationToken cancellationToken = default)
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.ISynchronizedStorageSession session, NServiceBus.Extensibility.IReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, System.Threading.CancellationToken cancellationToken = default)
             where TSagaData :  class, NServiceBus.IContainSagaData { }
-        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.ISynchronizedStorageSession session) { }
     }
 }
 public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);

@@ -16,7 +16,7 @@ class SynchronizedStorage : ISynchronizedStorage
         this.currentSessionHolder = currentSessionHolder;
     }
 
-    public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken = default)
+    public async Task<ICompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken = default)
     {
         var connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();

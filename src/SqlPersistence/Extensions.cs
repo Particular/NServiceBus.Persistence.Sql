@@ -157,7 +157,7 @@ static class Extensions
         throw new Exception("Can't find message headers from context.");
     }
 
-    public static bool EndpointIsMultiTenant(this ReadOnlySettings settings)
+    public static bool EndpointIsMultiTenant(this IReadOnlySettings settings)
     {
         return settings.GetOrDefault<bool>("SqlPersistence.MultiTenant");
     }

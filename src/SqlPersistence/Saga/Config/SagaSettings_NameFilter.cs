@@ -10,7 +10,7 @@
             settings.Set("SqlPersistence.Saga.NameFilter", nameFilter);
         }
 
-        internal static Func<string, string> GetNameFilter(ReadOnlySettings settings)
+        internal static Func<string, string> GetNameFilter(IReadOnlySettings settings)
         {
             return settings.GetOrDefault<Func<string, string>>("SqlPersistence.Saga.NameFilter");
         }

@@ -50,7 +50,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
             EndpointSetup<DefaultServer>();
         }
 
-        public class FindByStartSagaMessage : IFindSagas<TestSaga.SagaData>.Using<StartSagaMessage>
+        public class FindByStartSagaMessage : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
             Context testContext;
 
@@ -59,7 +59,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
                 testContext = context;
             }
 
-            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, SynchronizedStorageSession session, ReadOnlyContextBag context, CancellationToken cancellationToken = default)
+            public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.StartSagaFinderUsed = true;
 
