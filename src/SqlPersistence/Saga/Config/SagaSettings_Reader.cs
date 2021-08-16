@@ -15,7 +15,7 @@
             settings.Set("SqlPersistence.Saga.ReaderCreator", readerCreator);
         }
 
-        internal static Func<TextReader, JsonReader> GetReaderCreator(ReadOnlySettings settings)
+        internal static Func<TextReader, JsonReader> GetReaderCreator(IReadOnlySettings settings)
         {
             return settings.GetOrDefault<Func<TextReader, JsonReader>>("SqlPersistence.Saga.ReaderCreator");
         }

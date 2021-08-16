@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 
 [TestFixture]
-public class EnsureSqlSagaNotDecoratedBySqlSagaAttribute
+public class EnsureSqlSagaNotDecoratedWithSqlSaga
 {
     [Test]
     public void ThrowIfAttributeExists()
@@ -15,14 +15,14 @@ public class EnsureSqlSagaNotDecoratedBySqlSagaAttribute
         var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         var readerParameters = new ReaderParameters(ReadingMode.Deferred);
         var module = ModuleDefinition.ReadModule(path, readerParameters);
-        var dataType = module.GetTypeDefinition<SqlSagaWithAttribute>();
+        var dataType = module.GetTypeDefinition<SagaDecoratedWithSqlSaga>();
 
         var ex = Assert.Throws<Exception>(() => SagaDefinitionReader.TryGetSagaDefinition(dataType, out _));
         Assert.IsTrue(ex.Message.Contains("attribute is invalid"));
     }
 
     [SqlSaga]
-    public class SqlSagaWithAttribute : SqlSaga<SqlSagaWithAttribute.SagaData>
+    public class SagaDecoratedWithSqlSaga : SqlSaga<SagaDecoratedWithSqlSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {

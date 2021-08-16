@@ -7,13 +7,13 @@ static class ScriptLocation
 {
     const string ScriptFolder = "NServiceBus.Persistence.Sql";
 
-    public static string FindScriptDirectory(ReadOnlySettings settings)
+    public static string FindScriptDirectory(IReadOnlySettings settings)
     {
         var currentDirectory = GetScriptsRootPath(settings);
         return Path.Combine(currentDirectory, ScriptFolder, settings.GetSqlDialect().Name);
     }
 
-    static string GetScriptsRootPath(ReadOnlySettings settings)
+    static string GetScriptsRootPath(IReadOnlySettings settings)
     {
         if (settings.TryGet("SqlPersistence.ScriptDirectory", out string scriptDirectory))
         {

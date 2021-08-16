@@ -29,7 +29,7 @@ class OutboxPersister : IOutboxStorage
         this.cleanupBatchSize = cleanupBatchSize;
     }
 
-    public Task<OutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
+    public Task<IOutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
     {
         var transaction = outboxTransactionFactory();
         transaction.Prepare(context);
@@ -37,7 +37,7 @@ class OutboxPersister : IOutboxStorage
         return BeginTransactionInternal(transaction, context, cancellationToken);
     }
 
-    static async Task<OutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken)
+    static async Task<IOutboxTransaction> BeginTransactionInternal(ISqlOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken)
     {
         try
         {
@@ -121,7 +121,7 @@ class OutboxPersister : IOutboxStorage
         }
     }
 
-    public Task Store(OutboxMessage message, OutboxTransaction outboxTransaction, ContextBag context, CancellationToken cancellationToken = default) =>
+    public Task Store(OutboxMessage message, IOutboxTransaction outboxTransaction, ContextBag context, CancellationToken cancellationToken = default) =>
         ((ISqlOutboxTransaction)outboxTransaction).Complete(message, context, cancellationToken);
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken = default)

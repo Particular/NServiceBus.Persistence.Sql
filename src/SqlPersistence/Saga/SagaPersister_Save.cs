@@ -8,12 +8,12 @@ using NServiceBus.Sagas;
 
 partial class SagaPersister
 {
-    public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
     {
         return Save(sagaData, session, correlationProperty?.Value, cancellationToken);
     }
 
-    internal async Task Save(IContainSagaData sagaData, SynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default)
+    internal async Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());

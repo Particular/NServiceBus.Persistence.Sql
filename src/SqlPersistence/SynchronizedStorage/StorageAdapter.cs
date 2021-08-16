@@ -8,7 +8,7 @@ using NServiceBus.Transport;
 
 class StorageAdapter : ISynchronizedStorageAdapter
 {
-    static Task<CompletableSynchronizedStorageSession> EmptyResultTask = Task.FromResult(default(CompletableSynchronizedStorageSession));
+    static Task<ICompletableSynchronizedStorageSession> EmptyResultTask = Task.FromResult(default(ICompletableSynchronizedStorageSession));
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
@@ -23,7 +23,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
         this.currentSessionHolder = currentSessionHolder;
     }
 
-    public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
+    public Task<ICompletableSynchronizedStorageSession> TryAdapt(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         if (!(transaction is ISqlOutboxTransaction outboxTransaction))
         {
@@ -33,10 +33,10 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
         currentSessionHolder?.SetCurrentSession(session);
 
-        return Task.FromResult<CompletableSynchronizedStorageSession>(session);
+        return Task.FromResult<ICompletableSynchronizedStorageSession>(session);
     }
 
-    public async Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
+    public async Task<ICompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
     {
         var session = await dialect.TryAdaptTransportConnection(
             transportTransaction,

@@ -17,7 +17,7 @@
         /// <summary>
         /// Gets the current context SqlPersistence <see cref="ISqlStorageSession" />.
         /// </summary>
-        public static ISqlStorageSession SqlPersistenceSession(this SynchronizedStorageSession session)
+        public static ISqlStorageSession SqlPersistenceSession(this ISynchronizedStorageSession session)
         {
             Guard.AgainstNull(nameof(session), session);
 
@@ -29,7 +29,7 @@
             throw new Exception("Cannot access the SQL synchronized storage session. Either this endpoint has not been configured to use the SQL persistence or a different persistence type is used for sagas.");
         }
 
-        static StorageSession GetInternalSqlStorageSession(this SynchronizedStorageSession session)
+        static StorageSession GetInternalSqlStorageSession(this ISynchronizedStorageSession session)
         {
             if (session is StorageSession storageSession)
             {
@@ -51,7 +51,7 @@
         /// <param name="whereClause">The SQL where clause to append to the retrieve saga SQL statement.</param>
         /// <param name="appendParameters">Used to append <see cref="DbParameter" />s used in the <paramref name="whereClause" />.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public static Task<TSagaData> GetSagaData<TSagaData>(this SynchronizedStorageSession session, ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, CancellationToken cancellationToken = default)
+        public static Task<TSagaData> GetSagaData<TSagaData>(this ISynchronizedStorageSession session, IReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, CancellationToken cancellationToken = default)
             where TSagaData : class, IContainSagaData
         {
             Guard.AgainstNull(nameof(session), session);

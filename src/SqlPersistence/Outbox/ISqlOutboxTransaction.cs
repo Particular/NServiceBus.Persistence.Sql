@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 
-interface ISqlOutboxTransaction : OutboxTransaction
+interface ISqlOutboxTransaction : IOutboxTransaction
 {
     DbTransaction Transaction { get; }
     DbConnection Connection { get; }

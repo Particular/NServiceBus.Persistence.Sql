@@ -22,11 +22,11 @@
             settings.Set("SqlPersistence.Subscription.CacheFor", TimeSpan.Zero);
         }
 
-        internal static TimeSpan? GetCacheFor(ReadOnlySettings settings)
+        internal static TimeSpan? GetCacheFor(IReadOnlySettings settings)
         {
             if (settings.TryGet("SqlPersistence.Subscription.CacheFor", out TimeSpan cache))
             {
-                // since ReadOnlySettings.TryGet will return false if the underlying value is null
+                // since IReadOnlySettings.TryGet will return false if the underlying value is null
                 // we use TimeSpan.Zero as a marker for DisableCache
                 if (cache == TimeSpan.Zero)
                 {

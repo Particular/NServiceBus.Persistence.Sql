@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 
-class StorageSession : CompletableSynchronizedStorageSession, ISqlStorageSession
+class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
     Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
