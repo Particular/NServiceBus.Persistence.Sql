@@ -57,7 +57,7 @@ public abstract class SagaPersisterTests
             {
                 yield return nestedType;
             }
-            if (nestedType.GetInterfaces().Any(_ => _.Name.StartsWith("Using")))
+            if (nestedType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISagaFinder<,>)))
             {
                 yield return nestedType;
             }
