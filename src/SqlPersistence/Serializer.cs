@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -13,7 +14,11 @@ static class Serializer
         var settings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.Ignore
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Converters = new List<JsonConverter>
+            {
+                new BinaryConverter()
+            }
         };
         JsonSerializer = JsonSerializer.Create(settings);
     }

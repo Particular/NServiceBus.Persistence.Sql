@@ -29,7 +29,7 @@ public class OperationConverterTests
                 }
             )
         };
-        var serializableOperations = operations.ToSerializable();
+        var serializableOperations = Serializer.Serialize(operations.ToSerializable());
         Approver.Verify(serializableOperations);
     }
 }
