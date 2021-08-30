@@ -110,7 +110,7 @@ public abstract class OutboxPersisterTests
     {
         var persister = Setup(schema);
         var result = StoreDispatchAndGetAsync(persister).GetAwaiter().GetResult();
-        Approver.Verify(result);
+        Approver.Verify(Serializer.Serialize(result));
 
         Assert.AreEqual(1, result.Item1.TransportOperations.Length);
         Assert.AreEqual(0, result.Item2.TransportOperations.Length);
