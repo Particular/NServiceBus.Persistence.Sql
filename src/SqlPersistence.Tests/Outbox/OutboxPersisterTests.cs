@@ -159,7 +159,7 @@ public abstract class OutboxPersisterTests
         var persister = Setup(schema);
         var result = StoreAndGetAsync(persister).GetAwaiter().GetResult();
         Assert.IsNotNull(result);
-        Approver.Verify(result);
+        Approver.Verify(Serializer.Serialize(result));
     }
 
     [Test]
