@@ -17,7 +17,7 @@ static class Serializer
             DefaultValueHandling = DefaultValueHandling.Ignore,
             Converters = new List<JsonConverter>
             {
-                new BinaryConverter()
+                new ReadOnlyMemoryConverter()
             }
         };
         JsonSerializer = JsonSerializer.Create(settings);
