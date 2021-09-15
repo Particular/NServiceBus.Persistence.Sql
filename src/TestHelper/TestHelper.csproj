@@ -10,7 +10,7 @@
     <PackageReference Include="Npgsql" Version="5.0.4" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.110" />
     <PackageReference Include="MySql.Data" Version="8.0.26" ExcludeAssets="contentFiles" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
   </ItemGroup>
 
