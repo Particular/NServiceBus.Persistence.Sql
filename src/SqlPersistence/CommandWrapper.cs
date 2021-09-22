@@ -76,7 +76,7 @@ class CommandWrapper : IDisposable
     public CharArrayTextWriter LeaseWriter()
     {
         var writer = CharArrayTextWriter.Lease();
-        writers = writers ?? new List<CharArrayTextWriter>();
+        writers ??= new List<CharArrayTextWriter>();
         writers.Add(writer);
         return writer;
     }

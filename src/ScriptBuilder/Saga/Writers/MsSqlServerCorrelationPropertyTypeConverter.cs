@@ -7,23 +7,14 @@
     /// </summary>
     public static class MsSqlServerCorrelationPropertyTypeConverter
     {
-        public static string GetColumnType(CorrelationPropertyType propertyType)
+        public static string GetColumnType(CorrelationPropertyType propertyType) => propertyType switch
         {
-            switch (propertyType)
-            {
-                case CorrelationPropertyType.DateTime:
-                    return "datetime";
-                case CorrelationPropertyType.DateTimeOffset:
-                    return "datetimeoffset";
-                case CorrelationPropertyType.String:
-                    return "nvarchar(200)";
-                case CorrelationPropertyType.Int:
-                    return "bigint";
-                case CorrelationPropertyType.Guid:
-                    return "uniqueidentifier";
-                default:
-                    throw new Exception($"Could not convert {propertyType}.");
-            }
-        }
+            CorrelationPropertyType.DateTime => "datetime",
+            CorrelationPropertyType.DateTimeOffset => "datetimeoffset",
+            CorrelationPropertyType.String => "nvarchar(200)",
+            CorrelationPropertyType.Int => "bigint",
+            CorrelationPropertyType.Guid => "uniqueidentifier",
+            _ => throw new Exception($"Could not convert {propertyType}.")
+        };
     }
 }

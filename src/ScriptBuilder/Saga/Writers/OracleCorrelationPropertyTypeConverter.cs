@@ -7,22 +7,14 @@
     /// </summary>
     public static class OracleCorrelationPropertyTypeConverter
     {
-        public static string GetColumnType(CorrelationPropertyType propertyType)
+        public static string GetColumnType(CorrelationPropertyType propertyType) => propertyType switch
         {
-            switch (propertyType)
-            {
-                case CorrelationPropertyType.DateTime:
-                    return "TIMESTAMP";
-                case CorrelationPropertyType.String:
-                    return "NVARCHAR2(200)";
-                case CorrelationPropertyType.Int:
-                    return "NUMBER(19)";
-                case CorrelationPropertyType.Guid:
-                    return "VARCHAR2(38)";
-                case CorrelationPropertyType.DateTimeOffset:
-                default:
-                    throw new Exception($"Could not convert {propertyType}.");
-            }
-        }
+            CorrelationPropertyType.DateTime => "TIMESTAMP",
+            CorrelationPropertyType.String => "NVARCHAR2(200)",
+            CorrelationPropertyType.Int => "NUMBER(19)",
+            CorrelationPropertyType.Guid => "VARCHAR2(38)",
+            CorrelationPropertyType.DateTimeOffset => throw new Exception($"Could not convert {propertyType}."),
+            _ => throw new Exception($"Could not convert {propertyType}.")
+        };
     }
 }
