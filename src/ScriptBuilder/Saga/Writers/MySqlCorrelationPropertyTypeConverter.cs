@@ -7,22 +7,14 @@
     /// </summary>
     public static class MySqlCorrelationPropertyTypeConverter
     {
-        public static string GetColumnType(CorrelationPropertyType propertyType)
+        public static string GetColumnType(CorrelationPropertyType propertyType) => propertyType switch
         {
-            switch (propertyType)
-            {
-                case CorrelationPropertyType.DateTime:
-                    return "datetime";
-                case CorrelationPropertyType.String:
-                    return "varchar(200) character set utf8mb4";
-                case CorrelationPropertyType.Int:
-                    return "bigint(20)";
-                case CorrelationPropertyType.Guid:
-                    return "varchar(38) character set ascii";
-                case CorrelationPropertyType.DateTimeOffset:
-                default:
-                    throw new Exception($"Could not convert {propertyType}.");
-            }
-        }
+            CorrelationPropertyType.DateTime => "datetime",
+            CorrelationPropertyType.String => "varchar(200) character set utf8mb4",
+            CorrelationPropertyType.Int => "bigint(20)",
+            CorrelationPropertyType.Guid => "varchar(38) character set ascii",
+            CorrelationPropertyType.DateTimeOffset => throw new Exception($"Could not convert {propertyType}."),
+            _ => throw new Exception($"Could not convert {propertyType}.")
+        };
     }
 }

@@ -7,22 +7,14 @@
     /// </summary>
     public static class PostgreSqlCorrelationPropertyTypeConverter
     {
-        public static string GetColumnType(CorrelationPropertyType propertyType)
+        public static string GetColumnType(CorrelationPropertyType propertyType) => propertyType switch
         {
-            switch (propertyType)
-            {
-                case CorrelationPropertyType.DateTime:
-                    return "timestamp";
-                case CorrelationPropertyType.String:
-                    return "character varying(200)";
-                case CorrelationPropertyType.Int:
-                    return "integer";
-                case CorrelationPropertyType.Guid:
-                    return "uuid";
-                case CorrelationPropertyType.DateTimeOffset:
-                default:
-                    throw new Exception($"Could not convert {propertyType}.");
-            }
-        }
+            CorrelationPropertyType.DateTime => "timestamp",
+            CorrelationPropertyType.String => "character varying(200)",
+            CorrelationPropertyType.Int => "integer",
+            CorrelationPropertyType.Guid => "uuid",
+            CorrelationPropertyType.DateTimeOffset => throw new Exception($"Could not convert {propertyType}."),
+            _ => throw new Exception($"Could not convert {propertyType}.")
+        };
     }
 }
