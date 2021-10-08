@@ -4,7 +4,14 @@ using NServiceBus.Persistence.Sql;
 
 class CurrentSessionHolder
 {
-    public ISqlStorageSession Current => pipelineContext.Value.Session;
+    public ISqlStorageSession Current
+    {
+        get
+        {
+            var context = pipelineContext.Value;
+            return (ISqlStorageSession)context?.Session ?? NoSqlStorageSession.Instance;
+        }
+    }
 
     public void SetCurrentSession(StorageSession session)
     {
