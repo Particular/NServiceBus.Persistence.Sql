@@ -83,21 +83,19 @@ where Dispatched = 'true' and
 
             internal override string AddOutboxPadding(string json)
             {
-                //We need to ensure the outbox content is at lest 8000 bytes long because otherwise SQL Server will attempt to
-                //store is inside the data page which will result in low space utilization.
+                //We need to ensure the outbox content is at least 8000 bytes long because otherwise SQL Server will attempt to
+                //store is inside the data page which will result in low space utilization after the outgoing messages are dispatched.
 
                 //We tried using *varchar values out of the row* table option but while it did improve situation on on-premises 
                 //SQL Server it didn't work as expected in SQL Azure where it caused LOB pages to be allocated (one for each record) 
-                //but never deallocated after the messages data is supposed to be removed.
+                //but never de-allocated after the messages data is supposed to be removed.
 
                 //We use 4000 instead of 8000 in the condition because the SQL Persistence uses nvarchar data type which encodes
-                //strings at UTF-16 (2 bytes per character)
+                //strings in UTF-16 (2 bytes per character)
 
-                //We allow content smaller than 1800 characters (3600 bytes) to not be padded because such content does not block
-                //SQL Server from re-using data pages.
-                if (json.Length >= 1800 && json.Length <= 4000)
+                if (json.Length <= 4000)
                 {
-                    return json.PadRight(4000, ' ');
+                    return json.PadRight(4001 - json.Length, ' ');
                 }
 
                 return json;
