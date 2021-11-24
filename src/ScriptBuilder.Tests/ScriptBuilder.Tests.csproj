@@ -20,7 +20,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
     <PackageReference Include="Particular.Approvals" Version="0.3.0" />
     <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
-    <PackageReference Include="NServiceBus" Version="8.0.0-alpha.1899" />
+    <PackageReference Include="NServiceBus" Version="8.0.0-alpha.1900" />
   </ItemGroup>
 
 </Project>
