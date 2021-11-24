@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -14,8 +14,8 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.1897" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.0-alpha.389" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.1900" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.0-alpha.390" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.0" />
   </ItemGroup>
