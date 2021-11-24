@@ -6,7 +6,6 @@
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
     using Configuration.AdvancedExtensibility;
-    using Features;
 
     public class NoPersistenceServer : IEndpointSetupTemplate
     {
@@ -20,9 +19,9 @@
             this.typesToInclude = typesToInclude;
         }
 
-#pragma warning disable CS0618
+#pragma warning disable PS0018 // A task-returning method should have a CancellationToken parameter unless it has a parameter implementing ICancellableContext
         public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, Action<EndpointConfiguration> configurationBuilderCustomization)
-#pragma warning restore CS0618
+#pragma warning restore PS0018 // A task-returning method should have a CancellationToken parameter unless it has a parameter implementing ICancellableContext
         {
             var types = endpointConfiguration.GetTypesScopedByTestClass();
 
