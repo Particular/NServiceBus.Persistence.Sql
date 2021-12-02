@@ -77,6 +77,7 @@ jobs:
             project-filter: SomePrefixWellFigureOut*
       fail-fast: false
     env:
+      foo: bar
     steps:
       - name: Download src directory
         uses: actions/download-artifact@v2.0.10
