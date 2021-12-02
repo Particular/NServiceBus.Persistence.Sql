@@ -38,9 +38,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1.9.0
         with:
-          dotnet-version: |
-            5.0.x
-            3.1.x
+          dotnet-version: 5.0.x
       - name: Build
         run: dotnet build src --configuration Release
       - name: Upload packages
@@ -53,28 +51,24 @@ jobs:
         uses: actions/upload-artifact@v2.2.4
         with:
           name: src
-          path: src/
+          path: |
+            src/**/bin/Release
+            src/**/*.approved.txt
           retention-days: 1
   tests:
     needs: build
-    name: Tests-${{ matrix.name }}
+    name: Tests-${{ matrix.os }}-${{ matrix.test-prefix }}
     runs-on: windows-2019
     strategy:
       matrix:
         os: [ windows-2019, ubuntu-20.04 ]
-        include:
-          - name: MicrosoftSQL
-            project-filter: MsSql*
-          - name: Oracle
-            project-filter: Oracle*
-          - name: MySQL
-            project-filter: MySql*
-          - name: PostgreSQL
-            project-filter: PostgreSql*
-          - name: ScriptBuilder
-            project-filter: ScriptBuilder*
-          - name: OtherTests
-            project-filter: SomePrefixWellFigureOut*
+        test-prefix: 
+          - MsSql 
+          - Oracle 
+          - MySql 
+          - PostgreSql 
+          - ScriptBuilder 
+          - OtherTests
       fail-fast: false
     env:
       foo: bar
@@ -85,14 +79,20 @@ jobs:
           name: src
           path: src
       - name: Display structure of downloaded files
-        run: ls
+        run: ls -R
         working-directory: src
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: |
+            5.0.x
+            3.1.x
       - name: Azure login
         uses: azure/login@v1.3.0
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
-        if: matrix.name == 'MicrosoftSQL'
+        if: matrix.test-prefix == 'MsSql'
         uses: Particular/install-sql-server-action@v1.0.0
         with:
           connection-string-env-var: SQLServerConnectionString
@@ -100,7 +100,7 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@project-filter
         with:
-          project-filter: ${{ matrix.project-filter }}
+          project-filter: "${{ matrix.test-prefix }}*"
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh
