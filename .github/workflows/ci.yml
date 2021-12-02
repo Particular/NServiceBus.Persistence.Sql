@@ -1,0 +1,107 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+      - release-[6-9].*
+  pull_request:
+    branches-ignore: release-[0-5].*
+  pull_request_target:
+    branches-ignore: release-[0-5].*
+  workflow_dispatch:
+env:
+  DOTNET_NOLOGO: true
+jobs:
+  build:
+    if:
+      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-2019
+    steps:
+      - name: Check for secrets
+        env:
+          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
+        shell: pwsh
+        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
+      - name: Checkout
+        if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+      - name: Checkout for Dependabot
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: |
+            5.0.x
+            3.1.0
+      - name: Build
+        run: dotnet build src --configuration Release
+      - name: Upload packages
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: NuGet packages
+          path: nugets/
+          retention-days: 7
+      - name: Upload src directory
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: src
+          path: src/
+          retention-days: 1
+  tests:
+    needs: build
+    name: Tests-${{ matrix.name }}
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        os: [ windows-2019, ubuntu-20.04 ]
+        include:
+          - name: MicrosoftSQL
+            project-filter: MsSql*
+          - name: Oracle
+            project-filter: Oracle*
+          - name: MySQL
+            project-filter: MySql*
+          - name: PostgreSQL
+            project-filter: PostgreSql*
+          - name: ScriptBuilder
+            project-filter: ScriptBuilder*
+          - name: OtherTests
+            project-filter: SomePrefixWellFigureOut*
+      fail-fast: false
+    env:
+    steps:
+      - name: Download src directory
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: src
+          path: src
+      - name: Display structure of downloaded files
+        run: ls
+        working-directory: src
+      - name: Azure login
+        uses: azure/login@v1.3.0
+        with:
+          creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
+      - name: Setup SQL Server
+        if: matrix.name == 'MicrosoftSQL'
+        uses: Particular/install-sql-server-action@v1.0.0
+        with:
+          connection-string-env-var: SQLServerConnectionString
+          catalog: nservicebus
+      - name: Run tests
+        uses: Particular/run-tests-action@project-filter
+        with:
+          project-filter: ${{ matrix.project-filter }}
+      - name: Teardown infrastructure
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          echo "Probably going to need this eventually"
