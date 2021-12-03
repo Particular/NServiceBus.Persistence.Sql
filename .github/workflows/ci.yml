@@ -71,8 +71,6 @@ jobs:
           catalog: nservicebus
       - name: Run tests
         uses: Particular/run-tests-action@project-filter
-        with:
-          project-filter: "${{ matrix.test-prefix }}*"
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh

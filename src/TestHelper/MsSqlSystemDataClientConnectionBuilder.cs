@@ -58,7 +58,7 @@ public static class MsSqlSystemDataClientConnectionBuilder
                 connection = ConnectionString;
             }
 
-            if (!connection.Contains(";Database=nservicebus;"))
+            if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus;"))
             {
                 throw new Exception("Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `nservicebus` to test multi-tenant operations.");
             }
