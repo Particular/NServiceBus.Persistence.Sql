@@ -13,7 +13,7 @@ env:
   DOTNET_NOLOGO: true
 jobs:
   build:
-    name: CI-${{ matrix.os }}-${{ matrix.test-prefix }}
+    name: CI-${{ matrix.os }}-${{ matrix.engine }}
     if:
       (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
       (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
@@ -22,13 +22,11 @@ jobs:
     strategy:
       matrix:
         os: [ windows-2019, ubuntu-20.04 ]
-        test-prefix: 
-          - MsSql 
-          - Oracle 
-          - MySql 
-          - PostgreSql 
-          - ScriptBuilder 
-          - OtherTests
+        engine:
+          - MsSql
+          - Oracle
+          - MySql
+          - PostgreSql
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -66,7 +64,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
-        if: matrix.test-prefix == 'MsSql'
+        if: matrix.engine == 'MsSql'
         uses: Particular/install-sql-server-action@v1.0.0
         with:
           connection-string-env-var: SQLServerConnectionString

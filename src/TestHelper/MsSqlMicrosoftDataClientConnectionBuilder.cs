@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Data.SqlClient;
+using NUnit.Framework;
 
 public static class MsSqlMicrosoftDataClientConnectionBuilder
 {
@@ -49,6 +50,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
             if (string.IsNullOrWhiteSpace(connection))
             {
+                if (Environment.GetEnvironmentVariable("CI") == "true")
+                {
+                    Assert.Ignore("Ignoring MSSQL test");
+                }
+
                 connection = ConnectionString;
             }
 
@@ -120,6 +126,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         if (string.IsNullOrWhiteSpace(connection))
         {
+            if (Environment.GetEnvironmentVariable("CI") == "true")
+            {
+                Assert.Ignore("Ignoring MSSQL test");
+            }
+
             return ConnectionString;
         }
 
