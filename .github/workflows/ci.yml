@@ -97,7 +97,7 @@ jobs:
           $fqdn = $details.ipAddress.fqdn
           echo "::add-mask::$fqdn"
 
-          $connectionString = "User ID=postgres;Password=$password;Host=$fqdn;Port=8080;Database=postgres;"
+          $connectionString = "User ID=postgres;Password=$password;Host=$fqdn;Port=8080;Database=postgres;Connect Timeout=120"
           echo "PostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Setup MySQL
@@ -128,11 +128,11 @@ jobs:
           $fqdn = $details.ipAddress.fqdn
           echo "::add-mask::$fqdn"
 
-          $connectionString = "server=$fqdn;user=particular;database=nservicebus;port=3306;password=$password;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=120;SslMode=none"
+          $connectionString = "server=$fqdn;user=particular;database=nservicebus;port=3306;password=$password;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=120;SslMode=Required"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Run tests
-        uses: Particular/run-tests-action@project-filter
+        uses: Particular/run-tests-action@v1.0.0
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh
