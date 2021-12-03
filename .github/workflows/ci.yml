@@ -88,6 +88,8 @@ jobs:
           $details = az container create --image postgres:14 --name $name --location $region --dns-name-label $name --resource-group GitHubActions-RG --cpu 2 --memory 8 --ports 8080 --ip-address public --environment-variables POSTGRES_PASSWORD="$password"
           echo "::set-output name=name::$name"
 
+          echo $details
+
           $ignore = az tag create --resource-id $details.id --tags $packageTag $runnerOsTag $dateTag
 
           $fqdn = $details.ipAddress.fqdn
@@ -104,5 +106,5 @@ jobs:
         shell: pwsh
         run: |
           if ('${{ matrix.engine }}' -eq 'PostgreSql') {
-            $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-postgresql.outputs.name }} --yes
+            #$ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-postgresql.outputs.name }} --yes
           }
