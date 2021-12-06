@@ -101,6 +101,14 @@ jobs:
           echo "PostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           $env:PGPASSWORD = $password
+
+          # psql not in PATH on Windows
+          if ($Env:RUNNER_OS -eq 'Windows') {
+            $Env:PATH = $Env:PATH + ';' + $Env:PGBIN
+            echo "New Path"
+            echo $Env:PATH
+          }
+
           for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
             echo "Checking for PostgreSQL connectivity $($i+1)/30..."
             $ignore = psql --host $fqdn --username=postgres --list
