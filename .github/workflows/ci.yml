@@ -97,7 +97,7 @@ jobs:
           $fqdn = $details.ipAddress.fqdn
           echo "::add-mask::$fqdn"
 
-          $connectionString = "User ID=postgres;Password=$password;Host=$fqdn;Port=8080;Database=postgres;"
+          $connectionString = "User ID=postgres;Password=$password;Host=$fqdn;Port=5432;Database=postgres;"
           echo "PostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           $env:PGPASSWORD = $password
