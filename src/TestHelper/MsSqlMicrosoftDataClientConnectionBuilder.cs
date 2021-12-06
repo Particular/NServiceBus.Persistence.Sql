@@ -41,7 +41,9 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         public static SqlConnection Build(string tenantId)
         {
-            var connection = GetBaseConnectionString().Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};");
+            var connection = GetBaseConnectionString()
+                .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
+                .Replace(";Initial Catalog=nservicebus;", $";Initial Catalog=nservicebus_{tenantId.ToLower()};");
             return new SqlConnection(connection);
         }
 
