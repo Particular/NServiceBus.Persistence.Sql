@@ -180,7 +180,7 @@ jobs:
           echo "::add-mask::$password"
 
           echo "Creating Oracle container $name (This can take a while)"
-          $details = az container create --image gvenzl/oracle-xe:18 --name $name --location $region --dns-name-label $name --resource-group GitHubActions-RG --cpu 2 --memory 8 --ports 1521 5500 --ip-address public --environment-variables ORACLE_PASSWORD="$password" ORACLE_CHARACTERSET=AL32UTF8 | ConvertFrom-Json
+          $details = az container create --image particularci.azurecr.io/oracledb:21.3 --name $name --location $region --dns-name-label $name --resource-group GitHubActions-RG --cpu 2 --memory 8 --ports 1521 5500 --ip-address public --environment-variables ORACLE_PWD="$password" ORACLE_CHARACTERSET=AL32UTF8 | ConvertFrom-Json
           echo "::set-output name=name::$name"
 
           echo "Tagging container"
