@@ -208,3 +208,7 @@ jobs:
           if ('${{ matrix.engine }}' -eq 'MySql') {
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-mysql.outputs.name }} --yes
           }
+
+          if ('${{ matrix.engine }}' -eq 'Oracle') {
+            $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
+          }
