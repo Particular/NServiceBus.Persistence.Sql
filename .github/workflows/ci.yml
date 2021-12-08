@@ -218,7 +218,10 @@ jobs:
       (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
       (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: [self-hosted, Windows, oracle]
+    runs-on:
+      - self-hosted
+      - windows
+      - oracle
     steps:
       - name: Check for secrets
         env:
@@ -265,11 +268,11 @@ jobs:
         ports:
           - 1521:1521
           - 5500:5500
-        #options: >-
-        #  --health-cmd healthcheck.sh
-        #  --health-interval 10s
-        #  --health-timeout 5s
-        #  --health-retries 10
+        options: >-
+         --health-cmd healthcheck.sh
+         --health-interval 10s
+         --health-timeout 5s
+         --health-retries 10
     steps:
       - name: Check for secrets
         env:
@@ -298,5 +301,5 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
         env:
-          OracleConnectionString: "User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic"
 
