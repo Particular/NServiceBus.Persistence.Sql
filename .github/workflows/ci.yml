@@ -24,7 +24,7 @@ jobs:
         os: [ windows-2019, ubuntu-20.04 ]
         engine:
           - MsSql
-          - Oracle
+          #- Oracle
           - MySql
           - PostgreSql
       fail-fast: false
@@ -212,3 +212,91 @@ jobs:
           if ('${{ matrix.engine }}' -eq 'Oracle') {
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
           }
+  oracle-windows:
+    name: CI-windows-2019-Oracle
+    if:
+      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, windows, oracle]
+    steps:
+      - name: Check for secrets
+        env:
+          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
+        shell: pwsh
+        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
+      - name: Checkout
+        if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+      - name: Checkout for Dependabot
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: |
+            5.0.x
+            3.1.x
+      - name: Build
+        run: dotnet build src --configuration Release
+      - name: Run tests
+        uses: Particular/run-tests-action@v1.0.0
+        env:
+          OracleConnectionString: "User Id=system;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+  oracle-linux:
+    name: CI-ubuntu-20.04-Oracle
+    if:
+      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-20.04
+    services:
+      oracle:
+        image: gvenzl/oracle-xe:latest
+        env:
+          ORACLE_PWD: Welcome1
+          APP_USER: particular
+          APP_USER_PASSWORD: Welcome1
+        ports:
+          - 1521:1521
+          - 5500:5500
+        #options: >-
+        #  --health-cmd healthcheck.sh
+        #  --health-interval 10s
+        #  --health-timeout 5s
+        #  --health-retries 10
+    steps:
+      - name: Check for secrets
+        env:
+          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
+        shell: pwsh
+        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
+      - name: Checkout
+        if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+      - name: Checkout for Dependabot
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: |
+            5.0.x
+            3.1.x
+      - name: Build
+        run: dotnet build src --configuration Release
+      - name: Run tests
+        uses: Particular/run-tests-action@v1.0.0
+        env:
+          OracleConnectionString: "User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+
