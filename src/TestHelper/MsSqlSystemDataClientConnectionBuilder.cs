@@ -4,8 +4,6 @@ using NUnit.Framework;
 
 public static class MsSqlSystemDataClientConnectionBuilder
 {
-    const string ConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
-
     public static SqlConnection Build()
     {
         return new SqlConnection(GetConnectionString());
@@ -52,12 +50,7 @@ public static class MsSqlSystemDataClientConnectionBuilder
             var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
             if (string.IsNullOrWhiteSpace(connection))
             {
-                if (Environment.GetEnvironmentVariable("CI") == "true")
-                {
-                    Assert.Ignore("Ignoring MSSQL test");
-                }
-
-                connection = ConnectionString;
+                throw new Exception("SQLServerConnectionString environment variable is empty");
             }
 
             if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus;"))
@@ -128,12 +121,7 @@ public static class MsSqlSystemDataClientConnectionBuilder
 
         if (string.IsNullOrWhiteSpace(connection))
         {
-            if (Environment.GetEnvironmentVariable("CI") == "true")
-            {
-                Assert.Ignore("Ignoring MSSQL test");
-            }
-
-            return ConnectionString;
+            throw new Exception("SQLServerConnectionString environment variable is empty");
         }
 
         return connection;

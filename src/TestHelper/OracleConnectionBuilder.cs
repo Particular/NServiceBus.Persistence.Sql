@@ -1,5 +1,4 @@
 using System;
-using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
 
 public static class OracleConnectionBuilder
@@ -15,10 +14,6 @@ public static class OracleConnectionBuilder
 
         if (string.IsNullOrWhiteSpace(connection))
         {
-            if (Environment.GetEnvironmentVariable("CI") == "true")
-            {
-                Assert.Ignore("Ignoring Oracle test");
-            }
             throw new Exception("OracleConnectionString environment variable is empty");
         }
 

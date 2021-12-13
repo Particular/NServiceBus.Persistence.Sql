@@ -10,10 +10,10 @@ class OnlyOnWindowsAttribute : Attribute, IApplyToContext
 {
     public void ApplyToContext(TestExecutionContext context)
     {
-        if (!IsOnWindows)
-        {
-            Assert.Ignore("Only on windows");
-        }
+        //if (!IsOnWindows)
+        //{
+        //    Assert.Ignore("Only on windows");
+        //}
     }
 
     public static bool IsOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

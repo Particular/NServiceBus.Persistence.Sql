@@ -5,7 +5,7 @@ namespace SqlServerMicrosoftData
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, MsSqlOnly]
     public class SqlServerMicrosoftDataClientSubscriptionPersisterTests : SubscriptionPersisterTests
     {
         public SqlServerMicrosoftDataClientSubscriptionPersisterTests() : base(BuildSqlDialect.MsSqlServer,

@@ -8,6 +8,7 @@ namespace SqlServerMicrosoftData
     using NServiceBus.Transport;
     using NUnit.Framework;
 
+    [MsSqlOnly]
     class SqlServerMicrosoftDataClientAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
         public SqlServerMicrosoftDataClientAdaptTransportConnectionTests() : base(BuildSqlDialect.MsSqlServer)

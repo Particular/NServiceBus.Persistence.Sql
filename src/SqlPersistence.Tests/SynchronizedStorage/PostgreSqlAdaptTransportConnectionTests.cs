@@ -5,6 +5,7 @@ namespace PostgreSql
     using System.Data.Common;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+    [PostgreSqlOnly]
     class PostgreSqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
     {
         public PostgreSqlAdaptTransportConnectionTests() : base(BuildSqlDialect.PostgreSql)

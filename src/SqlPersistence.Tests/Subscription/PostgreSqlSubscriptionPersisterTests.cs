@@ -6,7 +6,7 @@ namespace PostgreSql
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, PostgreSqlOnly]
     public class PostgreSqlSubscriptionPersisterTests : SubscriptionPersisterTests
     {
         public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")
