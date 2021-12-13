@@ -202,15 +202,21 @@ jobs:
         shell: pwsh
         run: |
           if ('${{ matrix.engine }}' -eq 'PostgreSql') {
+            echo "Removing container ${{ steps.setup-postgresql.outputs.name }}"
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-postgresql.outputs.name }} --yes
+            echo "Removal complete"
           }
 
           if ('${{ matrix.engine }}' -eq 'MySql') {
+            echo "Removing container ${{ steps.setup-mysql.outputs.name }}"
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-mysql.outputs.name }} --yes
+            echo "Removal complete"
           }
 
           # if ('${{ matrix.engine }}' -eq 'Oracle') {
+          # echo "Removing container ${{ steps.setup-oracle.outputs.name }}"
           #   $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
+          #  echo "Removal complete"
           # }
   oracle-windows:
     name: CI-windows-2019-Oracle
@@ -266,11 +272,11 @@ jobs:
         ports:
           - 1521:1521
           - 5500:5500
-        # options: >-
-        #  --health-cmd healthcheck.sh
-        #  --health-interval 10s
-        #  --health-timeout 5s
-        #  --health-retries 10
+        options: >-
+         --health-cmd healthcheck.sh
+         --health-interval 10s
+         --health-timeout 5s
+         --health-retries 10
     steps:
       - name: Check for secrets
         env:
@@ -299,5 +305,5 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
         env:
-          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic"
+          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic"
 
