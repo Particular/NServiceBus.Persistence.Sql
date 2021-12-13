@@ -209,9 +209,9 @@ jobs:
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-mysql.outputs.name }} --yes
           }
 
-          if ('${{ matrix.engine }}' -eq 'Oracle') {
-            $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
-          }
+          # if ('${{ matrix.engine }}' -eq 'Oracle') {
+          #   $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
+          # }
   oracle-windows:
     name: CI-windows-2019-Oracle
     if:
@@ -247,7 +247,8 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
         env:
-          OracleConnectionString: "User Id=system;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+          OracleConnectionString: "User Id=c##particular;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+          OracleConnectionString_Particular2: "User Id=c##particular2;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
   oracle-linux:
     name: CI-ubuntu-20.04-Oracle
     if:
@@ -298,5 +299,5 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
         env:
-          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic"
+          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic"
 
