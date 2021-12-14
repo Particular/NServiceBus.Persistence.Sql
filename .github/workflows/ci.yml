@@ -253,8 +253,8 @@ jobs:
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
         env:
-          OracleConnectionString: "User Id=c##particular;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
-          OracleConnectionString_Particular2: "User Id=c##particular2;Password=Welcome1;Data Source=127.0.0.1:1521/XEPDB1;Enlist=dynamic"
+          OracleConnectionString: "User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic"
+          OracleConnectionString_Particular2: "User Id=particular2;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic"
   oracle-linux:
     name: CI-ubuntu-20.04-Oracle
     if:
