@@ -24,9 +24,13 @@ jobs:
         os: [ windows-2019, ubuntu-20.04 ]
         engine:
           - MsSql
-          #- Oracle
           - MySql
           - PostgreSql
+        include:
+          - os: ubuntu-20.04
+            engine: Oracle
+          - os: [self-hosted, windows, oracle]
+            engine: Oracle
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -105,8 +109,6 @@ jobs:
           # psql not in PATH on Windows
           if ($Env:RUNNER_OS -eq 'Windows') {
             $Env:PATH = $Env:PATH + ';' + $Env:PGBIN
-            echo "New Path"
-            echo $Env:PATH
           }
 
           for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
@@ -166,34 +168,25 @@ jobs:
         if: matrix.engine == 'Oracle'
         shell: pwsh
         run: |
-          echo "Getting the Azure region in which this workflow is running..."
-          $hostInfo = curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | ConvertFrom-Json
-          $region = $hostInfo.compute.location
-          echo "Actions agent running in Azure region $region"
+          if ( $Env:RUNNER_OS -eq 'Windows') {
+            echo "Adding environment variables for Oracle connection strings"
+            echo "OracleConnectionString=User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+            echo "OracleConnectionString_Particular2=User Id=particular2;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          }
 
-          $name = "oracle-$(Get-Random)"
-          $packageTag = "Package=SqlPersistence"
-          $runnerOsTag = "RunnerOS=$($Env:RUNNER_OS)"
-          $dateTag = "Created=$(Get-Date -Format "yyyy-MM-dd")"
+          if ( $Env:RUNNER_OS -eq 'Linux' ) {
+            echo "Running Oracle using Docker"
+            docker run --name oracle -d -p 1521:1521 -e ORACLE_PASSWORD=Welcome1 gvenzl/oracle-xe:21
 
-          $password = [guid]::NewGuid().ToString("n")
-          echo "::add-mask::$password"
+            echo "Sleeping for 20s to wait for Oracle startup"
+            sleep 20
 
-          echo "Creating Oracle container $name (This can take a while)"
-          $details = az container create --image particularci.azurecr.io/oracledb:21.3 --registry-username particularci --registry-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }} --name $name --location $region --dns-name-label $name --resource-group GitHubActions-RG --cpu 2 --memory 8 --ports 1521 5500 --ip-address public --environment-variables ORACLE_PWD="$password" ORACLE_CHARACTERSET=AL32UTF8 | ConvertFrom-Json
-          echo "::set-output name=name::$name"
+            cat ./.github/workflows/scripts/oracle-setup-linux.sql | docker exec -i oracle sqlplus / as sysdba
 
-          echo "Tagging container"
-          $ignore = az tag create --resource-id $details.id --tags $packageTag $runnerOsTag $dateTag
-
-          $fqdn = $details.ipAddress.fqdn
-          echo "::add-mask::$fqdn"
-
-          $connectionString = "User Id=system;Password=$password;Data Source=$fqdn:1521/XEPDB1;"
-          echo "OracleConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-
-          echo "Sleeping for 20s to wait for Oracle to start up. Should replace this with a script or tool in the future."
-          sleep 20
+            echo "Adding environment variables for Oracle connection strings"
+            echo "OracleConnectionString=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+            echo "OracleConnectionString_Particular2=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular2; Password=Welcome1; Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          }
 
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
@@ -212,88 +205,3 @@ jobs:
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-mysql.outputs.name }} --yes
             echo "Removal complete"
           }
-
-          # if ('${{ matrix.engine }}' -eq 'Oracle') {
-          # echo "Removing container ${{ steps.setup-oracle.outputs.name }}"
-          #   $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-oracle.outputs.name }} --yes
-          #  echo "Removal complete"
-          # }
-  oracle-windows:
-    name: CI-windows-2019-Oracle
-    if:
-      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: [self-hosted, windows, oracle]
-    steps:
-      - name: Check for secrets
-        env:
-          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
-        shell: pwsh
-        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
-      - name: Checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-      - name: Checkout for Dependabot
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v2.3.4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-          fetch-depth: 0
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1.9.0
-        with:
-          dotnet-version: |
-            5.0.x
-            3.1.x
-      - name: Build
-        run: dotnet build src --configuration Release
-      - name: Run tests
-        uses: Particular/run-tests-action@v1.0.0
-        env:
-          OracleConnectionString: "User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic"
-          OracleConnectionString_Particular2: "User Id=particular2;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic"
-  oracle-linux:
-    name: CI-ubuntu-20.04-Oracle
-    if:
-      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check for secrets
-        env:
-          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
-        shell: pwsh
-        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
-      - name: Checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-      - name: Checkout for Dependabot
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v2.3.4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-          fetch-depth: 0
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1.9.0
-        with:
-          dotnet-version: |
-            5.0.x
-            3.1.x
-      - name: Setup Oracle
-        shell: bash
-        run: |
-          docker run -d -p 1521:1521 -e ORACLE_PASSWORD=Welcome1 gvenzl/oracle-xe
-          sleep 20
-      - name: Build
-        run: dotnet build src --configuration Release
-      - name: Run tests
-        uses: Particular/run-tests-action@v1.0.0
-        env:
-          OracleConnectionString: "Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic"
-
