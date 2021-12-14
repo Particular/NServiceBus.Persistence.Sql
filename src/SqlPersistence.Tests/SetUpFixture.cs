@@ -2,7 +2,7 @@ namespace PostgreSql
 {
     using NUnit.Framework;
 
-    [SetUpFixture]
+    [SetUpFixture, PostgreSqlOnly]
     public class SetUpFixture
     {
         [OneTimeSetUp]
@@ -25,7 +25,7 @@ namespace SqlServerSystemData
 {
     using NUnit.Framework;
 
-    [SetUpFixture]
+    [SetUpFixture, MsSqlOnly]
     public class SetUpFixture
     {
         [OneTimeSetUp]
@@ -53,7 +53,7 @@ namespace SqlServerMicrosoftData
 {
     using NUnit.Framework;
 
-    [SetUpFixture]
+    [SetUpFixture, MsSqlOnly]
     public class SetUpFixture
     {
         [OneTimeSetUp]
@@ -81,7 +81,7 @@ namespace MySql
 {
     using NUnit.Framework;
 
-    [SetUpFixture]
+    [SetUpFixture, MySqlOnly]
     public class SetUpFixture
     {
         [OneTimeSetUp]
@@ -99,7 +99,7 @@ namespace Oracle
 {
     using NUnit.Framework;
 
-    [SetUpFixture]
+    [SetUpFixture, OracleOnly]
     public class SetUpFixture
     {
         [OneTimeSetUp]
