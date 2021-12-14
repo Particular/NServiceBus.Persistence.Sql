@@ -10,7 +10,6 @@ namespace Oracle
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
-    [OnlyOnWindows]
     [OracleOnly]
     public class OracleOutboxPersisterTests : OutboxPersisterTests
     {

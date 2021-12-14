@@ -6,7 +6,7 @@
     using NUnit.Framework;
     using Oracle.ManagedDataAccess.Client;
 
-    [TestFixture, OnlyOnWindows, OracleOnly]
+    [TestFixture, OracleOnly]
     public class OracleSagaPersisterTests : SagaPersisterTests
     {
         public OracleSagaPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")

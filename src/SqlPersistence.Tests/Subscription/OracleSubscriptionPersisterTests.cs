@@ -6,7 +6,7 @@ namespace Oracle
     using NUnit.Framework;
     using Oracle.ManagedDataAccess.Client;
 
-    [TestFixture, OnlyOnWindows, OracleOnly]
+    [TestFixture, OracleOnly]
     public class OracleSubscriptionPersisterTests : SubscriptionPersisterTests
     {
         public OracleSubscriptionPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")
