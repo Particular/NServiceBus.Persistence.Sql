@@ -182,7 +182,7 @@ jobs:
 
             for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
               echo "Checking for Oracle connectivity $($i+1)/24..."
-              $ignore = echo "show con_name;" | docker exec -i oracle sqlplus / as sysdba
+              docker exec oracle ./healthcheck.sh
               if ($?) {
                 echo "Connection successful"
                 break;
