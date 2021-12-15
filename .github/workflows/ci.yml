@@ -83,7 +83,7 @@ jobs:
           echo "Getting the Azure region in which this workflow is running..."
           $hostInfo = curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | ConvertFrom-Json
           $region = $hostInfo.compute.location
-          echo "Actions agent running in Azure region $region"
+          echo "Actions agent running in Azure region: $region"
 
           $name = "postgres-$(Get-Random)"
           $packageTag = "Package=SqlPersistence"
