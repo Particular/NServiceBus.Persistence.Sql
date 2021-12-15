@@ -1,10 +1,9 @@
 using System;
 using Microsoft.Data.SqlClient;
+using NUnit.Framework;
 
 public static class MsSqlMicrosoftDataClientConnectionBuilder
 {
-    const string ConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
-
     public static SqlConnection Build()
     {
         return new SqlConnection(GetConnectionString());
@@ -40,7 +39,9 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         public static SqlConnection Build(string tenantId)
         {
-            var connection = GetBaseConnectionString().Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};");
+            var connection = GetBaseConnectionString()
+                .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
+                .Replace(";Initial Catalog=nservicebus;", $";Initial Catalog=nservicebus_{tenantId.ToLower()};");
             return new SqlConnection(connection);
         }
 
@@ -49,10 +50,10 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
             if (string.IsNullOrWhiteSpace(connection))
             {
-                connection = ConnectionString;
+                throw new Exception("SQLServerConnectionString environment variable is empty");
             }
 
-            if (!connection.Contains(";Database=nservicebus;"))
+            if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus"))
             {
                 throw new Exception("Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `nservicebus` to test multi-tenant operations.");
             }
@@ -120,7 +121,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         if (string.IsNullOrWhiteSpace(connection))
         {
-            return ConnectionString;
+            throw new Exception("SQLServerConnectionString environment variable is empty");
         }
 
         return connection;

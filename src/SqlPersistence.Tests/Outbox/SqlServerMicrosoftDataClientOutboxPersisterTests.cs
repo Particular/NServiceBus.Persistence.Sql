@@ -7,6 +7,7 @@ using NUnit.Framework;
 [TestFixture(true, false)]
 [TestFixture(false, true)]
 [TestFixture(true, true)]
+[MsSqlOnly]
 public class SqlServerMicrosoftDataClientOutboxPersisterTests : OutboxPersisterTests
 {
     public SqlServerMicrosoftDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope)

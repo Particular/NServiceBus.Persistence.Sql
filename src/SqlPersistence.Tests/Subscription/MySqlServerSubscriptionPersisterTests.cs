@@ -3,7 +3,7 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture]
+[TestFixture, MySqlOnly]
 public class MySqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
 {
     public MySqlServerSubscriptionPersisterTests() : base(BuildSqlDialect.MySql, null)

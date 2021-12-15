@@ -4,7 +4,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
 
-[TestFixture, OnlyOnWindows]
+[TestFixture, OracleOnly]
 public class OracleSagaPersisterTests : SagaPersisterTests
 {
     public OracleSagaPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")

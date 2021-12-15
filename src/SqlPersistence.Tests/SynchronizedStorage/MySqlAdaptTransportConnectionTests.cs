@@ -2,6 +2,7 @@ using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+[MySqlOnly]
 class MySqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
 {
     public MySqlAdaptTransportConnectionTests() : base(BuildSqlDialect.MySql)

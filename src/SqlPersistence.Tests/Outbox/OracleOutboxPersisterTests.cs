@@ -8,7 +8,7 @@ using Oracle.ManagedDataAccess.Client;
 [TestFixture(true, false)]
 [TestFixture(false, true)]
 [TestFixture(true, true)]
-[OnlyOnWindows]
+[OracleOnly]
 public class OracleOutboxPersisterTests : OutboxPersisterTests
 {
     public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope)

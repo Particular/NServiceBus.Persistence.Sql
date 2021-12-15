@@ -3,6 +3,7 @@ using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+[OracleOnly]
 class OracleAdaptTransportConnectionTests : AdaptTransportConnectionTests
 {
     public OracleAdaptTransportConnectionTests() : base(BuildSqlDialect.Oracle)
