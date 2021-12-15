@@ -1,35 +1,13 @@
-namespace PostgreSql
+using System;
+using NUnit.Framework;
+
+[SetUpFixture]
+public class SetUpFixture
 {
-    using NUnit.Framework;
-
-    [SetUpFixture, PostgreSqlOnly]
-    public class SetUpFixture
+    [OneTimeSetUp]
+    public void SetUp()
     {
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            using (var connection = PostgreSqlConnectionBuilder.Build())
-            {
-                connection.Open();
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = @"create schema if not exists ""SchemaName"";";
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-    }
-}
-
-namespace SqlServerSystemData
-{
-    using NUnit.Framework;
-
-    [SetUpFixture, MsSqlOnly]
-    public class SetUpFixture
-    {
-        [OneTimeSetUp]
-        public void Setup()
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
         {
             using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
             {
@@ -46,68 +24,17 @@ exec('create schema schema_name');";
                 }
             }
         }
-    }
-}
 
-namespace SqlServerMicrosoftData
-{
-    using NUnit.Framework;
-
-    [SetUpFixture, MsSqlOnly]
-    public class SetUpFixture
-    {
-        [OneTimeSetUp]
-        public void Setup()
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
         {
-            using (var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build())
+            using (var connection = PostgreSqlConnectionBuilder.Build())
             {
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"
-if not exists (
-    select  *
-    from sys.schemas
-    where name = 'schema_name')
-exec('create schema schema_name');";
+                    command.CommandText = @"create schema if not exists ""SchemaName"";";
                     command.ExecuteNonQuery();
                 }
-            }
-        }
-    }
-}
-
-namespace MySql
-{
-    using NUnit.Framework;
-
-    [SetUpFixture, MySqlOnly]
-    public class SetUpFixture
-    {
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            using (var connection = MySqlConnectionBuilder.Build())
-            {
-                connection.Open();
-            }
-        }
-    }
-}
-
-namespace Oracle
-{
-    using NUnit.Framework;
-
-    [SetUpFixture, OracleOnly]
-    public class SetUpFixture
-    {
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            using (var connection = OracleConnectionBuilder.Build())
-            {
-                connection.Open();
             }
         }
     }
