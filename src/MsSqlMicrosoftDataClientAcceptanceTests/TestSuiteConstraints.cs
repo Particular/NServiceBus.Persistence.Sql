@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿[assembly: SqlServerTest]
+
+namespace NServiceBus.AcceptanceTests
 {
     using AcceptanceTesting.Support;
 

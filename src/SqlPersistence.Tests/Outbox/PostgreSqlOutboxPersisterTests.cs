@@ -10,6 +10,7 @@ namespace PostgreSql
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
+    [PostgreSqlTest]
     public class PostgreSqlOutboxPersisterTests : OutboxPersisterTests
     {
         public PostgreSqlOutboxPersisterTests(bool pessimistic, bool transactionScope)

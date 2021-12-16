@@ -15,14 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.1897" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.1897" GeneratePathProperty="True" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+    <Compile Remove="$(PkgNServiceBus_PersistenceTests_Sources)\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
   </ItemGroup>
 
 </Project>

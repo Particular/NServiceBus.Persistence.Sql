@@ -1,16 +1,16 @@
 namespace Oracle
 {
-    using Oracle.ManagedDataAccess.Client;
     using System;
     using System.Data.Common;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NUnit.Framework;
+    using Oracle.ManagedDataAccess.Client;
 
     [TestFixture(false, false)]
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
-    [OnlyOnWindows]
+    [OracleTest]
     public class OracleOutboxPersisterTests : OutboxPersisterTests
     {
         public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope)

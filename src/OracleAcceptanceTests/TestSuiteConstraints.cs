@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿[assembly: OracleTest]
+
+namespace NServiceBus.AcceptanceTests
 {
     using AcceptanceTesting.Support;
 

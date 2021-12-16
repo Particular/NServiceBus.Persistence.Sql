@@ -9,6 +9,7 @@ namespace SqlServerMicrosoftData
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
+    [SqlServerTest]
     public class SqlServerMicrosoftDataClientOutboxPersisterTests : OutboxPersisterTests
     {
         public SqlServerMicrosoftDataClientOutboxPersisterTests(bool pessimistic, bool transactionScope)

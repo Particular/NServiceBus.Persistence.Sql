@@ -9,6 +9,7 @@ namespace MySql
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
+    [MySqlTest]
     public class MySqlOutboxPersisterTests : OutboxPersisterTests
     {
         public MySqlOutboxPersisterTests(bool pessimistic, bool transactionScope)

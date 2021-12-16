@@ -1,21 +1,21 @@
 ﻿namespace NServiceBus.PersistenceTesting
 {
-    using System.Transactions;
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
+    using System.Transactions;
     using Newtonsoft.Json;
     using Npgsql;
     using NpgsqlTypes;
+    using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
-    using NServiceBus.Sagas;
-    using NUnit.Framework;
     using NServiceBus.Persistence;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
+    using NServiceBus.Sagas;
     using NServiceBus.Transport;
-    using System.Threading;
+    using NUnit.Framework;
 
     public partial class PersistenceTestsConfiguration
     {
@@ -48,12 +48,22 @@
                 }
             };
 
-            var variants = new List<object>
+            var variants = new List<object>();
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
             {
-                CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build),
-                CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build),
-                CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql, MySqlConnectionBuilder.Build),
-            };
+                variants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
+            {
+                variants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
+            {
+                variants.Add(CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql, MySqlConnectionBuilder.Build));
+            }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
             {

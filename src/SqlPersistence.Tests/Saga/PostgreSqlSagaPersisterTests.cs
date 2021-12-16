@@ -4,6 +4,7 @@ namespace PostgreSql
     using System.Data.Common;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+    [PostgreSqlTest]
     public class PostgreSqlSagaPersisterTests : SagaPersisterTests
     {
         public PostgreSqlSagaPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")

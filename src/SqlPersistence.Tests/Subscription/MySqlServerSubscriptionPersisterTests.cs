@@ -5,7 +5,7 @@ namespace MySql
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, MySqlTest]
     public class MySqlServerSubscriptionPersisterTests : SubscriptionPersisterTests
     {
         public MySqlServerSubscriptionPersisterTests() : base(BuildSqlDialect.MySql, null)
