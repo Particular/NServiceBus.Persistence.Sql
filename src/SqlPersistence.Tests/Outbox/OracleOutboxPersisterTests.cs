@@ -10,7 +10,7 @@ namespace Oracle
     [TestFixture(true, false)]
     [TestFixture(false, true)]
     [TestFixture(true, true)]
-    [OracleOnly]
+    [OracleTest]
     public class OracleOutboxPersisterTests : OutboxPersisterTests
     {
         public OracleOutboxPersisterTests(bool pessimistic, bool transactionScope)

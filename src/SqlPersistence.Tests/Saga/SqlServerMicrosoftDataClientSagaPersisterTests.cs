@@ -5,7 +5,7 @@ namespace SqlServerMicrosoftData
     using NServiceBus.Persistence.Sql.ScriptBuilder;
     using NUnit.Framework;
 
-    [TestFixture, MsSqlOnly]
+    [TestFixture, SqlServerTest]
     public class SqlServerMicrosoftDataClientSagaPersisterTests : SagaPersisterTests
     {
         public SqlServerMicrosoftDataClientSagaPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")
