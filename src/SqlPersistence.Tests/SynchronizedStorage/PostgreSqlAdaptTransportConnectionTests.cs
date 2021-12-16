@@ -1,6 +1,5 @@
 namespace PostgreSql
 {
-#if NETFRAMEWORK
     using System;
     using System.Data.Common;
     using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -21,5 +20,4 @@ namespace PostgreSql
             };
         }
     }
-#endif
 }
