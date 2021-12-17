@@ -10,12 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-    <PackageReference Include="Particular.Packaging" Version="1.4.0" PrivateAssets="All" />
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="Particular.Packaging" Version="1.4.0" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup>
