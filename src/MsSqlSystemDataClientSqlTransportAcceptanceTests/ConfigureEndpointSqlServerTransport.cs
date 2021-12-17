@@ -180,6 +180,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
             var infra = await base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
 
             ReceiveAddresses = infra.Receivers.Select(r => r.Value.ReceiveAddress).ToArray();
+
             return infra;
         }
     }
