@@ -58,7 +58,7 @@ jobs:
           retention-days: 7
       - name: Azure login
         uses: azure/login@v1.3.0
-        if: matrix.engine == 'PostgreSQL' || matrix.engine == 'MySQL'
+        if: matrix.engine == 'PostgreSQL'
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
@@ -120,36 +120,21 @@ jobs:
         if: matrix.engine == 'MySql'
         shell: pwsh
         run: |
-          echo "Getting the Azure region in which this workflow is running..."
-          $hostInfo = curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | ConvertFrom-Json
-          $region = $hostInfo.compute.location
-          echo "Actions agent running in Azure region $region"
+          if ($Env:RUNNER_OS -eq 'Windows') {
+            echo "Installing MySQL from Chocolatey"
+            choco install mysql
+          } else {
+            echo "Starting MySQL service preinstalled on runner agent"
+            sudo systemctl start mysql
+          }
 
-          $name = "mysql-$(Get-Random)"
-          $packageTag = "Package=SqlPersistence"
-          $runnerOsTag = "RunnerOS=$($Env:RUNNER_OS)"
-          $dateTag = "Created=$(Get-Date -Format "yyyy-MM-dd")"
-
-          $password = [guid]::NewGuid().ToString("n")
-          echo "::add-mask::$password"
-
-          echo "Creating MySQL container $name (This can take a while)"
-          $details = az container create --image mysql:8 --name $name --location $region --dns-name-label $name --resource-group GitHubActions-RG --cpu 2 --memory 8 --ports 3306 --ip-address public --environment-variables MYSQL_ROOT_PASSWORD="$password" MYSQL_USER=particular MYSQL_PASSWORD="$password" MYSQL_DATABASE=nservicebus | ConvertFrom-Json
-          echo "::set-output name=name::$name"
-
-          echo "Tagging container"
-          $ignore = az tag create --resource-id $details.id --tags $packageTag $runnerOsTag $dateTag
-
-          $fqdn = $details.ipAddress.fqdn
-          echo "::add-mask::$fqdn"
-
-          $connectionString = "server=$fqdn;user=particular;database=nservicebus;port=3306;password=$password;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=120;SslMode=Required"
+          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=root;Password=;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           $passwordArg = "-p$password"
           for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
             echo "Checking for MySQL connectivity $($i+1)/30..."
-            $ignore = mysql -h $fqdn -u particular $passwordArg -e "show databases;"
+            $ignore = mysql -h localhost -u root -e "show databases;"
             if ($?) {
               echo "Connection successful"
               break;
@@ -198,11 +183,5 @@ jobs:
           if ('${{ matrix.engine }}' -eq 'PostgreSql') {
             echo "Removing container ${{ steps.setup-postgresql.outputs.name }}"
             $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-postgresql.outputs.name }} --yes
-            echo "Removal complete"
-          }
-
-          if ('${{ matrix.engine }}' -eq 'MySql') {
-            echo "Removing container ${{ steps.setup-mysql.outputs.name }}"
-            $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-mysql.outputs.name }} --yes
             echo "Removal complete"
           }
