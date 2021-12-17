@@ -30,7 +30,12 @@ public class ConventionTests
             {
                 continue;
             }
-            throw new Exception($"Type {type.Name} should have no namespace.");
+            if (type.Namespace.StartsWith("Microsoft.") || type.Namespace.StartsWith("System."))
+            {
+                TestContext.WriteLine($"Exception for type: {type.AssemblyQualifiedName}");
+                continue;
+            }
+            throw new Exception($"Type {type.AssemblyQualifiedName} should have no namespace.");
         }
     }
 }
