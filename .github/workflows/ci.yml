@@ -120,21 +120,16 @@ jobs:
         if: matrix.engine == 'MySql'
         shell: pwsh
         run: |
-          $password = ""
           $passwordArg = ""
 
           if ($Env:RUNNER_OS -eq 'Windows') {
             echo "Installing MySQL from Chocolatey"
-            choco install mysql
+            choco install mysql --limit-output
           } else {
-            echo "Starting MySQL service preinstalled on runner agent"
+            echo "Starting MySQL service preinstalled on Linux agent"
             sudo systemctl start mysql.service
-            $password = "root"
             $passwordArg = "-proot"
           }
-
-          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=root;Password=$password;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
-          echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           for ($i = 0; $i -lt 30; $i++) { ## 2.5 minute timeout
             echo "Checking for MySQL connectivity $($i+1)/30..."
@@ -145,6 +140,16 @@ jobs:
             }
             sleep 5
           }
+
+          echo "Creating nservicebus database"
+          mysql -h localhost -u root $passwordArg -e "create database if not exists nservicebus ;"
+          echo "Creating user particular"
+          mysql -h localhost -u root $passwordArg -e "create user particular identified by 'Welcome1' ;"
+          echo "Giving user particular access to schema nservicebus"
+          mysql -h localhost -u root $passwordArg -e "grant all on nservicebus to particular ;"
+
+          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
+          echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Setup Oracle
         id: setup-oracle
