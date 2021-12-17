@@ -27,4 +27,8 @@
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_Deferring_a_message.cs" />
   </ItemGroup>
 
+  <ItemGroup Label="Not enough time in Oracle - timeout removed in master">
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
+  </ItemGroup>
+
 </Project>
