@@ -3,7 +3,7 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture, MsSqlOnly]
+[TestFixture, SqlServerTest]
 public class SqlServerMicrosoftDataClientTimeoutPersisterTests : TimeoutPersisterTests
 {
     public SqlServerMicrosoftDataClientTimeoutPersisterTests() : base(BuildSqlDialect.MsSqlServer, "schema_name")

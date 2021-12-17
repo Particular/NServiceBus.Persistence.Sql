@@ -3,7 +3,7 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture, PostgreSqlOnly]
+[TestFixture, PostgreSqlTest]
 public class PostgreSqlTimeoutPersisterTests : TimeoutPersisterTests
 {
     public PostgreSqlTimeoutPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")

@@ -2,7 +2,7 @@ using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-[PostgreSqlOnly]
+[PostgreSqlTest]
 public class PostgreSqlSagaPersisterTests : SagaPersisterTests
 {
     public PostgreSqlSagaPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")

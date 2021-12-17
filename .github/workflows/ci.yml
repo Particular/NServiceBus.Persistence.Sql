@@ -5,32 +5,31 @@ on:
       - master
       - release-[6-9].*
   pull_request:
-    branches-ignore: release-[0-5].*
-  pull_request_target:
-    branches-ignore: release-[0-5].*
+    branches-ignore:
+      - release-[0-5].*
   workflow_dispatch:
 env:
   DOTNET_NOLOGO: true
 jobs:
   build:
-    name: CI-${{ matrix.os-name || matrix.os }}-${{ matrix.engine }}
-    if:
-      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    name: ${{ matrix.os-name }}-${{ matrix.engine }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ windows-2019, ubuntu-20.04 ]
-        engine:
-          - MsSql
-          - MySql
-          - PostgreSql
+        engine: [ MsSql, MySql, PostgreSql ]
         include:
+          # Add os-name alias for job name
+          - os: windows-2019
+            os-name: Windows
           - os: ubuntu-20.04
+            os-name: Linux
+          # Additional permutatations for Oracle
+          - os: ubuntu-20.04
+            os-name: Linux
             engine: Oracle
           - os: [self-hosted, windows, oracle]
-            os-name: windows
+            os-name: Windows
             engine: Oracle
       fail-fast: false
     steps:
@@ -40,15 +39,8 @@ jobs:
         shell: pwsh
         run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
       - name: Checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
         with:
-          fetch-depth: 0
-      - name: Checkout for Dependabot
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v2.3.4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1.9.0

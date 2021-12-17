@@ -3,7 +3,7 @@ using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture, PostgreSqlOnly]
+[TestFixture, PostgreSqlTest]
 public class PostgreSqlSubscriptionPersisterTests : SubscriptionPersisterTests
 {
     public PostgreSqlSubscriptionPersisterTests() : base(BuildSqlDialect.PostgreSql, "SchemaName")

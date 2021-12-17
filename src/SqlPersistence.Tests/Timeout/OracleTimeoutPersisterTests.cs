@@ -4,7 +4,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
 
-[TestFixture, OracleOnly]
+[TestFixture, OracleTest]
 public class OracleTimeoutPersisterTests : TimeoutPersisterTests
 {
     public OracleTimeoutPersisterTests() : base(BuildSqlDialect.Oracle, "Particular2")

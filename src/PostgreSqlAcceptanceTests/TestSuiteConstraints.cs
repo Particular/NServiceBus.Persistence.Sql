@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿[assembly: PostgreSqlTest]
+
+namespace NServiceBus.AcceptanceTests
 {
     using AcceptanceTesting.Support;
 
