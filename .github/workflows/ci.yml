@@ -120,21 +120,25 @@ jobs:
         if: matrix.engine == 'MySql'
         shell: pwsh
         run: |
+          $password = ""
+          $passwordArg = ""
+
           if ($Env:RUNNER_OS -eq 'Windows') {
             echo "Installing MySQL from Chocolatey"
             choco install mysql
           } else {
             echo "Starting MySQL service preinstalled on runner agent"
-            sudo systemctl start mysql
+            sudo systemctl start mysql.service
+            $password = "root"
+            $passwordArg = "-proot"
           }
 
-          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=root;Password=;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
+          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=root;Password=$password;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
-          $passwordArg = "-p$password"
-          for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
+          for ($i = 0; $i -lt 30; $i++) { ## 2.5 minute timeout
             echo "Checking for MySQL connectivity $($i+1)/30..."
-            $ignore = mysql -h localhost -u root -e "show databases;"
+            $ignore = mysql -h localhost -u root $passwordArg -e "show databases;"
             if ($?) {
               echo "Connection successful"
               break;
