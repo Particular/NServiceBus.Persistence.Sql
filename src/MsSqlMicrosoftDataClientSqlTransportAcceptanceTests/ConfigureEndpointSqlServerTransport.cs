@@ -174,12 +174,14 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
         public string[] ReceivingAddresses { get; private set; }
 
-        public override Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
+        public override async Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
             string[] sendingAddresses, CancellationToken cancellationToken = default)
         {
-            ReceivingAddresses = receivers.Select(r => r.ReceiveAddress).ToArray();
+            var infra = await base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
 
-            return base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
+            ReceivingAddresses = infra.Receivers.Select(r => r.Value.ReceiveAddress).ToArray();
+
+            return infra;
         }
     }
 }
