@@ -43,9 +43,4 @@
 
   </Target>
 
-  <!--Support for ncrunch-->
-  <ItemGroup  Condition="'$(NCrunch)' == '1'">
-    <None Include="$(MSBuildThisFileDirectory)..\*.*" />
-  </ItemGroup>
-
 </Project>
