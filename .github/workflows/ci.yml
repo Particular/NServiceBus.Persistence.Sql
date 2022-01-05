@@ -56,7 +56,7 @@ jobs:
           path: nugets/
           retention-days: 7
       - name: Azure login
-        uses: azure/login@v1.3.0
+        uses: azure/login@v1.4.2
         if: matrix.engine == 'PostgreSQL'
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
