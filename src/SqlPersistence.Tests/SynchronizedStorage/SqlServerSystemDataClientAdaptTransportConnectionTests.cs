@@ -6,6 +6,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Transport;
 using NUnit.Framework;
 
+[SqlServerTest]
 class SqlServerSystemDataClientAdaptTransportConnectionTests : AdaptTransportConnectionTests
 {
     public SqlServerSystemDataClientAdaptTransportConnectionTests() : base(BuildSqlDialect.MsSqlServer)

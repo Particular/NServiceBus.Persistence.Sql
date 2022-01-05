@@ -1,8 +1,8 @@
-#if NETFRAMEWORK
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+[OracleTest]
 class OracleAdaptTransportConnectionTests : AdaptTransportConnectionTests
 {
     public OracleAdaptTransportConnectionTests() : base(BuildSqlDialect.Oracle)
@@ -18,4 +18,3 @@ class OracleAdaptTransportConnectionTests : AdaptTransportConnectionTests
         };
     }
 }
-#endif

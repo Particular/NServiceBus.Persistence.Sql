@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 [SetUpFixture]
@@ -6,27 +7,34 @@ public class SetUpFixture
     [OneTimeSetUp]
     public void SetUp()
     {
-        using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
         {
-            connection.Open();
-            using (var command = connection.CreateCommand())
+            using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
             {
-                command.CommandText = @"
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
 if not exists (
     select  *
     from sys.schemas
     where name = 'schema_name')
 exec('create schema schema_name');";
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
             }
         }
-        using (var connection = PostgreSqlConnectionBuilder.Build())
+
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
         {
-            connection.Open();
-            using (var command = connection.CreateCommand())
+            using (var connection = PostgreSqlConnectionBuilder.Build())
             {
-                command.CommandText = @"create schema if not exists ""SchemaName"";";
-                command.ExecuteNonQuery();
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"create schema if not exists ""SchemaName"";";
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }

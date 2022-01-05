@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿[assembly: MySqlTest]
+
+namespace NServiceBus.AcceptanceTests
 {
     using AcceptanceTesting.Support;
 

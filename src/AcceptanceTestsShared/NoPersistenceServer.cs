@@ -6,7 +6,7 @@
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
     using Configuration.AdvancedExtensibility;
-    using Features;
+    using NServiceBus.Features;
 
     public class NoPersistenceServer : IEndpointSetupTemplate
     {
@@ -20,9 +20,7 @@
             this.typesToInclude = typesToInclude;
         }
 
-#pragma warning disable CS0618
         public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, Action<EndpointConfiguration> configurationBuilderCustomization)
-#pragma warning restore CS0618
         {
             var types = endpointConfiguration.GetTypesScopedByTestClass();
 

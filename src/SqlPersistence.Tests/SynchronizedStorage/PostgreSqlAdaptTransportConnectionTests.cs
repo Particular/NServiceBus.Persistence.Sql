@@ -1,8 +1,8 @@
-#if NETFRAMEWORK
 using System;
 using System.Data.Common;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
+[PostgreSqlTest]
 class PostgreSqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
 {
     public PostgreSqlAdaptTransportConnectionTests() : base(BuildSqlDialect.PostgreSql)
@@ -18,4 +18,3 @@ class PostgreSqlAdaptTransportConnectionTests : AdaptTransportConnectionTests
         };
     }
 }
-#endif
