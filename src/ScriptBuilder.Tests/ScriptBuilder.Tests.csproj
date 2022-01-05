@@ -24,8 +24,4 @@
     <PackageReference Include="NserviceBus" Version="[7.4.1,)" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="14.0.3811.1" />
-  </ItemGroup>
-
 </Project>
