@@ -1,26 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <ToolCommandName>sql-persistence</ToolCommandName>
     <PackAsTool>True</PackAsTool>
-    <Description>.NET Core global tool to generate scripts for NServiceBus Sql persistence</Description>
+    <Description>.NET tool for generating deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-	<PackageReference Include="Particular.Packaging" Version="1.2.1" PrivateAssets="All" />
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="Particular.Packaging" Version="1.4.0" PrivateAssets="All" />
   </ItemGroup>
-  
-  <PropertyGroup>
-    <PackageId>NServiceBus.Persistence.Sql.CommandLine</PackageId>
-    <Description>Dotnet tool for generating deployment scripts for the NServiceBus.Persistence.Sql package</Description>
-  </PropertyGroup>
 
 </Project>
