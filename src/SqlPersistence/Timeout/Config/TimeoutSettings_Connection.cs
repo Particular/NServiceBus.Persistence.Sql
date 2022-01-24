@@ -3,6 +3,10 @@ namespace NServiceBus.Persistence.Sql
     using System;
     using System.Data.Common;
 
+    [ObsoleteEx(
+        Message = "Timeout Manager is being deprecated. See upgrade guide for guidance on migrating to transport native delayed delivery.",
+        TreatAsErrorFromVersion = "7",
+        RemoveInVersion = "8")]
     public partial class TimeoutSettings
     {
         /// <summary>
