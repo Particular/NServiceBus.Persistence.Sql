@@ -29,7 +29,9 @@ namespace NServiceBus.Persistence.Sql
     }
     public class static ScriptRunner
     {
+        [System.ObsoleteAttribute(@"Timeout Manager is being deprecated. See upgrade guide for guidance on migrating to transport native delayed delivery. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. Will be treated as an error from version 7.0.0. Will be removed in version 8.0.0.", false)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
+        [System.ObsoleteAttribute(@"Timeout Manager is being deprecated. See upgrade guide for guidance on migrating to transport native delayed delivery. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. Will be treated as an error from version 7.0.0. Will be removed in version 8.0.0.", false)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = True, bool shouldInstallSagas = True, bool shouldInstallSubscriptions = True, bool shouldInstallTimeouts = True) { }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
@@ -75,6 +77,9 @@ namespace NServiceBus.Persistence.Sql
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
     }
+    [System.ObsoleteAttribute("Timeout Manager is being deprecated. See upgrade guide for guidance on migrating " +
+        "to transport native delayed delivery. Will be treated as an error from version 7" +
+        ".0.0. Will be removed in version 8.0.0.", false)]
     public class TimeoutSettings
     {
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
