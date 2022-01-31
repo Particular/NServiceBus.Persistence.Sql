@@ -20,11 +20,6 @@
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        [ObsoleteEx(
-            Message = "Timeout Manager is being deprecated. See upgrade guide for guidance on migrating to transport native delayed delivery.",
-            TreatAsErrorFromVersion = "7",
-            RemoveInVersion = "8",
-            ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)")]
         public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
@@ -36,11 +31,6 @@
         /// <remarks>
         /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
         /// </remarks>
-        [ObsoleteEx(
-            Message = "Timeout Manager is being deprecated. See upgrade guide for guidance on migrating to transport native delayed delivery.",
-            TreatAsErrorFromVersion = "7",
-            RemoveInVersion = "8",
-            ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)")]
         public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
             Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
