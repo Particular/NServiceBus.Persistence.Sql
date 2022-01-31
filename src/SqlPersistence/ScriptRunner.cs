@@ -25,9 +25,25 @@
             TreatAsErrorFromVersion = "7",
             RemoveInVersion = "8",
             ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)")]
-        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
         {
-            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions, shouldInstallTimeouts);
+            await Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions).ConfigureAwait(false);
+
+            if (shouldInstallTimeouts)
+            {
+                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, x => connectionBuilder()).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Executes the scripts produced by a Sql Persistence MSBuild task.
+        /// </summary>
+        /// <remarks>
+        /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
+        /// </remarks>
+        public static Task Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true)
+        {
+            return Install(sqlDialect, tablePrefix, x => connectionBuilder(), scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions);
         }
 
         /// <summary>
@@ -42,6 +58,22 @@
             RemoveInVersion = "8",
             ReplacementTypeOrMember = "Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)")]
         public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true)
+        {
+            await Install(sqlDialect, tablePrefix, connectionBuilder, scriptDirectory, shouldInstallOutbox, shouldInstallSagas, shouldInstallSubscriptions).ConfigureAwait(false);
+
+            if (shouldInstallTimeouts)
+            {
+                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Executes the scripts produced by a Sql Persistence MSBuild task.
+        /// </summary>
+        /// <remarks>
+        /// Designed to be used in a manual installation without the requirement of starting a full NServiceBus endpoint.
+        /// </remarks>
+        public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true)
         {
             Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
             Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
@@ -63,11 +95,6 @@
             if (shouldInstallSubscriptions)
             {
                 await ExecuteInSeparateConnection<StorageType.Subscriptions>(InstallSubscriptions, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
-            }
-
-            if (shouldInstallTimeouts)
-            {
-                await ExecuteInSeparateConnection<StorageType.Timeouts>(InstallTimeouts, scriptDirectory, tablePrefix, sqlDialect, connectionBuilder).ConfigureAwait(false);
             }
         }
 
