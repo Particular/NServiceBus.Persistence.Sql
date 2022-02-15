@@ -1,8 +1,5 @@
 [*.cs]
 
-# Justification: Test project
-dotnet_diagnostic.CA2007.severity = none
-
 # Justification: No saga analyzers here
 dotnet_diagnostic.NSB0003.severity = none
 dotnet_diagnostic.NSB0004.severity = none
