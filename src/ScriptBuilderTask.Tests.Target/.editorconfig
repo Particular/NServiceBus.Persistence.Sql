@@ -1,8 +1,5 @@
 [*.cs]
 
-# Justification: Tests don't support cancellation and don't need to forward IMessageHandlerContext.CancellationToken
-dotnet_diagnostic.NSB0002.severity = suggestion
-
 # Justification: No saga analyzers here
 dotnet_diagnostic.NSB0003.severity = none
 dotnet_diagnostic.NSB0004.severity = none
