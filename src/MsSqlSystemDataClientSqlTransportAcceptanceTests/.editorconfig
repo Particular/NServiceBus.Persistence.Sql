@@ -2,3 +2,20 @@
 
 # Justification: Test project
 dotnet_diagnostic.CA2007.severity = none
+
+# Justification: No saga analyzers here
+dotnet_diagnostic.NSB0003.severity = none
+dotnet_diagnostic.NSB0004.severity = none
+dotnet_diagnostic.NSB0005.severity = none
+dotnet_diagnostic.NSB0006.severity = none
+dotnet_diagnostic.NSB0007.severity = none
+dotnet_diagnostic.NSB0008.severity = none
+dotnet_diagnostic.NSB0009.severity = none
+dotnet_diagnostic.NSB0010.severity = none
+dotnet_diagnostic.NSB0011.severity = none
+dotnet_diagnostic.NSB0012.severity = none
+dotnet_diagnostic.NSB0013.severity = none
+dotnet_diagnostic.NSB0014.severity = none
+dotnet_diagnostic.NSB0015.severity = none
+dotnet_diagnostic.NSB0016.severity = none
+dotnet_diagnostic.NSB0017.severity = none
