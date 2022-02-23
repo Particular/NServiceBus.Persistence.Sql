@@ -13,13 +13,17 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.1900" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.1900" GeneratePathProperty="True" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup Label="Flaky tests on Oracle">
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
   </ItemGroup>
 
 </Project>
