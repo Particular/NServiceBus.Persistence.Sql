@@ -215,6 +215,92 @@ public class SagaDefinitionReaderTest : IDisposable
         }
     }
 
+    [Test]
+    public void CorrelationIdInBaseClassSqlSaga()
+    {
+        var sagaType = module.GetTypeDefinition<SqlSagaWithDataBaseClass>();
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+        Approver.Verify(definition);
+    }
+
+    public class SqlSagaWithDataBaseClass : SqlSaga<SqlSagaWithDataBaseClass.SagaData>
+    {
+        public abstract class SagaDataBaseClass : ContainSagaData
+        {
+            public string MyId { get; set; }
+        }
+        public class SagaData : SagaDataBaseClass
+        {
+        }
+
+        protected override string TableSuffix => "TheTableSuffix";
+        protected override string CorrelationPropertyName => nameof(SagaData.MyId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void CorrelationIdInTwoLevelsDeepBaseClassSqlSaga()
+    {
+        var sagaType = module.GetTypeDefinition<SqlSagaWithTwoLevelsDeepDataBaseClass>();
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+        Approver.Verify(definition);
+    }
+
+    public class SqlSagaWithTwoLevelsDeepDataBaseClass : SqlSaga<SqlSagaWithTwoLevelsDeepDataBaseClass.SagaData>
+    {
+        public abstract class SagaDataBaseClassOne : ContainSagaData
+        {
+            public abstract string MyId { get; set; }
+        }
+        public class SagaDataBaseClassTwo : SagaDataBaseClassOne
+        {
+            public override string MyId { get; set; }
+        }
+        public class SagaData : SagaDataBaseClassTwo
+        {
+        }
+
+        protected override string TableSuffix => "TheTableSuffix";
+        protected override string CorrelationPropertyName => nameof(SagaData.MyId);
+
+        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        {
+        }
+    }
+
+    [Test]
+    public void CorrelationIdInBaseClassRegularSaga()
+    {
+        var sagaType = module.GetTypeDefinition<SagaWithDataBaseClass>();
+        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
+        Assert.IsNotNull(definition);
+        Approver.Verify(definition);
+    }
+
+    [SqlSaga(tableSuffix: "TheTableSuffix")]
+    public class SagaWithDataBaseClass : Saga<SagaWithDataBaseClass.SagaData>
+    {
+        public abstract class SagaDataBaseClass : ContainSagaData
+        {
+            public string MyId { get; set; }
+        }
+        public class SagaData : SagaDataBaseClass
+        {
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.ConfigureMapping<AMessage>(m => m.MyId).ToSaga(s => s.MyId);
+    }
+
+    class AMessage
+    {
+        public Guid MyId { get; set; }
+    }
+
     public void Dispose()
     {
         module?.Dispose();
