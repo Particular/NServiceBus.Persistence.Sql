@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -7,6 +8,20 @@ using NServiceBus.Persistence.Sql;
 
 static class CecilExtensions
 {
+    public static T FindInTypeHierarchy<T>(this TypeDefinition type, Func<TypeDefinition, T> search)
+    {
+        var inspectingType = type;
+        T result = search(inspectingType);
+
+        while (result == null && inspectingType.BaseType != null && inspectingType.BaseType.FullName != "NServiceBus.ContainSagaData")
+        {
+            inspectingType = inspectingType.BaseType.Resolve();
+            result = search(inspectingType);
+        }
+
+        return result;
+    }
+
     public static string GetStringProperty(this ICustomAttribute attribute, string name)
     {
         return (string)attribute.Properties

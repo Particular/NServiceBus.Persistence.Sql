@@ -117,7 +117,8 @@ static class SagaDefinitionReader
             throw new ErrorsException("Unable to determine Saga correlation property because an unexpected method call was detected in the ConfigureHowToFindSaga method.");
         }
 
-        var correlationId = InstructionAnalyzer.GetCorrelationId(instructions, sagaDataType.FullName);
+        var correlationId = sagaDataType.FindInTypeHierarchy(t => InstructionAnalyzer.GetCorrelationId(instructions, t.FullName));
+
         return correlationId;
     }
 
@@ -205,7 +206,8 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
         {
             return null;
         }
-        var propertyDefinition = sagaDataTypeDefinition.Properties.SingleOrDefault(x => x.Name == propertyName);
+
+        var propertyDefinition = sagaDataTypeDefinition.FindInTypeHierarchy(t => t.Properties.SingleOrDefault(x => x.Name == propertyName));
 
         if (propertyDefinition == null)
         {
