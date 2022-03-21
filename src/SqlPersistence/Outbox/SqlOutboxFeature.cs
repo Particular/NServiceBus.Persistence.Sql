@@ -28,6 +28,7 @@ class SqlOutboxFeature : Feature
             adoTransactionIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
         }
         var transactionScopeIsolationLevel = context.Settings.GetOrDefault<System.Transactions.IsolationLevel>(TransactionScopeIsolationLevel);
+        var transactionScopeTimeout = context.Settings.GetOrDefault<TimeSpan>(TransactionScopeTimeout);
 
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
 
@@ -44,7 +45,7 @@ class SqlOutboxFeature : Feature
         ISqlOutboxTransaction transactionFactory()
         {
             return transactionScopeMode
-                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel)
+                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel, transactionScopeTimeout)
                 : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
         }
 
@@ -87,4 +88,5 @@ class SqlOutboxFeature : Feature
     internal const string UseTransactionScope = "Persistence.Sql.Outbox.TransactionScopeMode";
     internal const string AdoTransactionIsolationLevel = "Persistence.Sql.Outbox.AdoTransactionIsolationLevel";
     internal const string TransactionScopeIsolationLevel = "Persistence.Sql.Outbox.TransactionScopeIsolationLevel";
+    internal const string TransactionScopeTimeout = "Persistence.Sql.Outbox.TransactionScopeTimeout";
 }

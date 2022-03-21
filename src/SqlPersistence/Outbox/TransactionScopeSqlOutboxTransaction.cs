@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -16,13 +17,15 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     TransactionScope transactionScope;
     Transaction ambientTransaction;
     bool commit;
+    TimeSpan transactionTimeout;
 
     public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-        IConnectionManager connectionManager, IsolationLevel isolationLevel)
+        IConnectionManager connectionManager, IsolationLevel isolationLevel, TimeSpan transactionTimeout = default)
     {
         this.connectionManager = connectionManager;
         this.isolationLevel = isolationLevel;
         this.concurrencyControlStrategy = concurrencyControlStrategy;
+        this.transactionTimeout = transactionTimeout;
     }
 
     public DbTransaction Transaction => null;
@@ -33,7 +36,8 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     {
         var options = new TransactionOptions
         {
-            IsolationLevel = isolationLevel
+            IsolationLevel = isolationLevel,
+            Timeout = transactionTimeout
         };
 
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);
