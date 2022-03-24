@@ -118,6 +118,10 @@
         /// <param name="timeout">timeout period for the transaction.</param>
         public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel, TimeSpan timeout)
         {
+            if (timeout > TransactionManager.MaximumTimeout)
+            {
+                throw new Exception("Timeout requested is longer than the maximum value for this machine. Override using the maxTimeout setting of the system.transactions section in machine.config");
+            }
             outboxSettings.UseTransactionScope(isolationLevel);
             outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeTimeout, timeout);
         }
