@@ -20,7 +20,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     TimeSpan transactionTimeout;
 
     public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-        IConnectionManager connectionManager, IsolationLevel isolationLevel, TimeSpan transactionTimeout = default)
+        IConnectionManager connectionManager, IsolationLevel isolationLevel, TimeSpan transactionTimeout)
     {
         this.connectionManager = connectionManager;
         this.isolationLevel = isolationLevel;
@@ -37,7 +37,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
         var options = new TransactionOptions
         {
             IsolationLevel = isolationLevel,
-            Timeout = transactionTimeout; // TimeSpan.Zero is default of `TransactionOptions.Timeout`
+            Timeout = transactionTimeout // TimeSpan.Zero is default of `TransactionOptions.Timeout`
         };
 
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);

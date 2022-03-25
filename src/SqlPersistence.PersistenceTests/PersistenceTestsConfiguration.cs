@@ -175,7 +175,7 @@
             ISqlOutboxTransaction transactionFactory()
             {
                 return transactionScopeMode
-                   ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted)
+                   ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, IsolationLevel.ReadCommitted, TimeSpan.Zero)
                    : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             }
 
