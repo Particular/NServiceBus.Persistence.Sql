@@ -37,7 +37,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
         var options = new TransactionOptions
         {
             IsolationLevel = isolationLevel,
-            Timeout = transactionTimeout
+            Timeout = transactionTimeout; // TimeSpan.Zero is default of `TransactionOptions.Timeout`
         };
 
         transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);
