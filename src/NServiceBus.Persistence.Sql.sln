@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -36,8 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSqlAcceptanceTests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FB898D09-ADF0-49D4-8089-D743F1A31D12}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-		..\GitVersion.yml = ..\GitVersion.yml
+		Custom.Build.props = Custom.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlSystemDataClientSqlTransportAcceptanceTests", "MsSqlSystemDataClientSqlTransportAcceptanceTests\MsSqlSystemDataClientSqlTransportAcceptanceTests.csproj", "{0E98C052-F67F-4826-A344-7685504CA955}"
@@ -48,9 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientSql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientAcceptanceTests", "MsSqlMicrosoftDataClientAcceptanceTests\MsSqlMicrosoftDataClientAcceptanceTests.csproj", "{7C16BE00-7198-4B6C-A094-C0B62A539F77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
