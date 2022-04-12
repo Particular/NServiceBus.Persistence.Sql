@@ -46,7 +46,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     public void OnSaveChanges(Func<ISqlStorageSession, Task> callback) => throw new NotImplementedException();
 #pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
 
-    public ValueTask<bool> TryOpenSession(IOutboxTransaction transaction, ContextBag context,
+    public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context,
         CancellationToken cancellationToken = new CancellationToken())
     {
         if (!(transaction is ISqlOutboxTransaction outboxTransaction))
@@ -60,7 +60,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         return new ValueTask<bool>(true);
     }
 
-    public async ValueTask<bool> TryOpenSession(TransportTransaction transportTransaction, ContextBag context,
+    public async ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context,
         CancellationToken cancellationToken = new CancellationToken())
     {
         (bool wasAdapted, DbConnection connection, DbTransaction transaction, bool ownsTx) =
@@ -77,7 +77,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         return true;
     }
 
-    public async ValueTask OpenSession(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+    public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
     {
         Connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
         Transaction = Connection.BeginTransaction();
