@@ -65,7 +65,7 @@ public class CharArrayTextWriterPerformanceTests
 
         public Task Handle(AMessage message, IMessageHandlerContext context)
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 

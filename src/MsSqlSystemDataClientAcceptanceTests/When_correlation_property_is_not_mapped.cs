@@ -82,7 +82,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             protected override string CorrelationPropertyName => nameof(SagaData.Property);

@@ -99,7 +99,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
             {
                 testContext.HandledOtherMessage = true;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             protected override string CorrelationPropertyName => nameof(SagaData.Property);

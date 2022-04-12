@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus
 {
-    using System;
     using System.Data.Common;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,16 +10,13 @@
     {
         public partial class MySql
         {
-            static readonly Task<StorageSession> result = Task.FromResult<StorageSession>(null);
-
             // MySQL does not support DTC so we should not enlist if transport has such a transaction.
-            internal override Task<StorageSession> TryAdaptTransportConnection(
+            internal override ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)> TryAdaptTransportConnection(
                 TransportTransaction transportTransaction,
                 ContextBag context,
                 IConnectionManager connectionManager,
-                Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
                 CancellationToken cancellationToken = default) =>
-                result;
+                new ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)>((WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false));
         }
     }
 }

@@ -14,7 +14,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         var hashcodeString = Math.Abs(endpointName.GetHashCode()).ToString();
@@ -38,7 +38,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     bool FilterTableExists(Exception exception)

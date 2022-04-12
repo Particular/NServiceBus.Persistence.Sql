@@ -195,7 +195,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 await helperA.Cleanup();
                 await helperB.Cleanup();
             };
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         });
     }
 
@@ -245,7 +245,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     testContext.TenantBDbName = dbName;
                 }
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
     }
@@ -286,7 +286,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     testContext.TenantBDbName = dbName;
                 }
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             public class TestSagaData : ContainSagaData

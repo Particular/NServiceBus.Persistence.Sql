@@ -35,8 +35,7 @@ abstract class AdaptTransportConnectionTests
             transportTransaction.Set(Transaction.Current);
             using (new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
-                var ex = Assert.ThrowsAsync<Exception>(() => sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
-                    (conn, tx, arg3) => new StorageSession(conn, tx, false, null)));
+                var ex = Assert.ThrowsAsync<Exception>(async () => await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager));
 
                 StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", ex.Message);
             }
@@ -44,12 +43,11 @@ abstract class AdaptTransportConnectionTests
     }
 
     [Test]
-    public async Task It_returns_null_if_there_is_no_transaction_scope()
+    public async Task It_returns_false_if_there_is_no_transaction_scope()
     {
         var transportTransaction = new TransportTransaction();
-        var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager,
-            (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
+        (bool wasAdapted, DbConnection _, DbTransaction _, bool _) = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager);
 
-        Assert.IsNull(result);
+        Assert.That(wasAdapted, Is.False);
     }
 }

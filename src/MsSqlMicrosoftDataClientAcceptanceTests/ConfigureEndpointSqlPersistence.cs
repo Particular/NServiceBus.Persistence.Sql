@@ -12,7 +12,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlMicrosoftDataClientConnectionBuilder.Build, BuildSqlDialect.MsSqlServer, FilterTableExists);
@@ -22,7 +22,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     bool FilterTableExists(Exception exception)

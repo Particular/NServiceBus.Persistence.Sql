@@ -12,7 +12,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 30));
         endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlDialect.MySql);
@@ -23,7 +23,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     public Task Cleanup()

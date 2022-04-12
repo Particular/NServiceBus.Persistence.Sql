@@ -6,18 +6,9 @@ class ConnectionManager : IConnectionManager
 {
     Func<DbConnection> connectionBuilder;
 
-    public ConnectionManager(Func<DbConnection> connectionBuilder)
-    {
-        this.connectionBuilder = connectionBuilder;
-    }
+    public ConnectionManager(Func<DbConnection> connectionBuilder) => this.connectionBuilder = connectionBuilder;
 
-    public DbConnection BuildNonContextual()
-    {
-        return connectionBuilder();
-    }
+    public DbConnection BuildNonContextual() => connectionBuilder();
 
-    public DbConnection Build(IncomingMessage incomingMessage)
-    {
-        return connectionBuilder();
-    }
+    public DbConnection Build(IncomingMessage incomingMessage) => connectionBuilder();
 }

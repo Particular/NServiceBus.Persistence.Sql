@@ -30,11 +30,9 @@
 
         public ISagaPersister SagaStorage { get; private set; }
 
-        public ISynchronizedStorage SynchronizedStorage { get; private set; }
-
-        public ISynchronizedStorageAdapter SynchronizedStorageAdapter { get; private set; }
-
         public IOutboxStorage OutboxStorage { get; private set; }
+
+        public Func<ICompletableSynchronizedStorageSession> CreateStorageSession { get; private set; }
 
         static PersistenceTestsConfiguration()
         {
@@ -102,10 +100,9 @@
             var connectionManager = new ConnectionManager(connectionFactory);
             SagaIdGenerator = new DefaultSagaIdGenerator();
             SagaStorage = new SagaPersister(infoCache, dialect);
-            SynchronizedStorage = new SynchronizedStorage(connectionManager, infoCache, null);
-            SynchronizedStorageAdapter = new StorageAdapter(connectionManager, infoCache, dialect, null);
             OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, false);
             SupportsPessimisticConcurrency = pessimisticMode;
+            CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
             GetContextBagForSagaStorage = () =>
             {

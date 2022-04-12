@@ -57,7 +57,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
 
             public override Task Handle(StartSaga message, IMessageHandlerContext context)
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
 
@@ -72,7 +72,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
 
             public virtual Task Handle(StartSaga message, IMessageHandlerContext context)
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
 
@@ -101,7 +101,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
 
             public Task Handle(StartSaga message, IMessageHandlerContext context)
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
 

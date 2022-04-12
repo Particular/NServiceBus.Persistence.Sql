@@ -12,7 +12,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         var lastDot = endpointName.LastIndexOf('.');
@@ -35,7 +35,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var sagaSettings = persistence.SagaSettings();
         sagaSettings.NameFilter(sagaName => sagaName.Substring(0, Math.Min(27, sagaName.Length)));
 
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     bool FilterTableExists(Exception exception)
@@ -47,6 +47,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
     public Task Cleanup()
     {
         endpointHelper?.Cleanup();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 }

@@ -54,7 +54,7 @@ public class When_sagas_and_outbox_are_disabled : NServiceBusAcceptanceTest
                 testContext.SessionCreated = session != null;
                 testContext.Done = true;
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
     }

@@ -171,7 +171,7 @@ end";
                         testContext.ReplyReceived = true;
                     }
 
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }
             }
 

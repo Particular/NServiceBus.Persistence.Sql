@@ -12,23 +12,22 @@
     {
         public partial class MsSqlServer
         {
-            internal override async Task<StorageSession> TryAdaptTransportConnection(
+            internal override async ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)> TryAdaptTransportConnection(
                 TransportTransaction transportTransaction,
                 ContextBag context,
                 IConnectionManager connectionManager,
-                Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
                 CancellationToken cancellationToken = default)
             {
                 if (DoNotUseTransportConnection)
                 {
-                    return null;
+                    return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
                 }
 
                 // SQL server transport in native TX mode
                 if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
                     transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
                 {
-                    return storageSessionFactory(existingSqlConnection, existingSqlTransaction, false);
+                    return (WasAdapted: true, Connection: existingSqlConnection, Transaction: existingSqlTransaction, OwnsTransaction: false);
                 }
 
                 // Transport supports DTC and uses TxScope owned by the transport
@@ -49,13 +48,12 @@
                 if (ambientTransaction == null)
                 {
                     // Other modes handled by creating a new session.
-                    return null;
+                    return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
                 }
 
                 var connection = await connectionManager.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
-
-                return storageSessionFactory(connection, null, true);
+                return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: false);
             }
 
             internal bool DoNotUseTransportConnection { get; set; }
