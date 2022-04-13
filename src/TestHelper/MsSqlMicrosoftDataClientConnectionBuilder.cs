@@ -24,7 +24,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
-            using (var conn = MsSqlSystemDataClientConnectionBuilder.Build())
+            using (var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build())
             {
                 conn.Open();
                 conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
