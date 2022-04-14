@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Data.SqlClient;
-using NUnit.Framework;
 
 public static class MsSqlMicrosoftDataClientConnectionBuilder
 {

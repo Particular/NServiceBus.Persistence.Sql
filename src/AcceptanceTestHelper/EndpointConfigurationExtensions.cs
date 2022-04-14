@@ -18,7 +18,8 @@ public static class EndpointConfigurationExtensions
         {
             throw new Exception($"Could not extract field '{userProvidedTypesPropertyName}' from {scannerConfigurationTypeName}.");
         }
-        return (List<Type>)property.GetValue(scannerConfiguration);
+
+        return (List<Type>)property.GetValue(scannerConfiguration) ?? new List<Type>(0);
     }
 
     public static bool IsSendOnly(this EndpointConfiguration configuration)

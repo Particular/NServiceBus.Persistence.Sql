@@ -172,7 +172,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         {
         }
 
-        public string[] ReceivingAddresses { get; private set; }
+        public string[] ReceivingAddresses { get; private set; } = Array.Empty<string>();
 
         public override async Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
             string[] sendingAddresses, CancellationToken cancellationToken = default)
