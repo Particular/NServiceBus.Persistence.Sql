@@ -52,22 +52,22 @@
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
             {
-                variants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, MsSqlMicrosoftDataClientConnectionBuilder.Build));
+                variants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer));
             }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
             {
-                variants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql, PostgreSqlConnectionBuilder.Build));
+                variants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql));
             }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
             {
-                variants.Add(CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql, MySqlConnectionBuilder.Build));
+                variants.Add(CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql));
             }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
             {
-                variants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle, OracleConnectionBuilder.Build));
+                variants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle));
             }
 
             SagaVariants = variants.ToArray();
