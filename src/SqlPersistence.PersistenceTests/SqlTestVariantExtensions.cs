@@ -14,7 +14,7 @@ namespace NServiceBus.PersistenceTesting
                 BuildSqlDialect.Oracle => OracleConnectionBuilder.Build(),
                 BuildSqlDialect.PostgreSql => PostgreSqlConnectionBuilder.Build(),
                 _ => throw new ArgumentOutOfRangeException(
-                    $"BuildSQL dialect '{variant.BuildDialect}' is not supported yet as a test variant.")
+                    $"{nameof(SqlTestVariant.BuildDialect)} '{variant.BuildDialect}' is not supported yet as a test variant.")
             };
     }
 }
