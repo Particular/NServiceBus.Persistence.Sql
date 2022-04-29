@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Common;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
@@ -74,17 +73,15 @@
             OutboxVariants = variants.ToArray();
         }
 
-        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, Func<DbConnection> connectionFactory, bool usePessimisticMode = true)
-        {
-            return new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, connectionFactory, usePessimisticMode)));
-        }
+        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, bool usePessimisticMode = true) =>
+            new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticMode)));
 
         public Task Configure(CancellationToken cancellationToken = default)
         {
             var variant = (SqlTestVariant)Variant.Values[0];
             var dialect = variant.Dialect;
             var buildDialect = variant.BuildDialect;
-            var connectionFactory = variant.ConnectionFactory;
+            var connectionFactory = () => variant.Open();
             var pessimisticMode = variant.UsePessimisticMode;
 
             if (SessionTimeout.HasValue)
@@ -113,14 +110,14 @@
             GetContextBagForSagaStorage = () =>
             {
                 var contextBag = new ContextBag();
-                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), new byte[0]));
+                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), Array.Empty<byte>()));
                 return contextBag;
             };
 
             GetContextBagForOutbox = () =>
             {
                 var contextBag = new ContextBag();
-                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), new byte[0]));
+                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), Array.Empty<byte>()));
                 return contextBag;
             };
 
