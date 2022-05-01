@@ -54,7 +54,7 @@ public abstract class OutboxPersisterTests
                 }
 
                 return transactionScope
-                    ? new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted)
+                    ? new TransactionScopeSqlOutboxTransaction(behavior, connectionManager, IsolationLevel.ReadCommitted, TimeSpan.Zero)
                     : new AdoNetSqlOutboxTransaction(behavior, connectionManager, System.Data.IsolationLevel.ReadCommitted);
             },
             cleanupBatchSize: 5);

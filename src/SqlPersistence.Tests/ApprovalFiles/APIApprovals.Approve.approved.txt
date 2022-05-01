@@ -156,6 +156,7 @@ namespace NServiceBus
         public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings, System.Transactions.IsolationLevel isolationLevel) { }
+        public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings, System.Transactions.IsolationLevel isolationLevel, System.TimeSpan timeout) { }
     }
     public static class SqlPersistenceStorageSessionExtensions
     {

@@ -107,5 +107,23 @@
             outboxSettings.GetSettings().Set(SqlOutboxFeature.UseTransactionScope, true);
             outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeIsolationLevel, isolationLevel);
         }
+
+        /// <summary>
+        /// Configures the outbox to use TransactionScope instead of SqlTransaction. This allows wrapping the
+        /// the outbox transaction (and synchronized storage session it manages) and other database transactions in a single scope - provided that
+        /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
+        /// </summary>
+        /// <param name="outboxSettings">Outbox settings.</param>
+        /// <param name="isolationLevel">Isolation level to use. Only levels Read Committed, Repeatable Read and Serializable are supported.</param>
+        /// <param name="timeout">timeout period for the transaction.</param>
+        public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel, TimeSpan timeout)
+        {
+            if (timeout > TransactionManager.MaximumTimeout)
+            {
+                throw new Exception("Timeout requested is longer than the maximum value for this machine. Override using the maxTimeout setting of the system.transactions section in machine.config");
+            }
+            outboxSettings.UseTransactionScope(isolationLevel);
+            outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeTimeout, timeout);
+        }
     }
 }
