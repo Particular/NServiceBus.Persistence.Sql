@@ -6,7 +6,13 @@ class SqlSagaFeature : Feature
 {
     SqlSagaFeature()
     {
+        Defaults(s =>
+        {
+            s.EnableFeatureByDefault<SqlStorageSessionFeature>();
+            s.AddUnrecoverableException(typeof(SerializationException));
+        });
         DependsOn<Sagas>();
+        DependsOn<SqlStorageSessionFeature>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)

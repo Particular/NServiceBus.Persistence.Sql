@@ -2,8 +2,6 @@
 {
     using Features;
     using Persistence;
-    using Persistence.Sql;
-    using Settings;
 
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
@@ -15,21 +13,6 @@
         /// </summary>
         public SqlPersistence()
         {
-            Supports<StorageType.Outbox>(s =>
-            {
-                EnableSession(s);
-                s.EnableFeatureByDefault<SqlOutboxFeature>();
-            });
-            Supports<StorageType.Sagas>(s =>
-            {
-                EnableSession(s);
-                s.EnableFeatureByDefault<SqlSagaFeature>();
-                s.AddUnrecoverableException(typeof(SerializationException));
-            });
-            Supports<StorageType.Subscriptions>(s =>
-            {
-                s.EnableFeatureByDefault<SqlSubscriptionFeature>();
-            });
             Defaults(s =>
             {
                 var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultsApplied";
@@ -52,11 +35,10 @@
 
                 s.Set(defaultsAppliedSettingsKey, true);
             });
-        }
 
-        static void EnableSession(SettingsHolder s)
-        {
-            s.EnableFeatureByDefault<StorageSessionFeature>();
+            Supports<StorageType.Outbox>(s => s.EnableFeatureByDefault<SqlOutboxFeature>());
+            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<SqlSagaFeature>());
+            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<SqlSubscriptionFeature>());
         }
     }
 }

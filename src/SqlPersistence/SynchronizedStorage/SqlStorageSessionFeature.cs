@@ -9,7 +9,7 @@ using NServiceBus.Settings;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using SagaSettings = NServiceBus.Persistence.Sql.SagaSettings;
 
-class StorageSessionFeature : Feature
+class SqlStorageSessionFeature : Feature
 {
     protected override void Setup(FeatureConfigurationContext context)
     {
