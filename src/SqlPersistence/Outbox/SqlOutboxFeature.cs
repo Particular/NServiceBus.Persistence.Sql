@@ -8,7 +8,12 @@ class SqlOutboxFeature : Feature
 {
     SqlOutboxFeature()
     {
+        Defaults(s =>
+        {
+            s.EnableFeatureByDefault<SqlStorageSessionFeature>();
+        });
         DependsOn<Outbox>();
+        DependsOn<SqlStorageSessionFeature>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
