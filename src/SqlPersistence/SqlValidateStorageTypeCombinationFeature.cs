@@ -7,7 +7,8 @@ sealed class SqlValidateStorageTypeCombinationFeature : Feature
     public SqlValidateStorageTypeCombinationFeature()
     {
         EnableByDefault();
-        DependsOnAtLeastOne(typeof(SqlOutboxFeature), typeof(SqlSagaFeature));
+        DependsOnOptionally<SqlOutboxFeature>();
+        DependsOnOptionally<SqlSagaFeature>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
