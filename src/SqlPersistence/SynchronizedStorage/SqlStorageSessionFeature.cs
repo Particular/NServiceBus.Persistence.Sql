@@ -26,6 +26,8 @@ class SqlStorageSessionFeature : Feature
         context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
     }
 
+    // This check should normally be handled by Core but unfortunately there is a bug that prevents the check from executing
+    // https://github.com/Particular/NServiceBus/issues/6378
     static void ValidateSagaOutboxCombo(IReadOnlySettings settings)
     {
         var isOutboxEnabled = settings.IsFeatureActive(typeof(Outbox));
