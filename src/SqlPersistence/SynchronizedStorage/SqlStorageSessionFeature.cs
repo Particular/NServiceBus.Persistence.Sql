@@ -12,13 +12,9 @@ class SqlStorageSessionFeature : Feature
         var services = context.Services;
         var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
 
-        var sessionHolder = new CurrentSessionHolder();
-
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        services.AddSingleton<ISynchronizedStorage>(provider => new SynchronizedStorage(connectionManager, provider.GetService<SagaInfoCache>(), sessionHolder));
-        services.AddSingleton<ISynchronizedStorageAdapter>(provider => new StorageAdapter(connectionManager, provider.GetService<SagaInfoCache>(), sqlDialect, sessionHolder));
-
-        services.AddTransient(_ => sessionHolder.Current);
-        context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
+        // TODO: The connection manager design needs a revisit to avoid the closure
+        services.AddScoped<ICompletableSynchronizedStorageSession>(provider => new StorageSession(connectionManager, provider.GetService<SagaInfoCache>(), sqlDialect));
+        services.AddScoped(provider => provider.GetService<ISynchronizedStorageSession>().SqlPersistenceSession());
     }
 }
