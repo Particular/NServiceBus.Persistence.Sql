@@ -188,8 +188,8 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
-            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null));
-            cfg.RegisterStartupTask(new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null));
+            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer));
+            cfg.RegisterStartupTask(new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer));
         });
     }
 

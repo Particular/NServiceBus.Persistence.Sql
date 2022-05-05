@@ -37,6 +37,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
         {
             EndpointSetup<DefaultServer>(c =>
             {
+                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox();
                 c.UsePersistence<AcceptanceTestingPersistence, StorageType.Sagas>();
             });

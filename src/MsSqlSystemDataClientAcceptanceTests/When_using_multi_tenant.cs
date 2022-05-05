@@ -137,6 +137,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     var persistence = cfg.UsePersistence<SqlPersistence>();
                     persistence.MultiTenantConnectionBuilder(captureTenantId, tenantId => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId));
 
+                    cfg.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     cfg.EnableOutbox().DisableCleanup();
                 });
                 SetupTenantDatabases(b);
@@ -165,6 +166,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         if (useOutbox)
         {
+            c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
             var outbox = c.EnableOutbox();
             if (!cleanOutbox)
             {
@@ -188,8 +190,8 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
-            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null));
-            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null));
+            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer));
+            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer));
         });
     }
 

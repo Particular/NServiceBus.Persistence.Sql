@@ -16,12 +16,6 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
         PerformTestOn<CoreSagaBaseClassEndpoint>();
     }
 
-    [Test]
-    public void Ensure_SqlSaga_will_throw()
-    {
-        PerformTestOn<SqlSagaBaseClassEndpoint>();
-    }
-
     void PerformTestOn<TEndpointSelection>()
         where TEndpointSelection : EndpointConfigurationBuilder
     {
@@ -45,7 +39,10 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
     {
         public CoreSagaBaseClassEndpoint()
         {
-            EndpointSetup<DefaultServer>();
+            EndpointSetup<DefaultServer>(c =>
+            {
+                c.Sagas().DisableBestPracticeValidation();
+            });
         }
 
         public class CoreSagaWithBase : BaseSaga
@@ -76,44 +73,6 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
             }
         }
 
-    }
-
-    public class SqlSagaBaseClassEndpoint : EndpointConfigurationBuilder
-    {
-        public SqlSagaBaseClassEndpoint()
-        {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class SqlSagaWithBase : BaseSqlSaga,
-            IAmStartedByMessages<StartSaga>
-        {
-            public class SagaData : ContainSagaData
-            {
-                public string Correlation { get; set; }
-            }
-
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-            {
-                base.ConfigureMapping(mapper);
-                mapper.ConfigureMapping<StartSaga>(msg => msg.Correlation);
-            }
-
-            public Task Handle(StartSaga message, IMessageHandlerContext context)
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-        public class BaseSqlSaga : SqlSaga<SqlSagaWithBase.SagaData>
-        {
-            protected override string CorrelationPropertyName => "Correlation";
-
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-            {
-
-            }
-        }
     }
 
     public class StartSaga : ICommand

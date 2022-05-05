@@ -37,6 +37,7 @@ public class When_different_persistence_used_for_outbox : NServiceBusAcceptanceT
         {
             EndpointSetup<DefaultServer>(c =>
             {
+                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox();
                 c.UsePersistence<AcceptanceTestingPersistence, StorageType.Outbox>();
             });

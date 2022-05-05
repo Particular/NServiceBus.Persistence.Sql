@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
+using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Settings;
 
@@ -20,8 +20,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,
             MsSqlSystemDataClientConnectionBuilder.Build,
-            BuildSqlDialect.MsSqlServer,
-            FilterTableExists));
+            BuildSqlDialect.MsSqlServer));
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlSystemDataClientConnectionBuilder.Build);
@@ -30,12 +29,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         subscriptions.DisableCache();
         persistence.DisableInstaller();
         return Task.CompletedTask;
-    }
-
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("Cannot drop the table") ||
-               exception.Message.Contains("There is already an object named");
     }
 
     public Task Cleanup() =>

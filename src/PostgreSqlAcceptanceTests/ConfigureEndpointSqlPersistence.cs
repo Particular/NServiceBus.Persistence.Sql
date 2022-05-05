@@ -29,8 +29,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,
             PostgreSqlConnectionBuilder.Build,
-            BuildSqlDialect.PostgreSql,
-            FilterTableExists));
+            BuildSqlDialect.PostgreSql));
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
@@ -46,11 +45,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         subscriptions.DisableCache();
         persistence.DisableInstaller();
         return Task.CompletedTask;
-    }
-
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("Cannot drop the table");
     }
 
     public Task Cleanup() =>

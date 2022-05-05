@@ -27,8 +27,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,
             OracleConnectionBuilder.Build,
-            BuildSqlDialect.Oracle,
-            FilterTableExists));
+            BuildSqlDialect.Oracle));
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.Oracle>();
@@ -45,11 +44,6 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         return Task.CompletedTask;
     }
 
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("ORA-00054") || // resource busy and acquire with NOWAIT specified or timeout expired
-            exception.Message.Contains("ORA-00942"); // table or view does not exist
-    }
     public Task Cleanup() =>
         //Cleanup is made in the SetupAndTeardownDatabase feature OnStop method 
         Task.CompletedTask;

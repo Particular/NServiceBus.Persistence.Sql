@@ -33,6 +33,7 @@ public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTes
         {
             EndpointSetup<DefaultServer>(c =>
             {
+                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox().UseTransactionScope();
             });
         }

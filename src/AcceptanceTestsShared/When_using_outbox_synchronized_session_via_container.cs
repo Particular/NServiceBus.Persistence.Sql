@@ -36,6 +36,7 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
         {
             EndpointSetup<DefaultServer>(c =>
             {
+                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox();
                 c.RegisterComponents(cc =>
                 {
