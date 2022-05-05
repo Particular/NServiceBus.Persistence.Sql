@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using NpgsqlTypes;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
-
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
@@ -24,7 +25,13 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 19));
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
 
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
+        configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
+            sp.GetRequiredService<IReadOnlySettings>(),
+            tablePrefix,
+            PostgreSqlConnectionBuilder.Build,
+            BuildSqlDialect.PostgreSql,
+            FilterTableExists));
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
         var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
@@ -46,8 +53,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         return exception.Message.Contains("Cannot drop the table");
     }
 
-    public Task Cleanup()
-    {
-        return endpointHelper?.Cleanup();
-    }
+    public Task Cleanup() =>
+        //Cleanup is made in the SetupAndTeardownDatabase feature OnStop method 
+        Task.CompletedTask;
 }

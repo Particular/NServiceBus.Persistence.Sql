@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
-
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
@@ -15,7 +16,13 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.CompletedTask;
         }
         var tablePrefix = TableNameCleaner.Clean(endpointName);
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlSystemDataClientConnectionBuilder.Build, BuildSqlDialect.MsSqlServer, FilterTableExists);
+        configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
+            sp.GetRequiredService<IReadOnlySettings>(),
+            tablePrefix,
+            MsSqlSystemDataClientConnectionBuilder.Build,
+            BuildSqlDialect.MsSqlServer,
+            FilterTableExists));
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlSystemDataClientConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
@@ -27,11 +34,11 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 
     bool FilterTableExists(Exception exception)
     {
-        return exception.Message.Contains("Cannot drop the table");
+        return exception.Message.Contains("Cannot drop the table") ||
+               exception.Message.Contains("There is already an object named");
     }
 
-    public Task Cleanup()
-    {
-        return endpointHelper?.Cleanup();
-    }
+    public Task Cleanup() =>
+        //Cleanup is made in the SetupAndTeardownDatabase feature OnStop method 
+        Task.CompletedTask;
 }

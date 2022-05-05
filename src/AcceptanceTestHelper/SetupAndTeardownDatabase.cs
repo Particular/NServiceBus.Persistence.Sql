@@ -5,26 +5,34 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Features;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
 
-public class ConfigureEndpointHelper
+public class SetupAndTeardownDatabase : FeatureStartupTask
 {
     Func<DbConnection> connectionBuilder;
     BuildSqlDialect sqlDialect;
     Func<Exception, bool> exceptionFilter;
+    IReadOnlySettings settings;
     string tablePrefix;
     List<SagaDefinition> sagaDefinitions;
 
-    public ConfigureEndpointHelper(EndpointConfiguration configuration, string tablePrefix, Func<DbConnection> connectionBuilder, BuildSqlDialect sqlDialect, Func<Exception, bool> exceptionFilter = null)
+    public SetupAndTeardownDatabase(IReadOnlySettings settings, string tablePrefix, Func<DbConnection> connectionBuilder, BuildSqlDialect sqlDialect, Func<Exception, bool> exceptionFilter = null)
     {
+        this.settings = settings;
         this.tablePrefix = tablePrefix;
         this.connectionBuilder = connectionBuilder;
         this.sqlDialect = sqlDialect;
         this.exceptionFilter = exceptionFilter;
-        sagaDefinitions = RuntimeSagaDefinitionReader.GetSagaDefinitions(configuration, sqlDialect).ToList();
+    }
+
+    protected override async Task OnStart(IMessageSession session, CancellationToken cancellationToken = default)
+    {
+        sagaDefinitions = RuntimeSagaDefinitionReader.GetSagaDefinitions(settings, sqlDialect).ToList();
         using (var connection = connectionBuilder())
         {
-            connection.Open();
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             foreach (var definition in sagaDefinitions)
             {
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix, exceptionFilter);
@@ -46,11 +54,11 @@ public class ConfigureEndpointHelper
         }
     }
 
-    public Task Cleanup(CancellationToken cancellationToken = default)
+    protected override async Task OnStop(IMessageSession session, CancellationToken cancellationToken = default)
     {
         using (var connection = connectionBuilder())
         {
-            connection.Open();
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
             foreach (var definition in sagaDefinitions)
             {
@@ -61,7 +69,5 @@ public class ConfigureEndpointHelper
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
         }
-
-        return Task.CompletedTask;
     }
 }

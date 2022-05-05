@@ -7,15 +7,18 @@ using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
     static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
     const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(EndpointConfiguration endpointConfiguration, BuildSqlDialect sqlDialect)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
-        var sagaTypes = endpointConfiguration.GetScannedSagaTypes().ToArray();
+        var sagaTypes = settings.Get<IList<Type>>("TypesToScan")
+            .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type)).ToArray();
+
         if (!sagaTypes.Any())
         {
             return Enumerable.Empty<SagaDefinition>();

@@ -181,21 +181,15 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         EndpointConfiguration cfg = null;
 
-        builder.CustomConfig(c => cfg = c);
-
-        builder.When((session, context) =>
+        builder.CustomConfig(c =>
         {
+            cfg = c;
+
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
-            var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
-            var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
-            context.Cleanup = async () =>
-            {
-                await helperA.Cleanup();
-                await helperB.Cleanup();
-            };
-            return Task.CompletedTask;
+            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null));
+            cfg.RegisterStartupTask(new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null));
         });
     }
 
