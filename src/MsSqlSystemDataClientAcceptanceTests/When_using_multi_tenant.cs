@@ -112,8 +112,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-
-        await context.Cleanup();
     }
 
     [Test]
@@ -153,8 +151,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-
-        await context.Cleanup();
     }
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)
