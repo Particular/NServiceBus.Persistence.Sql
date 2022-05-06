@@ -161,6 +161,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         if (useOutbox)
         {
+            c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
             var outbox = c.EnableOutbox();
             if (!cleanOutbox)
             {
