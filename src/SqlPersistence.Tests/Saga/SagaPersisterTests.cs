@@ -85,6 +85,7 @@ public abstract class SagaPersisterTests
         );
         using (var connection = dbConnection())
         {
+            connection.Open();
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: schema);
             var createScript = SagaScriptBuilder.BuildCreateScript(definition, sqlDialect);
             connection.ExecuteCommand(createScript, endpointName, schema: schema);
@@ -107,6 +108,9 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
+
+            connection.Open();
+
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
             var definition2 = new SagaDefinition(
@@ -154,6 +158,9 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
+
+            connection.Open();
+
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
             var definition2 = new SagaDefinition(
@@ -324,6 +331,8 @@ public abstract class SagaPersisterTests
     {
         using (var connection = GetConnection()(theSchema))
         {
+            connection.Open();
+
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: theSchema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), endpointName, schema: theSchema);
         }
@@ -701,6 +710,7 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
+            connection.Open();
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
             Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
@@ -748,6 +758,8 @@ public abstract class SagaPersisterTests
     {
         using (var connection = GetConnection()(schema))
         {
+            connection.Open();
+
             var sql = GetPropertyWhereClauseExists(schema, table, propertyName);
             using (var command = connection.CreateCommand())
             {
