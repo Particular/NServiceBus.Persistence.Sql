@@ -36,15 +36,6 @@
 
         static PersistenceTestsConfiguration()
         {
-            var postgreSql = new SqlDialect.PostgreSql
-            {
-                JsonBParameterModifier = parameter =>
-                {
-                    var npgsqlParameter = (NpgsqlParameter)parameter;
-                    npgsqlParameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
-                }
-            };
-
             var variants = new List<object>();
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
@@ -54,7 +45,7 @@
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
             {
-                variants.Add(CreateVariant(postgreSql, BuildSqlDialect.PostgreSql));
+                variants.Add(CreateVariant(new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql));
             }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
