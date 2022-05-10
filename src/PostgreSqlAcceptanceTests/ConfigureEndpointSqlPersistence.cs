@@ -29,7 +29,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,
             PostgreSqlConnectionBuilder.Build,
-            BuildSqlDialect.PostgreSql));
+            BuildSqlDialect.PostgreSql,
+            e => e.Message.Contains("duplicate key value violates unique constraint")));
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
