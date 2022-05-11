@@ -191,7 +191,9 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
             cfg.RegisterStartupTask(sp =>
             {
-                tenantASetupFeature = new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix,
+                tenantASetupFeature = new SetupAndTeardownDatabase(
+                    TestContext.CurrentContext.Test.ID,
+                    cfg.GetSettings(), tablePrefix,
                     () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"),
                     BuildSqlDialect.MsSqlServer);
 
@@ -199,7 +201,9 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             });
             cfg.RegisterStartupTask(sp =>
             {
-                tenantBSetupFeature = new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix,
+                tenantBSetupFeature = new SetupAndTeardownDatabase(
+                    TestContext.CurrentContext.Test.ID,
+                    cfg.GetSettings(), tablePrefix,
                     () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"),
                     BuildSqlDialect.MsSqlServer);
 

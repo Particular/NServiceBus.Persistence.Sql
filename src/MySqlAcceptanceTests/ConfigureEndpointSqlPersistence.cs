@@ -6,6 +6,7 @@ using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Settings;
+using NUnit.Framework;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
@@ -22,6 +23,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         configuration.RegisterStartupTask(sp =>
         {
             setupFeature = new SetupAndTeardownDatabase(
+                TestContext.CurrentContext.Test.ID,
                 sp.GetRequiredService<IReadOnlySettings>(),
                 tablePrefix,
                 MySqlConnectionBuilder.Build,
