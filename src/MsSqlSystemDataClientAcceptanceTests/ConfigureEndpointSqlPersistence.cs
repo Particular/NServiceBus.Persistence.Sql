@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
-using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Settings;
 
@@ -15,7 +14,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.CompletedTask;
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName);
         configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,

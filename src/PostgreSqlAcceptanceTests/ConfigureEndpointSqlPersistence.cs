@@ -18,11 +18,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.CompletedTask;
         }
 
-        var hashcodeString = Math.Abs(endpointName.GetHashCode()).ToString();
-        var suffixLength = 19 - hashcodeString.Length;
-        var nameSuffix = endpointName.Substring(Math.Max(0, endpointName.Length - suffixLength));
-        endpointName = nameSuffix + hashcodeString;
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 19));
+        //Why is it 19? Answer: because we constrain the tablePrefix in PostgreSQL to 20 and we add '_' to the prefix later on
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 19);
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
 
         configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(

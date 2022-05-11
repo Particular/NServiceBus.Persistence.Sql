@@ -14,7 +14,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.CompletedTask;
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName);
         configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,

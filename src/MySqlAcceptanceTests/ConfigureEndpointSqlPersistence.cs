@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -15,7 +14,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.CompletedTask;
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 30));
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 30);
+
         configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
             sp.GetRequiredService<IReadOnlySettings>(),
             tablePrefix,

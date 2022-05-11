@@ -16,12 +16,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.CompletedTask;
         }
 
-        var lastDot = endpointName.LastIndexOf('.');
-        if (lastDot > 0)
-        {
-            endpointName = endpointName.Substring(lastDot + 1) + Math.Abs(endpointName.GetHashCode());
-        }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 24));
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 24);
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
         configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
             sp.GetRequiredService<IReadOnlySettings>(),
