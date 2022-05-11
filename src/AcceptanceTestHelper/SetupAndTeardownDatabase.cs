@@ -46,7 +46,7 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
                     connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix, exceptionFilter);
                     try
                     {
-                        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), tablePrefix);
+                        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), tablePrefix, exceptionFilter);
                     }
                     catch (Exception exception) when (exception.Message.Contains("Can't DROP"))
                     {
