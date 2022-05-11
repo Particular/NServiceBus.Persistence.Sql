@@ -12,7 +12,9 @@ using NServiceBus.Settings;
 
 public class SetupAndTeardownDatabase : FeatureStartupTask
 {
-    static ConcurrentDictionary<string, SemaphoreSlim> endpointSetupSemaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
+    static ConcurrentDictionary<string, SemaphoreSlim> endpointSetupSemaphores =
+        new ConcurrentDictionary<string, SemaphoreSlim>();
+
     Func<DbConnection> connectionBuilder;
     BuildSqlDialect sqlDialect;
     Func<Exception, bool> exceptionFilter;
@@ -20,7 +22,8 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
     string tablePrefix;
     List<SagaDefinition> sagaDefinitions;
 
-    public SetupAndTeardownDatabase(IReadOnlySettings settings, string tablePrefix, Func<DbConnection> connectionBuilder, BuildSqlDialect sqlDialect, Func<Exception, bool> exceptionFilter = null)
+    public SetupAndTeardownDatabase(IReadOnlySettings settings, string tablePrefix,
+        Func<DbConnection> connectionBuilder, BuildSqlDialect sqlDialect, Func<Exception, bool> exceptionFilter = null)
     {
         this.settings = settings;
         this.tablePrefix = tablePrefix;
@@ -43,22 +46,31 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
                 await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
                 foreach (var definition in sagaDefinitions)
                 {
-                    connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix, exceptionFilter);
+                    connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix,
+                        exceptionFilter);
                     try
                     {
-                        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), tablePrefix, exceptionFilter);
+                        connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect),
+                            tablePrefix, exceptionFilter);
                     }
                     catch (Exception exception) when (exception.Message.Contains("Can't DROP"))
                     {
                         //ignore cleanup exceptions caused by async database operations
                     }
                 }
-                connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
-                connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
+
+                connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
+                connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
+                connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
+                connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
+                connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
+                connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix,
+                    exceptionFilter);
             }
         }
         finally
@@ -67,7 +79,9 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
         }
     }
 
-    protected override async Task OnStop(IMessageSession session, CancellationToken cancellationToken = default)
+    protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public async Task ManualStop(CancellationToken cancellationToken = default)
     {
         var semaphore = endpointSetupSemaphores.GetOrAdd(tablePrefix, _ => new SemaphoreSlim(1));
 

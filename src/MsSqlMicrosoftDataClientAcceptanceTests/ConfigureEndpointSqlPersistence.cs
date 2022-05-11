@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -8,6 +9,8 @@ using NServiceBus.Settings;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
+    SetupAndTeardownDatabase setupFeature;
+
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
@@ -15,11 +18,16 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
             return Task.CompletedTask;
         }
         var tablePrefix = TestTableNameCleaner.Clean(endpointName);
-        configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
-            sp.GetRequiredService<IReadOnlySettings>(),
-            tablePrefix,
-            MsSqlMicrosoftDataClientConnectionBuilder.Build,
-            BuildSqlDialect.MsSqlServer));
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                MsSqlMicrosoftDataClientConnectionBuilder.Build,
+                BuildSqlDialect.MsSqlServer);
+
+            return setupFeature;
+        });
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.Build);
@@ -30,7 +38,5 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         return Task.CompletedTask;
     }
 
-    public Task Cleanup() =>
-        //Cleanup is made in the SetupAndTeardownDatabase feature OnStop method 
-        Task.CompletedTask;
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }

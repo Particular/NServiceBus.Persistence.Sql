@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -177,6 +178,8 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     static void SetupTenantDatabases(EndpointBehaviorBuilder<Context> builder)
     {
         EndpointConfiguration cfg = null;
+        SetupAndTeardownDatabase tenantASetupFeature = null;
+        SetupAndTeardownDatabase tenantBSetupFeature = null;
 
         builder.CustomConfig(c =>
         {
@@ -185,8 +188,41 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
-            cfg.RegisterStartupTask(sp => new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer));
-            cfg.RegisterStartupTask(new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer));
+
+            cfg.RegisterStartupTask(sp =>
+            {
+                tenantASetupFeature = new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix,
+                    () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantA"),
+                    BuildSqlDialect.MsSqlServer);
+
+                return tenantASetupFeature;
+            });
+            cfg.RegisterStartupTask(sp =>
+            {
+                tenantBSetupFeature = new SetupAndTeardownDatabase(cfg.GetSettings(), tablePrefix,
+                    () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build("TenantB"),
+                    BuildSqlDialect.MsSqlServer);
+
+                return tenantBSetupFeature;
+            });
+        });
+
+        builder.When((_, context) =>
+        {
+            context.Cleanup = async () =>
+            {
+                if (tenantASetupFeature != null)
+                {
+                    await tenantASetupFeature.ManualStop(CancellationToken.None);
+                }
+
+                if (tenantBSetupFeature != null)
+                {
+                    await tenantBSetupFeature.ManualStop(CancellationToken.None);
+                }
+            };
+
+            return Task.CompletedTask;
         });
     }
 

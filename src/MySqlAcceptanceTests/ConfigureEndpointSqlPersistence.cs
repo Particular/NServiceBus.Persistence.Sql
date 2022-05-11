@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -8,6 +9,8 @@ using NServiceBus.Settings;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
+    SetupAndTeardownDatabase setupFeature;
+
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
@@ -16,12 +19,17 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         }
         var tablePrefix = TestTableNameCleaner.Clean(endpointName, 30);
 
-        configuration.RegisterStartupTask(sp => new SetupAndTeardownDatabase(
-            sp.GetRequiredService<IReadOnlySettings>(),
-            tablePrefix,
-            MySqlConnectionBuilder.Build,
-            BuildSqlDialect.MySql,
-            e => e.Message.Contains("sqlpersistence_raiseerror already exists")));
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                MySqlConnectionBuilder.Build,
+                BuildSqlDialect.MySql,
+                e => e.Message.Contains("sqlpersistence_raiseerror already exists"));
+
+            return setupFeature;
+        });
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
@@ -33,7 +41,5 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         return Task.CompletedTask;
     }
 
-    public Task Cleanup() =>
-        //Cleanup is made in the SetupAndTeardownDatabase feature OnStop method 
-        Task.CompletedTask;
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }
