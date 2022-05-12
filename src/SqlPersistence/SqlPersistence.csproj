@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\net6.0;buildTransitive\net472;buildTransitive\netcoreapp3.1;" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\net6.0;buildTransitive\net472;buildTransitive\net6.0" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net46\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net6.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net6.0" Visible="false" />
   </ItemGroup>
