@@ -40,6 +40,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
+
         return Task.CompletedTask;
     }
 
