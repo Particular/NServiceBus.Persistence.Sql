@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -27,9 +27,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\netcoreapp3.1;buildTransitive\net472;buildTransitive\netcoreapp3.1;" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\net6.0;buildTransitive\net472;buildTransitive\netcoreapp3.1;" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net46\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netcoreapp3.1\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\netcoreapp3.1" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net6.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net6.0" Visible="false" />
   </ItemGroup>
 
   <!-- Workaround for https://github.com/microsoft/msbuild/issues/4303 -->
