@@ -49,7 +49,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        if (!(transaction is ISqlOutboxTransaction outboxTransaction))
+        if (transaction is not ISqlOutboxTransaction outboxTransaction)
         {
             return new ValueTask<bool>(false);
         }
