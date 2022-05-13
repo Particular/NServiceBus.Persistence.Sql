@@ -53,7 +53,7 @@
 
                 var connection = await connectionManager.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
-                return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: false);
+                return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }
 
             internal bool DoNotUseTransportConnection { get; set; }
