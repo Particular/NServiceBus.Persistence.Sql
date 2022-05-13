@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitHubActionsTestLogger" Version="1.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-beta.1" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="1.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-beta.1" GeneratePathProperty="true" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
@@ -23,12 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\DelayedDelivery\When_using_special_characters_in_headers.cs" />
-    <Compile Remove="\**\Outbox\When_headers_contain_special_characters.cs" />
-    <Compile Remove="\**\Sagas\When_correlating_on_special_characters.cs" />
-    <Compile Remove="\**\Sagas\When_doing_request_response_between_sagas.cs" />
-    <Compile Remove="\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
-    <Compile Remove="\**\Sagas\When_sagas_cant_be_found.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_using_special_characters_in_headers.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Outbox\When_headers_contain_special_characters.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_correlating_on_special_characters.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_doing_request_response_between_sagas.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_replying_to_originator_from_a_timeout.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_sagas_cant_be_found.cs" />
   </ItemGroup>
 
 </Project>

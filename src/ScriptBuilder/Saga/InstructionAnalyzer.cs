@@ -38,8 +38,7 @@ static class InstructionAnalyzer
 
     public static bool ContainsBranchingLogic(IList<Instruction> instructions)
     {
-        return instructions.Any(instruction => instruction.OpCode.FlowControl == FlowControl.Branch
-            || instruction.OpCode.FlowControl == FlowControl.Cond_Branch);
+        return instructions.Any(instruction => instruction.OpCode.FlowControl is FlowControl.Branch or FlowControl.Cond_Branch);
     }
 
     public static string GetCorrelationId(IList<Instruction> instructions, string sagaDataTypeName)
@@ -87,7 +86,7 @@ static class InstructionAnalyzer
     public static bool CallsUnexpectedMethods(IList<Instruction> instructions)
     {
         var methodRefs = instructions
-            .Where(instruction => instruction.OpCode.Code == Code.Call || instruction.OpCode.Code == Code.Callvirt)
+            .Where(instruction => instruction.OpCode.Code is Code.Call or Code.Callvirt)
             .Select(instruction => instruction.Operand as MethodReference)
             .ToArray();
 

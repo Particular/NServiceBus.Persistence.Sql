@@ -54,7 +54,7 @@ static class SagaDefinitionReader
         definition = null;
 
         // Class must directly inherit from NServiceBus.Saga<T> so that no tricks can be pulled from an intermediate class
-        if (!(type.BaseType is GenericInstanceType baseType) || !baseType.FullName.StartsWith("NServiceBus.Saga") || baseType.GenericArguments.Count != 1)
+        if (type.BaseType is not GenericInstanceType baseType || !baseType.FullName.StartsWith("NServiceBus.Saga") || baseType.GenericArguments.Count != 1)
         {
             return false;
         }

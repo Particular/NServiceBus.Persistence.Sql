@@ -1,7 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Features;
-using Microsoft.Extensions.DependencyInjection;
 using NServiceBus.Outbox;
 
 class SqlOutboxFeature : Feature
@@ -50,7 +50,7 @@ class SqlOutboxFeature : Feature
         ISqlOutboxTransaction transactionFactory()
         {
             return transactionScopeMode
-                ? (ISqlOutboxTransaction)new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel, transactionScopeTimeout)
+                ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel, transactionScopeTimeout)
                 : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
         }
 

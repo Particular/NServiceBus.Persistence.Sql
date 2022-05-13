@@ -24,7 +24,7 @@ jobs:
             os-name: Windows
           - os: ubuntu-20.04
             os-name: Linux
-          # Additional permutatations for Oracle
+          # Additional permutations for Oracle
           - os: ubuntu-20.04
             os-name: Linux
             engine: Oracle
@@ -45,9 +45,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: |
-            6.0.x
-            3.1.x
+          dotnet-version: 6.0.x
       - name: Build
         run: dotnet build src --configuration Release
       - name: Upload packages

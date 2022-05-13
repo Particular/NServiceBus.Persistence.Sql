@@ -25,7 +25,7 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     public Task<ICompletableSynchronizedStorageSession> TryAdapt(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
-        if (!(transaction is ISqlOutboxTransaction outboxTransaction))
+        if (transaction is not ISqlOutboxTransaction outboxTransaction)
         {
             return EmptyResultTask;
         }
