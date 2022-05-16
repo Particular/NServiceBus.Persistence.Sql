@@ -2,19 +2,29 @@
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class SqlStorageSessionFeature : Feature
 {
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var settings = context.Settings;
-        var sqlDialect = settings.GetSqlDialect();
-        var services = context.Services;
-        var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
+        // the settings are deliberately acquired here to make sure exceptions are raised in case of misconfiguration
+        // during feature setup time. Later the same settings are resolved from DI to avoid allocation closures
+        // everytime the scope synchronized storage session is retrieved.
+        _ = context.Settings.GetSqlDialect();
+        _ = context.Settings.GetConnectionBuilder<StorageType.Sagas>();
 
-        //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        // TODO: The connection manager design needs a revisit to avoid the closure
-        services.AddScoped<ICompletableSynchronizedStorageSession>(provider => new StorageSession(connectionManager, provider.GetService<SagaInfoCache>(), sqlDialect));
+        var services = context.Services;
+        services.AddScoped<ICompletableSynchronizedStorageSession>(provider =>
+        {
+            var settings = provider.GetRequiredService<IReadOnlySettings>();
+            var sqlDialect = settings.GetSqlDialect();
+            var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
+            //Info cache can be null if Outbox is enabled but Sagas are disabled.
+            var sagaInfoCache = provider.GetService<SagaInfoCache>();
+
+            return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
+        });
         services.AddScoped(provider => provider.GetService<ISynchronizedStorageSession>().SqlPersistenceSession());
     }
 }
