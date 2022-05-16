@@ -2,28 +2,31 @@
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.Extensibility;
+using NServiceBus.Outbox;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Transport;
 
 class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession
 {
     bool ownsTransaction;
     Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
     Action disposedCallback = () => { };
+    readonly IConnectionManager connectionManager;
+    readonly SqlDialect dialect;
 
-    public StorageSession(DbConnection connection, DbTransaction transaction, bool ownsTransaction, SagaInfoCache infoCache)
+    public StorageSession(IConnectionManager connectionManager, SagaInfoCache infoCache, SqlDialect dialect)
     {
-        Guard.AgainstNull(nameof(connection), connection);
-
-        Connection = connection;
-        this.ownsTransaction = ownsTransaction;
+        this.dialect = dialect;
+        this.connectionManager = connectionManager;
         InfoCache = infoCache;
-        Transaction = transaction;
     }
 
     internal SagaInfoCache InfoCache { get; }
-    public DbTransaction Transaction { get; }
-    public DbConnection Connection { get; }
+    public DbTransaction Transaction { get; private set; }
+    public DbConnection Connection { get; private set; }
 
     public void OnSaveChanges(Func<ISqlStorageSession, CancellationToken, Task> callback)
     {
@@ -42,6 +45,44 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 #pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
     public void OnSaveChanges(Func<ISqlStorageSession, Task> callback) => throw new NotImplementedException();
 #pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
+
+    public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (transaction is not ISqlOutboxTransaction outboxTransaction)
+        {
+            return new ValueTask<bool>(false);
+        }
+
+        Connection = outboxTransaction.Connection;
+        ownsTransaction = false;
+        Transaction = outboxTransaction.Transaction;
+        return new ValueTask<bool>(true);
+    }
+
+    public async ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        (bool wasAdapted, DbConnection connection, DbTransaction transaction, bool ownsTx) =
+            await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionManager, cancellationToken)
+            .ConfigureAwait(false);
+        if (!wasAdapted)
+        {
+            return false;
+        }
+
+        Connection = connection;
+        Transaction = transaction;
+        ownsTransaction = ownsTx;
+        return true;
+    }
+
+    public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+    {
+        Connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
+        Transaction = Connection.BeginTransaction();
+        ownsTransaction = true;
+    }
 
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
     {
@@ -66,8 +107,5 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         disposedCallback();
     }
 
-    public void OnDisposed(Action callback)
-    {
-        disposedCallback = callback;
-    }
+    public void OnDisposed(Action callback) => disposedCallback = callback;
 }

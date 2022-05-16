@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
@@ -112,8 +113,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-
-        await context.Cleanup();
     }
 
     [Test]
@@ -137,6 +136,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     var persistence = cfg.UsePersistence<SqlPersistence>();
                     persistence.MultiTenantConnectionBuilder(captureTenantId, tenantId => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId));
 
+                    cfg.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     cfg.EnableOutbox().DisableCleanup();
                 });
                 SetupTenantDatabases(b);
@@ -152,8 +152,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
         Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
-
-        await context.Cleanup();
     }
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)
@@ -165,6 +163,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
         if (useOutbox)
         {
+            c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
             var outbox = c.EnableOutbox();
             if (!cleanOutbox)
             {
@@ -181,21 +180,54 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         EndpointConfiguration cfg = null;
 
-        builder.CustomConfig(c => cfg = c);
+        SetupAndTeardownDatabase tenantASetupFeature = null;
+        SetupAndTeardownDatabase tenantBSetupFeature = null;
 
-        builder.When((session, context) =>
+        builder.CustomConfig(c =>
         {
+            cfg = c;
+
             var tablePrefix = cfg.GetSettings().EndpointName().Replace(".", "_");
             MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantA");
             MsSqlSystemDataClientConnectionBuilder.MultiTenant.Setup("TenantB");
-            var helperA = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantA"), BuildSqlDialect.MsSqlServer, null);
-            var helperB = new ConfigureEndpointHelper(cfg, tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantB"), BuildSqlDialect.MsSqlServer, null);
+            cfg.RegisterStartupTask(sp =>
+            {
+                tenantASetupFeature = new SetupAndTeardownDatabase(
+                    TestContext.CurrentContext.Test.ID,
+                    cfg.GetSettings(), tablePrefix,
+                    () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantA"),
+                    BuildSqlDialect.MsSqlServer);
+
+                return tenantASetupFeature;
+            });
+            cfg.RegisterStartupTask(sp =>
+            {
+                tenantBSetupFeature = new SetupAndTeardownDatabase(
+                    TestContext.CurrentContext.Test.ID,
+                    cfg.GetSettings(), tablePrefix,
+                    () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build("TenantB"),
+                    BuildSqlDialect.MsSqlServer);
+
+                return tenantBSetupFeature;
+            });
+        });
+
+        builder.When((_, context) =>
+        {
             context.Cleanup = async () =>
             {
-                await helperA.Cleanup();
-                await helperB.Cleanup();
+                if (tenantASetupFeature != null)
+                {
+                    await tenantASetupFeature.ManualStop(CancellationToken.None);
+                }
+
+                if (tenantBSetupFeature != null)
+                {
+                    await tenantBSetupFeature.ManualStop(CancellationToken.None);
+                }
             };
-            return Task.FromResult(0);
+
+            return Task.CompletedTask;
         });
     }
 
@@ -245,7 +277,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     testContext.TenantBDbName = dbName;
                 }
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
     }
@@ -286,7 +318,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                     testContext.TenantBDbName = dbName;
                 }
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             public class TestSagaData : ContainSagaData

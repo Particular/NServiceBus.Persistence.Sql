@@ -83,10 +83,7 @@ namespace NServiceBus
         }
 
         internal static IConnectionManager GetConnectionBuilder<T>(this IReadOnlySettings settings)
-            where T : StorageType
-        {
-            return GetConnectionBuilder(settings, typeof(T));
-        }
-
+            where T : StorageType =>
+            GetConnectionBuilder(settings, typeof(T));
     }
 }

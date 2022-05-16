@@ -1,37 +1,44 @@
-﻿using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
+using NUnit.Framework;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
+    SetupAndTeardownDatabase setupFeature;
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName);
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MsSqlMicrosoftDataClientConnectionBuilder.Build, BuildSqlDialect.MsSqlServer, FilterTableExists);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName);
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                TestContext.CurrentContext.Test.ID,
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                MsSqlMicrosoftDataClientConnectionBuilder.Build,
+                BuildSqlDialect.MsSqlServer);
+
+            return setupFeature;
+        });
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("Cannot drop the table");
-    }
-
-    public Task Cleanup()
-    {
-        return endpointHelper?.Cleanup();
-    }
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }

@@ -61,6 +61,6 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     public Task Commit(CancellationToken cancellationToken = default)
     {
         Transaction.Commit();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 }

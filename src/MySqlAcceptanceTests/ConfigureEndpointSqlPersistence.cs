@@ -1,21 +1,38 @@
-﻿using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
+using NUnit.Framework;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
+    SetupAndTeardownDatabase setupFeature;
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 30));
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, MySqlConnectionBuilder.Build, BuildSqlDialect.MySql);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 30);
+
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                TestContext.CurrentContext.Test.ID,
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                MySqlConnectionBuilder.Build,
+                BuildSqlDialect.MySql,
+                e => e.Message.Contains("sqlpersistence_raiseerror already exists"));
+
+            return setupFeature;
+        });
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MySqlConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MySql>();
@@ -23,11 +40,9 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+
+        return Task.CompletedTask;
     }
 
-    public Task Cleanup()
-    {
-        return endpointHelper?.Cleanup();
-    }
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }

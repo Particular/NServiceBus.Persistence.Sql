@@ -1,30 +1,44 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using NpgsqlTypes;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
+using NUnit.Framework;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
+    SetupAndTeardownDatabase setupFeature;
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
-        var hashcodeString = Math.Abs(endpointName.GetHashCode()).ToString();
-        var suffixLength = 19 - hashcodeString.Length;
-        var nameSuffix = endpointName.Substring(Math.Max(0, endpointName.Length - suffixLength));
-        endpointName = nameSuffix + hashcodeString;
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 19));
+        //Why is it 19? Answer: because we constrain the tablePrefix in PostgreSQL to 20 and we add '_' to the prefix later on
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 19);
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
 
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, PostgreSqlConnectionBuilder.Build, BuildSqlDialect.PostgreSql, FilterTableExists);
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                TestContext.CurrentContext.Test.ID,
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                PostgreSqlConnectionBuilder.Build,
+                BuildSqlDialect.PostgreSql,
+                e => e.Message.Contains("duplicate key value violates unique constraint"));
+
+            return setupFeature;
+        });
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(PostgreSqlConnectionBuilder.Build);
         var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
@@ -38,16 +52,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("Cannot drop the table");
-    }
-
-    public Task Cleanup()
-    {
-        return endpointHelper?.Cleanup();
-    }
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }

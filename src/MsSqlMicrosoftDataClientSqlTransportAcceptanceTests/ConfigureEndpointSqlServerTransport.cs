@@ -20,7 +20,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
 
         configuration.UseTransport(transport);
 
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     public Task Cleanup()
@@ -36,7 +36,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
                 TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
             }
         }
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     static void TryDeleteTable(SqlConnection conn, QueueAddress address)
@@ -172,7 +172,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         {
         }
 
-        public string[] ReceivingAddresses { get; private set; }
+        public string[] ReceivingAddresses { get; private set; } = Array.Empty<string>();
 
         public override async Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
             string[] sendingAddresses, CancellationToken cancellationToken = default)

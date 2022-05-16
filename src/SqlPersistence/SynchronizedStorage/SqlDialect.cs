@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus
 {
-    using System;
     using System.Data.Common;
     using System.Threading;
     using System.Threading.Tasks;
@@ -9,11 +8,10 @@
 
     public partial class SqlDialect
     {
-        internal abstract Task<StorageSession> TryAdaptTransportConnection(
+        internal abstract ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)> TryAdaptTransportConnection(
             TransportTransaction transportTransaction,
             ContextBag context,
             IConnectionManager connectionManager,
-            Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
             CancellationToken cancellationToken = default);
     }
 }

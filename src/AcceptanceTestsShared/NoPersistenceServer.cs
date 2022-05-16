@@ -19,7 +19,11 @@
             this.typesToInclude = typesToInclude;
         }
 
-        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration, Action<EndpointConfiguration> configurationBuilderCustomization)
+        public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
+            EndpointCustomizationConfiguration endpointConfiguration,
+#pragma warning disable PS0013
+            Func<EndpointConfiguration, Task> configurationBuilderCustomization)
+#pragma warning restore PS0013
         {
             var types = endpointConfiguration.GetTypesScopedByTestClass();
 
@@ -40,7 +44,7 @@
             configuration.RegisterComponentsAndInheritanceHierarchy(runDescriptor);
 
             configuration.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
-            configurationBuilderCustomization(configuration);
+            await configurationBuilderCustomization(configuration).ConfigureAwait(false);
 
             return configuration;
         }

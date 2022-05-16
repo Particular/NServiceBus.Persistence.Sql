@@ -16,7 +16,6 @@ namespace PostgreSql
             return x =>
             {
                 var connection = PostgreSqlConnectionBuilder.Build();
-                connection.Open();
                 return connection;
             };
         }

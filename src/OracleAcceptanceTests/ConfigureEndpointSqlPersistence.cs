@@ -1,28 +1,39 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Settings;
+using NUnit.Framework;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
-    ConfigureEndpointHelper endpointHelper;
+    SetupAndTeardownDatabase setupFeature;
 
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         if (configuration.IsSendOnly())
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
-        var lastDot = endpointName.LastIndexOf('.');
-        if (lastDot > 0)
-        {
-            endpointName = endpointName.Substring(lastDot + 1) + Math.Abs(endpointName.GetHashCode());
-        }
-        var tablePrefix = TableNameCleaner.Clean(endpointName).Substring(0, Math.Min(endpointName.Length, 24));
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 24);
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
-        endpointHelper = new ConfigureEndpointHelper(configuration, tablePrefix, OracleConnectionBuilder.Build, BuildSqlDialect.Oracle, FilterTableExists);
+        configuration.RegisterStartupTask(sp =>
+        {
+            setupFeature = new SetupAndTeardownDatabase(
+                TestContext.CurrentContext.Test.ID,
+                sp.GetRequiredService<IReadOnlySettings>(),
+                tablePrefix,
+                OracleConnectionBuilder.Build,
+                BuildSqlDialect.Oracle);
+
+            return setupFeature;
+        });
+
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.SqlDialect<SqlDialect.Oracle>();
         persistence.ConnectionBuilder(OracleConnectionBuilder.Build);
@@ -35,18 +46,8 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var sagaSettings = persistence.SagaSettings();
         sagaSettings.NameFilter(sagaName => sagaName.Substring(0, Math.Min(27, sagaName.Length)));
 
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
-    bool FilterTableExists(Exception exception)
-    {
-        return exception.Message.Contains("ORA-00054") || // resource busy and acquire with NOWAIT specified or timeout expired
-            exception.Message.Contains("ORA-00942"); // table or view does not exist
-    }
-
-    public Task Cleanup()
-    {
-        endpointHelper?.Cleanup();
-        return Task.FromResult(0);
-    }
+    public Task Cleanup() => setupFeature != null ? setupFeature.ManualStop(CancellationToken.None) : Task.CompletedTask;
 }

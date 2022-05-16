@@ -18,7 +18,6 @@ namespace MySql
             return x =>
             {
                 var connection = MySqlConnectionBuilder.Build();
-                connection.Open();
                 return connection;
             };
         }

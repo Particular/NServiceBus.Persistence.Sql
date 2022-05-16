@@ -83,6 +83,6 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public Task Commit(CancellationToken cancellationToken = default)
     {
         commit = true;
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 }

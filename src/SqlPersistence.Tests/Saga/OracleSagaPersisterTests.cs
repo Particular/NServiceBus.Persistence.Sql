@@ -30,7 +30,6 @@
                 }
 
                 var connection = new OracleConnection(connectionString);
-                connection.Open();
                 return connection;
             };
         }

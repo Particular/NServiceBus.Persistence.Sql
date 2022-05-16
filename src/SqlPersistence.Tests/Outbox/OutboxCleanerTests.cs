@@ -14,7 +14,7 @@ public class OutboxCleanerTests
         var cleaner = new TestableCleaner((time, token) =>
         {
             cutOffTime = time;
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }, (m, e, _) => { }, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
@@ -31,7 +31,7 @@ public class OutboxCleanerTests
     {
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
-        var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
+        var cleaner = new TestableCleaner((time, token) => Task.CompletedTask,
             (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);
@@ -58,7 +58,7 @@ public class OutboxCleanerTests
     {
         var criticalActionTriggered = false;
         var timer = new FakeTimer();
-        var cleaner = new TestableCleaner((time, token) => Task.FromResult(0),
+        var cleaner = new TestableCleaner((time, token) => Task.CompletedTask,
             (m, e, _) => criticalActionTriggered = true, TimeSpan.FromDays(7), TimeSpan.Zero, timer);
 
         await cleaner.Start().ConfigureAwait(false);

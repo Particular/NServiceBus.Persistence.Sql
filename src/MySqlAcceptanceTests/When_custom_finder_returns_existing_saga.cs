@@ -96,7 +96,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
             {
                 testContext.HandledOtherMessage = true;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             public class SagaData : ContainSagaData

@@ -33,6 +33,7 @@ public class When_using_outbox_but_no_sagas : NServiceBusAcceptanceTest
             EndpointSetup<DefaultServer>(c =>
             {
                 c.DisableFeature<Sagas>();
+                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox();
             });
         }

@@ -17,7 +17,6 @@ namespace SqlServerSystemData
             return x =>
             {
                 var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-                connection.Open();
                 return connection;
             };
         }

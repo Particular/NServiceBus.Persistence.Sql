@@ -38,11 +38,13 @@ namespace SqlServerSystemData
 
             var altConnectionManager = new ConnectionManager(() => throw new Exception("Should not be called"));
 
-            var result = await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(),
-                altConnectionManager,
-                (conn, tx, arg3) => new StorageSession(conn, tx, false, null));
+            (bool wasAdapted, DbConnection connection, DbTransaction tx, bool ownsTransaction) =
+                await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager);
 
-            Assert.IsNotNull(result);
+            Assert.That(wasAdapted, Is.True);
+            Assert.That(connection, Is.Not.Null);
+            Assert.That(tx, Is.Not.Null);
+            Assert.That(ownsTransaction, Is.False);
         }
     }
 }

@@ -85,7 +85,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 testContext.HandledOtherMessage = true;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             protected override string CorrelationPropertyName => null;

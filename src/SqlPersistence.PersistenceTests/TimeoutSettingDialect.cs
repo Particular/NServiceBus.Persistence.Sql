@@ -21,12 +21,12 @@
             this.commandTimeout = commandTimeout;
         }
 
-        internal override Task<StorageSession> TryAdaptTransportConnection(TransportTransaction transportTransaction,
+        internal override ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)>
+            TryAdaptTransportConnection(TransportTransaction transportTransaction,
             ContextBag context,
             IConnectionManager connectionManager,
-            Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
             CancellationToken cancellationToken = default) =>
-            impl.TryAdaptTransportConnection(transportTransaction, context, connectionManager, storageSessionFactory, cancellationToken);
+            impl.TryAdaptTransportConnection(transportTransaction, context, connectionManager, cancellationToken);
 
         internal override string GetSubscriptionTableName(string tablePrefix)
         {

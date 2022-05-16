@@ -12,11 +12,10 @@
     {
         public partial class PostgreSql
         {
-            internal override async Task<StorageSession> TryAdaptTransportConnection(
+            internal override async ValueTask<(bool WasAdapted, DbConnection Connection, DbTransaction Transaction, bool OwnsTransaction)> TryAdaptTransportConnection(
                 TransportTransaction transportTransaction,
                 ContextBag context,
                 IConnectionManager connectionBuilder,
-                Func<DbConnection, DbTransaction, bool, StorageSession> storageSessionFactory,
                 CancellationToken cancellationToken = default)
             {
                 // Transport supports DTC and uses TxScope owned by the transport
@@ -37,13 +36,13 @@
                 if (ambientTransaction == null)
                 {
                     // Other modes handled by creating a new session.
-                    return null;
+                    return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
                 }
 
                 var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
                 connection.EnlistTransaction(ambientTransaction);
 
-                return storageSessionFactory(connection, null, true);
+                return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }
         }
     }

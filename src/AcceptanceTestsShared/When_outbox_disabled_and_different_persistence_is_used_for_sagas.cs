@@ -63,7 +63,7 @@ public class When_outbox_disabled_and_different_persistence_used_for_sagas : NSe
                     testContext.ExceptionMessage = e.Message;
                 }
                 testContext.Done = true;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
         }
 

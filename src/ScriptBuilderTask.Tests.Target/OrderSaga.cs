@@ -15,7 +15,7 @@ public class OrderSaga :
 
     public Task Handle(StartOrder message, IMessageHandlerContext context)
     {
-        return Task.FromResult(0);
+        return Task.CompletedTask;
     }
 
     public class SagaData :

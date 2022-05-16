@@ -2,23 +2,29 @@
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
+using NServiceBus.Settings;
 
 class SqlStorageSessionFeature : Feature
 {
     protected override void Setup(FeatureConfigurationContext context)
     {
-        var settings = context.Settings;
-        var sqlDialect = settings.GetSqlDialect();
+        // the settings are deliberately acquired here to make sure exceptions are raised in case of misconfiguration
+        // during feature setup time. Later the same settings are resolved from DI to avoid allocation closures
+        // everytime the scope synchronized storage session is retrieved.
+        _ = context.Settings.GetSqlDialect();
+        _ = context.Settings.GetConnectionBuilder<StorageType.Sagas>();
+
         var services = context.Services;
-        var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
+        services.AddScoped<ICompletableSynchronizedStorageSession>(provider =>
+        {
+            var settings = provider.GetRequiredService<IReadOnlySettings>();
+            var sqlDialect = settings.GetSqlDialect();
+            var connectionManager = settings.GetConnectionBuilder<StorageType.Sagas>();
+            //Info cache can be null if Outbox is enabled but Sagas are disabled.
+            var sagaInfoCache = provider.GetService<SagaInfoCache>();
 
-        var sessionHolder = new CurrentSessionHolder();
-
-        //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        services.AddSingleton<ISynchronizedStorage>(provider => new SynchronizedStorage(connectionManager, provider.GetService<SagaInfoCache>(), sessionHolder));
-        services.AddSingleton<ISynchronizedStorageAdapter>(provider => new StorageAdapter(connectionManager, provider.GetService<SagaInfoCache>(), sqlDialect, sessionHolder));
-
-        services.AddTransient(_ => sessionHolder.Current);
-        context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
+            return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
+        });
+        services.AddScoped(provider => provider.GetService<ISynchronizedStorageSession>().SqlPersistenceSession());
     }
 }
