@@ -49,7 +49,7 @@ jobs:
           retention-days: 7
       - name: Azure login
         uses: azure/login@v1.4.3
-        if: matrix.engine == 'PostgreSQL'
+        if: matrix.engine == 'PostgreSQL' || matrix.engine == 'Oracle'
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
@@ -145,7 +145,8 @@ jobs:
           $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Install Oracle
-        if: contains(matrix.engines, 'Oracle')
+        id: setup-oracle
+        if: matrix.engine == 'Oracle'
         uses: Particular/setup-oracle-action@a10e77929e10c7309a674e9dcf1597673027229a
         with:
           connection-string-name: OracleConnectionString
