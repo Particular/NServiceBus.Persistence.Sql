@@ -144,13 +144,21 @@ jobs:
           
           $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-      - name: Install Oracle
+      - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
-        uses: Particular/setup-oracle-action@a10e77929e10c7309a674e9dcf1597673027229a
+        uses: Particular/setup-oracle-action@6c59898f2d4da1796369bc6455c34bf16c08614a
         with:
           connection-string-name: OracleConnectionString
+          init-script: ./.github/workflows/scripts/oracle-setup-linux.sql
           tag: SqlPersistence
+      - name: Prepare Connection Strings
+        if: matrix.engine == 'Oracle'
+        shell: pwsh
+        run: |
+          $connectionString = $Env:OracleConnectionString
+          "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
+          "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
       - name: Run tests
         uses: Particular/run-tests-action@v1.3.0
       - name: Teardown infrastructure
