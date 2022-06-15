@@ -48,7 +48,7 @@ jobs:
           dotnet-version: |
             7.0.x
             6.0.x
-          include-prerelease:true
+          include-prerelease: true
       - name: Build
         run: dotnet build src --configuration Release
       - name: Upload packages
