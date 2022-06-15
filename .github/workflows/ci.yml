@@ -150,7 +150,7 @@ jobs:
         uses: Particular/setup-oracle-action@script-execution
         with:
           connection-string-name: OracleConnectionString
-          init-script: /.github/workflows/scripts/oracle-setup-linux.sql
+          init-script: ./.github/workflows/scripts/oracle-setup-linux.sql
           tag: SqlPersistence
       - name: Prepare Connection Strings
         if: matrix.engine == 'Oracle'
