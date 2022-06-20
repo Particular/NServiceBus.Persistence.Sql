@@ -152,7 +152,7 @@ jobs:
           connection-string-name: OracleConnectionString
           init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
           tag: SqlPersistence
-      - name: Prepare Connection Strings
+      - name: Prepare Connection Strings for Oracle
         if: matrix.engine == 'Oracle'
         shell: pwsh
         run: |
