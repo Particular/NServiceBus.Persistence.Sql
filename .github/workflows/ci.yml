@@ -143,7 +143,7 @@ jobs:
           mysql --defaults-extra-file=mysql-login -D mysql -e "create user particular identified by 'Welcome1' ;"
           echo "Giving user particular access to schema nservicebus"
           mysql --defaults-extra-file=mysql-login -D mysql -e "grant all on *.* to particular@'%' ;"
-
+          
           $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Setup Oracle
@@ -162,7 +162,7 @@ jobs:
           "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
           "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
       - name: Run tests
-        uses: Particular/run-tests-action@v1.0.0
+        uses: Particular/run-tests-action@v1.3.0
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh
