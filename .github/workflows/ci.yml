@@ -17,20 +17,13 @@ jobs:
     strategy:
       matrix:
         os: [ windows-2019, ubuntu-20.04 ]
-        engine: [ SqlServer, MySql, PostgreSql ]
+        engine: [ SqlServer, MySql, PostgreSql, Oracle ]
         include:
           # Add os-name alias for job name
           - os: windows-2019
             os-name: Windows
           - os: ubuntu-20.04
-            os-name: Linux
-          # Additional permutatations for Oracle
-          - os: ubuntu-20.04
-            os-name: Linux
-            engine: Oracle
-          - os: [self-hosted, windows, oracle]
-            os-name: Windows
-            engine: Oracle
+            os-name: Linux        
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -39,11 +32,11 @@ jobs:
         shell: pwsh
         run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1.9.0
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: |
             6.0.x
@@ -51,14 +44,14 @@ jobs:
       - name: Build
         run: dotnet build src --configuration Release
       - name: Upload packages
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v3
         with:
           name: NuGet packages
           path: nugets/
           retention-days: 7
       - name: Azure login
-        uses: azure/login@v1.3.0
-        if: matrix.engine == 'PostgreSQL'
+        uses: azure/login@v1.4.3
+        if: matrix.engine == 'PostgreSQL' || matrix.engine == 'Oracle'
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
@@ -153,39 +146,21 @@ jobs:
 
           $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
+        uses: Particular/setup-oracle-action@v1.0.0
+        with:
+          connection-string-name: OracleConnectionString
+          init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
+          tag: SqlPersistence
+      - name: Prepare Connection Strings
+        if: matrix.engine == 'Oracle'
         shell: pwsh
         run: |
-          if ( $Env:RUNNER_OS -eq 'Windows') {
-            echo "Adding environment variables for Oracle connection strings"
-            echo "OracleConnectionString=User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-            echo "OracleConnectionString_Particular2=User Id=particular2;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-          }
-
-          if ( $Env:RUNNER_OS -eq 'Linux' ) {
-            echo "Running Oracle using Docker"
-            docker run --name oracle -d -p 1521:1521 -e ORACLE_PASSWORD=Welcome1 gvenzl/oracle-xe:21
-
-            for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
-              echo "Checking for Oracle connectivity $($i+1)/24..."
-              docker exec oracle ./healthcheck.sh
-              if ($?) {
-                echo "Connection successful"
-                break;
-              }
-              sleep 5
-            }
-
-            cat ./.github/workflows/scripts/oracle-setup-linux.sql | docker exec -i oracle sqlplus / as sysdba
-
-            echo "Adding environment variables for Oracle connection strings"
-            echo "OracleConnectionString=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-            echo "OracleConnectionString_Particular2=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular2; Password=Welcome1; Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-          }
-
+          $connectionString = $Env:OracleConnectionString
+          "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
+          "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
       - name: Run tests
         uses: Particular/run-tests-action@v1.0.0
       - name: Teardown infrastructure
