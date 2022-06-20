@@ -141,7 +141,7 @@ jobs:
           mysql --defaults-extra-file=mysql-login -D mysql -e "create user particular identified by 'Welcome1' ;"
           echo "Giving user particular access to schema nservicebus"
           mysql --defaults-extra-file=mysql-login -D mysql -e "grant all on *.* to particular@'%' ;"
-          
+
           $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
           echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Setup Oracle
