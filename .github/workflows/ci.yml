@@ -150,7 +150,7 @@ jobs:
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
-        uses: Particular/setup-oracle-action@v1.0.0
+        uses: Particular/setup-oracle-action@v1.0.1
         with:
           connection-string-name: OracleConnectionString
           init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
