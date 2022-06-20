@@ -19,11 +19,16 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <SourcesFramework>net6.0</SourcesFramework>
+    <SourcesFramework Condition="'$(TargetFramework)' == 'net472'">net472</SourcesFramework>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\EndpointTemplates\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\ScenarioDescriptors\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\NServiceBusAcceptanceTest.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(SourcesFramework)\**\EndpointTemplates\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(SourcesFramework)\**\ScenarioDescriptors\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(SourcesFramework)\**\NServiceBusAcceptanceTest.cs" />
   </ItemGroup>
 
 </Project>
