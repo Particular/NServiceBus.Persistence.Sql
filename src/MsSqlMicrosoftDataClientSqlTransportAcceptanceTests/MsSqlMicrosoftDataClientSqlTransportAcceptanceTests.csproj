@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''" />
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\any\**\EndpointTemplates\*.cs" />
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\any\**\ScenarioDescriptors\*.cs" />
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\any\**\NServiceBusAcceptanceTest.cs" />
