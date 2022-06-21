@@ -51,22 +51,13 @@ Add an environment variable called `PostgreSqlConnectionString` with the connect
 
 ### Oracle
 
-Docker:
+Docker (using [lightweight community image](https://hub.docker.com/r/gvenzl/oracle-xe) that we also use for CI/CD):
 
-    docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=super-secret-password -e ORACLE_CHARACTERSET=AL32UTF8 oracle/database:18.4.0-xe
+    docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=super-secret-password gvenzl/oracle-xe:21.3.0-slim
 
-Above *Oracle Database Express* image can be created via the following procedure which is based on the [official guidance for running Oracle Database 18c Express Edition in a Docker container](https://github.com/oracle/docker-images/tree/master/OracleDatabase/SingleInstance#running-oracle-database-18c-express-edition-in-a-docker-container).
+Docker (official image):
 
-1. Clone <https://github.com/oracle/docker-images/>
-2. Download [Oracle Database Express Edition (XE) Release 18.4.0.0.0 (18c)](https://www.oracle.com/database/technologies/xe-downloads.html)
-3. Move it to `$/OracleDatabase/SingleInstance/dockerfiles/18.4.0`
-4. Invoke `$/OracleDatabase/SingleInstance/dockerfiles/buildDockerImage.sh` (git bash or WSL) as `./buildDockerImage.sh -v 18.4.0 - x` (build express image)
-
-Environment variable:
-
-NOTE: Requires [building your own docker image](/dev/oracle-docker-image.md)
-
-    docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=super-secret-password -e ORACLE_CHARACTERSET=AL32UTF8 oracle/database:18.4.0-xe
+    docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=super-secret-password -e ORACLE_CHARACTERSET=AL32UTF8 container-registry.oracle.com/database/express:21.3.0-xe
 
 Add an environment variable called `OracleConnectionString` with the connection string:
 
