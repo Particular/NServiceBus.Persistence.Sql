@@ -49,7 +49,7 @@ jobs:
           retention-days: 7
       - name: Azure login
         uses: azure/login@v1.4.4
-        if: matrix.engine == 'PostgreSQL' || matrix.engine == 'Oracle'
+        if: matrix.engine == 'PostgreSQL' || (matrix.engine == 'Oracle' && matrix.os-name == 'Windows')
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
@@ -150,7 +150,7 @@ jobs:
         uses: Particular/setup-oracle-action@v1.0.1
         with:
           connection-string-name: OracleConnectionString
-          init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
+          init-script: ./.github/workflows/scripts/setup-oracle-database-users-and-permissions.sql
           tag: SqlPersistence
       - name: Prepare Connection Strings for Oracle
         if: matrix.engine == 'Oracle'
