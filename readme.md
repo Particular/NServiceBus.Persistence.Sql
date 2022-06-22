@@ -51,7 +51,7 @@ Add an environment variable called `PostgreSqlConnectionString` with the connect
 
 ### Oracle
 
-Docker (using [lightweight community image](https://hub.docker.com/r/gvenzl/oracle-xe) that we also use for CI/CD):
+Docker (using the [lightweight community image](https://hub.docker.com/r/gvenzl/oracle-xe) that we also use for CI/CD):
 
     docker run -d --name oracledb -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=super-secret-password gvenzl/oracle-xe:21.3.0-slim
 
