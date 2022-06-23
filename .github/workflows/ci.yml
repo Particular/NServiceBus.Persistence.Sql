@@ -58,6 +58,7 @@ jobs:
         with:
           connection-string-env-var: SQLServerConnectionString
           catalog: nservicebus
+          extra-params: "Encrypt=False;"
       - name: Setup PostgreSql
         id: setup-postgresql
         if: matrix.engine == 'PostgreSql'
