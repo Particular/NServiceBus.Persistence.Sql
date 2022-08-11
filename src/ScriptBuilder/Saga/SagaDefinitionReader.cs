@@ -32,10 +32,7 @@ static class SagaDefinitionReader
 
         SagaDefinitionValidator.ValidateSagaDefinition(correlation, type.FullName, transitional, tableSuffix);
 
-        if (tableSuffix == null)
-        {
-            tableSuffix = type.Name;
-        }
+        tableSuffix ??= type.Name;
 
         var sagaDataType = GetSagaDataTypeFromSagaType(type);
 
@@ -76,17 +73,11 @@ static class SagaDefinitionReader
 
         var sagaDataType = GetSagaDataTypeFromSagaType(type);
 
-        if (correlationId == null)
-        {
-            correlationId = GetCoreSagaCorrelationId(type, sagaDataType);
-        }
+        correlationId ??= GetCoreSagaCorrelationId(type, sagaDataType);
 
         SagaDefinitionValidator.ValidateSagaDefinition(correlationId, type.FullName, transitionalId, tableSuffix);
 
-        if (tableSuffix == null)
-        {
-            tableSuffix = type.Name;
-        }
+        tableSuffix ??= type.Name;
 
         definition = new SagaDefinition
         (

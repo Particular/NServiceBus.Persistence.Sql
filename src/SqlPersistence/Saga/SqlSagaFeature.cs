@@ -50,20 +50,11 @@ class SqlSagaFeature : Feature
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
         sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
-        if (readerCreator == null)
-        {
-            readerCreator = reader => new JsonTextReader(reader);
-        }
+        readerCreator ??= reader => new JsonTextReader(reader);
         var writerCreator = SagaSettings.GetWriterCreator(settings);
-        if (writerCreator == null)
-        {
-            writerCreator = writer => new JsonTextWriter(writer);
-        }
+        writerCreator ??= writer => new JsonTextWriter(writer);
         var nameFilter = SagaSettings.GetNameFilter(settings);
-        if (nameFilter == null)
-        {
-            nameFilter = sagaName => sagaName;
-        }
+        nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix();
         return new SagaInfoCache(
