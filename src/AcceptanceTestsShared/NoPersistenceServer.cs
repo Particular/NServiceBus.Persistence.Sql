@@ -41,8 +41,6 @@
 
             await configuration.DefineTransport(runDescriptor, endpointConfiguration).ConfigureAwait(false);
 
-            configuration.RegisterComponentsAndInheritanceHierarchy(runDescriptor);
-
             configuration.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
             await configurationBuilderCustomization(configuration).ConfigureAwait(false);
 
