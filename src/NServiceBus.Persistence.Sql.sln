@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32328.378
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -36,7 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgreSqlAcceptanceTests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FB898D09-ADF0-49D4-8089-D743F1A31D12}"
 	ProjectSection(SolutionItems) = preProject
-		Custom.Build.props = Custom.Build.props
+		Directory.Build.props = Directory.Build.props
+		..\GitVersion.yml = ..\GitVersion.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlSystemDataClientSqlTransportAcceptanceTests", "MsSqlSystemDataClientSqlTransportAcceptanceTests\MsSqlSystemDataClientSqlTransportAcceptanceTests.csproj", "{0E98C052-F67F-4826-A344-7685504CA955}"
@@ -47,9 +48,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientSql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientAcceptanceTests", "MsSqlMicrosoftDataClientAcceptanceTests\MsSqlMicrosoftDataClientAcceptanceTests.csproj", "{7C16BE00-7198-4B6C-A094-C0B62A539F77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.TransactionalSession", "NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj", "{67DC5C83-52A4-4C53-8948-A223DE05FF1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Sql.AcceptanceTests", "TransactionalSession.Sql.AcceptanceTests\TransactionalSession.Sql.AcceptanceTests.csproj", "{20DA1B6B-651B-480F-BEA9-3E92673C5793}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +140,18 @@ Global
 		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67DC5C83-52A4-4C53-8948-A223DE05FF1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67DC5C83-52A4-4C53-8948-A223DE05FF1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67DC5C83-52A4-4C53-8948-A223DE05FF1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67DC5C83-52A4-4C53-8948-A223DE05FF1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20DA1B6B-651B-480F-BEA9-3E92673C5793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20DA1B6B-651B-480F-BEA9-3E92673C5793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20DA1B6B-651B-480F-BEA9-3E92673C5793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20DA1B6B-651B-480F-BEA9-3E92673C5793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE280E3C-E711-4543-BF53-09D7840C3033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE280E3C-E711-4543-BF53-09D7840C3033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE280E3C-E711-4543-BF53-09D7840C3033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE280E3C-E711-4543-BF53-09D7840C3033}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +165,7 @@ Global
 		{0E98C052-F67F-4826-A344-7685504CA955} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{FD72D8C3-5FAC-4D33-AD68-FF0857132007} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{7C16BE00-7198-4B6C-A094-C0B62A539F77} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+		{20DA1B6B-651B-480F-BEA9-3E92673C5793} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90D6A734-35FA-4702-BDFD-74EADABDE821}
