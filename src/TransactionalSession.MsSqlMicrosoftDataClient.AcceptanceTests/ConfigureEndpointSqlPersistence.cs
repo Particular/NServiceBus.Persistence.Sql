@@ -2,19 +2,19 @@
 
 using System.Threading.Tasks;
 using AcceptanceTesting.Support;
+using TransactionalSession;
 
-public class ConfigureSqlPersistence : IConfigureEndpointTestExecution
+public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.Build);
+        persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.BuildWithoutCertificateCheck);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
-
-        //persistence.EnableTransactionalSession();
+        persistence.EnableTransactionalSession();
 
         return Task.CompletedTask;
     }

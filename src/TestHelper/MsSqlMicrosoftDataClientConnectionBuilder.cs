@@ -8,6 +8,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         return new SqlConnection(GetConnectionString());
     }
 
+    public static SqlConnection BuildWithoutCertificateCheck()
+    {
+        return new SqlConnection(GetConnectionString(true));
+    }
+
     public static bool IsSql2016OrHigher()
     {
         using (var connection = Build())
@@ -19,7 +24,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
     public static class MultiTenant
     {
-        public static void Setup(string tenantId)
+        public static void Setup(string tenantId, bool disableServerCertificateCheck = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
@@ -30,13 +35,13 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             }
         }
 
-        public static void TearDown(string tenantId)
+        public static void TearDown(string tenantId, bool disableServerCertificateCheck = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
             DropDatabase(dbName);
         }
 
-        public static SqlConnection Build(string tenantId)
+        public static SqlConnection Build(string tenantId, bool disableServerCertificateCheck = false)
         {
             var connection = GetBaseConnectionString()
                 .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
@@ -61,9 +66,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         }
     }
 
-    public static void DropDbIfCollationIncorrect()
+    public static void DropDbIfCollationIncorrect(bool disableServerCertificateCheck = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        string connectionString = GetConnectionString(disableServerCertificateCheck);
+
+        var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";
@@ -79,16 +86,16 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
                 {
                     if (reader.HasRows) // The database collation is wront, drop so that it will be recreated
                     {
-                        DropDatabase(databaseName);
+                        DropDatabase(databaseName, disableServerCertificateCheck);
                     }
                 }
             }
         }
     }
 
-    public static void CreateDbIfNotExists()
+    public static void CreateDbIfNotExists(bool disableServerCertificateCheck = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(disableServerCertificateCheck));
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";
@@ -114,7 +121,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         }
     }
 
-    static string GetConnectionString()
+    static string GetConnectionString(bool disableServerCertificateCheck = false)
     {
         var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
 
@@ -123,12 +130,17 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             throw new Exception("SQLServerConnectionString environment variable is empty");
         }
 
+        if (disableServerCertificateCheck)
+        {
+            connection += ";Encrypt=False";
+        }
+
         return connection;
     }
 
-    static void DropDatabase(string databaseName)
+    static void DropDatabase(string databaseName, bool disableServerCertificateCheck = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString())
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(disableServerCertificateCheck))
         {
             InitialCatalog = "master"
         };

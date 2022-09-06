@@ -54,7 +54,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.TransactionalSession", "NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj", "{67DC5C83-52A4-4C53-8948-A223DE05FF1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Sql.AcceptanceTests", "TransactionalSession.Sql.AcceptanceTests\TransactionalSession.Sql.AcceptanceTests.csproj", "{20DA1B6B-651B-480F-BEA9-3E92673C5793}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests", "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj", "{20DA1B6B-651B-480F-BEA9-3E92673C5793}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
 EndProject
