@@ -18,6 +18,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="OracleAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="MsSqlSystemDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Guard.cs" />
   </ItemGroup>
 

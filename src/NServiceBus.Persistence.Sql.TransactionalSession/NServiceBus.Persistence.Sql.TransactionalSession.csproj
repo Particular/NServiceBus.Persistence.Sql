@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Particular.Packaging" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="[2.0.0-beta.4, 3.0.0)" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.0-beta.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,8 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="TransactionalSession.Sql.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="TransactionalSession.Sql.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
 </Project>
