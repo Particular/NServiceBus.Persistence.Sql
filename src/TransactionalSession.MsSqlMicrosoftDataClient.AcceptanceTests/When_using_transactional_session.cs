@@ -11,6 +11,13 @@
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect(true);
+            MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists(true);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit(

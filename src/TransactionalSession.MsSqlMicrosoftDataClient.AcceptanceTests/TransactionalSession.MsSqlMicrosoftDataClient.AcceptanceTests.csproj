@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+<!--    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />-->
   </ItemGroup>
   
   <ItemGroup>
@@ -25,10 +25,7 @@
     <PackageReference Include="Nunit" Version="3.13.3" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="8.0.0-rc.1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AssemblyAttribute Include="NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute" />
+    <PackageReference Include="NServiceBus.Persistence.Sql" Version="7.0.0-beta.2" />
   </ItemGroup>
 
 </Project>

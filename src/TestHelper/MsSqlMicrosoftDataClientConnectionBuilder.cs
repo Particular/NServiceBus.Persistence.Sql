@@ -28,7 +28,8 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
-            using (var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build())
+            var sqlConnection = disableServerCertificateCheck ? BuildWithoutCertificateCheck() : MsSqlMicrosoftDataClientConnectionBuilder.Build();
+            using (var conn = sqlConnection)
             {
                 conn.Open();
                 conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
@@ -46,6 +47,12 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             var connection = GetBaseConnectionString()
                 .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
                 .Replace(";Initial Catalog=nservicebus;", $";Initial Catalog=nservicebus_{tenantId.ToLower()};");
+
+            if (disableServerCertificateCheck)
+            {
+                connection += ";Encrypt=False";
+            }
+
             return new SqlConnection(connection);
         }
 
