@@ -12,19 +12,11 @@
 
   <ItemGroup>
     <PackageReference Include="Particular.Packaging" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.0-beta.5" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="[2.0.0-beta.6, 3.0.0)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
 </Project>

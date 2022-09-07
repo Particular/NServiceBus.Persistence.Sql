@@ -1,20 +1,6 @@
 namespace NServiceBus.TransactionalSession
 {
-    using Features;
-
-    sealed class SqlPersistenceTransactionalSession : Feature
+    sealed class SqlPersistenceTransactionalSession : TransactionalSession
     {
-        public SqlPersistenceTransactionalSession()
-        {
-            Defaults(s => s.EnableFeatureByDefault<TransactionalSession>());
-
-            DependsOn<SynchronizedStorage>();
-            DependsOn<TransactionalSession>();
-        }
-
-        protected override void Setup(FeatureConfigurationContext context)
-        {
-
-        }
     }
 }

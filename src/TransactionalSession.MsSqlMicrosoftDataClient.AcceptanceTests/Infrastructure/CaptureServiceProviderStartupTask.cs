@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
     using System.Threading;
@@ -19,10 +19,5 @@
         protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken = default) => Task.CompletedTask;
-    }
-
-    public interface IInjectServiceProvider
-    {
-        IServiceProvider ServiceProvider { get; set; }
     }
 }

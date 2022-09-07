@@ -18,10 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
-  </ItemGroup>
-
-  <ItemGroup>
     <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />

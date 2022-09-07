@@ -1,16 +1,13 @@
-﻿namespace NServiceBus.AcceptanceTests
+﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
-    using EndpointTemplates;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
-    using TransactionalSession;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
@@ -175,24 +172,14 @@
         {
             public AnEndpoint()
             {
-                if ((bool)TestContext.CurrentContext.Test.Arguments[0]!)
+                var useOutbox = (bool)TestContext.CurrentContext.Test.Arguments[0];
+                if (useOutbox)
                 {
-                    EndpointSetup<DefaultServer>((endpointConfiguration, descriptor) =>
-                    {
-                        endpointConfiguration.RegisterStartupTask(provider =>
-                            new CaptureServiceProviderStartupTask(provider, descriptor.ScenarioContext));
-                        endpointConfiguration.TypesToIncludeInScan(new[] { typeof(SqlPersistenceTransactionalSession), typeof(TransactionalSession) });
-                    });
+                    EndpointSetup<TransactionSessionWithOutboxEndpoint>();
                 }
                 else
                 {
-                    EndpointSetup<DefaultServer>((endpointConfiguration, runDescriptor) =>
-                    {
-                        endpointConfiguration.EnableOutbox();
-                        endpointConfiguration.RegisterStartupTask(provider =>
-                            new CaptureServiceProviderStartupTask(provider, runDescriptor.ScenarioContext));
-                        endpointConfiguration.TypesToIncludeInScan(new[] { typeof(SqlPersistenceTransactionalSession), typeof(TransactionalSession) });
-                    });
+                    EndpointSetup<TransactionSessionDefaultServer>();
                 }
             }
 

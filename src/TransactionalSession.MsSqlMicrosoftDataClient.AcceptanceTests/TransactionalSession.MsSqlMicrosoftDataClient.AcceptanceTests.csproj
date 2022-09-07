@@ -10,21 +10,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
+    <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
+    
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Nunit" Version="3.13.3" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-rc.1" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="8.0.0-rc.1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
   </ItemGroup>
 
-  <Import Project="Includes.targets" />
+  <ItemGroup>
+    <AssemblyAttribute Include="NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute" />
+  </ItemGroup>
 
 </Project>
