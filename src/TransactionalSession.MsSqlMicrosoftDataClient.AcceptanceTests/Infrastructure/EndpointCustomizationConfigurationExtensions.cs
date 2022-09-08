@@ -5,7 +5,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using System.Linq;
     using System.Reflection;
     using NServiceBus.AcceptanceTesting.Support;
-    using NServiceBus.Hosting.Helpers;
+    using Hosting.Helpers;
 
     public static class EndpointCustomizationConfigurationExtensions
     {

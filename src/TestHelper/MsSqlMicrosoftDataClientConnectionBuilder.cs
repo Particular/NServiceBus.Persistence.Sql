@@ -39,7 +39,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         public static void TearDown(string tenantId, bool disableServerCertificateCheck = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
-            DropDatabase(dbName);
+            DropDatabase(dbName, disableServerCertificateCheck);
         }
 
         public static SqlConnection Build(string tenantId, bool disableServerCertificateCheck = false)
