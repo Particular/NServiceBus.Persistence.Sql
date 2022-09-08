@@ -24,6 +24,8 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
     public static class MultiTenant
     {
+        const string DefaultDatabaseName = "nservicebus";
+
         public static void Setup(string tenantId, bool disableServerCertificateCheck = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
@@ -64,9 +66,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
                 throw new Exception("SQLServerConnectionString environment variable is empty");
             }
 
-            if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus"))
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connection);
+            bool foundDatabaseValue = connectionStringBuilder.TryGetValue("Database", out var databaseValue);
+            if (connectionStringBuilder.InitialCatalog != DefaultDatabaseName || (foundDatabaseValue && databaseValue.ToString() != DefaultDatabaseName))
             {
-                throw new Exception("Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `nservicebus` to test multi-tenant operations.");
+                throw new Exception($"Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `{DefaultDatabaseName}` to test multi-tenant operations.");
             }
 
             return connection;

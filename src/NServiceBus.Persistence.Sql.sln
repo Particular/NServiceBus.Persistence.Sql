@@ -58,6 +58,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.MsSqlM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests\TransactionalSession.MsSqlSystemDataClient.AcceptenceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{DE280E3C-E711-4543-BF53-09D7840C3033}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE280E3C-E711-4543-BF53-09D7840C3033}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE280E3C-E711-4543-BF53-09D7840C3033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB33F7C1-FF29-4958-B176-81AC227451A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB33F7C1-FF29-4958-B176-81AC227451A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB33F7C1-FF29-4958-B176-81AC227451A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB33F7C1-FF29-4958-B176-81AC227451A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +172,7 @@ Global
 		{FD72D8C3-5FAC-4D33-AD68-FF0857132007} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{7C16BE00-7198-4B6C-A094-C0B62A539F77} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{20DA1B6B-651B-480F-BEA9-3E92673C5793} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+		{AB33F7C1-FF29-4958-B176-81AC227451A5} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90D6A734-35FA-4702-BDFD-74EADABDE821}
