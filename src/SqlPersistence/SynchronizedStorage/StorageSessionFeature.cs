@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
@@ -26,14 +27,11 @@ class StorageSessionFeature : Feature
             infoCache = BuildSagaInfoCache(sqlDialect, settings);
         }
 
-        var sessionHolder = new CurrentSessionHolder();
-
         //Info cache can be null if Outbox is enabled but Sagas are disabled.
-        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache, sessionHolder), DependencyLifecycle.SingleInstance);
-        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect, sessionHolder), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new SynchronizedStorage(connectionManager, infoCache), DependencyLifecycle.SingleInstance);
+        container.ConfigureComponent(() => new StorageAdapter(connectionManager, infoCache, sqlDialect), DependencyLifecycle.SingleInstance);
 
-        container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
-        context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
+        container.ConfigureComponent(b => b.Build<CompletableSynchronizedStorageSessionAdapter>().AdaptedSession.SqlPersistenceSession(), DependencyLifecycle.InstancePerUnitOfWork);
 
         if (sqlSagaPersistenceActivated)
         {
