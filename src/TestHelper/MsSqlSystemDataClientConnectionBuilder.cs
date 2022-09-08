@@ -24,10 +24,12 @@ public static class MsSqlSystemDataClientConnectionBuilder
 
     public static class MultiTenant
     {
-        public static void Setup(string tenantId, bool disableServerCertificateCheck = false)
+        const string DefaultDatabaseName = "nservicebus";
+
+        public static void Setup(string tenantId, bool trustServerCertificate = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
-            var connectionString = disableServerCertificateCheck ? BuildWithoutCertificateCheck() : MsSqlSystemDataClientConnectionBuilder.Build();
+            var connectionString = trustServerCertificate ? BuildWithoutCertificateCheck() : MsSqlSystemDataClientConnectionBuilder.Build();
 
             using (var conn = connectionString)
             {
@@ -36,27 +38,32 @@ public static class MsSqlSystemDataClientConnectionBuilder
             }
         }
 
-        public static void TearDown(string tenantId, bool disableServerCertificateCheck = false)
+        public static void TearDown(string tenantId, bool trustServerCertificate = false)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
-            DropDatabase(dbName, disableServerCertificateCheck);
+            DropDatabase(dbName, trustServerCertificate);
         }
 
-        public static SqlConnection Build(string tenantId, bool disableServerCertificateCheck = false)
+        public static SqlConnection Build(string tenantId, bool trustServerCertificate = false)
         {
-            var connection = GetBaseConnectionString()
-                .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
-                .Replace(";Initial Catalog=nservicebus;", $";Initial Catalog=nservicebus_{tenantId.ToLower()};");
+            var connectionBuilder = GetBaseConnectionString();
 
-            if (disableServerCertificateCheck)
+            bool foundDatabaseValue = connectionBuilder.TryGetValue("Database", out _);
+            if (foundDatabaseValue)
             {
-                connection += ";Encrypt=False";
+                connectionBuilder["Database"] = $"nservicebus_{tenantId.ToLower()}";
+            }
+            else if (!string.IsNullOrEmpty(connectionBuilder.InitialCatalog))
+            {
+                connectionBuilder.InitialCatalog = $"nservicebus_{tenantId.ToLower()}";
             }
 
-            return new SqlConnection(connection);
+            connectionBuilder.TrustServerCertificate = trustServerCertificate;
+
+            return new SqlConnection(connectionBuilder.ToString());
         }
 
-        static string GetBaseConnectionString()
+        static SqlConnectionStringBuilder GetBaseConnectionString()
         {
             var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
             if (string.IsNullOrWhiteSpace(connection))
@@ -64,18 +71,20 @@ public static class MsSqlSystemDataClientConnectionBuilder
                 throw new Exception("SQLServerConnectionString environment variable is empty");
             }
 
-            if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus;"))
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connection);
+            bool foundDatabaseValue = connectionStringBuilder.TryGetValue("Database", out var databaseValue);
+            if (connectionStringBuilder.InitialCatalog != DefaultDatabaseName || (foundDatabaseValue && databaseValue.ToString() != DefaultDatabaseName))
             {
-                throw new Exception("Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `nservicebus` to test multi-tenant operations.");
+                throw new Exception($"Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `{DefaultDatabaseName}` to test multi-tenant operations.");
             }
 
-            return connection;
+            return connectionStringBuilder;
         }
     }
 
-    public static void DropDbIfCollationIncorrect(bool disableServerCertificateCheck = false)
+    public static void DropDbIfCollationIncorrect(bool trustServerCertificate = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(disableServerCertificateCheck));
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(trustServerCertificate));
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";
@@ -98,9 +107,9 @@ public static class MsSqlSystemDataClientConnectionBuilder
         }
     }
 
-    public static void CreateDbIfNotExists(bool disableServerCertificateCheck = false)
+    public static void CreateDbIfNotExists(bool trustServerCertificate = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(disableServerCertificateCheck));
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(trustServerCertificate));
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";
@@ -126,7 +135,7 @@ public static class MsSqlSystemDataClientConnectionBuilder
         }
     }
 
-    static string GetConnectionString(bool disableServerCertificateCheck = false)
+    static string GetConnectionString(bool trustServerCertificate = false)
     {
         var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
 
@@ -135,7 +144,7 @@ public static class MsSqlSystemDataClientConnectionBuilder
             throw new Exception("SQLServerConnectionString environment variable is empty");
         }
 
-        if (disableServerCertificateCheck)
+        if (trustServerCertificate)
         {
             connection += ";Encrypt=False";
         }
@@ -143,9 +152,9 @@ public static class MsSqlSystemDataClientConnectionBuilder
         return connection;
     }
 
-    static void DropDatabase(string databaseName, bool disableCertificateCheck = false)
+    static void DropDatabase(string databaseName, bool trustServerCertificate = false)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(disableCertificateCheck))
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(trustServerCertificate))
         {
             InitialCatalog = "master"
         };
