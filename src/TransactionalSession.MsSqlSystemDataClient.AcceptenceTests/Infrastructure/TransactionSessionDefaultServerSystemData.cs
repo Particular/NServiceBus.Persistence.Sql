@@ -3,5 +3,5 @@
 public partial class TransactionSessionDefaultServer
 {
     private partial void SetConnectionBuilder(PersistenceExtensions<SqlPersistence> sqlPersistence) =>
-        sqlPersistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.BuildWithoutCertificateCheck);
+        sqlPersistence.ConnectionBuilder(MsSqlSystemDataClientConnectionBuilder.BuildWithoutCertificateCheck);
 }
