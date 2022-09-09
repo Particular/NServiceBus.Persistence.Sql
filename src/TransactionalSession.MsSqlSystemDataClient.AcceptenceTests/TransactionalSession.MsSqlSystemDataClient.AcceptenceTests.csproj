@@ -42,6 +42,12 @@
     <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\NServiceBusAcceptanceTest.cs">
       <Link>Infrastructure\NServiceBusAcceptanceTest.cs</Link>
     </Compile>
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\TransactionSessionDefaultServer.cs">
+      <Link>Infrastructure\TransactionSessionDefaultServer.cs</Link>
+    </Compile>
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\TransactionSessionWithOutboxEndpoint.cs">
+      <Link>Infrastructure\TransactionSessionWithOutboxEndpoint.cs</Link>
+    </Compile>
   </ItemGroup>
 
 </Project>

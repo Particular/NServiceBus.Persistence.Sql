@@ -8,7 +8,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using AcceptanceTesting.Support;
     using NUnit.Framework;
 
-    public class TransactionSessionDefaultServer : IEndpointSetupTemplate
+    public partial class TransactionSessionDefaultServer : IEndpointSetupTemplate
     {
         public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration,
                                                                           Func<EndpointConfiguration, Task> configurationBuilderCustomization)
@@ -28,7 +28,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             });
 
             var persistence = builder.UsePersistence<SqlPersistence>();
-            persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.BuildWithoutCertificateCheck);
+            SetConnectionBuilder(persistence);
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
             persistence.EnableTransactionalSession();
 
@@ -41,5 +41,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
 
             return builder;
         }
+
+        private partial void SetConnectionBuilder(PersistenceExtensions<SqlPersistence> sqlPersistence);
     }
 }
