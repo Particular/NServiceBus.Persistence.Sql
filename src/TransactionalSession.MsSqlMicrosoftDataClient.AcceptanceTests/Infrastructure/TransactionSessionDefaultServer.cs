@@ -10,22 +10,20 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
 
     public partial class TransactionSessionDefaultServer : IEndpointSetupTemplate
     {
-        public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration,
-                                                                          Func<EndpointConfiguration, Task> configurationBuilderCustomization)
+        public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
+            EndpointCustomizationConfiguration endpointConfiguration,
+            Func<EndpointConfiguration, Task> configurationBuilderCustomization)
         {
             var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
             builder.EnableInstallers();
 
             builder.Recoverability()
-                   .Delayed(delayed => delayed.NumberOfRetries(0))
-                   .Immediate(immediate => immediate.NumberOfRetries(0));
+                .Delayed(delayed => delayed.NumberOfRetries(0))
+                .Immediate(immediate => immediate.NumberOfRetries(0));
 
             var storageDir = Path.Combine(Path.GetTempPath(), "learn", TestContext.CurrentContext.Test.ID);
 
-            builder.UseTransport(new AcceptanceTestingTransport
-            {
-                StorageLocation = storageDir
-            });
+            builder.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
 
             var persistence = builder.UsePersistence<SqlPersistence>();
             SetConnectionBuilder(persistence);

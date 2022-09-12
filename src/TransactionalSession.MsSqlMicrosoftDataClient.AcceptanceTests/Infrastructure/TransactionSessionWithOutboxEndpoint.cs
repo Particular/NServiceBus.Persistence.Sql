@@ -6,8 +6,9 @@
 
     public class TransactionSessionWithOutboxEndpoint : TransactionSessionDefaultServer
     {
-        public override Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointConfiguration,
-                                                                     Func<EndpointConfiguration, Task> configurationBuilderCustomization) =>
+        public override Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
+            EndpointCustomizationConfiguration endpointConfiguration,
+            Func<EndpointConfiguration, Task> configurationBuilderCustomization) =>
             base.GetConfiguration(runDescriptor, endpointConfiguration, async configuration =>
             {
                 configuration.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
