@@ -1,7 +1,8 @@
-﻿namespace NServiceBus.TransactionalSession.AcceptanceTests;
-
-public partial class TransactionSessionDefaultServer
+﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
-    private partial void SetConnectionBuilder(PersistenceExtensions<SqlPersistence> sqlPersistence) =>
-        sqlPersistence.ConnectionBuilder(MsSqlSystemDataClientConnectionBuilder.Build);
+    public partial class TransactionSessionDefaultServer
+    {
+        private partial void SetConnectionBuilder(PersistenceExtensions<SqlPersistence> sqlPersistence) =>
+            sqlPersistence.ConnectionBuilder(MsSqlSystemDataClientConnectionBuilder.Build);
+    }
 }
