@@ -9,6 +9,7 @@
     using NUnit.Framework;
     using ObjectBuilder;
     using Persistence.Sql;
+    using Persistence.Sql.ScriptBuilder;
 
     public class When_running_with_multitenancy : NServiceBusAcceptanceTest
     {
@@ -49,13 +50,12 @@
 
         static async Task CreateOutboxTable(string tenantId, string endpointName)
         {
-            string tablePrefix = $"{endpointName.Replace('.', '_')}_";
-            var dialect = new SqlDialect.MsSqlServer();
+            string tablePrefix = endpointName.Replace('.', '_');
+            using var connection = MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId);
+            await connection.OpenAsync().ConfigureAwait(false);
 
-            string scriptDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NServiceBus.Persistence.Sql",
-                dialect.GetType().Name);
-
-            await ScriptRunner.Install(dialect, tablePrefix, () => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId), scriptDirectory, true, false, false).ConfigureAwait(false);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectBuilder

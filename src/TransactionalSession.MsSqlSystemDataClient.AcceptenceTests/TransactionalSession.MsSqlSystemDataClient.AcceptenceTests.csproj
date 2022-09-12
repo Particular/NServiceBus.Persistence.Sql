@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
@@ -23,8 +24,6 @@
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
     <PackageReference Include="NServiceBus.TransactionalSession" Version="[1.0.0-beta.1, 2)" />
   </ItemGroup>
-
-  <Import Project="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" />
 
   <ItemGroup>
     <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs">

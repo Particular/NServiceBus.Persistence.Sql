@@ -3,7 +3,6 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using System;
     using System.IO;
     using System.Threading.Tasks;
-    using AcceptanceTesting;
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
     using NUnit.Framework;
@@ -27,6 +26,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             SetConnectionBuilder(persistence);
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
             persistence.EnableTransactionalSession();
+            persistence.DisableInstaller();
 
             builder.RegisterComponents(c => c.RegisterSingleton(runDescriptor.ScenarioContext)); // register base ScenarioContext type
             builder.RegisterComponents(c => c.RegisterSingleton(runDescriptor.ScenarioContext.GetType(), runDescriptor.ScenarioContext)); // register specific implementation
