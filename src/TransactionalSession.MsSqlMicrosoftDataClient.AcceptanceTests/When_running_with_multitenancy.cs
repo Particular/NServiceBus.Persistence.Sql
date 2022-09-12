@@ -18,13 +18,13 @@ public class When_running_with_multitenancy : NServiceBusAcceptanceTest
     [OneTimeSetUp]
     public void SetUpTenantDatabases()
     {
-        MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup(tenantId, true);
+        MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup(tenantId);
     }
 
     [OneTimeTearDown]
     public void TearDownTenantDatabases()
     {
-        MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.TearDown(tenantId, true);
+        MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.TearDown(tenantId);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class When_running_with_multitenancy : NServiceBusAcceptanceTest
         string scriptDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NServiceBus.Persistence.Sql",
             dialect.GetType().Name);
 
-        await ScriptRunner.Install(dialect, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build(tenantId, true), scriptDirectory, true, false, false,
+        await ScriptRunner.Install(dialect, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build(tenantId), scriptDirectory, true, false, false,
             CancellationToken.None).ConfigureAwait(false);
     }
 

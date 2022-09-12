@@ -8,11 +8,6 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         return new SqlConnection(GetConnectionString());
     }
 
-    public static SqlConnection BuildWithoutCertificateCheck()
-    {
-        return new SqlConnection(GetConnectionString(true));
-    }
-
     public static bool IsSql2016OrHigher()
     {
         using (var connection = Build())
@@ -26,11 +21,11 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
     {
         const string DefaultDatabaseName = "nservicebus";
 
-        public static void Setup(string tenantId, bool trustServerCertificate = false)
+        public static void Setup(string tenantId)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
-            var sqlConnection = trustServerCertificate ? BuildWithoutCertificateCheck() : MsSqlMicrosoftDataClientConnectionBuilder.Build();
+            var sqlConnection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             using (var conn = sqlConnection)
             {
                 conn.Open();
@@ -38,13 +33,13 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             }
         }
 
-        public static void TearDown(string tenantId, bool trustServerCertificate = false)
+        public static void TearDown(string tenantId)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
-            DropDatabase(dbName, trustServerCertificate);
+            DropDatabase(dbName);
         }
 
-        public static SqlConnection Build(string tenantId, bool trustServerCertificate = false)
+        public static SqlConnection Build(string tenantId)
         {
             var connectionBuilder = GetBaseConnectionString();
 
@@ -57,8 +52,6 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             {
                 connectionBuilder.InitialCatalog = $"nservicebus_{tenantId.ToLower()}";
             }
-
-            connectionBuilder.TrustServerCertificate = trustServerCertificate;
 
             return new SqlConnection(connectionBuilder.ToString());
         }
@@ -82,9 +75,9 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         }
     }
 
-    public static void DropDbIfCollationIncorrect(bool trustServerCertificate = false)
+    public static void DropDbIfCollationIncorrect()
     {
-        string connectionString = GetConnectionString(trustServerCertificate);
+        string connectionString = GetConnectionString();
 
         var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
         var databaseName = connectionStringBuilder.InitialCatalog;
@@ -102,16 +95,16 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
                 {
                     if (reader.HasRows) // The database collation is wront, drop so that it will be recreated
                     {
-                        DropDatabase(databaseName, trustServerCertificate);
+                        DropDatabase(databaseName);
                     }
                 }
             }
         }
     }
 
-    public static void CreateDbIfNotExists(bool trustServerCertificate = false)
+    public static void CreateDbIfNotExists()
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(trustServerCertificate));
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";
@@ -137,7 +130,7 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
         }
     }
 
-    static string GetConnectionString(bool trustServerCertificate = false)
+    static string GetConnectionString()
     {
         var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
 
@@ -146,17 +139,12 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             throw new Exception("SQLServerConnectionString environment variable is empty");
         }
 
-        if (trustServerCertificate)
-        {
-            connection += ";Encrypt=False";
-        }
-
         return connection;
     }
 
-    static void DropDatabase(string databaseName, bool trustServerCertificate = false)
+    static void DropDatabase(string databaseName)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString(trustServerCertificate))
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString())
         {
             InitialCatalog = "master"
         };

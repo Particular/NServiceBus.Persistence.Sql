@@ -14,8 +14,8 @@
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect(true);
-            MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists(true);
+            MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
+            MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
         }
 
         [TestCase(true)]
@@ -56,7 +56,7 @@
                           .Done(c => c.MessageReceived)
                           .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.BuildWithoutCertificateCheck();
+            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
 
             using var queryCommand =
@@ -105,7 +105,7 @@
                           .Done(c => c.MessageReceived)
                           .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.BuildWithoutCertificateCheck();
+            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
 
             using var queryCommand =
