@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using Microsoft.Data.SqlClient;
@@ -33,7 +32,7 @@
                     var sessionOptions = new SqlPersistenceOpenSessionOptions();
                     await transactionalSession.Open(sessionOptions);
 
-                    await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
+                    await transactionalSession.SendLocal(new SampleMessage());
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
@@ -51,7 +50,7 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
-                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                    await transactionalSession.Commit().ConfigureAwait(false);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
@@ -81,7 +80,7 @@
                     var sessionOptions = new SqlPersistenceOpenSessionOptions();
                     await transactionalSession.Open(sessionOptions);
 
-                    await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
+                    await transactionalSession.SendLocal(new SampleMessage());
 
                     ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
 
@@ -99,7 +98,7 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
-                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                    await transactionalSession.Commit().ConfigureAwait(false);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
@@ -157,8 +156,7 @@
                     var sendOptions = new SendOptions();
                     sendOptions.RequireImmediateDispatch();
                     sendOptions.RouteToThisEndpoint();
-                    await transactionalSession.Send(new SampleMessage(), sendOptions,
-                        CancellationToken.None);
+                    await transactionalSession.Send(new SampleMessage(), sendOptions);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();

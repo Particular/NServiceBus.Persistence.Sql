@@ -40,9 +40,9 @@
                     sendOptions.SetHeader(tenantIdHeaderName, tenantId);
                     sendOptions.RouteToThisEndpoint();
 
-                    await transactionalSession.Send(new SampleMessage(), sendOptions, CancellationToken.None);
+                    await transactionalSession.Send(new SampleMessage(), sendOptions);
 
-                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                    await transactionalSession.Commit().ConfigureAwait(false);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
