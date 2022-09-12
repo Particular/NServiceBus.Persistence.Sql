@@ -145,23 +145,23 @@
         public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
         {
             var result = await Scenario.Define<Context>()
-                    .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
-                    {
-                        using IServiceScope scope = ctx.ServiceProvider.CreateScope();
-                        using var transactionalSession = scope.ServiceProvider
-                            .GetRequiredService<ITransactionalSession>();
+                .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
+                {
+                    using IServiceScope scope = ctx.ServiceProvider.CreateScope();
+                    using var transactionalSession = scope.ServiceProvider
+                        .GetRequiredService<ITransactionalSession>();
 
-                        var sessionOptions = new SqlPersistenceOpenSessionOptions();
-                        await transactionalSession.Open(sessionOptions);
+                    var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                    await transactionalSession.Open(sessionOptions);
 
-                        var sendOptions = new SendOptions();
-                        sendOptions.RequireImmediateDispatch();
-                        sendOptions.RouteToThisEndpoint();
-                        await transactionalSession.Send(new SampleMessage(), sendOptions,
-                            CancellationToken.None);
-                    }))
-                    .Done(c => c.MessageReceived)
-                    .Run();
+                    var sendOptions = new SendOptions();
+                    sendOptions.RequireImmediateDispatch();
+                    sendOptions.RouteToThisEndpoint();
+                    await transactionalSession.Send(new SampleMessage(), sendOptions,
+                        CancellationToken.None);
+                }))
+                .Done(c => c.MessageReceived)
+                .Run();
 
             Assert.True(result.MessageReceived);
         }
