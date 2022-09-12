@@ -26,35 +26,35 @@
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
-                          .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
-                          {
-                              using IServiceScope scope = ctx.ServiceProvider.CreateScope();
-                              using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
-                              var sessionOptions = new SqlPersistenceOpenSessionOptions();
-                              await transactionalSession.Open(sessionOptions);
+                .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
+                {
+                    using IServiceScope scope = ctx.ServiceProvider.CreateScope();
+                    using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
+                    var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                    await transactionalSession.Open(sessionOptions);
 
-                              await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
+                    await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
 
-                              var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
+                    var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
-                              string insertText =
-                                  $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
+                    string insertText =
+                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
                                         BEGIN
 	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
                                         END;
                                         INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
-                              using (var insertCommand = new SqlCommand(insertText,
-                                         (SqlConnection)storageSession.Connection,
-                                         (SqlTransaction)storageSession.Transaction))
-                              {
-                                  await insertCommand.ExecuteNonQueryAsync();
-                              }
+                    using (var insertCommand = new SqlCommand(insertText,
+                               (SqlConnection)storageSession.Connection,
+                               (SqlTransaction)storageSession.Transaction))
+                    {
+                        await insertCommand.ExecuteNonQueryAsync();
+                    }
 
-                              await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
-                          }))
-                          .Done(c => c.MessageReceived)
-                          .Run();
+                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                }))
+                .Done(c => c.MessageReceived)
+                .Run();
 
             using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
@@ -66,7 +66,6 @@
             Assert.AreEqual(rowId, result);
         }
 
-
         [TestCase(true)]
         [TestCase(false)]
         public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit(
@@ -75,35 +74,35 @@
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
-                          .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
-                          {
-                              using IServiceScope scope = ctx.ServiceProvider.CreateScope();
-                              using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
-                              var sessionOptions = new SqlPersistenceOpenSessionOptions();
-                              await transactionalSession.Open(sessionOptions);
+                .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
+                {
+                    using IServiceScope scope = ctx.ServiceProvider.CreateScope();
+                    using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
+                    var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                    await transactionalSession.Open(sessionOptions);
 
-                              await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
+                    await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
 
-                              ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
+                    ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
 
-                              string insertText =
-                                  $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
+                    string insertText =
+                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
                                         BEGIN
 	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
                                         END;
                                         INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
-                              using (var insertCommand = new SqlCommand(insertText,
-                                         (SqlConnection)storageSession.Connection,
-                                         (SqlTransaction)storageSession.Transaction))
-                              {
-                                  await insertCommand.ExecuteNonQueryAsync();
-                              }
+                    using (var insertCommand = new SqlCommand(insertText,
+                               (SqlConnection)storageSession.Connection,
+                               (SqlTransaction)storageSession.Transaction))
+                    {
+                        await insertCommand.ExecuteNonQueryAsync();
+                    }
 
-                              await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
-                          }))
-                          .Done(c => c.MessageReceived)
-                          .Run();
+                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                }))
+                .Done(c => c.MessageReceived)
+                .Run();
 
             using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
@@ -119,23 +118,23 @@
         [TestCase(false)]
         public async Task Should_not_send_messages_if_session_is_not_committed(bool outboxEnabled)
         {
-            Context result = await Scenario.Define<Context>()
-                                           .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
-                                           {
-                                               using (IServiceScope scope = ctx.ServiceProvider.CreateScope())
-                                               using (var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>())
-                                               {
-                                                   var sessionOptions = new SqlPersistenceOpenSessionOptions();
-                                                   await transactionalSession.Open(sessionOptions);
+            var result = await Scenario.Define<Context>()
+                .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
+                {
+                    using (IServiceScope scope = ctx.ServiceProvider.CreateScope())
+                    using (var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>())
+                    {
+                        var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                        await transactionalSession.Open(sessionOptions);
 
-                                                   await transactionalSession.SendLocal(new SampleMessage());
-                                               }
+                        await transactionalSession.SendLocal(new SampleMessage());
+                    }
 
-                                               //Send immediately dispatched message to finish the test
-                                               await statelessSession.SendLocal(new CompleteTestMessage());
-                                           }))
-                                           .Done(c => c.CompleteMessageReceived)
-                                           .Run();
+                    //Send immediately dispatched message to finish the test
+                    await statelessSession.SendLocal(new CompleteTestMessage());
+                }))
+                .Done(c => c.CompleteMessageReceived)
+                .Run();
 
             Assert.True(result.CompleteMessageReceived);
             Assert.False(result.MessageReceived);
@@ -145,25 +144,24 @@
         [TestCase(false)]
         public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
         {
-            Context result = await Scenario.Define<Context>()
-                                           .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
-                                           {
-                                               using IServiceScope scope = ctx.ServiceProvider.CreateScope();
-                                               using var transactionalSession = scope.ServiceProvider
-                                                   .GetRequiredService<ITransactionalSession>();
+            var result = await Scenario.Define<Context>()
+                    .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
+                    {
+                        using IServiceScope scope = ctx.ServiceProvider.CreateScope();
+                        using var transactionalSession = scope.ServiceProvider
+                            .GetRequiredService<ITransactionalSession>();
 
-                                               var sessionOptions = new SqlPersistenceOpenSessionOptions();
-                                               await transactionalSession.Open(sessionOptions);
+                        var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                        await transactionalSession.Open(sessionOptions);
 
-                                               var sendOptions = new SendOptions();
-                                               sendOptions.RequireImmediateDispatch();
-                                               sendOptions.RouteToThisEndpoint();
-                                               await transactionalSession.Send(new SampleMessage(), sendOptions,
-                                                   CancellationToken.None);
-                                           }))
-                                           .Done(c => c.MessageReceived)
-                                           .Run()
-                ;
+                        var sendOptions = new SendOptions();
+                        sendOptions.RequireImmediateDispatch();
+                        sendOptions.RouteToThisEndpoint();
+                        await transactionalSession.Send(new SampleMessage(), sendOptions,
+                            CancellationToken.None);
+                    }))
+                    .Done(c => c.MessageReceived)
+                    .Run();
 
             Assert.True(result.MessageReceived);
         }
@@ -192,7 +190,6 @@
 
             class SampleHandler : IHandleMessages<SampleMessage>
             {
-                readonly Context testContext;
                 public SampleHandler(Context testContext) => this.testContext = testContext;
 
                 public Task Handle(SampleMessage message, IMessageHandlerContext context)
@@ -201,11 +198,12 @@
 
                     return Task.CompletedTask;
                 }
+                
+                readonly Context testContext;
             }
 
             class CompleteTestMessageHandler : IHandleMessages<CompleteTestMessage>
             {
-                readonly Context testContext;
                 public CompleteTestMessageHandler(Context context) => testContext = context;
 
                 public Task Handle(CompleteTestMessage message, IMessageHandlerContext context)
@@ -214,6 +212,8 @@
 
                     return Task.CompletedTask;
                 }
+                
+                readonly Context testContext;
             }
         }
 

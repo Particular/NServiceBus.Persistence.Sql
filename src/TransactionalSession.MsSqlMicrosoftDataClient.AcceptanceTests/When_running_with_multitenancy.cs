@@ -16,16 +16,10 @@
         static readonly string tenantIdHeaderName = "TenantName";
 
         [OneTimeSetUp]
-        public void SetUpTenantDatabases()
-        {
-            MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup(tenantId);
-        }
+        public void SetUpTenantDatabases() => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Setup(tenantId);
 
         [OneTimeTearDown]
-        public void TearDownTenantDatabases()
-        {
-            MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.TearDown(tenantId);
-        }
+        public void TearDownTenantDatabases() => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.TearDown(tenantId);
 
         [Test]
         public async Task Should_send_messages_on_transactional_session_commit()
@@ -33,28 +27,28 @@
             await CreateOutboxTable(tenantId, Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
 
             await Scenario.Define<Context>()
-                          .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
-                          {
-                              using IServiceScope scope = ctx.ServiceProvider.CreateScope();
-                              using ITransactionalSession transactionalSession =
-                                  scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
+                .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
+                {
+                    using IServiceScope scope = ctx.ServiceProvider.CreateScope();
+                    using ITransactionalSession transactionalSession =
+                        scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
 
-                              var sessionOptions = new SqlPersistenceOpenSessionOptions(tenantIdHeaderName, tenantId);
-                              await transactionalSession.Open(sessionOptions);
+                    var sessionOptions = new SqlPersistenceOpenSessionOptions(tenantIdHeaderName, tenantId);
+                    await transactionalSession.Open(sessionOptions);
 
-                              var sendOptions = new SendOptions();
-                              sendOptions.SetHeader(tenantIdHeaderName, tenantId);
-                              sendOptions.RouteToThisEndpoint();
+                    var sendOptions = new SendOptions();
+                    sendOptions.SetHeader(tenantIdHeaderName, tenantId);
+                    sendOptions.RouteToThisEndpoint();
 
-                              await transactionalSession.Send(new SampleMessage(), sendOptions, CancellationToken.None);
+                    await transactionalSession.Send(new SampleMessage(), sendOptions, CancellationToken.None);
 
-                              await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
-                          }))
-                          .Done(c => c.MessageReceived)
-                          .Run();
+                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                }))
+                .Done(c => c.MessageReceived)
+                .Run();
         }
 
-        public static async Task CreateOutboxTable(string tenantId, string endpointName)
+        static async Task CreateOutboxTable(string tenantId, string endpointName)
         {
             string tablePrefix = $"{endpointName.Replace('.', '_')}_";
             var dialect = new SqlDialect.MsSqlServer();
@@ -80,8 +74,6 @@
 
             class SampleHandler : IHandleMessages<SampleMessage>
             {
-                readonly Context testContext;
-
                 public SampleHandler(Context testContext) => this.testContext = testContext;
 
                 public Task Handle(SampleMessage message, IMessageHandlerContext context)
@@ -90,12 +82,12 @@
 
                     return Task.CompletedTask;
                 }
+                
+                readonly Context testContext;
             }
 
             class CompleteTestMessageHandler : IHandleMessages<CompleteTestMessage>
             {
-                readonly Context testContext;
-
                 public CompleteTestMessageHandler(Context context) => testContext = context;
 
                 public Task Handle(CompleteTestMessage message, IMessageHandlerContext context)
@@ -104,6 +96,8 @@
 
                     return Task.CompletedTask;
                 }
+                
+                readonly Context testContext;
             }
         }
 
