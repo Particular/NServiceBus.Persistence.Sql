@@ -1,0 +1,6 @@
+﻿<Project>
+    <PropertyGroup>
+        <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(SolutionDir)ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+        <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(SolutionDir)ScriptBuilderTask\bin\$(Configuration)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    </PropertyGroup>
+</Project>

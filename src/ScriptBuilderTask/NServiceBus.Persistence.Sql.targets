@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
-    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
-    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(SqlPersistenceScriptBuilderTaskPath)' == ''">$(MSBuildThisFileDirectory)..\..\build\netstandard\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core' AND '$(SqlPersistenceScriptBuilderTaskPath)' == ''">$(MSBuildThisFileDirectory)..\..\build\netclassic\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>
 
   <UsingTask
@@ -12,9 +12,9 @@
     Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
 
   <UsingTask
-  TaskName="NServiceBus.Persistence.Sql.PublishDedupeTask"
-  AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
-  Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
+    TaskName="NServiceBus.Persistence.Sql.PublishDedupeTask"
+    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
+    Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
 
   <Target Name="SqlPersistenceScriptBuilder"
           AfterTargets="AfterCompile"
@@ -49,8 +49,8 @@
   </Target>
 
   <Target Name="SqlPersistenceDedupeScriptsBeforePublish"
-         BeforeTargets="_HandleFileConflictsForPublish;CopyFilesToPublishDirectory"
-         Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
+          BeforeTargets="_HandleFileConflictsForPublish;CopyFilesToPublishDirectory"
+          Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND (('$(UsingMicrosoftNETSdk)' == 'true' AND '$(DesignTimeBuild)' != 'true') OR ('$(UsingMicrosoftNETSdk)' != 'true' AND '$(BuildingProject)' == 'true'))">
 
     <PublishDedupeTask FilesToPublish="@(ResolvedFileToPublish)">
       <Output TaskParameter="FilesToRemove" ItemName="FilesToRemove" />

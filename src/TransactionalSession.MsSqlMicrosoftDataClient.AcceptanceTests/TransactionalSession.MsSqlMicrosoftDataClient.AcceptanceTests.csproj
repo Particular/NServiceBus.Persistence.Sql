@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;net6.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>10.0</LangVersion>
+    <!-- We want the root namespace to match the transactional session one -->
+    <RootNamespace>NServiceBus.TransactionalSession.AcceptanceTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj" />
+    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
+    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
+    <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="Nunit" Version="3.13.3" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.8.0" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="[1.0.0-beta.1, 2)" />
+  </ItemGroup>
+
+  <Import Project="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" />
+
+</Project>

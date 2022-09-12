@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
-    <PackageReference Include="Particular.Packaging" Version="2.0.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="2.2.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,5 +28,10 @@
     <PackageId>NServiceBus.Persistence.Sql.ScriptBuilder</PackageId>
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
+
+   <ItemGroup>
+     <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
+     <InternalsVisibleTo Include="ScriptBuilder.Tests" Key="$(NServiceBusTestsKey)" />
+   </ItemGroup>
 
 </Project>
