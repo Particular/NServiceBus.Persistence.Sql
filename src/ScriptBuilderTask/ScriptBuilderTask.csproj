@@ -39,4 +39,8 @@
     <RemoveDir Directories="$(TempFolder)" />
   </Target>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="ScriptBuilderTask.Tests" Key="$(NServiceBusTestsKey)" />
+  </ItemGroup>
+
 </Project>

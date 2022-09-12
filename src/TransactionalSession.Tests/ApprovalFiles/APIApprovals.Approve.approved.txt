@@ -1,0 +1,13 @@
+namespace NServiceBus.TransactionalSession
+{
+    public sealed class SqlPersistenceOpenSessionOptions : NServiceBus.TransactionalSession.OpenSessionOptions
+    {
+        public SqlPersistenceOpenSessionOptions([System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "tenantIdHeaderName",
+                "tenantId"})] System.ValueTuple<string, string> tenantInformation = default) { }
+    }
+    public static class SqlPersistenceTransactionalSessionExtensions
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> EnableTransactionalSession(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> persistenceExtensions) { }
+    }
+}
