@@ -1,14 +1,12 @@
 ﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
-    using System.IO;
-    using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
-    using Persistence.Sql;
+    using Persistence.Sql.ScriptBuilder;
 
     public class When_running_with_multitenancy : NServiceBusAcceptanceTest
     {
@@ -50,14 +48,12 @@
 
         static async Task CreateOutboxTable(string tenantId, string endpointName)
         {
-            string tablePrefix = $"{endpointName.Replace('.', '_')}_";
-            var dialect = new SqlDialect.MsSqlServer();
+            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
+            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build(tenantId);
+            await connection.OpenAsync().ConfigureAwait(false);
 
-            string scriptDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NServiceBus.Persistence.Sql",
-                dialect.GetType().Name);
-
-            await ScriptRunner.Install(dialect, tablePrefix, () => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build(tenantId), scriptDirectory, true, false, false,
-                CancellationToken.None).ConfigureAwait(false);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
@@ -72,7 +68,7 @@
             public AnEndpoint() =>
                 EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
                 {
-                    var persistence = c.UsePersistence<SqlPersistence>(); 
+                    var persistence = c.UsePersistence<SqlPersistence>();
                     persistence.MultiTenantConnectionBuilder(tenantIdHeaderName, tenantId => MsSqlMicrosoftDataClientConnectionBuilder.MultiTenant.Build(tenantId));
                 });
 
@@ -86,7 +82,7 @@
 
                     return Task.CompletedTask;
                 }
-                
+
                 readonly Context testContext;
             }
 
@@ -100,7 +96,7 @@
 
                     return Task.CompletedTask;
                 }
-                
+
                 readonly Context testContext;
             }
         }
