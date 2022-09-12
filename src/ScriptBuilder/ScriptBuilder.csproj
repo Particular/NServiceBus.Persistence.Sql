@@ -32,6 +32,7 @@
   </PropertyGroup>
 
    <ItemGroup>
+     <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.ScriptBuilderTask" Key="$(NServiceBusTestsKey)" />
      <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
      <InternalsVisibleTo Include="ScriptBuilder.Tests" Key="$(NServiceBusTestsKey)" />
    </ItemGroup>
