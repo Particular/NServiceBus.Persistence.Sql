@@ -27,27 +27,10 @@
   <Import Project="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" />
 
   <ItemGroup>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\CaptureServiceProviderStartupTask.cs">
-      <Link>Infrastructure\CaptureServiceProviderStartupTask.cs</Link>
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs">
+      <Link>Infrastructure\*.cs</Link>
     </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\ConfigureExtensions.cs">
-      <Link>Infrastructure\ConfigureExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\EndpointCustomizationConfigurationExtensions.cs">
-      <Link>Infrastructure\EndpointCustomizationConfigurationExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\IInjectServiceProvider.cs">
-      <Link>Infrastructure\IInjectServiceProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\NServiceBusAcceptanceTest.cs">
-      <Link>Infrastructure\NServiceBusAcceptanceTest.cs</Link>
-    </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\TransactionSessionDefaultServer.cs">
-      <Link>Infrastructure\TransactionSessionDefaultServer.cs</Link>
-    </Compile>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\TransactionSessionWithOutboxEndpoint.cs">
-      <Link>Infrastructure\TransactionSessionWithOutboxEndpoint.cs</Link>
-    </Compile>
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\AssemblyInfo.cs" />
   </ItemGroup>
 
 </Project>
