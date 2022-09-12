@@ -19,7 +19,7 @@
             Dictionary<string, string> headers = null;
             if (tenantInformation != default)
             {
-                headers = new(1)
+                headers = new Dictionary<string, string>(1)
                 {
                     { tenantInformation.tenantIdHeaderName, tenantInformation.tenantId }
                 };
