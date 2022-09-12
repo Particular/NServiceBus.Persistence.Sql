@@ -19,11 +19,14 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
     public static class MultiTenant
     {
+        const string DefaultDatabaseName = "nservicebus";
+
         public static void Setup(string tenantId)
         {
             var dbName = "nservicebus_" + tenantId.ToLower();
 
-            using (var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build())
+            var sqlConnection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+            using (var conn = sqlConnection)
             {
                 conn.Open();
                 conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
@@ -38,13 +41,22 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         public static SqlConnection Build(string tenantId)
         {
-            var connection = GetBaseConnectionString()
-                .Replace(";Database=nservicebus;", $";Database=nservicebus_{tenantId.ToLower()};")
-                .Replace(";Initial Catalog=nservicebus;", $";Initial Catalog=nservicebus_{tenantId.ToLower()};");
-            return new SqlConnection(connection);
+            var connectionBuilder = GetBaseConnectionString();
+
+            bool foundDatabaseValue = connectionBuilder.TryGetValue("Database", out _);
+            if (foundDatabaseValue)
+            {
+                connectionBuilder["Database"] = $"nservicebus_{tenantId.ToLower()}";
+            }
+            else if (!string.IsNullOrEmpty(connectionBuilder.InitialCatalog))
+            {
+                connectionBuilder.InitialCatalog = $"nservicebus_{tenantId.ToLower()}";
+            }
+
+            return new SqlConnection(connectionBuilder.ToString());
         }
 
-        static string GetBaseConnectionString()
+        static SqlConnectionStringBuilder GetBaseConnectionString()
         {
             var connection = Environment.GetEnvironmentVariable("SQLServerConnectionString");
             if (string.IsNullOrWhiteSpace(connection))
@@ -52,18 +64,22 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
                 throw new Exception("SQLServerConnectionString environment variable is empty");
             }
 
-            if (!connection.Contains(";Database=nservicebus;") && !connection.Contains(";Initial Catalog=nservicebus"))
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connection);
+            bool foundDatabaseValue = connectionStringBuilder.TryGetValue("Database", out var databaseValue);
+            if (connectionStringBuilder.InitialCatalog != DefaultDatabaseName || (foundDatabaseValue && databaseValue.ToString() != DefaultDatabaseName))
             {
-                throw new Exception("Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `nservicebus` to test multi-tenant operations.");
+                throw new Exception($"Environment variable `SQLServerConnectionString` must include a connection string that specifies a database name of `{DefaultDatabaseName}` to test multi-tenant operations.");
             }
 
-            return connection;
+            return connectionStringBuilder;
         }
     }
 
     public static void DropDbIfCollationIncorrect()
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString());
+        string connectionString = GetConnectionString();
+
+        var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
         var databaseName = connectionStringBuilder.InitialCatalog;
 
         connectionStringBuilder.InitialCatalog = "master";

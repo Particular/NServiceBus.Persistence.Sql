@@ -31,4 +31,9 @@
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
 
+   <ItemGroup>
+     <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
+     <InternalsVisibleTo Include="ScriptBuilder.Tests" Key="$(NServiceBusTestsKey)" />
+   </ItemGroup>
+
 </Project>
