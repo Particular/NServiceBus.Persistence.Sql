@@ -5,14 +5,14 @@
     using Transport;
 
     /// <summary>
-    ///
+    /// The options allowing to control the behavior of the transactional session.
     /// </summary>
     public sealed class SqlPersistenceOpenSessionOptions : OpenSessionOptions
     {
         /// <summary>
-        ///
+        /// Creates a new instance of the SqlPersistenceOpenSessionOptions.
         /// </summary>
-        /// <param name="tenantIdHeaderName"></param>
+        /// <param name="tenantIdHeaderName">An optional tenant</param>
         /// <param name="tenantId"></param>
         public SqlPersistenceOpenSessionOptions(string tenantIdHeaderName = null, string tenantId = null)
         {
