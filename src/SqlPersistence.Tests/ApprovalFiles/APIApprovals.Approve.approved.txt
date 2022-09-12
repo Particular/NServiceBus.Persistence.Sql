@@ -1,7 +1,11 @@
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"AcceptanceTestHelper, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"MsSqlMicrosoftDataClientAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"MsSqlMicrosoftDataClientSqlTransportAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"MsSqlSystemDataClientAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"MsSqlSystemDataClientSqlTransportAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"MySqlAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"OracleAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"PostgreSqlAcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"SqlPersistence.PersistenceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"SqlPersistence.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"TransactionalSession.MsSqlSystemDataClient.AcceptanceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
@@ -15,9 +19,7 @@ namespace NServiceBus.Persistence.Sql
     {
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
-        [System.Obsolete("Use the overload that supports cancellation. Will be removed in version 8.0.0.", true)]
         void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.Tasks.Task> callback);
-        void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
     public class SagaSettings
@@ -29,14 +31,10 @@ namespace NServiceBus.Persistence.Sql
     }
     public static class ScriptRunner
     {
-        [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
-        [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
     public sealed class SqlPersistenceSettingsAttribute : System.Attribute
     {
         public SqlPersistenceSettingsAttribute() { }
@@ -50,7 +48,7 @@ namespace NServiceBus.Persistence.Sql
         public bool ProduceTimeoutScripts { get; set; }
         public string ScriptPromotionPath { get; set; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class, Inherited=false)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
@@ -79,11 +77,11 @@ namespace NServiceBus.Persistence.Sql
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
     }
-    [System.Obsolete("Timeout manager is removed. Timeout storage configuration can be removed. Will be" +
-        " removed in version 8.0.0.", true)]
+    [System.Obsolete("Timeout Manager is being deprecated. See upgrade guide for guidance on migrating " +
+        "to transport native delayed delivery. Will be treated as an error from version 7" +
+        ".0.0. Will be removed in version 8.0.0.", false)]
     public class TimeoutSettings
     {
-        public TimeoutSettings() { }
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
     }
 }
@@ -139,9 +137,6 @@ namespace NServiceBus
             where T : NServiceBus.SqlDialect, new () { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tablePrefix) { }
-        [System.Obsolete("Timeout manager is removed. Timeout storage configuration can be removed. The mem" +
-            "ber currently throws a NotImplementedException. Will be removed in version 8.0.0" +
-            ".", true)]
         public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
     }
     public static class SqlPersistenceOutboxSettingsExtensions
@@ -153,13 +148,12 @@ namespace NServiceBus
         public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings, System.Transactions.IsolationLevel isolationLevel) { }
-        public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings, System.Transactions.IsolationLevel isolationLevel, System.TimeSpan timeout) { }
     }
     public static class SqlPersistenceStorageSessionExtensions
     {
-        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.ISynchronizedStorageSession session, NServiceBus.Extensibility.IReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, System.Threading.CancellationToken cancellationToken = default)
+        public static System.Threading.Tasks.Task<TSagaData> GetSagaData<TSagaData>(this NServiceBus.Persistence.SynchronizedStorageSession session, NServiceBus.Extensibility.ReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters)
             where TSagaData :  class, NServiceBus.IContainSagaData { }
-        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.ISynchronizedStorageSession session) { }
+        public static NServiceBus.Persistence.Sql.ISqlStorageSession SqlPersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
 public delegate void ParameterAppender(System.Func<System.Data.Common.DbParameter> parameterBuilder, System.Action<System.Data.Common.DbParameter> append);
