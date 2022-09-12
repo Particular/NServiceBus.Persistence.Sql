@@ -12,22 +12,22 @@
         /// <summary>
         /// Creates a new instance of the SqlPersistenceOpenSessionOptions.
         /// </summary>
-        /// <param name="tenantIdHeaderName">An optional tenant</param>
-        /// <param name="tenantId"></param>
-        public SqlPersistenceOpenSessionOptions(string tenantIdHeaderName = null, string tenantId = null)
+        /// <param name="tenantInformation">An optional tenant id header name and value.</param>
+        public SqlPersistenceOpenSessionOptions(
+            (string tenantIdHeaderName, string tenantId) tenantInformation = default)
         {
-            var headers = new Dictionary<string, string>();
-            if (tenantIdHeaderName != null)
+            Dictionary<string, string> headers = null;
+            if (tenantInformation != default)
             {
-                if (string.IsNullOrEmpty(tenantId))
+                headers = new(1)
                 {
-                    throw new Exception("A tenant header is available, but the value is missing.");
-                }
-                headers.Add(tenantIdHeaderName, tenantId);
-                Metadata.Add(tenantIdHeaderName, tenantId);
+                    { tenantInformation.tenantIdHeaderName, tenantInformation.tenantId }
+                };
+                Metadata.Add(tenantInformation.tenantIdHeaderName, tenantInformation.tenantId);
             }
 
-            Extensions.Set(new IncomingMessage(SessionId, headers, Array.Empty<byte>()));
+            Extensions.Set(new IncomingMessage(SessionId, headers ?? new Dictionary<string, string>(0),
+                Array.Empty<byte>()));
         }
     }
 }

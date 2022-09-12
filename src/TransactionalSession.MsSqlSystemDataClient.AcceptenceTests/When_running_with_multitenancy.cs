@@ -33,7 +33,7 @@
                     using ITransactionalSession transactionalSession =
                         scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
 
-                    var sessionOptions = new SqlPersistenceOpenSessionOptions(tenantIdHeaderName, tenantId);
+                    var sessionOptions = new SqlPersistenceOpenSessionOptions((tenantIdHeaderName, tenantId));
                     await transactionalSession.Open(sessionOptions);
 
                     var sendOptions = new SendOptions();
