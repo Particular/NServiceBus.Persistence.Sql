@@ -70,7 +70,11 @@
         class AnEndpoint : EndpointConfigurationBuilder
         {
             public AnEndpoint() =>
-                EndpointSetup<TransactionSessionWithOutboxEndpoint>();
+                EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
+                {
+                    var persistence = c.UsePersistence<SqlPersistence>(); 
+                    persistence.MultiTenantConnectionBuilder(tenantIdHeaderName, tenantId => MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId));
+                });
 
             class SampleHandler : IHandleMessages<SampleMessage>
             {
