@@ -36,7 +36,7 @@ namespace NServiceBus.Persistence.Sql
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
     public sealed class SqlPersistenceSettingsAttribute : System.Attribute
     {
         public SqlPersistenceSettingsAttribute() { }
@@ -50,7 +50,7 @@ namespace NServiceBus.Persistence.Sql
         public bool ProduceTimeoutScripts { get; set; }
         public string ScriptPromotionPath { get; set; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class, Inherited=false)]
     public sealed class SqlSagaAttribute : System.Attribute
     {
         public SqlSagaAttribute(string correlationProperty = null, string transitionalCorrelationProperty = null, string tableSuffix = null) { }
