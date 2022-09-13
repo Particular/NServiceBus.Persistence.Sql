@@ -11,15 +11,13 @@ class StorageAdapter : ISynchronizedStorageAdapter
 
     SagaInfoCache infoCache;
     SqlDialect dialect;
-    CurrentSessionHolder currentSessionHolder;
     IConnectionManager connectionBuilder;
 
-    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect, CurrentSessionHolder currentSessionHolder)
+    public StorageAdapter(IConnectionManager connectionBuilder, SagaInfoCache infoCache, SqlDialect dialect)
     {
         this.connectionBuilder = connectionBuilder;
         this.infoCache = infoCache;
         this.dialect = dialect;
-        this.currentSessionHolder = currentSessionHolder;
     }
 
     public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -30,8 +28,6 @@ class StorageAdapter : ISynchronizedStorageAdapter
         }
         var session = new StorageSession(outboxTransaction.Connection, outboxTransaction.Transaction, false, infoCache);
 
-        currentSessionHolder.SetCurrentSession(session);
-
         return Task.FromResult<CompletableSynchronizedStorageSession>(session);
     }
 
@@ -39,10 +35,6 @@ class StorageAdapter : ISynchronizedStorageAdapter
     {
         var session = await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionBuilder,
             (conn, trans, ownsTx) => new StorageSession(conn, trans, ownsTx, infoCache)).ConfigureAwait(false);
-        if (session != null)
-        {
-            currentSessionHolder.SetCurrentSession(session);
-        }
         return session;
     }
 }

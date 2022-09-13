@@ -6,13 +6,11 @@ class SynchronizedStorage : ISynchronizedStorage
 {
     IConnectionManager connectionManager;
     SagaInfoCache infoCache;
-    CurrentSessionHolder currentSessionHolder;
 
-    public SynchronizedStorage(IConnectionManager connectionManager, SagaInfoCache infoCache, CurrentSessionHolder currentSessionHolder)
+    public SynchronizedStorage(IConnectionManager connectionManager, SagaInfoCache infoCache)
     {
         this.connectionManager = connectionManager;
         this.infoCache = infoCache;
-        this.currentSessionHolder = currentSessionHolder;
     }
 
     public async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
@@ -20,8 +18,6 @@ class SynchronizedStorage : ISynchronizedStorage
         var connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage()).ConfigureAwait(false);
         var transaction = connection.BeginTransaction();
         var session = new StorageSession(connection, transaction, true, infoCache);
-
-        currentSessionHolder.SetCurrentSession(session);
         return session;
     }
 }
