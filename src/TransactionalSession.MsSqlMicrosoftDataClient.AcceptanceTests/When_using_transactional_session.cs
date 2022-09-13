@@ -3,10 +3,12 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
+    using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
+    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
@@ -22,6 +24,11 @@
         public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit(
             bool outboxEnabled)
         {
+            if (outboxEnabled)
+            {
+                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            }
+
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -70,6 +77,11 @@
         public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit(
             bool outboxEnabled)
         {
+            if (outboxEnabled)
+            {
+                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            }
+
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -117,6 +129,11 @@
         [TestCase(false)]
         public async Task Should_not_send_messages_if_session_is_not_committed(bool outboxEnabled)
         {
+            if (outboxEnabled)
+            {
+                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            }
+
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
                 {
@@ -143,6 +160,11 @@
         [TestCase(false)]
         public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
         {
+            if (outboxEnabled)
+            {
+                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            }
+
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
                 {
@@ -162,6 +184,16 @@
                 .Run();
 
             Assert.True(result.MessageReceived);
+        }
+
+        static async Task CreateOutboxTable(string endpointName)
+        {
+            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
+            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
+            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
@@ -196,7 +228,7 @@
 
                     return Task.CompletedTask;
                 }
-                
+
                 readonly Context testContext;
             }
 
@@ -210,7 +242,7 @@
 
                     return Task.CompletedTask;
                 }
-                
+
                 readonly Context testContext;
             }
         }
