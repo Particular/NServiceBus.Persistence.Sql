@@ -29,6 +29,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             SetConnectionBuilder(persistence);
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
             persistence.EnableTransactionalSession();
+            persistence.DisableInstaller();
 
             builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
 
