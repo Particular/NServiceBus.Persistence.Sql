@@ -148,7 +148,7 @@ jobs:
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
-        uses: Particular/setup-oracle-action@v1.2.0
+        uses: Particular/setup-oracle-action@v1.3.0
         with:
           connection-string-name: OracleConnectionString
           init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
@@ -161,7 +161,7 @@ jobs:
           "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
           "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
       - name: Run tests
-        uses: Particular/run-tests-action@v1.3.0
+        uses: Particular/run-tests-action@v1.4.0
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh
