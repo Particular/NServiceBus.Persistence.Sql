@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 15.0.26403.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence", "SqlPersistence\SqlPersistence.csproj", "{E3CF4CB1-9F87-4F81-B6B0-B599035C1BCE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{63784399-65AF-424A-B2AD-0C94AE326823} = {63784399-65AF-424A-B2AD-0C94AE326823}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence.Tests", "SqlPersistence.Tests\SqlPersistence.Tests.csproj", "{5FE6F59E-67B8-4B84-8365-67CDFF4145AE}"
 EndProject
@@ -47,17 +44,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientSql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsSqlMicrosoftDataClientAcceptanceTests", "MsSqlMicrosoftDataClientAcceptanceTests\MsSqlMicrosoftDataClientAcceptanceTests.csproj", "{7C16BE00-7198-4B6C-A094-C0B62A539F77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlPersistence.PersistenceTests", "SqlPersistence.PersistenceTests\SqlPersistence.PersistenceTests.csproj", "{E38E90AF-2F79-490E-8EE1-6650C2BDF49C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Persistence.Sql.CommandLine", "CommandLine\NServiceBus.Persistence.Sql.CommandLine.csproj", "{DC682A5A-3ECD-4FB1-826E-A2BD988F40E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.Persistence.Sql.TransactionalSession", "NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj", "{67DC5C83-52A4-4C53-8948-A223DE05FF1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Persistence.Sql.TransactionalSession", "NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj", "{67DC5C83-52A4-4C53-8948-A223DE05FF1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests", "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj", "{20DA1B6B-651B-480F-BEA9-3E92673C5793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests", "TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj", "{20DA1B6B-651B-480F-BEA9-3E92673C5793}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests\TransactionalSession.MsSqlSystemDataClient.AcceptenceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests\TransactionalSession.MsSqlSystemDataClient.AcceptenceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
