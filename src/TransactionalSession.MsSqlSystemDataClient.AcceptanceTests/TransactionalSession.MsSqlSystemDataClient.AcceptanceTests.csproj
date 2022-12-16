@@ -27,9 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs">
-      <Link>Infrastructure\*.cs</Link>
-    </Compile>
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs" Link="Infrastructure\%(Filename).%(Extension)" />
     <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\AssemblyInfo.cs" />
   </ItemGroup>
 
