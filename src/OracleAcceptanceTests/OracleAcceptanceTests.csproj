@@ -22,7 +22,7 @@
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
   </ItemGroup>
 
-  <ItemGroup Label="Flaky tests on Oracle">
+  <ItemGroup Label="Flaky tests on Oracle" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
   </ItemGroup>
 
