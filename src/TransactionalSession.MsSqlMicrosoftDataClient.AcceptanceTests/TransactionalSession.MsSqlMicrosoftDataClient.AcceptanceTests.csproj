@@ -11,10 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
-    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

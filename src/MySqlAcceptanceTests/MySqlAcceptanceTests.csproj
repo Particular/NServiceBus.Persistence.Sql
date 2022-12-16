@@ -22,7 +22,7 @@
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_using_special_characters_in_headers.cs" />
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Outbox\When_headers_contain_special_characters.cs" />
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_correlating_on_special_characters.cs" />
