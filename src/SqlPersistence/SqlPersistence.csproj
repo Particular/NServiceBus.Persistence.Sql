@@ -8,6 +8,10 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <ItemGroup Label="Needed for build ordering">
+    <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj" ReferenceOutputAssembly="false" Private="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="[13.0.1, 14.0.0)" />
     <PackageReference Include="NServiceBus" Version="[7.8.0, 8.0.0)" />
@@ -42,14 +46,8 @@
 
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build;buildTransitive" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netclassic" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.???" Pack="true" PackagePath="netstandard" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net452\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="netclassic" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\netstandard1.5\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="netstandard" Visible="false" />
   </ItemGroup>
-
-  <!-- Workaround for https://github.com/microsoft/msbuild/issues/4303 -->
-  <PropertyGroup>
-    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
-  </PropertyGroup>
-  <!-- End Workaround -->
 
 </Project>
