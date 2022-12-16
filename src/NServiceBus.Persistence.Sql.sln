@@ -54,7 +54,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.Tests", "TransactionalSession.Tests\TransactionalSession.Tests.csproj", "{DE280E3C-E711-4543-BF53-09D7840C3033}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptenceTests\TransactionalSession.MsSqlSystemDataClient.AcceptenceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlSystemDataClient.AcceptanceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptanceTests\TransactionalSession.MsSqlSystemDataClient.AcceptanceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
