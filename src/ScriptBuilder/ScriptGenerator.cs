@@ -129,7 +129,7 @@ public class ScriptGenerator
 
     IEnumerable<string> GetSelectedDialects()
     {
-        return dialectOptions != null ? dialectOptions.Select(d => d.ToString()) : Enum.GetNames(typeof(BuildSqlDialect));
+        return dialectOptions.Count == 0 ? Enum.GetNames(typeof(BuildSqlDialect)) : dialectOptions.Select(d => d.ToString());
     }
 
     static IEnumerable<string> GetKnownScripts(string dialectDirectory)
