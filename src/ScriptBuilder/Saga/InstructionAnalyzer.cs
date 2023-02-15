@@ -27,11 +27,8 @@ static class InstructionAnalyzer
 
     public static IList<Instruction> GetConfigureHowToFindSagaInstructions(TypeDefinition sagaTypeDefinition)
     {
-        var configureMethod = sagaTypeDefinition.Methods.FirstOrDefault(m => m.Name == "ConfigureHowToFindSaga");
-        if (configureMethod == null)
-        {
-            throw new ErrorsException("Saga does not contain a ConfigureHowToFindSaga method.");
-        }
+        var configureMethod = sagaTypeDefinition.Methods.FirstOrDefault(m => m.Name == "ConfigureHowToFindSaga")
+                              ?? throw new ErrorsException("Saga does not contain a ConfigureHowToFindSaga method.");
 
         return configureMethod.Body.Instructions;
     }

@@ -198,12 +198,8 @@ For example: protected override string TableSuffix => ""TheCustomTableSuffix"";"
             return null;
         }
 
-        var propertyDefinition = sagaDataTypeDefinition.FindInTypeHierarchy(t => t.Properties.SingleOrDefault(x => x.Name == propertyName));
-
-        if (propertyDefinition == null)
-        {
-            throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
-        }
+        var propertyDefinition = sagaDataTypeDefinition.FindInTypeHierarchy(t => t.Properties.SingleOrDefault(x => x.Name == propertyName))
+                                 ?? throw new ErrorsException($"Expected type '{sagaDataTypeDefinition.FullName}' to contain a property named '{propertyName}'.");
         if (propertyDefinition.SetMethod == null)
         {
             throw new ErrorsException($"The type '{sagaDataTypeDefinition.FullName}' has a constraint property '{propertyName}' that is read-only.");
