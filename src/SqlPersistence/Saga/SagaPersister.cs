@@ -20,12 +20,9 @@ partial class SagaPersister : ISagaPersister
         {
             return;
         }
-        var transitionalId = sagaInfo.TransitionalAccessor(sagaData);
-        if (transitionalId == null)
-        {
-            //TODO: validate non default for value types
-            throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaDataType: {sagaData.GetType().FullName}.");
-        }
+
+        //TODO: validate non default for value types if TransitionalAccessor returns null
+        var transitionalId = sagaInfo.TransitionalAccessor(sagaData) ?? throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaDataType: {sagaData.GetType().FullName}.");
         command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
