@@ -2,12 +2,12 @@
 {
     using System;
     using System.Threading.Tasks;
+    using System.Transactions;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
-    using Persistence.Sql;
     using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session_with_transactinscope : NServiceBusAcceptanceTest
@@ -36,8 +36,7 @@
 
                     await transactionalSession.SendLocal(new SampleMessage());
 
-                    using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-                    await connection.OpenAsync();
+                    var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
                     string insertText =
                         $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
@@ -46,16 +45,23 @@
                                         END;
                                         INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
-                    using (var insertCommand = new SqlCommand(insertText, connection))
+                    using (var insertCommand = new SqlCommand(insertText, (SqlConnection)storageSession.Connection))
                     {
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
-                    using var queryCommand =
-                        new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-                    object result = await queryCommand.ExecuteScalarAsync();
+                    using (var transactionScope = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        using var connection2 = MsSqlMicrosoftDataClientConnectionBuilder.Build();
 
-                    Assert.AreEqual(null, result);
+                        await connection2.OpenAsync();
+
+                        using var queryCommand =
+                            new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ", connection2);
+                        object result = await queryCommand.ExecuteScalarAsync();
+
+                        Assert.AreEqual(null, result);
+                    }
 
                     await transactionalSession.Commit().ConfigureAwait(false);
                 }))

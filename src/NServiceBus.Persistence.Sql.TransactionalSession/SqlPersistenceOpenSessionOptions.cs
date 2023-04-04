@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Transactions;
     using Transport;
 
     /// <summary>
@@ -29,5 +30,8 @@
             Extensions.Set(new IncomingMessage(SessionId, headers ?? new Dictionary<string, string>(0),
                 Array.Empty<byte>()));
         }
+
+        internal void SetTransaction(Transaction transaction) =>
+            Extensions.Set(transaction);
     }
 }

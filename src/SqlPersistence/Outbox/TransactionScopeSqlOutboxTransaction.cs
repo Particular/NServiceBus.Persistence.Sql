@@ -34,14 +34,18 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     // Prepare is deliberately kept sync to allow floating of TxScope where needed
     public void Prepare(ContextBag context)
     {
-        var options = new TransactionOptions
+        if (!context.TryGet(out ambientTransaction))
         {
-            IsolationLevel = isolationLevel,
-            Timeout = transactionTimeout // TimeSpan.Zero is default of `TransactionOptions.Timeout`
-        };
+            var options = new TransactionOptions
+            {
+                IsolationLevel = isolationLevel,
+                Timeout = transactionTimeout // TimeSpan.Zero is default of `TransactionOptions.Timeout`
+            };
 
-        transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, options, TransactionScopeAsyncFlowOption.Enabled);
-        ambientTransaction = System.Transactions.Transaction.Current;
+            ambientTransaction = new CommittableTransaction(options);
+        }
+
+        transactionScope = new TransactionScope(ambientTransaction, TransactionScopeAsyncFlowOption.Enabled);
     }
 
     public async Task Begin(ContextBag context, CancellationToken cancellationToken = default)
