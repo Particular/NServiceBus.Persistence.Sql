@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- net46 TFM needed to support VS 2017 -->
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.5" />
     <PackageReference Include="Particular.Packaging" Version="2.3.0" PrivateAssets="All" />
   </ItemGroup>
 
