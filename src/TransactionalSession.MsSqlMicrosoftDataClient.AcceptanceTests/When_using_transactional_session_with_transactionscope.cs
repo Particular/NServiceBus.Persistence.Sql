@@ -4,11 +4,9 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
-    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session_with_transactionscope : NServiceBusAcceptanceTest
     {
@@ -22,7 +20,7 @@
         [Test]
         public async Task Should_provide_ambient_transactionscope()
         {
-            await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
 
             string rowId = Guid.NewGuid().ToString();
 
@@ -76,17 +74,6 @@
             object result = await queryCommand.ExecuteScalarAsync();
 
             Assert.AreEqual(rowId, result);
-        }
-
-
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider

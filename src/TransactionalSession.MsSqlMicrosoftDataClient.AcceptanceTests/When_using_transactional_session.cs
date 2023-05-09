@@ -3,12 +3,10 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
-    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
@@ -26,7 +24,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -79,7 +77,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -131,7 +129,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -162,7 +160,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -184,16 +182,6 @@
                 .Run();
 
             Assert.True(result.MessageReceived);
-        }
-
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
