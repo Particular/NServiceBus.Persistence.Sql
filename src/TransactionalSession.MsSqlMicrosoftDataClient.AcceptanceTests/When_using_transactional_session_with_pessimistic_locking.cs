@@ -3,30 +3,27 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
 
-    public class When_using_transactional_session : NServiceBusAcceptanceTest
+    public class When_using_transactional_session_with_pessimistic_locking : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
-            MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
+            MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
+            MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit(
-            bool outboxEnabled)
-        {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
+        [SetUp]
+        public async Task Setup() =>
+            await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
 
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit()
+        {
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -60,7 +57,7 @@
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
+            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
 
             using var queryCommand =
@@ -70,16 +67,9 @@
             Assert.AreEqual(rowId, result);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit(
-            bool outboxEnabled)
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -113,7 +103,7 @@
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
+            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
             await connection.OpenAsync();
 
             using var queryCommand =
@@ -123,15 +113,9 @@
             Assert.AreEqual(rowId, result);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_not_send_messages_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_not_send_messages_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
                 {
@@ -154,15 +138,9 @@
             Assert.False(result.MessageReceived);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
                 {
@@ -193,18 +171,7 @@
 
         class AnEndpoint : EndpointConfigurationBuilder
         {
-            public AnEndpoint()
-            {
-                var useOutbox = (bool)TestContext.CurrentContext.Test.Arguments[0];
-                if (useOutbox)
-                {
-                    EndpointSetup<TransactionSessionWithOutboxEndpoint>();
-                }
-                else
-                {
-                    EndpointSetup<TransactionSessionDefaultServer>();
-                }
-            }
+            public AnEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c => c.EnableOutbox().UsePessimisticConcurrencyControl());
 
             class SampleHandler : IHandleMessages<SampleMessage>
             {
