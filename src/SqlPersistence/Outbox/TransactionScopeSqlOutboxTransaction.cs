@@ -4,13 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus.Extensibility;
-using NServiceBus.Logging;
 using NServiceBus.Outbox;
 
 class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
 {
-    static ILog Log = LogManager.GetLogger<TransactionScopeSqlOutboxTransaction>();
-
     IConnectionManager connectionManager;
     IsolationLevel isolationLevel;
     ConcurrencyControlStrategy concurrencyControlStrategy;
@@ -53,16 +50,6 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default) =>
         concurrencyControlStrategy.Complete(outboxMessage, Connection, null, context, cancellationToken);
-
-    public void BeginSynchronizedSession(ContextBag context)
-    {
-        if (System.Transactions.Transaction.Current != null && System.Transactions.Transaction.Current != ambientTransaction)
-        {
-            Log.Warn("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope " +
-                     "has been detected in the current context. " +
-                     "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
-        }
-    }
 
     public void Dispose()
     {
