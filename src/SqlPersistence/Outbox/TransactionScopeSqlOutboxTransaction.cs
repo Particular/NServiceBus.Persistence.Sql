@@ -16,7 +16,6 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     ConcurrencyControlStrategy concurrencyControlStrategy;
     TransactionScope transactionScope;
     Transaction ambientTransaction;
-    bool commit;
     TimeSpan transactionTimeout;
 
     public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
@@ -68,21 +67,15 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public void Dispose()
     {
         Connection?.Dispose();
-        if (transactionScope != null)
-        {
-            if (commit)
-            {
-                transactionScope.Complete();
-            }
-            transactionScope.Dispose();
-            transactionScope = null;
-            ambientTransaction = null;
-        }
+        transactionScope = null;
+        ambientTransaction = null;
     }
 
     public Task Commit(CancellationToken cancellationToken = default)
     {
-        commit = true;
+        transactionScope?.Complete();
+        // we need to dispose it after completion in order to execute the transaction after marking it as completed
+        transactionScope?.Dispose();
         return Task.CompletedTask;
     }
 }
