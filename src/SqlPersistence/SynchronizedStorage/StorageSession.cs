@@ -13,7 +13,6 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 {
     bool ownsTransaction;
     Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
-    Action disposedCallback = () => { };
     readonly IConnectionManager connectionManager;
     readonly SqlDialect dialect;
 
@@ -47,7 +46,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 #pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
 
     public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         if (transaction is not ISqlOutboxTransaction outboxTransaction)
         {
@@ -61,7 +60,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     }
 
     public async ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = default)
     {
         (bool wasAdapted, DbConnection connection, DbTransaction transaction, bool ownsTx) =
             await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionManager, cancellationToken)
@@ -77,7 +76,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         return true;
     }
 
-    public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+    public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = default)
     {
         Connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
         Transaction = Connection.BeginTransaction();
@@ -103,9 +102,5 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
             Transaction?.Dispose();
             Connection?.Dispose();
         }
-
-        disposedCallback();
     }
-
-    public void OnDisposed(Action callback) => disposedCallback = callback;
 }
