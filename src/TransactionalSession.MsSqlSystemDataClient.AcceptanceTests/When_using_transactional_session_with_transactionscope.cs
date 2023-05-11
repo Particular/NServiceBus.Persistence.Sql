@@ -11,10 +11,12 @@
     public class When_using_transactional_session_with_transactionscope : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public async Task OneTimeSetup()
         {
             MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
             MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
+
+            await OutboxHelpers.CreateDataTable();
         }
 
         [Test]
@@ -36,44 +38,40 @@
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText, (SqlConnection)storageSession.Connection))
                     {
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
-                    using (var __ = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-
-                        await connection.OpenAsync();
-
-                        using var queryCommand =
-                            new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ", connection);
-                        object result = await queryCommand.ExecuteScalarAsync();
-
-                        Assert.AreEqual(null, result);
-                    }
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
 
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
+        }
+
+        static async Task<string> QueryInsertedEntry(string rowId)
+        {
+            using var __ = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
             using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
+
             await connection.OpenAsync();
 
             using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
+                new SqlCommand($"SET TRANSACTION ISOLATION LEVEL READ COMMITTED; SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ",
+                    connection);
+            return (string)await queryCommand.ExecuteScalarAsync();
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
