@@ -4,6 +4,7 @@ namespace NServiceBus.PersistenceTesting
     using System.Data.Common;
     using Npgsql;
     using NpgsqlTypes;
+    using NUnit.Framework;
     using Persistence.Sql.ScriptBuilder;
 
     static class SqlTestVariantExtensions
@@ -32,6 +33,14 @@ namespace NServiceBus.PersistenceTesting
                 _ => throw new ArgumentOutOfRangeException(
                     $"{nameof(SqlTestVariant.BuildDialect)} '{variant.BuildDialect}' is not supported yet as a test variant.")
             };
+        }
+
+        public static void RequiresOutboxPessimisticConcurrencySupport(this SqlTestVariant variant)
+        {
+            if (!variant.UsePessimisticMode)
+            {
+                Assert.Ignore("Ignoring this test because it requires pessimistic concurrency support from persister.");
+            }
         }
     }
 }

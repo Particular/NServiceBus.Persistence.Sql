@@ -91,7 +91,7 @@
             var connectionManager = new ConnectionManager(connectionFactory);
             SagaIdGenerator = new DefaultSagaIdGenerator();
             SagaStorage = new SagaPersister(infoCache, dialect);
-            OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, false);
+            OutboxStorage = CreateOutboxPersister(connectionManager, dialect, pessimisticMode, false);
             SupportsPessimisticConcurrency = pessimisticMode;
             CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
