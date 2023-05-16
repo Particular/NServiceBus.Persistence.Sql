@@ -11,10 +11,12 @@
     public class When_using_transactional_session_with_pessimistic_locking : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public async Task OneTimeSetup()
         {
             MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
             MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
+
+            await OutboxHelpers.CreateDataTable();
         }
 
         [SetUp]
@@ -38,12 +40,7 @@
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -52,19 +49,21 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
+                    // the transactional operations should not be visible before commit
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
+
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await connection.OpenAsync();
-
-            using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
         }
 
         [Test]
@@ -84,12 +83,7 @@
 
                     ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -98,19 +92,33 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
+                    // the transactional operations should not be visible before commit
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
+
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
+        }
+
+        static async Task<string> QueryInsertedEntry(string rowId)
+        {
             using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+
             await connection.OpenAsync();
 
             using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
+                new SqlCommand($"SET TRANSACTION ISOLATION LEVEL READ COMMITTED; SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ",
+                    connection);
+            return (string)await queryCommand.ExecuteScalarAsync();
         }
 
         [Test]
