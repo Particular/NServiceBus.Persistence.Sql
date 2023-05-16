@@ -13,5 +13,4 @@ interface ISqlOutboxTransaction : IOutboxTransaction
     void Prepare(ContextBag context);
     Task Begin(ContextBag context, CancellationToken cancellationToken = default);
     Task Complete(OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default);
-    void BeginSynchronizedSession(ContextBag context);
 }

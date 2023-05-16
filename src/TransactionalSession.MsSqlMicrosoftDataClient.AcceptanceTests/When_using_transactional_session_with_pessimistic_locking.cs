@@ -3,32 +3,29 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
-    using Persistence.Sql.ScriptBuilder;
 
-    public class When_using_transactional_session : NServiceBusAcceptanceTest
+    public class When_using_transactional_session_with_pessimistic_locking : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public async Task OneTimeSetup()
         {
-            MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
-            MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
+            MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
+            MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
+
+            await OutboxHelpers.CreateDataTable();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit(
-            bool outboxEnabled)
-        {
-            if (outboxEnabled)
-            {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
-            }
+        [SetUp]
+        public async Task Setup() =>
+            await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
 
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit()
+        {
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -43,12 +40,7 @@
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -57,31 +49,26 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
+                    // the transactional operations should not be visible before commit
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
+
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-            await connection.OpenAsync();
-
-            using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit(
-            bool outboxEnabled)
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit()
         {
-            if (outboxEnabled)
-            {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
-            }
-
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -96,12 +83,7 @@
 
                     ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -110,30 +92,38 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
+                    // the transactional operations should not be visible before commit
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
+
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
+        }
+
+        static async Task<string> QueryInsertedEntry(string rowId)
+        {
+            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+
             await connection.OpenAsync();
 
             using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
+                new SqlCommand($"SET TRANSACTION ISOLATION LEVEL READ COMMITTED; SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ",
+                    connection);
+            return (string)await queryCommand.ExecuteScalarAsync();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_not_send_messages_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_not_send_messages_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
                 {
@@ -156,15 +146,9 @@
             Assert.False(result.MessageReceived);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
                 {
@@ -186,16 +170,6 @@
             Assert.True(result.MessageReceived);
         }
 
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-        }
-
         class Context : ScenarioContext, IInjectServiceProvider
         {
             public bool MessageReceived { get; set; }
@@ -205,18 +179,7 @@
 
         class AnEndpoint : EndpointConfigurationBuilder
         {
-            public AnEndpoint()
-            {
-                var useOutbox = (bool)TestContext.CurrentContext.Test.Arguments[0];
-                if (useOutbox)
-                {
-                    EndpointSetup<TransactionSessionWithOutboxEndpoint>();
-                }
-                else
-                {
-                    EndpointSetup<TransactionSessionDefaultServer>();
-                }
-            }
+            public AnEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c => c.EnableOutbox().UsePessimisticConcurrencyControl());
 
             class SampleHandler : IHandleMessages<SampleMessage>
             {

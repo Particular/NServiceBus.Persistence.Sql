@@ -4,19 +4,18 @@
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using Microsoft.Data.SqlClient;
+    using System.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Persistence.Sql;
-    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
         public async Task OneTimeSetup()
         {
-            MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
-            MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
+            MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
+            MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
 
             await OutboxHelpers.CreateDataTable();
         }
@@ -28,7 +27,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -83,7 +82,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -100,7 +99,12 @@
 
                     ISqlStorageSession storageSession = scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
 
-                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText =
+                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
+                                        BEGIN
+	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
+                                        END;
+                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -128,7 +132,7 @@
 
         static async Task<string> QueryInsertedEntry(string rowId)
         {
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
 
             await connection.OpenAsync();
 
@@ -144,7 +148,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -175,7 +179,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -197,16 +201,6 @@
                 .Run();
 
             Assert.True(result.MessageReceived);
-        }
-
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = TestTableNameCleaner.Clean(endpointName);
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
