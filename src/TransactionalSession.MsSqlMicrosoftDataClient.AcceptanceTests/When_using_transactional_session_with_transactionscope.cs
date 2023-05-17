@@ -4,25 +4,25 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using NUnit.Framework;
     using ObjectBuilder;
-    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session_with_transactionscope : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public async Task OneTimeSetup()
         {
             MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
             MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
+
+            await OutboxHelpers.CreateDataTable();
         }
 
         [Test]
         public async Task Should_provide_ambient_transactionscope()
         {
-            await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+            await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
 
             string rowId = Guid.NewGuid().ToString();
 
@@ -50,43 +50,34 @@
                         await insertCommand.ExecuteNonQueryAsync();
                     }
 
-                    using (var __ = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-
-                        await connection.OpenAsync();
-
-                        using var queryCommand =
-                            new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ", connection);
-                        object result = await queryCommand.ExecuteScalarAsync();
-
-                        Assert.AreEqual(null, result);
-                    }
+                    // the transactional operations should not be visible before commit
+                    var resultBeforeCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(null, resultBeforeCommit);
 
                     await transactionalSession.Commit().ConfigureAwait(false);
+
+                    // the transactional operations should be visible after commit
+                    var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
+                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.AreEqual(rowId, resultAfterDispose);
+        }
+
+        static async Task<string> QueryInsertedEntry(string rowId)
+        {
+            using var __ = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
             using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
+
             await connection.OpenAsync();
 
             using var queryCommand =
-                new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
-            object result = await queryCommand.ExecuteScalarAsync();
-
-            Assert.AreEqual(rowId, result);
-        }
-
-
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = endpointName.Replace('.', '_');
-            using var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
+                new SqlCommand($"SET TRANSACTION ISOLATION LEVEL READ COMMITTED; SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WITH (READPAST) WHERE [Id]='{rowId}' ",
+                    connection);
+            return (string)await queryCommand.ExecuteScalarAsync();
         }
 
         class Context : ScenarioContext, IInjectBuilder

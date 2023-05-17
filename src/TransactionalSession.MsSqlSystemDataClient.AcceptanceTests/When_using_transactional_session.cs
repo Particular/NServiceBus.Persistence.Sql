@@ -3,20 +3,20 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using System.Data.SqlClient;
     using NUnit.Framework;
     using ObjectBuilder;
     using Persistence.Sql;
-    using Persistence.Sql.ScriptBuilder;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetup()
+        public async Task OneTimeSetup()
         {
             MsSqlSystemDataClientConnectionBuilder.DropDbIfCollationIncorrect();
             MsSqlSystemDataClientConnectionBuilder.CreateDbIfNotExists();
+
+            await OutboxHelpers.CreateDataTable();
         }
 
         [TestCase(true)]
@@ -26,7 +26,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -79,7 +79,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             string rowId = Guid.NewGuid().ToString();
@@ -131,7 +131,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -162,7 +162,7 @@
         {
             if (outboxEnabled)
             {
-                await CreateOutboxTable(Conventions.EndpointNamingConvention(typeof(AnEndpoint)));
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
             }
 
             var result = await Scenario.Define<Context>()
@@ -183,16 +183,6 @@
                 .Run();
 
             Assert.True(result.MessageReceived);
-        }
-
-        static async Task CreateOutboxTable(string endpointName)
-        {
-            string tablePrefix = endpointName.Replace('.', '_');
-            using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
-
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);
         }
 
         class Context : ScenarioContext, IInjectBuilder

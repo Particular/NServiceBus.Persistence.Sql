@@ -2,13 +2,10 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 using NServiceBus.Extensibility;
-using NServiceBus.Logging;
 using NServiceBus.Outbox;
 
 class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
 {
-    static ILog Log = LogManager.GetLogger<AdoNetSqlOutboxTransaction>();
-
     IConnectionManager connectionManager;
     IsolationLevel isolationLevel;
     ConcurrencyControlStrategy concurrencyControlStrategy;
@@ -38,20 +35,7 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     }
 
     public Task Complete(OutboxMessage outboxMessage, ContextBag context)
-    {
-        return concurrencyControlStrategy.Complete(outboxMessage, Connection, Transaction, context);
-    }
-
-    public void BeginSynchronizedSession(ContextBag context)
-    {
-        if (System.Transactions.Transaction.Current != null)
-        {
-            Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. " +
-                     "In order to make the Outbox compatible with TransactionScope, use " +
-                     "config.EnableOutbox().UseTransactionScope(). " +
-                     "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
-        }
-    }
+        => concurrencyControlStrategy.Complete(outboxMessage, Connection, Transaction, context);
 
     public void Dispose()
     {
