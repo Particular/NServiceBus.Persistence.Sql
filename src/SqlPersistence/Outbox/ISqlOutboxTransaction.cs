@@ -12,5 +12,4 @@ interface ISqlOutboxTransaction : OutboxTransaction
     void Prepare(ContextBag context);
     Task Begin(ContextBag context);
     Task Complete(OutboxMessage outboxMessage, ContextBag context);
-    void BeginSynchronizedSession(ContextBag context);
 }

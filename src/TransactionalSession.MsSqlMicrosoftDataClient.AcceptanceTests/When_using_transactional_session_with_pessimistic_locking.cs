@@ -1,15 +1,14 @@
-﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
+namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using Microsoft.Data.SqlClient;
     using NUnit.Framework;
     using ObjectBuilder;
     using Persistence.Sql;
 
-    public class When_using_transactional_session : NServiceBusAcceptanceTest
+    public class When_using_transactional_session_with_pessimistic_locking : NServiceBusAcceptanceTest
     {
         [OneTimeSetUp]
         public async Task OneTimeSetup()
@@ -20,16 +19,13 @@
             await OutboxHelpers.CreateDataTable();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit(
-            bool outboxEnabled)
-        {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
+        [SetUp]
+        public async Task Setup() =>
+            await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
 
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_synchronized_session_on_transactional_session_commit()
+        {
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -44,12 +40,7 @@
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.SqlPersistenceSession();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -75,16 +66,9 @@
             Assert.AreEqual(rowId, resultAfterDispose);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit(
-            bool outboxEnabled)
+        [Test]
+        public async Task Should_send_messages_and_insert_rows_in_sql_session_on_transactional_session_commit()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             string rowId = Guid.NewGuid().ToString();
 
             await Scenario.Define<Context>()
@@ -99,12 +83,7 @@
 
                     ISqlStorageSession storageSession = scope.Build<ISqlStorageSession>();
 
-                    string insertText =
-                        $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
-                                        BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
-                                        END;
-                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+                    string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
                     using (var insertCommand = new SqlCommand(insertText,
                                (SqlConnection)storageSession.Connection,
@@ -142,15 +121,9 @@
             return (string)await queryCommand.ExecuteScalarAsync();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_not_send_messages_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_not_send_messages_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
                 {
@@ -173,15 +146,9 @@
             Assert.False(result.MessageReceived);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed(bool outboxEnabled)
+        [Test]
+        public async Task Should_send_immediate_dispatch_messages_even_if_session_is_not_committed()
         {
-            if (outboxEnabled)
-            {
-                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
-            }
-
             var result = await Scenario.Define<Context>()
                 .WithEndpoint<AnEndpoint>(s => s.When(async (_, ctx) =>
                 {
@@ -202,29 +169,18 @@
             Assert.True(result.MessageReceived);
         }
 
-        public class Context : ScenarioContext, IInjectBuilder
+        class Context : ScenarioContext, IInjectBuilder
         {
             public bool MessageReceived { get; set; }
             public bool CompleteMessageReceived { get; set; }
             public IBuilder Builder { get; set; }
         }
 
-        public class AnEndpoint : EndpointConfigurationBuilder
+        class AnEndpoint : EndpointConfigurationBuilder
         {
-            public AnEndpoint()
-            {
-                var useOutbox = (bool)TestContext.CurrentContext.Test.Arguments[0];
-                if (useOutbox)
-                {
-                    EndpointSetup<TransactionSessionWithOutboxEndpoint>();
-                }
-                else
-                {
-                    EndpointSetup<TransactionSessionDefaultServer>();
-                }
-            }
+            public AnEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c => c.EnableOutbox().UsePessimisticConcurrencyControl());
 
-            public class SampleHandler : IHandleMessages<SampleMessage>
+            class SampleHandler : IHandleMessages<SampleMessage>
             {
                 public SampleHandler(Context testContext) => this.testContext = testContext;
 
@@ -238,7 +194,7 @@
                 readonly Context testContext;
             }
 
-            public class CompleteTestMessageHandler : IHandleMessages<CompleteTestMessage>
+            class CompleteTestMessageHandler : IHandleMessages<CompleteTestMessage>
             {
                 public CompleteTestMessageHandler(Context context) => testContext = context;
 
@@ -253,11 +209,11 @@
             }
         }
 
-        public class SampleMessage : ICommand
+        class SampleMessage : ICommand
         {
         }
 
-        public class CompleteTestMessage : ICommand
+        class CompleteTestMessage : ICommand
         {
         }
     }
