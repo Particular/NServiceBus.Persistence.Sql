@@ -53,6 +53,7 @@ class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
 
     public void Dispose()
     {
+        transactionScope?.Dispose();
         Connection?.Dispose();
         transactionScope = null;
         ambientTransaction = null;
