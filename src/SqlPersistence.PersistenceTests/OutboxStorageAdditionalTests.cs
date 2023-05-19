@@ -1,9 +1,13 @@
 namespace NServiceBus.PersistenceTesting.Outbox
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Extensibility;
     using NServiceBus.Outbox;
     using NUnit.Framework;
+    using Transport;
+    using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
     [TestFixtureSource(typeof(PersistenceTestsConfiguration), nameof(PersistenceTestsConfiguration.OutboxVariants))]
     class OutboxStorageAdditionalTests
@@ -38,9 +42,16 @@ namespace NServiceBus.PersistenceTesting.Outbox
 
             var firstSessionBeginDone = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
+            ContextBag GetContextBagForOutbox(string incomingMessageId)
+            {
+                var contextBag = new ContextBag();
+                contextBag.Set(new IncomingMessage(incomingMessageId, new Dictionary<string, string>(), Array.Empty<byte>()));
+                return contextBag;
+            };
+
             async Task FirstSession()
             {
-                var firstSessionContextBag = configuration.GetContextBagForOutbox();
+                var firstSessionContextBag = GetContextBagForOutbox(messageId);
                 var outboxMessage = await storage.Get(messageId, firstSessionContextBag);
                 Assert.Null(outboxMessage);
 
@@ -53,13 +64,16 @@ namespace NServiceBus.PersistenceTesting.Outbox
                 await storage.Store(new OutboxMessage(messageId, Array.Empty<TransportOperation>()), transactionA, firstSessionContextBag);
                 Console.WriteLine("First session stored");
                 Console.WriteLine("First session commit");
+
+                await Task.Delay(TimeSpan.FromMinutes(2));
+                
                 await transactionA.Commit();
                 Console.WriteLine("First session committed");
             }
 
             async Task SecondSession()
             {
-                var secondSessionContextBag = configuration.GetContextBagForOutbox();
+                var secondSessionContextBag = GetContextBagForOutbox(messageId);
                 await firstSessionBeginDone.Task;
                 var outboxMessage = await storage.Get(messageId, secondSessionContextBag);
                 Assert.Null(outboxMessage);
