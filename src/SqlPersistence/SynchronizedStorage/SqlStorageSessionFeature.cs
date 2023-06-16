@@ -2,6 +2,7 @@
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
 class SqlStorageSessionFeature : Feature
@@ -25,6 +26,6 @@ class SqlStorageSessionFeature : Feature
 
             return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
         });
-        services.AddScoped(provider => provider.GetService<ISynchronizedStorageSession>().SqlPersistenceSession());
+        services.AddScoped(sp => (sp.GetService<ISynchronizedStorageSession>() as ISqlStorageSession)!);
     }
 }
