@@ -26,6 +26,6 @@ class SqlStorageSessionFeature : Feature
 
             return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
         });
-        services.AddScoped(sp => (sp.GetService<ISynchronizedStorageSession>() as ISqlStorageSession)!);
+        services.AddScoped(sp => (sp.GetService<ICompletableSynchronizedStorageSession>() as ISqlStorageSession)!);
     }
 }
