@@ -56,7 +56,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlSystemDataClient.AcceptanceTests", "TransactionalSession.MsSqlSystemDataClient.AcceptanceTests\TransactionalSession.MsSqlSystemDataClient.AcceptanceTests.csproj", "{AB33F7C1-FF29-4958-B176-81AC227451A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraPostgreSqlAcceptanceTests", "AuroraPostgreSqlAcceptanceTests\AuroraPostgreSqlAcceptanceTests.csproj", "{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuroraPostgreSqlAcceptanceTests", "AuroraPostgreSqlAcceptanceTests\AuroraPostgreSqlAcceptanceTests.csproj", "{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraMySqlAcceptanceTests", "AuroraMySqlAcceptanceTests\AuroraMySqlAcceptanceTests.csproj", "{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,10 @@ Global
 		{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +182,7 @@ Global
 		{20DA1B6B-651B-480F-BEA9-3E92673C5793} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{AB33F7C1-FF29-4958-B176-81AC227451A5} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90D6A734-35FA-4702-BDFD-74EADABDE821}
