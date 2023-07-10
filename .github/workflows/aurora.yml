@@ -54,10 +54,10 @@ jobs:
           cdk deploy
 
           $secrets = aws secretsmanager get-secret-value --secret-id aurora_test_secrets --region us-east-2 --query SecretString --output text | ConvertFrom-Json
-          $host = $secrets.host
+          $aurorahost = $secrets.host
           $user = $secrets.user
           $pw = $secrets.password
-          $connectionString = "Host=$host;User ID=$user;Password=$pw;Port=5432;Database=postgres;"
+          $connectionString = "Host=$aurorahost;User ID=$user;Password=$pw;Port=5432;Database=postgres;"
           echo "AuroraPostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Run tests
