@@ -58,7 +58,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionalSession.MsSqlS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuroraPostgreSqlAcceptanceTests", "AuroraPostgreSqlAcceptanceTests\AuroraPostgreSqlAcceptanceTests.csproj", "{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraMySqlAcceptanceTests", "AuroraMySqlAcceptanceTests\AuroraMySqlAcceptanceTests.csproj", "{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuroraMySqlAcceptanceTests", "AuroraMySqlAcceptanceTests\AuroraMySqlAcceptanceTests.csproj", "{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraSetup", "AuroraSetup\AuroraSetup.csproj", "{B1B4FF6C-354C-4B73-B383-CD1D4F76400C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,6 +168,10 @@ Global
 		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B4FF6C-354C-4B73-B383-CD1D4F76400C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B4FF6C-354C-4B73-B383-CD1D4F76400C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B4FF6C-354C-4B73-B383-CD1D4F76400C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B4FF6C-354C-4B73-B383-CD1D4F76400C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{AB33F7C1-FF29-4958-B176-81AC227451A5} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{4D0B3E33-C0C5-4DA0-AA6C-1A15A7CD5581} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 		{A4CBD2B1-0E53-42AA-8AFA-E72C9D1180FE} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
+		{B1B4FF6C-354C-4B73-B383-CD1D4F76400C} = {8E942C0C-AAAB-4962-87F6-3D0F584003F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90D6A734-35FA-4702-BDFD-74EADABDE821}
