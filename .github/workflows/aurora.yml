@@ -1,5 +1,8 @@
 name: Aurora tests
 on:
+  push:
+    branches:
+      - '*'
   workflow_dispatch:
 env:
   DOTNET_NOLOGO: true
