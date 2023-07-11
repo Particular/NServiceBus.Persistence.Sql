@@ -9,7 +9,6 @@ using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Settings;
 using NUnit.Framework;
-using TestHelper;
 
 public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
 {

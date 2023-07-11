@@ -1,4 +1,4 @@
 ﻿public class AuroraPostgreSqlTestAttribute : EngineSpecificTestAttribute
 {
-    protected override string ConnectionStringName => "AuroraPostgreSqlConnectionString";
+    protected override string ConnectionStringName => AuroraPostgreSqlConnectionBuilder.EnvVarName;
 }
