@@ -8,6 +8,7 @@ env:
   DOTNET_NOLOGO: true
 permissions:
   id-token: write # This is required for requesting the JWT
+concurrency: aurora_tests
 jobs:
   build:
     runs-on: ubuntu-20.04
