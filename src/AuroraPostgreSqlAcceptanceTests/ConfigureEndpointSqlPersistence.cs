@@ -31,7 +31,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
                 TestContext.CurrentContext.Test.ID,
                 sp.GetRequiredService<IReadOnlySettings>(),
                 tablePrefix,
-                AuroraMySqlConnectionBuilder.Build,
+                AuroraPostgreSqlConnectionBuilder.Build,
                 BuildSqlDialect.PostgreSql,
                 e => e.Message.Contains("duplicate key value violates unique constraint"));
 
@@ -39,7 +39,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         });
 
         var persistence = configuration.UsePersistence<SqlPersistence>();
-        persistence.ConnectionBuilder(AuroraMySqlConnectionBuilder.Build);
+        persistence.ConnectionBuilder(AuroraPostgreSqlConnectionBuilder.Build);
         var sqlDialect = persistence.SqlDialect<SqlDialect.PostgreSql>();
         persistence.TablePrefix($"{tablePrefix}_");
         sqlDialect.JsonBParameterModifier(parameter =>
