@@ -61,7 +61,7 @@ jobs:
           $aurorauser = $secrets.username
           $pw = $secrets.password
           $connectionString = "Host=$aurorahost;User ID=$aurorauser;Password=$pw;Port=5432;Database=postgres;"
-          echo "AuroraPostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo "PostgreSqlConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Run tests
         uses: Particular/run-tests-action@v1.6.0
