@@ -69,7 +69,6 @@ jobs:
       - name: Teardown infrastructure
         if: ${{ always() }}
         shell: pwsh
-        # todo: needs to use cdk destroy --force
         run: |
           cd src/AuroraSetup
-          cdk destroy
+          cdk destroy --force
