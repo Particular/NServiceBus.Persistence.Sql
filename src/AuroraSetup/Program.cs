@@ -36,7 +36,6 @@ var vpc = new Vpc(stack, "VPC",
             new SubnetConfiguration() { Name = "AuroraTestClusterSubnet", SubnetType = SubnetType.PUBLIC }
         }
     });
-//var vpc = Vpc.FromLookup(stack, "vpc-01588be1b553e506a", new VpcLookupOptions() { VpcId = "vpc-01588be1b553e506a" });
 
 var securityGroup = new SecurityGroup(stack, "SecurityGroup", new SecurityGroupProps()
 {
@@ -44,16 +43,16 @@ var securityGroup = new SecurityGroup(stack, "SecurityGroup", new SecurityGroupP
     Vpc = vpc
 });
 
-//TODO MySQL will require a different port
-securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(5432), "allow CI connections");
+securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(5432), "allow CI for PostgreSQL connections");
+securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(3306), "allow CI for MySQL connections");
 
-var db = new DatabaseCluster(stack, "DbCluster", new DatabaseClusterProps()
+var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps()
 {
     Engine = DatabaseClusterEngine.AuroraPostgres(new AuroraPostgresClusterEngineProps()
     {
         Version = AuroraPostgresEngineVersion.VER_15_2
     }),
-    Credentials = Credentials.FromGeneratedSecret("aurora_test", new CredentialsBaseOptions { SecretName = "aurora_test_secrets" }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = "aurora_postgres_secrets" }),
     Vpc = vpc,
     StorageType = DBClusterStorageType.AURORA_IOPT1, // is IO optimized better for tests?
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps()
@@ -68,6 +67,28 @@ var db = new DatabaseCluster(stack, "DbCluster", new DatabaseClusterProps()
     }
 });
 
-new CfnOutput(stack, "secrets_name", new CfnOutputProps() { Value = db.Secret!.SecretName });
+var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseClusterProps()
+{
+    Engine = DatabaseClusterEngine.AuroraMysql(new AuroraMysqlClusterEngineProps
+    {
+        Version = AuroraMysqlEngineVersion.VER_3_03_0
+    }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets" }),
+    Vpc = vpc,
+    StorageType = DBClusterStorageType.AURORA_IOPT1, // is IO optimized better for tests?
+    Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps
+    {
+        InstanceType = InstanceType.Of(InstanceClass.T3, InstanceSize.MEDIUM),
+        PubliclyAccessible = true
+    }),
+    VpcSubnets = new SubnetSelection() { SubnetType = SubnetType.PUBLIC },
+    SecurityGroups = new[]
+    {
+        securityGroup
+    }
+});
+
+new CfnOutput(stack, "postgres_secrets", new CfnOutputProps() { Value = postgresCluster.Secret!.SecretName });
+new CfnOutput(stack, "mysql_secrets", new CfnOutputProps() { Value = mysqlCluster.Secret!.SecretName });
 
 app.Synth();
