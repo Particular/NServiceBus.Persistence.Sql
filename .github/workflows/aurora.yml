@@ -81,5 +81,4 @@ jobs:
         shell: pwsh
         run: |
           cd src/AuroraSetup
-          #TODO uncomment
-          #cdk destroy --force
+          cdk destroy --force
