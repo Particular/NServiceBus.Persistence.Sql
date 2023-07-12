@@ -75,7 +75,7 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     }),
     Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets" }),
     Vpc = vpc,
-    StorageType = DBClusterStorageType.AURORA_IOPT1, // is IO optimized better for tests?
+    StorageType = DBClusterStorageType.AURORA,
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps
     {
         InstanceType = InstanceType.Of(InstanceClass.T3, InstanceSize.MEDIUM),
