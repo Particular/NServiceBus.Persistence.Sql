@@ -71,7 +71,7 @@ jobs:
           echo "MySQLConnectionString=$mysqlConnectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           echo "Creating nservicebus database"
-          mysql --host $mysqlHost --user $postgresUser --password $mysqlPassword -D mysql -e "create database if not exists nservicebus ;"
+          mysql --host $mysqlHost --user $mysqlUser --password $mysqlPassword -D mysql -e "create database if not exists nservicebus ;"
 
       - name: Run tests
         uses: Particular/run-tests-action@v1.6.0
