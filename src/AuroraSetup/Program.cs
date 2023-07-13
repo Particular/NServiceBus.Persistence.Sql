@@ -13,7 +13,12 @@ var stack = new AuroraTestInfrastructure(app, "AuroraTestInfrastructure", new St
     {
         Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
         Region = "us-east-2",
-    }
+    },
+    Synthesizer = new DefaultStackSynthesizer(new DefaultStackSynthesizerProps
+    {
+        // There is a dedicated CDK toolkit (including CF service roles) stack with reduced permissions
+        Qualifier = "aurora-ci"
+    })
 });
 
 var vpc = new Vpc(stack, "VPC",
