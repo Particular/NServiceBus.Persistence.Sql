@@ -21,6 +21,7 @@ var stack = new AuroraTestInfrastructure(app, "AuroraTestInfrastructure", new St
     })
 });
 
+
 var vpc = new Vpc(stack, "VPC",
     new VpcProps
     {
