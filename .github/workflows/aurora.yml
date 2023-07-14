@@ -1,8 +1,7 @@
 name: Aurora tests
 on:
-  push:
-    branches:
-      - 'aws-aurora'
+  schedule:
+    - cron: 0 22 * * 0 # run workflow every sunday
   workflow_dispatch:
 env:
   DOTNET_NOLOGO: true
