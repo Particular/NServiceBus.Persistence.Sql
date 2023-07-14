@@ -51,7 +51,7 @@ jobs:
         run: npm install -g aws-cdk
 
       - name: Setup Aurora
-        id: aurora-postgresql
+        id: aurora-setup
         shell: pwsh
         run: |
           cd src/AuroraSetup
