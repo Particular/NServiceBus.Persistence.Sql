@@ -76,7 +76,7 @@ where MessageId = @MessageId";
             internal override string GetOutboxCleanupCommand(string tableName)
             {
                 return $@"
-delete top (@BatchSize) from {tableName}
+delete top (@BatchSize) from {tableName} with (rowlock)
 where Dispatched = 'true' and
       DispatchedAt < @DispatchedBefore";
             }
