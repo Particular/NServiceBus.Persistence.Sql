@@ -27,6 +27,7 @@ namespace NServiceBus
         internal void AddJsonParameter(DbParameter parameter, string paramName, object value)
         {
             parameter.ParameterName = paramName;
+            parameter.Size = -1; // https://stackoverflow.com/a/973269/199551
             SetJsonParameterValue(parameter, value);
         }
 
