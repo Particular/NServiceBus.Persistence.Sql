@@ -18,7 +18,7 @@ class OutboxPersister : IOutboxStorage
     readonly Func<ISqlOutboxTransaction> outboxTransactionFactory;
 
     public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
-        Func<ISqlOutboxTransaction> outboxTransactionFactory) 
+        Func<ISqlOutboxTransaction> outboxTransactionFactory)
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
