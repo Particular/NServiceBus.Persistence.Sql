@@ -27,7 +27,6 @@ namespace NServiceBus
         internal void AddJsonParameter(DbParameter parameter, string paramName, object value)
         {
             parameter.ParameterName = paramName;
-            parameter.Size = -1; // Must be -1 as value can exceed 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
             SetJsonParameterValue(parameter, value);
         }
 
