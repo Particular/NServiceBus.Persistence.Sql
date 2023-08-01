@@ -14,16 +14,19 @@ class OutboxPersister : IOutboxStorage
 {
     readonly IConnectionManager connectionManager;
     readonly SqlDialect sqlDialect;
+    readonly int cleanupBatchSize;
     readonly OutboxCommands outboxCommands;
     readonly Func<ISqlOutboxTransaction> outboxTransactionFactory;
 
     public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
-        Func<ISqlOutboxTransaction> outboxTransactionFactory)
+        Func<ISqlOutboxTransaction> outboxTransactionFactory,
+        int cleanupBatchSize = 4000) // Keep below 4000 to prevent lock escalation
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
         this.outboxCommands = outboxCommands;
         this.outboxTransactionFactory = outboxTransactionFactory;
+        this.cleanupBatchSize = cleanupBatchSize;
     }
 
     public Task<IOutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
@@ -123,8 +126,6 @@ class OutboxPersister : IOutboxStorage
 
     public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken = default)
     {
-        const int CleanupBatchSize = 4000; // Keep below 4000 to prevent lock escalation
-
         using (var connection = await connectionManager.OpenNonContextualConnection(cancellationToken).ConfigureAwait(false))
         {
             var continuePurging = true;
@@ -136,7 +137,7 @@ class OutboxPersister : IOutboxStorage
                 {
                     command.CommandText = outboxCommands.Cleanup;
                     command.AddParameter("DispatchedBefore", dateTime);
-                    command.AddParameter("BatchSize", CleanupBatchSize);
+                    command.AddParameter("BatchSize", cleanupBatchSize);
                     var rowCount = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
                     continuePurging = rowCount != 0;
                 }
