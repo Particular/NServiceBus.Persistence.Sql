@@ -29,7 +29,7 @@ jobs:
             7.0.x
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.AURORA_CI_ROLE }}
           role-session-name: AuroraCI
