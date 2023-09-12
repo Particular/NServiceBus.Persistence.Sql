@@ -20,7 +20,7 @@ class OutboxPersister : IOutboxStorage
 
     public OutboxPersister(IConnectionManager connectionManager, SqlDialect sqlDialect, OutboxCommands outboxCommands,
         Func<ISqlOutboxTransaction> outboxTransactionFactory,
-        int cleanupBatchSize = 10000)
+        int cleanupBatchSize = 4000) // Keep below 4000 to prevent lock escalation
     {
         this.connectionManager = connectionManager;
         this.sqlDialect = sqlDialect;
