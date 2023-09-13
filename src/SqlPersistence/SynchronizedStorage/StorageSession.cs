@@ -74,11 +74,8 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = default)
     {
         Connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
-#if NET
+
         Transaction = await Connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-#else
-        Transaction = Connection.BeginTransaction();
-#endif
         ownsTransaction = true;
     }
 
@@ -88,13 +85,9 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 
         if (ownsTransaction && Transaction != null)
         {
-#if NET
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             await Transaction.DisposeAsync().ConfigureAwait(false);
-#else
-            Transaction.Commit();
-            Transaction.Dispose();
-#endif
+
             Connection.Dispose();
         }
     }
