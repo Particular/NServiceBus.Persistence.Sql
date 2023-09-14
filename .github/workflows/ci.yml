@@ -14,14 +14,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-2019, ubuntu-20.04 ]
-        engine: [ SqlServer, MySql, PostgreSql, Oracle ]
+        os: [windows-2022, ubuntu-22.04]
+        engine: [SqlServer, MySql, PostgreSql, Oracle]
         include:
           # Add os-name alias for job name
-          - os: windows-2019
+          - os: windows-2022
             os-name: Windows
-          - os: ubuntu-20.04
-            os-name: Linux        
+          - os: ubuntu-22.04
+            os-name: Linux
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -36,9 +36,8 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
-          dotnet-version: |
-            6.0.x
-            7.0.x
+          dotnet-version: 8.0.x
+          dotnet-quality: 'preview'
       - name: Build
         run: dotnet build src --configuration Release
       - name: Upload packages
