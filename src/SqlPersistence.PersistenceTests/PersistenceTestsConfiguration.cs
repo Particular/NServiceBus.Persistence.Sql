@@ -6,8 +6,6 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Newtonsoft.Json;
-    using Npgsql;
-    using NpgsqlTypes;
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Persistence;
@@ -18,7 +16,7 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => false;
+        public bool SupportsDtc => OperatingSystem.IsWindows() && ((SqlTestVariant)Variant.Values[0]).SupportsDtc;
 
         public bool SupportsOutbox => true;
 
@@ -40,7 +38,7 @@
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
             {
-                variants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer));
+                variants.Add(CreateVariant(new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, supportsDtc: true));
             }
 
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
@@ -62,11 +60,16 @@
             OutboxVariants = variants.ToArray();
         }
 
-        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, bool usePessimisticMode = true) =>
-            new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticMode)));
+        static TestFixtureData CreateVariant(SqlDialect dialect, BuildSqlDialect buildDialect, bool usePessimisticMode = true, bool supportsDtc = false) =>
+            new TestFixtureData(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticMode, supportsDtc)));
 
         public Task Configure(CancellationToken cancellationToken = default)
         {
+            if (OperatingSystem.IsWindows() && SupportsDtc)
+            {
+                TransactionManager.ImplicitDistributedTransactions = true;
+            }
+
             var variant = (SqlTestVariant)Variant.Values[0];
             var dialect = variant.Dialect;
             var buildDialect = variant.BuildDialect;
