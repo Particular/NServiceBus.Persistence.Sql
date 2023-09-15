@@ -14,16 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23424-02" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Nunit" Version="3.13.3" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.0.0-alpha.2" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23424-02" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.0.0-alpha.2" />
     <PackageReference Include="NServiceBus.TransactionalSession" Version="3.0.0-alpha.1" />
+    <PackageReference Include="Nunit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs" Link="Infrastructure\%(Filename).%(Extension)" />
+    <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*.cs" Exclude="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\Infrastructure\*MicrosoftData.cs" LinkBase="Infrastructure" />
     <Compile Include="..\TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests\AssemblyInfo.cs" />
   </ItemGroup>
 
