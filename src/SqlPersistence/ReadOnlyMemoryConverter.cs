@@ -1,7 +1,4 @@
 ﻿using System;
-#if NETFRAMEWORK
-using System.Runtime.InteropServices;
-#endif
 using Newtonsoft.Json;
 
 /// <summary>
@@ -22,8 +19,10 @@ class ReadOnlyMemoryConverter : JsonConverter
             writer.WriteNull();
             return;
         }
+
         var mem = (ReadOnlyMemory<byte>)value;
         string base64 = Convert.ToBase64String(mem.Span);
+
         writer.WriteValue(base64);
     }
 

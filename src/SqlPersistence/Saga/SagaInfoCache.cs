@@ -7,8 +7,6 @@ using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-#pragma warning disable 618
-
 class SagaInfoCache
 {
     RetrieveVersionSpecificJsonSettings versionSpecificSettings;

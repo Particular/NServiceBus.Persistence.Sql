@@ -1,6 +1,4 @@
-﻿#pragma warning disable 1591
-
-// used by docs engine to create scripts
+﻿// used by docs engine to create scripts
 class OutboxCommands
 {
     public string PessimisticBegin { get; }
