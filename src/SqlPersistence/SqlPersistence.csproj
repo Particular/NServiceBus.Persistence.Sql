@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -40,9 +40,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\net6.0;buildTransitive\net472;buildTransitive\net6.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net46\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net6.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net6.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net8.0;buildTransitive\net8.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net8.0" Visible="false" />
   </ItemGroup>
 
 </Project>
