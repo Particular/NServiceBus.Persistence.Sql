@@ -27,6 +27,7 @@ begin
 end";
 
         [Test]
+        [TestCase(TransportTransactionMode.TransactionScope, false)] //Uses TransactionScope to ensure exactly-once
         [TestCase(TransportTransactionMode.SendsAtomicWithReceive, false)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
         [TestCase(TransportTransactionMode.ReceiveOnly, true)] //Uses the Outbox to ensure exactly-once
         public async Task Should_rollback_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode, bool enableOutbox)

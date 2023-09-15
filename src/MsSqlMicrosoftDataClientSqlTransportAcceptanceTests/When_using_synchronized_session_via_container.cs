@@ -10,6 +10,7 @@ using NUnit.Framework;
 public class When_using_synchronized_session_via_container : NServiceBusAcceptanceTest
 {
     [Test]
+    [TestCase(TransportTransactionMode.TransactionScope)] //Uses TransactionScope to ensure exactly-once
     [TestCase(TransportTransactionMode.SendsAtomicWithReceive)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
     public async Task Should_inject_synchronized_session_into_handler(TransportTransactionMode transactionMode)
     {
