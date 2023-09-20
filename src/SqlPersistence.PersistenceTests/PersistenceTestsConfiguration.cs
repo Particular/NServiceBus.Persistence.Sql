@@ -65,11 +65,6 @@
 
         public Task Configure(CancellationToken cancellationToken = default)
         {
-            if (OperatingSystem.IsWindows() && SupportsDtc)
-            {
-                TransactionManager.ImplicitDistributedTransactions = true;
-            }
-
             var variant = (SqlTestVariant)Variant.Values[0];
             var dialect = variant.Dialect;
             var buildDialect = variant.BuildDialect;
