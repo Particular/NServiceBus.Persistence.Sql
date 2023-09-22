@@ -10,9 +10,9 @@
     {
         public async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
             EndpointCustomizationConfiguration endpointConfiguration,
-#pragma warning disable PS0013
+#pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
             Func<EndpointConfiguration, Task> configurationBuilderCustomization)
-#pragma warning restore PS0013
+#pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
         {
             var configuration = new EndpointConfiguration(endpointConfiguration.EndpointName);
 

@@ -1,6 +1,4 @@
-﻿#pragma warning disable 672 // overrides obsolete
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-namespace NServiceBus
+﻿namespace NServiceBus
 {
     using System;
     using System.Text;

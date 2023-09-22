@@ -10,11 +10,7 @@ public static class SqlHelpers
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = script;
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable IDE0078
-                if (command is System.Data.SqlClient.SqlCommand || command is Microsoft.Data.SqlClient.SqlCommand)
-#pragma warning restore IDE0078
-#pragma warning restore IDE0079 // Remove unnecessary suppression
+                if (command is System.Data.SqlClient.SqlCommand or Microsoft.Data.SqlClient.SqlCommand)
                 {
                     command.AddParameter("schema", schema ?? "dbo");
                 }
@@ -33,11 +29,7 @@ public static class SqlHelpers
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{tablePrefix}_");
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable IDE0078
-                if (command is System.Data.SqlClient.SqlCommand || command is Microsoft.Data.SqlClient.SqlCommand)
-#pragma warning restore IDE0078
-#pragma warning restore IDE0079 // Remove unnecessary suppression
+                if (command is System.Data.SqlClient.SqlCommand or Microsoft.Data.SqlClient.SqlCommand)
                 {
                     command.AddParameter("schema", schema ?? "dbo");
                 }

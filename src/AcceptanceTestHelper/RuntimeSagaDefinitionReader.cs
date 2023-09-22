@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -40,7 +40,7 @@ public static class RuntimeSagaDefinitionReader
             throw new Exception("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported.");
         }
 
-        var saga = (Saga)FormatterServices.GetUninitializedObject(sagaType);
+        var saga = (Saga)RuntimeHelpers.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
         methodInfo.Invoke(saga, new object[]
         {

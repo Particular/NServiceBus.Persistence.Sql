@@ -94,7 +94,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     }
 
     async Task RunTest<TEndpointType>(bool useOutbox)
-        where TEndpointType : EndpointConfigurationBuilder
+        where TEndpointType : EndpointConfigurationBuilder, new()
     {
         var context = await Scenario.Define<Context>()
             .WithEndpoint<TEndpointType>(b =>

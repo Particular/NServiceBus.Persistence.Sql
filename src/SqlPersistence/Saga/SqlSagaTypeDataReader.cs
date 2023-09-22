@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
@@ -26,7 +26,7 @@ static class SqlSagaTypeDataReader
 
     static SqlSagaTypeData GetTypeDataFromSqlSaga(Type sagaType)
     {
-        var instance = FormatterServices.GetUninitializedObject(sagaType);
+        var instance = RuntimeHelpers.GetUninitializedObject(sagaType);
 
         string transitionalCorrelationPropertyName = null;
         var transitionalCorrelationProperty = GetProperty(sagaType, "TransitionalCorrelationPropertyName");

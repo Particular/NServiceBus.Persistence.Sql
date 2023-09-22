@@ -1,7 +1,4 @@
 ﻿using System;
-#if NETFRAMEWORK
-using System.Runtime.InteropServices;
-#endif
 using Newtonsoft.Json;
 
 /// <summary>
@@ -22,16 +19,9 @@ class ReadOnlyMemoryConverter : JsonConverter
             writer.WriteNull();
             return;
         }
-        var mem = (ReadOnlyMemory<byte>)value;
-        string base64;
 
-#if NETFRAMEWORK
-        base64 = MemoryMarshal.TryGetArray(mem, out var bodySegment)
-            ? Convert.ToBase64String(bodySegment.Array, bodySegment.Offset, bodySegment.Count)
-            : Convert.ToBase64String(mem.ToArray());
-#else
-        base64 = Convert.ToBase64String(mem.Span);
-#endif
+        var mem = (ReadOnlyMemory<byte>)value;
+        string base64 = Convert.ToBase64String(mem.Span);
 
         writer.WriteValue(base64);
     }

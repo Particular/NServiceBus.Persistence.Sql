@@ -15,8 +15,6 @@ namespace NServiceBus.Persistence.Sql
     {
         System.Data.Common.DbConnection Connection { get; }
         System.Data.Common.DbTransaction Transaction { get; }
-        [System.Obsolete("Use the overload that supports cancellation. Will be removed in version 8.0.0.", true)]
-        void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.Tasks.Task> callback);
         void OnSaveChanges(System.Func<NServiceBus.Persistence.Sql.ISqlStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
     }
     public delegate Newtonsoft.Json.JsonSerializerSettings RetrieveVersionSpecificJsonSettings(System.Type sagaDataType, System.Version sagaVersion);
@@ -29,11 +27,7 @@ namespace NServiceBus.Persistence.Sql
     }
     public static class ScriptRunner
     {
-        [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
-        [System.Obsolete(@"Timeout manager is removed. Use `Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox, bool shouldInstallSagas, bool shouldInstallSubscriptions)` instead. The member currently throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
-        public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, bool shouldInstallTimeouts = true) { }
         public static System.Threading.Tasks.Task Install(NServiceBus.SqlDialect sqlDialect, string tablePrefix, System.Func<System.Type, System.Data.Common.DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, System.Threading.CancellationToken cancellationToken = default) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Assembly)]
@@ -78,13 +72,6 @@ namespace NServiceBus.Persistence.Sql
         public void CacheFor(System.TimeSpan timeSpan) { }
         public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
         public void DisableCache() { }
-    }
-    [System.Obsolete("Timeout manager is removed. Timeout storage configuration can be removed. Will be" +
-        " removed in version 8.0.0.", true)]
-    public class TimeoutSettings
-    {
-        public TimeoutSettings() { }
-        public void ConnectionBuilder(System.Func<System.Data.Common.DbConnection> connectionBuilder) { }
     }
 }
 namespace NServiceBus
@@ -139,10 +126,6 @@ namespace NServiceBus
             where T : NServiceBus.SqlDialect, new () { }
         public static NServiceBus.Persistence.Sql.SubscriptionSettings SubscriptionSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
         public static void TablePrefix(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration, string tablePrefix) { }
-        [System.Obsolete("Timeout manager is removed. Timeout storage configuration can be removed. The mem" +
-            "ber currently throws a NotImplementedException. Will be removed in version 8.0.0" +
-            ".", true)]
-        public static NServiceBus.Persistence.Sql.TimeoutSettings TimeoutSettings(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> configuration) { }
     }
     public static class SqlPersistenceOutboxSettingsExtensions
     {

@@ -4,7 +4,6 @@ using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
-using NServiceBus.Persistence.Sql;
 using NUnit.Framework;
 
 [TestFixture]
@@ -17,7 +16,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
     }
 
     void PerformTestOn<TEndpointSelection>()
-        where TEndpointSelection : EndpointConfigurationBuilder
+        where TEndpointSelection : EndpointConfigurationBuilder, new()
     {
         var ex = Assert.ThrowsAsync<Exception>(async () =>
         {

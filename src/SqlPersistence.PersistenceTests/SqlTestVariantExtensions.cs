@@ -19,7 +19,7 @@ namespace NServiceBus.PersistenceTesting
                 {
                     //HINT: Test infrastructure from Core deep-copies the tests variants but
                     //      skips delegates. This code solves this problem by setting a global
-                    //      configuration which is good-enough for the current test setup. 
+                    //      configuration which is good-enough for the current test setup.
                     var postgreSqlDialect = (SqlDialect.PostgreSql)variant.Dialect;
 
                     postgreSqlDialect.JsonBParameterModifier = parameter =>

@@ -40,7 +40,7 @@
         }
 
         /// <summary>
-        /// Retrieves a <see cref="IContainSagaData" /> instance. Used when implementing a <see cref="IFindSagas{T}" />.
+        /// Retrieves a <see cref="IContainSagaData" /> instance. Used when implementing a <see cref="ISagaFinder{TSagaData, TMessage}" />.
         /// </summary>
         /// <typeparam name="TSagaData">The <see cref="IContainSagaData" /> type to return.</typeparam>
         /// <param name="session">

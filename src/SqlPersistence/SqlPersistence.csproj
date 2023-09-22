@@ -1,12 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup Label="Needed for build ordering">
@@ -15,20 +14,13 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="[13.0.3, 14.0.0)" />
-    <PackageReference Include="NServiceBus" Version="[8.0.0, 9.0.0)" />
-    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="All" />
-    <PackageReference Include="Obsolete.Fody" Version="5.3.0" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="3.0.0" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="9.0.0-alpha.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="OracleAcceptanceTests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="MsSqlSystemDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="5.3.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="3.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,9 +33,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net472;build\net6.0;buildTransitive\net472;buildTransitive\net6.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net46\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net472" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net6.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net6.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net8.0;buildTransitive\net8.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net8.0\task\net472" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\Mono.Cecil.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="OracleAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="MsSqlSystemDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
 </Project>

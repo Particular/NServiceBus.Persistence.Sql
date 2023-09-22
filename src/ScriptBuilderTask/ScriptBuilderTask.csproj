@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- net46 TFM needed to support VS 2017 -->
-    <TargetFrameworks>net46;net6.0</TargetFrameworks>
+    <!-- net472 TFM needed to support VS 2022 -->
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType>full</DebugType>
+    <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,14 +19,15 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.18" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="3.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <!--Package needs to stay on 15.x to support Visual Studio 2017 -->
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="[15.9.20, 16.0.0]" PrivateAssets="All" />
+    <!--Package needs to stay on 17.x to support Visual Studio 2022 -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="[17.7.2, 18.0.0]" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>
