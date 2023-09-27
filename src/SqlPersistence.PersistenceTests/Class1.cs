@@ -18,9 +18,9 @@
             await SaveSaga(sagaData);
             var generatedSagaId = sagaData.Id;
 
-            var dtcTransactionSource = new TaskCompletionSource();
-            var unenlistedUpdateSource = new TaskCompletionSource();
-            var enlistedUpdateSource = new TaskCompletionSource();
+            var dtcTransactionSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var unenlistedUpdateSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var enlistedUpdateSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
             var enlistmentNotifier = new EnlistmentWhichEnforcesDtcEscalation(dtcTransactionSource);
 
