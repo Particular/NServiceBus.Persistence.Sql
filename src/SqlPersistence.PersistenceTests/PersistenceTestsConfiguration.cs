@@ -6,8 +6,6 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Newtonsoft.Json;
-    using Npgsql;
-    using NpgsqlTypes;
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Persistence;
@@ -18,8 +16,11 @@
 
     public partial class PersistenceTestsConfiguration
     {
+#if NETFRAMEWORK
+        public bool SupportsDtc => true;
+#else
         public bool SupportsDtc => false;
-
+#endif
         public bool SupportsOutbox => true;
 
         public bool SupportsFinders => false;

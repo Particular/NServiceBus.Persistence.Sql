@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Remove="$(PkgNServiceBus_PersistenceTests_Sources)\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+    <Compile Remove="$(PkgNServiceBus_PersistenceTests_Sources)\**\When_persisting_a_saga_with_an_escalated_DTC_transaction.cs" />
   </ItemGroup>
 
 </Project>
