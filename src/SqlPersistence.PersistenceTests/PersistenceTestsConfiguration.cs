@@ -96,14 +96,14 @@
             GetContextBagForSagaStorage = () =>
             {
                 var contextBag = new ContextBag();
-                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), Array.Empty<byte>()));
+                contextBag.Set(new IncomingMessage("MessageId", [], Array.Empty<byte>()));
                 return contextBag;
             };
 
             GetContextBagForOutbox = () =>
             {
                 var contextBag = new ContextBag();
-                contextBag.Set(new IncomingMessage("MessageId", new Dictionary<string, string>(), Array.Empty<byte>()));
+                contextBag.Set(new IncomingMessage("MessageId", [], Array.Empty<byte>()));
                 return contextBag;
             };
 

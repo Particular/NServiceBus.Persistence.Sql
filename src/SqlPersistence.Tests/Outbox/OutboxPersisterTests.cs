@@ -218,7 +218,7 @@ public abstract class OutboxPersisterTests
     static ContextBag CreateContextBag(string messageId)
     {
         var contextBag = new ContextBag();
-        contextBag.Set(new IncomingMessage(messageId, new Dictionary<string, string>(), new byte[0]));
+        contextBag.Set(new IncomingMessage(messageId, [], new byte[0]));
         return contextBag;
     }
 
