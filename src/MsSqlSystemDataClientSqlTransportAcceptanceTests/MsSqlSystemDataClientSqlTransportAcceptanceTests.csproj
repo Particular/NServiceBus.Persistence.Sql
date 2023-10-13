@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-release-23468-02" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.0.0-alpha.6" GeneratePathProperty="true" />
     <PackageReference Include="NServiceBus.SqlServer" Version="8.0.0-alpha.1" />
