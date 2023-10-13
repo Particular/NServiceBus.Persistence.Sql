@@ -15,13 +15,13 @@
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.1" GeneratePathProperty="True" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.5" GeneratePathProperty="True" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PkgNServiceBus_PersistenceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_PersistenceTests_Sources)\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
   </ItemGroup>
 
