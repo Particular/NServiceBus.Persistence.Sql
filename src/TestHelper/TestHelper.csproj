@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
-    <PackageReference Include="MySql.Data" Version="8.0.29" ExcludeAssets="contentFiles" />
+    <PackageReference Include="MySql.Data" Version="8.1.0" ExcludeAssets="contentFiles" />
     <PackageReference Include="Npgsql" Version="7.0.6" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.210" />
