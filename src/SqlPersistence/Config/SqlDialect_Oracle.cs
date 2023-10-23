@@ -17,10 +17,10 @@ namespace NServiceBus
 
             internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
-                SetParameterValue(parameter, value);
+                SetParameterValue(parameter, value, -1);
             }
 
-            internal override void SetParameterValue(DbParameter parameter, object value)
+            internal override void SetParameterValue(DbParameter parameter, object value, int lengthMax)
             {
                 if (value is Guid)
                 {

@@ -22,7 +22,7 @@ partial class SagaPersister
         {
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
-            command.AddParameter("Id", sagaData.Id);
+            command.AddParameter("Id", sagaData.Id, 200);
             var metadata = new Dictionary<string, string>();
             if (sagaData.OriginalMessageId != null)
             {
@@ -32,13 +32,13 @@ partial class SagaPersister
             {
                 metadata.Add("Originator", sagaData.Originator);
             }
-            command.AddParameter("Metadata", Serializer.Serialize(metadata));
+            command.AddParameter("Metadata", Serializer.Serialize(metadata), -1);
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
-            command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion, 23);
+            command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion, 23);
             if (correlationId != null)
             {
-                command.AddParameter("CorrelationId", correlationId);
+                command.AddParameter("CorrelationId", correlationId, 200);
             }
             AddTransitionalParameter(sagaData, sagaInfo, command);
             await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);

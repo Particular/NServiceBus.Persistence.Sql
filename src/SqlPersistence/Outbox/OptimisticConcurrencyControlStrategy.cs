@@ -27,9 +27,9 @@ class OptimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
         {
             command.CommandText = outboxCommands.OptimisticStore;
             command.Transaction = transaction;
-            command.AddParameter("MessageId", outboxMessage.MessageId);
+            command.AddParameter("MessageId", outboxMessage.MessageId, 200);
             command.AddJsonParameter("Operations", json);
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion, 23);
             await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }

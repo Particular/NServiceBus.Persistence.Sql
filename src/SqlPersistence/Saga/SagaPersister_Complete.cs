@@ -20,8 +20,8 @@ partial class SagaPersister
             command.CommandText = sagaInfo.CompleteCommand;
             command.Transaction = sqlSession.Transaction;
 
-            command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("Concurrency", concurrency);
+            command.AddParameter("Id", sagaData.Id, 200);
+            command.AddParameter("Concurrency", concurrency, 0);
 
             var affected = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 

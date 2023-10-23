@@ -33,10 +33,10 @@ class CommandWrapper : IDisposable
         set => command.Transaction = value;
     }
 
-    public void AddParameter(string name, object value)
+    public void AddParameter(string name, object value, int lengthMax)
     {
         var parameter = command.CreateParameter();
-        dialect.AddParameter(parameter, name, value);
+        dialect.AddParameter(parameter, name, value, lengthMax);
         command.Parameters.Add(parameter);
     }
 
@@ -47,9 +47,9 @@ class CommandWrapper : IDisposable
         command.Parameters.Add(parameter);
     }
 
-    public void AddParameter(string name, Version value)
+    public void AddParameter(string name, Version value, int lengthMax)
     {
-        AddParameter(name, value.ToString());
+        AddParameter(name, value.ToString(), lengthMax);
     }
 
     public Task<int> ExecuteNonQueryEx(CancellationToken cancellationToken = default)

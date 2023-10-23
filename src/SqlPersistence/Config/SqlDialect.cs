@@ -32,13 +32,13 @@ namespace NServiceBus
 
         internal abstract void SetJsonParameterValue(DbParameter parameter, object value);
 
-        internal void AddParameter(DbParameter parameter, string paramName, object value)
+        internal void AddParameter(DbParameter parameter, string paramName, object value, int lengthMax)
         {
             parameter.ParameterName = paramName;
-            SetParameterValue(parameter, value);
+            SetParameterValue(parameter, value, lengthMax);
         }
 
-        internal abstract void SetParameterValue(DbParameter parameter, object value);
+        internal abstract void SetParameterValue(DbParameter parameter, object value, int lengthMax);
 
         internal abstract CommandWrapper CreateCommand(DbConnection connection);
         internal async Task ExecuteTableCommand(DbConnection connection, DbTransaction transaction, string script, string tablePrefix, CancellationToken cancellationToken = default)

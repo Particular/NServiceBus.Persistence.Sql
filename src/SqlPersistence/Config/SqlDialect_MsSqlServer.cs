@@ -26,29 +26,50 @@ namespace NServiceBus
 
             internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
-                SetParameterValue(parameter, value);
+                SetParameterValue(parameter, value, -1);
             }
 
-            internal override void SetParameterValue(DbParameter parameter, object value)
+            internal override void SetParameterValue(DbParameter parameter, object value, int lengthMax)
             {
+                const int defaultLength = 4000;
+
                 if (value is ArraySegment<char> charSegment)
                 {
+                    if (lengthMax == 0)
+                    {
+                        throw new ArgumentException("Value cannot be 0 for arrays", nameof(lengthMax));
+                    }
+
                     parameter.Value = charSegment.Array;
 
                     // Set to 4000 or -1 to improve query execution plan reuse
                     // Must be when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                    parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
+                    parameter.Size = lengthMax == -1 && charSegment.Count <= defaultLength
+                        ? defaultLength
+                        : lengthMax;
                 }
                 else if (value is string stringValue)
                 {
+                    if (lengthMax == 0)
+                    {
+                        throw new ArgumentException("Value cannot be 0 for strings", nameof(lengthMax));
+                    }
+
                     parameter.Value = stringValue;
 
                     // Set to 4000 or -1 to improve query execution plan reuse
                     // Must be when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                    parameter.Size = stringValue.Length > 4000 ? -1 : 4000;
+                    parameter.Size = lengthMax == -1 && stringValue.Length <= defaultLength
+                        ? defaultLength
+                        : lengthMax;
                 }
                 else
                 {
+                    if (lengthMax != 0)
+                    {
+                        throw new ArgumentException("Value must be 0 when not an array or string", nameof(lengthMax));
+                    }
+
                     parameter.Value = value;
                 }
             }
