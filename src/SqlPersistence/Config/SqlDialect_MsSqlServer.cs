@@ -36,7 +36,7 @@ namespace NServiceBus
                     parameter.Value = charSegment.Array;
 
                     // Set to 4000 or -1 to improve query execution plan reuse
-                    // Must be when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
+                    // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
                     parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
                 }
                 else if (value is string stringValue)
@@ -44,7 +44,7 @@ namespace NServiceBus
                     parameter.Value = stringValue;
 
                     // Set to 4000 or -1 to improve query execution plan reuse
-                    // Must be when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
+                    // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
                     parameter.Size = stringValue.Length > 4000 ? -1 : 4000;
                 }
                 else
