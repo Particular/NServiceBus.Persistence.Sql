@@ -73,8 +73,8 @@ class OutboxPersister : IOutboxStorage
         using (var command = sqlDialect.CreateCommand(connection))
         {
             command.CommandText = outboxCommands.SetAsDispatched;
-            command.AddParameter("MessageId", messageId, 200);
-            command.AddParameter("DispatchedAt", DateTime.UtcNow, 0);
+            command.AddParameter("MessageId", messageId);
+            command.AddParameter("DispatchedAt", DateTime.UtcNow);
             await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
     }
@@ -90,7 +90,7 @@ class OutboxPersister : IOutboxStorage
             {
                 command.CommandText = outboxCommands.Get;
                 command.Transaction = transaction;
-                command.AddParameter("MessageId", messageId, 200);
+                command.AddParameter("MessageId", messageId);
 
                 // to avoid loading into memory SequentialAccess is required which means each fields needs to be accessed, but SequentialAccess is unsupported for SQL Server AlwaysEncrypted
                 using (var dataReader = await command.ExecuteReaderAsync(CommandBehavior.SequentialAccess | CommandBehavior.SingleRow, cancellationToken).ConfigureAwait(false))
@@ -136,8 +136,8 @@ class OutboxPersister : IOutboxStorage
                 using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = outboxCommands.Cleanup;
-                    command.AddParameter("DispatchedBefore", dateTime, 0);
-                    command.AddParameter("BatchSize", cleanupBatchSize, 0);
+                    command.AddParameter("DispatchedBefore", dateTime);
+                    command.AddParameter("BatchSize", cleanupBatchSize);
                     var rowCount = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
                     continuePurging = rowCount != 0;
                 }

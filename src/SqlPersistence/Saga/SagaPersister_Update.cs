@@ -21,11 +21,11 @@ partial class SagaPersister
         {
             command.CommandText = sagaInfo.UpdateCommand;
             command.Transaction = sqlSession.Transaction;
-            command.AddParameter("Id", sagaData.Id, 200);
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion, 23);
-            command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion, 23);
+            command.AddParameter("Id", sagaData.Id);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+            command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
-            command.AddParameter("Concurrency", concurrency, 0);
+            command.AddParameter("Concurrency", concurrency);
             AddTransitionalParameter(sagaData, sagaInfo, command);
             var affected = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             if (affected != 1)

@@ -28,7 +28,7 @@ namespace NServiceBus
             {
                 ValidateJsonBModifier();
                 JsonBParameterModifier(parameter);
-                SetParameterValue(parameter, value, -1);
+                SetParameterValue(parameter, value);
             }
 
             void ValidateJsonBModifier()
@@ -57,7 +57,7 @@ dialect.JsonBParameterModifier(
                 throw new Exception(error);
             }
 
-            internal override void SetParameterValue(DbParameter parameter, object value, int lengthMax)
+            internal override void SetParameterValue(DbParameter parameter, object value)
             {
                 if (value is DateTime)
                 {

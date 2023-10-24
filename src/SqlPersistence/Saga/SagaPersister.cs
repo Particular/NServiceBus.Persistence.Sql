@@ -23,7 +23,7 @@ partial class SagaPersister : ISagaPersister
 
         //TODO: validate non default for value types if TransitionalAccessor returns null
         var transitionalId = sagaInfo.TransitionalAccessor(sagaData) ?? throw new Exception($"Null transitionalCorrelationProperty is not allowed. SagaDataType: {sagaData.GetType().FullName}.");
-        command.AddParameter("TransitionalCorrelationId", transitionalId, 200);
+        command.AddParameter("TransitionalCorrelationId", transitionalId);
     }
 
     static int GetConcurrency(ContextBag context)

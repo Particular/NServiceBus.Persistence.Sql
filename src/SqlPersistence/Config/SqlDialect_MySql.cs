@@ -12,10 +12,10 @@ namespace NServiceBus
         {
             internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
-                SetParameterValue(parameter, value, -1);
+                SetParameterValue(parameter, value);
             }
 
-            internal override void SetParameterValue(DbParameter parameter, object value, int lengthMax)
+            internal override void SetParameterValue(DbParameter parameter, object value)
             {
                 parameter.Value = value;
             }

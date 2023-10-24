@@ -35,10 +35,10 @@ class SubscriptionPersister : ISubscriptionStorage
                 using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = subscriptionCommands.Subscribe;
-                    command.AddParameter("MessageType", messageType.TypeName, 200);
-                    command.AddParameter("Subscriber", subscriber.TransportAddress, 200);
-                    command.AddParameter("Endpoint", Nullable(subscriber.Endpoint), 200);
-                    command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion, 23);
+                    command.AddParameter("MessageType", messageType.TypeName);
+                    command.AddParameter("Subscriber", subscriber.TransportAddress);
+                    command.AddParameter("Endpoint", Nullable(subscriber.Endpoint));
+                    command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
                     _ = await command.ExecuteNonQueryEx(token).ConfigureAwait(false);
                 }
             },
@@ -57,8 +57,8 @@ class SubscriptionPersister : ISubscriptionStorage
                 using (var command = sqlDialect.CreateCommand(connection))
                 {
                     command.CommandText = subscriptionCommands.Unsubscribe;
-                    command.AddParameter("MessageType", messageType.TypeName, 200);
-                    command.AddParameter("Subscriber", subscriber.TransportAddress, 200);
+                    command.AddParameter("MessageType", messageType.TypeName);
+                    command.AddParameter("Subscriber", subscriber.TransportAddress);
                     _ = await command.ExecuteNonQueryEx(token).ConfigureAwait(false);
                 }
             },
@@ -168,7 +168,7 @@ class SubscriptionPersister : ISubscriptionStorage
             {
                 var messageType = messageHierarchy[i];
                 var paramName = $"type{i}";
-                command.AddParameter(paramName, messageType.TypeName, 200);
+                command.AddParameter(paramName, messageType.TypeName);
             }
 
             command.CommandText = getSubscribersCommand;

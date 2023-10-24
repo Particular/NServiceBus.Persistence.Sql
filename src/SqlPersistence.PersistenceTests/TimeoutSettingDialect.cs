@@ -123,9 +123,9 @@
             impl.SetJsonParameterValue(parameter, value);
         }
 
-        internal override void SetParameterValue(DbParameter parameter, object value, int lengthMax)
+        internal override void SetParameterValue(DbParameter parameter, object value)
         {
-            impl.SetParameterValue(parameter, value, lengthMax);
+            impl.SetParameterValue(parameter, value);
         }
 
         internal override CommandWrapper CreateCommand(DbConnection connection)

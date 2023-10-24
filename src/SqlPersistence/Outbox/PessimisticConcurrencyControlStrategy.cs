@@ -23,8 +23,8 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
             command.CommandText = outboxCommands.PessimisticBegin;
             command.Transaction = transaction;
 
-            command.AddParameter("MessageId", messageId, 200);
-            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion, 23);
+            command.AddParameter("MessageId", messageId);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
 
             _ = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);
         }
@@ -40,7 +40,7 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
             command.CommandText = outboxCommands.PessimisticComplete;
             command.Transaction = transaction;
 
-            command.AddParameter("MessageId", outboxMessage.MessageId, 200);
+            command.AddParameter("MessageId", outboxMessage.MessageId);
             command.AddJsonParameter("Operations", json);
 
             _ = await command.ExecuteNonQueryEx(cancellationToken).ConfigureAwait(false);

@@ -85,7 +85,7 @@ where Dispatched = 'true' and
             internal override string AddOutboxPadding(string json)
             {
                 //We need to ensure the outbox content is at least 8000 bytes long because otherwise SQL Server will attempt to
-                //store it inside the data page which will result in low space utilization after the outgoing messages are dispatched.
+                //store is inside the data page which will result in low space utilization after the outgoing messages are dispatched.
 
                 //We tried using *varchar values out of the row* table option but while it did improve situation on on-premises 
                 //SQL Server it didn't work as expected in SQL Azure where it caused LOB pages to be allocated (one for each record) 

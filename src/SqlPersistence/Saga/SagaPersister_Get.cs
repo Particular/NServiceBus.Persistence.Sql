@@ -43,7 +43,7 @@ partial class SagaPersister
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sqlDialect.AddParameter(parameter, "propertyValue", propertyValue, -1);
+                sqlDialect.AddParameter(parameter, "propertyValue", propertyValue);
                 append(parameter);
             }, cancellationToken);
     }
@@ -63,7 +63,7 @@ partial class SagaPersister
             appendParameters: (parameterBuilder, append) =>
             {
                 var parameter = parameterBuilder();
-                sqlDialect.AddParameter(parameter, "Id", sagaId, 200);
+                sqlDialect.AddParameter(parameter, "Id", sagaId);
                 append(parameter);
             }, cancellationToken);
     }
