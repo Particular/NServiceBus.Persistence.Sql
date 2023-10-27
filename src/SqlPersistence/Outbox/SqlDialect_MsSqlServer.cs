@@ -75,8 +75,9 @@ where MessageId = @MessageId";
 
             internal override string GetOutboxCleanupCommand(string tableName)
             {
+                // Rowlock hint to prevent lock escalation which can result in INSERT's and competing cleanup to dead-lock
                 return $@"
-delete top (@BatchSize) from {tableName}
+delete top (@BatchSize) from {tableName} with (rowlock)
 where Dispatched = 'true' and
       DispatchedAt < @DispatchedBefore";
             }
