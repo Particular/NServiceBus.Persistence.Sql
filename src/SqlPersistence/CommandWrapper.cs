@@ -64,12 +64,14 @@ class CommandWrapper : IDisposable
 
     public Task<DbDataReader> ExecuteReaderAsync(CancellationToken cancellationToken = default)
     {
+        dialect.OptimizeForReads(command);
         return command.ExecuteReaderAsync(cancellationToken);
     }
 
     public Task<DbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken = default)
     {
         var resultingBehavior = dialect.ModifyBehavior(command.Connection, behavior);
+        dialect.OptimizeForReads(command);
         return command.ExecuteReaderAsync(resultingBehavior, cancellationToken);
     }
 
