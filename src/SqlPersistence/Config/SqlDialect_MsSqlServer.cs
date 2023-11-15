@@ -34,18 +34,7 @@ namespace NServiceBus
                 if (value is ArraySegment<char> charSegment)
                 {
                     parameter.Value = charSegment.Array;
-
-                    // Set to 4000 or -1 to improve query execution plan reuse
-                    // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                    parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
-                }
-                else if (value is string stringValue)
-                {
-                    parameter.Value = stringValue;
-
-                    // Set to 4000 or -1 to improve query execution plan reuse
-                    // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                    parameter.Size = stringValue.Length > 4000 ? -1 : 4000;
+                    parameter.Size = charSegment.Count;
                 }
                 else
                 {
@@ -84,9 +73,29 @@ namespace NServiceBus
                 };
             }
 
+            internal override void OptimizeForReads(DbCommand command)
+            {
+                foreach (DbParameter parameter in command.Parameters)
+                {
+                    if (parameter.Value is ArraySegment<char> charSegment)
+                    {
+                        // Set to 4000 or -1 to improve query execution plan reuse
+                        // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
+                        parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
+                    }
+                    else if (parameter.Value is string stringValue)
+                    {
+                        // Set to 4000 or -1 to improve query execution plan reuse
+                        // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
+                        parameter.Size = stringValue.Length > 4000 ? -1 : 4000;
+                    }
+                }
+            }
+
             internal string Schema { get; set; }
             bool hasConnectionBeenInspectedForEncryption;
             bool isConnectionEncrypted;
         }
+
     }
 }

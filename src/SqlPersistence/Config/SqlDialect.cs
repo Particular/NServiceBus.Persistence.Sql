@@ -62,5 +62,9 @@ namespace NServiceBus
         }
 
         internal abstract object GetCustomDialectDiagnosticsInfo();
+
+        internal virtual void OptimizeForReads(DbCommand command)
+        {
+        }
     }
 }
