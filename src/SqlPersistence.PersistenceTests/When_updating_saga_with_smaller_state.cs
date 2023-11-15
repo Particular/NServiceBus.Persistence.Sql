@@ -49,8 +49,11 @@
 
             Assert.LessOrEqual(retrieved.Payload, sagaData.Payload); // No real need, but here to prevent accidental updates
             Assert.AreEqual(retrieved.Payload, retrieved2.Payload);
-
+#if NETFRAMEWORK
+            using var con = sqlVariant.Open();
+#else
             await using var con = sqlVariant.Open();
+#endif
             await con.OpenAsync();
             var cmd = con.CreateCommand();
             cmd.CommandText = $"SELECT Data FROM [PersistenceTests_SWCP] WHERE Id = '{retrieved.Id}'";
