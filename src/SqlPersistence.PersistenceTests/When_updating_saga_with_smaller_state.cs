@@ -5,15 +5,17 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    public class When_updating_saga : SagaPersisterTests
+    public class When_updating_saga_with_smaller_state : SagaPersisterTests
     {
         [Test]
-        public async Task It_should_trim_state_when_storing_smaller_payload()
+        public async Task It_should_truncate_the_stored_state()
         {
             // When updating an existing saga where the serialized state is smaller in length than the previous the column value should not have any left over data from the previous value.
             // The deserializer ignores any trailing 
 
-            if (param.Values[0] is not SqlTestVariant sqlVariant)
+            var sqlVariant = (SqlTestVariant)param.Values[0];
+
+            if (sqlVariant.Dialect is not SqlDialect.MsSqlServer)
             {
                 Assert.Ignore("Only relevant for SQL Server");
                 return; // Satisfy compiler
@@ -84,7 +86,7 @@
             public string SomeId { get; set; }
         }
 
-        public When_updating_saga(TestVariant param) : base(param)
+        public When_updating_saga_with_smaller_state(TestVariant param) : base(param)
         {
         }
     }
