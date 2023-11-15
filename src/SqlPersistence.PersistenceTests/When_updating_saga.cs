@@ -19,15 +19,15 @@
                 return; // Satisfy compiler
             }
 
-            var sagaData = new SagaState
+            var sagaData = new SagaWithCorrelationPropertyData
             {
-                CorrelationProperty = Guid.NewGuid().ToString(),
+                CorrelatedProperty = Guid.NewGuid().ToString(),
                 Payload = "very long state"
             };
 
             await SaveSaga(sagaData);
 
-            SagaState retrieved;
+            SagaWithCorrelationPropertyData retrieved;
             var context = configuration.GetContextBagForSagaStorage();
             var persister = configuration.SagaStorage;
 
@@ -35,7 +35,7 @@
             {
                 await completeSession.Open(context);
 
-                retrieved = await persister.Get<SagaState>("CorrelationProperty", sagaData.CorrelationProperty, completeSession, context);
+                retrieved = await persister.Get<SagaWithCorrelationPropertyData>(nameof(sagaData.CorrelatedProperty), sagaData.CorrelatedProperty, completeSession, context);
 
                 retrieved.Payload = "short";
 
@@ -43,39 +43,39 @@
                 await completeSession.CompleteAsync();
             }
 
+            var retrieved2 = await GetById<SagaWithCorrelationPropertyData>(sagaData.Id);
+
             Assert.LessOrEqual(retrieved.Payload, sagaData.Payload); // No real need, but here to prevent accidental updates
-
-            var retrieved2 = await GetById<SagaState>(sagaData.Id);
-
             Assert.AreEqual(retrieved.Payload, retrieved2.Payload);
 
             await using var con = sqlVariant.Open();
             await con.OpenAsync();
             var cmd = con.CreateCommand();
-            cmd.CommandText = $"SELECT Data FROM [PersistenceTests_TS] WHERE Id = '{retrieved.Id}'";
+            cmd.CommandText = $"SELECT Data FROM [PersistenceTests_SWCP] WHERE Id = '{retrieved.Id}'";
             var data = (string)await cmd.ExecuteScalarAsync();
 
+            // Payload should only have a single closing bracket, if there are more that means there is trailing data
             var countClosingBrackets = data.ToCharArray().Count(x => x == '}');
 
             Assert.AreEqual(1, countClosingBrackets);
         }
 
-        public class TestSaga : Saga<SagaState>, IAmStartedByMessages<StartMessage>
+        public class SagaWithCorrelationProperty : Saga<SagaWithCorrelationPropertyData>, IAmStartedByMessages<StartMessage>
         {
             public Task Handle(StartMessage message, IMessageHandlerContext context)
             {
                 throw new NotImplementedException();
             }
 
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaState> mapper)
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithCorrelationPropertyData> mapper)
             {
-                mapper.ConfigureMapping<StartMessage>(msg => msg.SomeId).ToSaga(saga => saga.CorrelationProperty);
+                mapper.ConfigureMapping<StartMessage>(msg => msg.SomeId).ToSaga(saga => saga.CorrelatedProperty);
             }
         }
 
-        public class SagaState : ContainSagaData
+        public class SagaWithCorrelationPropertyData : ContainSagaData
         {
-            public string CorrelationProperty { get; set; }
+            public string CorrelatedProperty { get; set; }
             public string Payload { get; set; }
         }
 
