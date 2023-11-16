@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- net472 TFM needed to support VS 2022 -->
@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.18" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="3.0.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="4.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
