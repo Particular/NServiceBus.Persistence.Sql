@@ -1,6 +1,6 @@
 # Saga json state patch tool
 
-Version 7.0.3 introduced a bug where saga json state could become corrupted if the saga state is updated with the string value that is shorter than the previous. Data from the previous state is trailing at the end. This is not causing any issues for the SQL persister its JSON Serializer which ignores this but the column can contain invalid JSON data and can result in parsing issues. Another side effect is that the values always have a length of 4,000 characters (stored as 8,000 bytes) which can cause storage issues.
+Version 7.0.3 introduced a bug where Saga json state could become corrupted if the saga state is updated with a string value that is shorter than the previous. Data from the previous state is trailing at the end. This is not causing any issues for the SQL persister its JSON Serializer which ignores this but the column can contain invalid JSON data and can result in parsing issues. Another side effect is that the values always have a length of 4,000 characters (stored as 8,000 bytes) which can cause storage issues.
 
 This bug is patched in 7.0.4
 
@@ -9,7 +9,7 @@ This bug is patched in 7.0.4
 1. Run into json parser issues because you are using a custom tool
 2. Want to trim the data to free space
 
-Please note that if you use version 7.0.4 and sagas are updated that the JSON data column will be automatically trimmed.
+Please note that if you use version 7.0.4 and sagas are updated the JSON data column will be automatically trimmed.
 
 ## Build
 
@@ -17,13 +17,13 @@ Build the `sagajsonstatepatch` solution. It currently requires .net 8 but if nee
 
 ## Usage
 
-When the tool is ran it shows this data and asks to run the tool as a dry run and shows the "patch" UPDATE queries that would be executed and some statistics on processed records and patch success/failure statistics.
+When the tool is run it shows this data and asks to run the tool as a dry run and shows the "patch" UPDATE queries that would be executed and some statistics on processed records and patch success/failure statistics.
 
 NOTE: It is recommended to backup the data and thoroughly review the output of the tool. 
 
 ### Arguments
 
-The tool requires a connection string and a table name which need to be provided on the commandline:
+The tool requires a connection string and a table name which need to be provided on the command line:
 
     sagajsonstatepatch.exe ""connection string"" ""table name""
 
