@@ -35,16 +35,10 @@ partial class SagaPersister : ISagaPersister
         return concurrency;
     }
 
-    internal struct Concurrency<TSagaData>
-        where TSagaData : IContainSagaData
+    internal readonly struct Concurrency<TSagaData>(TSagaData data, int version) where TSagaData : IContainSagaData
     {
-        public readonly TSagaData Data;
-        public readonly int Version;
+        public TSagaData Data { get; } = data;
 
-        public Concurrency(TSagaData data, int version)
-        {
-            Data = data;
-            Version = version;
-        }
+        public int Version { get; } = version;
     }
 }
