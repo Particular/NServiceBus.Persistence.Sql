@@ -160,7 +160,8 @@ public partial class CoreSagaMetadataTests
 
         try
         {
-            SagaDefinitionReader.TryGetSagaDefinition(dataType, out results.SagaDefinition);
+            SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
+            results.SagaDefinition = definition;
         }
         catch (Exception x)
         {
@@ -172,14 +173,14 @@ public partial class CoreSagaMetadataTests
 
     class SagaInspectionResults
     {
-        public bool HasUnmanagedCalls;
-        public bool HasUnexpectedCalls;
-        public bool HasBranchingLogic;
-        public SagaDefinition SagaDefinition;
-        public string Exception;
+        public bool HasUnmanagedCalls { get; set; }
+
+        public bool HasUnexpectedCalls { get; set; }
+
+        public bool HasBranchingLogic { get; set; }
+
+        public SagaDefinition SagaDefinition { get; set; }
+
+        public string Exception { get; set; }
     }
-
-
-
-
 }
