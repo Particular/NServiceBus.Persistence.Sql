@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FixJson": {
+      "commandName": "Project",
+      "commandLineArgs": "\"%SQLServerConnectionString%\" \"NsbSamplesSqlPersistence.dbo.Samples_SqlPersistence_EndpointSqlServer_OrderSaga\""
+    }
+  }
+}
