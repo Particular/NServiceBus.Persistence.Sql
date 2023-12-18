@@ -1,6 +1,6 @@
 # NServiceBus.SqlPersistence
 
-NServiceBus.SqlPersistence provides support for [NServiceBus](https://docs.particular.net/nservicebus/) to persist to a Sql Database.
+NServiceBus.SqlPersistence provides support for NServiceBus to persist to an Sql Database.
 
 It is part of the [Particular Service Platform](https://particular.net/service-platform), which includes [NServiceBus](https://particular.net/nservicebus) and tools to build, monitor, and debug distributed systems.
 
@@ -8,8 +8,7 @@ See the [Sql Persistence documentation](https://docs.particular.net/persistence/
 
 ## Running tests locally
 
-There are tests targetting multiple database engines. These can be installed on your machine or run in a docker container.
-The tests require a connectionstring set up in environment variables (remember that Visual Studio and Rider load these at start up, so restarting the IDE might be necessary).
+There are tests targeting multiple database engines. These can be installed on your machine or run in a Docker container. The tests require a connection string set up in environment variables (remember that Visual Studio and Rider load these at start up, so restarting the IDE might be necessary).
 
 ### SQL Server
 
