@@ -77,18 +77,14 @@ namespace NServiceBus
             {
                 foreach (DbParameter parameter in command.Parameters)
                 {
-                    if (parameter.Value is ArraySegment<char> charSegment)
-                    {
-                        // Set to 4000 or -1 to improve query execution plan reuse
-                        // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                        parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
-                    }
-                    else if (parameter.Value is string stringValue)
+                    if (parameter.Value is string stringValue)
                     {
                         // Set to 4000 or -1 to improve query execution plan reuse
                         // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
                         parameter.Size = stringValue.Length > 4000 ? -1 : 4000;
                     }
+
+                    // Cannot generically optimize `ArraySegment<char>` as its internal buffer is pooled and its value can be longer that the `char[]` data that is used by the query
                 }
             }
 
