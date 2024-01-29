@@ -12,7 +12,7 @@
     <PackageReference Include="Npgsql" Version="7.0.6" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.210" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
   <!-- Workaround to prevent VS test discovery error -->
