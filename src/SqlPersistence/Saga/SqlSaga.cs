@@ -49,7 +49,7 @@
             get => (TSagaData)Entity;
             set
             {
-                Guard.AgainstNull(nameof(value), value);
+                ArgumentNullException.ThrowIfNull(value);
                 Entity = value;
             }
         }

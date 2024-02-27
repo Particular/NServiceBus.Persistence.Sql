@@ -10,7 +10,7 @@
         /// </summary>
         public void CacheFor(TimeSpan timeSpan)
         {
-            Guard.AgainstNegativeAndZero(nameof(timeSpan), timeSpan);
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(timeSpan, TimeSpan.Zero);
             settings.Set("SqlPersistence.Subscription.CacheFor", timeSpan);
         }
 

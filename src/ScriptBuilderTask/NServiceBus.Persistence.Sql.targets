@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
+    <SqlPersistenceSolutionDir Condition="'..\' != '*Undefined*'">..\</SqlPersistenceSolutionDir>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\..\build\net8.0\task\net8.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\..\build\net8.0\task\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>

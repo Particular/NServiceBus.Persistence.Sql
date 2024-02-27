@@ -1,5 +1,7 @@
 namespace NServiceBus
 {
+    using System;
+
     public static partial class SqlPersistenceConfig
     {
         /// <summary>
@@ -7,8 +9,8 @@ namespace NServiceBus
         /// </summary>
         public static void Schema(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings, string schema)
         {
-            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
-            Guard.AgainstNullAndEmpty(nameof(schema), schema);
+            ArgumentNullException.ThrowIfNull(dialectSettings);
+            ArgumentException.ThrowIfNullOrWhiteSpace(schema);
             Guard.AgainstSqlDelimiters(nameof(schema), schema);
             dialectSettings.TypedDialect.Schema = schema;
         }
@@ -18,7 +20,7 @@ namespace NServiceBus
         /// </summary>
         public static void DoNotUseSqlServerTransportConnection(this SqlDialectSettings<SqlDialect.MsSqlServer> dialectSettings)
         {
-            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
+            ArgumentNullException.ThrowIfNull(dialectSettings);
             dialectSettings.TypedDialect.DoNotUseTransportConnection = true;
         }
     }

@@ -29,7 +29,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 
     public void OnSaveChanges(Func<ISqlStorageSession, CancellationToken, Task> callback)
     {
-        Guard.AgainstNull(nameof(callback), callback);
+        ArgumentNullException.ThrowIfNull(callback);
 
         var oldCallback = onSaveChangesCallback;
 

@@ -10,7 +10,7 @@ namespace NServiceBus.Persistence.Sql
         /// </summary>
         public void ConnectionBuilder(Func<DbConnection> connectionBuilder)
         {
-            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
+            ArgumentNullException.ThrowIfNull(connectionBuilder);
             settings.Set($"SqlPersistence.ConnectionManager.{nameof(StorageType.Subscriptions)}",
                 new ConnectionManager(connectionBuilder));
         }

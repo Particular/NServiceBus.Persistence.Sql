@@ -5,4 +5,4 @@
     MySqlScripts = true,
     PostgreSqlScripts = true,
     OracleScripts = true,
-    ScriptPromotionPath = "$(SolutionDir)$(ProjectDir)Postfix")]
+    ScriptPromotionPath = @"..\$(ProjectDir)Postfix")]

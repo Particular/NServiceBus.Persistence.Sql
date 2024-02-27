@@ -29,7 +29,7 @@ class InnerTask
         promotionPath = promotionPath
             .Replace("$(ProjectDir)", GetFullPathWithEndingSlashes(projectDirectory));
 
-        if (!promotionPath.Contains("$(SolutionDir)"))
+        if (!promotionPath.Contains(@"..\"))
         {
             return promotionPath;
         }
@@ -37,16 +37,16 @@ class InnerTask
         if (string.IsNullOrWhiteSpace(solutionDirectory))
         {
             throw new ErrorsException(
-                @"The ScriptPromotionPath contains '$(SolutionDir)' but no SolutionDirectory was passed to the MSBuildTask. One possible cause of this is a csproj file is being build directly, rather than building the parent solution.
+                @"The ScriptPromotionPath contains '..\' but no SolutionDirectory was passed to the MSBuildTask. One possible cause of this is a csproj file is being build directly, rather than building the parent solution.
 Possible workarounds:
 
- * Don't use '$(SolutionDir)' in the ScriptPromotionPath
+ * Don't use '..\' in the ScriptPromotionPath
  * Build the solution rather than the project
- * Add a property to the project that adds the SolutionDir property: <PropertyGroup><SolutionDir Condition=""$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"">..\</SolutionDir></PropertyGroup>");
+ * Add a property to the project that adds the SolutionDir property: <PropertyGroup><SolutionDir Condition=""..\ == '' Or ..\ == '*Undefined*'"">..\</SolutionDir></PropertyGroup>");
         }
 
         promotionPath = promotionPath
-            .Replace("$(SolutionDir)", GetFullPathWithEndingSlashes(solutionDirectory));
+            .Replace(@"..\", GetFullPathWithEndingSlashes(solutionDirectory));
 
         return promotionPath;
     }

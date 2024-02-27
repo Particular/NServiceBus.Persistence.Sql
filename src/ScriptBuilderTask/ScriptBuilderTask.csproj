@@ -6,7 +6,7 @@
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -18,21 +18,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ILRepack" Version="2.0.22" PrivateAssets="All" />
+    <PackageReference Include="ILRepack" Version="2.0.27" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <!--Package needs to stay on 17.x to support Visual Studio 2022 -->
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="[17.7.2, 18.0.0]" PrivateAssets="All" />
+    <!--Package
+    needs to stay on 17.x to support Visual Studio 2022 -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory"
+    Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>
     <MakeDir Directories="$(TempFolder)" />
-    <Exec Command="&quot;$(ILRepack)&quot; /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <Exec
+      Command="&quot;$(ILRepack)&quot; /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
     <ItemGroup>
       <TempFiles Include="$(TempFolder)\*.*" />
     </ItemGroup>

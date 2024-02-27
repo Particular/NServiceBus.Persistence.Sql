@@ -13,8 +13,8 @@ namespace NServiceBus
         /// </summary>
         public static void ConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<DbConnection> connectionBuilder)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(connectionBuilder);
 
             configuration.GetSettings()
                 .Set("SqlPersistence.ConnectionManager", new ConnectionManager(connectionBuilder));
@@ -49,9 +49,9 @@ namespace NServiceBus
         /// <param name="buildConnectionFromTenantData">Using a tenant id, builds a database connection for that tenant database.</param>
         public static void MultiTenantConnectionBuilder(this PersistenceExtensions<SqlPersistence> configuration, Func<IncomingMessage, string> captureTenantId, Func<string, DbConnection> buildConnectionFromTenantData)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNull(nameof(captureTenantId), captureTenantId);
-            Guard.AgainstNull(nameof(buildConnectionFromTenantData), buildConnectionFromTenantData);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(captureTenantId);
+            ArgumentNullException.ThrowIfNull(buildConnectionFromTenantData);
 
             var connectionManager = new MultiTenantConnectionManager(captureTenantId, buildConnectionFromTenantData);
 
