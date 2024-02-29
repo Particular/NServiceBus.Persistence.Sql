@@ -26,8 +26,7 @@
                 Metadata.Add(tenantInformation.tenantIdHeaderName, tenantInformation.tenantId);
             }
 
-            Extensions.Set(new IncomingMessage(SessionId, headers ?? new Dictionary<string, string>(0),
-                Array.Empty<byte>()));
+            Extensions.Set(new IncomingMessage(SessionId, headers ?? [], Array.Empty<byte>()));
         }
     }
 }
