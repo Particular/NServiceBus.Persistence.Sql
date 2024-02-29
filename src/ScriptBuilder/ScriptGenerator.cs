@@ -25,10 +25,10 @@ public class ScriptGenerator
         this.assemblyPath = assemblyPath;
         this.overwrite = overwrite;
         this.clean = clean;
-        this.dialectOptions = dialectOptions ?? new List<BuildSqlDialect>();
+        this.dialectOptions = dialectOptions ?? [];
         this.logError = logError;
         this.promotionFinder = promotionFinder;
-        this.scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
+        scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
     }
 
     public static void Generate(string assemblyPath, string targetDirectory,
