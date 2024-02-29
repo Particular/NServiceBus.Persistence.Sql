@@ -13,7 +13,7 @@ namespace NServiceBus
         /// </summary>
         public partial class Oracle : SqlDialect
         {
-            volatile PropertyInfo bindByName;
+            volatile PropertyInfo parametersByNameProperty;
 
             internal override void SetJsonParameterValue(DbParameter parameter, object value)
             {
@@ -42,16 +42,19 @@ namespace NServiceBus
             {
                 var command = connection.CreateCommand();
 
-                if (bindByName == null)
+                if (parametersByNameProperty == null)
                 {
                     var type = command.GetType();
-                    bindByName = type.GetProperty("BindByName");
-                    if (bindByName == null)
+                    parametersByNameProperty = type.GetProperty("BindByName") ??
+                                               // someone might be using DevArt Oracle provider which uses PassParametersByName
+                                               type.GetProperty("PassParametersByName");
+                    if (parametersByNameProperty == null)
                     {
-                        throw new Exception($"Could not extract field 'BindByName' from '{type.AssemblyQualifiedName}'.");
+                        throw new Exception($"Could not extract property 'BindByName' nor 'PassParametersByName' from '{type.AssemblyQualifiedName}'. The property is required to make sure the parameters passed to the commands can be passed by name and do not depend on the order they are added to the command.");
                     }
                 }
-                bindByName.SetValue(command, true);
+
+                parametersByNameProperty.SetValue(command, true);
 
                 return new CommandWrapper(command, this);
             }
