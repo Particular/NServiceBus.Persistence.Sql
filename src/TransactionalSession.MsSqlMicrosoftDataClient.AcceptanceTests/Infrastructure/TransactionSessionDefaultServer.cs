@@ -15,6 +15,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             Func<EndpointConfiguration, Task> configurationBuilderCustomization)
         {
             var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
+            builder.UseSerialization<SystemJsonSerializer>();
             builder.EnableInstallers();
 
             builder.Recoverability()
