@@ -21,7 +21,7 @@ jobs:
           - os: windows-2019
             os-name: Windows
           - os: ubuntu-20.04
-            os-name: Linux        
+            os-name: Linux
       fail-fast: false
     steps:
       - name: Check for secrets
