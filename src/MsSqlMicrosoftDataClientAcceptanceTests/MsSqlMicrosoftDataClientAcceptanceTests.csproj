@@ -6,6 +6,7 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBusTests.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>MsSqlAcceptanceTests</RootNamespace>
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <WriteMinVerProperties>false</WriteMinVerProperties>
   </PropertyGroup>
 
   <ItemGroup>

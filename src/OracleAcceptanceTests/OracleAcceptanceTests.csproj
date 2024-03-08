@@ -5,6 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBusTests.snk</AssemblyOriginatorKeyFile>
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <WriteMinVerProperties>false</WriteMinVerProperties>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,11 +25,11 @@
   </ItemGroup>
 
   <ItemGroup Label="Remove 2s delay test - Oracle doesn't store fractional seconds">
-    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_Deferring_a_message.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_Deferring_a_message.cs" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''" />
   </ItemGroup>
 
   <ItemGroup Label="Not enough time in Oracle - timeout removed in master">
-    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''" />
   </ItemGroup>
 
 </Project>
