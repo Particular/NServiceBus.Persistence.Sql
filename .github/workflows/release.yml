@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
         with:
-          fetch-depth: 0      
+          fetch-depth: 0
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4.0.0
         with:
@@ -34,6 +34,7 @@ jobs:
           path: nugets/*
           retention-days: 1
       - name: Deploy
-        uses: Particular/push-octopus-package-action@v2.0.0
+        # Does not follow standard practice of targeting explicit versions because configuration is tightly coupled to Octopus Deploy configuration
+        uses: Particular/push-octopus-package-action@main
         with:
           octopus-deploy-api-key: ${{ secrets.OCTOPUS_DEPLOY_API_KEY }}

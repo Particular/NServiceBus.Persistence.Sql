@@ -21,7 +21,7 @@ jobs:
           - os: windows-2019
             os-name: Windows
           - os: ubuntu-20.04
-            os-name: Linux        
+            os-name: Linux
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -44,12 +44,13 @@ jobs:
         run: dotnet build src --configuration Release
       - name: Upload packages
         uses: actions/upload-artifact@v4.3.1
+        if: matrix.name == 'Windows-SqlServer'
         with:
           name: NuGet packages
           path: nugets/
           retention-days: 7
       - name: Azure login
-        uses: azure/login@v1.4.5
+        uses: azure/login@v2.0.0
         if: matrix.engine == 'PostgreSQL' || matrix.engine == 'Oracle'
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
