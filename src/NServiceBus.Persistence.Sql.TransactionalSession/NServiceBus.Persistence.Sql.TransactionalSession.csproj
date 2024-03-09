@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="NServiceBus.TransactionalSession" Version="3.0.0-alpha.1" />
-    <PackageReference Include="Particular.Packaging" Version="4.0.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
