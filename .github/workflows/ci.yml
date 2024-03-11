@@ -8,6 +8,9 @@ on:
   workflow_dispatch:
 env:
   DOTNET_NOLOGO: true
+defaults:
+  run:
+    shell: pwsh
 jobs:
   build:
     name: ${{ matrix.os-name }}-${{ matrix.engine }}
@@ -27,7 +30,6 @@ jobs:
       - name: Check for secrets
         env:
           SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
-        shell: pwsh
         run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -64,7 +66,6 @@ jobs:
       - name: Setup PostgreSql
         id: setup-postgresql
         if: matrix.engine == 'PostgreSql'
-        shell: pwsh
         run: |
           echo "Getting the Azure region in which this workflow is running..."
           $hostInfo = curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | ConvertFrom-Json
@@ -112,7 +113,6 @@ jobs:
       - name: Setup MySQL
         id: setup-mysql
         if: matrix.engine == 'MySql'
-        shell: pwsh
         run: |
           echo '[client]
           user=root
@@ -157,7 +157,6 @@ jobs:
           tag: SqlPersistence
       - name: Prepare Connection Strings for Oracle
         if: matrix.engine == 'Oracle'
-        shell: pwsh
         run: |
           $connectionString = $Env:OracleConnectionString
           "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
@@ -166,7 +165,6 @@ jobs:
         uses: Particular/run-tests-action@v1.7.0
       - name: Teardown infrastructure
         if: ${{ always() }}
-        shell: pwsh
         run: |
           if ('${{ matrix.engine }}' -eq 'PostgreSql') {
             echo "Removing container ${{ steps.setup-postgresql.outputs.name }}"
