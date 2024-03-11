@@ -58,7 +58,7 @@
 
         /// <summary>
         /// Path to promote SQL installation scripts to.
-        /// The token '..\' will be replace with the current solution directory.
+        /// The token '$(SolutionDir)' will be replace with the current solution directory.
         /// The token '$(ProjectDir)' will be replace with the current project directory.
         /// The path calculation is performed relative to the current project directory.
         /// </summary>
