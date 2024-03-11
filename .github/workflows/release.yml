@@ -6,6 +6,9 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+-*'
 env:
   DOTNET_NOLOGO: true
+defaults:
+  run:
+    shell: pwsh
 jobs:
   release:
     runs-on: windows-2019 # Windows required for ILMerge to work in ScriptBuilderTask
