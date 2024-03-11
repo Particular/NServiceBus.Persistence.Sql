@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net461;net6.0;net7.0;net8.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBusTests.snk</AssemblyOriginatorKeyFile>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <WriteMinVerProperties>false</WriteMinVerProperties>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.8.1" GeneratePathProperty="True" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,11 +25,11 @@
   </ItemGroup>
 
   <ItemGroup Label="Remove 2s delay test - Oracle doesn't store fractional seconds">
-    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_Deferring_a_message.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\DelayedDelivery\When_Deferring_a_message.cs" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''" />
   </ItemGroup>
 
   <ItemGroup Label="Not enough time in Oracle - timeout removed in master">
-    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''" />
   </ItemGroup>
 
 </Project>

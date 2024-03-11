@@ -16,3 +16,6 @@ dotnet_diagnostic.NSB0014.severity = none
 dotnet_diagnostic.NSB0015.severity = none
 dotnet_diagnostic.NSB0016.severity = none
 dotnet_diagnostic.NSB0017.severity = none
+
+# IDE0028: Collection initialization can be simplified
+dotnet_diagnostic.IDE0028.severity = suggestion
