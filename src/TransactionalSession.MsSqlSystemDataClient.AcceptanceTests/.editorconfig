@@ -10,3 +10,6 @@ dotnet_diagnostic.PS0013.severity = suggestion
 
 # Persistene library doesn't need saga analyzers
 dotnet_diagnostic.NSB0004.severity = none
+
+# IDE0028: Collection initialization can be simplified
+dotnet_diagnostic.IDE0028.severity = suggestion
