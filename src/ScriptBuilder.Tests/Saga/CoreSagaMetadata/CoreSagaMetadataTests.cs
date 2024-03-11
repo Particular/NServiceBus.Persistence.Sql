@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
@@ -144,7 +145,7 @@ public partial class CoreSagaMetadataTests
         TestSagaDefinition<ReverseHeaderMappingSaga>();
     }
 
-    void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
+    void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null, [CallerMemberName] string callerMemberName = null)
     {
         moduleToUse ??= module;
 
@@ -168,7 +169,7 @@ public partial class CoreSagaMetadataTests
             results.Exception = x.Message;
         }
 
-        Approver.Verify(results);
+        Approver.Verify(results, callerMemberName: callerMemberName);
     }
 
     class SagaInspectionResults
