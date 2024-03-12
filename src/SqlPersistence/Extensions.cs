@@ -72,15 +72,20 @@ static class Extensions
     public static async Task<bool> GetBoolAsync(this DbDataReader reader, int position, CancellationToken cancellationToken = default)
     {
         var type = reader.GetFieldType(position);
-        // MySql stores bools as ints
+        // MySql stores bools as longs (ulong)
         if (type == typeof(ulong))
         {
             return Convert.ToBoolean(await reader.GetFieldValueAsync<ulong>(position, cancellationToken).ConfigureAwait(false));
         }
-        // In Oracle we store bools as NUMBER(1,0) (short).
+        // In Oracle default driver store bools as NUMBER(1,0) (short).
         if (type == typeof(short))
         {
             return Convert.ToBoolean(await reader.GetFieldValueAsync<short>(position, cancellationToken).ConfigureAwait(false));
+        }
+        // or it might be stored as ints.
+        if (type == typeof(int))
+        {
+            return Convert.ToBoolean(await reader.GetFieldValueAsync<int>(position, cancellationToken).ConfigureAwait(false));
         }
         return await reader.GetFieldValueAsync<bool>(position, cancellationToken).ConfigureAwait(false);
     }
