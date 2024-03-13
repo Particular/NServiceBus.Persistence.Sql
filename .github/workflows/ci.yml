@@ -13,18 +13,17 @@ defaults:
     shell: pwsh
 jobs:
   build:
-    name: ${{ matrix.os-name }}-${{ matrix.engine }}
+    name: ${{ matrix.name }}-${{ matrix.engine }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-2022, ubuntu-22.04]
         engine: [SqlServer, MySql, PostgreSql, Oracle]
         include:
-          # Add os-name alias for job name
           - os: windows-2022
-            os-name: Windows
+            name: Windows
           - os: ubuntu-22.04
-            os-name: Linux
+            name: Linux
       fail-fast: false
     steps:
       - name: Check for secrets
@@ -49,7 +48,7 @@ jobs:
           retention-days: 7
       - name: Azure login
         uses: azure/login@v2.0.0
-        if: matrix.engine == 'PostgreSQL' || (matrix.engine == 'Oracle' && matrix.os-name == 'Windows')
+        if: matrix.engine == 'PostgreSQL' || (matrix.engine == 'Oracle' && matrix.name == 'Windows')
         with:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
