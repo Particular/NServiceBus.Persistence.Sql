@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <!-- We want the root namespace to match the transactional session one -->
     <RootNamespace>NServiceBus.TransactionalSession</RootNamespace>
     <Description>NServiceBus Transactional Session for SQL persistence.</Description>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="3.0.0-alpha.1" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="[3.0.0, 4.0.0)" />
     <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 

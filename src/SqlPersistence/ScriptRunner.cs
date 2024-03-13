@@ -32,11 +32,11 @@
         /// </remarks>
         public static async Task Install(SqlDialect sqlDialect, string tablePrefix, Func<Type, DbConnection> connectionBuilder, string scriptDirectory, bool shouldInstallOutbox = true, bool shouldInstallSagas = true, bool shouldInstallSubscriptions = true, CancellationToken cancellationToken = default)
         {
-            Guard.AgainstNull(nameof(sqlDialect), sqlDialect);
-            Guard.AgainstNull(nameof(tablePrefix), tablePrefix);
+            ArgumentNullException.ThrowIfNull(sqlDialect);
+            ArgumentNullException.ThrowIfNull(tablePrefix);
             Guard.AgainstSqlDelimiters(nameof(tablePrefix), tablePrefix);
-            Guard.AgainstNull(nameof(connectionBuilder), connectionBuilder);
-            Guard.AgainstNullAndEmpty(nameof(scriptDirectory), scriptDirectory);
+            ArgumentNullException.ThrowIfNull(connectionBuilder);
+            ArgumentException.ThrowIfNullOrWhiteSpace(scriptDirectory);
             sqlDialect.ValidateTablePrefix(tablePrefix);
 
             if (shouldInstallOutbox)

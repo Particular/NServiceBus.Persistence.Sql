@@ -10,8 +10,8 @@ namespace NServiceBus
         /// </summary>
         public static void Schema(this SqlDialectSettings<SqlDialect.PostgreSql> dialectSettings, string schema)
         {
-            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
-            Guard.AgainstNullAndEmpty(nameof(schema), schema);
+            ArgumentNullException.ThrowIfNull(dialectSettings);
+            ArgumentException.ThrowIfNullOrWhiteSpace(schema);
             Guard.AgainstSqlDelimiters(nameof(schema), schema);
             dialectSettings.TypedDialect.Schema = schema;
         }
@@ -21,8 +21,8 @@ namespace NServiceBus
         /// </summary>
         public static void JsonBParameterModifier(this SqlDialectSettings<SqlDialect.PostgreSql> dialectSettings, Action<DbParameter> modifier)
         {
-            Guard.AgainstNull(nameof(dialectSettings), dialectSettings);
-            Guard.AgainstNull(nameof(modifier), modifier);
+            ArgumentNullException.ThrowIfNull(dialectSettings);
+            ArgumentNullException.ThrowIfNull(modifier);
             dialectSettings.TypedDialect.JsonBParameterModifier = modifier;
         }
     }

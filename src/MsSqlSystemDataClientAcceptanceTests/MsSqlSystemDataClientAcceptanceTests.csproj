@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBusTests.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>MsSqlAcceptanceTests</RootNamespace>
   </PropertyGroup>
 
@@ -13,8 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.0.0-alpha.9" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.0.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>

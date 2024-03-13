@@ -19,7 +19,7 @@
         /// </summary>
         public static ISqlStorageSession SqlPersistenceSession(this ISynchronizedStorageSession session)
         {
-            Guard.AgainstNull(nameof(session), session);
+            ArgumentNullException.ThrowIfNull(session);
 
             if (session is ISqlStorageSession storageSession)
             {
@@ -54,10 +54,10 @@
         public static Task<TSagaData> GetSagaData<TSagaData>(this ISynchronizedStorageSession session, IReadOnlyContextBag context, string whereClause, ParameterAppender appendParameters, CancellationToken cancellationToken = default)
             where TSagaData : class, IContainSagaData
         {
-            Guard.AgainstNull(nameof(session), session);
-            Guard.AgainstNull(nameof(context), context);
-            Guard.AgainstNull(nameof(appendParameters), appendParameters);
-            Guard.AgainstNullAndEmpty(nameof(whereClause), whereClause);
+            ArgumentNullException.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(appendParameters);
+            ArgumentException.ThrowIfNullOrWhiteSpace(whereClause);
 
             var writableContextBag = (ContextBag)context;
             var sqlSession = session.GetInternalSqlStorageSession();

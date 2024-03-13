@@ -18,8 +18,8 @@
         /// The cleanup process removes entries older than the specified time to keep deduplication data. The time span cannot be negative or zero.</param>
         public static void KeepDeduplicationDataFor(this OutboxSettings configuration, TimeSpan timeToKeepDeduplicationData)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNegativeAndZero(nameof(timeToKeepDeduplicationData), timeToKeepDeduplicationData);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(timeToKeepDeduplicationData, TimeSpan.Zero);
 
             configuration.GetSettings().Set(SqlOutboxFeature.TimeToKeepDeduplicationData, timeToKeepDeduplicationData);
         }
@@ -31,8 +31,8 @@
         /// <param name="frequencyToRunDeduplicationDataCleanup">The frequency to run the deduplication data cleanup task. The time span cannot be negative or sero.</param>
         public static void RunDeduplicationDataCleanupEvery(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
-            Guard.AgainstNegativeAndZero(nameof(frequencyToRunDeduplicationDataCleanup), frequencyToRunDeduplicationDataCleanup);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(frequencyToRunDeduplicationDataCleanup, TimeSpan.Zero);
 
             configuration.GetSettings().Set(SqlOutboxFeature.FrequencyToRunDeduplicationDataCleanup, frequencyToRunDeduplicationDataCleanup);
         }
@@ -42,7 +42,7 @@
         /// </summary>
         public static void DisableCleanup(this OutboxSettings configuration)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
+            ArgumentNullException.ThrowIfNull(configuration);
 
             configuration.GetSettings().Set(SqlOutboxFeature.DisableCleanup, true);
         }

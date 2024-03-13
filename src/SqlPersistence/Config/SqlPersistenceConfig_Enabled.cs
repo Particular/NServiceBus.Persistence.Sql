@@ -1,5 +1,6 @@
 namespace NServiceBus
 {
+    using System;
     using Configuration.AdvancedExtensibility;
 
     public static partial class SqlPersistenceConfig
@@ -9,7 +10,7 @@ namespace NServiceBus
         /// </summary>
         public static void DisableInstaller(this PersistenceExtensions<SqlPersistence> configuration)
         {
-            Guard.AgainstNull(nameof(configuration), configuration);
+            ArgumentNullException.ThrowIfNull(configuration);
 
             var installerSettings = configuration.GetSettings().GetOrCreate<InstallerSettings>();
             installerSettings.Disabled = true;
