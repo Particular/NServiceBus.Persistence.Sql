@@ -58,7 +58,7 @@ jobs:
           creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup SQL Server
         if: matrix.engine == 'SqlServer'
-        uses: Particular/install-sql-server-action@v1.0.0
+        uses: Particular/install-sql-server-action@v1.1.0
         with:
           connection-string-env-var: SQLServerConnectionString
           catalog: nservicebus
@@ -150,7 +150,7 @@ jobs:
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
-        uses: Particular/setup-oracle-action@v1.3.0
+        uses: Particular/setup-oracle-action@v1.4.0
         with:
           connection-string-name: OracleConnectionString
           init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
