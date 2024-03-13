@@ -1,4 +1,4 @@
-# NServiceBus.SqlPersistence
+# NServiceBus.SqlPersistence test
 
 NServiceBus.SqlPersistence provides support for NServiceBus to persist in a Sql Database.
 
