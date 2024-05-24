@@ -57,7 +57,7 @@ create table if not exists ""public"".""{DataTableName}"" (
 
         public class Context : ScenarioContext
         {
-            public int RecordCount { get; set; }
+            public long RecordCount { get; set; }
             public int InvocationCount { get; set; }
             public bool TransactionEscalatedToDTC { get; set; }
             public bool ReplyReceived { get; set; }
@@ -124,14 +124,14 @@ create table if not exists ""public"".""{DataTableName}"" (
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
 
-                    int count;
+                    long count;
                     var selectCommand = $@"select count(*) from ""{DataTableName}"" where Id = @Id";
                     using (var command = session.Connection.CreateCommand())
                     {
                         command.Transaction = session.Transaction;
                         command.CommandText = selectCommand;
                         command.AddParameter("@Id", message.Id);
-                        count = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
+                        count = (long)await command.ExecuteScalarAsync().ConfigureAwait(false);
                     }
 
                     testContext.RecordCount = count;

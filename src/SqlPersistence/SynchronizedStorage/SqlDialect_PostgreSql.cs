@@ -18,29 +18,34 @@
                 IConnectionManager connectionBuilder,
                 CancellationToken cancellationToken = default)
             {
+                // SQL server transport in native TX mode
+                if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
+                    transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
+                {
+                    if (existingSqlConnection.GetType().Name != "NpgsqlConnection")
+                    {
+                        return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
+                    }
+
+                    return (WasAdapted: true, Connection: existingSqlConnection, Transaction: existingSqlTransaction, OwnsTransaction: false);
+                }
+
+                if (transportTransaction.TryGet(out Transaction _))
+                {
+                    throw new Exception("PostgreSQL persistence should not be used with TransportTransactionMode equal to TransactionScope");
+                }
+
                 // Transport supports DTC and uses TxScope owned by the transport
                 var scopeTx = Transaction.Current;
 
-                if (transportTransaction.TryGet(out Transaction transportTx) &&
-                    scopeTx != null &&
-                    transportTx != scopeTx)
-                {
-                    throw new Exception("A TransactionScope has been opened in the current context overriding the one created by the transport. "
-                                        + "This setup can result in inconsistent data because operations done via connections enlisted in the context scope won't be committed "
-                                        + "atomically with the receive transaction. To manually control the TransactionScope in the pipeline switch the transport transaction mode "
-                                        + $"to values lower than '{nameof(TransportTransactionMode.TransactionScope)}'.");
-                }
-
-                var ambientTransaction = transportTx ?? scopeTx;
-
-                if (ambientTransaction == null)
+                if (scopeTx == null)
                 {
                     // Other modes handled by creating a new session.
                     return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
                 }
 
                 var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
-                connection.EnlistTransaction(ambientTransaction);
+                connection.EnlistTransaction(scopeTx);
 
                 return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }
