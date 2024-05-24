@@ -1,4 +1,4 @@
-﻿[assembly: SqlServerTest]
+﻿[assembly: PostgreSqlTest]
 
 namespace NServiceBus.AcceptanceTests
 {

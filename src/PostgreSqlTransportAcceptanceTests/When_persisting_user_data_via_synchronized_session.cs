@@ -4,7 +4,6 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
     using EndpointTemplates;
     using NUnit.Framework;
     using Persistence.Sql;
@@ -12,27 +11,19 @@
 
     public class When_persisting_user_data_via_synchronized_session : NServiceBusAcceptanceTest
     {
-        static string EndpointName => Conventions.EndpointNamingConvention(typeof(Endpoint));
+        static string DataTableName => "MyPreciousTable";
 
         static string CreateUserDataTableText => $@"
-IF NOT  EXISTS (
-    select * from sys.objects
-    where object_id = object_id('[dbo].[{EndpointName}_Data]')
-    and type in ('U')
-)
-begin
-    create table [dbo].[{EndpointName}_Data](
-        [Id] [uniqueidentifier] not null
-    ) ON [PRIMARY];
-end";
+create table if not exists ""public"".""{DataTableName}"" (
+    Id uuid not null
+);";
 
         [Test]
-        [TestCase(TransportTransactionMode.TransactionScope, false)] //Uses TransactionScope to ensure exactly-once
         [TestCase(TransportTransactionMode.SendsAtomicWithReceive, false)] //Uses shared DbConnection/DbTransaction to ensure exactly-once
         [TestCase(TransportTransactionMode.ReceiveOnly, true)] //Uses the Outbox to ensure exactly-once
         public async Task Should_rollback_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode, bool enableOutbox)
         {
-            using (var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build())
+            using (var connection = PostgreSqlConnectionBuilder.Build())
             {
                 await connection.OpenAsync().ConfigureAwait(false);
                 using (var command = connection.CreateCommand())
@@ -124,7 +115,7 @@ end";
                     }
 
                     var session = context.SynchronizedStorageSession.SqlPersistenceSession();
-                    var insertCommand = $"insert into [dbo].[{EndpointName}_Data] (Id) VALUES (@Id)";
+                    var insertCommand = $@"insert into ""{DataTableName}"" (Id) VALUES (@Id)";
                     using (var command = session.Connection.CreateCommand())
                     {
                         command.Transaction = session.Transaction;
@@ -134,7 +125,7 @@ end";
                     }
 
                     int count;
-                    var selectCommand = $"select count(*) from [dbo].[{EndpointName}_Data] where Id = @Id";
+                    var selectCommand = $@"select count(*) from ""{DataTableName}"" where Id = @Id";
                     using (var command = session.Connection.CreateCommand())
                     {
                         command.Transaction = session.Transaction;
