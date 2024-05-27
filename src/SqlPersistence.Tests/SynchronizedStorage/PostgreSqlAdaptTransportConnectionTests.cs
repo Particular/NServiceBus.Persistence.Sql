@@ -22,7 +22,7 @@ namespace PostgreSql
         });
 
         [Test]
-        public void It_throws_if_non_transport_transaction_scope_exists()
+        public void It_throws_if_transport_transaction_scope_exists()
         {
             using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
