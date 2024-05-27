@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Npgsql;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
-using NServiceBus.Transport;
 
 public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecution
 {
     public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
-        transport = new TestingPostgreSqlTransport(async cancellationToken =>
+        transport = new PostgreSqlTransport(async cancellationToken =>
         {
             var conn = PostgreSqlConnectionBuilder.Build();
             await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -33,12 +30,11 @@ public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecut
 
             var testingData = transport.GetType().GetProperty("Testing", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(transport);
 
-            var queueAddresses = transport.ReceivingAddresses;
 
             var commandTextBuilder = new StringBuilder();
 
             //No clean-up for send-only endpoints
-            if (queueAddresses != null)
+            if (testingData.GetType().GetProperty("ReceiveAddresses", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(testingData) is string[] queueAddresses)
             {
                 foreach (var address in queueAddresses)
                 {
@@ -86,28 +82,5 @@ public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecut
         }
     }
 
-    TestingPostgreSqlTransport transport;
-
-    class TestingPostgreSqlTransport : PostgreSqlTransport
-    {
-        public TestingPostgreSqlTransport(string connectionString) : base(connectionString)
-        {
-        }
-
-        public TestingPostgreSqlTransport(Func<CancellationToken, Task<NpgsqlConnection>> connectionFactory) : base(connectionFactory)
-        {
-        }
-
-        public string[] ReceivingAddresses { get; private set; } = Array.Empty<string>();
-
-        public override async Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers,
-            string[] sendingAddresses, CancellationToken cancellationToken = default)
-        {
-            var infra = await base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
-
-            ReceivingAddresses = infra.Receivers.Select(r => r.Value.ReceiveAddress).ToArray();
-
-            return infra;
-        }
-    }
+    PostgreSqlTransport transport;
 }
