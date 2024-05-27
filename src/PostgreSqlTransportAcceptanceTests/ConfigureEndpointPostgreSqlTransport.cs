@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Npgsql;
@@ -23,22 +25,66 @@ public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecut
         return Task.CompletedTask;
     }
 
-    public Task Cleanup()
+    public async Task Cleanup()
     {
         using (var conn = PostgreSqlConnectionBuilder.Build())
         {
             conn.Open();
 
-            //var queueAddresses = transport.ReceivingAddresses.ToList();
-            //foreach (var address in queueAddresses)
-            //{
-            //    TryDeleteTable(conn, address);
-            //    TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
-            //}
+            var testingData = transport.GetType().GetProperty("Testing", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(transport);
+
+            var queueAddresses = transport.ReceivingAddresses;
+
+            var commandTextBuilder = new StringBuilder();
+
+            //No clean-up for send-only endpoints
+            if (queueAddresses != null)
+            {
+                foreach (var address in queueAddresses)
+                {
+                    commandTextBuilder.AppendLine($"DROP TABLE IF EXISTS {address};");
+                }
+            }
+
+            //Null-check because if an exception is thrown before startup these fields might be empty
+            if (testingData.GetType().GetProperty("DelayedDeliveryQueue", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(testingData) is string delayedQueueAddress)
+            {
+                commandTextBuilder.AppendLine($"DROP TABLE IF EXISTS {delayedQueueAddress};");
+            }
+
+            var subscriptionTableName = testingData.GetType().GetProperty("SubscriptionTable", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(testingData) as string;
+
+            if (!string.IsNullOrEmpty(subscriptionTableName))
+            {
+                commandTextBuilder.AppendLine($"DROP TABLE IF EXISTS {subscriptionTableName};");
+            }
+
+            var commandText = commandTextBuilder.ToString();
+            if (!string.IsNullOrEmpty(commandText))
+            {
+                await TryDeleteTables(conn, commandText);
+            }
         }
-        return Task.CompletedTask;
     }
 
+    static async Task TryDeleteTables(NpgsqlConnection conn, string commandText)
+    {
+        try
+        {
+            using (var comm = conn.CreateCommand())
+            {
+                comm.CommandText = commandText;
+                await comm.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+        }
+        catch (Exception e)
+        {
+            if (!e.Message.Contains("it does not exist or you do not have permission"))
+            {
+                throw;
+            }
+        }
+    }
 
     TestingPostgreSqlTransport transport;
 
