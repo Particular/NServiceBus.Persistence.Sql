@@ -19,7 +19,7 @@ sealed class SqlValidateStorageTypeCombinationFeature : Feature
 
     // This check should normally be handled by Core but unfortunately there is a bug that prevents the check from executing
     // https://github.com/Particular/NServiceBus/issues/6378
-    static void ValidateSagaOutboxCombo(IReadOnlySettings settings)
+    internal static void ValidateSagaOutboxCombo(IReadOnlySettings settings)
     {
         var isOutboxEnabled = settings.IsFeatureActive(typeof(Outbox));
         var isSagasEnabled = settings.IsFeatureActive(typeof(Sagas));
@@ -29,7 +29,8 @@ sealed class SqlValidateStorageTypeCombinationFeature : Feature
         }
         var isSagasEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlSagaFeature));
         var isOutboxEnabledForSqlPersistence = settings.IsFeatureActive(typeof(SqlOutboxFeature));
-        if (isSagasEnabledForSqlPersistence && isOutboxEnabledForSqlPersistence)
+        if ((isSagasEnabledForSqlPersistence && isOutboxEnabledForSqlPersistence)
+            || (!isSagasEnabledForSqlPersistence && !isOutboxEnabledForSqlPersistence))
         {
             return;
         }
