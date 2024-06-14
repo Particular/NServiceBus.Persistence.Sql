@@ -1,0 +1,6 @@
+ComponentType: Persistence
+ComponentPackages:
+  - Name: NServiceBus.Persistence.Sql
+  - Name: NServiceBus.Persistence.Sql.TransactionalSession
+  - Name: NServiceBus.Persistence.Sql.CommandLine
+  - Name: NServiceBus.Persistence.Sql.ScriptBuilder
