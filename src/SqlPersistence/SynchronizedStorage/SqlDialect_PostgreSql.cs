@@ -18,6 +18,11 @@
                 IConnectionManager connectionBuilder,
                 CancellationToken cancellationToken = default)
             {
+                if (DoNotUseTransportConnection)
+                {
+                    return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
+                }
+
                 // SQL server transport in native TX mode
                 if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
                     transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
@@ -49,6 +54,8 @@
 
                 return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }
+
+            internal bool DoNotUseTransportConnection { get; set; }
         }
     }
 }

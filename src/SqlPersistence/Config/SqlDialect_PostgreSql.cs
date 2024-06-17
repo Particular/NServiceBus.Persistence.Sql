@@ -88,7 +88,8 @@ dialect.JsonBParameterModifier(
                 return new
                 {
                     CustomSchema = string.IsNullOrEmpty(Schema),
-                    CustomJsonBParameterModifier = JsonBParameterModifier != null
+                    CustomJsonBParameterModifier = JsonBParameterModifier != null,
+                    DoNotUseTransportConnection
                 };
             }
 
