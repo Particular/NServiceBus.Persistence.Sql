@@ -27,7 +27,7 @@ namespace NServiceBus
         }
 
         /// <summary>
-        /// Instructs the persistence to not use the connection established by the SQL Server transport.
+        /// Instructs the persistence to not use the connection established by the PostgreSQL transport.
         /// </summary>
         public static void DoNotUsePostgreSqlTransportConnection(this SqlDialectSettings<SqlDialect.PostgreSql> dialectSettings)
         {
