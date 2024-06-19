@@ -25,5 +25,14 @@ namespace NServiceBus
             ArgumentNullException.ThrowIfNull(modifier);
             dialectSettings.TypedDialect.JsonBParameterModifier = modifier;
         }
+
+        /// <summary>
+        /// Instructs the persistence to not use the connection established by the PostgreSQL transport.
+        /// </summary>
+        public static void DoNotUsePostgreSqlTransportConnection(this SqlDialectSettings<SqlDialect.PostgreSql> dialectSettings)
+        {
+            ArgumentNullException.ThrowIfNull(dialectSettings);
+            dialectSettings.TypedDialect.DoNotUseTransportConnection = true;
+        }
     }
 }

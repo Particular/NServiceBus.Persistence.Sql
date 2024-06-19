@@ -27,6 +27,11 @@
                 if (transportTransaction.TryGet("System.Data.SqlClient.SqlConnection", out DbConnection existingSqlConnection) &&
                     transportTransaction.TryGet("System.Data.SqlClient.SqlTransaction", out DbTransaction existingSqlTransaction))
                 {
+                    if (existingSqlConnection.GetType().Name != "SqlConnection")
+                    {
+                        return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
+                    }
+
                     return (WasAdapted: true, Connection: existingSqlConnection, Transaction: existingSqlTransaction, OwnsTransaction: false);
                 }
 
