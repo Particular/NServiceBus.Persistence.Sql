@@ -76,7 +76,7 @@ namespace NServiceBus
 
             if (settings.EndpointIsMultiTenant())
             {
-                exceptionMessage += $" When in multi-tenant mode with `{nameof(MultiTenantConnectionBuilder)}`, you must still use `{nameof(ConnectionBuilder)}` to provide a database connection for subscriptions/timeouts on message transports that don't support those features natively.";
+                exceptionMessage += $" When in multi-tenant mode with `{nameof(MultiTenantConnectionBuilder)}`, you must still use `{nameof(ConnectionBuilder)}` to provide a database connection for subscriptions on message transports that don't support this feature natively.";
             }
 
             throw new Exception(exceptionMessage);
