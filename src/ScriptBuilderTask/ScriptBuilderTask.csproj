@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- net472 TFM needed to support VS 2022 -->
-    <TargetFrameworks>net472;net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
@@ -20,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.27" PrivateAssets="All" />
+    <!--<PackageReference Include="Microsoft.IO.Redist" Version="6.0.1" />-->
     <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
@@ -27,21 +26,6 @@
     <!-- Package needs to stay on 17.8.3 until we no longer need to ensure we run on the 8.0.10x SDK and Visual Studio 17.8 -->
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="All" />
   </ItemGroup>
-
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory"
-    Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
-    <PropertyGroup>
-      <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
-    </PropertyGroup>
-    <MakeDir Directories="$(TempFolder)" />
-    <Exec Command="&quot;$(ILRepack)&quot; /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <ItemGroup>
-      <TempFiles Include="$(TempFolder)\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TempFiles)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
-    <Delete Files="@(TempFiles)" />
-    <RemoveDir Directories="$(TempFolder)" />
-  </Target>
 
   <ItemGroup>
     <InternalsVisibleTo Include="ScriptBuilderTask.Tests" Key="$(NServiceBusTestsKey)" />

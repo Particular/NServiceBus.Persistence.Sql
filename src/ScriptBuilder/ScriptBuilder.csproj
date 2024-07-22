@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <!-- net472 TFM needed to support VS 2022 -->
-    <TargetFrameworks>net472;net9.0</TargetFrameworks>
+  <PropertyGroup>    
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilder</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Mono.Cecil" Version="0.11.5" />
     <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
@@ -27,7 +26,7 @@
     <Description>Library for building deployment scripts for the NServiceBus.Persistence.Sql package</Description>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup>    
     <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.ScriptBuilderTask" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="ScriptBuilder.Tests" Key="$(NServiceBusTestsKey)" />
