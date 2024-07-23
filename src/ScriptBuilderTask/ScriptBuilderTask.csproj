@@ -9,7 +9,6 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
-    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +17,6 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.27" PrivateAssets="All" />
-    <!--<PackageReference Include="Microsoft.IO.Redist" Version="6.0.1" />-->
     <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 

@@ -5,7 +5,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>MsSqlAcceptanceTests</RootNamespace>
-    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
