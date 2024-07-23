@@ -22,6 +22,7 @@
 
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" />
+    <!--Change to use $(TargetFramework) once nsb is updated-->
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net8.0\**\EndpointTemplates\*.cs" />
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net8.0\**\ScenarioDescriptors\*.cs" />
     <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net8.0\**\NServiceBusAcceptanceTest.cs" />
