@@ -36,6 +36,6 @@ public class SqlValidateStorageTypeCombinationFeatureTests
         settings.Set(typeof(SqlOutboxFeature).FullName, sagaUsingSqlPersistence);
 
         var ex = Assert.Throws<Exception>(() => SqlValidateStorageTypeCombinationFeature.ValidateSagaOutboxCombo(settings));
-        Assert.That(ex.Message.Equals("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.", comparisonType: StringComparison.OrdinalIgnoreCase));
+        Assert.AreEqual("When both sagas and outbox are enabled, SQL persistence must be enabled for either both sagas and outbox, or neither.", ex.Message);
     }
 }

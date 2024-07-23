@@ -21,7 +21,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
                 .ConfigureAwait(false);
         });
 
-        StringAssert.StartsWith("Sql Persistence must be enabled for either both Sagas and Outbox, or neither.", ex.Message);
+        StringAssert.StartsWith("When both sagas and outbox are enabled, SQL persistence must be enabled for either both sagas and outbox, or neither.", ex.Message);
     }
 
     public class Context : ScenarioContext
