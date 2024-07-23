@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <!-- net472 TFM needed to support VS 2022 -->
+    <TargetFrameworks>net472;net9.0</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
+    <NoWarn>$(NoWarn);CS1591;NU1903</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -29,4 +31,18 @@
     <InternalsVisibleTo Include="ScriptBuilderTask.Tests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory"
+   Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
+    <PropertyGroup>
+      <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
+    </PropertyGroup>
+    <MakeDir Directories="$(TempFolder)" />
+    <Exec Command="&quot;$(ILRepack)&quot; /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
+    <ItemGroup>
+      <TempFiles Include="$(TempFolder)\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TempFiles)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
+    <Delete Files="@(TempFiles)" />
+    <RemoveDir Directories="$(TempFolder)" />
+  </Target>
 </Project>

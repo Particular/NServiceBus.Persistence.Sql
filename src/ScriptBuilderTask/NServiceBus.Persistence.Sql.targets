@@ -3,6 +3,7 @@
   <PropertyGroup>
     <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
     <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\..\build\net9.0\task\net9.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath Condition="'$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\..\build\net8.0\task\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>
 
   <UsingTask
