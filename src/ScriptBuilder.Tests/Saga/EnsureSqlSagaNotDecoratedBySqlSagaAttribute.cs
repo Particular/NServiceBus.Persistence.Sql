@@ -18,7 +18,7 @@ public class EnsureSqlSagaNotDecoratedWithSqlSaga
         var dataType = module.GetTypeDefinition<SagaDecoratedWithSqlSaga>();
 
         var ex = Assert.Throws<Exception>(() => SagaDefinitionReader.TryGetSagaDefinition(dataType, out _));
-        Assert.That(ex.Message.Contains("attribute is invalid"), Is.True);
+        Assert.That(ex.Message, Does.Contain("attribute is invalid"));
     }
 
     [SqlSaga]

@@ -66,7 +66,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         var exception = failed.Exception;
         var msg = exception.Message;
 
-        Assert.That(msg.Contains("unable to determine the tenant id"));
+        Assert.That(msg, Does.Contain("unable to determine the tenant id"));
     }
 
     [Test]

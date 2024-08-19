@@ -824,7 +824,7 @@ public abstract class SagaPersisterTests
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
-            Assert.That(exception.Message.Contains("Optimistic concurrency violation"), Is.True);
+            Assert.That(exception.Message, Does.Contain("Optimistic concurrency violation"));
         }
     }
 
