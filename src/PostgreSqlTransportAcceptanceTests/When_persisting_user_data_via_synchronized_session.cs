@@ -50,7 +50,7 @@ create table if not exists ""public"".""{DataTableName}"" (
                 .Run();
 
             Assert.True(context.ReplyReceived);
-            Assert.IsFalse(context.TransactionEscalatedToDTC);
+            Assert.That(context.TransactionEscalatedToDTC, Is.False);
             Assert.AreEqual(2, context.InvocationCount, "Handler should be called twice");
             Assert.AreEqual(1, context.RecordCount, "There should be only once record in the database");
         }

@@ -41,7 +41,7 @@ public class OutboxCleanerTests
             timer.OnError(new Exception("Simulated!"));
         }
 
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
 
         //Trigger the 10th time
         timer.OnError(new Exception("Simulated!"));
@@ -50,7 +50,7 @@ public class OutboxCleanerTests
 
         //Trigger again -- the counter should be reset
         timer.OnError(new Exception("Simulated!"));
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class OutboxCleanerTests
             }
         }
 
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
     }
 
     class TestableCleaner : OutboxCleaner
