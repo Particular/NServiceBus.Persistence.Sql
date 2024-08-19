@@ -91,7 +91,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine2", "endpoint"), type2, null).Await();
         persister.Subscribe(new Subscriber("e@machine3", null), type2, null).Await();
         var result = persister.GetSubscribers(new[] { type1, type2 }).Result.OrderBy(s => s.TransportAddress);
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
@@ -212,7 +212,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type2, null).Await();
         var result = persister.GetSubscribers(new[] { type1, type2 }).Result.ToList();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
@@ -226,7 +226,7 @@ public abstract class SubscriptionPersisterTests
         //NSB 6.x: same subscriber now mentions endpoint
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
         var result = persister.GetSubscribers(type1).Result.ToList();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
@@ -240,7 +240,7 @@ public abstract class SubscriptionPersisterTests
         //NSB 6.x: same address, new endpoint value
         persister.Subscribe(new Subscriber("e@machine1", "e2"), type1, null).Await();
         var result = persister.GetSubscribers(type1).Result.ToList();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
@@ -254,7 +254,7 @@ public abstract class SubscriptionPersisterTests
         //NSB 5.x: endpoint is null, don't want to remove endpoint value from table though
         persister.Subscribe(new Subscriber("e@machine1", null), type1, null).Await();
         var result = persister.GetSubscribers(type1).Result.ToList();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
@@ -273,7 +273,7 @@ public abstract class SubscriptionPersisterTests
         persister.Subscribe(address2, message1, null).Await();
         persister.Unsubscribe(address1, message2, null).Await();
         var result = persister.GetSubscribers(new[] { message2, message1 }).Result.ToList();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Approver.Verify(result);
     }
 
