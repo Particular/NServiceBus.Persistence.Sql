@@ -359,7 +359,7 @@ public abstract class SagaPersisterTests
             await storageSession.CompleteAsync();
         }
 
-        Assert.IsTrue(callbackInvoked);
+        Assert.That(callbackInvoked, Is.True);
     }
 
     [Test]
@@ -409,7 +409,7 @@ public abstract class SagaPersisterTests
             }
         }
 
-        Assert.IsTrue(exceptionThrown);
+        Assert.That(exceptionThrown, Is.True);
 
         using (var connection = dbConnection())
         using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
@@ -713,7 +713,7 @@ public abstract class SagaPersisterTests
             connection.Open();
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
 
             var definition2 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -731,8 +731,8 @@ public abstract class SagaPersisterTests
             );
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
+            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -746,7 +746,7 @@ public abstract class SagaPersisterTests
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
             Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
         }
     }
 
@@ -824,7 +824,7 @@ public abstract class SagaPersisterTests
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
-            Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
+            Assert.That(exception.Message.Contains("Optimistic concurrency violation"), Is.True);
         }
     }
 
@@ -1157,7 +1157,7 @@ public abstract class SagaPersisterTests
                 await storageSession.CompleteAsync();
             });
             var innerException = throwsAsync.InnerException;
-            Assert.IsTrue(IsConcurrencyException(innerException));
+            Assert.That(IsConcurrencyException(innerException), Is.True);
         }
     }
 

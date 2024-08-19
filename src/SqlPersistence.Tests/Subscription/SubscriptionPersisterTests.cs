@@ -123,7 +123,7 @@ public abstract class SubscriptionPersisterTests
         var subscribersSecond = await persister.GetSubscribers(type)
             .ConfigureAwait(false);
         var secondTime = second.ElapsedMilliseconds;
-        Assert.IsTrue(secondTime * 1000 < firstTime);
+        Assert.That(secondTime * 1000 < firstTime, Is.True);
         Assert.AreEqual(subscribersFirst.Count(), subscribersSecond.Count());
     }
 

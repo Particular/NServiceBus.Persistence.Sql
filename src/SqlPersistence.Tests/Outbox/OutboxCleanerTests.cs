@@ -45,7 +45,7 @@ public class OutboxCleanerTests
 
         //Trigger the 10th time
         timer.OnError(new Exception("Simulated!"));
-        Assert.IsTrue(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.True);
         criticalActionTriggered = false;
 
         //Trigger again -- the counter should be reset
