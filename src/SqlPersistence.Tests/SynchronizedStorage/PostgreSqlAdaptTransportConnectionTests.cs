@@ -35,7 +35,7 @@ namespace PostgreSql
                         connectionManager);
                 });
 
-                StringAssert.StartsWith("PostgreSQL persistence should not be used with TransportTransactionMode equal to TransactionScope", ex.Message);
+                Assert.That(ex.Message, Does.StartWith("PostgreSQL persistence should not be used with TransportTransactionMode equal to TransactionScope"));
             }
         }
 

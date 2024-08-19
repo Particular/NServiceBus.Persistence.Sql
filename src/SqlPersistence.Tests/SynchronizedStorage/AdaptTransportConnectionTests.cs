@@ -37,7 +37,7 @@ abstract class AdaptTransportConnectionTests
             {
                 var ex = Assert.ThrowsAsync<Exception>(async () => await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager));
 
-                StringAssert.StartsWith("A TransactionScope has been opened in the current context overriding the one created by the transport.", ex.Message);
+                Assert.That(ex.Message, Does.StartWith("A TransactionScope has been opened in the current context overriding the one created by the transport."));
             }
         }
     }
