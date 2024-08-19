@@ -47,8 +47,11 @@
 
             var retrieved2 = await GetById<SagaWithCorrelationPropertyData>(sagaData.Id);
 
-            Assert.That(retrieved.Payload, Is.LessThanOrEqualTo(sagaData.Payload)); // No real need, but here to prevent accidental updates
-            Assert.That(retrieved2.Payload, Is.EqualTo(retrieved.Payload));
+            Assert.Multiple(() =>
+            {
+                Assert.That(retrieved.Payload, Is.LessThanOrEqualTo(sagaData.Payload)); // No real need, but here to prevent accidental updates
+                Assert.That(retrieved2.Payload, Is.EqualTo(retrieved.Payload));
+            });
 
             await using var con = sqlVariant.Open();
             await con.OpenAsync();

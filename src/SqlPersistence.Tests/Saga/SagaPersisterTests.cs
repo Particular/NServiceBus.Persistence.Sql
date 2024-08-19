@@ -731,8 +731,11 @@ public abstract class SagaPersisterTests
             );
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
-            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
-            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            });
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -745,8 +748,11 @@ public abstract class SagaPersisterTests
             );
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
-            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);
-            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            });
         }
     }
 

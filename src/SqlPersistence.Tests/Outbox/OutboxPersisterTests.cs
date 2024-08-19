@@ -112,8 +112,11 @@ public abstract class OutboxPersisterTests
         var result = StoreDispatchAndGetAsync(persister).GetAwaiter().GetResult();
         Approver.Verify(Serializer.Serialize(result));
 
-        Assert.That(result.Item1.TransportOperations.Length, Is.EqualTo(1));
-        Assert.That(result.Item2.TransportOperations.Length, Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Item1.TransportOperations.Length, Is.EqualTo(1));
+            Assert.That(result.Item2.TransportOperations.Length, Is.EqualTo(0));
+        });
     }
 
     static async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)
@@ -237,9 +240,12 @@ public abstract class OutboxPersisterTests
         await Store(13, persister).ConfigureAwait(false);
 
         await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
-        Assert.That(await persister.Get("MessageId1", null).ConfigureAwait(false), Is.Null);
-        Assert.That(await persister.Get("MessageId12", null).ConfigureAwait(false), Is.Null);
-        Assert.That(await persister.Get("MessageId13", null).ConfigureAwait(false), Is.Not.Null);
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await persister.Get("MessageId1", null).ConfigureAwait(false), Is.Null);
+            Assert.That(await persister.Get("MessageId12", null).ConfigureAwait(false), Is.Null);
+            Assert.That(await persister.Get("MessageId13", null).ConfigureAwait(false), Is.Not.Null);
+        });
     }
 
     static async Task Store(int i, OutboxPersister persister, CancellationToken cancellationToken = default)

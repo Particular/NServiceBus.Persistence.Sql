@@ -58,10 +58,13 @@ end";
                 .Done(c => c.ReplyReceived)
                 .Run();
 
-            Assert.That(context.ReplyReceived, Is.True);
-            Assert.That(context.TransactionEscalatedToDTC, Is.False);
-            Assert.That(context.InvocationCount, Is.EqualTo(2), "Handler should be called twice");
-            Assert.That(context.RecordCount, Is.EqualTo(1), "There should be only once record in the database");
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.ReplyReceived, Is.True);
+                Assert.That(context.TransactionEscalatedToDTC, Is.False);
+                Assert.That(context.InvocationCount, Is.EqualTo(2), "Handler should be called twice");
+                Assert.That(context.RecordCount, Is.EqualTo(1), "There should be only once record in the database");
+            });
         }
 
         public class Context : ScenarioContext

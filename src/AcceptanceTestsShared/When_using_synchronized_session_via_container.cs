@@ -21,9 +21,12 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
             .Run()
             .ConfigureAwait(false);
 
-        Assert.That(context.ConnectionInjectedToFirstHandler, Is.Not.Null);
-        Assert.That(context.ConnectionInjectedToSecondHandler, Is.Not.Null);
-        Assert.That(context.ConnectionInjectedToThirdHandler, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.ConnectionInjectedToFirstHandler, Is.Not.Null);
+            Assert.That(context.ConnectionInjectedToSecondHandler, Is.Not.Null);
+            Assert.That(context.ConnectionInjectedToThirdHandler, Is.Not.Null);
+        });
         Assert.That(context.ConnectionInjectedToSecondHandler, Is.SameAs(context.ConnectionInjectedToFirstHandler));
         Assert.That(context.ConnectionInjectedToThirdHandler, Is.Not.SameAs(context.ConnectionInjectedToFirstHandler));
     }

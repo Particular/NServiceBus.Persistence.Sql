@@ -30,8 +30,11 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             .Run()
             .ConfigureAwait(false);
 
-        Assert.That(context.StartSagaFinderUsed, Is.True);
-        Assert.That(context.SomeOtherFinderUsed, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.StartSagaFinderUsed, Is.True);
+            Assert.That(context.SomeOtherFinderUsed, Is.True);
+        });
     }
 
     public class Context : ScenarioContext

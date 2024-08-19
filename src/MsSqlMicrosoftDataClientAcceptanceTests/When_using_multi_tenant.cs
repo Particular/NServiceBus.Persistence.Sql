@@ -111,8 +111,11 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             .Run(TimeSpan.FromSeconds(30))
             .ConfigureAwait(false);
 
-        Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
-        Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
+            Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        });
     }
 
     [Test]
@@ -149,8 +152,11 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             .Run(TimeSpan.FromSeconds(30))
             .ConfigureAwait(false);
 
-        Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
-        Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
+            Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        });
     }
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)

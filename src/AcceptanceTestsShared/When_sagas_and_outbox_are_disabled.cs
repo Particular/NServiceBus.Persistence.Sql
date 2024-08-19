@@ -19,8 +19,11 @@ public class When_sagas_and_outbox_are_disabled : NServiceBusAcceptanceTest
             .Run()
             .ConfigureAwait(false);
 
-        Assert.That(context.Done, Is.True);
-        Assert.That(context.SessionCreated, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Done, Is.True);
+            Assert.That(context.SessionCreated, Is.True);
+        });
     }
 
     public class Context : ScenarioContext

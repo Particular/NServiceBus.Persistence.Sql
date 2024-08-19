@@ -64,10 +64,13 @@ namespace PostgreSql
             (bool wasAdapted, DbConnection connection, DbTransaction tx, bool ownsTransaction) =
                 await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager);
 
-            Assert.That(wasAdapted, Is.True);
-            Assert.That(connection, Is.EqualTo(transportConnection));
-            Assert.That(tx, Is.EqualTo(transaction));
-            Assert.That(ownsTransaction, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(wasAdapted, Is.True);
+                Assert.That(connection, Is.EqualTo(transportConnection));
+                Assert.That(tx, Is.EqualTo(transaction));
+                Assert.That(ownsTransaction, Is.False);
+            });
         }
     }
 }
