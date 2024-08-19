@@ -25,7 +25,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         Assert.That(context.ConnectionInjectedToSecondHandler, Is.Not.Null);
         Assert.That(context.ConnectionInjectedToThirdHandler, Is.Not.Null);
         Assert.That(context.ConnectionInjectedToSecondHandler, Is.SameAs(context.ConnectionInjectedToFirstHandler));
-        Assert.AreNotSame(context.ConnectionInjectedToFirstHandler, context.ConnectionInjectedToThirdHandler);
+        Assert.That(context.ConnectionInjectedToThirdHandler, Is.Not.SameAs(context.ConnectionInjectedToFirstHandler));
     }
 
     public class Context : ScenarioContext
