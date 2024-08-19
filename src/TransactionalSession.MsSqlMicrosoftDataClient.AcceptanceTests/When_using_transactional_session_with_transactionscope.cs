@@ -47,19 +47,19 @@
 
                     // the transactional operations should not be visible before commit
                     var resultBeforeCommit = await QueryInsertedEntry(rowId);
-                    Assert.AreEqual(null, resultBeforeCommit);
+                    Assert.That(resultBeforeCommit, Is.EqualTo(null));
 
                     await transactionalSession.Commit().ConfigureAwait(false);
 
                     // the transactional operations should be visible after commit
                     var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
-                    Assert.AreEqual(rowId, resultBeforeAfterCommit);
+                    Assert.That(resultBeforeAfterCommit, Is.EqualTo(rowId));
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
 
             var resultAfterDispose = await QueryInsertedEntry(rowId);
-            Assert.AreEqual(rowId, resultAfterDispose);
+            Assert.That(resultAfterDispose, Is.EqualTo(rowId));
         }
 
         static async Task<string> QueryInsertedEntry(string rowId)
