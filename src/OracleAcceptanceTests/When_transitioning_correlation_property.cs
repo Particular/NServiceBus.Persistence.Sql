@@ -53,14 +53,14 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             connection.PurgeStatementCache();
         }
 
-        CollectionAssert.Contains(phase1Schema, "CORR_ORDERNUMBER");
-        CollectionAssert.DoesNotContain(phase1Schema, "CORR_ORDERID");
+        Assert.That(phase1Schema, Has.Member("CORR_ORDERNUMBER"));
+        Assert.That(phase1Schema, Has.No.Member("CORR_ORDERID"));
 
-        CollectionAssert.Contains(phase2Schema, "CORR_ORDERNUMBER");
-        CollectionAssert.Contains(phase2Schema, "CORR_ORDERID");
+        Assert.That(phase2Schema, Has.Member("CORR_ORDERNUMBER"));
+        Assert.That(phase2Schema, Has.Member("CORR_ORDERID"));
 
-        CollectionAssert.DoesNotContain(phase3Schema, "CORR_ORDERNUMBER");
-        CollectionAssert.Contains(phase3Schema, "CORR_ORDERID");
+        Assert.That(phase3Schema, Has.No.Member("CORR_ORDERNUMBER"));
+        Assert.That(phase3Schema, Has.Member("CORR_ORDERID"));
     }
 
     static string[] GetSchema(OracleConnection connection)
