@@ -33,7 +33,7 @@
                 .Done(c => c.ReplyReceived)
                 .Run();
 
-            Assert.True(context.ReplyReceived);
+            Assert.That(context.ReplyReceived, Is.True);
             Assert.That(context.TransactionEscalatedToDTC, Is.False);
             Assert.AreEqual(2, context.SagaInvocationCount, "Saga handler should be called twice");
             Assert.AreEqual(1, context.SagaCounterValue, "Saga value should be incremented only once");

@@ -58,7 +58,7 @@ end";
                 .Done(c => c.ReplyReceived)
                 .Run();
 
-            Assert.True(context.ReplyReceived);
+            Assert.That(context.ReplyReceived, Is.True);
             Assert.That(context.TransactionEscalatedToDTC, Is.False);
             Assert.AreEqual(2, context.InvocationCount, "Handler should be called twice");
             Assert.AreEqual(1, context.RecordCount, "There should be only once record in the database");
