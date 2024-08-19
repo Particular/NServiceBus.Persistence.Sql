@@ -23,7 +23,7 @@ public class OutboxCleanerTests
         await timer.Tick(now).ConfigureAwait(false);
 
         var expected = new DateTime(2017, 3, 24, 0, 0, 0);
-        Assert.AreEqual(expected, cutOffTime);
+        Assert.That(cutOffTime, Is.EqualTo(expected));
     }
 
     [Test]

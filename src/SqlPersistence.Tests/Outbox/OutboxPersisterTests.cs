@@ -112,8 +112,8 @@ public abstract class OutboxPersisterTests
         var result = StoreDispatchAndGetAsync(persister).GetAwaiter().GetResult();
         Approver.Verify(Serializer.Serialize(result));
 
-        Assert.AreEqual(1, result.Item1.TransportOperations.Length);
-        Assert.AreEqual(0, result.Item2.TransportOperations.Length);
+        Assert.That(result.Item1.TransportOperations.Length, Is.EqualTo(1));
+        Assert.That(result.Item2.TransportOperations.Length, Is.EqualTo(0));
     }
 
     static async Task<Tuple<OutboxMessage, OutboxMessage>> StoreDispatchAndGetAsync(OutboxPersister persister, CancellationToken cancellationToken = default)

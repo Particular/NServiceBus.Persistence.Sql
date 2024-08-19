@@ -627,7 +627,7 @@ public abstract class SagaPersisterTests
 
             Assert.IsNotNull(sagaData);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
-            Assert.AreEqual(2, sagaData.Version);
+            Assert.That(sagaData.Version, Is.EqualTo(2));
         }
     }
 
@@ -691,7 +691,7 @@ public abstract class SagaPersisterTests
 
             Assert.IsNotNull(sagaData);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
-            Assert.AreEqual(2, sagaData.Version);
+            Assert.That(sagaData.Version, Is.EqualTo(2));
         }
     }
 

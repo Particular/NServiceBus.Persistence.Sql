@@ -78,6 +78,6 @@ public class CharArrayTextWriterTests
         writer.Write('a');
         writer.Release();
 
-        Assert.AreEqual(0, writer.Size);
+        Assert.That(writer.Size, Is.EqualTo(0));
     }
 }

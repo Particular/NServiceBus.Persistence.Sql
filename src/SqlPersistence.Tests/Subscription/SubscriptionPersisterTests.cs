@@ -105,7 +105,7 @@ public abstract class SubscriptionPersisterTests
         // Ensuring that MSSQL's handling of = null vs. is null doesn't cause a PK violation here
         persister.Subscribe(new Subscriber("e@machine1", null), type, null).Await();
         var result = persister.GetSubscribers(type).Result.OrderBy(s => s.TransportAddress);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -124,7 +124,7 @@ public abstract class SubscriptionPersisterTests
             .ConfigureAwait(false);
         var secondTime = second.ElapsedMilliseconds;
         Assert.That(secondTime * 1000 < firstTime, Is.True);
-        Assert.AreEqual(subscribersFirst.Count(), subscribersSecond.Count());
+        Assert.That(subscribersSecond.Count(), Is.EqualTo(subscribersFirst.Count()));
     }
 
     [Test]

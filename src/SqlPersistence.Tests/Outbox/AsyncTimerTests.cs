@@ -130,7 +130,7 @@ public class AsyncTimerTests
         var delayTask = Task.Delay(1000);
 
         var firstToComplete = await Task.WhenAny(stopTask, delayTask).ConfigureAwait(false);
-        Assert.AreEqual(delayTask, firstToComplete);
+        Assert.That(firstToComplete, Is.EqualTo(delayTask));
         callbackCompleted.SetResult(true);
 
         await stopTask.ConfigureAwait(false);

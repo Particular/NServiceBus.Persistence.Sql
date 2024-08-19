@@ -15,7 +15,7 @@ public class MessagePropertyMapperTests
             CorrelationProperty = "Foo"
         };
         var property = expression.Compile()(instance);
-        Assert.AreEqual("Foo", property);
+        Assert.That(property, Is.EqualTo("Foo"));
     }
 
     public class SagaWithStringCorrelationId : SqlSaga<SagaWithStringCorrelationId.SagaData>
@@ -42,7 +42,7 @@ public class MessagePropertyMapperTests
             CorrelationProperty = 10
         };
         var property = expression.Compile()(instance);
-        Assert.AreEqual(10, property);
+        Assert.That(property, Is.EqualTo(10));
     }
 
     public class SagaWithIntCorrelationId : SqlSaga<SagaWithIntCorrelationId.SagaData>
@@ -69,7 +69,7 @@ public class MessagePropertyMapperTests
             CorrelationProperty = guid
         };
         var property = expression.Compile()(instance);
-        Assert.AreEqual(guid, property);
+        Assert.That(property, Is.EqualTo(guid));
     }
 
     public class SagaWithGuidCorrelationId : SqlSaga<SagaWithGuidCorrelationId.SagaData>

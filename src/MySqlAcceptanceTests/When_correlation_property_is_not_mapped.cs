@@ -31,7 +31,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
                 .Done(c => c.StartSagaFinderUsed)
                 .Run());
 
-        Assert.AreEqual("The saga 'When_correlation_property_is_not_mapped+SagaEndpoint+TestSaga' defines a correlation property 'Property' which is not mapped to any message. Either map it or remove it from the saga definition.", exception.Message);
+        Assert.That(exception.Message, Is.EqualTo("The saga 'When_correlation_property_is_not_mapped+SagaEndpoint+TestSaga' defines a correlation property 'Property' which is not mapped to any message. Either map it or remove it from the saga definition."));
     }
 
     public class Context : ScenarioContext
