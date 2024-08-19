@@ -292,6 +292,6 @@ public abstract class SubscriptionPersisterTests
         defaultSchemaPersister.Subscribe(new Subscriber("e@machine1", "endpoint"), type1, null).Await();
 
         var result = schemaPersister.GetSubscribers(type1).Result.OrderBy(s => s.TransportAddress);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 }
