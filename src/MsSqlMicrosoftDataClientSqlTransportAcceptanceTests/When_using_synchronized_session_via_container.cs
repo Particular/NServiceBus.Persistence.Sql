@@ -27,7 +27,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         Assert.NotNull(context.InjectedSession.Connection);
         if (transactionMode == TransportTransactionMode.TransactionScope)
         {
-            Assert.IsNull(context.InjectedSession.Transaction);
+            Assert.That(context.InjectedSession.Transaction, Is.Null);
         }
         else
         {

@@ -230,7 +230,7 @@ public abstract class SagaPersisterTests
 
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
             await persister.Complete(sagaData, storageSession, 1).ConfigureAwait(false);
-            Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data);
+            Assert.That((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data, Is.Null);
         }
     }
 
@@ -418,7 +418,7 @@ public abstract class SagaPersisterTests
 
             var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
 
-            Assert.IsNull(savedEntity.Data);
+            Assert.That(savedEntity.Data, Is.Null);
         }
     }
 
@@ -1265,7 +1265,7 @@ public abstract class SagaPersisterTests
             await storageSession.Open(null);
 
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 

@@ -237,8 +237,8 @@ public abstract class OutboxPersisterTests
         await Store(13, persister).ConfigureAwait(false);
 
         await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
-        Assert.IsNull(await persister.Get("MessageId1", null).ConfigureAwait(false));
-        Assert.IsNull(await persister.Get("MessageId12", null).ConfigureAwait(false));
+        Assert.That(await persister.Get("MessageId1", null).ConfigureAwait(false), Is.Null);
+        Assert.That(await persister.Get("MessageId12", null).ConfigureAwait(false), Is.Null);
         Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
     }
 
@@ -315,6 +315,6 @@ public abstract class OutboxPersisterTests
         }
 
         var result = await schemaPersister.Get(messageId, contextBag).ConfigureAwait(false);
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 }
