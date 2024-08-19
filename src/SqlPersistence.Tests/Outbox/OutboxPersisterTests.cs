@@ -114,7 +114,7 @@ public abstract class OutboxPersisterTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.Item1.TransportOperations.Length, Is.EqualTo(1));
+            Assert.That(result.Item1.TransportOperations, Has.Length.EqualTo(1));
             Assert.That(result.Item2.TransportOperations.Length, Is.EqualTo(0));
         });
     }
