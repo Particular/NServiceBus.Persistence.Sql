@@ -18,7 +18,7 @@ public class SqlAttributeParametersReadersTest
                     }
                 }));
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
 
@@ -26,7 +26,7 @@ public class SqlAttributeParametersReadersTest
     public void Defaults()
     {
         var result = SettingsAttributeReader.ReadFromAttribute(null);
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
 
@@ -62,7 +62,7 @@ public class SqlAttributeParametersReadersTest
                         "ProduceOutboxScripts", false
                     }
                 }));
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
 

@@ -158,7 +158,7 @@ public abstract class OutboxPersisterTests
     {
         var persister = Setup(schema);
         var result = StoreAndGetAsync(persister).GetAwaiter().GetResult();
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(Serializer.Serialize(result));
     }
 
@@ -176,7 +176,7 @@ public abstract class OutboxPersisterTests
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
             var ambientTransaction = Transaction.Current;
-            Assert.IsNotNull(ambientTransaction);
+            Assert.That(ambientTransaction, Is.Not.Null);
 
             await transaction.Commit();
         }
@@ -239,7 +239,7 @@ public abstract class OutboxPersisterTests
         await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
         Assert.That(await persister.Get("MessageId1", null).ConfigureAwait(false), Is.Null);
         Assert.That(await persister.Get("MessageId12", null).ConfigureAwait(false), Is.Null);
-        Assert.IsNotNull(await persister.Get("MessageId13", null).ConfigureAwait(false));
+        Assert.That(await persister.Get("MessageId13", null).ConfigureAwait(false), Is.Not.Null);
     }
 
     static async Task Store(int i, OutboxPersister persister, CancellationToken cancellationToken = default)

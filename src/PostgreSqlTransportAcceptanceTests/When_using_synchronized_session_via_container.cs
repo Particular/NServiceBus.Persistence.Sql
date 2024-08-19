@@ -30,7 +30,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         }
         else
         {
-            Assert.IsNotNull(context.InjectedSession.Transaction);
+            Assert.That(context.InjectedSession.Transaction, Is.Not.Null);
         }
     }
 

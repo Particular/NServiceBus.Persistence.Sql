@@ -26,7 +26,7 @@ public class SagaDefinitionReaderTest : IDisposable
         {
             SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
-        Assert.IsNotNull(exception.Message);
+        Assert.That(exception.Message, Is.Not.Null);
         Approver.Verify(exception.Message);
     }
 
@@ -53,7 +53,7 @@ public class SagaDefinitionReaderTest : IDisposable
         {
             SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
-        Assert.IsNotNull(exception.Message);
+        Assert.That(exception.Message, Is.Not.Null);
         Approver.Verify(exception.Message);
     }
 
@@ -71,7 +71,7 @@ public class SagaDefinitionReaderTest : IDisposable
         var sagaType = module.GetTypeDefinition<SimpleSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
 
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -100,7 +100,7 @@ public class SagaDefinitionReaderTest : IDisposable
         {
             SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
         });
-        Assert.IsNotNull(exception.Message);
+        Assert.That(exception.Message, Is.Not.Null);
         Approver.Verify(exception.Message);
     }
 
@@ -123,7 +123,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -146,7 +146,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<TableSuffixSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -170,7 +170,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<WithNoCorrelationSaga>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -192,7 +192,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<WithStatementBodyPropertySaga>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -220,7 +220,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<SqlSagaWithDataBaseClass>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -247,7 +247,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<SqlSagaWithTwoLevelsDeepDataBaseClass>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 
@@ -278,7 +278,7 @@ public class SagaDefinitionReaderTest : IDisposable
     {
         var sagaType = module.GetTypeDefinition<SagaWithDataBaseClass>();
         SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.IsNotNull(definition);
+        Assert.That(definition, Is.Not.Null);
         Approver.Verify(definition);
     }
 

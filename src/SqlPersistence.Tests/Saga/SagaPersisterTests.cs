@@ -133,7 +133,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
-            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
+            Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
         }
     }
@@ -188,7 +188,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
-            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
+            Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
         }
     }
@@ -323,7 +323,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -466,7 +466,7 @@ public abstract class SagaPersisterTests
             var id = Guid.NewGuid();
             var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
 
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.Not.Null);
             Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
         });
 
@@ -522,7 +522,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveWithSpaceAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -625,7 +625,7 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
 
-            Assert.IsNotNull(sagaData);
+            Assert.That(sagaData, Is.Not.Null);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.That(sagaData.Version, Is.EqualTo(2));
         }
@@ -689,7 +689,7 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession);
 
-            Assert.IsNotNull(sagaData);
+            Assert.That(sagaData, Is.Not.Null);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.That(sagaData.Version, Is.EqualTo(2));
         }
@@ -846,7 +846,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByIdAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -993,7 +993,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByStringMappingAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -1058,7 +1058,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByNonStringMappingAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -1174,7 +1174,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveWithNoCorrelationAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
