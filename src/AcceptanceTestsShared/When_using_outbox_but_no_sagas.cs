@@ -19,7 +19,7 @@ public class When_using_outbox_but_no_sagas : NServiceBusAcceptanceTest
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.EndpointsStarted);
+        Assert.That(context.EndpointsStarted, Is.True);
     }
 
     public class Context : ScenarioContext

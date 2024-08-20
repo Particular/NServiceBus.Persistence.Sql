@@ -49,10 +49,13 @@ create table if not exists ""public"".""{DataTableName}"" (
                 .Done(c => c.ReplyReceived)
                 .Run();
 
-            Assert.True(context.ReplyReceived);
-            Assert.IsFalse(context.TransactionEscalatedToDTC);
-            Assert.AreEqual(2, context.InvocationCount, "Handler should be called twice");
-            Assert.AreEqual(1, context.RecordCount, "There should be only once record in the database");
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.ReplyReceived, Is.True);
+                Assert.That(context.TransactionEscalatedToDTC, Is.False);
+                Assert.That(context.InvocationCount, Is.EqualTo(2), "Handler should be called twice");
+                Assert.That(context.RecordCount, Is.EqualTo(1), "There should be only once record in the database");
+            });
         }
 
         public class Context : ScenarioContext

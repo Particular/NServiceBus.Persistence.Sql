@@ -24,14 +24,14 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
             .Run()
             .ConfigureAwait(false);
 
-        Assert.NotNull(context.InjectedSession.Connection);
+        Assert.That(context.InjectedSession.Connection, Is.Not.Null);
         if (transactionMode == TransportTransactionMode.TransactionScope)
         {
-            Assert.IsNull(context.InjectedSession.Transaction);
+            Assert.That(context.InjectedSession.Transaction, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(context.InjectedSession.Transaction);
+            Assert.That(context.InjectedSession.Transaction, Is.Not.Null);
         }
     }
 

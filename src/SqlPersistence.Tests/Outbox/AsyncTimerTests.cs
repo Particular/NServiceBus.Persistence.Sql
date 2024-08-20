@@ -19,7 +19,7 @@ public class AsyncTimerTests
             errorCallbackInvoked.SetResult(true);
         }, Task.Delay);
 
-        Assert.IsTrue(await errorCallbackInvoked.Task.ConfigureAwait(false));
+        Assert.That(await errorCallbackInvoked.Task.ConfigureAwait(false), Is.True);
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class AsyncTimerTests
                 fail = false;
                 throw new Exception("Simulated!");
             }
-            Assert.IsTrue(exceptionThrown);
+            Assert.That(exceptionThrown, Is.True);
             callbackInvokedAfterError.SetResult(true);
             return Task.CompletedTask;
         }, TimeSpan.Zero, e =>
@@ -45,7 +45,7 @@ public class AsyncTimerTests
             exceptionThrown = true;
         }, Task.Delay);
 
-        Assert.IsTrue(await callbackInvokedAfterError.Task.ConfigureAwait(false));
+        Assert.That(await callbackInvokedAfterError.Task.ConfigureAwait(false), Is.True);
     }
 
     [Test]
@@ -76,7 +76,7 @@ public class AsyncTimerTests
         await delayStarted.Task.ConfigureAwait(false);
         await timer.Stop().ConfigureAwait(false);
 
-        Assert.IsTrue(waitCanceled);
+        Assert.That(waitCanceled, Is.True);
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class AsyncTimerTests
         var stopTask = timer.Stop();
         stopInitiated.SetResult(true);
         await stopTask.ConfigureAwait(false);
-        Assert.IsTrue(callbackCanceled);
+        Assert.That(callbackCanceled, Is.True);
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class AsyncTimerTests
         var delayTask = Task.Delay(1000);
 
         var firstToComplete = await Task.WhenAny(stopTask, delayTask).ConfigureAwait(false);
-        Assert.AreEqual(delayTask, firstToComplete);
+        Assert.That(firstToComplete, Is.EqualTo(delayTask));
         callbackCompleted.SetResult(true);
 
         await stopTask.ConfigureAwait(false);

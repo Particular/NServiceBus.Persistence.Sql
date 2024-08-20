@@ -31,14 +31,14 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
             var phase3Schema = GetSchema(connection);
 
-            CollectionAssert.Contains(phase1Schema, "Correlation_OrderNumber");
-            CollectionAssert.DoesNotContain(phase1Schema, "Correlation_OrderId");
+            Assert.That(phase1Schema, Has.Member("Correlation_OrderNumber"));
+            Assert.That(phase1Schema, Has.No.Member("Correlation_OrderId"));
 
-            CollectionAssert.Contains(phase2Schema, "Correlation_OrderNumber");
-            CollectionAssert.Contains(phase2Schema, "Correlation_OrderId");
+            Assert.That(phase2Schema, Has.Member("Correlation_OrderNumber"));
+            Assert.That(phase2Schema, Has.Member("Correlation_OrderId"));
 
-            CollectionAssert.DoesNotContain(phase3Schema, "Correlation_OrderNumber");
-            CollectionAssert.Contains(phase3Schema, "Correlation_OrderId");
+            Assert.That(phase3Schema, Has.No.Member("Correlation_OrderNumber"));
+            Assert.That(phase3Schema, Has.Member("Correlation_OrderId"));
         }
     }
 

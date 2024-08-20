@@ -20,9 +20,12 @@ public class When_outbox_disabled_and_different_persistence_used_for_sagas : NSe
             .Run()
             .ConfigureAwait(false);
 
-        Assert.IsTrue(context.Done);
-        Assert.IsFalse(context.SessionCreated);
-        StringAssert.StartsWith("Cannot access the SQL synchronized storage session", context.ExceptionMessage);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.Done, Is.True);
+            Assert.That(context.SessionCreated, Is.False);
+        });
+        Assert.That(context.ExceptionMessage, Does.StartWith("Cannot access the SQL synchronized storage session"));
     }
 
     public class Context : ScenarioContext

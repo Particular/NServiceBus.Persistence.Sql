@@ -16,7 +16,7 @@ public class SagaDefinitionValidatorTest
     public void WithMatchingIds()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Transitional", "saga1", "Transitional", "tableSuffix"));
-        Assert.IsNotNull(errorsException.Message);
+        Assert.That(errorsException.Message, Is.Not.Null);
         Approver.Verify(errorsException.Message);
     }
 
@@ -24,7 +24,7 @@ public class SagaDefinitionValidatorTest
     public void WithInvalidSuffixLeft()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table[Suffix"));
-        Assert.IsNotNull(errorsException.Message);
+        Assert.That(errorsException.Message, Is.Not.Null);
         Approver.Verify(errorsException.Message);
     }
 
@@ -32,7 +32,7 @@ public class SagaDefinitionValidatorTest
     public void WithInvalidSuffixRight()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table]Suffix"));
-        Assert.IsNotNull(errorsException.Message);
+        Assert.That(errorsException.Message, Is.Not.Null);
         Approver.Verify(errorsException.Message);
     }
 
@@ -40,7 +40,7 @@ public class SagaDefinitionValidatorTest
     public void WithInvalidSuffixTick()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition("Correlation", "saga1", "Transitional", "table`Suffix"));
-        Assert.IsNotNull(errorsException.Message);
+        Assert.That(errorsException.Message, Is.Not.Null);
         Approver.Verify(errorsException.Message);
     }
 
@@ -73,7 +73,7 @@ public class SagaDefinitionValidatorTest
     public void WithTransitionalAndNoCorrelation()
     {
         var errorsException = Assert.Throws<ErrorsException>(() => SagaDefinitionValidator.ValidateSagaDefinition(null, "saga1", "Transitional", "tableSuffix"));
-        Assert.IsNotNull(errorsException.Message);
+        Assert.That(errorsException.Message, Is.Not.Null);
         Approver.Verify(errorsException.Message);
     }
 }

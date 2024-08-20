@@ -30,7 +30,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.FinderUsed);
+        Assert.That(context.FinderUsed, Is.True);
     }
 
     public class Context : ScenarioContext

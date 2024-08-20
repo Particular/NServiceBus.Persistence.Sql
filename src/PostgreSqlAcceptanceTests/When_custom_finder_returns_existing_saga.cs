@@ -31,7 +31,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.FinderUsed);
+        Assert.That(context.FinderUsed, Is.True);
     }
 
     public class Context : ScenarioContext

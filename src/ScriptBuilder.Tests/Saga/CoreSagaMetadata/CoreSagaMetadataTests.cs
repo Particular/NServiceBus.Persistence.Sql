@@ -11,12 +11,16 @@ public partial class CoreSagaMetadataTests
 {
     ModuleDefinition module;
 
-    public CoreSagaMetadataTests()
+    [SetUp]
+    public void SetUp()
     {
         var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ScriptBuilder.Tests.dll");
         var readerParameters = new ReaderParameters(ReadingMode.Deferred);
         module = ModuleDefinition.ReadModule(path, readerParameters);
     }
+
+    [TearDown]
+    public void TearDown() => module.Dispose();
 
     [Test]
     public void SingleMapping()

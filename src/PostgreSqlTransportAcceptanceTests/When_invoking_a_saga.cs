@@ -32,10 +32,13 @@
                 .Done(c => c.ReplyReceived)
                 .Run();
 
-            Assert.True(context.ReplyReceived);
-            Assert.IsFalse(context.TransactionEscalatedToDTC);
-            Assert.AreEqual(2, context.SagaInvocationCount, "Saga handler should be called twice");
-            Assert.AreEqual(1, context.SagaCounterValue, "Saga value should be incremented only once");
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.ReplyReceived, Is.True);
+                Assert.That(context.TransactionEscalatedToDTC, Is.False);
+                Assert.That(context.SagaInvocationCount, Is.EqualTo(2), "Saga handler should be called twice");
+                Assert.That(context.SagaCounterValue, Is.EqualTo(1), "Saga value should be incremented only once");
+            });
         }
 
         public class Context : ScenarioContext

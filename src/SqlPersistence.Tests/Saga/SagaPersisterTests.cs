@@ -133,8 +133,8 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
-            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
-            StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
+            Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
+            Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
     }
 
@@ -188,8 +188,8 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
-            Assert.IsNotNull(exceptionMessage, "Expected ExecuteCommand to throw");
-            StringAssert.Contains("Incorrect data type for Correlation_", exceptionMessage);
+            Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
+            Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
     }
 
@@ -230,7 +230,7 @@ public abstract class SagaPersisterTests
 
             await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
             await persister.Complete(sagaData, storageSession, 1).ConfigureAwait(false);
-            Assert.IsNull((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data);
+            Assert.That((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data, Is.Null);
         }
     }
 
@@ -323,7 +323,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -359,7 +359,7 @@ public abstract class SagaPersisterTests
             await storageSession.CompleteAsync();
         }
 
-        Assert.IsTrue(callbackInvoked);
+        Assert.That(callbackInvoked, Is.True);
     }
 
     [Test]
@@ -409,7 +409,7 @@ public abstract class SagaPersisterTests
             }
         }
 
-        Assert.IsTrue(exceptionThrown);
+        Assert.That(exceptionThrown, Is.True);
 
         using (var connection = dbConnection())
         using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
@@ -418,7 +418,7 @@ public abstract class SagaPersisterTests
 
             var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
 
-            Assert.IsNull(savedEntity.Data);
+            Assert.That(savedEntity.Data, Is.Null);
         }
     }
 
@@ -466,7 +466,7 @@ public abstract class SagaPersisterTests
             var id = Guid.NewGuid();
             var result = SaveWeirdAsync(id, endpointName).GetAwaiter().GetResult();
 
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.Not.Null);
             Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
         });
 
@@ -522,7 +522,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveWithSpaceAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -625,9 +625,9 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
 
-            Assert.IsNotNull(sagaData);
+            Assert.That(sagaData, Is.Not.EqualTo(default));
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
-            Assert.AreEqual(2, sagaData.Version);
+            Assert.That(sagaData.Version, Is.EqualTo(2));
         }
     }
 
@@ -689,9 +689,9 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession);
 
-            Assert.IsNotNull(sagaData);
+            Assert.That(sagaData, Is.Not.EqualTo(default));
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
-            Assert.AreEqual(2, sagaData.Version);
+            Assert.That(sagaData.Version, Is.EqualTo(2));
         }
     }
 
@@ -713,7 +713,7 @@ public abstract class SagaPersisterTests
             connection.Open();
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
+            Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
 
             var definition2 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -731,8 +731,11 @@ public abstract class SagaPersisterTests
             );
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.True);
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            });
 
             var definition3 = new SagaDefinition(
                 tableSuffix: "CorrAndTransitionalSaga",
@@ -745,8 +748,11 @@ public abstract class SagaPersisterTests
             );
             var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
             connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
-            Assert.IsFalse(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")));
-            Assert.IsTrue(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")));
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);
+                Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
+            });
         }
     }
 
@@ -824,7 +830,7 @@ public abstract class SagaPersisterTests
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
-            Assert.IsTrue(exception.Message.Contains("Optimistic concurrency violation"));
+            Assert.That(exception.Message, Does.Contain("Optimistic concurrency violation"));
         }
     }
 
@@ -846,7 +852,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByIdAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -993,7 +999,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByStringMappingAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -1058,7 +1064,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await GetByNonStringMappingAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -1157,7 +1163,7 @@ public abstract class SagaPersisterTests
                 await storageSession.CompleteAsync();
             });
             var innerException = throwsAsync.InnerException;
-            Assert.IsTrue(IsConcurrencyException(innerException));
+            Assert.That(IsConcurrencyException(innerException), Is.True);
         }
     }
 
@@ -1174,7 +1180,7 @@ public abstract class SagaPersisterTests
         var id = Guid.NewGuid();
         var result = await SaveWithNoCorrelationAsync(id, endpointName);
 
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
         Approver.Verify(result, s => s.Replace(id.ToString(), "theSagaId"));
     }
 
@@ -1265,7 +1271,7 @@ public abstract class SagaPersisterTests
             await storageSession.Open(null);
 
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 

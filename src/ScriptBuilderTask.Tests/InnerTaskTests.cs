@@ -32,7 +32,7 @@ class InnerTaskTests
                         .Select(s => s.Replace(temp, "temp").ConvertPathSeparators("/"))
                         .OrderBy(f => f) // Deterministic order
                         .ToList();
-        Assert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
 
         Approver.Verify(files);
     }

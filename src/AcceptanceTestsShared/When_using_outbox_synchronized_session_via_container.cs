@@ -21,7 +21,7 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
             .Run()
             .ConfigureAwait(false);
 
-        Assert.True(context.RepositoryHasConnection);
+        Assert.That(context.RepositoryHasConnection, Is.True);
     }
 
     public class Context : ScenarioContext

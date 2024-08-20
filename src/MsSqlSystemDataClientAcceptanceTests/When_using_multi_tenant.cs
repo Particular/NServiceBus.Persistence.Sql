@@ -66,7 +66,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         var exception = failed.Exception;
         var msg = exception.Message;
 
-        Assert.That(msg.Contains("unable to determine the tenant id"));
+        Assert.That(msg, Does.Contain("unable to determine the tenant id"));
     }
 
     [Test]
@@ -111,8 +111,11 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             .Run(TimeSpan.FromSeconds(30))
             .ConfigureAwait(false);
 
-        Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
-        Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
+            Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        });
     }
 
     [Test]
@@ -150,8 +153,11 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             .Run(TimeSpan.FromSeconds(30))
             .ConfigureAwait(false);
 
-        Assert.AreEqual("nservicebus_tenanta", context.TenantADbName);
-        Assert.AreEqual("nservicebus_tenantb", context.TenantBDbName);
+        Assert.Multiple(() =>
+        {
+            Assert.That(context.TenantADbName, Is.EqualTo("nservicebus_tenanta"));
+            Assert.That(context.TenantBDbName, Is.EqualTo("nservicebus_tenantb"));
+        });
     }
 
     static void ConfigureMultiTenant(EndpointConfiguration c, bool useOutbox = true, bool cleanOutbox = true)

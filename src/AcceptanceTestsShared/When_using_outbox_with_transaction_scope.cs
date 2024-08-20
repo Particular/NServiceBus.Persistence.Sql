@@ -18,7 +18,7 @@ public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTes
             .Run()
             .ConfigureAwait(false);
 
-        Assert.NotNull(context.Transaction);
+        Assert.That(context.Transaction, Is.Not.Null);
     }
 
     public class Context : ScenarioContext

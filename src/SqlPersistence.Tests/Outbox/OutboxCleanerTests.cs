@@ -23,7 +23,7 @@ public class OutboxCleanerTests
         await timer.Tick(now).ConfigureAwait(false);
 
         var expected = new DateTime(2017, 3, 24, 0, 0, 0);
-        Assert.AreEqual(expected, cutOffTime);
+        Assert.That(cutOffTime, Is.EqualTo(expected));
     }
 
     [Test]
@@ -41,16 +41,16 @@ public class OutboxCleanerTests
             timer.OnError(new Exception("Simulated!"));
         }
 
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
 
         //Trigger the 10th time
         timer.OnError(new Exception("Simulated!"));
-        Assert.IsTrue(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.True);
         criticalActionTriggered = false;
 
         //Trigger again -- the counter should be reset
         timer.OnError(new Exception("Simulated!"));
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class OutboxCleanerTests
             }
         }
 
-        Assert.IsFalse(criticalActionTriggered);
+        Assert.That(criticalActionTriggered, Is.False);
     }
 
     class TestableCleaner : OutboxCleaner

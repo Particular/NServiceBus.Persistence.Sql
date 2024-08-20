@@ -21,7 +21,7 @@ public class When_different_persistence_used_for_outbox : NServiceBusAcceptanceT
                 .ConfigureAwait(false);
         });
 
-        StringAssert.StartsWith("When both sagas and outbox are enabled, SQL persistence must be enabled for either both sagas and outbox, or neither.", ex.Message);
+        Assert.That(ex.Message, Does.StartWith("When both sagas and outbox are enabled, SQL persistence must be enabled for either both sagas and outbox, or neither."));
     }
 
     public class Context : ScenarioContext

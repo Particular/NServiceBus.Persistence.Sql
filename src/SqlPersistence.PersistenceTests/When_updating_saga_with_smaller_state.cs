@@ -47,8 +47,11 @@
 
             var retrieved2 = await GetById<SagaWithCorrelationPropertyData>(sagaData.Id);
 
-            Assert.LessOrEqual(retrieved.Payload, sagaData.Payload); // No real need, but here to prevent accidental updates
-            Assert.AreEqual(retrieved.Payload, retrieved2.Payload);
+            Assert.Multiple(() =>
+            {
+                Assert.That(retrieved.Payload, Is.LessThanOrEqualTo(sagaData.Payload)); // No real need, but here to prevent accidental updates
+                Assert.That(retrieved2.Payload, Is.EqualTo(retrieved.Payload));
+            });
 
             await using var con = sqlVariant.Open();
             await con.OpenAsync();
@@ -59,7 +62,7 @@
             // Payload should only have a single closing bracket, if there are more that means there is trailing data
             var countClosingBrackets = data.ToCharArray().Count(x => x == '}');
 
-            Assert.AreEqual(1, countClosingBrackets);
+            Assert.That(countClosingBrackets, Is.EqualTo(1));
         }
 
         public class SagaWithCorrelationProperty : Saga<SagaWithCorrelationPropertyData>, IAmStartedByMessages<StartMessage>

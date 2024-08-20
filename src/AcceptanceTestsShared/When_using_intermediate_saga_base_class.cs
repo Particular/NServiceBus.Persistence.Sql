@@ -27,7 +27,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
                 .ConfigureAwait(false);
         });
 
-        Assert.IsTrue(ex.Message == "Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported.");
+        Assert.That(ex.Message, Is.EqualTo("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported."));
     }
 
     public class Context : ScenarioContext

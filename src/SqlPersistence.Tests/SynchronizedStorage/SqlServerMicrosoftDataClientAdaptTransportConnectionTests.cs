@@ -41,10 +41,13 @@ namespace SqlServerMicrosoftData
             (bool wasAdapted, DbConnection connection, DbTransaction tx, bool ownsTransaction) =
                 await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), altConnectionManager);
 
-            Assert.That(wasAdapted, Is.True);
-            Assert.That(connection, Is.Not.Null);
-            Assert.That(tx, Is.Not.Null);
-            Assert.That(ownsTransaction, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(wasAdapted, Is.True);
+                Assert.That(connection, Is.Not.Null);
+                Assert.That(tx, Is.Not.Null);
+                Assert.That(ownsTransaction, Is.False);
+            });
         }
     }
 }

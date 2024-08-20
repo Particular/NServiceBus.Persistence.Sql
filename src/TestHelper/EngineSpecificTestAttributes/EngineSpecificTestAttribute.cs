@@ -11,7 +11,7 @@ public abstract class EngineSpecificTestAttribute : Attribute, IApplyToContext
         var connection = Environment.GetEnvironmentVariable(ConnectionStringName);
         if (string.IsNullOrWhiteSpace(connection))
         {
-            Assert.Ignore("Ignoring because environment variable {0} not available.", ConnectionStringName);
+            Assert.Ignore($"Ignoring because environment variable {ConnectionStringName} not available.");
         }
     }
 
