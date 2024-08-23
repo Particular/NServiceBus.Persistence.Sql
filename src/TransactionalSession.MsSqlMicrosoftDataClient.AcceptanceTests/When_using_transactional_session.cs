@@ -163,8 +163,11 @@
                 .Done(c => c.CompleteMessageReceived)
                 .Run();
 
-            Assert.That(result.CompleteMessageReceived, Is.True);
-            Assert.That(result.MessageReceived, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.CompleteMessageReceived, Is.True);
+                Assert.That(result.MessageReceived, Is.False);
+            });
         }
 
         [TestCase(true)]

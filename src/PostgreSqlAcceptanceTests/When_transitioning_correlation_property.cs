@@ -32,12 +32,18 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             var phase3Schema = GetSchema(connection);
 
             Assert.That(phase1Schema, Has.Member("Correlation_OrderNumber"));
-            Assert.That(phase1Schema, Has.No.Member("Correlation_OrderId"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(phase1Schema, Has.No.Member("Correlation_OrderId"));
 
-            Assert.That(phase2Schema, Has.Member("Correlation_OrderNumber"));
-            Assert.That(phase2Schema, Has.Member("Correlation_OrderId"));
+                Assert.That(phase2Schema, Has.Member("Correlation_OrderNumber"));
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(phase2Schema, Has.Member("Correlation_OrderId"));
 
-            Assert.That(phase3Schema, Has.No.Member("Correlation_OrderNumber"));
+                Assert.That(phase3Schema, Has.No.Member("Correlation_OrderNumber"));
+            });
             Assert.That(phase3Schema, Has.Member("Correlation_OrderId"));
         }
     }
