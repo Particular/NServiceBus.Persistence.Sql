@@ -168,8 +168,11 @@
                 .Done(c => c.CompleteMessageReceived)
                 .Run();
 
-            Assert.True(result.CompleteMessageReceived);
-            Assert.False(result.MessageReceived);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.CompleteMessageReceived, Is.True);
+                Assert.That(result.MessageReceived, Is.False);
+            });
         }
 
         [TestCase(true)]
@@ -199,7 +202,7 @@
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            Assert.True(result.MessageReceived);
+            Assert.That(result.MessageReceived, Is.True);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
