@@ -16,8 +16,7 @@ public class When_using_outbox_but_no_sagas : NServiceBusAcceptanceTest
         var context = await Scenario.Define<Context>()
             .WithEndpoint<OutboxEndpointWithSagasDisabled>()
             .Done(c => c.EndpointsStarted)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.That(context.EndpointsStarted, Is.True);
     }

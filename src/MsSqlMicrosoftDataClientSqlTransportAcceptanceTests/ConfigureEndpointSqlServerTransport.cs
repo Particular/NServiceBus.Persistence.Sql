@@ -14,7 +14,7 @@ public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecuti
         transport = new TestingSqlServerTransport(async cancellationToken =>
         {
             var conn = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
+            await conn.OpenAsync(cancellationToken);
             return conn;
         });
 

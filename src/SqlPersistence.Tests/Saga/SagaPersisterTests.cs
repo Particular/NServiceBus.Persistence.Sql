@@ -228,8 +228,8 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
-            await persister.Complete(sagaData, storageSession, 1).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty");
+            await persister.Complete(sagaData, storageSession, 1);
             Assert.That((await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data, Is.Null);
         }
     }
@@ -269,7 +269,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty");
 
             const int invalidConcurrencyVersion = 42;
             Assert.ThrowsAsync<Exception>(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion));
@@ -395,7 +395,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            await persister.Save(sagaData, storageSession, "theProperty").ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty");
 
             storageSession.OnSaveChanges((_, __) => throw new Exception("Simulated"));
 
@@ -416,7 +416,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
+            var savedEntity = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
 
             Assert.That(savedEntity.Data, Is.Null);
         }
@@ -440,7 +440,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, "theProperty", cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theProperty", cancellationToken);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -498,7 +498,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ", cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "thePropertyಠ_ಠ", cancellationToken);
             return (await persister.Get<SagaWithWeirdCharactersಠ_ಠ.SagaData>(id, storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -543,7 +543,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, "property value", cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "property value", cancellationToken);
             return (await persister.Get<SagaWithSpaceInName.SagaData>(id, storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -817,8 +817,8 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            await persister.Save(sagaData1, storageSession, "theProperty").ConfigureAwait(false);
-            await storageSession.CompleteAsync().ConfigureAwait(false);
+            await persister.Save(sagaData1, storageSession, "theProperty");
+            await storageSession.CompleteAsync();
         }
 
         using (var connection = dbConnection())
@@ -826,7 +826,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession).ConfigureAwait(false);
+            var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
             var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
@@ -874,7 +874,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, "theCorrelationProperty", cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty", cancellationToken);
             return (await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -1019,7 +1019,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, "theCorrelationProperty", cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, "theCorrelationProperty", cancellationToken);
             return (await persister.Get<SagaWithStringCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -1083,7 +1083,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null, cancellationToken);
 
-            await persister.Save(sagaData, storageSession, 666, cancellationToken).ConfigureAwait(false);
+            await persister.Save(sagaData, storageSession, 666, cancellationToken);
             return (await persister.Get<NonStringCorrelationSaga.SagaData>("CorrelationProperty", 666, storageSession, cancellationToken).ConfigureAwait(false)).Data;
         }
     }
@@ -1140,8 +1140,8 @@ public abstract class SagaPersisterTests
                 CorrelationProperty = "theCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
-            await persister.Save(data, storageSession, "theCorrelationProperty").ConfigureAwait(false);
-            await storageSession.CompleteAsync().ConfigureAwait(false);
+            await persister.Save(data, storageSession, "theCorrelationProperty");
+            await storageSession.CompleteAsync();
         }
 
         using (var connection = dbConnection())
@@ -1261,7 +1261,7 @@ public abstract class SagaPersisterTests
         {
             await storageSession.Open(null);
 
-            await defaultSchemaPersister.Save(sagaData, storageSession, null).ConfigureAwait(false);
+            await defaultSchemaPersister.Save(sagaData, storageSession, null);
         }
 
         using (var connection = dbConnection())

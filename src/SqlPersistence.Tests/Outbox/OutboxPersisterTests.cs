@@ -145,13 +145,13 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await persister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
 
-        var beforeDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
-        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
-        var afterDispatch = await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        var beforeDispatch = await persister.Get(messageId, contextBag, cancellationToken);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken);
+        var afterDispatch = await persister.Get(messageId, contextBag, cancellationToken);
 
         return Tuple.Create(beforeDispatch, afterDispatch);
     }
@@ -212,10 +212,10 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
-        return await persister.Get(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        return await persister.Get(messageId, contextBag, cancellationToken);
     }
 
     static ContextBag CreateContextBag(string messageId)
@@ -231,15 +231,15 @@ public abstract class OutboxPersisterTests
         var persister = Setup(schema);
         for (var i = 0; i < 13; i++)
         {
-            await Store(i, persister).ConfigureAwait(false);
+            await Store(i, persister);
         }
 
-        await Task.Delay(1000).ConfigureAwait(false);
+        await Task.Delay(1000);
         var dateTime = DateTime.UtcNow;
-        await Task.Delay(1000).ConfigureAwait(false);
-        await Store(13, persister).ConfigureAwait(false);
+        await Task.Delay(1000);
+        await Store(13, persister);
 
-        await persister.RemoveEntriesOlderThan(dateTime).ConfigureAwait(false);
+        await persister.RemoveEntriesOlderThan(dateTime);
         Assert.Multiple(async () =>
         {
             Assert.That(await persister.Get("MessageId1", null).ConfigureAwait(false), Is.Null);
@@ -276,10 +276,10 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag, cancellationToken))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken).ConfigureAwait(false);
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
-        await persister.SetAsDispatched(messageId, contextBag, cancellationToken).ConfigureAwait(false);
+        await persister.SetAsDispatched(messageId, contextBag, cancellationToken);
     }
 
     [Test]
@@ -316,11 +316,11 @@ public abstract class OutboxPersisterTests
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await defaultSchemaPersister.BeginTransaction(contextBag))
         {
-            await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag).ConfigureAwait(false);
+            await defaultSchemaPersister.Store(new OutboxMessage(messageId, operations.ToArray()), transaction, contextBag);
             await transaction.Commit();
         }
 
-        var result = await schemaPersister.Get(messageId, contextBag).ConfigureAwait(false);
+        var result = await schemaPersister.Get(messageId, contextBag);
         Assert.That(result, Is.Null);
     }
 }

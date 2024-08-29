@@ -24,7 +24,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
         using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
@@ -35,7 +35,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
         using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
             phase2Schema = GetSchema(connection);
@@ -45,7 +45,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
         using (var connection = OracleConnectionBuilder.Build(disableMetadataPooling: true))
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
             phase3Schema = GetSchema(connection);

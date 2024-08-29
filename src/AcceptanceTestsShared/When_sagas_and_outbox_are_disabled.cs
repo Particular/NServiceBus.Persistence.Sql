@@ -16,8 +16,7 @@ public class When_sagas_and_outbox_are_disabled : NServiceBusAcceptanceTest
         var context = await Scenario.Define<Context>()
             .WithEndpoint<EndpointWithSagasDisabled>(bb => bb.When(s => s.SendLocal(new MyMessage())))
             .Done(c => c.Done)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.Multiple(() =>
         {

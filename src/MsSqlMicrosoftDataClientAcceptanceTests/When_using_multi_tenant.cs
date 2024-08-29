@@ -38,8 +38,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
             await Scenario.Define<Context>()
                 .WithEndpoint<MultiTenantHandlerEndpoint>(b => b.CustomConfig(c => ConfigureMultiTenant(c, true, true)))
                 .Done(c => c.EndpointsStarted)
-                .Run()
-                .ConfigureAwait(false);
+                .Run();
         });
 
         var msg = exception.Message;
@@ -59,8 +58,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 b.When(session => session.SendLocal(new TestMessage { TenantId = "TenantIdButNotInHeader" }));
             })
             .Done(c => c.FailedMessages.Any())
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         var failed = context.FailedMessages.Values.FirstOrDefault()?.FirstOrDefault();
         var exception = failed.Exception;
@@ -108,8 +106,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 });
             })
             .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
-            .Run(TimeSpan.FromSeconds(30))
-            .ConfigureAwait(false);
+            .Run(TimeSpan.FromSeconds(30));
 
         Assert.Multiple(() =>
         {
@@ -149,8 +146,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 });
             })
             .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
-            .Run(TimeSpan.FromSeconds(30))
-            .ConfigureAwait(false);
+            .Run(TimeSpan.FromSeconds(30));
 
         Assert.Multiple(() =>
         {

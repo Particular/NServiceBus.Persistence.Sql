@@ -17,8 +17,7 @@ public class When_outbox_disabled_and_different_persistence_used_for_sagas : NSe
         var context = await Scenario.Define<Context>()
             .WithEndpoint<EndpointWithDummySaga>(bb => bb.When(s => s.SendLocal(new MyMessage())))
             .Done(c => c.Done)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.Multiple(() =>
         {

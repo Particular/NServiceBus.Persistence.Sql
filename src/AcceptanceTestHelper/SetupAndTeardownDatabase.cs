@@ -37,14 +37,14 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
     {
         var semaphore = endpointSetupSemaphores.GetOrAdd(testId, _ => new SemaphoreSlim(1));
 
-        await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await semaphore.WaitAsync(cancellationToken);
 
         try
         {
             sagaDefinitions = RuntimeSagaDefinitionReader.GetSagaDefinitions(settings, sqlDialect).ToList();
             using (var connection = connectionBuilder())
             {
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                await connection.OpenAsync(cancellationToken);
                 foreach (var definition in sagaDefinitions)
                 {
                     connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), tablePrefix, exceptionFilter);
@@ -78,13 +78,13 @@ public class SetupAndTeardownDatabase : FeatureStartupTask
     {
         var semaphore = endpointSetupSemaphores.GetOrAdd(testId, _ => new SemaphoreSlim(1));
 
-        await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await semaphore.WaitAsync(cancellationToken);
 
         try
         {
             using (var connection = connectionBuilder())
             {
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                await connection.OpenAsync(cancellationToken);
 
                 if (sagaDefinitions != null)
                 {

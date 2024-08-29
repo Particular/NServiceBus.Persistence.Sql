@@ -23,10 +23,10 @@
             recoverability.Immediate(immediate => immediate.NumberOfRetries(0));
             configuration.SendFailedMessagesTo("error");
 
-            await configuration.DefineTransport(runDescriptor, endpointConfiguration).ConfigureAwait(false);
+            await configuration.DefineTransport(runDescriptor, endpointConfiguration);
 
             configuration.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
-            await configurationBuilderCustomization(configuration).ConfigureAwait(false);
+            await configurationBuilderCustomization(configuration);
 
             configuration.ScanTypesForTest(endpointConfiguration);
 

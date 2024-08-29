@@ -17,8 +17,7 @@ public class When_outbox_enabled_and_different_persistence_used_for_sagas : NSer
             await Scenario.Define<Context>()
                 .WithEndpoint<EndpointWithDummySaga>()
                 .Done(c => c.Done)
-                .Run()
-                .ConfigureAwait(false);
+                .Run();
         });
 
         Assert.That(ex.Message, Does.StartWith("When both sagas and outbox are enabled, SQL persistence must be enabled for either both sagas and outbox, or neither."));

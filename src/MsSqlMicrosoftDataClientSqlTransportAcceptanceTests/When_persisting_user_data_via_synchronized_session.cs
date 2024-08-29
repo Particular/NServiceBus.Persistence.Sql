@@ -34,11 +34,11 @@ end";
         {
             using (var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build())
             {
-                await connection.OpenAsync().ConfigureAwait(false);
+                await connection.OpenAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = CreateUserDataTableText;
-                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -133,7 +133,7 @@ end";
                         command.Transaction = session.Transaction;
                         command.CommandText = insertCommand;
                         command.AddParameter("@Id", message.Id);
-                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        await command.ExecuteNonQueryAsync();
                     }
 
                     int count;
@@ -143,7 +143,7 @@ end";
                         command.Transaction = session.Transaction;
                         command.CommandText = selectCommand;
                         command.AddParameter("@Id", message.Id);
-                        count = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
+                        count = (int)await command.ExecuteScalarAsync();
                     }
 
                     testContext.RecordCount = count;

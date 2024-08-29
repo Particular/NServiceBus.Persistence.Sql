@@ -18,8 +18,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
             .Done(c => c.Done)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.Multiple(() =>
         {
