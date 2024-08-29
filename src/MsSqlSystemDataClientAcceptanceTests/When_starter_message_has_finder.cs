@@ -31,8 +31,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                     return session.SendLocal(startSagaMessage);
                 }))
             .Done(c => c.HandledOtherMessage)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.That(context.StartSagaFinderUsed, Is.True);
     }

@@ -20,8 +20,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
                 cfg.ConfigureTransport().TransportTransactionMode = transactionMode;
             }))
             .Done(c => c.Done)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.That(context.InjectedSession.Connection, Is.Not.Null);
         if (transactionMode == TransportTransactionMode.TransactionScope)

@@ -15,8 +15,7 @@ public class When_using_different_persistence : NServiceBusAcceptanceTest
         var context = await Scenario.Define<Context>()
             .WithEndpoint<InMemoryPersistenceEndpoint>()
             .Done(c => c.EndpointsStarted)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         // If installers were run, we'd get an System.Exception: "ConnectionBuilder must be defined."
         Assert.That(context.EndpointsStarted, Is.True);

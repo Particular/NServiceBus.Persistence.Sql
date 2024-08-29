@@ -22,7 +22,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
         using (var connection = MsSqlSystemDataClientConnectionBuilder.Build())
         {
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
             var phase1Schema = GetSchema(connection);

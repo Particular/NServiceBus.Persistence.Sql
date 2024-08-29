@@ -116,12 +116,10 @@ public abstract class SubscriptionPersisterTests
         var type = new MessageType("type1", new Version(0, 0, 0, 0));
         persister.Subscribe(new Subscriber("e@machine1", "endpoint"), type, null).Await();
         var first = Stopwatch.StartNew();
-        var subscribersFirst = await persister.GetSubscribers(type)
-            .ConfigureAwait(false);
+        var subscribersFirst = await persister.GetSubscribers(type);
         var firstTime = first.ElapsedMilliseconds;
         var second = Stopwatch.StartNew();
-        var subscribersSecond = await persister.GetSubscribers(type)
-            .ConfigureAwait(false);
+        var subscribersSecond = await persister.GetSubscribers(type);
         var secondTime = second.ElapsedMilliseconds;
         Assert.Multiple(() =>
         {

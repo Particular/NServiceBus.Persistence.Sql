@@ -23,8 +23,7 @@ public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
             await Scenario.Define<Context>()
                 .WithEndpoint<TEndpointSelection>(c => { c.When(session => session.SendLocal(new StartSaga { Correlation = "Corr" })); })
                 .Done(c => c.EndpointsStarted)
-                .Run()
-                .ConfigureAwait(false);
+                .Run();
         });
 
         Assert.That(ex.Message, Is.EqualTo("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported."));

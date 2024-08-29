@@ -13,7 +13,7 @@ public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecut
         transport = new PostgreSqlTransport(async cancellationToken =>
         {
             var conn = PostgreSqlConnectionBuilder.Build();
-            await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
+            await conn.OpenAsync(cancellationToken);
             return conn;
         });
 
@@ -70,7 +70,7 @@ public class ConfigureEndpointPostgreSqlTransport : IConfigureEndpointTestExecut
             using (var comm = conn.CreateCommand())
             {
                 comm.CommandText = commandText;
-                await comm.ExecuteNonQueryAsync().ConfigureAwait(false);
+                await comm.ExecuteNonQueryAsync();
             }
         }
         catch (Exception e)

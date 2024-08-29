@@ -31,8 +31,7 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
                     return session.SendLocal(startSagaMessage);
                 }))
             .Done(c => c.HandledOtherMessage)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.Multiple(() =>
         {

@@ -14,7 +14,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
         {
             string tablePrefix = TestTableNameCleaner.Clean(endpointName);
             using var connection = MsSqlSystemDataClientConnectionBuilder.Build();
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
 
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);

@@ -61,7 +61,7 @@
                     var resultBeforeCommit = await QueryInsertedEntry(rowId);
                     Assert.That(resultBeforeCommit, Is.EqualTo(null));
 
-                    await transactionalSession.Commit().ConfigureAwait(false);
+                    await transactionalSession.Commit();
 
                     // the transactional operations should be visible after commit
                     var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);
@@ -116,7 +116,7 @@
                     var resultBeforeCommit = await QueryInsertedEntry(rowId);
                     Assert.That(resultBeforeCommit, Is.EqualTo(null));
 
-                    await transactionalSession.Commit().ConfigureAwait(false);
+                    await transactionalSession.Commit();
 
                     // the transactional operations should be visible after commit
                     var resultBeforeAfterCommit = await QueryInsertedEntry(rowId);

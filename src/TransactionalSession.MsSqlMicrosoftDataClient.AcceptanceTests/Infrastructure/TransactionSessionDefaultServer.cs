@@ -34,7 +34,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
 
             builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
 
-            await configurationBuilderCustomization(builder).ConfigureAwait(false);
+            await configurationBuilderCustomization(builder);
 
             // scan types at the end so that all types used by the configuration have been loaded into the AppDomain
             builder.TypesToIncludeInScan(endpointConfiguration.GetTypesScopedByTestClass());

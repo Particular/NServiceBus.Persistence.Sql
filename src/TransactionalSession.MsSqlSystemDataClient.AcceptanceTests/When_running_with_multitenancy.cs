@@ -41,7 +41,7 @@
 
                     await transactionalSession.Send(new SampleMessage(), sendOptions, CancellationToken.None);
 
-                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                    await transactionalSession.Commit(CancellationToken.None);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
@@ -51,7 +51,7 @@
         {
             string tablePrefix = TestTableNameCleaner.Clean(endpointName);
             using var connection = MsSqlSystemDataClientConnectionBuilder.MultiTenant.Build(tenantId);
-            await connection.OpenAsync().ConfigureAwait(false);
+            await connection.OpenAsync();
 
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(BuildSqlDialect.MsSqlServer), tablePrefix);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(BuildSqlDialect.MsSqlServer), tablePrefix);

@@ -32,8 +32,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                     return session.SendLocal(startSagaMessage);
                 }))
             .Done(c => c.HandledOtherMessage)
-            .Run()
-            .ConfigureAwait(false);
+            .Run();
 
         Assert.That(context.FinderUsed, Is.True);
     }

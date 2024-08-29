@@ -25,11 +25,11 @@ create table if not exists ""public"".""{DataTableName}"" (
         {
             using (var connection = PostgreSqlConnectionBuilder.Build())
             {
-                await connection.OpenAsync().ConfigureAwait(false);
+                await connection.OpenAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = CreateUserDataTableText;
-                    await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -124,7 +124,7 @@ create table if not exists ""public"".""{DataTableName}"" (
                         command.Transaction = session.Transaction;
                         command.CommandText = insertCommand;
                         command.AddParameter("@Id", message.Id);
-                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        await command.ExecuteNonQueryAsync();
                     }
 
                     long count;
@@ -134,7 +134,7 @@ create table if not exists ""public"".""{DataTableName}"" (
                         command.Transaction = session.Transaction;
                         command.CommandText = selectCommand;
                         command.AddParameter("@Id", message.Id);
-                        count = (long)await command.ExecuteScalarAsync().ConfigureAwait(false);
+                        count = (long)await command.ExecuteScalarAsync();
                     }
 
                     testContext.RecordCount = count;
