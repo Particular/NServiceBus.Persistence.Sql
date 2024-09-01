@@ -200,6 +200,51 @@
             Assert.That(result.MessageReceived, Is.True);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Should_allow_using_synchronized_storage_even_when_there_are_no_outgoing_operations(bool outboxEnabled)
+        {
+            if (outboxEnabled)
+            {
+                await OutboxHelpers.CreateOutboxTable<AnEndpoint>();
+            }
+
+            string rowId = Guid.NewGuid().ToString();
+
+            await Scenario.Define<Context>()
+                .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
+                {
+                    using (IServiceScope scope = ctx.ServiceProvider.CreateScope())
+                    using (var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>())
+                    {
+                        var sessionOptions = new SqlPersistenceOpenSessionOptions();
+                        await transactionalSession.Open(sessionOptions);
+
+                        ISqlStorageSession storageSession =
+                            scope.ServiceProvider.GetRequiredService<ISqlStorageSession>();
+
+                        string insertText = $@"INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+
+                        using (var insertCommand = new SqlCommand(insertText,
+                                   (SqlConnection)storageSession.Connection,
+                                   (SqlTransaction)storageSession.Transaction))
+                        {
+                            await insertCommand.ExecuteNonQueryAsync();
+                        }
+
+                        await transactionalSession.Commit();
+                    }
+
+                    //Send immediately dispatched message to finish the test
+                    await statelessSession.SendLocal(new CompleteTestMessage());
+                }))
+                .Done(c => c.CompleteMessageReceived)
+                .Run();
+
+            var resultAfterDispose = await QueryInsertedEntry(rowId);
+            Assert.That(resultAfterDispose, Is.EqualTo(rowId));
+        }
+
         class Context : ScenarioContext, IInjectServiceProvider
         {
             public bool MessageReceived { get; set; }
