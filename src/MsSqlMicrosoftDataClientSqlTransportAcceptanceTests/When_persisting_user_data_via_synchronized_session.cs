@@ -5,7 +5,6 @@
     using System.Transactions;
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
-    using EndpointTemplates;
     using NUnit.Framework;
     using Persistence.Sql;
     using Pipeline;
