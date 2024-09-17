@@ -7,5 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.0-rc.1.24431.7" />
+  </ItemGroup>
 </Project>
