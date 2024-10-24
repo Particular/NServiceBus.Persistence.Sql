@@ -62,12 +62,12 @@ jobs:
           extra-params: "Encrypt=False;"
       - name: Setup Postgres
         if: matrix.engine == 'PostgreSql'
-        uses: Particular/setup-postgres-action@echo
+        uses: Particular/setup-postgres-action@v1.0.1
         with:
           connection-string-name: PostgreSqlConnectionString
           tag: SqlPersistence
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
-          registry-password: ${{ secrets.DOCKERHUB_TOKEN }}}}
+          registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Setup MySQL
         id: setup-mysql
         if: matrix.engine == 'MySql'
