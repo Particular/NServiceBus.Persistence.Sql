@@ -61,7 +61,7 @@ jobs:
           catalog: nservicebus
       - name: Setup Postgres
         if: matrix.engine == 'PostgreSql'
-        uses: Particular/setup-postgres-action@v1.0.0
+        uses: Particular/setup-postgres-action@v1.0.1
         with:
           connection-string-name: PostgreSqlConnectionString
           tag: 14
