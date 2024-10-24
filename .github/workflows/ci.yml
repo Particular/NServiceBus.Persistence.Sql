@@ -111,7 +111,7 @@ jobs:
         uses: Particular/setup-oracle-action@v1.5.0
         with:
           connection-string-name: OracleConnectionString
-          init-script: ./.github/workflows/scripts/setup-oracle-database-users-and-permissions.sql
+          init-script: ./.github/workflows/scripts/setup-database-users-and-permissions.sql
           tag: SqlPersistence
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
