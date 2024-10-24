@@ -123,11 +123,3 @@ jobs:
           "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
       - name: Run tests
         uses: Particular/run-tests-action@v1.7.0
-      - name: Teardown infrastructure
-        if: ${{ always() }}
-        run: |
-          if ('${{ matrix.engine }}' -eq 'PostgreSql') {
-            echo "Removing container ${{ steps.setup-postgresql.outputs.name }}"
-            $ignore = az container delete --resource-group GitHubActions-RG --name ${{ steps.setup-postgresql.outputs.name }} --yes
-            echo "Removal complete"
-          }
