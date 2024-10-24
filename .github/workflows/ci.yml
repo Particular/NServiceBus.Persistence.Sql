@@ -17,11 +17,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-2019, ubuntu-20.04 ]
+        os: [ windows-2022, ubuntu-20.04 ]
         engine: [ SqlServer, MySql, PostgreSql, Oracle ]
         include:
           # Add os-name alias for job name
-          - os: windows-2019
+          - os: windows-2022
             os-name: Windows
           - os: ubuntu-20.04
             os-name: Linux
@@ -64,7 +64,7 @@ jobs:
         uses: Particular/setup-postgres-action@v1.0.1
         with:
           connection-string-name: PostgreSqlConnectionString
-          tag: 14
+          tag: SqlPersistence
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}}}    
       - name: Setup MySQL
