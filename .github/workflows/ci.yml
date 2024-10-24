@@ -62,7 +62,7 @@ jobs:
           extra-params: "Encrypt=False;"
       - name: Setup Postgres
         if: matrix.engine == 'PostgreSql'
-        uses: Particular/setup-postgres-action@v1.0.1
+        uses: Particular/setup-postgres-action@echo
         with:
           connection-string-name: PostgreSqlConnectionString
           tag: SqlPersistence
