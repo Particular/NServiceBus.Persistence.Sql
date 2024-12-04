@@ -5,7 +5,7 @@ using Persistence.Sql.ScriptBuilder;
 
 class SqlTestVariant(SqlDialect dialect,
     BuildSqlDialect buildDialect,
-    bool usePessimisticMode,
+    bool usePessimisticModeForSagas,
     bool supportsDtc,
     IsolationLevel isolationLevel,
     bool useTransactionScope,
@@ -15,7 +15,7 @@ class SqlTestVariant(SqlDialect dialect,
 
     public BuildSqlDialect BuildDialect { get; } = buildDialect;
 
-    public bool UsePessimisticMode { get; } = usePessimisticMode;
+    public bool UsePessimisticModeForSagas { get; } = usePessimisticModeForSagas;
 
     public bool SupportsDtc { get; } = supportsDtc;
 
@@ -27,7 +27,7 @@ class SqlTestVariant(SqlDialect dialect,
 
     public override string ToString()
     {
-        var mode = UsePessimisticMode ? "pessimistic" : "optimistic";
+        var mode = UsePessimisticModeForSagas ? "pessimistic" : "optimistic";
         var transaction = UseTransactionScope ? $"transactionscope({ScopeIsolationLevel})" : $"ado({IsolationLevel})";
         return $"{Dialect.GetType().Name}-{mode}-{transaction}";
     }
