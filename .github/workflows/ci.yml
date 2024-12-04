@@ -63,7 +63,7 @@ jobs:
         if: matrix.engine == 'SqlServer'
         shell: pwsh
         run: |
-          sqlcmd -Q "ALTER DATABASE nservicebus SET ALLOW_SNAPSHOT_ISOLATION ON" -d "master"
+          sqlcmd -Q "ALTER DATABASE nservicebus SET ALLOW_SNAPSHOT_ISOLATION ON" -d "nservicebus"
       - name: Setup PostgreSql 15.x
         if: matrix.engine == 'PostgreSql'
         uses: Particular/setup-postgres-action@v1.0.0
