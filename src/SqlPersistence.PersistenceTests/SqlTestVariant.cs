@@ -1,25 +1,26 @@
-﻿namespace NServiceBus.PersistenceTesting
+﻿namespace NServiceBus.PersistenceTesting;
+
+using System.Data;
+using Persistence.Sql.ScriptBuilder;
+
+class SqlTestVariant(SqlDialect dialect,
+    BuildSqlDialect buildDialect,
+    bool usePessimisticMode,
+    bool supportsDtc,
+    IsolationLevel isolationLevel,
+    System.Transactions.IsolationLevel scopeIsolationLevel)
 {
-    using Persistence.Sql.ScriptBuilder;
+    public SqlDialect Dialect { get; } = dialect;
 
-    class SqlTestVariant
-    {
-        public SqlTestVariant(SqlDialect dialect, BuildSqlDialect buildDialect, bool usePessimisticMode, bool supportsDtc)
-        {
-            Dialect = dialect;
-            BuildDialect = buildDialect;
-            UsePessimisticMode = usePessimisticMode;
-            SupportsDtc = supportsDtc;
-        }
+    public BuildSqlDialect BuildDialect { get; } = buildDialect;
 
-        public SqlDialect Dialect { get; }
+    public bool UsePessimisticMode { get; } = usePessimisticMode;
 
-        public BuildSqlDialect BuildDialect { get; }
+    public bool SupportsDtc { get; } = supportsDtc;
 
-        public bool UsePessimisticMode { get; set; }
+    public IsolationLevel IsolationLevel { get; } = isolationLevel;
 
-        public bool SupportsDtc { get; set; }
+    public System.Transactions.IsolationLevel ScopeIsolationLevel { get; } = scopeIsolationLevel;
 
-        public override string ToString() => $"{Dialect.GetType().Name}-pessimistic={UsePessimisticMode}";
-    }
+    public override string ToString() => $"{Dialect.GetType().Name}-pessimistic={UsePessimisticMode}-{IsolationLevel}";
 }
