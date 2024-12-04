@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
@@ -36,16 +37,20 @@ public partial class PersistenceTestsConfiguration
     {
         var variants = new List<object>();
 
-        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SQLServerConnectionString")))
+        var sqlServerConnectionString = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+        if (!string.IsNullOrWhiteSpace(sqlServerConnectionString))
         {
             variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
                 BuildSqlDialect.MsSqlServer,
-                supportsDtc: true));
-
-            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
-                BuildSqlDialect.MsSqlServer,
+                usePessimisticMode: true,
                 supportsDtc: true,
-                isolationLevel: IsolationLevel.Snapshot));
+                isolationLevel: IsolationLevel.ReadCommitted));
+
+            using var connection = new SqlConnection(sqlServerConnectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
+            _ = command.ExecuteNonQuery();
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
@@ -72,8 +77,9 @@ public partial class PersistenceTestsConfiguration
         bool usePessimisticMode = true,
         bool supportsDtc = false,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+        bool useTransactionScope = false,
         System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted) =>
-        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticMode, supportsDtc, isolationLevel, scopeIsolationLevel)));
+        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticMode, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
@@ -84,6 +90,7 @@ public partial class PersistenceTestsConfiguration
         var pessimisticMode = variant.UsePessimisticMode;
         var isolationLevel = variant.IsolationLevel;
         var scopeIsolationLevel = variant.ScopeIsolationLevel;
+        var useTransactionScopeScope = variant.UseTransactionScope;
 
         if (SessionTimeout.HasValue)
         {
@@ -103,7 +110,7 @@ public partial class PersistenceTestsConfiguration
         var connectionManager = new ConnectionManager(connectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, false, isolationLevel, scopeIsolationLevel);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, pessimisticMode, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
         SupportsPessimisticConcurrency = pessimisticMode;
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 

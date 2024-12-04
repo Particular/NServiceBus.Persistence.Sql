@@ -8,6 +8,7 @@ class SqlTestVariant(SqlDialect dialect,
     bool usePessimisticMode,
     bool supportsDtc,
     IsolationLevel isolationLevel,
+    bool useTransactionScope,
     System.Transactions.IsolationLevel scopeIsolationLevel)
 {
     public SqlDialect Dialect { get; } = dialect;
@@ -20,7 +21,14 @@ class SqlTestVariant(SqlDialect dialect,
 
     public IsolationLevel IsolationLevel { get; } = isolationLevel;
 
+    public bool UseTransactionScope { get; } = useTransactionScope;
+
     public System.Transactions.IsolationLevel ScopeIsolationLevel { get; } = scopeIsolationLevel;
 
-    public override string ToString() => $"{Dialect.GetType().Name}-pessimistic={UsePessimisticMode}-{IsolationLevel}";
+    public override string ToString()
+    {
+        var mode = UsePessimisticMode ? "pessimistic" : "optimistic";
+        var transaction = UseTransactionScope ? $"transactionscope({ScopeIsolationLevel})" : $"ado({IsolationLevel})";
+        return $"{Dialect.GetType().Name}-{mode}-{transaction}";
+    }
 }
