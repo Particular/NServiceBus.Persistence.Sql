@@ -43,12 +43,14 @@ public partial class PersistenceTestsConfiguration
             variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
                 BuildSqlDialect.MsSqlServer,
                 usePessimisticModeForSagas: true,
+                usePessimisticModeForOutbox: false,
                 supportsDtc: true,
                 isolationLevel: IsolationLevel.ReadCommitted));
 
             variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
                 BuildSqlDialect.MsSqlServer,
                 usePessimisticModeForSagas: true,
+                usePessimisticModeForOutbox: false,
                 supportsDtc: true,
                 isolationLevel: IsolationLevel.Snapshot));
 
@@ -82,11 +84,12 @@ public partial class PersistenceTestsConfiguration
     static TestFixtureData CreateVariant(SqlDialect dialect,
         BuildSqlDialect buildDialect,
         bool usePessimisticModeForSagas = true,
+        bool usePessimisticModeForOutbox = false,
         bool supportsDtc = false,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         bool useTransactionScope = false,
         System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted) =>
-        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForSagas, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
+        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForSagas, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
