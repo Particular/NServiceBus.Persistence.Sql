@@ -61,7 +61,7 @@ jobs:
           extra-params: "Encrypt=False;" 
       - name: Setup PostgreSql 15.x
         if: matrix.engine == 'PostgreSql'
-        uses: Particular/setup-postgres-action@v1.0.1
+        uses: Particular/setup-postgres-action@v1.0.2
         with:
           connection-string-name: PostgreSqlConnectionString
           tag: SqlPersistence
@@ -107,7 +107,7 @@ jobs:
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
-        uses: Particular/setup-oracle-action@v1.5.0
+        uses: Particular/setup-oracle-action@v1.5.1
         with:
           connection-string-name: OracleConnectionString
           init-script: ./.github/workflows/scripts/setup-oracle-database-users-and-permissions.sql
