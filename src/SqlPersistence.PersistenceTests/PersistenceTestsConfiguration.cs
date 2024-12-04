@@ -120,7 +120,7 @@ public partial class PersistenceTestsConfiguration
         var connectionManager = new ConnectionManager(connectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, false, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, useTransactionScopeScope, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
         SupportsPessimisticConcurrency = usePessimisticModeForSagas;
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
