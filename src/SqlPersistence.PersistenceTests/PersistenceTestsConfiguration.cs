@@ -40,45 +40,51 @@ public partial class PersistenceTestsConfiguration
         var sqlServerConnectionString = Environment.GetEnvironmentVariable("SQLServerConnectionString");
         if (!string.IsNullOrWhiteSpace(sqlServerConnectionString))
         {
-            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
-                BuildSqlDialect.MsSqlServer,
-                usePessimisticModeForSagas: true,
-                usePessimisticModeForOutbox: false,
-                supportsDtc: true,
-                isolationLevel: IsolationLevel.ReadCommitted));
-
-            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
-                BuildSqlDialect.MsSqlServer,
-                usePessimisticModeForSagas: true,
-                usePessimisticModeForOutbox: false,
-                supportsDtc: true,
-                isolationLevel: IsolationLevel.Snapshot));
-
             using var connection = new SqlConnection(sqlServerConnectionString);
 
             connection.Open();
             var command = connection.CreateCommand();
             command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
             _ = command.ExecuteNonQuery();
+
+            RegisterCommonVariants(variants, new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, supportsDtc: true);
         }
 
-        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PostgreSqlConnectionString")))
+        var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
+        if (!string.IsNullOrWhiteSpace(postgresConnectionString))
         {
-            variants.Add(CreateVariant(new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql));
+            RegisterCommonVariants(variants, new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
         {
-            variants.Add(CreateVariant(new SqlDialect.MySql(), BuildSqlDialect.MySql));
+            RegisterCommonVariants(variants, new SqlDialect.MySql(), BuildSqlDialect.MySql);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
         {
-            variants.Add(CreateVariant(new SqlDialect.Oracle(), BuildSqlDialect.Oracle));
+            RegisterCommonVariants(variants, new SqlDialect.Oracle(), BuildSqlDialect.Oracle);
         }
 
         SagaVariants = [.. variants];
         OutboxVariants = [.. variants];
+    }
+
+    static void RegisterCommonVariants(List<object> variants, SqlDialect sqlDialect, BuildSqlDialect buildSqlDialect, bool supportsDtc = false)
+    {
+        variants.Add(CreateVariant(sqlDialect,
+            buildSqlDialect,
+            usePessimisticModeForSagas: true,
+            usePessimisticModeForOutbox: false,
+            supportsDtc: supportsDtc,
+            isolationLevel: IsolationLevel.ReadCommitted));
+
+        variants.Add(CreateVariant(sqlDialect,
+            BuildSqlDialect.MsSqlServer,
+            usePessimisticModeForSagas: true,
+            usePessimisticModeForOutbox: false,
+            supportsDtc: supportsDtc,
+            isolationLevel: IsolationLevel.Snapshot));
     }
 
     static TestFixtureData CreateVariant(SqlDialect dialect,
