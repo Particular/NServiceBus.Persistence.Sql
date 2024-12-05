@@ -97,7 +97,7 @@
         /// <param name="isolationLevel">Isolation level to use. Only levels Read Committed, Repeatable Read and Serializable are supported.</param>
         public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel)
         {
-            if (isolationLevel is IsolationLevel.Chaos or IsolationLevel.ReadUncommitted or IsolationLevel.Snapshot or IsolationLevel.Unspecified)
+            if (isolationLevel is IsolationLevel.Chaos or IsolationLevel.ReadUncommitted or IsolationLevel.Unspecified)
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
