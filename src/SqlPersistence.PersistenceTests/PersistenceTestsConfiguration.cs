@@ -48,12 +48,24 @@ public partial class PersistenceTestsConfiguration
             _ = command.ExecuteNonQuery();
 
             RegisterCommonVariants(variants, new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, supportsDtc: true);
+
+            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
+                BuildSqlDialect.MsSqlServer,
+                usePessimisticModeForOutbox: false,
+                supportsDtc: true,
+                isolationLevel: IsolationLevel.Snapshot));
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
         if (!string.IsNullOrWhiteSpace(postgresConnectionString))
         {
             RegisterCommonVariants(variants, new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql);
+
+            variants.Add(CreateVariant(new SqlDialect.PostgreSql(),
+                BuildSqlDialect.PostgreSql,
+                usePessimisticModeForOutbox: false,
+                supportsDtc: true,
+                isolationLevel: IsolationLevel.Snapshot));
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
@@ -77,12 +89,6 @@ public partial class PersistenceTestsConfiguration
             usePessimisticModeForOutbox: false,
             supportsDtc: supportsDtc,
             isolationLevel: IsolationLevel.ReadCommitted));
-
-        variants.Add(CreateVariant(sqlDialect,
-            buildSqlDialect,
-            usePessimisticModeForOutbox: false,
-            supportsDtc: supportsDtc,
-            isolationLevel: IsolationLevel.Snapshot));
     }
 
     static TestFixtureData CreateVariant(SqlDialect dialect,
