@@ -3,18 +3,13 @@ using Microsoft.Data.SqlClient;
 
 public static class MsSqlMicrosoftDataClientConnectionBuilder
 {
-    public static SqlConnection Build()
-    {
-        return new SqlConnection(GetConnectionString());
-    }
+    public static SqlConnection Build() => new(GetConnectionString());
 
     public static bool IsSql2016OrHigher()
     {
-        using (var connection = Build())
-        {
-            connection.Open();
-            return Version.Parse(connection.ServerVersion).Major >= 13;
-        }
+        using var connection = Build();
+        connection.Open();
+        return Version.Parse(connection.ServerVersion).Major >= 13;
     }
 
     public static class MultiTenant
@@ -26,11 +21,9 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
             var dbName = "nservicebus_" + tenantId.ToLower();
 
             var sqlConnection = MsSqlMicrosoftDataClientConnectionBuilder.Build();
-            using (var conn = sqlConnection)
-            {
-                conn.Open();
-                conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
-            }
+            using var conn = sqlConnection;
+            conn.Open();
+            conn.ExecuteCommand($"if not exists (select * from sysdatabases where name = '{dbName}') create database {dbName};");
         }
 
         public static void TearDown(string tenantId)
@@ -84,21 +77,15 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         connectionStringBuilder.InitialCatalog = "master";
 
-        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
-        {
-            connection.Open();
+        using var connection = new SqlConnection(connectionStringBuilder.ToString());
+        connection.Open();
 
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = $"SELECT * FROM sys.databases WHERE name = '{databaseName}' AND COALESCE(collation_name, '') <> 'SQL_Latin1_General_CP1_CS_AS'";
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.HasRows) // The database collation is wront, drop so that it will be recreated
-                    {
-                        DropDatabase(databaseName);
-                    }
-                }
-            }
+        using var command = connection.CreateCommand();
+        command.CommandText = $"SELECT * FROM sys.databases WHERE name = '{databaseName}' AND COALESCE(collation_name, '') <> 'SQL_Latin1_General_CP1_CS_AS'";
+        using var reader = command.ExecuteReader();
+        if (reader.HasRows) // The database collation is wront, drop so that it will be recreated
+        {
+            DropDatabase(databaseName);
         }
     }
 
@@ -109,25 +96,21 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
         connectionStringBuilder.InitialCatalog = "master";
 
-        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
+        using var connection = new SqlConnection(connectionStringBuilder.ToString());
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = $"select * from master.dbo.sysdatabases where name='{databaseName}'";
+        using (var reader = command.ExecuteReader())
         {
-            connection.Open();
-
-            using (var command = connection.CreateCommand())
+            if (reader.HasRows) // exists
             {
-                command.CommandText = $"select * from master.dbo.sysdatabases where name='{databaseName}'";
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.HasRows) // exists
-                    {
-                        return;
-                    }
-                }
-
-                command.CommandText = $"CREATE DATABASE {databaseName} COLLATE SQL_Latin1_General_CP1_CS_AS";
-                command.ExecuteNonQuery();
+                return;
             }
         }
+
+        command.CommandText = $"CREATE DATABASE {databaseName} COLLATE SQL_Latin1_General_CP1_CS_AS";
+        command.ExecuteNonQuery();
     }
 
     static string GetConnectionString()
@@ -144,19 +127,23 @@ public static class MsSqlMicrosoftDataClientConnectionBuilder
 
     static void DropDatabase(string databaseName)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString())
-        {
-            InitialCatalog = "master"
-        };
+        var connectionStringBuilder = new SqlConnectionStringBuilder(GetConnectionString()) { InitialCatalog = "master" };
 
-        using (var connection = new SqlConnection(connectionStringBuilder.ToString()))
-        {
-            connection.Open();
-            using (var dropCommand = connection.CreateCommand())
-            {
-                dropCommand.CommandText = $"use master; if exists(select * from sysdatabases where name = '{databaseName}') begin alter database {databaseName} set SINGLE_USER with rollback immediate; drop database {databaseName}; end; ";
-                dropCommand.ExecuteNonQuery();
-            }
-        }
+        using var connection = new SqlConnection(connectionStringBuilder.ToString());
+        connection.Open();
+
+        using var dropCommand = connection.CreateCommand();
+        dropCommand.CommandText = $"use master; if exists(select * from sysdatabases where name = '{databaseName}') begin alter database {databaseName} set SINGLE_USER with rollback immediate; drop database {databaseName}; end; ";
+        dropCommand.ExecuteNonQuery();
+    }
+
+    public static void EnableSnapshotIsolation()
+    {
+        using var connection = new SqlConnection(GetConnectionString());
+
+        connection.Open();
+        var command = connection.CreateCommand();
+        command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
+        _ = command.ExecuteNonQuery();
     }
 }
