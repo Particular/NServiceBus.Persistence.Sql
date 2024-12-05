@@ -79,7 +79,7 @@ public partial class PersistenceTestsConfiguration
             isolationLevel: IsolationLevel.ReadCommitted));
 
         variants.Add(CreateVariant(sqlDialect,
-            BuildSqlDialect.MsSqlServer,
+            buildSqlDialect,
             usePessimisticModeForOutbox: false,
             supportsDtc: supportsDtc,
             isolationLevel: IsolationLevel.Snapshot));
