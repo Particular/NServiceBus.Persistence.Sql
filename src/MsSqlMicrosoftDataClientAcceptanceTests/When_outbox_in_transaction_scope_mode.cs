@@ -1,26 +1,26 @@
-﻿using System.Threading.Tasks;
+namespace NServiceBus.AcceptanceTests;
+
+using System.Threading.Tasks;
 using System.Transactions;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
-using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NUnit.Framework;
 
 [TestFixture]
-public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTest
+public class When_outbox_in_transaction_scope_mode : NServiceBusAcceptanceTest
 {
-    [TestCase(IsolationLevel.ReadCommitted)]
-    [TestCase(IsolationLevel.Serializable)]
-    public async Task Should_float_transaction_scope_into_handler(IsolationLevel isolationLevel)
+    [Test]
+    public async Task Should_work_with_snapshot_isolation()
     {
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage()))
-                .CustomConfig(c => c.EnableOutbox().UseTransactionScope(isolationLevel)))
+                .CustomConfig(c => c.EnableOutbox().UseTransactionScope(IsolationLevel.Snapshot)))
             .Done(c => c.Done)
             .Run();
 
         Assert.That(context.Transaction, Is.Not.Null, "Ambient transaction should be available in handler");
-        Assert.That(context.IsolationLevel, Is.EqualTo(isolationLevel), "IsolationLevel should be honored");
+        Assert.That(context.IsolationLevel, Is.EqualTo(IsolationLevel.Snapshot), "IsolationLevel should be honored");
     }
 
     public class Context : ScenarioContext
