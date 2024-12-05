@@ -23,7 +23,7 @@ public partial class PersistenceTestsConfiguration
 
     public bool SupportsFinders => false;
 
-    public bool SupportsPessimisticConcurrency { get; set; }
+    public bool SupportsPessimisticConcurrency => true;
 
     public ISagaIdGenerator SagaIdGenerator { get; private set; }
 
@@ -74,14 +74,12 @@ public partial class PersistenceTestsConfiguration
     {
         variants.Add(CreateVariant(sqlDialect,
             buildSqlDialect,
-            usePessimisticModeForSagas: true,
             usePessimisticModeForOutbox: false,
             supportsDtc: supportsDtc,
             isolationLevel: IsolationLevel.ReadCommitted));
 
         variants.Add(CreateVariant(sqlDialect,
             BuildSqlDialect.MsSqlServer,
-            usePessimisticModeForSagas: true,
             usePessimisticModeForOutbox: false,
             supportsDtc: supportsDtc,
             isolationLevel: IsolationLevel.Snapshot));
@@ -89,13 +87,12 @@ public partial class PersistenceTestsConfiguration
 
     static TestFixtureData CreateVariant(SqlDialect dialect,
         BuildSqlDialect buildDialect,
-        bool usePessimisticModeForSagas = true,
         bool usePessimisticModeForOutbox = false,
         bool supportsDtc = false,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         bool useTransactionScope = false,
         System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted) =>
-        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForSagas, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
+        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
@@ -103,7 +100,6 @@ public partial class PersistenceTestsConfiguration
         var dialect = variant.Dialect;
         var buildDialect = variant.BuildDialect;
         var connectionFactory = () => variant.Open();
-        var usePessimisticModeForSagas = variant.UsePessimisticModeForSagas;
         var isolationLevel = variant.IsolationLevel;
         var scopeIsolationLevel = variant.ScopeIsolationLevel;
         var useTransactionScopeScope = variant.UseTransactionScope;
@@ -127,7 +123,6 @@ public partial class PersistenceTestsConfiguration
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
         OutboxStorage = CreateOutboxPersister(connectionManager, dialect, useTransactionScopeScope, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
-        SupportsPessimisticConcurrency = usePessimisticModeForSagas;
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
         GetContextBagForSagaStorage = () =>
