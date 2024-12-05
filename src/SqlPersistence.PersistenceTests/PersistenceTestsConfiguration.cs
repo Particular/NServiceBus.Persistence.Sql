@@ -64,7 +64,6 @@ public partial class PersistenceTestsConfiguration
             variants.Add(CreateVariant(new SqlDialect.PostgreSql(),
                 BuildSqlDialect.PostgreSql,
                 usePessimisticModeForOutbox: false,
-                supportsDtc: true,
                 isolationLevel: IsolationLevel.Snapshot));
         }
 
