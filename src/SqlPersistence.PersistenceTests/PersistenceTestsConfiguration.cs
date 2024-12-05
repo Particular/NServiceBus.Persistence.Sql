@@ -108,6 +108,7 @@ public partial class PersistenceTestsConfiguration
         var isolationLevel = variant.IsolationLevel;
         var scopeIsolationLevel = variant.ScopeIsolationLevel;
         var useTransactionScopeScope = variant.UseTransactionScope;
+        var usePessimisticModeForOutbox = variant.UsePessimisticModeForOutbox;
 
         if (SessionTimeout.HasValue)
         {
@@ -127,7 +128,7 @@ public partial class PersistenceTestsConfiguration
         var connectionManager = new ConnectionManager(connectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, useTransactionScopeScope, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, usePessimisticModeForOutbox, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
         GetContextBagForSagaStorage = () =>
