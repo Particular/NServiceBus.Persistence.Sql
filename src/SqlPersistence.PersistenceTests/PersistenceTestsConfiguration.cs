@@ -17,7 +17,7 @@ using NUnit.Framework;
 
 public partial class PersistenceTestsConfiguration
 {
-    public bool SupportsDtc => OperatingSystem.IsWindows() && ((SqlTestVariant)Variant.Values[0]).SupportsDtc;
+    public bool SupportsDtc => OperatingSystem.IsWindows() && ((SqlTestVariant)Variant.Values[0]).DatabaseEngine.SupportsDtc;
 
     public bool SupportsOutbox => true;
 
@@ -47,70 +47,59 @@ public partial class PersistenceTestsConfiguration
             command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
             _ = command.ExecuteNonQuery();
 
-            RegisterCommonVariants(variants, new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, supportsDtc: true);
+            RegisterCommonVariants(variants, DatabaseEngine.MsSqlServer);
 
-            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
-                BuildSqlDialect.MsSqlServer,
-                supportsDtc: true,
-                isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, isolationLevel: IsolationLevel.Snapshot));
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
         if (!string.IsNullOrWhiteSpace(postgresConnectionString))
         {
-            RegisterCommonVariants(variants, new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql);
+            RegisterCommonVariants(variants, DatabaseEngine.Postgres);
 
-            variants.Add(CreateVariant(new SqlDialect.PostgreSql(),
-                BuildSqlDialect.PostgreSql,
-                isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.Postgres, isolationLevel: IsolationLevel.Snapshot));
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
         {
-            RegisterCommonVariants(variants, new SqlDialect.MySql(), BuildSqlDialect.MySql);
+            RegisterCommonVariants(variants, DatabaseEngine.MySql);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
         {
-            RegisterCommonVariants(variants, new SqlDialect.Oracle(), BuildSqlDialect.Oracle);
+            RegisterCommonVariants(variants, DatabaseEngine.Oracle);
         }
 
         SagaVariants = [.. variants];
         OutboxVariants = [.. variants];
     }
 
-    static void RegisterCommonVariants(List<object> variants, SqlDialect sqlDialect, BuildSqlDialect buildSqlDialect, bool supportsDtc = false)
+    static void RegisterCommonVariants(List<object> variants, DatabaseEngine databaseEngine)
     {
-        variants.Add(CreateVariant(sqlDialect,
-            buildSqlDialect,
-            supportsDtc: supportsDtc,
+        variants.Add(CreateVariant(databaseEngine,
             useTransactionScope: false,
             isolationLevel: IsolationLevel.ReadCommitted));
 
-        variants.Add(CreateVariant(sqlDialect,
-            buildSqlDialect,
-            supportsDtc: supportsDtc,
+        variants.Add(CreateVariant(databaseEngine,
             useTransactionScope: true,
             scopeIsolationLevel: System.Transactions.IsolationLevel.Serializable));
     }
 
     // usePessimisticModeForOutbox must always be set to false until the core persistence tests have been modified
     // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
-    static TestFixtureData CreateVariant(SqlDialect dialect,
-        BuildSqlDialect buildDialect,
-        bool supportsDtc = false,
+    static TestFixtureData CreateVariant(DatabaseEngine databaseEngine,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, // ReadCommited is the default for ADO
         bool useTransactionScope = false,
         System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.Serializable, // Serializable is the default for scopes
         bool usePessimisticModeForOutbox = false
     ) =>
-        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
+        new(new TestVariant(new SqlTestVariant(databaseEngine, isolationLevel, useTransactionScope, scopeIsolationLevel, usePessimisticModeForOutbox)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
         var variant = (SqlTestVariant)Variant.Values[0];
-        var dialect = variant.Dialect;
-        var buildDialect = variant.BuildDialect;
+        var dialect = variant.DatabaseEngine.SqlDialect;
+        var buildDialect = variant.DatabaseEngine.BuildSqlDialect;
         var connectionFactory = () => variant.Open();
         var isolationLevel = variant.IsolationLevel;
         var scopeIsolationLevel = variant.ScopeIsolationLevel;

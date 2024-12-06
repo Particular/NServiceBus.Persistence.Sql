@@ -1,23 +1,16 @@
 ﻿namespace NServiceBus.PersistenceTesting;
 
 using System.Data;
-using Persistence.Sql.ScriptBuilder;
 
-class SqlTestVariant(SqlDialect dialect,
-    BuildSqlDialect buildDialect,
-    bool usePessimisticModeForOutbox,
-    bool supportsDtc,
+class SqlTestVariant(DatabaseEngine databaseEngine,
     IsolationLevel isolationLevel,
     bool useTransactionScope,
-    System.Transactions.IsolationLevel scopeIsolationLevel)
+    System.Transactions.IsolationLevel scopeIsolationLevel,
+    bool usePessimisticModeForOutbox)
 {
-    public SqlDialect Dialect { get; } = dialect;
-
-    public BuildSqlDialect BuildDialect { get; } = buildDialect;
+    public DatabaseEngine DatabaseEngine { get; } = databaseEngine;
 
     public bool UsePessimisticModeForOutbox { get; } = usePessimisticModeForOutbox;
-
-    public bool SupportsDtc { get; } = supportsDtc;
 
     public IsolationLevel IsolationLevel { get; } = isolationLevel;
 
@@ -29,6 +22,6 @@ class SqlTestVariant(SqlDialect dialect,
     {
         var outboxMode = UsePessimisticModeForOutbox ? "pessimistic" : "optimistic";
         var transaction = UseTransactionScope ? $"TransactionScope({ScopeIsolationLevel})" : $"Ado({IsolationLevel})";
-        return $"{Dialect.GetType().Name}-Outbox({outboxMode})-{transaction}";
+        return $"{DatabaseEngine.GetType().Name}-Outbox({outboxMode})-{transaction}";
     }
 }
