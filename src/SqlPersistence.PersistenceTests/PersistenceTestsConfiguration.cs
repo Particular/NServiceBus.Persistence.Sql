@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -50,6 +51,7 @@ public partial class PersistenceTestsConfiguration
             RegisterCommonVariants(variants, DatabaseEngine.MsSqlServer);
 
             variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Ado(IsolationLevel.Snapshot)));
+            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
@@ -58,6 +60,7 @@ public partial class PersistenceTestsConfiguration
             RegisterCommonVariants(variants, DatabaseEngine.Postgres);
 
             variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Ado(IsolationLevel.Snapshot)));
+            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
@@ -80,21 +83,20 @@ public partial class PersistenceTestsConfiguration
         variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
     }
 
-    // usePessimisticModeForOutbox must always be set to false until the core persistence tests have been modified
+    // OutboxLockMode must always be set to false until the core persistence tests have been modified
     // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
     static TestFixtureData CreateVariant(DatabaseEngine databaseEngine,
         TransactionMode transactionMode,
-        bool usePessimisticModeForOutbox = false
+        OutboxLockMode outboxLockMode = OutboxLockMode.Optimistic
     ) =>
-        new(new TestVariant(new SqlTestVariant(databaseEngine, transactionMode, usePessimisticModeForOutbox)));
+        new(new TestVariant(new SqlTestVariant(databaseEngine, transactionMode, outboxLockMode)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
         var variant = (SqlTestVariant)Variant.Values[0];
         var dialect = variant.DatabaseEngine.SqlDialect;
         var buildDialect = variant.DatabaseEngine.BuildSqlDialect;
-        var connectionFactory = () => variant.Open();
-        var usePessimisticModeForOutbox = variant.UsePessimisticModeForOutbox;
+        DbConnection ConnectionFactory() => variant.Open();
 
         if (SessionTimeout.HasValue)
         {
@@ -111,10 +113,10 @@ public partial class PersistenceTestsConfiguration
             SagaMetadataCollection,
             ShortenSagaName);
 
-        var connectionManager = new ConnectionManager(connectionFactory);
+        var connectionManager = new ConnectionManager(ConnectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, usePessimisticModeForOutbox, variant.TransactionMode);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, variant.TransactionMode, variant.OutboxLockMode);
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
         GetContextBagForSagaStorage = () =>
@@ -131,7 +133,7 @@ public partial class PersistenceTestsConfiguration
             return contextBag;
         };
 
-        using (var connection = connectionFactory())
+        using (var connection = ConnectionFactory())
         {
             connection.Open();
 
@@ -167,19 +169,17 @@ public partial class PersistenceTestsConfiguration
 
     static OutboxPersister CreateOutboxPersister(IConnectionManager connectionManager,
         SqlDialect sqlDialect,
-        bool pessimisticMode,
-        TransactionMode transactionMode)
+        TransactionMode transactionMode,
+        OutboxLockMode outboxLockMode)
     {
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "PersistenceTests_");
-        ConcurrencyControlStrategy concurrencyControlStrategy;
-        if (pessimisticMode)
+
+        ConcurrencyControlStrategy concurrencyControlStrategy = outboxLockMode switch
         {
-            concurrencyControlStrategy = new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
-        else
-        {
-            concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
+            OutboxLockMode.Optimistic => new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
+            OutboxLockMode.Pessimistic => new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
+            _ => throw new ArgumentOutOfRangeException(nameof(outboxLockMode), outboxLockMode, null)
+        };
 
         var transactionScopeMode = transactionMode is TransactionScopeMode;
 
