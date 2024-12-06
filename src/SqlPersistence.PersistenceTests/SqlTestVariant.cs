@@ -1,25 +1,34 @@
-﻿namespace NServiceBus.PersistenceTesting
+﻿namespace NServiceBus.PersistenceTesting;
+
+using System.Data;
+using Persistence.Sql.ScriptBuilder;
+
+class SqlTestVariant(SqlDialect dialect,
+    BuildSqlDialect buildDialect,
+    bool usePessimisticModeForOutbox,
+    bool supportsDtc,
+    IsolationLevel isolationLevel,
+    bool useTransactionScope,
+    System.Transactions.IsolationLevel scopeIsolationLevel)
 {
-    using Persistence.Sql.ScriptBuilder;
+    public SqlDialect Dialect { get; } = dialect;
 
-    class SqlTestVariant
+    public BuildSqlDialect BuildDialect { get; } = buildDialect;
+
+    public bool UsePessimisticModeForOutbox { get; } = usePessimisticModeForOutbox;
+
+    public bool SupportsDtc { get; } = supportsDtc;
+
+    public IsolationLevel IsolationLevel { get; } = isolationLevel;
+
+    public bool UseTransactionScope { get; } = useTransactionScope;
+
+    public System.Transactions.IsolationLevel ScopeIsolationLevel { get; } = scopeIsolationLevel;
+
+    public override string ToString()
     {
-        public SqlTestVariant(SqlDialect dialect, BuildSqlDialect buildDialect, bool usePessimisticMode, bool supportsDtc)
-        {
-            Dialect = dialect;
-            BuildDialect = buildDialect;
-            UsePessimisticMode = usePessimisticMode;
-            SupportsDtc = supportsDtc;
-        }
-
-        public SqlDialect Dialect { get; }
-
-        public BuildSqlDialect BuildDialect { get; }
-
-        public bool UsePessimisticMode { get; set; }
-
-        public bool SupportsDtc { get; set; }
-
-        public override string ToString() => $"{Dialect.GetType().Name}-pessimistic={UsePessimisticMode}";
+        var outboxMode = UsePessimisticModeForOutbox ? "pessimistic" : "optimistic";
+        var transaction = UseTransactionScope ? $"TransactionScope({ScopeIsolationLevel})" : $"Ado({IsolationLevel})";
+        return $"{Dialect.GetType().Name}-Outbox({outboxMode})-{transaction}";
     }
 }

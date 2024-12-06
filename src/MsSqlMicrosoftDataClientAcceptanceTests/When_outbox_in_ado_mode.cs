@@ -1,32 +1,36 @@
-﻿using System.Threading.Tasks;
+namespace NServiceBus.AcceptanceTests;
+
+using System.Data.Common;
+using System.Threading.Tasks;
 using System.Transactions;
+using Microsoft.Data.SqlClient;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
-using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NUnit.Framework;
+using Persistence.Sql;
+using IsolationLevel = System.Data.IsolationLevel;
 
 [TestFixture]
-public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTest
+public class When_outbox_in_ado_mode : NServiceBusAcceptanceTest
 {
-    [TestCase(IsolationLevel.ReadCommitted)]
-    [TestCase(IsolationLevel.Serializable)]
-    public async Task Should_float_transaction_scope_into_handler(IsolationLevel isolationLevel)
+    [Test]
+    public async Task Should_work_with_snapshot_isolation()
     {
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage()))
-                .CustomConfig(c => c.EnableOutbox().UseTransactionScope(isolationLevel)))
+                .CustomConfig(c => c.EnableOutbox().TransactionIsolationLevel(IsolationLevel.Snapshot)))
             .Done(c => c.Done)
             .Run();
 
-        Assert.That(context.Transaction, Is.Not.Null, "Ambient transaction should be available in handler");
-        Assert.That(context.IsolationLevel, Is.EqualTo(isolationLevel), "IsolationLevel should be honored");
+        Assert.That(context.Transaction, Is.Not.Null, "Transaction should be available in handler");
+        Assert.That(context.IsolationLevel, Is.EqualTo(IsolationLevel.Snapshot), "IsolationLevel should be honored");
     }
 
     public class Context : ScenarioContext
     {
         public bool Done { get; set; }
-        public Transaction Transaction { get; set; }
+        public DbTransaction Transaction { get; set; }
         public IsolationLevel IsolationLevel { get; set; }
     }
 
@@ -35,16 +39,12 @@ public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTes
         public Endpoint() =>
             EndpointSetup<DefaultServer>(c => c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly);
 
-        public class MyMessageHandler(Context context) : IHandleMessages<MyMessage>
+        public class MyMessageHandler(Context context, ISqlStorageSession storageSession) : IHandleMessages<MyMessage>
         {
             public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
             {
-                context.Transaction = Transaction.Current;
-                if (Transaction.Current != null)
-                {
-                    context.IsolationLevel = Transaction.Current.IsolationLevel;
-                }
-
+                context.Transaction = storageSession.Transaction;
+                context.IsolationLevel = storageSession.Transaction.IsolationLevel;
                 context.Done = true;
                 return Task.CompletedTask;
             }

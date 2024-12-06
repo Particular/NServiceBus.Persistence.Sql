@@ -8,5 +8,6 @@ public class SetUpFixture
     {
         MsSqlMicrosoftDataClientConnectionBuilder.DropDbIfCollationIncorrect();
         MsSqlMicrosoftDataClientConnectionBuilder.CreateDbIfNotExists();
+        MsSqlMicrosoftDataClientConnectionBuilder.EnableSnapshotIsolation();
     }
 }

@@ -66,10 +66,13 @@
         /// </summary>
         public static void TransactionIsolationLevel(this OutboxSettings outboxSettings, System.Data.IsolationLevel isolationLevel)
         {
-            if (isolationLevel is System.Data.IsolationLevel.Chaos or System.Data.IsolationLevel.ReadUncommitted or System.Data.IsolationLevel.Snapshot or System.Data.IsolationLevel.Unspecified)
+            if (isolationLevel is System.Data.IsolationLevel.Chaos or
+                System.Data.IsolationLevel.ReadUncommitted or
+                System.Data.IsolationLevel.Unspecified)
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
+
             outboxSettings.GetSettings().Set(SqlOutboxFeature.AdoTransactionIsolationLevel, isolationLevel);
         }
 
@@ -94,10 +97,11 @@
         /// <param name="isolationLevel">Isolation level to use. Only levels Read Committed, Repeatable Read and Serializable are supported.</param>
         public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel)
         {
-            if (isolationLevel is IsolationLevel.Chaos or IsolationLevel.ReadUncommitted or IsolationLevel.Snapshot or IsolationLevel.Unspecified)
+            if (isolationLevel is IsolationLevel.Chaos or IsolationLevel.ReadUncommitted or IsolationLevel.Unspecified)
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
+
             outboxSettings.GetSettings().Set(SqlOutboxFeature.UseTransactionScope, true);
             outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeIsolationLevel, isolationLevel);
         }
@@ -116,6 +120,7 @@
             {
                 throw new Exception("Timeout requested is longer than the maximum value for this machine. Override using the maxTimeout setting of the system.transactions section in machine.config");
             }
+
             outboxSettings.UseTransactionScope(isolationLevel);
             outboxSettings.GetSettings().Set(SqlOutboxFeature.TransactionScopeTimeout, timeout);
         }
