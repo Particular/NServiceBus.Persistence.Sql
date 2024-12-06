@@ -51,7 +51,6 @@ public partial class PersistenceTestsConfiguration
 
             variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
                 BuildSqlDialect.MsSqlServer,
-                usePessimisticModeForOutbox: false,
                 supportsDtc: true,
                 isolationLevel: IsolationLevel.Snapshot));
         }
@@ -63,7 +62,6 @@ public partial class PersistenceTestsConfiguration
 
             variants.Add(CreateVariant(new SqlDialect.PostgreSql(),
                 BuildSqlDialect.PostgreSql,
-                usePessimisticModeForOutbox: false,
                 isolationLevel: IsolationLevel.Snapshot));
         }
 
@@ -85,18 +83,27 @@ public partial class PersistenceTestsConfiguration
     {
         variants.Add(CreateVariant(sqlDialect,
             buildSqlDialect,
-            usePessimisticModeForOutbox: false,
             supportsDtc: supportsDtc,
+            useTransactionScope: false,
             isolationLevel: IsolationLevel.ReadCommitted));
+
+        variants.Add(CreateVariant(sqlDialect,
+            buildSqlDialect,
+            supportsDtc: supportsDtc,
+            useTransactionScope: true,
+            scopeIsolationLevel: System.Transactions.IsolationLevel.Serializable));
     }
 
+    // usePessimisticModeForOutbox must always be set to false until the core persistence tests have been modified
+    // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
     static TestFixtureData CreateVariant(SqlDialect dialect,
         BuildSqlDialect buildDialect,
-        bool usePessimisticModeForOutbox = false,
         bool supportsDtc = false,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, // ReadCommited is the default for ADO
         bool useTransactionScope = false,
-        System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted) =>
+        System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.Serializable, // Serializable is the default for scopes
+        bool usePessimisticModeForOutbox = false
+    ) =>
         new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
 
     public Task Configure(CancellationToken cancellationToken = default)
