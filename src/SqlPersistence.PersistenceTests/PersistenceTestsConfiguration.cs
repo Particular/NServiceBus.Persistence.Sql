@@ -96,7 +96,6 @@ public partial class PersistenceTestsConfiguration
         var variant = (SqlTestVariant)Variant.Values[0];
         var dialect = variant.DatabaseEngine.SqlDialect;
         var buildDialect = variant.DatabaseEngine.BuildSqlDialect;
-        DbConnection ConnectionFactory() => variant.Open();
 
         if (SessionTimeout.HasValue)
         {
@@ -157,6 +156,8 @@ public partial class PersistenceTestsConfiguration
         }
 
         return Task.CompletedTask;
+
+        DbConnection ConnectionFactory() => variant.Open();
     }
 
     static string ShortenSagaName(string sagaName) =>
@@ -178,7 +179,7 @@ public partial class PersistenceTestsConfiguration
         {
             OutboxLockMode.Optimistic => new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
             OutboxLockMode.Pessimistic => new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
-            _ => throw new ArgumentOutOfRangeException(nameof(outboxLockMode), outboxLockMode, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(outboxLockMode), outboxLockMode, "Unknown outbox lock mode.")
         };
 
         var transactionScopeMode = transactionMode is TransactionScopeMode;
