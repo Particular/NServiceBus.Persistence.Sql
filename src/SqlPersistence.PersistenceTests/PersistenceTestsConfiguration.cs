@@ -49,7 +49,7 @@ public partial class PersistenceTestsConfiguration
 
             RegisterCommonVariants(variants, DatabaseEngine.MsSqlServer);
 
-            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Ado(IsolationLevel.Snapshot)));
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
@@ -57,7 +57,7 @@ public partial class PersistenceTestsConfiguration
         {
             RegisterCommonVariants(variants, DatabaseEngine.Postgres);
 
-            variants.Add(CreateVariant(DatabaseEngine.Postgres, isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Ado(IsolationLevel.Snapshot)));
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
@@ -76,24 +76,17 @@ public partial class PersistenceTestsConfiguration
 
     static void RegisterCommonVariants(List<object> variants, DatabaseEngine databaseEngine)
     {
-        variants.Add(CreateVariant(databaseEngine,
-            useTransactionScope: false,
-            isolationLevel: IsolationLevel.ReadCommitted));
-
-        variants.Add(CreateVariant(databaseEngine,
-            useTransactionScope: true,
-            scopeIsolationLevel: System.Transactions.IsolationLevel.Serializable));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.ReadCommitted)));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
     }
 
     // usePessimisticModeForOutbox must always be set to false until the core persistence tests have been modified
     // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
     static TestFixtureData CreateVariant(DatabaseEngine databaseEngine,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, // ReadCommited is the default for ADO
-        bool useTransactionScope = false,
-        System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.Serializable, // Serializable is the default for scopes
+        TransactionMode transactionMode,
         bool usePessimisticModeForOutbox = false
     ) =>
-        new(new TestVariant(new SqlTestVariant(databaseEngine, isolationLevel, useTransactionScope, scopeIsolationLevel, usePessimisticModeForOutbox)));
+        new(new TestVariant(new SqlTestVariant(databaseEngine, transactionMode, usePessimisticModeForOutbox)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
@@ -101,9 +94,6 @@ public partial class PersistenceTestsConfiguration
         var dialect = variant.DatabaseEngine.SqlDialect;
         var buildDialect = variant.DatabaseEngine.BuildSqlDialect;
         var connectionFactory = () => variant.Open();
-        var isolationLevel = variant.IsolationLevel;
-        var scopeIsolationLevel = variant.ScopeIsolationLevel;
-        var useTransactionScopeScope = variant.UseTransactionScope;
         var usePessimisticModeForOutbox = variant.UsePessimisticModeForOutbox;
 
         if (SessionTimeout.HasValue)
@@ -124,7 +114,7 @@ public partial class PersistenceTestsConfiguration
         var connectionManager = new ConnectionManager(connectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, usePessimisticModeForOutbox, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, usePessimisticModeForOutbox, variant.TransactionMode);
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
         GetContextBagForSagaStorage = () =>
@@ -178,9 +168,7 @@ public partial class PersistenceTestsConfiguration
     static OutboxPersister CreateOutboxPersister(IConnectionManager connectionManager,
         SqlDialect sqlDialect,
         bool pessimisticMode,
-        bool transactionScopeMode,
-        IsolationLevel isolationLevel,
-        System.Transactions.IsolationLevel scopeIsolationLevel)
+        TransactionMode transactionMode)
     {
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "PersistenceTests_");
         ConcurrencyControlStrategy concurrencyControlStrategy;
@@ -193,11 +181,18 @@ public partial class PersistenceTestsConfiguration
             concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
         }
 
+        var transactionScopeMode = transactionMode is TransactionScopeMode;
+
         return new OutboxPersister(connectionManager, sqlDialect, outboxCommands, TransactionFactory);
 
         ISqlOutboxTransaction TransactionFactory() => transactionScopeMode
-            ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, scopeIsolationLevel, TimeSpan.Zero)
-            : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, isolationLevel);
+            ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy,
+                connectionManager,
+                ((TransactionScopeMode)transactionMode).IsolationLevel,
+                TimeSpan.Zero)
+            : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy,
+                connectionManager,
+                ((AdoTransactionMode)transactionMode).IsolationLevel);
     }
 
     public Task Cleanup(CancellationToken cancellationToken = default) => Task.CompletedTask;
