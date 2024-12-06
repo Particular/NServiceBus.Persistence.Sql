@@ -15,7 +15,7 @@
 
             var sqlVariant = (SqlTestVariant)param.Values[0];
 
-            if (sqlVariant.Dialect is not SqlDialect.MsSqlServer)
+            if (sqlVariant.DatabaseEngine.SqlDialect is not SqlDialect.MsSqlServer)
             {
                 Assert.Ignore("Only relevant for SQL Server");
                 return; // Satisfy compiler
