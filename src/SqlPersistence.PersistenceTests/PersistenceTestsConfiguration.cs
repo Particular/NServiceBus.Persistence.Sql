@@ -83,7 +83,7 @@ public partial class PersistenceTestsConfiguration
         variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
     }
 
-    // OutboxLockMode must always be set to false until the core persistence tests have been modified
+    // OutboxLockMode must always be set to Optimistic until the core persistence tests have been modified
     // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
     static TestFixtureData CreateVariant(DatabaseEngine databaseEngine,
         TransactionMode transactionMode,
