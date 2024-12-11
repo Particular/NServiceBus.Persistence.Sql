@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -17,7 +18,7 @@ using NUnit.Framework;
 
 public partial class PersistenceTestsConfiguration
 {
-    public bool SupportsDtc => OperatingSystem.IsWindows() && ((SqlTestVariant)Variant.Values[0]).SupportsDtc;
+    public bool SupportsDtc => OperatingSystem.IsWindows() && ((SqlTestVariant)Variant.Values[0]).DatabaseEngine.SupportsDtc;
 
     public bool SupportsOutbox => true;
 
@@ -47,68 +48,54 @@ public partial class PersistenceTestsConfiguration
             command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
             _ = command.ExecuteNonQuery();
 
-            RegisterCommonVariants(variants, new SqlDialect.MsSqlServer(), BuildSqlDialect.MsSqlServer, supportsDtc: true);
+            RegisterCommonVariants(variants, DatabaseEngine.MsSqlServer);
 
-            variants.Add(CreateVariant(new SqlDialect.MsSqlServer(),
-                BuildSqlDialect.MsSqlServer,
-                usePessimisticModeForOutbox: false,
-                supportsDtc: true,
-                isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Ado(IsolationLevel.Snapshot)));
+            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
         if (!string.IsNullOrWhiteSpace(postgresConnectionString))
         {
-            RegisterCommonVariants(variants, new SqlDialect.PostgreSql(), BuildSqlDialect.PostgreSql);
+            RegisterCommonVariants(variants, DatabaseEngine.Postgres);
 
-            variants.Add(CreateVariant(new SqlDialect.PostgreSql(),
-                BuildSqlDialect.PostgreSql,
-                usePessimisticModeForOutbox: false,
-                isolationLevel: IsolationLevel.Snapshot));
+            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Ado(IsolationLevel.Snapshot)));
+            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
         {
-            RegisterCommonVariants(variants, new SqlDialect.MySql(), BuildSqlDialect.MySql);
+            RegisterCommonVariants(variants, DatabaseEngine.MySql);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
         {
-            RegisterCommonVariants(variants, new SqlDialect.Oracle(), BuildSqlDialect.Oracle);
+            RegisterCommonVariants(variants, DatabaseEngine.Oracle);
         }
 
         SagaVariants = [.. variants];
         OutboxVariants = [.. variants];
     }
 
-    static void RegisterCommonVariants(List<object> variants, SqlDialect sqlDialect, BuildSqlDialect buildSqlDialect, bool supportsDtc = false)
+    static void RegisterCommonVariants(List<object> variants, DatabaseEngine databaseEngine)
     {
-        variants.Add(CreateVariant(sqlDialect,
-            buildSqlDialect,
-            usePessimisticModeForOutbox: false,
-            supportsDtc: supportsDtc,
-            isolationLevel: IsolationLevel.ReadCommitted));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.ReadCommitted)));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
     }
 
-    static TestFixtureData CreateVariant(SqlDialect dialect,
-        BuildSqlDialect buildDialect,
-        bool usePessimisticModeForOutbox = false,
-        bool supportsDtc = false,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-        bool useTransactionScope = false,
-        System.Transactions.IsolationLevel scopeIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted) =>
-        new(new TestVariant(new SqlTestVariant(dialect, buildDialect, usePessimisticModeForOutbox, supportsDtc, isolationLevel, useTransactionScope, scopeIsolationLevel)));
+    // OutboxLockMode must always be set to Optimistic until the core persistence tests have been modified
+    // to take pessimistic outbox locking into account - https://github.com/Particular/NServiceBus/issues/7237
+    static TestFixtureData CreateVariant(DatabaseEngine databaseEngine,
+        TransactionMode transactionMode,
+        OutboxLockMode outboxLockMode = OutboxLockMode.Optimistic
+    ) =>
+        new(new TestVariant(new SqlTestVariant(databaseEngine, transactionMode, outboxLockMode)));
 
     public Task Configure(CancellationToken cancellationToken = default)
     {
         var variant = (SqlTestVariant)Variant.Values[0];
-        var dialect = variant.Dialect;
-        var buildDialect = variant.BuildDialect;
-        var connectionFactory = () => variant.Open();
-        var isolationLevel = variant.IsolationLevel;
-        var scopeIsolationLevel = variant.ScopeIsolationLevel;
-        var useTransactionScopeScope = variant.UseTransactionScope;
-        var usePessimisticModeForOutbox = variant.UsePessimisticModeForOutbox;
+        var dialect = variant.DatabaseEngine.SqlDialect;
+        var buildDialect = variant.DatabaseEngine.BuildSqlDialect;
 
         if (SessionTimeout.HasValue)
         {
@@ -125,10 +112,10 @@ public partial class PersistenceTestsConfiguration
             SagaMetadataCollection,
             ShortenSagaName);
 
-        var connectionManager = new ConnectionManager(connectionFactory);
+        var connectionManager = new ConnectionManager(ConnectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
         SagaStorage = new SagaPersister(infoCache, dialect);
-        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, usePessimisticModeForOutbox, useTransactionScopeScope, isolationLevel, scopeIsolationLevel);
+        OutboxStorage = CreateOutboxPersister(connectionManager, dialect, variant.TransactionMode, variant.OutboxLockMode);
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
         GetContextBagForSagaStorage = () =>
@@ -145,7 +132,7 @@ public partial class PersistenceTestsConfiguration
             return contextBag;
         };
 
-        using (var connection = connectionFactory())
+        using (var connection = ConnectionFactory())
         {
             connection.Open();
 
@@ -169,6 +156,8 @@ public partial class PersistenceTestsConfiguration
         }
 
         return Task.CompletedTask;
+
+        DbConnection ConnectionFactory() => variant.Open();
     }
 
     static string ShortenSagaName(string sagaName) =>
@@ -181,27 +170,30 @@ public partial class PersistenceTestsConfiguration
 
     static OutboxPersister CreateOutboxPersister(IConnectionManager connectionManager,
         SqlDialect sqlDialect,
-        bool pessimisticMode,
-        bool transactionScopeMode,
-        IsolationLevel isolationLevel,
-        System.Transactions.IsolationLevel scopeIsolationLevel)
+        TransactionMode transactionMode,
+        OutboxLockMode outboxLockMode)
     {
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "PersistenceTests_");
-        ConcurrencyControlStrategy concurrencyControlStrategy;
-        if (pessimisticMode)
+
+        ConcurrencyControlStrategy concurrencyControlStrategy = outboxLockMode switch
         {
-            concurrencyControlStrategy = new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
-        else
-        {
-            concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
+            OutboxLockMode.Optimistic => new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
+            OutboxLockMode.Pessimistic => new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands),
+            _ => throw new ArgumentOutOfRangeException(nameof(outboxLockMode), outboxLockMode, "Unknown outbox lock mode.")
+        };
+
+        var transactionScopeMode = transactionMode is TransactionScopeMode;
 
         return new OutboxPersister(connectionManager, sqlDialect, outboxCommands, TransactionFactory);
 
         ISqlOutboxTransaction TransactionFactory() => transactionScopeMode
-            ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, scopeIsolationLevel, TimeSpan.Zero)
-            : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, isolationLevel);
+            ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy,
+                connectionManager,
+                ((TransactionScopeMode)transactionMode).IsolationLevel,
+                TimeSpan.Zero)
+            : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy,
+                connectionManager,
+                ((AdoTransactionMode)transactionMode).IsolationLevel);
     }
 
     public Task Cleanup(CancellationToken cancellationToken = default) => Task.CompletedTask;
