@@ -79,7 +79,11 @@ public partial class PersistenceTestsConfiguration
 
     static void RegisterCommonVariants(List<object> variants, DatabaseEngine databaseEngine)
     {
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.RepeatableRead)));
         variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.ReadCommitted)));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.Serializable)));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.RepeatableRead)));
+        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.ReadCommitted)));
         variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
     }
 

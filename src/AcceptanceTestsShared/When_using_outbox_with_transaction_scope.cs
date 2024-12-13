@@ -9,6 +9,7 @@ using NUnit.Framework;
 [TestFixture]
 public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTest
 {
+    [TestCase(IsolationLevel.RepeatableRead)]
     [TestCase(IsolationLevel.ReadCommitted)]
     [TestCase(IsolationLevel.Serializable)]
     public async Task Should_float_transaction_scope_into_handler(IsolationLevel isolationLevel)
