@@ -31,7 +31,7 @@ public record DatabaseEngine(SqlDialect SqlDialect,
     public static DatabaseEngine Oracle => new(new SqlDialect.Oracle(),
         BuildSqlDialect.Oracle,
         false,
-        [IsolationLevel.Serializable, IsolationLevel.ReadCommitted],
+        [IsolationLevel.ReadCommitted],
         [System.Transactions.IsolationLevel.Serializable, System.Transactions.IsolationLevel.ReadCommitted]);
 
     public override string ToString() => BuildSqlDialect.ToString();
