@@ -48,43 +48,40 @@ public partial class PersistenceTestsConfiguration
             command.CommandText = $"ALTER DATABASE {connection.Database} SET ALLOW_SNAPSHOT_ISOLATION ON";
             _ = command.ExecuteNonQuery();
 
-            RegisterCommonVariants(variants, DatabaseEngine.MsSqlServer);
-
-            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Ado(IsolationLevel.Snapshot)));
-            variants.Add(CreateVariant(DatabaseEngine.MsSqlServer, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
+            RegisterVariants(variants, DatabaseEngine.MsSqlServer);
         }
 
         var postgresConnectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
         if (!string.IsNullOrWhiteSpace(postgresConnectionString))
         {
-            RegisterCommonVariants(variants, DatabaseEngine.Postgres);
-
-            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Ado(IsolationLevel.Snapshot)));
-            variants.Add(CreateVariant(DatabaseEngine.Postgres, TransactionMode.Scope(System.Transactions.IsolationLevel.Snapshot)));
+            RegisterVariants(variants, DatabaseEngine.Postgres);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MySQLConnectionString")))
         {
-            RegisterCommonVariants(variants, DatabaseEngine.MySql);
+            RegisterVariants(variants, DatabaseEngine.MySql);
         }
 
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OracleConnectionString")))
         {
-            RegisterCommonVariants(variants, DatabaseEngine.Oracle);
+            RegisterVariants(variants, DatabaseEngine.Oracle);
         }
 
         SagaVariants = [.. variants];
         OutboxVariants = [.. variants];
     }
 
-    static void RegisterCommonVariants(List<object> variants, DatabaseEngine databaseEngine)
+    static void RegisterVariants(List<object> variants, DatabaseEngine databaseEngine)
     {
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.RepeatableRead)));
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.ReadCommitted)));
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(IsolationLevel.Serializable)));
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.RepeatableRead)));
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.ReadCommitted)));
-        variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(System.Transactions.IsolationLevel.Serializable)));
+        foreach (var adoIsolationLevel in databaseEngine.SupportedAdoIsolationLevels)
+        {
+            variants.Add(CreateVariant(databaseEngine, TransactionMode.Ado(adoIsolationLevel)));
+        }
+
+        foreach (var scopeIsolationLevel in databaseEngine.SupportedScopeIsolationLevels)
+        {
+            variants.Add(CreateVariant(databaseEngine, TransactionMode.Scope(scopeIsolationLevel)));
+        }
     }
 
     // OutboxLockMode must always be set to Optimistic until the core persistence tests have been modified
