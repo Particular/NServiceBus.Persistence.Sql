@@ -9,7 +9,7 @@ using NUnit.Framework;
 [TestFixture]
 public class When_using_outbox_with_transaction_scope : NServiceBusAcceptanceTest
 {
-    // These are the isolatiion levels supported by all database engines
+    // These are the isolation levels supported by all database engines
     [TestCase(IsolationLevel.ReadCommitted)]
     [TestCase(IsolationLevel.Serializable)]
     public async Task Should_float_transaction_scope_into_handler(IsolationLevel isolationLevel)
