@@ -31,7 +31,7 @@ public record DatabaseEngine(SqlDialect SqlDialect,
     public static DatabaseEngine Oracle => new(new SqlDialect.Oracle(),
         BuildSqlDialect.Oracle,
         false,
-        [IsolationLevel.ReadCommitted], //IsolationLevel.Serializable causes test failures on Oracle - https://github.com/Particular/NServiceBus.Persistence.Sql/issues/1654
+        [IsolationLevel.Serializable, IsolationLevel.ReadCommitted],
         [System.Transactions.IsolationLevel.Serializable, System.Transactions.IsolationLevel.ReadCommitted]);
 
     public override string ToString() => BuildSqlDialect.ToString();
