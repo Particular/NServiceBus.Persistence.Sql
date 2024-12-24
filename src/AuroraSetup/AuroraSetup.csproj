@@ -12,5 +12,9 @@
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="1.102.0" />
     <PackageReference Include="Constructs" Version="10.4.2" />
   </ItemGroup>
+  
+  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
 
 </Project>
