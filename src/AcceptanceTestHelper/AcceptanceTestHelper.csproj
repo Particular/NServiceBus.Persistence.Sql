@@ -12,9 +12,4 @@
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NServiceBus" Version="9.0.0" />
-  </ItemGroup>
-
 </Project>
