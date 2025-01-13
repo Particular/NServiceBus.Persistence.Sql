@@ -13,4 +13,8 @@
     <PackageReference Include="Constructs" Version="10.4.2" />
   </ItemGroup>
 
+  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
 </Project>
