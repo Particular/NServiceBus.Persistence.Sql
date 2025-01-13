@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="ILRepack" Version="2.0.27" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="4.1.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="4.2.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,8 +31,7 @@
     <PackageReference Include="Microsoft.IO.Redist" Version="6.1.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory"
-    Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>
