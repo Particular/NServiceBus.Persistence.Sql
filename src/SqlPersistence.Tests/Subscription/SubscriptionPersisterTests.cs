@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Unicast.Subscriptions;
@@ -137,7 +138,7 @@ public abstract class SubscriptionPersisterTests
         VerifyCache(persister.Cache);
     }
 
-    static void VerifyCache(ConcurrentDictionary<string, SubscriptionPersister.CacheItem> cache)
+    static void VerifyCache(ConcurrentDictionary<string, SubscriptionPersister.CacheItem> cache, [CallerMemberName] string callerMemberName = null)
     {
         var items = cache
             .OrderBy(_ => _.Key)
@@ -148,7 +149,7 @@ public abstract class SubscriptionPersisterTests
                         .OrderBy(_ => _.Endpoint)
                         .ThenBy(_ => _.TransportAddress);
                 });
-        Approver.Verify(items);
+        Approver.Verify(items, callerMemberName: callerMemberName);
     }
 
     [Test]

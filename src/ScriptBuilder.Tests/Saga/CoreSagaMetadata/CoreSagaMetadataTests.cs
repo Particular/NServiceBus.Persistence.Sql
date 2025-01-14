@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
@@ -144,7 +145,7 @@ public partial class CoreSagaMetadataTests
         TestSagaDefinition<ReverseHeaderMappingSaga>();
     }
 
-    void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null)
+    void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null, [CallerMemberName] string callerMemberName = null)
     {
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0054 //False positive
@@ -164,23 +165,24 @@ public partial class CoreSagaMetadataTests
 
         try
         {
-            SagaDefinitionReader.TryGetSagaDefinition(dataType, out results.SagaDefinition);
+            SagaDefinitionReader.TryGetSagaDefinition(dataType, out var definition);
+            results.SagaDefinition = definition;
         }
         catch (Exception x)
         {
             results.Exception = x.Message;
         }
 
-        Approver.Verify(results);
+        Approver.Verify(results, callerMemberName: callerMemberName);
     }
 
     class SagaInspectionResults
     {
-        public bool HasUnmanagedCalls;
-        public bool HasUnexpectedCalls;
-        public bool HasBranchingLogic;
-        public SagaDefinition SagaDefinition;
-        public string Exception;
+        public bool HasUnmanagedCalls { get; set; }
+        public bool HasUnexpectedCalls { get; set; }
+        public bool HasBranchingLogic { get; set; }
+        public SagaDefinition SagaDefinition { get; set; }
+        public string Exception { get; set; }
     }
 
 
