@@ -11,19 +11,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
-    <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
-    <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
     <ProjectReference Include="..\NServiceBus.Persistence.Sql.TransactionalSession\NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
-    <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Nunit" Version="3.13.3" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="8.1.6" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="8.2.4" />
+    <PackageReference Include="Nunit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 
 </Project>
