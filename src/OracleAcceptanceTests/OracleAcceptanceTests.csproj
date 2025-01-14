@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\AcceptanceTestsShared\**\*.cs" Link="Shared\%(RecursiveDir)\%(Filename).%(Extension)" />
+    <Compile Include="..\AcceptanceTestsShared\**\*.cs" LinkBase="Shared" />
   </ItemGroup>
 
   <ItemGroup Label="Flaky tests on Oracle" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
