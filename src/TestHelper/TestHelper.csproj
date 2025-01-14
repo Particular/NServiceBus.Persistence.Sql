@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="MySql.Data" Version="9.1.0" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.180" />
-    <PackageReference Include="MySql.Data" Version="8.0.29" ExcludeAssets="contentFiles" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <!-- Workaround to prevent VS test discovery error -->

@@ -25,10 +25,6 @@
             Func<EndpointConfiguration, Task> configurationBuilderCustomization)
 #pragma warning restore PS0013
         {
-            var types = endpointConfiguration.GetTypesScopedByTestClass();
-
-            typesToInclude.AddRange(types);
-
             var configuration = new EndpointConfiguration(endpointConfiguration.EndpointName);
 
             configuration.TypesToIncludeInScan(typesToInclude);
@@ -43,6 +39,8 @@
 
             configuration.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
             await configurationBuilderCustomization(configuration).ConfigureAwait(false);
+
+            configuration.ScanTypesForTest(endpointConfiguration);
 
             return configuration;
         }
