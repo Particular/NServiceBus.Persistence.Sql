@@ -40,7 +40,7 @@ Create a `patch.sql` file:
 ## Output example
 
 ```txt
-Please contact Particular support at <support@particular.net> if assistance is required.
+Please contact Particular support if assistance is required.
 
 Connection string: data source=localhost;Database=nservicebus;persist security info=True;User Id=sa;Password=yourStrong(!)Password;Encrypt=false
 Table name       : NsbSamplesSqlPersistence.dbo.Samples_SqlPersistence_EndpointSqlServer_OrderSaga
