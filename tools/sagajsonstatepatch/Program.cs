@@ -9,7 +9,7 @@ const string RED = "\u001b[31m";
 const string YELLOW = "\u001b[33m";
 const string RESET = "\u001b[0m";
 
-Console.WriteLine(UNDERLINE + "\nPlease contact Particular support at <support@particular.net> if assistance is required.\n" + RESET);
+Console.WriteLine(UNDERLINE + "\nPlease contact Particular support if assistance is required.\n" + RESET);
 
 if (args.Length < 2)
 {
