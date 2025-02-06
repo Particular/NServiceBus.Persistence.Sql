@@ -11,6 +11,9 @@ env:
   DOTNET_NOLOGO: true
 permissions:
   id-token: write # This is required for requesting the JWT
+defaults:
+  run:
+    shell: pwsh
 concurrency: aurora_tests
 jobs:
   build:
@@ -40,6 +43,7 @@ jobs:
           role-duration-seconds: 7200
 
       - name: Build
+        shell: bash
         run: dotnet build src --configuration Release
       - name: Upload packages
         uses: actions/upload-artifact@v4.6.0
@@ -50,6 +54,7 @@ jobs:
 
       - name: Install CDK
         id: install-cdk
+        shell: bash
         run: npm install -g aws-cdk
 
       - name: Setup Aurora
