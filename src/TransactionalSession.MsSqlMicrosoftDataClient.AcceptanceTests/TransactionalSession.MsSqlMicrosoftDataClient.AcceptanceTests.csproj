@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
     <!-- We want the root namespace to match the transactional session one -->
     <RootNamespace>NServiceBus.TransactionalSession.AcceptanceTests</RootNamespace>
   </PropertyGroup>
