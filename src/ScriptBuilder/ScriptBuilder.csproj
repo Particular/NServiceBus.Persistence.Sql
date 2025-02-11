@@ -6,7 +6,7 @@
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilder</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql.ScriptBuilder</RootNamespace>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <LangVersion>10.0</LangVersion>
@@ -32,7 +32,6 @@
   </PropertyGroup>
 
    <ItemGroup>
-     <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.ScriptBuilderTask" Key="$(NServiceBusTestsKey)" />
      <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
      <InternalsVisibleTo Include="ScriptBuilder.Tests" Key="$(NServiceBusTestsKey)" />
    </ItemGroup>
