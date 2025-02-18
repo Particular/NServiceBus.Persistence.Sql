@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ILRepack" Version="2.0.34" PrivateAssets="All" />
+    <PackageReference Include="ILRepack" Version="2.0.38" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="4.2.2" PrivateAssets="All" />
   </ItemGroup>
 
