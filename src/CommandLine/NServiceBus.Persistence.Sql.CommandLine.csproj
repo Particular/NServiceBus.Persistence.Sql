@@ -7,6 +7,7 @@
     <PackAsTool>True</PackAsTool>
     <Description>.NET tool for generating deployment scripts for the NServiceBus.Persistence.Sql package</Description>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
