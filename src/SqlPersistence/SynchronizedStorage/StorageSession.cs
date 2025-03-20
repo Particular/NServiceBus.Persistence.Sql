@@ -101,6 +101,11 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
             Transaction.Dispose();
 #endif
             Connection.Dispose();
+
+            if (dialect is SqlDialect.PostgreSql)
+            {
+                Transaction = null;
+            }
         }
     }
 
