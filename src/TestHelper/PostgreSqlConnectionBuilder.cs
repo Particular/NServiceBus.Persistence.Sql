@@ -3,13 +3,24 @@ using Npgsql;
 
 public static class PostgreSqlConnectionBuilder
 {
-    public static NpgsqlConnection Build()
+    static NpgsqlDataSource _dataSource;
+    static NpgsqlDataSource DataSource
     {
-        var connection = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
-        if (string.IsNullOrWhiteSpace(connection))
+        get
         {
-            throw new Exception("PostgreSqlConnectionString environment variable is empty");
+            if (_dataSource == null)
+            {
+                var connectionString = Environment.GetEnvironmentVariable("PostgreSqlConnectionString");
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    throw new Exception("PostgreSqlConnectionString environment variable is empty");
+                }
+                _dataSource = NpgsqlDataSource.Create(connectionString);
+            }
+
+            return _dataSource;
         }
-        return new NpgsqlConnection(connection);
     }
+
+    public static NpgsqlConnection Build() => DataSource.CreateConnection();
 }
