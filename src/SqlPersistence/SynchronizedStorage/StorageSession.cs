@@ -94,7 +94,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
 
         GC.SuppressFinalize(this);
     }
@@ -125,7 +125,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     {
         await DisposeAsyncCore().ConfigureAwait(false);
 
-        Dispose(disposing:true);
+        Dispose(disposing: true);
 
         GC.SuppressFinalize(this);
     }
