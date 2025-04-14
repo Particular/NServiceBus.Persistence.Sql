@@ -86,9 +86,6 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         if (ownsTransaction && Transaction != null)
         {
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            await Transaction.DisposeAsync().ConfigureAwait(false);
-
-            await Connection.DisposeAsync().ConfigureAwait(false);
         }
     }
 
@@ -111,11 +108,11 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
             if (ownsTransaction)
             {
                 Transaction?.Dispose();
-                Connection?.Dispose();
-            }
+                Transaction = null;
 
-            Transaction = null;
-            Connection = null;
+                Connection?.Dispose();
+                Connection = null;
+            }
         }
 
         disposed = false;
@@ -140,16 +137,15 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
             {
                 //DbTransaction is required to implement IAsyncDisposable
                 await Transaction.DisposeAsync().ConfigureAwait(false);
+                Transaction = null;
             }
 
             if (Connection != null)
             {
                 //DbConnect is required to implement IAsyncDisposable
                 await Connection.DisposeAsync().ConfigureAwait(false);
+                Connection = null;
             }
-
-            Transaction = null;
-            Connection = null;
         }
     }
 }
