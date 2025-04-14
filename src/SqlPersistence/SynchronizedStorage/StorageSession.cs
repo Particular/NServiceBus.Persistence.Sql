@@ -101,12 +101,12 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         {
             if (Transaction != null)
             {
-                await Transaction.DisposeAsync();
+                await Transaction.DisposeAsync().ConfigureAwait(false);
             }
 
             if (Connection != null)
             {
-                await Connection.DisposeAsync();
+                await Connection.DisposeAsync().ConfigureAwait(false);
             }
         }
 
