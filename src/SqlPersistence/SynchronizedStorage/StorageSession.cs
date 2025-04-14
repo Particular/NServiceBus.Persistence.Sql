@@ -96,7 +96,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     {
         Dispose(true);
 
-        GC.SuppressFinalize(true);
+        GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing)
