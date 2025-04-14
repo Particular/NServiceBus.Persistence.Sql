@@ -8,15 +8,13 @@ using Persistence;
 public class When_using_storage_sessions_concurrently(TestVariant param) : SagaPersisterTests(param)
 {
     [Test]
-    public async Task It_should_not_throw_when_being_disposed_more_than_once()
-    {
+    public void It_should_not_throw_when_being_disposed_more_than_once() =>
         // 1 : Open
         // 1 : Commit
         // 1 : Dispose
         // 2 : Open
         // 1 : Dispose
         // 2 : Commit
-
         Assert.DoesNotThrowAsync(async () =>
         {
             var correlationPropertyData = Guid.NewGuid().ToString();
@@ -65,7 +63,6 @@ public class When_using_storage_sessions_concurrently(TestVariant param) : SagaP
             } //dispose session2StorageSession 
 
         });
-    }
 
     // Needed to satisfy
     public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<StartMessage>
