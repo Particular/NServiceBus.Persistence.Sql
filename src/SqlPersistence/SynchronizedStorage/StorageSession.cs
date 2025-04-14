@@ -130,7 +130,9 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         GC.SuppressFinalize(this);
     }
 
+#pragma warning disable PS0018
     protected virtual async ValueTask DisposeAsyncCore()
+#pragma warning restore PS0018
     {
         if (ownsTransaction)
         {
