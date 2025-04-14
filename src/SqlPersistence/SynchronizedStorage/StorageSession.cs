@@ -9,9 +9,10 @@ using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
-class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession
+class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession, IAsyncDisposable
 {
     bool ownsTransaction;
+    bool disposed;
     Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
     readonly IConnectionManager connectionManager;
     readonly SqlDialect dialect;
@@ -93,10 +94,60 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 
     public void Dispose()
     {
+        Dispose(true);
+
+        GC.SuppressFinalize(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            if (ownsTransaction)
+            {
+                Transaction?.Dispose();
+                Connection?.Dispose();
+            }
+
+            Transaction = null;
+            Connection = null;
+        }
+
+        disposed = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore().ConfigureAwait(false);
+
+        Dispose(disposing:true);
+
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual async ValueTask DisposeAsyncCore()
+    {
         if (ownsTransaction)
         {
-            Transaction?.Dispose();
-            Connection?.Dispose();
+            if (Transaction != null)
+            {
+                //DbTransaction is required to implement IAsyncDisposable
+                await Transaction.DisposeAsync().ConfigureAwait(false);
+            }
+
+            if (Connection != null)
+            {
+                //DbConnect is required to implement IAsyncDisposable
+                await Connection.DisposeAsync().ConfigureAwait(false);
+            }
+
+            Transaction = null;
+            Connection = null;
         }
     }
 }
