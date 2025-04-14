@@ -40,8 +40,11 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         };
     }
 
-    public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context,
-        CancellationToken cancellationToken = default)
+    public ValueTask<bool> TryOpen(
+        IOutboxTransaction transaction,
+        ContextBag context,
+        CancellationToken cancellationToken = default
+    )
     {
         if (transaction is not ISqlOutboxTransaction outboxTransaction)
         {
@@ -54,8 +57,11 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         return new ValueTask<bool>(true);
     }
 
-    public async ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<bool> TryOpen(
+        TransportTransaction transportTransaction,
+        ContextBag context,
+        CancellationToken cancellationToken = default
+    )
     {
         (bool wasAdapted, DbConnection connection, DbTransaction transaction, bool ownsTx) =
             await dialect.TryAdaptTransportConnection(transportTransaction, context, connectionManager, cancellationToken)
