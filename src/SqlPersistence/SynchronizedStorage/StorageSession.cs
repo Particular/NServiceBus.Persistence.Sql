@@ -91,9 +91,9 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         if (ownsTransaction && Transaction != null)
         {
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            await Transaction.DisposeAsync().ConfigureAwait(false);
 
-            Connection.Dispose();
+            await Transaction.DisposeAsync().ConfigureAwait(false);
+            await Connection.DisposeAsync().ConfigureAwait(false);
         }
     }
 
