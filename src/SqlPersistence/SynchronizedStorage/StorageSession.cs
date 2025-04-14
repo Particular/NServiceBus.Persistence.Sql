@@ -91,10 +91,20 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         if (ownsTransaction && Transaction != null)
         {
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-
-            await Transaction.DisposeAsync().ConfigureAwait(false);
-            await Connection.DisposeAsync().ConfigureAwait(false);
+            await DisposeAsync().ConfigureAwait(false);
         }
+    }
+
+    async ValueTask DisposeAsync()
+    {
+        if (ownsTransaction)
+        {
+            if (Transaction != null) await Transaction.DisposeAsync();
+            if (Connection != null) await Connection.DisposeAsync();
+        }
+
+        Transaction = null;
+        Connection = null;
     }
 
     public void Dispose()
@@ -104,5 +114,8 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
             Transaction?.Dispose();
             Connection?.Dispose();
         }
+
+        Transaction = null;
+        Connection = null;
     }
 }
