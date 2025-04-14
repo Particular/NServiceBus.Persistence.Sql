@@ -99,8 +99,15 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
     {
         if (ownsTransaction)
         {
-            if (Transaction != null) await Transaction.DisposeAsync();
-            if (Connection != null) await Connection.DisposeAsync();
+            if (Transaction != null)
+            {
+                await Transaction.DisposeAsync();
+            }
+
+            if (Connection != null)
+            {
+                await Connection.DisposeAsync();
+            }
         }
 
         Transaction = null;
