@@ -95,7 +95,9 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         }
     }
 
+#pragma warning disable PS0018
     async ValueTask DisposeAsync()
+#pragma warning restore PS0018
     {
         if (ownsTransaction)
         {
