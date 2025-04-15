@@ -9,7 +9,7 @@ using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
-class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession, IAsyncDisposable
+sealed class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession, IAsyncDisposable
 {
     bool ownsTransaction;
     bool disposed;
@@ -91,46 +91,30 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
 
     public void Dispose()
     {
-        Dispose(disposing: true);
-
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
         if (disposed)
         {
             return;
         }
 
-        if (disposing)
+        if (ownsTransaction)
         {
-            if (ownsTransaction)
-            {
-                Transaction?.Dispose();
-                Transaction = null;
+            Transaction?.Dispose();
+            Transaction = null;
 
-                Connection?.Dispose();
-                Connection = null;
-            }
+            Connection?.Dispose();
+            Connection = null;
         }
 
-        disposed = false;
+        disposed = true;
     }
 
     public async ValueTask DisposeAsync()
     {
-        await DisposeAsyncCore().ConfigureAwait(false);
-
-        Dispose(disposing: true);
-
-        GC.SuppressFinalize(this);
-    }
-
-#pragma warning disable PS0018
-    protected virtual async ValueTask DisposeAsyncCore()
-#pragma warning restore PS0018
-    {
+        if (disposed)
+        {
+            return;
+        }
+        
         if (ownsTransaction)
         {
             if (Transaction != null)
@@ -147,5 +131,7 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
                 Connection = null;
             }
         }
+
+        disposed = true;
     }
 }
