@@ -87,6 +87,9 @@ sealed class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorag
         {
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         }
+
+        // Required, as NServiceBus 9.2 will invoke Dispose, and not DisposeAsync
+        await DisposeAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
