@@ -114,19 +114,17 @@ sealed class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorag
         {
             return;
         }
-        
+
         if (ownsTransaction)
         {
             if (Transaction != null)
             {
-                //DbTransaction is required to implement IAsyncDisposable
                 await Transaction.DisposeAsync().ConfigureAwait(false);
                 Transaction = null;
             }
 
             if (Connection != null)
             {
-                //DbConnect is required to implement IAsyncDisposable
                 await Connection.DisposeAsync().ConfigureAwait(false);
                 Connection = null;
             }
