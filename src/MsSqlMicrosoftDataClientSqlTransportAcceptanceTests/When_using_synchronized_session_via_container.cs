@@ -16,21 +16,25 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
     {
         // The EndpointsStarted flag is set by acceptance framework
         var context = await Scenario.Define<Context>()
-            .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())).CustomConfig(cfg =>
-            {
-                cfg.ConfigureTransport().TransportTransactionMode = transactionMode;
-            }))
+            .WithEndpoint<Endpoint>(b =>
+                b.When(s =>
+                    s.SendLocal(new MyMessage()))
+                    .CustomConfig(cfg =>
+                    {
+                        cfg.ConfigureTransport().TransportTransactionMode = transactionMode;
+                    }))
             .Done(c => c.Done)
             .Run();
 
-        Assert.That(context.InjectedSession.Connection, Is.Not.Null);
+        Assert.That(context.MessageHandlerSpySpy.ConnectionWasNotNullWhenHandleCalled);
+
         if (transactionMode == TransportTransactionMode.TransactionScope)
         {
-            Assert.That(context.InjectedSession.Transaction, Is.Null);
+            Assert.That(context.MessageHandlerSpySpy.TransactionWasNullWhenHandleCalled);
         }
         else
         {
-            Assert.That(context.InjectedSession.Transaction, Is.Not.Null);
+            Assert.That(context.MessageHandlerSpySpy.TransactionWasNotNullWhenHandleCalled);
         }
     }
 
@@ -38,6 +42,9 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
     {
         public bool Done { get; set; }
         public ISqlStorageSession InjectedSession { get; set; }
+
+        public StorageSessionMessageHandlerSpy MessageHandlerSpySpy { get; set; } = new();
+
     }
 
     public class Endpoint : EndpointConfigurationBuilder
@@ -64,7 +71,12 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
             public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
             {
                 context.Done = true;
+
                 context.InjectedSession = storageSession;
+
+                context.MessageHandlerSpySpy.ConnectionWasNotNullWhenHandleCalled = context.InjectedSession.Connection != null;
+
+                context.MessageHandlerSpySpy.TransactionWasNotNullWhenHandleCalled = context.InjectedSession.Transaction != null;
                 return Task.CompletedTask;
             }
         }
@@ -73,6 +85,21 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
     public class MyMessage : IMessage
     {
         public string Property { get; set; }
+    }
+
+    public class StorageSessionMessageHandlerSpy
+    {
+        //InjectedSession.Transaction is disposed and set to null after the message hanlder's
+        //Handle method executes, so it is captured when Handle is called
+        public bool TransactionWasNotNullWhenHandleCalled { get; set; }
+
+        public bool TransactionWasNullWhenHandleCalled => !TransactionWasNotNullWhenHandleCalled;
+
+        //InjectedSession.Connection is disposed and set to null after the message hanlder's
+        //Handle method executes, so it is captured when Handle is called
+        public bool ConnectionWasNotNullWhenHandleCalled { get; set; }
+
+        public bool ConnectionWasNullWhenHandleCalled => !ConnectionWasNotNullWhenHandleCalled;
     }
 
 }
