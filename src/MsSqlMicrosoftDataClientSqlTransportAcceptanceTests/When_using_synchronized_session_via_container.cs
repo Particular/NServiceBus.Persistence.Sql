@@ -44,7 +44,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         public bool Done { get; set; }
         public ISqlStorageSession InjectedSession { get; set; }
 
-        public StorageSessionMessageHandlerSpy MessageHandlerSpySpy { get; set; } = new();
+        public StorageSessionMessageHandlerSpy MessageHandlerSpySpy { get; set; } = new StorageSessionMessageHandlerSpy();
 
     }
 
