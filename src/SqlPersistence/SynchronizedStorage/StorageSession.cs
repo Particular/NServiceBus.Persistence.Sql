@@ -9,9 +9,10 @@ using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Transport;
 
-class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession
+sealed class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSession, IAsyncDisposable
 {
     bool ownsTransaction;
+    bool disposed;
     Func<ISqlStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
     readonly IConnectionManager connectionManager;
     readonly SqlDialect dialect;
@@ -85,18 +86,53 @@ class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorageSessio
         if (ownsTransaction && Transaction != null)
         {
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            await Transaction.DisposeAsync().ConfigureAwait(false);
-
-            Connection.Dispose();
         }
+
+        // Required, as NServiceBus 9.2 will invoke Dispose, and not DisposeAsync
+        await DisposeAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
     {
+        if (disposed)
+        {
+            return;
+        }
+
         if (ownsTransaction)
         {
             Transaction?.Dispose();
+            Transaction = null;
+
             Connection?.Dispose();
+            Connection = null;
         }
+
+        disposed = true;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        if (ownsTransaction)
+        {
+            if (Transaction != null)
+            {
+                await Transaction.DisposeAsync().ConfigureAwait(false);
+                Transaction = null;
+            }
+
+            if (Connection != null)
+            {
+                await Connection.DisposeAsync().ConfigureAwait(false);
+                Connection = null;
+            }
+        }
+
+        disposed = true;
     }
 }
