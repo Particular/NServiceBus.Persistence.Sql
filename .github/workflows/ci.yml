@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-2022, ubuntu-20.04 ]
+        os: [ windows-2022, ubuntu-22.04 ]
         engine: [ SqlServer, MySql, PostgreSql, Oracle ]
         include:
           # Add os-name alias for job name
