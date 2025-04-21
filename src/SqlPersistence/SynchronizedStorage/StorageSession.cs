@@ -101,10 +101,8 @@ sealed class StorageSession
         {
 #if NET
             await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            await DisposeAsync().ConfigureAwait(false);
 #else
             Transaction.Commit();
-            Dispose();
 #endif
         }
     }
