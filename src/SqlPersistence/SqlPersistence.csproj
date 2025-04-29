@@ -39,11 +39,11 @@
   <ItemGroup>
     <InternalsVisibleTo Include="AcceptanceTestHelper" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
     <InternalsVisibleTo Include="OracleAcceptanceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="PostgreSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="NServiceBus.Persistence.Sql.TransactionalSession" Key="$(NServiceBusKey)" />
     <InternalsVisibleTo Include="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
