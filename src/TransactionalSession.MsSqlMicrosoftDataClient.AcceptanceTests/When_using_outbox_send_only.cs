@@ -15,7 +15,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
     [Test()]
     public async Task Should_send_messages_on_transactional_session_commit()
     {
-        await OutboxHelpers.CreateOutboxTable<ProcessorEndpoint>();
+        await OutboxHelpers.CreateOutboxTable<SendOnlyEndpoint>();
 
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SendOnlyEndpoint>(s => s.When(async (_, ctx) =>
@@ -54,12 +54,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
     {
         public SendOnlyEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
         {
-            var settings = c.GetSettings();
-            var processorEndpointName = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint));
-
-            // use the outbox table of the processor endpoint
-            settings.Set(TransactionSessionDefaultServer.TablePrefixKey, processorEndpointName);
-            settings.Set(TransactionSessionDefaultServer.TransactionalSessionOptionsKey, new TransactionalSessionOptions { ProcessorAddress = processorEndpointName });
+            c.GetSettings().Set(TransactionSessionDefaultServer.TransactionalSessionOptionsKey, new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) });
 
             c.SendOnly();
         });
@@ -82,7 +77,16 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 
     class ProcessorEndpoint : EndpointConfigurationBuilder, IDoNotCaptureServiceProvider
     {
-        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c => c.Pipeline.Register(typeof(DiscoverControlMessagesBehavior), "Discovers control messages"));
+        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
+        {
+            var sendOnlyEndpointName = Conventions.EndpointNamingConvention.Invoke(typeof(SendOnlyEndpoint));
+            var tablePrefix = $"{TestTableNameCleaner.Clean(sendOnlyEndpointName)}_";
+
+            // use the outbox table of the send only endpoint
+            c.GetSettings().Set(TransactionSessionDefaultServer.TablePrefixKey, tablePrefix);
+
+            c.Pipeline.Register(typeof(DiscoverControlMessagesBehavior), "Discovers control messages");
+        });
 
         class DiscoverControlMessagesBehavior(Context testContext) : Behavior<ITransportReceiveContext>
         {
