@@ -6,10 +6,14 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
+    using Configuration.AdvancedExtensibility;
     using NUnit.Framework;
 
     public partial class TransactionSessionDefaultServer : IEndpointSetupTemplate
     {
+        public const string TransactionalSessionOptionsKey = "Test.TransactionalSessionOptions";
+        public const string TablePrefixKey = "Test.TablePrefix";
+
         public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
             EndpointCustomizationConfiguration endpointConfiguration,
             Func<EndpointConfiguration, Task> configurationBuilderCustomization)
@@ -29,12 +33,26 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             var persistence = builder.UsePersistence<SqlPersistence>();
             SetConnectionBuilder(persistence);
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
-            persistence.EnableTransactionalSession();
             persistence.DisableInstaller();
 
-            builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
+            if (this is not IDoNotCaptureServiceProvider)
+            {
+                builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
+            }
 
             await configurationBuilderCustomization(builder);
+
+            if (!builder.GetSettings().TryGet<TransactionalSessionOptions>(TransactionalSessionOptionsKey, out var transactionalSessionOptions))
+            {
+                transactionalSessionOptions = new TransactionalSessionOptions();
+            }
+
+            if (builder.GetSettings().TryGet<string>(TablePrefixKey, out var tablePrefix))
+            {
+                persistence.TablePrefix(tablePrefix);
+            }
+
+            persistence.EnableTransactionalSession(transactionalSessionOptions);
 
             // scan types at the end so that all types used by the configuration have been loaded into the AppDomain
             builder.TypesToIncludeInScan(endpointConfiguration.GetTypesScopedByTestClass());
