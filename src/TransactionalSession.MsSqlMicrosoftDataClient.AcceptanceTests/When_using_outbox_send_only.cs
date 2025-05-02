@@ -83,7 +83,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
             var tablePrefix = $"{TestTableNameCleaner.Clean(sendOnlyEndpointName)}_";
 
             // use the outbox table of the send only endpoint
-            c.GetSettings().Set(TransactionSessionDefaultServer.TablePrefixKey, tablePrefix);
+            c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>().TablePrefix(tablePrefix);
 
             c.Pipeline.Register(typeof(DiscoverControlMessagesBehavior), "Discovers control messages");
         });
