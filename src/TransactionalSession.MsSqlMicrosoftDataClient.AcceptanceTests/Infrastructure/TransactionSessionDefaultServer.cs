@@ -7,9 +7,9 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
 
     public class TransactionSessionDefaultServer : DefaultServer
     {
-        public override async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointCustomization, Func<EndpointConfiguration, Task> configurationBuilderCustomization)
+        public override async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointCustomizationConfiguration, Func<EndpointConfiguration, Task> configurationBuilderCustomization)
         {
-            var endpointConfiguration = await base.GetConfiguration(runDescriptor, endpointCustomization, configurationBuilderCustomization);
+            var endpointConfiguration = await base.GetConfiguration(runDescriptor, endpointCustomizationConfiguration, configurationBuilderCustomization);
 
             endpointConfiguration.GetSettings().Get<PersistenceExtensions<SqlPersistence>>()
                 .EnableTransactionalSession();

@@ -12,39 +12,39 @@ using NUnit.Framework;
 public partial class DefaultServer : IEndpointSetupTemplate
 {
     public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
-        EndpointCustomizationConfiguration endpointConfiguration,
+        EndpointCustomizationConfiguration endpointCustomizationConfiguration,
         Func<EndpointConfiguration, Task> configurationBuilderCustomization)
     {
-        var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
-        builder.UseSerialization<SystemJsonSerializer>();
-        builder.EnableInstallers();
+        var endpointConfiguration = new EndpointConfiguration(endpointCustomizationConfiguration.EndpointName);
+        endpointConfiguration.UseSerialization<SystemJsonSerializer>();
+        endpointConfiguration.EnableInstallers();
 
-        builder.Recoverability()
+        endpointConfiguration.Recoverability()
             .Delayed(delayed => delayed.NumberOfRetries(0))
             .Immediate(immediate => immediate.NumberOfRetries(0));
 
         var storageDir = Path.Combine(Path.GetTempPath(), "learn", TestContext.CurrentContext.Test.ID);
 
-        builder.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
+        endpointConfiguration.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
 
-        var persistence = builder.UsePersistence<SqlPersistence>();
+        var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
         SetConnectionBuilder(persistence);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
         persistence.DisableInstaller();
 
-        builder.GetSettings().Set(persistence);
+        endpointConfiguration.GetSettings().Set(persistence);
 
-        if (this is not IDoNotCaptureServiceProvider)
+        if (!typeof(IDoNotCaptureServiceProvider).IsAssignableFrom(endpointCustomizationConfiguration.BuilderType))
         {
-            builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
+            endpointConfiguration.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
         }
 
-        await configurationBuilderCustomization(builder);
+        await configurationBuilderCustomization(endpointConfiguration);
 
         // scan types at the end so that all types used by the configuration have been loaded into the AppDomain
-        builder.TypesToIncludeInScan(endpointConfiguration.GetTypesScopedByTestClass());
+        endpointConfiguration.TypesToIncludeInScan(endpointCustomizationConfiguration.GetTypesScopedByTestClass());
 
-        return builder;
+        return endpointConfiguration;
     }
 
     private partial void SetConnectionBuilder(PersistenceExtensions<SqlPersistence> sqlPersistence);
