@@ -52,9 +52,14 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 
     class SendOnlyEndpoint : EndpointConfigurationBuilder
     {
-        public SendOnlyEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
+        public SendOnlyEndpoint() => EndpointSetup<DefaultServer>(c =>
         {
-            c.GetSettings().Set(TransactionSessionDefaultServer.TransactionalSessionOptionsKey, new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) });
+            var options = new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
+
+            c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>().EnableTransactionalSession(options);
+
+            c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
+            c.EnableOutbox();
 
             c.SendOnly();
         });

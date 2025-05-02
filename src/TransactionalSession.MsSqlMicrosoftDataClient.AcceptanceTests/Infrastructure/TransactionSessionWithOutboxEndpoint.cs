@@ -13,8 +13,7 @@
             {
                 configuration.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
 
-                var outbox = configuration.EnableOutbox();
-                outbox.DisableCleanup();
+                configuration.EnableOutbox();
 
                 await configurationBuilderCustomization(configuration);
             });
