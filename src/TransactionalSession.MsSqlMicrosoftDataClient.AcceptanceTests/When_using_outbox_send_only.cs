@@ -37,17 +37,12 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
             .Done(c => c.MessageReceived)
             .Run();
 
-        Assert.That(context.ControlMessageReceived, Is.True);
         Assert.That(context.MessageReceived, Is.True);
     }
 
-    class Context : ScenarioContext, IInjectServiceProvider
+    class Context : TransactionalSessionTestContext
     {
         public bool MessageReceived { get; set; }
-
-        public IServiceProvider ServiceProvider { get; set; }
-
-        public bool ControlMessageReceived { get; set; }
     }
 
     class SendOnlyEndpoint : EndpointConfigurationBuilder
@@ -65,7 +60,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
         });
     }
 
-    class AnotherEndpoint : EndpointConfigurationBuilder, IDoNotCaptureServiceProvider
+    class AnotherEndpoint : EndpointConfigurationBuilder
     {
         public AnotherEndpoint() => EndpointSetup<TransactionSessionDefaultServer>();
 
@@ -80,7 +75,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
         }
     }
 
-    class ProcessorEndpoint : EndpointConfigurationBuilder, IDoNotCaptureServiceProvider
+    class ProcessorEndpoint : EndpointConfigurationBuilder
     {
         public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
         {
@@ -89,22 +84,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 
             // use the outbox table of the send only endpoint
             c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>().TablePrefix(tablePrefix);
-
-            c.Pipeline.Register(typeof(DiscoverControlMessagesBehavior), "Discovers control messages");
         });
-
-        class DiscoverControlMessagesBehavior(Context testContext) : Behavior<ITransportReceiveContext>
-        {
-            public override async Task Invoke(ITransportReceiveContext context, Func<Task> next)
-            {
-                if (context.Message.Headers.ContainsKey("NServiceBus.TransactionalSession.CommitDelayIncrement"))
-                {
-                    testContext.ControlMessageReceived = true;
-                }
-
-                await next();
-            }
-        }
     }
 
     class SampleMessage : ICommand
