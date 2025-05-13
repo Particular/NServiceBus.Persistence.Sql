@@ -32,7 +32,7 @@ namespace NServiceBus.TransactionalSession
 
             if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
             {
-                // remote processor configured so turn of the outbox cleanup on this instance
+                // remote processor configured so turn off the outbox cleanup on this instance
                 settings.Set(SqlOutboxFeature.DisableCleanup, true);
             }
 
