@@ -94,4 +94,5 @@ class SqlOutboxFeature : Feature
     internal const string AdoTransactionIsolationLevel = "Persistence.Sql.Outbox.AdoTransactionIsolationLevel";
     internal const string TransactionScopeIsolationLevel = "Persistence.Sql.Outbox.TransactionScopeIsolationLevel";
     internal const string TransactionScopeTimeout = "Persistence.Sql.Outbox.TransactionScopeTimeout";
+    internal const string ProcessorEndpointKey = "Persistence.Sql.Outbox.TransactionalSession.ProcessorEndpoint";
 }

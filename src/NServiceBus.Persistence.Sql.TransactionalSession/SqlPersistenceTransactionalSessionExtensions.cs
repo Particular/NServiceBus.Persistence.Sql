@@ -30,8 +30,10 @@ namespace NServiceBus.TransactionalSession
             settings.Set(transactionalSessionOptions);
             settings.EnableFeatureByDefault<SqlPersistenceTransactionalSession>();
 
-            if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
+            if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorEndpoint))
             {
+                settings.Set(SqlOutboxFeature.ProcessorEndpointKey, transactionalSessionOptions.ProcessorEndpoint);
+
                 // remote processor configured so turn off the outbox cleanup on this instance
                 settings.Set(SqlOutboxFeature.DisableCleanup, true);
             }

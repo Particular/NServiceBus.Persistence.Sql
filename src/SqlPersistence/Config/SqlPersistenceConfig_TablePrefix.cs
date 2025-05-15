@@ -20,14 +20,17 @@ namespace NServiceBus
 
         internal static string GetTablePrefix(this IReadOnlySettings settings)
         {
-            if (settings.TryGet("SqlPersistence.TablePrefix", out string tablePrefix))
+            var processorEndpoint = settings.GetOrDefault<string>(SqlOutboxFeature.ProcessorEndpointKey);
+
+            if (!string.IsNullOrWhiteSpace(processorEndpoint))
             {
-                return tablePrefix;
+                return TableNameCleaner.Clean(processorEndpoint);
             }
+
             var endpointName = settings.EndpointName();
-            var clean = TableNameCleaner.Clean(endpointName);
-            return $"{clean}_";
+            return settings.GetOverridenTablePrefix() ?? TableNameCleaner.Clean(endpointName);
         }
 
+        internal static string GetOverridenTablePrefix(this IReadOnlySettings settings) => settings.TryGet("SqlPersistence.TablePrefix", out string overriddenTablePrefix) ? overriddenTablePrefix : null;
     }
 }

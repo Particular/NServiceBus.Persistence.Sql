@@ -1,6 +1,5 @@
 namespace NServiceBus.TransactionalSession.AcceptanceTests;
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,6 @@ using AcceptanceTesting;
 using AcceptanceTesting.Customization;
 using Configuration.AdvancedExtensibility;
 using NUnit.Framework;
-using Pipeline;
 
 public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 {
@@ -49,7 +47,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
     {
         public SendOnlyEndpoint() => EndpointSetup<DefaultServer>(c =>
         {
-            var options = new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
+            var options = new TransactionalSessionOptions { ProcessorEndpoint = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
 
             c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>().EnableTransactionalSession(options);
 
