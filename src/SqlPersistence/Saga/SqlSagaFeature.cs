@@ -56,7 +56,7 @@ class SqlSagaFeature : Feature
         var nameFilter = SagaSettings.GetNameFilter(settings);
         nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
-        var tablePrefix = settings.GetTablePrefix();
+        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,

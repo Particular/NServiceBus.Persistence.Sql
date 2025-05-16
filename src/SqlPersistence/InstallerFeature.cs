@@ -19,7 +19,7 @@ class InstallerFeature : Feature
         settings.ConnectionBuilder = storageType => context.Settings.GetConnectionBuilder(storageType).BuildNonContextual();
         settings.Dialect = context.Settings.GetSqlDialect();
         settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
-        settings.TablePrefix = context.Settings.GetTablePrefix();
+        settings.TablePrefix = context.Settings.GetTablePrefix(context.Settings.EndpointName());
         settings.IsMultiTenant = context.Settings.EndpointIsMultiTenant();
 
         settings.Dialect.ValidateTablePrefix(settings.TablePrefix);

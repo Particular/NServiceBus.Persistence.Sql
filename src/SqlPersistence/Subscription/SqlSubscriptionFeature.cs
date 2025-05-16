@@ -16,7 +16,7 @@ class SqlSubscriptionFeature : Feature
         var settings = context.Settings;
 
         var connectionManager = settings.GetConnectionBuilder<StorageType.Subscriptions>();
-        var tablePrefix = settings.GetTablePrefix();
+        var tablePrefix = settings.GetTablePrefix(context.Settings.EndpointName());
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor);
