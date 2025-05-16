@@ -13,7 +13,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
     [Test()]
     public async Task Should_send_messages_on_transactional_session_commit()
     {
-        await OutboxHelpers.CreateOutboxTable<SendOnlyEndpoint>();
+        //await OutboxHelpers.CreateOutboxTable<SendOnlyEndpoint>();
 
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SendOnlyEndpoint>(s => s.When(async (_, ctx) =>
