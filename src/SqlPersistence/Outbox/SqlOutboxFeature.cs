@@ -20,7 +20,8 @@ class SqlOutboxFeature : Feature
     {
         var settings = context.Settings;
         var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
-        var tablePrefix = settings.GetTablePrefix();
+        var endpointName = settings.GetOrDefault<string>(ProcessorEndpointKey) ?? settings.EndpointName();
+        var tablePrefix = settings.GetTablePrefix(endpointName);
         var sqlDialect = settings.GetSqlDialect();
 
         var pessimisticMode = context.Settings.GetOrDefault<bool>(ConcurrencyMode);
@@ -94,5 +95,5 @@ class SqlOutboxFeature : Feature
     internal const string AdoTransactionIsolationLevel = "Persistence.Sql.Outbox.AdoTransactionIsolationLevel";
     internal const string TransactionScopeIsolationLevel = "Persistence.Sql.Outbox.TransactionScopeIsolationLevel";
     internal const string TransactionScopeTimeout = "Persistence.Sql.Outbox.TransactionScopeTimeout";
-    internal const string ProcessorEndpointKey = "Persistence.Sql.Outbox.TransactionalSession.ProcessorEndpoint";
+    internal const string ProcessorEndpointKey = "Persistence.Sql.TransactionalSession.ProcessorEndpoint";
 }

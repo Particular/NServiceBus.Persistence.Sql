@@ -75,10 +75,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 
     class ProcessorEndpoint : EndpointConfigurationBuilder
     {
-        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
-        {
-            c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>();
-        });
+        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>();
     }
 
     class SampleMessage : ICommand

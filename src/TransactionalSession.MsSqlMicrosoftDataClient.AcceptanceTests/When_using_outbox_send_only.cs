@@ -75,14 +75,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 
     class ProcessorEndpoint : EndpointConfigurationBuilder
     {
-        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
-        {
-            var sendOnlyEndpointName = Conventions.EndpointNamingConvention.Invoke(typeof(SendOnlyEndpoint));
-            var tablePrefix = $"{TestTableNameCleaner.Clean(sendOnlyEndpointName)}_";
-
-            // use the outbox table of the send only endpoint
-            c.GetSettings().Get<PersistenceExtensions<SqlPersistence>>().TablePrefix(tablePrefix);
-        });
+        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>();
     }
 
     class SampleMessage : ICommand
