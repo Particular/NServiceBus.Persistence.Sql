@@ -3,10 +3,7 @@ using NServiceBus.Features;
 
 class InstallerFeature : Feature
 {
-    public InstallerFeature()
-    {
-        Defaults(s => s.SetDefault(new InstallerSettings()));
-    }
+    public InstallerFeature() => Defaults(s => s.SetDefault(new InstallerSettings()));
 
     protected override void Setup(FeatureConfigurationContext context)
     {

@@ -34,6 +34,9 @@ namespace NServiceBus.TransactionalSession
             {
                 settings.Set(SqlOutboxFeature.ProcessorEndpointKey, transactionalSessionOptions.ProcessorEndpoint);
 
+                settings.GetOrCreate<InstallerSettings>()
+                    .DoNotCreateOutboxTable = true;
+
                 // remote processor configured so turn off the outbox cleanup on this instance
                 settings.Set(SqlOutboxFeature.DisableCleanup, true);
             }
