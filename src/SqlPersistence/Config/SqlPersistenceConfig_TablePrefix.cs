@@ -18,16 +18,14 @@ namespace NServiceBus
                 .Set("SqlPersistence.TablePrefix", tablePrefix);
         }
 
-        internal static string GetTablePrefix(this IReadOnlySettings settings)
+        internal static string GetTablePrefix(this IReadOnlySettings settings, string endpointName)
         {
-            if (settings.TryGet("SqlPersistence.TablePrefix", out string tablePrefix))
+            if (settings.TryGet("SqlPersistence.TablePrefix", out string overriddenTablePrefix))
             {
-                return tablePrefix;
+                return overriddenTablePrefix;
             }
-            var endpointName = settings.EndpointName();
-            var clean = TableNameCleaner.Clean(endpointName);
-            return $"{clean}_";
-        }
 
+            return $"{TableNameCleaner.Clean(endpointName)}_";
+        }
     }
 }

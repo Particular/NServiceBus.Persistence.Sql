@@ -10,4 +10,5 @@ class InstallerSettings
     public string ScriptDirectory { get; set; }
     public string TablePrefix { get; set; }
     public bool IsMultiTenant { get; set; }
+    public bool DoNotCreateOutboxTable { get; set; }
 }

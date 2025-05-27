@@ -9,5 +9,6 @@ namespace NServiceBus.TransactionalSession
     public static class SqlPersistenceTransactionalSessionExtensions
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> EnableTransactionalSession(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> persistenceExtensions) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> EnableTransactionalSession(this NServiceBus.PersistenceExtensions<NServiceBus.SqlPersistence> persistenceExtensions, NServiceBus.TransactionalSession.TransactionalSessionOptions transactionalSessionOptions) { }
     }
 }

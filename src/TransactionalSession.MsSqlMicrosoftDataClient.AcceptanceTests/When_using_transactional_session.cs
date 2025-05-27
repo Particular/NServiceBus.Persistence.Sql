@@ -245,11 +245,10 @@
             Assert.That(resultAfterDispose, Is.EqualTo(rowId));
         }
 
-        class Context : ScenarioContext, IInjectServiceProvider
+        class Context : TransactionalSessionTestContext
         {
             public bool MessageReceived { get; set; }
             public bool CompleteMessageReceived { get; set; }
-            public IServiceProvider ServiceProvider { get; set; }
         }
 
         class AnEndpoint : EndpointConfigurationBuilder
@@ -267,32 +266,24 @@
                 }
             }
 
-            class SampleHandler : IHandleMessages<SampleMessage>
+            class SampleHandler(Context testContext) : IHandleMessages<SampleMessage>
             {
-                public SampleHandler(Context testContext) => this.testContext = testContext;
-
                 public Task Handle(SampleMessage message, IMessageHandlerContext context)
                 {
                     testContext.MessageReceived = true;
 
                     return Task.CompletedTask;
                 }
-
-                readonly Context testContext;
             }
 
-            class CompleteTestMessageHandler : IHandleMessages<CompleteTestMessage>
+            class CompleteTestMessageHandler(Context testContext) : IHandleMessages<CompleteTestMessage>
             {
-                public CompleteTestMessageHandler(Context context) => testContext = context;
-
                 public Task Handle(CompleteTestMessage message, IMessageHandlerContext context)
                 {
                     testContext.CompleteMessageReceived = true;
 
                     return Task.CompletedTask;
                 }
-
-                readonly Context testContext;
             }
         }
 

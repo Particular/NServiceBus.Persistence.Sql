@@ -7,14 +7,14 @@
     public class TransactionSessionWithOutboxEndpoint : TransactionSessionDefaultServer
     {
         public override Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
-            EndpointCustomizationConfiguration endpointConfiguration,
+            EndpointCustomizationConfiguration endpointCustomizationConfiguration,
             Func<EndpointConfiguration, Task> configurationBuilderCustomization) =>
-            base.GetConfiguration(runDescriptor, endpointConfiguration, async configuration =>
+            base.GetConfiguration(runDescriptor, endpointCustomizationConfiguration, async configuration =>
             {
                 configuration.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
 
-                var outbox = configuration.EnableOutbox();
-                outbox.DisableCleanup();
+                configuration.EnableOutbox()
+                    .DisableCleanup();
 
                 await configurationBuilderCustomization(configuration);
             });
