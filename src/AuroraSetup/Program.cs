@@ -44,7 +44,7 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
 {
     Engine = DatabaseClusterEngine.AuroraMysql(new AuroraMysqlClusterEngineProps
     {
-        Version = AuroraMysqlEngineVersion.VER_3_03_0
+        Version = AuroraMysqlEngineVersion.VER_3_09_0
     }),
     Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets" }),
     Vpc = vpc,
@@ -65,7 +65,7 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
 {
     Engine = DatabaseClusterEngine.AuroraPostgres(new AuroraPostgresClusterEngineProps
     {
-        Version = AuroraPostgresEngineVersion.VER_15_2
+        Version = AuroraPostgresEngineVersion.VER_17_4
     }),
     Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = "aurora_postgres_secrets" }),
     Vpc = vpc,
