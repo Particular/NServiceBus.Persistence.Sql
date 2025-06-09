@@ -61,6 +61,13 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     }
 });
 
+//To ensure that no snapshots are created during CI/CD runs, we disable deletion protection and skip final snapshots.
+var mysqlCfnCluster = (CfnDBCluster)mysqlCluster.Node.DefaultChild!;
+mysqlCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
+mysqlCfnCluster.AddPropertyOverride("DeletionProtection", false);
+mysqlCfnCluster.AddPropertyOverride("SkipFinalSnapshot", true);
+
+
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
 {
     Engine = DatabaseClusterEngine.AuroraPostgres(new AuroraPostgresClusterEngineProps
@@ -81,6 +88,13 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
         securityGroup
     }
 });
+
+//To ensure that no snapshots are created during CI/CD runs, we disable deletion protection and skip final snapshots.
+var postgresCfnCluster = (CfnDBCluster)postgresCluster.Node.DefaultChild!;
+postgresCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
+postgresCfnCluster.AddPropertyOverride("DeletionProtection", false);
+postgresCfnCluster.AddPropertyOverride("SkipFinalSnapshot", true);
+
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
 _ = new CfnOutput(stack, "mysql_secrets", new CfnOutputProps { Value = mysqlCluster.Secret!.SecretName });

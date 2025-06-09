@@ -746,15 +746,13 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition3, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect), endpointName, schema: schema);
             Assert.Multiple(() =>
             {
                 Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);
                 Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property2")), Is.True);
             });
-
-            //cleanup
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition3, sqlDialect), endpointName, schema: schema);
         }
     }
 
