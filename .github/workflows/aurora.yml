@@ -44,7 +44,7 @@ jobs:
           role-to-assume: ${{ secrets.AURORA_CI_ROLE }}
           role-session-name: AuroraCI
           aws-region: us-east-2
-          role-duration-seconds: 7200
+          role-duration-seconds: 10800
 
       - name: Build
         shell: bash

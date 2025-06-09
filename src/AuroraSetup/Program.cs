@@ -61,11 +61,10 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     }
 });
 
-//To ensure that no snapshots are created during CI/CD runs, we disable deletion protection and skip final snapshots.
+// To ensure the resource can be deleted
 var mysqlCfnCluster = (CfnDBCluster)mysqlCluster.Node.DefaultChild!;
 mysqlCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
 mysqlCfnCluster.AddPropertyOverride("DeletionProtection", false);
-//mysqlCfnCluster.AddPropertyOverride("SkipFinalSnapshot", true);
 
 
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
@@ -89,11 +88,10 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
     }
 });
 
-//To ensure that no snapshots are created during CI/CD runs, we disable deletion protection and skip final snapshots.
+// To ensure the resource can be deleted
 var postgresCfnCluster = (CfnDBCluster)postgresCluster.Node.DefaultChild!;
 postgresCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
 postgresCfnCluster.AddPropertyOverride("DeletionProtection", false);
-//postgresCfnCluster.AddPropertyOverride("SkipFinalSnapshot", true);
 
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
