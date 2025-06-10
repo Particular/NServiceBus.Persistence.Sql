@@ -62,9 +62,9 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
 });
 
 // To ensure the resource can be deleted
+mysqlCluster.ApplyRemovalPolicy(RemovalPolicy.DESTROY); // This is important for CI/CD to avoid resource leaks
 var mysqlCfnCluster = (CfnDBCluster)mysqlCluster.Node.DefaultChild!;
 mysqlCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
-mysqlCfnCluster.AddPropertyOverride("DeletionProtection", false);
 
 
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
@@ -89,10 +89,9 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
 });
 
 // To ensure the resource can be deleted
+postgresCluster.ApplyRemovalPolicy(RemovalPolicy.DESTROY); // This is important for CI/CD to avoid resource leaks
 var postgresCfnCluster = (CfnDBCluster)postgresCluster.Node.DefaultChild!;
 postgresCfnCluster!.DeletionProtection = false; // Optional, but recommended for CI
-postgresCfnCluster.AddPropertyOverride("DeletionProtection", false);
-
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
 _ = new CfnOutput(stack, "mysql_secrets", new CfnOutputProps { Value = mysqlCluster.Secret!.SecretName });
