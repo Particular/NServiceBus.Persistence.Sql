@@ -6,7 +6,16 @@ using InstanceType = Amazon.CDK.AWS.EC2.InstanceType;
 
 var app = new App();
 
-var stack = new AuroraTestInfrastructure(app, "AuroraTestInfrastructure", new StackProps
+var stackName = app.Node.TryGetContext("stackName") as string;
+ArgumentException.ThrowIfNullOrEmpty(stackName, nameof(stackName));
+
+var mysqlSecretName = app.Node.TryGetContext("mysqlSecretName") as string;
+ArgumentException.ThrowIfNullOrEmpty(mysqlSecretName, nameof(mysqlSecretName));
+
+var postgresSecretName = app.Node.TryGetContext("postgresSecretName") as string;
+ArgumentException.ThrowIfNullOrEmpty(postgresSecretName, nameof(postgresSecretName));
+
+var stack = new AuroraTestInfrastructure(app, stackName, new StackProps
 {
     // For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     Env = new Amazon.CDK.Environment
@@ -47,7 +56,7 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     {
         Version = AuroraMysqlEngineVersion.VER_3_09_0
     }),
-    Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets" }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = mysqlSecretName }),
     Vpc = vpc,
     StorageType = DBClusterStorageType.AURORA,
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps
@@ -67,7 +76,7 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
     {
         Version = AuroraPostgresEngineVersion.VER_17_4
     }),
-    Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = "aurora_postgres_secrets" }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = postgresSecretName }),
     Vpc = vpc,
     StorageType = DBClusterStorageType.AURORA_IOPT1, // is IO optimized better for tests?
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps

@@ -15,7 +15,10 @@
       "src/*/*.csproj"
     ]
   },
-  "context": {
+  "context": {   
+    "stackName": "AuroraTestInfrastructure",
+    "mysqlSecretName": "aurora_mysql_secrets",
+    "postgresSecretName": "aurora_postgres_secrets",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/core:target-partitions": [
