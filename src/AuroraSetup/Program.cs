@@ -6,7 +6,7 @@ using InstanceType = Amazon.CDK.AWS.EC2.InstanceType;
 
 var app = new App();
 
-var stack = new AuroraTestInfrastructure(app, "AuroraTestInfrastructure", new StackProps
+var stack = new AuroraTestInfrastructure(app, "AuroraTestInfrastructureTemp", new StackProps
 {
     // For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     Env = new Amazon.CDK.Environment
@@ -46,7 +46,7 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     {
         Version = AuroraMysqlEngineVersion.VER_3_09_0
     }),
-    Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets" }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_mysql", new CredentialsBaseOptions { SecretName = "aurora_mysql_secrets_temp" }),
     Vpc = vpc,
     StorageType = DBClusterStorageType.AURORA,
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps
@@ -58,7 +58,8 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     SecurityGroups = new[]
     {
         securityGroup
-    }
+    },
+    RemovalPolicy = RemovalPolicy.DESTROY // This is for testing purposes, not recommended for production
 });
 
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
@@ -67,7 +68,7 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
     {
         Version = AuroraPostgresEngineVersion.VER_17_4
     }),
-    Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = "aurora_postgres_secrets" }),
+    Credentials = Credentials.FromGeneratedSecret("aurora_postgres", new CredentialsBaseOptions { SecretName = "aurora_postgres_secrets_temp" }),
     Vpc = vpc,
     StorageType = DBClusterStorageType.AURORA_IOPT1, // is IO optimized better for tests?
     Writer = ClusterInstance.Provisioned("Writer", new ProvisionedClusterInstanceProps
@@ -79,7 +80,8 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
     SecurityGroups = new[]
     {
         securityGroup
-    }
+    },
+    RemovalPolicy = RemovalPolicy.DESTROY // This is for testing purposes, not recommended for production
 });
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
