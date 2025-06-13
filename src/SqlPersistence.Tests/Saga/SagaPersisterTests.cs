@@ -746,8 +746,7 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
-            var buildCreateScript = SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect);
-            connection.ExecuteCommand(buildCreateScript, endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect), endpointName, schema: schema);
             Assert.Multiple(() =>
             {
                 Assert.That(PropertyExists(TestTableName("TransitionalProcess", "CorrAndTransitionalSaga"), CorrelationPropertyName("Property1")), Is.False);

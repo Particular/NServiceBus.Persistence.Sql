@@ -25,10 +25,10 @@ var vpc = new Vpc(stack, "VPC",
     new VpcProps
     {
         NatGateways = 0,
-        SubnetConfiguration = new[]
-        {
+        SubnetConfiguration =
+        [
             new SubnetConfiguration() { Name = "AuroraTestClusterSubnet", SubnetType = SubnetType.PUBLIC }
-        }
+        ]
     });
 
 var securityGroup = new SecurityGroup(stack, "SecurityGroup", new SecurityGroupProps()
@@ -42,6 +42,8 @@ securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(3306), "allow CI for MySQL
 
 var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseClusterProps
 {
+    DeletionProtection = false,
+    //Parameters = new Dictionary<string, string> { ["general_log"] = "1" },
     Engine = DatabaseClusterEngine.AuroraMysql(new AuroraMysqlClusterEngineProps
     {
         Version = AuroraMysqlEngineVersion.VER_3_09_0
@@ -55,14 +57,13 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
         PubliclyAccessible = true
     }),
     VpcSubnets = new SubnetSelection { SubnetType = SubnetType.PUBLIC },
-    SecurityGroups = new[]
-    {
-        securityGroup
-    }
+    SecurityGroups = [securityGroup],
+    RemovalPolicy = RemovalPolicy.DESTROY
 });
 
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
 {
+    DeletionProtection = false,
     Engine = DatabaseClusterEngine.AuroraPostgres(new AuroraPostgresClusterEngineProps
     {
         Version = AuroraPostgresEngineVersion.VER_17_4
@@ -76,10 +77,8 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
         PubliclyAccessible = true,
     }),
     VpcSubnets = new SubnetSelection { SubnetType = SubnetType.PUBLIC },
-    SecurityGroups = new[]
-    {
-        securityGroup
-    }
+    SecurityGroups = [securityGroup],
+    RemovalPolicy = RemovalPolicy.DESTROY
 });
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
