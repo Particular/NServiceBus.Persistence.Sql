@@ -86,7 +86,7 @@ jobs:
           mysql --host=$mysqlHost --user=$mysqlUser --password=$mysqlPassword -D mysql -e "create database if not exists nservicebus ;"
 
       - name: Run tests
-        uses: Particular/run-tests-action@v1.7.0
+        uses: Particular/run-tests-action@aurora
 
       - name: Teardown infrastructure
         if: ${{ always() }}
