@@ -9,10 +9,10 @@ public abstract class EngineSpecificTestAttribute : Attribute, IApplyToContext
     public void ApplyToContext(TestExecutionContext context)
     {
         var connection = Environment.GetEnvironmentVariable(ConnectionStringName);
-        Console.WriteLine($"Found {ConnectionStringName} connection string with value {connection ?? ""}.");
+        context.OutWriter.WriteLine($"Found {ConnectionStringName} connection string with value {connection ?? ""}.");        
         if (string.IsNullOrWhiteSpace(connection))
         {
-            Console.WriteLine($"Ignoring because environment variable {ConnectionStringName} not available.");
+            context.OutWriter.WriteLine($"Ignoring because environment variable {ConnectionStringName} not available.");
             Assert.Ignore($"Ignoring because environment variable {ConnectionStringName} not available.");
         }
     }
