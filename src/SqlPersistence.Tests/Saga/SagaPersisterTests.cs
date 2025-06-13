@@ -746,7 +746,6 @@ public abstract class SagaPersisterTests
                     type: CorrelationPropertyType.String
                 )
             );
-            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition3, sqlDialect), endpointName, schema: schema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition3, sqlDialect), endpointName, schema: schema);
             Assert.Multiple(() =>
             {
