@@ -44,7 +44,7 @@ jobs:
           role-to-assume: ${{ secrets.AURORA_CI_ROLE }}
           role-session-name: AuroraCI
           aws-region: us-east-2
-          role-duration-seconds: 7200
+          role-duration-seconds: 10800
 
       - name: Build
         shell: bash
@@ -73,14 +73,16 @@ jobs:
           $postgresUser = $postgresSecrets.username
           $postgresPassword = $postgresSecrets.password
           $postgresConnectionString = "Host=$postgresHost;User ID=$postgresUser;Password=$postgresPassword;Port=5432;Database=postgres;"
-          echo "PostgreSqlConnectionString=$postgresConnectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          "PostgreSqlConnectionString=$postgresConnectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           $mysqlSecrets = aws secretsmanager get-secret-value --secret-id aurora_mysql_secrets --region us-east-2 --query SecretString --output text | ConvertFrom-Json
           $mysqlHost = $mysqlSecrets.host
           $mysqlUser = $mysqlSecrets.username
           $mysqlPassword = $mysqlSecrets.password
-          $mysqlConnectionString = "Server=$mysqlHost;Uid=$mysqlUser;Pwd=$mysqlPassword;Port=3306;Database=postgres;Initial Catalog=nservicebus;AllowUserVariables=True;AutoEnlist=false;Connect Timeout=60"
-          echo "MySQLConnectionString=$mysqlConnectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+
+          #NOTE This part of the connection string is important to ensure protection from session state contamination: ConnectionReset=true;
+          $mysqlConnectionString = "Server=$mysqlHost;Uid=$mysqlUser;Pwd=$mysqlPassword;Port=3306;Database=postgres;Initial Catalog=nservicebus;AllowUserVariables=True;AutoEnlist=false;ConnectionReset=true;Connect Timeout=60"
+          "MySQLConnectionString=$mysqlConnectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
 
           echo "Creating nservicebus database"
           mysql --host=$mysqlHost --user=$mysqlUser --password=$mysqlPassword -D mysql -e "create database if not exists nservicebus ;"
