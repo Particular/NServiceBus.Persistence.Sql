@@ -43,7 +43,6 @@ securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(3306), "allow CI for MySQL
 var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseClusterProps
 {
     DeletionProtection = false,
-    //Parameters = new Dictionary<string, string> { ["general_log"] = "1" },
     Engine = DatabaseClusterEngine.AuroraMysql(new AuroraMysqlClusterEngineProps
     {
         Version = AuroraMysqlEngineVersion.VER_3_09_0
