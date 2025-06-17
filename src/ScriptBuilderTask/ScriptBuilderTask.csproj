@@ -24,12 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Package needs to stay on 17.8.3 until we no longer need to ensure we run on the 8.0.10x SDK and Visual Studio 17.8 -->
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE" Condition="'$(TargetFramework)' == 'net472'">
-    <PackageReference Include="Microsoft.IO.Redist" Version="6.1.0" PrivateAssets="All" />
+    <!-- Package needs to stay on 17.14.8 until we no longer need to ensure we run on the 10.0.10x SDK and Visual Studio 17.14 -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" PrivateAssets="All" />
   </ItemGroup>
 
   <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory"
