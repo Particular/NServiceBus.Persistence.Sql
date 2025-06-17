@@ -10,7 +10,7 @@ public static class SqlHelpers
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = script;
-                if (command is System.Data.SqlClient.SqlCommand or Microsoft.Data.SqlClient.SqlCommand)
+                if (command is Microsoft.Data.SqlClient.SqlCommand)
                 {
                     command.AddParameter("schema", schema ?? "dbo");
                 }
@@ -29,7 +29,7 @@ public static class SqlHelpers
             {
                 command.CommandText = script;
                 command.AddParameter("tablePrefix", $"{tablePrefix}_");
-                if (command is System.Data.SqlClient.SqlCommand or Microsoft.Data.SqlClient.SqlCommand)
+                if (command is Microsoft.Data.SqlClient.SqlCommand)
                 {
                     command.AddParameter("schema", schema ?? "dbo");
                 }

@@ -4,13 +4,11 @@
     <Project Path="AuroraSetup/AuroraSetup.csproj" />
     <Project Path="MsSqlMicrosoftDataClientAcceptanceTests/MsSqlMicrosoftDataClientAcceptanceTests.csproj" />
     <Project Path="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests/MsSqlMicrosoftDataClientSqlTransportAcceptanceTests.csproj" />
-    <Project Path="MsSqlSystemDataClientAcceptanceTests/MsSqlSystemDataClientAcceptanceTests.csproj" />
     <Project Path="MySqlAcceptanceTests/MySqlAcceptanceTests.csproj" />
     <Project Path="OracleAcceptanceTests/OracleAcceptanceTests.csproj" />
     <Project Path="PostgreSqlAcceptanceTests/PostgreSqlAcceptanceTests.csproj" />
     <Project Path="PostgreSqlTransportAcceptanceTests/PostgreSqlTransportAcceptanceTests.csproj" />
     <Project Path="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests/TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj" />
-    <Project Path="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests/TransactionalSession.MsSqlSystemDataClient.AcceptanceTests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../.github/workflows/aurora.yml" />
