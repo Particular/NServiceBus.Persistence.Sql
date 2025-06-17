@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/AcceptanceTests/">
+    <Project Path="AcceptanceTestHelper/AcceptanceTestHelper.csproj" />
+    <Project Path="AuroraSetup/AuroraSetup.csproj" />
+    <Project Path="MsSqlMicrosoftDataClientAcceptanceTests/MsSqlMicrosoftDataClientAcceptanceTests.csproj" />
+    <Project Path="MsSqlMicrosoftDataClientSqlTransportAcceptanceTests/MsSqlMicrosoftDataClientSqlTransportAcceptanceTests.csproj" />
+    <Project Path="MsSqlSystemDataClientAcceptanceTests/MsSqlSystemDataClientAcceptanceTests.csproj" />
+    <Project Path="MySqlAcceptanceTests/MySqlAcceptanceTests.csproj" />
+    <Project Path="OracleAcceptanceTests/OracleAcceptanceTests.csproj" />
+    <Project Path="PostgreSqlAcceptanceTests/PostgreSqlAcceptanceTests.csproj" />
+    <Project Path="PostgreSqlTransportAcceptanceTests/PostgreSqlTransportAcceptanceTests.csproj" />
+    <Project Path="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests/TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj" />
+    <Project Path="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests/TransactionalSession.MsSqlSystemDataClient.AcceptanceTests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/aurora.yml" />
+    <File Path="../.github/workflows/ci.yml" />
+    <File Path="../.github/workflows/release.yml" />
+    <File Path="Custom.Build.props" />
+  </Folder>
+  <Project Path="CommandLine/NServiceBus.Persistence.Sql.CommandLine.csproj" />
+  <Project Path="NServiceBus.Persistence.Sql.TransactionalSession/NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
+  <Project Path="ScriptBuilder.Tests/ScriptBuilder.Tests.csproj" />
+  <Project Path="ScriptBuilder/ScriptBuilder.csproj" />
+  <Project Path="ScriptBuilderTask.Tests.Target/ScriptBuilderTask.Tests.Target.csproj" />
+  <Project Path="ScriptBuilderTask.Tests/ScriptBuilderTask.Tests.csproj" />
+  <Project Path="ScriptBuilderTask/ScriptBuilderTask.csproj" />
+  <Project Path="SqlPersistence.PersistenceTests/SqlPersistence.PersistenceTests.csproj" />
+  <Project Path="SqlPersistence.Tests/SqlPersistence.Tests.csproj" />
+  <Project Path="SqlPersistence/SqlPersistence.csproj" />
+  <Project Path="TestHelper/TestHelper.csproj" />
+  <Project Path="TransactionalSession.Tests/TransactionalSession.Tests.csproj" />
+  <Project Path="VBTestCode/VBTestCode.vbproj" />
+</Solution>
