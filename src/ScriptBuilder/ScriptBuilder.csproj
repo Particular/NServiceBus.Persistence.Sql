@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>$(ScriptBuilderTargetFrameworks)</TargetFrameworks>
@@ -8,7 +8,8 @@
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <DebugType Condition="'$(TargetFramework)' == '$(ScriptBuilderTargetFrameworkForVS)'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <LangVersion>12.0</LangVersion>
+    <!-- TODO Set LangVersion to 14.0 when the .NET 10 SDK supports it -->
+    <LangVersion>13.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
