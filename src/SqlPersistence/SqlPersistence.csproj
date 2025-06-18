@@ -29,11 +29,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net10.0;buildTransitive\net10.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net10.0\task\net472" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net10.0\Mono.Cecil.dll" Pack="true" PackagePath="build\net10.0\task\net10.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net10.0\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\net10.0\task\net10.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net10.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net10.0\task\net10.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework);buildTransitive\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFrameworkForVS)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFrameworkForVS)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\Mono.Cecil.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

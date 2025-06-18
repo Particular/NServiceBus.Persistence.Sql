@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- net472 TFM needed to support VS 2022 -->
-    <TargetFrameworks>net472;net10.0</TargetFrameworks>
+    <TargetFrameworks>$(ScriptBuilderTargetFrameworks)</TargetFrameworks>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType Condition="'$(TargetFramework)' == 'net472'">full</DebugType>
+    <DebugType Condition="'$(TargetFramework)' == '$(ScriptBuilderTargetFrameworkForVS)'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
@@ -28,7 +27,7 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == 'net472' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
+  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == '$(ScriptBuilderTargetFrameworkForVS)' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
     </PropertyGroup>
