@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -12,26 +12,17 @@
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.2.3" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="8.1.8" />
-    <PackageReference Include="NUnit" Version="4.2.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="10.0.0-alpha.1" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="9.0.0-alpha.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
   </ItemGroup>
-  <!-- The referenced source package does not currently include support for .NET 9 sources. 
-     This change addresses that limitation to ensure compatibility with .NET 9. 
-     Once the package provides support for .NET 9, this change can be re-evaluated. -->
-  <PropertyGroup>
-    <ResolvedTargetFramework>$(TargetFramework)</ResolvedTargetFramework>
-    <ResolvedTargetFramework Condition="'$(TargetFramework)' == 'net9.0'">net8.0</ResolvedTargetFramework>
-  </PropertyGroup>
-  
+
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(ResolvedTargetFramework)\**\EndpointTemplates\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(ResolvedTargetFramework)\**\ScenarioDescriptors\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(ResolvedTargetFramework)\**\NServiceBusAcceptanceTest.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\EndpointTemplates\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\ScenarioDescriptors\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\NServiceBusAcceptanceTest.cs" />
   </ItemGroup>
 
 </Project>

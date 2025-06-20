@@ -625,7 +625,7 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
 
-            Assert.That(sagaData, Is.Not.EqualTo(default));
+            Assert.That(sagaData, Is.Not.Default);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.That(sagaData.Version, Is.EqualTo(2));
         }
@@ -689,7 +689,7 @@ public abstract class SagaPersisterTests
 
             var sagaData = await persister.Get<CorrAndTransitionalSaga.SagaData>(id, storageSession);
 
-            Assert.That(sagaData, Is.Not.EqualTo(default));
+            Assert.That(sagaData, Is.Not.Default);
             Approver.Verify(sagaData, s => s.Replace(id.ToString(), "theSagaId"));
             Assert.That(sagaData.Version, Is.EqualTo(2));
         }

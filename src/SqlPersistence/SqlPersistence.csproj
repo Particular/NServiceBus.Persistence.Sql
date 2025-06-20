@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -14,13 +14,11 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NServiceBus" Version="9.2.3" />
+    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="All" />
-    <PackageReference Include="Obsolete.Fody" Version="5.3.1" PrivateAssets="All" />
-    <PackageReference Include="Particular.Packaging" Version="4.2.2" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="4.4.0" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -29,11 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\net8.0;buildTransitive\net8.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net472\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net8.0\task\net472" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\Mono.Cecil.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\net8.0\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\net8.0\task\net8.0" Visible="false" />
+    <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework);buildTransitive\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFrameworkForVS)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFrameworkForVS)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\Mono.Cecil.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task\$(ScriptBuilderTargetFramework)" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

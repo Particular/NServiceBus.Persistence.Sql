@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ToolCommandName>sql-persistence</ToolCommandName>
     <PackAsTool>True</PackAsTool>
@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
-    <PackageReference Include="Particular.Packaging" Version="4.2.2" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="4.4.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

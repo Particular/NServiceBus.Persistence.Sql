@@ -1,29 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-    <PackageReference Include="MySql.Data" Version="9.1.0" />
+    <PackageReference Include="MySql.Data" Version="9.3.0" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="NUnit" Version="4.2.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.9.2" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
-
-  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
-    <PackageReference Include="System.Text.Json" Version="9.0.4" />
-  </ItemGroup>
-
-  <!-- Workaround to prevent VS test discovery error -->
-  <ItemGroup>
-    <ProjectCapability Remove="TestContainer" />
-  </ItemGroup>
-  <!-- End Workaround -->
 
 </Project>

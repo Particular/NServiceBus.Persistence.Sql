@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <!-- We want the root namespace to match the transactional session one -->
@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="3.3.0" />
-    <PackageReference Include="Particular.Packaging" Version="4.2.2" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="4.0.0-alpha.1" />
+    <PackageReference Include="Particular.Packaging" Version="4.4.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

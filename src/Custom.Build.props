@@ -1,8 +1,16 @@
 <Project>
 
   <PropertyGroup>
-    <MinVerMinimumMajorMinor>8.0</MinVerMinimumMajorMinor>
+    <MinVerMinimumMajorMinor>9.0</MinVerMinimumMajorMinor>
     <MinVerAutoIncrement>minor</MinVerAutoIncrement>
+  </PropertyGroup>
+
+  <!-- MSBuild tasks require a .NET Framework version to work in Visual Studo, so we have to multi-target. -->
+  <!-- When changing these values, the SqlPersistenceScriptBuilderTaskPath property in the NServiceBus.Persistence.Sql.targets file needs to be updated to match. -->
+  <PropertyGroup>
+    <ScriptBuilderTargetFrameworkForVS>net472</ScriptBuilderTargetFrameworkForVS>
+    <ScriptBuilderTargetFramework>net10.0</ScriptBuilderTargetFramework>
+    <ScriptBuilderTargetFrameworks>$(ScriptBuilderTargetFrameworkForVS);$(ScriptBuilderTargetFramework)</ScriptBuilderTargetFrameworks>
   </PropertyGroup>
 
 </Project>

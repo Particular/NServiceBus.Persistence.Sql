@@ -12,7 +12,7 @@ public class CharArrayTextWriterTests
 
         var written = writer.ToCharSegment();
 
-        Assert.That(written, Is.EqualTo('z'.ToString()).AsCollection);
+        Assert.That(written, Is.EqualTo('z'.ToString()));
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class CharArrayTextWriterTests
 
         var written = writer.ToCharSegment();
 
-        Assert.That(written, Is.EqualTo("test").AsCollection);
+        Assert.That(written, Is.EqualTo("test"));
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class CharArrayTextWriterTests
 
         var written = writer.ToCharSegment();
 
-        Assert.That(written, Is.EqualTo(s).AsCollection);
+        Assert.That(written, Is.EqualTo(s));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class CharArrayTextWriterTests
 
         var written = writer.ToCharSegment();
 
-        Assert.That(written, Is.EqualTo(s).AsCollection);
+        Assert.That(written, Is.EqualTo(s));
     }
 
     [Test]
