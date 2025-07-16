@@ -17,7 +17,7 @@ defaults:
 concurrency: aurora_tests
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check for secrets
         env:
