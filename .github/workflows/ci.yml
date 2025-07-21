@@ -17,12 +17,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-22.04]
+        os: [windows-latest, ubuntu-latest]
         engine: [SqlServer, MySql, PostgreSql, Oracle]
         include:
-          - os: windows-2022
+          - os: windows-latest
             name: Windows
-          - os: ubuntu-22.04
+          - os: ubuntu-latest
             name: Linux
       fail-fast: false
     steps:
