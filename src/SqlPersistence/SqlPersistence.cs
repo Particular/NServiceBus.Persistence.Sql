@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using Features;
     using NServiceBus.Sagas;
@@ -53,39 +54,23 @@
         public override IEnumerable<KeyValuePair<string, ManifestItem>> GetManifest(SettingsHolder settings)
         {
             var name = ToString().Replace("NServiceBus.", "");
+            var endpointName = settings.Get<string>("NServiceBus.Routing.EndpointName");
+
+            var hasOutbox = settings.Get<FeatureState>("SqlOutboxFeature") == FeatureState.Active;
 
             var persistenceValues = new List<KeyValuePair<string, ManifestItem>>();
 
             //dialect information
             if (settings.TryGet($"{name}.SqlDialect", out SqlDialectSettings dialectSettings))
             {
-                //TODO can we somehow get connection details out of here?
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("dialect", new ManifestItem { StringValue = dialectSettings.Dialect.Name }));
-                //dialectSettings.Dialect.GetOutboxTableName();
-                Console.WriteLine(dialectSettings.GetType().GetGenericArguments()[0].Name);
             }
 
-            //TODO difference connection managers - could be one for all storage types or one per storage type
-            if (settings.TryGet($"SqlPersistence.ConnectionManager.{nameof(StorageType.Outbox)}", out ConnectionManager connectionManagerOutbox))
+            //outbox information
+            if (hasOutbox)
             {
-                connectionManagerOutbox.ToString();
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outbox", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
             }
-
-            if (settings.TryGet($"SqlPersistence.ConnectionManager.{nameof(StorageType.Subscriptions)}", out ConnectionManager connectionManagerSubscription))
-            {
-                connectionManagerSubscription.ToString();
-            }
-
-            if (settings.TryGet($"SqlPersistence.ConnectionManager.{nameof(StorageType.Sagas)}", out ConnectionManager connectionManagerSaga))
-            {
-                connectionManagerSaga.ToString();
-            }
-            if (settings.TryGet($"SqlPersistence.ConnectionManager", out ConnectionManager connectionManager))
-            {
-                //TODO can we somehow get connection details out of here?
-                connectionManager.ToString();
-            }
-
 
             //Saga information
             if (settings.TryGet($"NServiceBus.Sagas.SagaMetadataCollection", out SagaMetadataCollection sagas))
@@ -96,7 +81,7 @@
                     persistenceValues.Add(new KeyValuePair<string, ManifestItem>($"saga-{saga.Name}", new ManifestItem
                     {
                         ItemValue = [
-                        new("tableName", new ManifestItem { StringValue = saga.EntityName }),
+                        new("tableName", new ManifestItem { StringValue = dialectSettings !=null ?  dialectSettings.Dialect.GetSagaTableName($"{endpointName}_", saga.EntityName) : saga.EntityName }),
                         new("schema", new ManifestItem { ArrayValue = saga.SagaEntityType.GetProperties().Select(
                             prop => new ManifestItem { ItemValue = [
                                 new("name", prop.Name),
@@ -105,10 +90,45 @@
                             }).ToArray() })
                         ]
                     }));
-
-                    Console.WriteLine(saga.Name);
                 }
             }
+
+            //connection information - include per storage type
+            if (!settings.TryGet($"SqlPersistence.ConnectionManager", out ConnectionManager connectionManager))
+            {
+                Debug.WriteLine("No connection manager configured");
+            }
+
+            if (settings.TryGet("ResultingSupportedStorages", out List<Type> supportedStorageTypes))
+            {
+                var storageManifest = new KeyValuePair<string, ManifestItem>(
+                    "storageTypes", new ManifestItem
+                    {
+                        ArrayValue = supportedStorageTypes.Select(
+                            storage => new ManifestItem
+                            {
+                                ItemValue = [
+                                new("type", storage.Name),
+                                new("connection", "TODO")
+                                ]
+                            }).ToArray()
+                    });
+
+                foreach (var storageType in supportedStorageTypes)
+                {
+                    if (!settings.TryGet($"SqlPersistence.ConnectionManager.{storageType.Name}", out ConnectionManager connectionManagerPerStorage))
+                    {
+                        connectionManagerPerStorage = connectionManager;
+                    }
+                    //TODO try and get the connection string from here into the TODO
+                    var manifestStorageValue = storageManifest.Value.ArrayValue.First(i => i.ItemValue.Any(kv => kv.Key == "type" && kv.Value == storageType.Name));
+                    manifestStorageValue.ItemValue.First(kv => kv.Key == "connection").Value.StringValue = connectionManagerPerStorage?.ToString() ?? "No connection manager configured";
+                }
+
+                persistenceValues.Add(storageManifest);
+            }
+
+            //var installerSettings = settings.Get<InstallerSettings>("InstallerSettings");
 
             var persistenceManifest = new KeyValuePair<string, ManifestItem>(name, new ManifestItem() { ItemValue = persistenceValues.AsEnumerable() });
 
