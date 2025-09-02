@@ -110,6 +110,7 @@ namespace NServiceBus
     public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition
     {
         public SqlPersistence() { }
+        public override System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, NServiceBus.ManifestItem>> GetManifest(NServiceBus.Settings.SettingsHolder settings) { }
     }
     public static class SqlPersistenceConfig
     {
