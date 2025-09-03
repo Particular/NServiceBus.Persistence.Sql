@@ -66,13 +66,15 @@
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("dialect", new ManifestItem { StringValue = dialectSettings.Dialect.Name }));
             }
 
+            //this applies to all queues/tables
             persistenceValues.Add(new KeyValuePair<string, ManifestItem>("prefix", new ManifestItem { StringValue = endpointName }));
 
             //outbox information
             persistenceValues.Add(new KeyValuePair<string, ManifestItem>("hasOutbox", new ManifestItem { StringValue = hasOutbox.ToString() }));
             if (hasOutbox)
             {
-                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outbox", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outboxTable", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
+                //TODO table schema is not available in code - should we hardcode it in based on dialect? Same for subscriptions and timeout tables?
             }
 
             //Saga information
