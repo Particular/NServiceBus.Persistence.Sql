@@ -53,15 +53,16 @@
         /// <returns></returns>
         public override IEnumerable<KeyValuePair<string, ManifestItem>> GetManifest(SettingsHolder settings)
         {
-            var name = ToString().Replace("NServiceBus.", "");
-            var endpointName = settings.Get<string>("NServiceBus.Routing.EndpointName");
+            var persistenceName = ToString().Replace("NServiceBus.", "");
+            _ = settings.TryGet<string>("NServiceBus.Routing.EndpointName", out var endpointName);
 
-            var hasOutbox = settings.Get<FeatureState>("SqlOutboxFeature") == FeatureState.Active;
+            var usingOutbox = settings.TryGet<FeatureState>("SqlOutboxFeature", out var outbox) && outbox == FeatureState.Active;
+            var usingSqlSubscription = settings.TryGet<FeatureState>("SqlSubscriptionFeature", out var subscription) && subscription == FeatureState.Active;
 
             var persistenceValues = new List<KeyValuePair<string, ManifestItem>>();
 
             //dialect information
-            if (settings.TryGet($"{name}.SqlDialect", out SqlDialectSettings dialectSettings))
+            if (settings.TryGet($"{persistenceName}.SqlDialect", out SqlDialectSettings dialectSettings))
             {
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("dialect", new ManifestItem { StringValue = dialectSettings.Dialect.Name }));
             }
@@ -70,11 +71,19 @@
             persistenceValues.Add(new KeyValuePair<string, ManifestItem>("prefix", new ManifestItem { StringValue = endpointName }));
 
             //outbox information
-            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("hasOutbox", new ManifestItem { StringValue = hasOutbox.ToString() }));
-            if (hasOutbox)
+            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("usingOutbox", new ManifestItem { StringValue = usingOutbox.ToString() }));
+            if (usingOutbox)
             {
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outboxTable", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
-                //TODO table schema is not available in code - should we hardcode it in based on dialect? Same for subscriptions and timeout tables?
+                //TODO table schema is not available in code
+            }
+
+            //sqlSubscription information
+            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("usingSqlSubscription", new ManifestItem { StringValue = usingSqlSubscription.ToString() }));
+            if (usingSqlSubscription)
+            {
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outboxTable", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetSubscriptionTableName($"{endpointName}_") : $"{endpointName}_SubscriptionData" }));
+                //TODO table schema is not available in code
             }
 
             //Saga information
@@ -145,7 +154,7 @@
 
             //var installerSettings = settings.Get<InstallerSettings>("InstallerSettings");
 
-            var persistenceManifest = new KeyValuePair<string, ManifestItem>(name, new ManifestItem() { ItemValue = persistenceValues.AsEnumerable() });
+            var persistenceManifest = new KeyValuePair<string, ManifestItem>(persistenceName, new ManifestItem() { ItemValue = persistenceValues.AsEnumerable() });
 
             return [persistenceManifest];
         }
