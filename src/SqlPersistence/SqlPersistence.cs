@@ -109,7 +109,7 @@
                             {
                                 ItemValue = [
                                 new("type", storage.Name),
-                                new("connection", "TODO")
+                                new("connection", "No connection information found")
                                 ]
                             }).ToArray()
                     });
@@ -120,9 +120,8 @@
                     {
                         connectionManagerPerStorage = connectionManager;
                     }
-                    //TODO try and get the connection string from here into the TODO
                     var manifestStorageValue = storageManifest.Value.ArrayValue.First(i => i.ItemValue.Any(kv => kv.Key == "type" && kv.Value == storageType.Name));
-                    manifestStorageValue.ItemValue.First(kv => kv.Key == "connection").Value.StringValue = connectionManagerPerStorage?.ToString() ?? "No connection manager configured";
+                    manifestStorageValue.ItemValue.First(kv => kv.Key == "connection").Value.StringValue = MaskPassword(connectionManagerPerStorage.BuildNonContextual().ConnectionString);
                 }
 
                 persistenceValues.Add(storageManifest);
@@ -133,6 +132,21 @@
             var persistenceManifest = new KeyValuePair<string, ManifestItem>(name, new ManifestItem() { ItemValue = persistenceValues.AsEnumerable() });
 
             return [persistenceManifest];
+        }
+
+        static string MaskPassword(string connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return connectionString;
+            }
+
+            // Regex matches Password=...; or Password=... (end of string)
+            return System.Text.RegularExpressions.Regex.Replace(
+                connectionString,
+                @"(?i)(Password\s*=\s*)([^;]*)",
+                "$1#####"
+            );
         }
     }
 }
