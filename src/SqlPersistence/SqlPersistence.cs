@@ -66,7 +66,10 @@
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("dialect", new ManifestItem { StringValue = dialectSettings.Dialect.Name }));
             }
 
+            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("prefix", new ManifestItem { StringValue = endpointName }));
+
             //outbox information
+            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("hasOutbox", new ManifestItem { StringValue = hasOutbox.ToString() }));
             if (hasOutbox)
             {
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outbox", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
