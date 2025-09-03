@@ -94,9 +94,14 @@
             }
 
             //connection information - include per storage type
-            if (!settings.TryGet($"SqlPersistence.ConnectionManager", out ConnectionManager connectionManager))
+            var connectionString = string.Empty;
+            if (settings.TryGet($"SqlPersistence.ConnectionManager", out ConnectionManager connectionManager))
             {
-                Debug.WriteLine("No connection manager configured");
+                connectionString = MaskPassword(connectionManager.BuildNonContextual().ConnectionString);
+            }
+            else
+            {
+                Debug.WriteLine("No overall connection manager configured");
             }
 
             if (settings.TryGet("ResultingSupportedStorages", out List<Type> supportedStorageTypes))
@@ -105,26 +110,32 @@
                     "storageTypes", new ManifestItem
                     {
                         ArrayValue = supportedStorageTypes.Select(
-                            storage => new ManifestItem
+                            storageType => new ManifestItem
                             {
                                 ItemValue = [
-                                new("type", storage.Name),
-                                new("connection", "No connection information found")
+                                new("type", storageType.Name),
+                                new("connection", GetConnectionString(storageType.Name))
                                 ]
                             }).ToArray()
                     });
 
-                foreach (var storageType in supportedStorageTypes)
+                string GetConnectionString(string storageTypeName)
                 {
-                    if (!settings.TryGet($"SqlPersistence.ConnectionManager.{storageType.Name}", out ConnectionManager connectionManagerPerStorage))
+                    if (settings.TryGet($"SqlPersistence.ConnectionManager.{storageTypeName}", out ConnectionManager connectionManagerPerStorage))
                     {
-                        connectionManagerPerStorage = connectionManager;
+                        return MaskPassword(connectionManagerPerStorage.BuildNonContextual().ConnectionString);
                     }
-                    var manifestStorageValue = storageManifest.Value.ArrayValue.First(i => i.ItemValue.Any(kv => kv.Key == "type" && kv.Value == storageType.Name));
-                    manifestStorageValue.ItemValue.First(kv => kv.Key == "connection").Value.StringValue = MaskPassword(connectionManagerPerStorage.BuildNonContextual().ConnectionString);
+                    else
+                    {
+                        return connectionString;
+                    }
                 }
 
                 persistenceValues.Add(storageManifest);
+            }
+            else
+            {
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("connection", new ManifestItem { StringValue = connectionString }));
             }
 
             //var installerSettings = settings.Get<InstallerSettings>("InstallerSettings");
