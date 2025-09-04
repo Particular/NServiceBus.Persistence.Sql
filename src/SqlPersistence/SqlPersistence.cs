@@ -71,40 +71,184 @@
             persistenceValues.Add(new KeyValuePair<string, ManifestItem>("prefix", new ManifestItem { StringValue = endpointName }));
 
             //outbox information
-            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("usingOutbox", new ManifestItem { StringValue = usingOutbox.ToString() }));
             if (usingOutbox)
             {
-                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outboxTable", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }));
-                //TODO table schema is not available in code
-            }
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outbox", new ManifestItem { ItemValue = GetOutboxTableSchema() }));
 
-            //sqlSubscription information
-            persistenceValues.Add(new KeyValuePair<string, ManifestItem>("usingSqlSubscription", new ManifestItem { StringValue = usingSqlSubscription.ToString() }));
-            if (usingSqlSubscription)
+                //NOTE this is hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
+                IEnumerable<KeyValuePair<string, ManifestItem>> GetOutboxTableSchema()
+                {
+                    return [
+                        new("tableName", new ManifestItem { StringValue = dialectSettings !=null ?  dialectSettings.Dialect.GetOutboxTableName($"{endpointName}_") : $"{endpointName}_OutboxData" }),
+                        new("primaryKey", new ManifestItem { StringValue = "MessageId" }),
+                        new("indexes", new ManifestItem { ArrayValue = [
+                            new ManifestItem { ItemValue = [
+                                new("name", "Index_DispatchedAt"),
+                                new("columns", "DispatchedAt")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Index_Dispatched"),
+                                new("columns", "Dispatched")
+                                ]}
+                            ]
+                        }),
+                        new("tableColumns", new ManifestItem { ArrayValue = [
+                            new ManifestItem { ItemValue = [
+                                new("name", "MessageId"),
+                                new("type", "string"),
+                                new("length", "200"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Dispatched"),
+                                new("type", "boolean"),
+                                new("mandatory", "true"),
+                                new("default", "false")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "DispatchedAt"),
+                                new("type", "datetime"),
+                                new("mandatory", "false")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "PersistenceVersion"),
+                                new("type", "string"),
+                                new("length", "23"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Operations"),
+                                new("type", "string"),
+                                new("length", "max"),
+                                new("mandatory", "true")
+                                ]},
+                            ]
+                        })
+                    ];
+                }
+            }
+            else
             {
-                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outboxTable", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetSubscriptionTableName($"{endpointName}_") : $"{endpointName}_SubscriptionData" }));
-                //TODO table schema is not available in code
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("outbox", new ManifestItem { StringValue = usingOutbox.ToString() }));
             }
 
             //Saga information
             if (settings.TryGet($"NServiceBus.Sagas.SagaMetadataCollection", out SagaMetadataCollection sagas))
             {
-                sagas.ToString();
-                foreach (var saga in sagas)
+                var sagaManifests = new KeyValuePair<string, ManifestItem>("sagas", new ManifestItem
                 {
-                    persistenceValues.Add(new KeyValuePair<string, ManifestItem>($"saga-{saga.Name}", new ManifestItem
-                    {
-                        ItemValue = [
-                        new("tableName", new ManifestItem { StringValue = dialectSettings !=null ?  dialectSettings.Dialect.GetSagaTableName($"{endpointName}_", saga.EntityName) : saga.EntityName }),
-                        new("schema", new ManifestItem { ArrayValue = saga.SagaEntityType.GetProperties().Select(
-                            prop => new ManifestItem { ItemValue = [
-                                new("name", prop.Name),
-                                new("type", prop.PropertyType.Name)
+                    ArrayValue = sagas.Select(
+                            saga => new ManifestItem
+                            {
+                                ItemValue = GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)
+                            }).ToArray()
+                });
+
+                persistenceValues.Add(sagaManifests);
+
+                //NOTE this is hardcoded so if the saga script (MsSqlServerSagaScriptWriter.cs in ScriptBuilder/Saga) changes this needs to be updated
+                IEnumerable<KeyValuePair<string, ManifestItem>> GetSagaTableSchema(string sagaName, string entityName, string correlationProperty)
+                {
+                    return [
+                        new("name", new ManifestItem { StringValue = sagaName }),
+                        new("tableName", new ManifestItem { StringValue = dialectSettings !=null ?  dialectSettings.Dialect.GetSagaTableName($"{endpointName}_", entityName) : entityName }),
+                        new("primaryKey", new ManifestItem { StringValue = "Id" }),
+                        new("indexes", new ManifestItem { ArrayValue = !string.IsNullOrEmpty(correlationProperty)
+                            ? [
+                                new ManifestItem { ItemValue = [
+                                    new("name", $"Index_Correlation_{correlationProperty}"),
+                                    new("columns", correlationProperty)
+                                    ]}
                                 ]
-                            }).ToArray() })
-                        ]
-                    }));
+                            : []
+                        }),
+                        new("tableColumns", new ManifestItem { ArrayValue = [
+                            new ManifestItem { ItemValue = [
+                                new("name", "Id"),
+                                new("type", "guid"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Metadata"),
+                                new("type", "string"),
+                                new("length", "max"),
+                                new("mandatory", "true"),
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Data"),
+                                new("type", "string"),
+                                new("length", "max"),
+                                new("mandatory", "true"),
+                                ]},
+
+                            new ManifestItem { ItemValue = [
+                                new("name", "PersistenceVersion"),
+                                new("type", "string"),
+                                new("length", "23"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "SagaTypeVersion"),
+                                new("type", "string"),
+                                new("length", "23"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Concurrency"),
+                                new("type", "integer"),
+                                new("mandatory", "true")
+                                ]},
+                            ]
+                        })
+                    ];
                 }
+            }
+
+            //sqlSubscription information
+            if (usingSqlSubscription)
+            {
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("sqlSubscriptions", new ManifestItem { ItemValue = GetSubscriptionTableSchema() }));
+
+                //NOTE this is hardcoded so if the subscription script (Create_MsSqlServer.sq in ScriptBuilder/Subscriptions) changes this needs to be updated
+                IEnumerable<KeyValuePair<string, ManifestItem>> GetSubscriptionTableSchema()
+                {
+                    return [
+                        new("tableName", new ManifestItem { StringValue = dialectSettings != null ? dialectSettings.Dialect.GetSubscriptionTableName($"{endpointName}_") : $"{endpointName}_SubscriptionData" }),
+                        new("primaryKey", new ManifestItem { StringValue = "Subscriber, MessageType" }),
+                        new("indexes", new ManifestItem { ArrayValue = [] }),
+                        new("tableColumns", new ManifestItem { ArrayValue = [
+                            new ManifestItem { ItemValue = [
+                                new("name", "Subscriber"),
+                                new("type", "string"),
+                                new("length", "200"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "Endpoint"),
+                                new("type", "string"),
+                                new("length", "200"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "MessageType"),
+                                new("type", "string"),
+                                new("length", "200"),
+                                new("mandatory", "true")
+                                ]},
+                            new ManifestItem { ItemValue = [
+                                new("name", "PersistenceVersion"),
+                                new("type", "string"),
+                                new("length", "23"),
+                                new("mandatory", "true")
+                                ]}
+                            ]
+                        })
+                    ];
+                }
+            }
+            else
+            {
+                persistenceValues.Add(new KeyValuePair<string, ManifestItem>("sqlSubscriptions", new ManifestItem { StringValue = usingSqlSubscription.ToString() }));
             }
 
             //connection information - include per storage type
@@ -151,8 +295,6 @@
             {
                 persistenceValues.Add(new KeyValuePair<string, ManifestItem>("connection", new ManifestItem { StringValue = connectionString }));
             }
-
-            //var installerSettings = settings.Get<InstallerSettings>("InstallerSettings");
 
             var persistenceManifest = new KeyValuePair<string, ManifestItem>(persistenceName, new ManifestItem() { ItemValue = persistenceValues.AsEnumerable() });
 
