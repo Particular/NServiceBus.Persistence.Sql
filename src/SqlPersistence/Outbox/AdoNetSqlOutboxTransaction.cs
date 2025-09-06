@@ -23,7 +23,7 @@ sealed class AdoNetSqlOutboxTransaction(
     {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage, cancellationToken).ConfigureAwait(false);
-        Transaction = Connection.BeginTransaction(isolationLevel);
+        Transaction = await Connection.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
         await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction, cancellationToken).ConfigureAwait(false);
     }
 
