@@ -5,20 +5,12 @@ using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 
-class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
+sealed class AdoNetSqlOutboxTransaction(
+    ConcurrencyControlStrategy concurrencyControlStrategy,
+    IConnectionManager connectionManager,
+    IsolationLevel isolationLevel)
+    : ISqlOutboxTransaction
 {
-    IConnectionManager connectionManager;
-    IsolationLevel isolationLevel;
-    ConcurrencyControlStrategy concurrencyControlStrategy;
-
-    public AdoNetSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-        IConnectionManager connectionManager, IsolationLevel isolationLevel)
-    {
-        this.connectionManager = connectionManager;
-        this.isolationLevel = isolationLevel;
-        this.concurrencyControlStrategy = concurrencyControlStrategy;
-    }
-
     public DbTransaction Transaction { get; private set; }
     public DbConnection Connection { get; private set; }
 
@@ -31,7 +23,7 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     {
         var incomingMessage = context.GetIncomingMessage();
         Connection = await connectionManager.OpenConnection(incomingMessage, cancellationToken).ConfigureAwait(false);
-        Transaction = Connection.BeginTransaction(isolationLevel);
+        Transaction = await Connection.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
         await concurrencyControlStrategy.Begin(incomingMessage.MessageId, Connection, Transaction, cancellationToken).ConfigureAwait(false);
     }
 
@@ -42,6 +34,25 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     {
         Transaction?.Dispose();
         Connection?.Dispose();
+
+        Transaction = null;
+        Connection = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Transaction is not null)
+        {
+            await Transaction.DisposeAsync().ConfigureAwait(false);
+        }
+
+        if (Connection is not null)
+        {
+            await Connection.DisposeAsync().ConfigureAwait(false);
+        }
+
+        Transaction = null;
+        Connection = null;
     }
 
     public Task Commit(CancellationToken cancellationToken = default)
