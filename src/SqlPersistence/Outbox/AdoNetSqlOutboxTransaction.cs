@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 
-class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
+sealed class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
 {
     IConnectionManager connectionManager;
     IsolationLevel isolationLevel;
@@ -42,6 +42,25 @@ class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
     {
         Transaction?.Dispose();
         Connection?.Dispose();
+
+        Transaction = null;
+        Connection = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Transaction is not null)
+        {
+            await Transaction.DisposeAsync().ConfigureAwait(false);
+        }
+
+        if (Connection is not null)
+        {
+            await Connection.DisposeAsync().ConfigureAwait(false);
+        }
+
+        Transaction = null;
+        Connection = null;
     }
 
     public Task Commit(CancellationToken cancellationToken = default)
