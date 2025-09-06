@@ -5,20 +5,12 @@ using System.Threading.Tasks;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 
-sealed class AdoNetSqlOutboxTransaction : ISqlOutboxTransaction
+sealed class AdoNetSqlOutboxTransaction(
+    ConcurrencyControlStrategy concurrencyControlStrategy,
+    IConnectionManager connectionManager,
+    IsolationLevel isolationLevel)
+    : ISqlOutboxTransaction
 {
-    IConnectionManager connectionManager;
-    IsolationLevel isolationLevel;
-    ConcurrencyControlStrategy concurrencyControlStrategy;
-
-    public AdoNetSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-        IConnectionManager connectionManager, IsolationLevel isolationLevel)
-    {
-        this.connectionManager = connectionManager;
-        this.isolationLevel = isolationLevel;
-        this.concurrencyControlStrategy = concurrencyControlStrategy;
-    }
-
     public DbTransaction Transaction { get; private set; }
     public DbConnection Connection { get; private set; }
 

@@ -6,23 +6,15 @@ using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 
-sealed class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
+sealed class TransactionScopeSqlOutboxTransaction(
+    ConcurrencyControlStrategy concurrencyControlStrategy,
+    IConnectionManager connectionManager,
+    IsolationLevel isolationLevel,
+    TimeSpan transactionTimeout)
+    : ISqlOutboxTransaction
 {
-    IConnectionManager connectionManager;
-    IsolationLevel isolationLevel;
-    ConcurrencyControlStrategy concurrencyControlStrategy;
     TransactionScope transactionScope;
     Transaction ambientTransaction;
-    TimeSpan transactionTimeout;
-
-    public TransactionScopeSqlOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-        IConnectionManager connectionManager, IsolationLevel isolationLevel, TimeSpan transactionTimeout)
-    {
-        this.connectionManager = connectionManager;
-        this.isolationLevel = isolationLevel;
-        this.concurrencyControlStrategy = concurrencyControlStrategy;
-        this.transactionTimeout = transactionTimeout;
-    }
 
     public DbTransaction Transaction => null;
     public DbConnection Connection { get; private set; }
@@ -81,7 +73,7 @@ sealed class TransactionScopeSqlOutboxTransaction : ISqlOutboxTransaction
     public Task Commit(CancellationToken cancellationToken = default)
     {
         transactionScope?.Complete();
-        // we need to dispose it after completion in order to execute the transaction after marking it as completed
+        // we need to dispose it after completion to execute the transaction after marking it as completed
         transactionScope?.Dispose();
         return Task.CompletedTask;
     }
