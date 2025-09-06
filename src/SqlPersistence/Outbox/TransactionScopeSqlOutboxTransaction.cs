@@ -55,10 +55,7 @@ sealed class TransactionScopeSqlOutboxTransaction(
 
     public async ValueTask DisposeAsync()
     {
-        if (Transaction is not null)
-        {
-            await Transaction.DisposeAsync().ConfigureAwait(false);
-        }
+        transactionScope?.Dispose();
 
         if (Connection is not null)
         {
