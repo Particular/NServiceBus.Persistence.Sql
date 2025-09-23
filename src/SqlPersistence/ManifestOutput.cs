@@ -100,6 +100,10 @@ class ManifestOutput : Feature
         var settings = context.Settings;
         var endpointName = settings.Get<string>("NServiceBus.Routing.EndpointName");
         //dialect information
+        if (!settings.HasSetting("SqlPersistence.SqlDialect"))
+        {
+            return;
+        }
         var dialect = settings.GetSqlDialect();
 
         var manifest = new PersistenceManifest
