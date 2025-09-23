@@ -10,266 +10,141 @@ class ManifestOutput : Feature
 {
     public ManifestOutput() => EnableByDefault();
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used exclusively for serialization")]
+    record PersistenceManifest
+    {
+        public string Dialect { get; init; }
+        public string Prefix { get; init; }
+        public OutboxManifest Outbox { get; set; }
+        public SagaManifest[] Sagas { get; set; }
+        public SubscriptionManifest SqlSubscriptions { get; set; }
+        public string[] StorageTypes { get; set; }
+
+        public record OutboxManifest
+        {
+            public string TableName { get; init; }
+            //NOTE this is hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
+            public string PrimaryKey => "MessageId";
+            public IndexProperty[] Indexes => [
+                new() { Name = "Index_DispatchedAt", Columns = "DispatchedAt" },
+                new() { Name = "Index_Dispatched", Columns = "Dispatched" }
+            ];
+            public object[] TableColumns => [
+                new VarcharSchemaProperty { Name = "MessageId", Length = "200", Mandatory = true },
+                new BitSchemaProperty { Name = "Dispatched", Mandatory = true, Default = false },
+                new SchemaProperty { Name = "DispatchedAt", Type = "datetime", Mandatory = false },
+                new VarcharSchemaProperty { Name = "PersistenceVersion", Length = "23", Mandatory = true },
+                new VarcharSchemaProperty { Name = "Operations", Length = "max", Mandatory = true }
+            ];
+        }
+
+        public record SagaManifest
+        {
+            public string Name { get; init; }
+            public string PrimaryKey => "Id";
+            public string TableName { get; init; }
+            public IndexProperty[] Indexes { get; init; }
+            //NOTE this is hardcoded so if the saga script (MsSqlServerSagaScriptWriter.cs in ScriptBuilder/Saga) changes this needs to be updated
+            public object[] TableColumns => [
+                new SchemaProperty { Name = "Id", Type = "guid", Mandatory = true },
+                new VarcharSchemaProperty { Name = "Metadata", Length = "max", Mandatory = true },
+                new VarcharSchemaProperty { Name = "Data", Length = "max", Mandatory = true },
+                new VarcharSchemaProperty { Name = "PersistenceVersion", Length = "23", Mandatory = true },
+                new VarcharSchemaProperty { Name = "SagaTypeVersion", Length = "23", Mandatory = true },
+                new SchemaProperty { Name = "Concurrency", Type = "integer", Mandatory = true }
+            ];
+        }
+
+        public record SubscriptionManifest
+        {
+            public string TableName { get; init; }
+            //NOTE this is hardcoded so if the subscription script (Create_MsSqlServer.sq in ScriptBuilder/Subscriptions) changes this needs to be updated
+            public string PrimaryKey => "Subscriber, MessageType";
+            public IndexProperty[] Indexes => [];
+            public object[] TableColumns => [
+                new VarcharSchemaProperty { Name = "Subscriber", Length = "200", Mandatory = true },
+                new VarcharSchemaProperty { Name = "Endpoint", Length = "200", Mandatory = true },
+                new VarcharSchemaProperty { Name = "MessageType", Length = "200", Mandatory = true },
+                new VarcharSchemaProperty { Name = "PersistenceVersion", Length = "23", Mandatory = true }
+            ];
+        }
+
+        public record SchemaProperty
+        {
+            public string Name { get; init; }
+            public virtual string Type { get; set; }
+            public bool Mandatory { get; init; }
+        }
+
+        public record VarcharSchemaProperty : SchemaProperty
+        {
+            public override string Type => "string";
+            public string Length { get; init; }
+        }
+
+        public record BitSchemaProperty : SchemaProperty
+        {
+            public override string Type => "boolean";
+            public bool Default { get; init; }
+        }
+
+        public record IndexProperty
+        {
+            public string Name { get; init; }
+            public string Columns { get; init; }
+        }
+    }
+
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-
-        if (!settings.GetOrDefault<bool>("Manifest.Enable"))
-        {
-            return;
-        }
-
-        _ = settings.TryGet<string>("NServiceBus.Routing.EndpointName", out var endpointName);
-
-        var usingOutbox = settings.TryGet<FeatureState>("SqlOutboxFeature", out var outbox) && outbox == FeatureState.Active;
-        var usingSqlSubscription = settings.TryGet<FeatureState>("SqlSubscriptionFeature", out var subscription) && subscription == FeatureState.Active;
-
-        Dictionary<string, ManifestItems.ManifestItem> persistenceValues = [];
+        var endpointName = settings.Get<string>("NServiceBus.Routing.EndpointName");
         //dialect information
         var dialect = settings.GetSqlDialect();
-        persistenceValues.Add("dialect", (ManifestItems.ManifestItem)dialect.Name);
 
-        //this applies to all queues/tables
-        persistenceValues.Add("prefix", (ManifestItems.ManifestItem)endpointName);
+        var manifest = new PersistenceManifest
+        {
+            Dialect = dialect.Name,
+            //this applies to all queues/tables
+            Prefix = endpointName
+        };
 
         //outbox information
-        if (usingOutbox)
+        if (settings.TryGet<FeatureState>("SqlOutboxFeature", out var outbox) && outbox == FeatureState.Active)
         {
-            persistenceValues.Add("outbox", new ManifestItems.ManifestItem { ItemValue = GetOutboxTableSchema() });
-
-            //NOTE this is hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
-            IEnumerable<KeyValuePair<string, ManifestItems.ManifestItem>> GetOutboxTableSchema()
-            {
-                return [
-                    new("tableName", dialect.GetOutboxTableName($"{endpointName}_")),
-                        new("primaryKey", "MessageId"),
-                        new("indexes", new ManifestItems.ManifestItem { ArrayValue = [
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Index_DispatchedAt"),
-                                new("columns", "DispatchedAt")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Index_Dispatched"),
-                                new("columns", "Dispatched")
-                                ]}
-                            ]
-                        }),
-                        new("tableColumns", new ManifestItems.ManifestItem { ArrayValue = [
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "MessageId"),
-                                new("type", "string"),
-                                new("length", "200"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Dispatched"),
-                                new("type", "boolean"),
-                                new("mandatory", "true"),
-                                new("default", "false")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "DispatchedAt"),
-                                new("type", "datetime"),
-                                new("mandatory", "false")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "PersistenceVersion"),
-                                new("type", "string"),
-                                new("length", "23"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Operations"),
-                                new("type", "string"),
-                                new("length", "max"),
-                                new("mandatory", "true")
-                                ]},
-                            ]
-                        })
-                ];
-            }
-        }
-        else
-        {
-            persistenceValues.Add("outbox", usingOutbox.ToString().ToLower());
+            manifest.Outbox = new PersistenceManifest.OutboxManifest { TableName = dialect.GetOutboxTableName($"{endpointName}_") };
         }
 
         //Saga information
         if (settings.TryGet($"NServiceBus.Sagas.SagaMetadataCollection", out SagaMetadataCollection sagas))
         {
-            persistenceValues.Add("sagas", new ManifestItems.ManifestItem
-            {
-                ArrayValue = sagas.Select(
-                        saga => new ManifestItems.ManifestItem
-                        {
-                            ItemValue = GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)
-                        }).ToArray()
-            });
+            manifest.Sagas = sagas.Select(
+                        saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray();
 
-            //NOTE this is hardcoded so if the saga script (MsSqlServerSagaScriptWriter.cs in ScriptBuilder/Saga) changes this needs to be updated
-            IEnumerable<KeyValuePair<string, ManifestItems.ManifestItem>> GetSagaTableSchema(string sagaName, string entityName, string correlationProperty)
+            PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
             {
-                return [
-                    new("name", sagaName),
-                        new("tableName", dialect.GetSagaTableName($"{endpointName}_", entityName)),
-                        new("primaryKey", "Id"),
-                        new("indexes", new ManifestItems.ManifestItem { ArrayValue = !string.IsNullOrEmpty(correlationProperty)
-                            ? [
-                                new ManifestItems.ManifestItem { ItemValue = [
-                                    new("name", $"Index_Correlation_{correlationProperty}"),
-                                    new("columns", correlationProperty)
-                                    ]}
-                                ]
+                Name = sagaName,
+                TableName = dialect.GetSagaTableName($"{endpointName}_", entityName),
+                Indexes = !string.IsNullOrEmpty(correlationProperty)
+                            ? [new() { Name = $"Index_Correlation_{correlationProperty}", Columns = correlationProperty }]
                             : []
-                        }),
-                        new("tableColumns", new ManifestItems.ManifestItem { ArrayValue = [
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Id"),
-                                new("type", "guid"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Metadata"),
-                                new("type", "string"),
-                                new("length", "max"),
-                                new("mandatory", "true"),
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Data"),
-                                new("type", "string"),
-                                new("length", "max"),
-                                new("mandatory", "true"),
-                                ]},
-
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "PersistenceVersion"),
-                                new("type", "string"),
-                                new("length", "23"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "SagaTypeVersion"),
-                                new("type", "string"),
-                                new("length", "23"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Concurrency"),
-                                new("type", "integer"),
-                                new("mandatory", "true")
-                                ]},
-                            ]
-                        })
-                ];
-            }
+            };
         }
 
         //sqlSubscription information
-        if (usingSqlSubscription)
+        if (settings.TryGet<FeatureState>("SqlSubscriptionFeature", out var subscription) && subscription == FeatureState.Active)
         {
-            persistenceValues.Add("sqlSubscriptions", new ManifestItems.ManifestItem { ItemValue = GetSubscriptionTableSchema() });
-
-            //NOTE this is hardcoded so if the subscription script (Create_MsSqlServer.sq in ScriptBuilder/Subscriptions) changes this needs to be updated
-            IEnumerable<KeyValuePair<string, ManifestItems.ManifestItem>> GetSubscriptionTableSchema()
+            manifest.SqlSubscriptions = new PersistenceManifest.SubscriptionManifest
             {
-                return [
-                    new("tableName", dialect.GetSubscriptionTableName($"{endpointName}_")),
-                        new("primaryKey", "Subscriber, MessageType"),
-                        new("indexes", new ManifestItems.ManifestItem { ArrayValue = [] }),
-                        new("tableColumns", new ManifestItems.ManifestItem { ArrayValue = [
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Subscriber"),
-                                new("type", "string"),
-                                new("length", "200"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "Endpoint"),
-                                new("type", "string"),
-                                new("length", "200"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "MessageType"),
-                                new("type", "string"),
-                                new("length", "200"),
-                                new("mandatory", "true")
-                                ]},
-                            new ManifestItems.ManifestItem { ItemValue = [
-                                new("name", "PersistenceVersion"),
-                                new("type", "string"),
-                                new("length", "23"),
-                                new("mandatory", "true")
-                                ]}
-                            ]
-                        })
-                ];
-            }
+                TableName = dialect.GetSubscriptionTableName($"{endpointName}_")
+            };
         }
-        else
-        {
-            persistenceValues.Add("sqlSubscriptions", usingSqlSubscription.ToString().ToLower());
-        }
-
-        ////connection information - include per storage type
-        //var connectionString = string.Empty;
-        //if (settings.TryGet($"SqlPersistence.ConnectionManager", out ConnectionManager connectionManager))
-        //{
-        //    connectionString = MaskPassword(connectionManager.BuildNonContextual().ConnectionString);
-        //}
-        //else
-        //{
-        //    Debug.WriteLine("No overall connection manager configured");
-        //}
 
         if (settings.TryGet("ResultingSupportedStorages", out List<Type> supportedStorageTypes))
         {
-            persistenceValues.Add(
-                "storageTypes", new ManifestItems.ManifestItem
-                {
-                    ArrayValue = supportedStorageTypes.Select(
-                        storageType => new ManifestItems.ManifestItem
-                        {
-                            ItemValue = [
-                            new("type", storageType.Name),
-                                //new("connection", GetConnectionString(storageType.Name))
-                            ]
-                        }).ToArray()
-                });
-
-            //string GetConnectionString(string storageTypeName)
-            //{
-            //    if (settings.TryGet($"SqlPersistence.ConnectionManager.{storageTypeName}", out ConnectionManager connectionManagerPerStorage))
-            //    {
-            //        return MaskPassword(connectionManagerPerStorage.BuildNonContextual().ConnectionString);
-            //    }
-            //    else
-            //    {
-            //        return connectionString;
-            //    }
-            //}
-        }
-        else
-        {
-            //persistenceValues.Add("connection", connectionString));
+            manifest.StorageTypes = supportedStorageTypes.Select(storageType => storageType.Name).ToArray();
         }
 
-        var manifest = settings.Get<ManifestItems>();
-        manifest.Add("persistence", new ManifestItems.ManifestItem { ItemValue = persistenceValues });
+        settings.AddStartupDiagnosticsSection("Manifest-Persistence", manifest);
     }
-
-    //static string MaskPassword(string connectionString)
-    //{
-    //    if (string.IsNullOrEmpty(connectionString))
-    //    {
-    //        return connectionString;
-    //    }
-
-    //    // Regex matches Password=...; or Password=... (end of string)
-    //    return System.Text.RegularExpressions.Regex.Replace(
-    //        connectionString,
-    //        @"(?i)(Password\s*=\s*)([^;]*)",
-    //        "$1#####"
-    //    );
-    //}
 }
