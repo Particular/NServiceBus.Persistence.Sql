@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="10.0.0-alpha.4" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="10.0.0-alpha.6" GeneratePathProperty="true" />
     <PackageReference Include="NServiceBus.Transport.PostgreSql" Version="9.0.0-alpha.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
   </ItemGroup>

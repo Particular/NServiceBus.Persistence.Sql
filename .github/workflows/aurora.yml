@@ -29,15 +29,15 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@v5.0.0
         with:
           global-json-file: global.json
       - name: Set up Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v5.0.0
         with:
           node-version: 22.16.x
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AURORA_CI_ROLE }}
           role-session-name: AuroraCI

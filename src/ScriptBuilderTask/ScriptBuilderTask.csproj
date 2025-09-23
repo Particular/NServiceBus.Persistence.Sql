@@ -10,7 +10,6 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
-    <GenerateSBOM>false</GenerateSBOM>
   </PropertyGroup>
 
   <ItemGroup>
