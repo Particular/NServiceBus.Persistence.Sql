@@ -1,10 +1,10 @@
-﻿namespace NServiceBus.Persistence.Sql;
+﻿namespace NServiceBus;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NServiceBus.Features;
-using NServiceBus.Sagas;
+using Features;
+using Sagas;
 
 class ManifestOutput : Feature
 {
