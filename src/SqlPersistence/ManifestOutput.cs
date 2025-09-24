@@ -97,7 +97,6 @@ class ManifestOutput : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        var endpointName = settings.Get<string>("NServiceBus.Routing.EndpointName");
         //dialect information
         if (!settings.HasSetting("SqlPersistence.SqlDialect"))
         {
@@ -109,13 +108,13 @@ class ManifestOutput : Feature
         {
             Dialect = dialect.Name,
             //this applies to all queues/tables
-            Prefix = endpointName
+            Prefix = settings.Get<string>("NServiceBus.Routing.EndpointName")
         };
 
         //outbox information
         if (settings.IsFeatureActive(typeof(SqlOutboxFeature)))
         {
-            manifest.Outbox = new PersistenceManifest.OutboxManifest { TableName = dialect.GetOutboxTableName($"{endpointName}_") };
+            manifest.Outbox = new PersistenceManifest.OutboxManifest { TableName = dialect.GetOutboxTableName($"{manifest.Prefix}_") };
         }
 
         //Saga information
@@ -127,7 +126,7 @@ class ManifestOutput : Feature
             PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
             {
                 Name = sagaName,
-                TableName = dialect.GetSagaTableName($"{endpointName}_", entityName),
+                TableName = dialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
                 Indexes = !string.IsNullOrEmpty(correlationProperty)
                             ? [new() { Name = $"Index_Correlation_{correlationProperty}", Columns = correlationProperty }]
                             : []
@@ -139,7 +138,7 @@ class ManifestOutput : Feature
         {
             manifest.SqlSubscriptions = new PersistenceManifest.SubscriptionManifest
             {
-                TableName = dialect.GetSubscriptionTableName($"{endpointName}_")
+                TableName = dialect.GetSubscriptionTableName($"{manifest.Prefix}_")
             };
         }
 
