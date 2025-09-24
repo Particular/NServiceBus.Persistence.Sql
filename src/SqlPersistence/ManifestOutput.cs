@@ -113,13 +113,13 @@ class ManifestOutput : Feature
         };
 
         //outbox information
-        if (settings.TryGet<FeatureState>("SqlOutboxFeature", out var outbox) && outbox == FeatureState.Active)
+        if (settings.IsFeatureActive(typeof(SqlOutboxFeature)))
         {
             manifest.Outbox = new PersistenceManifest.OutboxManifest { TableName = dialect.GetOutboxTableName($"{endpointName}_") };
         }
 
         //Saga information
-        if (settings.TryGet($"NServiceBus.Sagas.SagaMetadataCollection", out SagaMetadataCollection sagas))
+        if (settings.TryGet(out SagaMetadataCollection sagas))
         {
             manifest.Sagas = sagas.Select(
                         saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray();
@@ -135,7 +135,7 @@ class ManifestOutput : Feature
         }
 
         //sqlSubscription information
-        if (settings.TryGet<FeatureState>("SqlSubscriptionFeature", out var subscription) && subscription == FeatureState.Active)
+        if (settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
         {
             manifest.SqlSubscriptions = new PersistenceManifest.SubscriptionManifest
             {
