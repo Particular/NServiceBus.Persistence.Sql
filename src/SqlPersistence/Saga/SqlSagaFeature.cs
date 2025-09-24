@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Features;
@@ -18,6 +19,7 @@ class SqlSagaFeature : Feature
         });
         DependsOn<Sagas>();
         DependsOn<SqlStorageSessionFeature>();
+        DependsOnOptionally<ManifestOutput>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
@@ -42,6 +44,21 @@ class SqlSagaFeature : Feature
             CustomSagaWriter = customSagaWriter != null,
             CustomSagaReader = customSagaReader != null
         });
+
+        if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
+        {
+            manifest.Sagas = settings.Get<SagaMetadataCollection>().Select(
+                        saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray();
+
+            ManifestOutput.PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
+            {
+                Name = sagaName,
+                TableName = sqlDialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
+                Indexes = !string.IsNullOrEmpty(correlationProperty)
+                            ? [new() { Name = $"Index_Correlation_{correlationProperty}", Columns = correlationProperty }]
+                            : []
+            };
+        }
     }
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)

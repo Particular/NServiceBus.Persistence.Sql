@@ -9,6 +9,7 @@ class SqlSubscriptionFeature : Feature
     SqlSubscriptionFeature()
     {
         DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
+        DependsOnOptionally<ManifestOutput>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
@@ -31,5 +32,13 @@ class SqlSubscriptionFeature : Feature
             });
 
         context.Services.AddSingleton(typeof(ISubscriptionStorage), persister);
+
+        if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
+        {
+            manifest.SqlSubscriptions = new ManifestOutput.PersistenceManifest.SubscriptionManifest
+            {
+                TableName = sqlDialect.GetSubscriptionTableName($"{manifest.Prefix}_")
+            };
+        }
     }
 }

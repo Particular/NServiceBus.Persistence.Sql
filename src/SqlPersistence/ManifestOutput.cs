@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using NServiceBus;
 using NServiceBus.Features;
-using NServiceBus.Sagas;
+using NServiceBus.Settings;
 
 class ManifestOutput : Feature
 {
-    public ManifestOutput() => EnableByDefault();
+    public ManifestOutput()
+    {
+        EnableByDefault();
+        Defaults(s => s.Set(new PersistenceManifest { Prefix = s.Get<string>("NServiceBus.Routing.EndpointName") }));
+    }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used exclusively for serialization")]
-    class PersistenceManifest
+    internal class PersistenceManifest
     {
-        public string Dialect { get; init; }
         public string Prefix { get; init; }
+        public string Dialect { get; set; }
         public OutboxManifest Outbox { get; set; }
         public SagaManifest[] Sagas { get; set; }
         public SubscriptionManifest SqlSubscriptions { get; set; }
@@ -100,56 +104,24 @@ class ManifestOutput : Feature
     protected override void Setup(FeatureConfigurationContext context)
     {
         var settings = context.Settings;
-        //dialect information
         if (!settings.HasSetting("SqlPersistence.SqlDialect"))
         {
             return;
         }
-        var dialect = settings.GetSqlDialect();
 
-        var manifest = new PersistenceManifest
-        {
-            Dialect = dialect.Name,
-            //this applies to all queues/tables
-            Prefix = settings.Get<string>("NServiceBus.Routing.EndpointName")
-        };
+        settings.AddStartupDiagnosticsSection("Manifest-Persistence", () => GenerateManifest(context.Settings));
+    }
 
-        //outbox information
-        if (settings.IsFeatureActive(typeof(SqlOutboxFeature)))
-        {
-            manifest.Outbox = new PersistenceManifest.OutboxManifest { TableName = dialect.GetOutboxTableName($"{manifest.Prefix}_") };
-        }
-
-        //Saga information
-        if (settings.TryGet(out SagaMetadataCollection sagas))
-        {
-            manifest.Sagas = sagas.Select(
-                        saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray();
-
-            PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
-            {
-                Name = sagaName,
-                TableName = dialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
-                Indexes = !string.IsNullOrEmpty(correlationProperty)
-                            ? [new() { Name = $"Index_Correlation_{correlationProperty}", Columns = correlationProperty }]
-                            : []
-            };
-        }
-
-        //sqlSubscription information
-        if (settings.IsFeatureActive(typeof(SqlSubscriptionFeature)))
-        {
-            manifest.SqlSubscriptions = new PersistenceManifest.SubscriptionManifest
-            {
-                TableName = dialect.GetSubscriptionTableName($"{manifest.Prefix}_")
-            };
-        }
+    static PersistenceManifest GenerateManifest(IReadOnlySettings settings)
+    {
+        var manifest = settings.Get<PersistenceManifest>();
+        manifest.Dialect = settings.GetSqlDialect().Name;
 
         if (settings.TryGet("ResultingSupportedStorages", out List<Type> supportedStorageTypes))
         {
             manifest.StorageTypes = supportedStorageTypes.Select(storageType => storageType.Name).ToArray();
         }
 
-        settings.AddStartupDiagnosticsSection("Manifest-Persistence", manifest);
+        return manifest;
     }
 }
