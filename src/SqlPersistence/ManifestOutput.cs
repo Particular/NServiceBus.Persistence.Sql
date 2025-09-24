@@ -10,7 +10,7 @@ class ManifestOutput : Feature
     public ManifestOutput() => EnableByDefault();
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used exclusively for serialization")]
-    record PersistenceManifest
+    class PersistenceManifest
     {
         public string Dialect { get; init; }
         public string Prefix { get; init; }
@@ -19,15 +19,16 @@ class ManifestOutput : Feature
         public SubscriptionManifest SqlSubscriptions { get; set; }
         public string[] StorageTypes { get; set; }
 
+        //NOTE Some values are hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
         public record OutboxManifest
         {
             public string TableName { get; init; }
-            //NOTE this is hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
             public string PrimaryKey => "MessageId";
             public IndexProperty[] Indexes => [
                 new() { Name = "Index_DispatchedAt", Columns = "DispatchedAt" },
                 new() { Name = "Index_Dispatched", Columns = "Dispatched" }
             ];
+            //object to allow for serialization of multiple subtypes. They will never be deserialized
             public object[] TableColumns => [
                 new VarcharSchemaProperty { Name = "MessageId", Length = "200", Mandatory = true },
                 new BitSchemaProperty { Name = "Dispatched", Mandatory = true, Default = false },
@@ -37,13 +38,14 @@ class ManifestOutput : Feature
             ];
         }
 
+        //NOTE Some values are hardcoded so if the saga script (MsSqlServerSagaScriptWriter.cs in ScriptBuilder/Saga) changes this needs to be updated
         public record SagaManifest
         {
             public string Name { get; init; }
             public string PrimaryKey => "Id";
             public string TableName { get; init; }
             public IndexProperty[] Indexes { get; init; }
-            //NOTE this is hardcoded so if the saga script (MsSqlServerSagaScriptWriter.cs in ScriptBuilder/Saga) changes this needs to be updated
+            //object to allow for serialization of multiple subtypes. They will never be deserialized
             public object[] TableColumns => [
                 new SchemaProperty { Name = "Id", Type = "guid", Mandatory = true },
                 new VarcharSchemaProperty { Name = "Metadata", Length = "max", Mandatory = true },
@@ -54,12 +56,13 @@ class ManifestOutput : Feature
             ];
         }
 
+        //NOTE Some values are hardcoded so if the subscription script (Create_MsSqlServer.sq in ScriptBuilder/Subscriptions) changes this needs to be updated
         public record SubscriptionManifest
         {
             public string TableName { get; init; }
-            //NOTE this is hardcoded so if the subscription script (Create_MsSqlServer.sq in ScriptBuilder/Subscriptions) changes this needs to be updated
             public string PrimaryKey => "Subscriber, MessageType";
             public IndexProperty[] Indexes => [];
+            //object to allow for serialization of multiple subtypes. They will never be deserialized
             public object[] TableColumns => [
                 new VarcharSchemaProperty { Name = "Subscriber", Length = "200", Mandatory = true },
                 new VarcharSchemaProperty { Name = "Endpoint", Length = "200", Mandatory = true },
