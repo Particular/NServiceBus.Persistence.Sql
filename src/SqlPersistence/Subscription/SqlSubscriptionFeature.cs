@@ -35,10 +35,10 @@ class SqlSubscriptionFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SqlSubscriptions = new ManifestOutput.PersistenceManifest.SubscriptionManifest
+            manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
             {
                 TableName = sqlDialect.GetSubscriptionTableName($"{manifest.Prefix}_")
-            };
+            });
         }
     }
 }

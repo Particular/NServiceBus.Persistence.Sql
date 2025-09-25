@@ -89,7 +89,7 @@ class SqlOutboxFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.Outbox = new ManifestOutput.PersistenceManifest.OutboxManifest { TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_") };
+            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest { TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_") });
         }
     }
 

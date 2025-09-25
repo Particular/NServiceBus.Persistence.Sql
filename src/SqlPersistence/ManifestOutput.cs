@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Settings;
@@ -16,12 +17,21 @@ class ManifestOutput : Feature
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used exclusively for serialization")]
     internal class PersistenceManifest
     {
+        Lazy<OutboxManifest> outboxManifest;
+        Lazy<SagaManifest[]> sagaManifests;
+        Lazy<SubscriptionManifest> subscriptionManifest;
+
         public string Prefix { get; init; }
         public string Dialect { get; set; }
-        public OutboxManifest Outbox { get; set; }
-        public SagaManifest[] Sagas { get; set; }
-        public SubscriptionManifest SqlSubscriptions { get; set; }
+        public OutboxManifest Outbox => outboxManifest?.Value;
+        public SagaManifest[] Sagas => sagaManifests?.Value;
+        public SubscriptionManifest SqlSubscriptions => subscriptionManifest?.Value;
         public string[] StorageTypes { get; set; }
+
+        //initialising lazy so that any reflection/calculations don't slow down endpoint startup
+        public void SetOutbox(Func<OutboxManifest> lazyOutbox) => outboxManifest = new Lazy<OutboxManifest>(lazyOutbox);
+        public void SetSagas(Func<SagaManifest[]> lazySagas) => sagaManifests = new Lazy<SagaManifest[]>(lazySagas);
+        public void SetSqlSubscriptions(Func<SubscriptionManifest> lazySubscription) => subscriptionManifest = new Lazy<SubscriptionManifest>(lazySubscription);
 
         //NOTE Some values are hardcoded so if the outbox script (Create_MsSqlServer.sql in ScriptBuilder/Outbox) changes this needs to be updated
         public record OutboxManifest
