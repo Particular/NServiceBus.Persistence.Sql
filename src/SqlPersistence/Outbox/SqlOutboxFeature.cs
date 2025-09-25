@@ -14,6 +14,7 @@ class SqlOutboxFeature : Feature
         });
         DependsOn<Outbox>();
         DependsOn<SqlStorageSessionFeature>();
+        DependsOnOptionally<ManifestOutput>();
     }
 
     protected override void Setup(FeatureConfigurationContext context)
@@ -85,6 +86,11 @@ class SqlOutboxFeature : Feature
 
         context.RegisterStartupTask(b =>
             new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetRequiredService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
+
+        if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
+        {
+            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest { TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_") });
+        }
     }
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
