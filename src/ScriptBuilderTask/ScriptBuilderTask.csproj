@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(ScriptBuilderTargetFrameworks)</TargetFrameworks>
+    <TargetFramework>$(ScriptBuilderTargetFramework)</TargetFramework>
     <AssemblyName>NServiceBus.Persistence.Sql.ScriptBuilderTask</AssemblyName>
     <RootNamespace>NServiceBus.Persistence.Sql</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType Condition="'$(TargetFramework)' == '$(ScriptBuilderTargetFrameworkForVS)'">full</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsPackable>false</IsPackable>
@@ -17,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ILRepack" Version="2.0.44" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="4.5.0" PrivateAssets="All" />
   </ItemGroup>
 
@@ -25,20 +23,6 @@
     <!-- Package needs to stay on 17.14.28 until we no longer need to ensure we run on the 10.0.10x SDK and Visual Studio 17.14 -->
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="All" />
   </ItemGroup>
-
-  <Target Name="MergeDependencies" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(TargetFramework)' == '$(ScriptBuilderTargetFrameworkForVS)' And '$(Configuration)' == 'Release' And '$(OS)' == 'Windows_NT'">
-    <PropertyGroup>
-      <TempFolder>$(ProjectDir)$(OutputPath)temp</TempFolder>
-    </PropertyGroup>
-    <MakeDir Directories="$(TempFolder)" />
-    <Exec Command="&quot;$(ILRepack)&quot; /out:&quot;$(TempFolder)\$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; &quot;$(ProjectDir)$(OutputPath)NServiceBus.Persistence.Sql.ScriptBuilder.dll&quot; &quot;$(ProjectDir)$(OutputPath)Mono.Cecil.dll&quot; /targetplatform:v4 /internalize /keyfile:$(AssemblyOriginatorKeyFile)" />
-    <ItemGroup>
-      <TempFiles Include="$(TempFolder)\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TempFiles)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" />
-    <Delete Files="@(TempFiles)" />
-    <RemoveDir Directories="$(TempFolder)" />
-  </Target>
 
   <ItemGroup>
     <InternalsVisibleTo Include="ScriptBuilderTask.Tests" Key="$(NServiceBusTestsKey)" />
