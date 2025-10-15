@@ -28,21 +28,17 @@
     Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(MSBuildRuntimeType)' == 'Core'" />
 
   <Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
-
     <SqlPersistenceScriptBuilderTask
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
       IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
       ProjectDirectory="$(ProjectDir)"
       SolutionDirectory="$(SqlPersistenceSolutionDir)" />
-
   </Target>
 
   <Target Name="SqlPersistenceAddScriptsToContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems" AfterTargets="SqlPersistenceScriptBuilder" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
-
     <PropertyGroup>
       <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
     </PropertyGroup>
-
     <ItemGroup>
       <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
       <ContentWithTargetPath Include="@(SqlPersistenceScripts)">
@@ -51,19 +47,15 @@
         <TargetPath>NServiceBus.Persistence.Sql\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
       </ContentWithTargetPath>
     </ItemGroup>
-
   </Target>
 
   <Target Name="SqlPersistenceDedupeScriptsBeforePublish" BeforeTargets="_HandleFileConflictsForPublish;CopyFilesToPublishDirectory" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
-
     <PublishDedupeTask FilesToPublish="@(ResolvedFileToPublish)">
       <Output TaskParameter="FilesToRemove" ItemName="FilesToRemove" />
     </PublishDedupeTask>
-
     <ItemGroup>
       <ResolvedFileToPublish Remove="@(FilesToRemove)" />
     </ItemGroup>
-
   </Target>
 
 </Project>
