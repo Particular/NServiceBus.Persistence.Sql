@@ -8,10 +8,10 @@ namespace NServiceBus
     public partial class SqlPersistence
     {
         [ObsoleteMetadata(
-            Message = "The SqlPersistence class is not supposed to be instantiated directly.",
+            Message = "The SqlPersistence class is not supposed to be instantiated directly",
             RemoveInVersion = "10",
             TreatAsErrorFromVersion = "9")]
-        [Obsolete("The SqlPersistence class is not supposed to be instantiated directly.. Will be removed in version 10.0.0.", true)]
+        [Obsolete("The SqlPersistence class is not supposed to be instantiated directly. Will be removed in version 10.0.0.", true)]
         public SqlPersistence() => throw new NotImplementedException();
     }
 }
