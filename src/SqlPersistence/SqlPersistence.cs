@@ -13,13 +13,6 @@
         {
             Defaults(s =>
             {
-                var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultsApplied";
-
-                if (s.HasSetting(defaultsAppliedSettingsKey))
-                {
-                    return;
-                }
-
                 var dialect = s.GetSqlDialect();
                 var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
 
@@ -30,8 +23,6 @@
                 });
 
                 s.EnableFeatureByDefault<InstallerFeature>();
-
-                s.Set(defaultsAppliedSettingsKey, true);
             });
 
             Supports<StorageType.Outbox, SqlOutboxFeature>();
