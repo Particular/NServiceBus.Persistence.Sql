@@ -6,12 +6,10 @@
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
     /// </summary>
-    public class SqlPersistence : PersistenceDefinition
+    public class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="SqlPersistence"/>.
-        /// </summary>
-        public SqlPersistence()
+        // TODO obsolete public ctor
+        SqlPersistence()
         {
             Defaults(s =>
             {
@@ -36,9 +34,14 @@
                 s.Set(defaultsAppliedSettingsKey, true);
             });
 
-            Supports<StorageType.Outbox>(s => s.EnableFeatureByDefault<SqlOutboxFeature>());
-            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<SqlSagaFeature>());
-            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<SqlSubscriptionFeature>());
+            Supports<StorageType.Outbox, SqlOutboxFeature>();
+            Supports<StorageType.Sagas, SqlSagaFeature>();
+            Supports<StorageType.Subscriptions, SqlSubscriptionFeature>();
         }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="SqlPersistence"/> class.
+        /// </summary>
+        public static SqlPersistence Create() => new();
     }
 }
