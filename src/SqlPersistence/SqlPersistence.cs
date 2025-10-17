@@ -39,9 +39,6 @@
             Supports<StorageType.Subscriptions, SqlSubscriptionFeature>();
         }
 
-        /// <summary>
-        /// Creates a new instance of the <see cref="SqlPersistence"/> class.
-        /// </summary>
-        public static SqlPersistence Create() => new(null);
+        static SqlPersistence IPersistenceDefinitionFactory<SqlPersistence>.Create() => new(null);
     }
 }
