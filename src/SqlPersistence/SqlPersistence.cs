@@ -6,10 +6,10 @@
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
     /// </summary>
-    public class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>
+    public partial class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>
     {
-        // TODO obsolete public ctor
-        SqlPersistence()
+        // constructor parameter is a temporary workaround until the public constructor is removed
+        SqlPersistence(object _)
         {
             Defaults(s =>
             {
@@ -42,6 +42,6 @@
         /// <summary>
         /// Creates a new instance of the <see cref="SqlPersistence"/> class.
         /// </summary>
-        public static SqlPersistence Create() => new();
+        public static SqlPersistence Create() => new(null);
     }
 }
