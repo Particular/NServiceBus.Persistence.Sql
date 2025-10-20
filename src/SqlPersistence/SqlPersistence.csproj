@@ -14,7 +14,7 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.6.32" />
+    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.7" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
