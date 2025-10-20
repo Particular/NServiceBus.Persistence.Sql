@@ -6,22 +6,13 @@
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
     /// </summary>
-    public class SqlPersistence : PersistenceDefinition
+    public partial class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="SqlPersistence"/>.
-        /// </summary>
-        public SqlPersistence()
+        // constructor parameter is a temporary workaround until the public constructor is removed
+        SqlPersistence(object _)
         {
             Defaults(s =>
             {
-                var defaultsAppliedSettingsKey = "NServiceBus.Persistence.Sql.DefaultsApplied";
-
-                if (s.HasSetting(defaultsAppliedSettingsKey))
-                {
-                    return;
-                }
-
                 var dialect = s.GetSqlDialect();
                 var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
 
@@ -32,13 +23,13 @@
                 });
 
                 s.EnableFeatureByDefault<InstallerFeature>();
-
-                s.Set(defaultsAppliedSettingsKey, true);
             });
 
-            Supports<StorageType.Outbox>(s => s.EnableFeatureByDefault<SqlOutboxFeature>());
-            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<SqlSagaFeature>());
-            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<SqlSubscriptionFeature>());
+            Supports<StorageType.Outbox, SqlOutboxFeature>();
+            Supports<StorageType.Sagas, SqlSagaFeature>();
+            Supports<StorageType.Subscriptions, SqlSubscriptionFeature>();
         }
+
+        static SqlPersistence IPersistenceDefinitionFactory<SqlPersistence>.Create() => new(null);
     }
 }

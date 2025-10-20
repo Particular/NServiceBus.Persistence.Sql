@@ -12,12 +12,13 @@
     <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Public dependencies">
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.6" />
+    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.7" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Private dependencies">
+    <PackageReference Include="Particular.Obsoletes" Version="1.0.0" PrivateAssets="All" ExcludeAssets="runtime" />
     <PackageReference Include="Particular.Packaging" Version="4.5.0" PrivateAssets="All" />
   </ItemGroup>
 
