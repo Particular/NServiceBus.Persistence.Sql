@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <SqlPersistenceSolutionDir Condition="'$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</SqlPersistenceSolutionDir>
-    <SqlPersistenceScriptBuilderTaskPath>$(MSBuildThisFileDirectory)..\..\build\net10.0\task\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll</SqlPersistenceScriptBuilderTaskPath>
+    <SqlPersistenceScriptBuilderTaskPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\build\net10.0\task\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll))</SqlPersistenceScriptBuilderTaskPath>
   </PropertyGroup>
 
   <UsingTask TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
