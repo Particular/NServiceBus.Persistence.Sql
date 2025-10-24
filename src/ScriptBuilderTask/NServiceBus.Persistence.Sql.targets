@@ -8,24 +8,12 @@
   <UsingTask TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
     AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
     Runtime="NET"
-    TaskFactory="TaskHostFactory"
-    Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(MSBuildRuntimeType)' == 'Full'" />
-
-  <UsingTask TaskName="NServiceBus.Persistence.Sql.SqlPersistenceScriptBuilderTask"
-    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
-    Runtime="NET"
-    Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(MSBuildRuntimeType)' == 'Core'" />
+    Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
 
   <UsingTask TaskName="NServiceBus.Persistence.Sql.PublishDedupeTask"
     AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
     Runtime="NET"
-    TaskFactory="TaskHostFactory"
-    Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(MSBuildRuntimeType)' == 'Full'" />
-
-  <UsingTask TaskName="NServiceBus.Persistence.Sql.PublishDedupeTask"
-    AssemblyFile="$(SqlPersistenceScriptBuilderTaskPath)"
-    Runtime="NET"
-    Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(MSBuildRuntimeType)' == 'Core'" />
+    Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
 
   <Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
     <SqlPersistenceScriptBuilderTask
