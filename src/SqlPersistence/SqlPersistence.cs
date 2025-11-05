@@ -22,7 +22,7 @@
                     CustomDiagnostics = diagnostics
                 });
 
-                s.EnableFeatureByDefault<InstallerFeature>();
+                s.EnableFeature<InstallerFeature>();
             });
 
             Supports<StorageType.Outbox, SqlOutboxFeature>();
