@@ -8,9 +8,9 @@ using NServiceBus.Sagas;
 using NServiceBus.Settings;
 using SagaSettings = NServiceBus.Persistence.Sql.SagaSettings;
 
-class SqlSagaFeature : Feature
+sealed class SqlSagaFeature : Feature
 {
-    SqlSagaFeature()
+    public SqlSagaFeature()
     {
         Defaults(s =>
         {
