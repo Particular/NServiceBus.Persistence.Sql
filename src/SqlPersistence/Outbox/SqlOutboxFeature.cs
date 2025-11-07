@@ -6,7 +6,11 @@ using NServiceBus.Outbox;
 
 class SqlOutboxFeature : Feature
 {
-    SqlOutboxFeature()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlOutboxFeature"/> class.
+    /// This constructor is called by NServiceBus during feature activation.
+    /// </summary>
+    public SqlOutboxFeature()
     {
         DependsOn<Outbox>();
         Enable<SqlStorageSessionFeature>();

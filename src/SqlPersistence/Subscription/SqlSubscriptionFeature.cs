@@ -6,7 +6,11 @@ using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 class SqlSubscriptionFeature : Feature
 {
-    SqlSubscriptionFeature()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlSubscriptionFeature"/> class.
+    /// This constructor is called by NServiceBus during feature activation.
+    /// </summary>
+    public SqlSubscriptionFeature()
     {
         DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
         Enable<ManifestOutput>();

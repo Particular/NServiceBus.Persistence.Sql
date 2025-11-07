@@ -10,7 +10,11 @@ using SagaSettings = NServiceBus.Persistence.Sql.SagaSettings;
 
 class SqlSagaFeature : Feature
 {
-    SqlSagaFeature()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlSagaFeature"/> class.
+    /// This constructor is called by NServiceBus during feature activation.
+    /// </summary>
+    public SqlSagaFeature()
     {
         Defaults(s =>
         {
