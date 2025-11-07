@@ -4,14 +4,14 @@ using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Outbox;
 
-class SqlOutboxFeature : Feature
+sealed class SqlOutboxFeature : Feature
 {
-    SqlOutboxFeature()
+    public SqlOutboxFeature()
     {
         DependsOn<Outbox>();
-        EnableByDefault<SqlStorageSessionFeature>();
+        Enable<SqlStorageSessionFeature>();
         DependsOn<SqlStorageSessionFeature>();
-        EnableByDefault<ManifestOutput>();
+        Enable<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 

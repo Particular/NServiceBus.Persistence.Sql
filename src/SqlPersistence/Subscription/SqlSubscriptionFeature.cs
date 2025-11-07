@@ -4,12 +4,12 @@ using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
-class SqlSubscriptionFeature : Feature
+sealed class SqlSubscriptionFeature : Feature
 {
-    SqlSubscriptionFeature()
+    public SqlSubscriptionFeature()
     {
         DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
-        EnableByDefault<ManifestOutput>();
+        Enable<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 

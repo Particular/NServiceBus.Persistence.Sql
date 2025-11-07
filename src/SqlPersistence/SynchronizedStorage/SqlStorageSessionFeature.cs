@@ -5,7 +5,7 @@ using NServiceBus.Persistence;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Settings;
 
-class SqlStorageSessionFeature : Feature
+sealed class SqlStorageSessionFeature : Feature
 {
     protected override void Setup(FeatureConfigurationContext context)
     {
