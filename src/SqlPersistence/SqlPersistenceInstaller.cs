@@ -19,9 +19,9 @@ class SqlPersistenceInstaller(IReadOnlySettings settings) : INeedToInstallSometh
                 tablePrefix: installerSettings.TablePrefix,
                 connectionBuilder: installerSettings.ConnectionBuilder,
                 scriptDirectory: installerSettings.ScriptDirectory,
-                shouldInstallOutbox: !installerSettings.DoNotCreateOutboxTable && !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlOutboxFeature)),
-                shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive(typeof(SqlSagaFeature)),
-                shouldInstallSubscriptions: settings.IsFeatureActive(typeof(SqlSubscriptionFeature)),
+                shouldInstallOutbox: !installerSettings.DoNotCreateOutboxTable && !installerSettings.IsMultiTenant && settings.IsFeatureActive<SqlOutboxFeature>(),
+                shouldInstallSagas: !installerSettings.IsMultiTenant && settings.IsFeatureActive<SqlSagaFeature>(),
+                shouldInstallSubscriptions: settings.IsFeatureActive<SqlSubscriptionFeature>(),
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }

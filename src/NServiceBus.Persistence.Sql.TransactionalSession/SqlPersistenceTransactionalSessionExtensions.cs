@@ -28,7 +28,7 @@ namespace NServiceBus.TransactionalSession
             var settings = persistenceExtensions.GetSettings();
 
             settings.Set(transactionalSessionOptions);
-            settings.EnableFeatureByDefault<SqlPersistenceTransactionalSession>();
+            settings.EnableFeature<SqlPersistenceTransactionalSession>();
 
             if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorEndpoint))
             {

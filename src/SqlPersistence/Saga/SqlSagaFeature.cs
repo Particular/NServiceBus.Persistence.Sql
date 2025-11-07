@@ -14,11 +14,12 @@ class SqlSagaFeature : Feature
     {
         Defaults(s =>
         {
-            s.EnableFeatureByDefault<SqlStorageSessionFeature>();
             s.AddUnrecoverableException(typeof(SerializationException));
         });
         DependsOn<Sagas>();
+        EnableByDefault<SqlStorageSessionFeature>();
         DependsOn<SqlStorageSessionFeature>();
+        EnableByDefault<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 

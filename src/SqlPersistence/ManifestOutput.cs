@@ -7,11 +7,8 @@ using NServiceBus.Settings;
 
 class ManifestOutput : Feature
 {
-    public ManifestOutput()
-    {
-        EnableByDefault();
+    public ManifestOutput() =>
         Defaults(s => s.Set(new PersistenceManifest { Prefix = s.Get<string>("NServiceBus.Routing.EndpointName") }));
-    }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used exclusively for serialization")]
     internal class PersistenceManifest
