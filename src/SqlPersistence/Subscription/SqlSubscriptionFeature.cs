@@ -9,7 +9,7 @@ class SqlSubscriptionFeature : Feature
     SqlSubscriptionFeature()
     {
         DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
-        EnableByDefault<ManifestOutput>();
+        Enable<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 
