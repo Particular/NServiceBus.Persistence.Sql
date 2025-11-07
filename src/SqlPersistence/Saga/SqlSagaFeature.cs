@@ -17,9 +17,9 @@ class SqlSagaFeature : Feature
             s.AddUnrecoverableException(typeof(SerializationException));
         });
         DependsOn<Sagas>();
-        EnableByDefault<SqlStorageSessionFeature>();
+        Enable<SqlStorageSessionFeature>();
         DependsOn<SqlStorageSessionFeature>();
-        EnableByDefault<ManifestOutput>();
+        Enable<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 

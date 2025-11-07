@@ -9,9 +9,9 @@ class SqlOutboxFeature : Feature
     SqlOutboxFeature()
     {
         DependsOn<Outbox>();
-        EnableByDefault<SqlStorageSessionFeature>();
+        Enable<SqlStorageSessionFeature>();
         DependsOn<SqlStorageSessionFeature>();
-        EnableByDefault<ManifestOutput>();
+        Enable<ManifestOutput>();
         DependsOnOptionally<ManifestOutput>();
     }
 

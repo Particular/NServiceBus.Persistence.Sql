@@ -7,6 +7,10 @@ using NServiceBus.Settings;
 
 class SqlStorageSessionFeature : Feature
 {
+    internal SqlStorageSessionFeature()
+    {
+    }
+
     protected override void Setup(FeatureConfigurationContext context)
     {
         // the settings are deliberately acquired here to make sure exceptions are raised in case of misconfiguration
