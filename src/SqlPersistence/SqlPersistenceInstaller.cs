@@ -9,10 +9,7 @@ class SqlPersistenceInstaller(IReadOnlySettings settings) : INeedToInstallSometh
 {
     public async Task Install(string identity, CancellationToken cancellationToken = default)
     {
-        if (installerSettings == null || installerSettings.Disabled)
-        {
-            return;
-        }
+        var installerSettings = settings.Get<InstallerSettings>();
 
         await ScriptRunner.Install(
                 sqlDialect: installerSettings.Dialect,
@@ -25,6 +22,4 @@ class SqlPersistenceInstaller(IReadOnlySettings settings) : INeedToInstallSometh
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
-
-    readonly InstallerSettings installerSettings = settings.GetOrDefault<InstallerSettings>();
 }
