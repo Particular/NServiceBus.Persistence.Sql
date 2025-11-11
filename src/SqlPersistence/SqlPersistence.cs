@@ -10,6 +10,18 @@
         // constructor parameter is a temporary workaround until the public constructor is removed
         SqlPersistence(object _)
         {
+            Defaults(s =>
+            {
+                var dialect = s.GetSqlDialect();
+                var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
+
+                s.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", new
+                {
+                    dialect.Name,
+                    CustomDiagnostics = diagnostics
+                });
+            });
+
             Supports<StorageType.Outbox, SqlOutboxFeature>();
             Supports<StorageType.Sagas, SqlSagaFeature>();
             Supports<StorageType.Subscriptions, SqlSubscriptionFeature>();

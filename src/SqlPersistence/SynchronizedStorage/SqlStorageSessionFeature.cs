@@ -12,7 +12,7 @@ sealed class SqlStorageSessionFeature : Feature
         // the settings are deliberately acquired here to make sure exceptions are raised in case of misconfiguration
         // during feature setup time. Later the same settings are resolved from DI to avoid allocation closures
         // everytime the scope synchronized storage session is retrieved.
-        var dialect = context.Settings.GetSqlDialect();
+        _ = context.Settings.GetSqlDialect();
         _ = context.Settings.GetConnectionBuilder<StorageType.Sagas>();
 
         var services = context.Services;
@@ -27,13 +27,5 @@ sealed class SqlStorageSessionFeature : Feature
             return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
         });
         services.AddScoped(sp => (sp.GetService<ICompletableSynchronizedStorageSession>() as ISqlStorageSession)!);
-
-        var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
-
-        context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.SqlDialect", new
-        {
-            dialect.Name,
-            CustomDiagnostics = diagnostics
-        });
     }
 }
