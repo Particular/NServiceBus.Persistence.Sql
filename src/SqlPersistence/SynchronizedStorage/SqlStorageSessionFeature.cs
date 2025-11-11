@@ -7,8 +7,6 @@ using NServiceBus.Settings;
 
 sealed class SqlStorageSessionFeature : Feature
 {
-    public SqlStorageSessionFeature() => Defaults(s => s.SetDefault(new InstallerSettings()));
-
     protected override void Setup(FeatureConfigurationContext context)
     {
         // the settings are deliberately acquired here to make sure exceptions are raised in case of misconfiguration
@@ -29,20 +27,6 @@ sealed class SqlStorageSessionFeature : Feature
             return new StorageSession(connectionManager, sagaInfoCache, sqlDialect);
         });
         services.AddScoped(sp => (sp.GetService<ICompletableSynchronizedStorageSession>() as ISqlStorageSession)!);
-
-        var settings = context.Settings.Get<InstallerSettings>();
-        if (!settings.Disabled)
-        {
-            settings.ConnectionBuilder = storageType => context.Settings.GetConnectionBuilder(storageType).BuildNonContextual();
-            settings.Dialect = context.Settings.GetSqlDialect();
-            settings.ScriptDirectory = ScriptLocation.FindScriptDirectory(context.Settings);
-            settings.TablePrefix = context.Settings.GetTablePrefix(context.Settings.EndpointName());
-            settings.IsMultiTenant = context.Settings.EndpointIsMultiTenant();
-
-            settings.Dialect.ValidateTablePrefix(settings.TablePrefix);
-
-            context.AddInstaller<SqlPersistenceInstaller>();
-        }
 
         var diagnostics = dialect.GetCustomDialectDiagnosticsInfo();
 
