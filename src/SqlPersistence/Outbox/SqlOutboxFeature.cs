@@ -32,6 +32,7 @@ sealed class SqlOutboxFeature : Feature
             //Default to Read Committed
             adoTransactionIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
         }
+
         var transactionScopeIsolationLevel = context.Settings.GetOrDefault<System.Transactions.IsolationLevel>(TransactionScopeIsolationLevel);
         var transactionScopeTimeout = context.Settings.GetOrDefault<TimeSpan>(TransactionScopeTimeout);
 
@@ -56,6 +57,14 @@ sealed class SqlOutboxFeature : Feature
 
         var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
         context.Services.AddTransient<IOutboxStorage>(_ => outboxPersister);
+
+        var installerSettings = context.Settings.GetOrDefault<InstallerSettings>();
+        if (!installerSettings.Disabled &&
+            !installerSettings.DoNotCreateOutboxTable &&
+            !settings.EndpointIsMultiTenant())
+        {
+            context.AddInstaller<OutboxInstaller>();
+        }
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
         {
@@ -87,7 +96,10 @@ sealed class SqlOutboxFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest { TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_") });
+            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
+            {
+                TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_")
+            });
         }
     }
 

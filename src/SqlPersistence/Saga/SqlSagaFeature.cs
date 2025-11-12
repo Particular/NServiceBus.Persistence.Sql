@@ -33,6 +33,13 @@ sealed class SqlSagaFeature : Feature
         services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings));
         services.AddSingleton<ISagaPersister>(provider => new SagaPersister(provider.GetRequiredService<SagaInfoCache>(), sqlDialect));
 
+        var installerSettings = settings.GetOrDefault<InstallerSettings>();
+
+        if (!installerSettings.Disabled && !settings.EndpointIsMultiTenant())
+        {
+            context.AddInstaller<SagaInstaller>();
+        }
+
         var customJsonSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var versionSpecificJsonSettings = SagaSettings.GetVersionSettings(settings);
         var customSagaWriter = SagaSettings.GetWriterCreator(settings);
@@ -48,16 +55,22 @@ sealed class SqlSagaFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(
-                        saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray());
+            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray());
 
             ManifestOutput.PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
             {
                 Name = sagaName,
                 TableName = sqlDialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
                 Indexes = !string.IsNullOrEmpty(correlationProperty)
-                            ? [new() { Name = $"Index_Correlation_{correlationProperty}", Columns = correlationProperty }]
-                            : []
+                    ?
+                    [
+                        new()
+                        {
+                            Name = $"Index_Correlation_{correlationProperty}",
+                            Columns = correlationProperty
+                        }
+                    ]
+                    : []
             };
         }
     }
@@ -92,6 +105,7 @@ sealed class SqlSagaFeature : Feature
         {
             return Serializer.JsonSerializer;
         }
+
         return JsonSerializer.Create(jsonSerializerSettings);
     }
 }

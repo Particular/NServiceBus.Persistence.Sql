@@ -25,6 +25,13 @@ sealed class SqlSubscriptionFeature : Feature
 
         sqlDialect.ValidateTablePrefix(tablePrefix);
 
+        var installerSettings = settings.GetOrDefault<InstallerSettings>();
+
+        if (!installerSettings.Disabled)
+        {
+            context.AddInstaller<SubscriptionInstaller>();
+        }
+
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Subscriptions",
             new
             {

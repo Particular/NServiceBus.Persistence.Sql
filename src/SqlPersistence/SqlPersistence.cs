@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus
 {
-    using Features;
     using Persistence;
 
     /// <summary>
@@ -21,8 +20,6 @@
                     dialect.Name,
                     CustomDiagnostics = diagnostics
                 });
-
-                s.EnableFeature<InstallerFeature>();
             });
 
             Supports<StorageType.Outbox, SqlOutboxFeature>();
