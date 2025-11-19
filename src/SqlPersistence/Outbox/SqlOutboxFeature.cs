@@ -38,25 +38,16 @@ sealed class SqlOutboxFeature : Feature
 
         var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, tablePrefix);
 
-        ConcurrencyControlStrategy concurrencyControlStrategy;
-        if (pessimisticMode)
-        {
-            concurrencyControlStrategy = new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
-        else
-        {
-            concurrencyControlStrategy = new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
-        }
+        ConcurrencyControlStrategy concurrencyControlStrategy = pessimisticMode
+            ? new PessimisticConcurrencyControlStrategy(sqlDialect, outboxCommands)
+            : new OptimisticConcurrencyControlStrategy(sqlDialect, outboxCommands);
 
-        ISqlOutboxTransaction transactionFactory()
-        {
-            return transactionScopeMode
-                ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel, transactionScopeTimeout)
-                : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
-        }
+        ISqlOutboxTransaction transactionFactory() => transactionScopeMode
+            ? new TransactionScopeSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, transactionScopeIsolationLevel, transactionScopeTimeout)
+            : new AdoNetSqlOutboxTransaction(concurrencyControlStrategy, connectionManager, adoTransactionIsolationLevel);
 
         var outboxPersister = new OutboxPersister(connectionManager, sqlDialect, outboxCommands, transactionFactory);
-        context.Services.AddTransient<IOutboxStorage>(_ => outboxPersister);
+        _ = context.Services.AddTransient<IOutboxStorage>(_ => outboxPersister);
 
         var installerSettings = context.Settings.GetOrDefault<InstallerSettings>();
         if (!installerSettings.Disabled &&
@@ -64,6 +55,14 @@ sealed class SqlOutboxFeature : Feature
             !settings.EndpointIsMultiTenant())
         {
             context.AddInstaller<OutboxInstaller>();
+        }
+
+        if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
+        {
+            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
+            {
+                TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_")
+            });
         }
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -93,14 +92,6 @@ sealed class SqlOutboxFeature : Feature
 
         context.RegisterStartupTask(b =>
             new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetRequiredService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
-
-        if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
-        {
-            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
-            {
-                TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_")
-            });
-        }
     }
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
