@@ -1,4 +1,5 @@
-namespace NServiceBus.Persistence.Sql;
+using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 class FinderMapper<TSagaData>(IConfigureHowToFindSagaWithFinder configureHowToFindSagaWithFinder)
     : ISagaFinderMapper<TSagaData>

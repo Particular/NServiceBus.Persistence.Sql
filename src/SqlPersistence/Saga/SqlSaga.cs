@@ -75,7 +75,7 @@
         protected abstract void ConfigureMapping(IMessagePropertyMapper mapper);
 
         /// <summary>
-        /// Allows messages to be mapped using <see cref="ISagaFinder"/>.
+        /// Allows messages to be mapped using custom saga finders.
         /// </summary>
         protected virtual void ConfigureFinderMapping(ISagaFinderMapper<TSagaData> mapper)
         {
