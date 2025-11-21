@@ -54,7 +54,7 @@ namespace NServiceBus.Persistence.Sql
         public string TransitionalCorrelationProperty { get; }
     }
     public abstract class SqlSaga<TSagaData> : NServiceBus.Saga
-        where TSagaData : NServiceBus.IContainSagaData, new ()
+        where TSagaData :  class, NServiceBus.IContainSagaData
     {
         protected SqlSaga() { }
         protected abstract string CorrelationPropertyName { get; }
