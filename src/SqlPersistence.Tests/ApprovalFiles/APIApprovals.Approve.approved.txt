@@ -61,6 +61,7 @@ namespace NServiceBus.Persistence.Sql
         public TSagaData Data { get; set; }
         protected virtual string TableSuffix { get; }
         protected virtual string TransitionalCorrelationPropertyName { get; }
+        protected virtual void ConfigureFinderMapping(NServiceBus.IConfigureHowToFindSagaWithFinder mapper) { }
         protected override void ConfigureHowToFindSaga(NServiceBus.IConfigureHowToFindSagaWithMessage mapper) { }
         protected abstract void ConfigureMapping(NServiceBus.Persistence.Sql.IMessagePropertyMapper mapper);
     }

@@ -59,7 +59,11 @@
             VerifyNoConfigureHowToFindSaga();
             var propertyMapper = new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType());
             ConfigureMapping(propertyMapper);
-            ConfigureFinderMapping((IConfigureHowToFindSagaWithFinder)mapper);
+
+            if (mapper is IConfigureHowToFindSagaWithFinder finderMapper)
+            {
+                ConfigureFinderMapping(finderMapper);
+            }
         }
 
         /// <summary>

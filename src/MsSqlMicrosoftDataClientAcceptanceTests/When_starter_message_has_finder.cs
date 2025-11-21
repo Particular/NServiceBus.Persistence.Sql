@@ -20,6 +20,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
         {
             return;
         }
+
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
@@ -44,20 +45,10 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class FindByStartSagaMessage(Context testContext) : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class FindByStartSagaMessage : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
-        {
-            Context testContext;
-
-            public FindByStartSagaMessage(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.StartSagaFinderUsed = true;
@@ -75,17 +66,10 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class TestSaga(Context testContext) : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context context)
-            {
-                testContext = context;
-            }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;
@@ -103,10 +87,9 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 
             protected override string CorrelationPropertyName => nameof(SagaData.Property);
 
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-            {
-                mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
-            }
+            protected override void ConfigureMapping(IMessagePropertyMapper mapper) => mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
+
+            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, StartSagaMessage, FindByStartSagaMessage>();
 
             public class SagaData : ContainSagaData
             {
