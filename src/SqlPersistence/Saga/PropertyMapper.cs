@@ -4,20 +4,10 @@ using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 
-class PropertyMapper<TSagaData> : IMessagePropertyMapper
-    where TSagaData : IContainSagaData, new()
+class PropertyMapper<TSagaData>(IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration, Expression<Func<TSagaData, object>> sagaEntityProperty, Type sagaType)
+    : IMessagePropertyMapper
+    where TSagaData : class, IContainSagaData
 {
-    IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration;
-    Expression<Func<TSagaData, object>> sagaEntityProperty;
-    Type sagaType;
-
-    internal PropertyMapper(IConfigureHowToFindSagaWithMessage sagaMessageFindingConfiguration, Expression<Func<TSagaData, object>> sagaEntityProperty, Type sagaType)
-    {
-        this.sagaMessageFindingConfiguration = sagaMessageFindingConfiguration;
-        this.sagaEntityProperty = sagaEntityProperty;
-        this.sagaType = sagaType;
-    }
-
     public void ConfigureMapping<TMessage>(Expression<Func<TMessage, object>> messageProperty)
     {
         if (sagaEntityProperty == null)

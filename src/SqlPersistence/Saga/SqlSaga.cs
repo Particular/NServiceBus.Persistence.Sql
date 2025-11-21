@@ -8,11 +8,8 @@
     /// Base class for all sagas being stored by the SQL Persistence. Replaces <see cref="Saga{TSagaData}"/>.
     /// </summary>
     public abstract class SqlSaga<TSagaData> : Saga
-        where TSagaData :
-        IContainSagaData,
-        new()
+        where TSagaData : class, IContainSagaData
     {
-
         internal void VerifyNoConfigureHowToFindSaga()
         {
             var bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
@@ -60,8 +57,16 @@
         protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
             VerifyNoConfigureHowToFindSaga();
-            var propertyMapper = new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType());
-            ConfigureMapping(propertyMapper);
+            ConfigureMapping(new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType()));
+
+            if (mapper is IConfigureHowToFindSagaWithFinder finderMapper)
+            {
+                ConfigureFinderMapping(new FinderMapper<TSagaData>(finderMapper));
+            }
+            else
+            {
+                throw new InvalidOperationException($"{mapper.GetType().FullName} must implement {nameof(IConfigureHowToFindSagaWithFinder)}.");
+            }
         }
 
         /// <summary>
@@ -69,12 +74,20 @@
         /// </summary>
         protected abstract void ConfigureMapping(IMessagePropertyMapper mapper);
 
+        /// <summary>
+        /// Allows messages to be mapped using custom saga finders.
+        /// </summary>
+        protected virtual void ConfigureFinderMapping(ISagaFinderMapper<TSagaData> mapper)
+        {
+        }
+
         internal Expression<Func<TSagaData, object>> GetExpression()
         {
             if (CorrelationPropertyName == null)
             {
                 return null;
             }
+
             var correlationProperty = GetCorrelationProperty();
             var parameterExpression = Expression.Parameter(typeof(TSagaData));
             var propertyExpression = Expression.Property(parameterExpression, correlationProperty);
@@ -90,6 +103,7 @@
             {
                 return correlationProperty;
             }
+
             var message = $"Expected to find a property named '{CorrelationPropertyName}' on [{typeof(TSagaData).FullName}].";
             throw new Exception(message);
         }
