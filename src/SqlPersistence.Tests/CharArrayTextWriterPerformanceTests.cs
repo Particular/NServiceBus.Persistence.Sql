@@ -82,13 +82,12 @@ public class CharArrayTextWriterPerformanceTests
 
     static RuntimeSagaInfo BuildSagaInfo<TSaga, TSagaData>(SqlDialect dialect)
         where TSaga : SqlSaga<TSagaData>
-        where TSagaData : IContainSagaData, new()
+        where TSagaData : class, IContainSagaData
     {
         var sagaMetadataCollection = new SagaMetadataCollection();
-        sagaMetadataCollection.Initialize(new[]
-        {
+        sagaMetadataCollection.Initialize([
             typeof(TSaga)
-        });
+        ]);
 
         var infoCache = new SagaInfoCache(
             null,

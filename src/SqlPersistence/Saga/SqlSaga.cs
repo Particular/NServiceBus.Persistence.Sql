@@ -8,11 +8,8 @@
     /// Base class for all sagas being stored by the SQL Persistence. Replaces <see cref="Saga{TSagaData}"/>.
     /// </summary>
     public abstract class SqlSaga<TSagaData> : Saga
-        where TSagaData :
-        IContainSagaData,
-        new()
+        where TSagaData : class, IContainSagaData
     {
-
         internal void VerifyNoConfigureHowToFindSaga()
         {
             var bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
@@ -75,6 +72,7 @@
             {
                 return null;
             }
+
             var correlationProperty = GetCorrelationProperty();
             var parameterExpression = Expression.Parameter(typeof(TSagaData));
             var propertyExpression = Expression.Property(parameterExpression, correlationProperty);
@@ -90,6 +88,7 @@
             {
                 return correlationProperty;
             }
+
             var message = $"Expected to find a property named '{CorrelationPropertyName}' on [{typeof(TSagaData).FullName}].";
             throw new Exception(message);
         }
