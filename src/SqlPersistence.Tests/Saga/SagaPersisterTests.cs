@@ -58,6 +58,7 @@ public abstract class SagaPersisterTests
             {
                 yield return nestedType;
             }
+
             if (nestedType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISagaFinder<,>)))
             {
                 yield return nestedType;
@@ -133,6 +134,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
+
             Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
@@ -188,6 +190,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
+
             Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
@@ -775,10 +778,12 @@ public abstract class SagaPersisterTests
                     {
                         return false;
                     }
+
                     if (!reader.Read())
                     {
                         return false;
                     }
+
                     return reader.GetInt32(0) > 0;
                 }
             }
@@ -1219,10 +1224,14 @@ public abstract class SagaPersisterTests
         {
         }
 
-        public Task Handle(AMessage message, IMessageHandlerContext context)
+        protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, AMessage, CustomFinder>();
+
+        public class CustomFinder : ISagaFinder<SagaData, AMessage>
         {
-            return Task.CompletedTask;
+            public Task<SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
         }
+
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
     }
 
     [Test]
@@ -1272,11 +1281,6 @@ public abstract class SagaPersisterTests
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
             Assert.That(result, Is.Null);
         }
-    }
-
-    public class CustomFinder : ISagaFinder<SagaWithNoCorrelation.SagaData, AMessage>
-    {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);

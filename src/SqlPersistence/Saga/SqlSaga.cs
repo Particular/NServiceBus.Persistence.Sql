@@ -59,12 +59,21 @@
             VerifyNoConfigureHowToFindSaga();
             var propertyMapper = new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType());
             ConfigureMapping(propertyMapper);
+            ConfigureFinderMapping((IConfigureHowToFindSagaWithFinder)mapper);
         }
 
         /// <summary>
         /// Allows messages to be mapped to <see cref="CorrelationPropertyName"/>.
         /// </summary>
         protected abstract void ConfigureMapping(IMessagePropertyMapper mapper);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapper"></param>
+        protected virtual void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper)
+        {
+        }
 
         internal Expression<Func<TSagaData, object>> GetExpression()
         {
