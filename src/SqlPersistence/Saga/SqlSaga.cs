@@ -64,6 +64,10 @@
             {
                 ConfigureFinderMapping(finderMapper);
             }
+            else
+            {
+                throw new InvalidOperationException($"{mapper.GetType().FullName} must implement {nameof(IConfigureHowToFindSagaWithFinder)}.");
+            }
         }
 
         /// <summary>

@@ -2,8 +2,9 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using NServiceBus;
+using NServiceBus.Sagas;
 
-class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
+class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders, IConfigureHowToFindSagaWithFinder
 {
     public void ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
         where TSagaEntity : class, IContainSagaData
@@ -22,6 +23,11 @@ class ConfigureHowToFindSagaWithMessage : IConfigureHowToFindSagaWithMessage, IC
         var property = (PropertyInfo)member.Member;
         CorrelationProperty = property.Name;
         CorrelationType = property.PropertyType;
+    }
+
+    public void ConfigureMapping<TSagaEntity, TMessage, TFinder>() where TSagaEntity : class, IContainSagaData where TFinder : class, ISagaFinder<TSagaEntity, TMessage>
+    {
+        //TODO: What do we do here?
     }
 
     MemberExpression GetMemberExpression(Expression body)
