@@ -41,20 +41,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class CustomFinder(Context testContext) : ISagaFinder<TestSaga.SagaData, SomeOtherMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class CustomFinder : ISagaFinder<TestSaga.SagaData, SomeOtherMessage>
-        {
-            Context testContext;
-
-            public CustomFinder(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.FinderUsed = true;
@@ -72,17 +62,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class TestSaga(Context testContext) : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context context)
-            {
-                testContext = context;
-            }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 var otherMessage = new SomeOtherMessage
@@ -105,10 +88,9 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
             protected override string CorrelationPropertyName => nameof(SagaData.Property);
 
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-            {
-                mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
-            }
+            protected override void ConfigureMapping(IMessagePropertyMapper mapper) => mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
+
+            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, SomeOtherMessage, CustomFinder>();
         }
     }
 

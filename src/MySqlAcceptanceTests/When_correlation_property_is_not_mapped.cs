@@ -41,20 +41,10 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class FindByStartSagaMessage(Context testContext) : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class FindByStartSagaMessage : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
-        {
-            Context testContext;
-
-            public FindByStartSagaMessage(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.StartSagaFinderUsed = true;
@@ -86,6 +76,8 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
             }
+
+            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, StartSagaMessage, FindByStartSagaMessage>();
 
             public class SagaData : ContainSagaData
             {
