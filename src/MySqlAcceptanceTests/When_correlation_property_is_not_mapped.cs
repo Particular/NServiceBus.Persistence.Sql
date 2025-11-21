@@ -77,7 +77,7 @@ public class When_correlation_property_is_not_mapped : NServiceBusAcceptanceTest
             {
             }
 
-            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, StartSagaMessage, FindByStartSagaMessage>();
+            protected override void ConfigureFinderMapping(ISagaFinderMapper<SagaData> mapper) => mapper.ConfigureMapping<StartSagaMessage, FindByStartSagaMessage>();
 
             public class SagaData : ContainSagaData
             {

@@ -114,10 +114,10 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             {
             }
 
-            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper)
+            protected override void ConfigureFinderMapping(ISagaFinderMapper<SagaData> mapper)
             {
-                mapper.ConfigureMapping<SagaData, StartSagaMessage, FindByStartSagaMessage>();
-                mapper.ConfigureMapping<SagaData, SomeOtherMessage, FindBySomeOtherMessage>();
+                mapper.ConfigureMapping<StartSagaMessage, FindByStartSagaMessage>();
+                mapper.ConfigureMapping<SomeOtherMessage, FindBySomeOtherMessage>();
             }
 
             public class SagaData : ContainSagaData

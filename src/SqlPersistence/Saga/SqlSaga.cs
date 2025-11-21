@@ -57,12 +57,11 @@
         protected override void ConfigureHowToFindSaga(IConfigureHowToFindSagaWithMessage mapper)
         {
             VerifyNoConfigureHowToFindSaga();
-            var propertyMapper = new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType());
-            ConfigureMapping(propertyMapper);
+            ConfigureMapping(new PropertyMapper<TSagaData>(mapper, GetExpression(), GetType()));
 
             if (mapper is IConfigureHowToFindSagaWithFinder finderMapper)
             {
-                ConfigureFinderMapping(finderMapper);
+                ConfigureFinderMapping(new FinderMapper<TSagaData>(finderMapper));
             }
             else
             {
@@ -76,10 +75,9 @@
         protected abstract void ConfigureMapping(IMessagePropertyMapper mapper);
 
         /// <summary>
-        /// 
+        /// Allows messages to be mapped using <see cref="ISagaFinder"/>.
         /// </summary>
-        /// <param name="mapper"></param>
-        protected virtual void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper)
+        protected virtual void ConfigureFinderMapping(ISagaFinderMapper<TSagaData> mapper)
         {
         }
 

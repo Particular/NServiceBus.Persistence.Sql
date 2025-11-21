@@ -89,7 +89,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
             protected override void ConfigureMapping(IMessagePropertyMapper mapper) => mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
 
-            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, SomeOtherMessage, CustomFinder>();
+            protected override void ConfigureFinderMapping(ISagaFinderMapper<SagaData> mapper) => mapper.ConfigureMapping<SomeOtherMessage, CustomFinder>();
 
             public class SagaData : ContainSagaData
             {

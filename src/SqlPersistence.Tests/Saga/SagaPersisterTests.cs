@@ -1224,7 +1224,7 @@ public abstract class SagaPersisterTests
         {
         }
 
-        protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, AMessage, CustomFinder>();
+        protected override void ConfigureFinderMapping(ISagaFinderMapper<SagaData> mapper) => mapper.ConfigureMapping<AMessage, CustomFinder>();
 
         public class CustomFinder : ISagaFinder<SagaData, AMessage>
         {
