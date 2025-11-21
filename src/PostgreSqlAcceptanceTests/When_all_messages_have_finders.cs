@@ -40,20 +40,10 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class CustomFinder(Context testContext) : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class CustomFinder : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
-        {
-            Context testContext;
-
-            public CustomFinder(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.FinderUsed = true;
@@ -71,16 +61,9 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class TestSaga(Context testContext) : SqlSaga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context context)
-            {
-                testContext = context;
-            }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 testContext.HandledOtherMessage = true;
@@ -92,6 +75,8 @@ public class When_all_messages_have_finders : NServiceBusAcceptanceTest
             protected override void ConfigureMapping(IMessagePropertyMapper mapper)
             {
             }
+
+            protected override void ConfigureFinderMapping(IConfigureHowToFindSagaWithFinder mapper) => mapper.ConfigureMapping<SagaData, StartSagaMessage, CustomFinder>();
 
             public class SagaData : ContainSagaData
             {
