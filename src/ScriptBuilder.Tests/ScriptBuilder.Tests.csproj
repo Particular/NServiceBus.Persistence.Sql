@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Microsoft.SqlServer.DACFx" Version="170.2.70" />
     <PackageReference Include="NUnit" Version="4.4.0" />
