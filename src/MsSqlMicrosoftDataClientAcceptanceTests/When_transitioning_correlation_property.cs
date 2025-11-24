@@ -65,21 +65,13 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
     #region Phase 1
 
-    public class Phase1Saga : SqlSaga<Phase1Saga.SagaData>,
+    [SqlSaga(tableSuffix: "TransitioningCorrelationPropertySaga")]
+    public class Phase1Saga : Saga<Phase1Saga.SagaData>,
         IAmStartedByMessages<StartSagaMessage>
     {
-        protected override string CorrelationPropertyName => nameof(SagaData.OrderNumber);
-        protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.OrderNumber).ToMessage<StartSagaMessage>(m => m.OrderNumber);
 
-        public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<StartSagaMessage>(m => m.OrderNumber);
-        }
+        public Task Handle(StartSagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
         public class SagaData : ContainSagaData
         {
@@ -92,22 +84,13 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
     #region Phase 2
 
-    public class Phase2Saga : SqlSaga<Phase2Saga.SagaData>,
+    [SqlSaga(tableSuffix: "TransitioningCorrelationPropertySaga", transitionalCorrelationProperty: nameof(SagaData.OrderId))]
+    public class Phase2Saga : Saga<Phase2Saga.SagaData>,
         IAmStartedByMessages<StartSagaMessage>
     {
-        protected override string CorrelationPropertyName => nameof(SagaData.OrderNumber);
-        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.OrderId);
-        protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.OrderNumber).ToMessage<StartSagaMessage>(m => m.OrderNumber);
 
-        public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<StartSagaMessage>(m => m.OrderNumber);
-        }
+        public Task Handle(StartSagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
         public class SagaData : ContainSagaData
         {
@@ -120,21 +103,13 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
     #region Phase 3
 
-    public class Phase3Saga : SqlSaga<Phase3Saga.SagaData>,
+    [SqlSaga(tableSuffix: "TransitioningCorrelationPropertySaga")]
+    public class Phase3Saga : Saga<Phase3Saga.SagaData>,
         IAmStartedByMessages<StartSagaMessage>
     {
-        protected override string CorrelationPropertyName => nameof(SagaData.OrderId);
-        protected override string TableSuffix => "TransitioningCorrelationPropertySaga";
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.OrderId).ToMessage<StartSagaMessage>(m => m.OrderId);
 
-        public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<StartSagaMessage>(m => m.OrderId);
-        }
+        public Task Handle(StartSagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
         public class SagaData : ContainSagaData
         {

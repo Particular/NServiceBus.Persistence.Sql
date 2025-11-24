@@ -6,31 +6,14 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-public class ScriptGenerator
+public class ScriptGenerator(string assemblyPath,
+    string destinationDirectory,
+    bool clean = true,
+    bool overwrite = true,
+    IReadOnlyList<BuildSqlDialect> dialectOptions = null,
+    Func<string, string> promotionFinder = null,
+    Action<string, string> logError = null)
 {
-    string assemblyPath;
-    string scriptBasePath;
-    bool overwrite;
-    bool clean;
-    Func<string, string> promotionFinder;
-    Action<string, string> logError;
-    IReadOnlyList<BuildSqlDialect> dialectOptions;
-
-    public ScriptGenerator(string assemblyPath, string destinationDirectory,
-        bool clean = true, bool overwrite = true,
-        IReadOnlyList<BuildSqlDialect> dialectOptions = null,
-        Func<string, string> promotionFinder = null,
-        Action<string, string> logError = null)
-    {
-        this.assemblyPath = assemblyPath;
-        this.overwrite = overwrite;
-        this.clean = clean;
-        this.dialectOptions = dialectOptions ?? [];
-        this.logError = logError;
-        this.promotionFinder = promotionFinder;
-        scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
-    }
-
     public static void Generate(string assemblyPath, string targetDirectory,
         Action<string, string> logError, Func<string, string> promotionPathFinder)
     {
@@ -89,14 +72,12 @@ public class ScriptGenerator
         {
             return;
         }
+
         var replicationPath = promotionFinder(scriptPromotionPath);
         Promote(replicationPath);
     }
 
-    bool ShouldGenerateDialect(BuildSqlDialect dialect)
-    {
-        return dialectOptions.Count == 0 || dialectOptions.Contains(dialect);
-    }
+    bool ShouldGenerateDialect(BuildSqlDialect dialect) => dialectOptions.Count == 0 || dialectOptions.Contains(dialect);
 
     void CreateDialectDirectory(string dialectPath) => Directory.CreateDirectory(dialectPath);
 
@@ -111,15 +92,18 @@ public class ScriptGenerator
             {
                 continue;
             }
+
             foreach (var file in GetKnownScripts(dialectDirectory))
             {
                 File.Delete(file);
             }
+
             var sagaDirectory = Path.Combine(dialectDirectory, "Sagas");
             if (!Directory.Exists(sagaDirectory))
             {
                 continue;
             }
+
             foreach (var file in GetKnownScripts(sagaDirectory))
             {
                 File.Delete(file);
@@ -127,16 +111,11 @@ public class ScriptGenerator
         }
     }
 
-    IEnumerable<string> GetSelectedDialects()
-    {
-        return dialectOptions.Count == 0 ? Enum.GetNames(typeof(BuildSqlDialect)) : dialectOptions.Select(d => d.ToString());
-    }
+    IEnumerable<string> GetSelectedDialects() => dialectOptions.Count == 0 ? Enum.GetNames(typeof(BuildSqlDialect)) : dialectOptions.Select(d => d.ToString());
 
-    static IEnumerable<string> GetKnownScripts(string dialectDirectory)
-    {
-        return Directory.EnumerateFiles(dialectDirectory, "*_Drop.sql")
+    static IEnumerable<string> GetKnownScripts(string dialectDirectory) =>
+        Directory.EnumerateFiles(dialectDirectory, "*_Drop.sql")
             .Concat(Directory.EnumerateFiles(dialectDirectory, "*_Create.sql"));
-    }
 
     void Promote(string replicationPath)
     {
@@ -154,4 +133,7 @@ public class ScriptGenerator
             throw new ErrorsException($"Failed to promote scripts to '{replicationPath}'. Error: {exception.Message}");
         }
     }
+
+    readonly string scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
+    readonly IReadOnlyList<BuildSqlDialect> dialectOptions = dialectOptions ?? [];
 }

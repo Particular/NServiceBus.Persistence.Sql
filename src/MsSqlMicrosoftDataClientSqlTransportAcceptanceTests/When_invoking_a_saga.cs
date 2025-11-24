@@ -6,7 +6,6 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Persistence.Sql;
     using Pipeline;
 
     public class When_invoking_a_saga : NServiceBusAcceptanceTest
@@ -18,18 +17,17 @@
         public async Task Should_rollback_saga_data_changes_when_transport_transaction_is_rolled_back(TransportTransactionMode transactionMode, bool enableOutbox)
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<EndpointThatHostsASaga>(
-                    b => b.When((session, ctx) => session.SendLocal(new SagaMessage()
+                .WithEndpoint<EndpointThatHostsASaga>(b => b.When((session, ctx) => session.SendLocal(new SagaMessage()
+                {
+                    Id = ctx.TestRunId
+                })).DoNotFailOnErrorMessages().CustomConfig(c =>
+                {
+                    c.ConfigureTransport().TransportTransactionMode = transactionMode;
+                    if (enableOutbox)
                     {
-                        Id = ctx.TestRunId
-                    })).DoNotFailOnErrorMessages().CustomConfig(c =>
-                    {
-                        c.ConfigureTransport().TransportTransactionMode = transactionMode;
-                        if (enableOutbox)
-                        {
-                            c.EnableOutbox();
-                        }
-                    }))
+                        c.EnableOutbox();
+                    }
+                }))
                 .Done(c => c.ReplyReceived)
                 .Run();
 
@@ -65,15 +63,8 @@
                 });
             }
 
-            public class TestSaga : SqlSaga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
+            public class TestSaga(Context testContext) : Saga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
             {
-                Context testContext;
-
-                public TestSaga(Context context)
-                {
-                    testContext = context;
-                }
-
                 public async Task Handle(SagaMessage message, IMessageHandlerContext context)
                 {
                     if (message.Id != testContext.TestRunId)
@@ -93,12 +84,8 @@
                     });
                 }
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-                {
-                    mapper.ConfigureMapping<SagaMessage>(m => m.Id);
-                }
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.TestRunId).ToMessage<SagaMessage>(m => m.Id);
 
-                protected override string CorrelationPropertyName => "TestRunId";
                 public class SagaData : ContainSagaData
                 {
                     public virtual Guid TestRunId { get; set; }
@@ -106,15 +93,8 @@
                 }
             }
 
-            public class Handler : IHandleMessages<ReplyMessage>
+            public class Handler(Context testContext) : IHandleMessages<ReplyMessage>
             {
-                Context testContext;
-
-                public Handler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public Task Handle(ReplyMessage message, IMessageHandlerContext context)
                 {
                     if (testContext.TestRunId == message.Id)
@@ -126,15 +106,8 @@
                 }
             }
 
-            class BehaviorThatThrowsAfterFirstMessage : Behavior<IIncomingLogicalMessageContext>
+            class BehaviorThatThrowsAfterFirstMessage(Context testContext) : Behavior<IIncomingLogicalMessageContext>
             {
-                Context testContext;
-
-                public BehaviorThatThrowsAfterFirstMessage(Context context)
-                {
-                    testContext = context;
-                }
-
                 public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
                 {
                     await next();
@@ -147,12 +120,7 @@
                     }
                 }
 
-                public class Registration : RegisterStep
-                {
-                    public Registration() : base("BehaviorThatThrowsAfterFirstMessage", typeof(BehaviorThatThrowsAfterFirstMessage), "BehaviorThatThrowsAfterFirstMessage")
-                    {
-                    }
-                }
+                public class Registration() : RegisterStep("BehaviorThatThrowsAfterFirstMessage", typeof(BehaviorThatThrowsAfterFirstMessage), "BehaviorThatThrowsAfterFirstMessage");
             }
         }
 

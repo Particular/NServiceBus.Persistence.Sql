@@ -18,7 +18,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         var context = await Scenario.Define<Context>()
             .WithEndpoint<Endpoint>(b =>
                 b.When(s =>
-                    s.SendLocal(new MyMessage()))
+                        s.SendLocal(new MyMessage()))
                     .CustomConfig(cfg =>
                     {
                         cfg.ConfigureTransport().TransportTransactionMode = transactionMode;
@@ -42,32 +42,16 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
     {
         public bool Done { get; set; }
         public ISqlStorageSession InjectedSession { get; set; }
-
-        public StorageSessionMessageHandlerSpy MessageHandlerSpySpy { get; set; } = new();
-
+        public StorageSessionMessageHandlerSpy MessageHandlerSpySpy { get; } = new();
     }
 
     public class Endpoint : EndpointConfigurationBuilder
     {
-        public Endpoint()
+        public Endpoint() =>
+            EndpointSetup<DefaultServer>();
+
+        public class MyMessageHandler(ISqlStorageSession storageSession, Context context) : IHandleMessages<MyMessage>
         {
-            EndpointSetup<DefaultServer>(c =>
-            {
-            });
-        }
-
-        public class MyMessageHandler : IHandleMessages<MyMessage>
-        {
-            Context context;
-            ISqlStorageSession storageSession;
-
-            public MyMessageHandler(ISqlStorageSession storageSession, Context context)
-            {
-                this.storageSession = storageSession;
-                this.context = context;
-            }
-
-
             public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
             {
                 context.Done = true;
@@ -82,24 +66,18 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
         }
     }
 
-    public class MyMessage : IMessage
-    {
-        public string Property { get; set; }
-    }
+    public class MyMessage : IMessage;
 
     public class StorageSessionMessageHandlerSpy
     {
-        //InjectedSession.Transaction is disposed and set to null after the message hanlder's
+        //InjectedSession.Transaction is disposed and set to null after the message handler's
         //Handle method executes, so it is captured when Handle is called
         public bool TransactionWasNotNullWhenHandleCalled { get; set; }
 
         public bool TransactionWasNullWhenHandleCalled => !TransactionWasNotNullWhenHandleCalled;
 
-        //InjectedSession.Connection is disposed and set to null after the message hanlder's
+        //InjectedSession.Connection is disposed and set to null after the message handler's
         //Handle method executes, so it is captured when Handle is called
         public bool ConnectionWasNotNullWhenHandleCalled { get; set; }
-
-        public bool ConnectionWasNullWhenHandleCalled => !ConnectionWasNotNullWhenHandleCalled;
     }
-
 }

@@ -11,18 +11,20 @@ using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
-    static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
+    static readonly MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
     const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
+        //TODO: This won't work, we need the saga metadata registry?
         var sagaTypes = settings.Get<IList<Type>>("TypesToScan")
             .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type)).ToArray();
 
         if (!sagaTypes.Any())
         {
-            return Enumerable.Empty<SagaDefinition>();
+            return [];
         }
+
         var sagaAssembly = sagaTypes.First().Assembly;
         //Validate the saga definitions using script builder compile-time validation
         using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
@@ -30,6 +32,7 @@ public static class RuntimeSagaDefinitionReader
             var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
             compileTimeReader.GetSagas();
         }
+
         return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
     }
 
@@ -42,10 +45,9 @@ public static class RuntimeSagaDefinitionReader
 
         var saga = (Saga)RuntimeHelpers.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
-        methodInfo.Invoke(saga, new object[]
-        {
+        methodInfo.Invoke(saga, [
             mapper
-        });
+        ]);
         CorrelationProperty correlationProperty = null;
         if (mapper.CorrelationType != null)
         {
@@ -54,7 +56,7 @@ public static class RuntimeSagaDefinitionReader
                 type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
         }
 
-        var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, saga, "TransitionalCorrelationPropertyName", att => att.TransitionalCorrelationProperty);
+        var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, att => att.TransitionalCorrelationProperty);
 
         CorrelationProperty transitional = null;
         if (transitionalCorrelationPropertyName != null)
@@ -64,7 +66,7 @@ public static class RuntimeSagaDefinitionReader
             transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
         }
 
-        var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
+        var tableSuffixOverride = GetSagaMetadataProperty(sagaType, att => att.TableSuffix);
         var tableSuffix = tableSuffixOverride ?? sagaType.Name;
 
         if (sqlDialect == BuildSqlDialect.Oracle)
@@ -89,22 +91,15 @@ public static class RuntimeSagaDefinitionReader
         }
 
         var genericBase = baseType.GetGenericTypeDefinition();
-        return genericBase != typeof(Saga<>) && genericBase != typeof(SqlSaga<>);
+        return genericBase != typeof(Saga<>);
     }
 
-    static string GetSagaMetadataProperty(Type sagaType, Saga instance, string sqlSagaPropertyName, Func<SqlSagaAttribute, string> getSqlSagaAttributeValue)
+    static string GetSagaMetadataProperty(Type sagaType, Func<SqlSagaAttribute, string> getSqlSagaAttributeValue)
     {
-        if (sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
-        {
-            return (string)sagaType
-                .GetProperty(sqlSagaPropertyName, AnyInstanceMember)
-                .GetValue(instance);
-        }
-
         if (sagaType.IsSubclassOfRawGeneric(typeof(Saga<>)))
         {
             var attr = sagaType.GetCustomAttribute<SqlSagaAttribute>();
-            return (attr != null) ? getSqlSagaAttributeValue(attr) : null;
+            return attr != null ? getSqlSagaAttributeValue(attr) : null;
         }
 
         throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");

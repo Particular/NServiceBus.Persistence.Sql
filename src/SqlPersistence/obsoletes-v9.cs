@@ -16,4 +16,17 @@ namespace NServiceBus
     }
 }
 
+namespace NServiceBus.Persistence.Sql
+{
+    using System;
+    using Particular.Obsoletes;
+
+    [ObsoleteMetadata(
+        Message = "SqlSaga is no longer supported, use the normal sagas with the new mapping API.",
+        RemoveInVersion = "10",
+        TreatAsErrorFromVersion = "9")]
+    [Obsolete("SqlSaga is no longer supported, use the normal sagas with the new mapping API.. Will be removed in version 10.0.0.", true)]
+    public abstract class SqlSaga<TSagaData>;
+}
+
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
