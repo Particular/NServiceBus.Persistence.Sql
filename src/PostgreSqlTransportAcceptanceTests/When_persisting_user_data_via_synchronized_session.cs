@@ -34,18 +34,14 @@ create table if not exists ""public"".""{DataTableName}"" (
             }
 
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(
-                    b => b.When((session, ctx) => session.SendLocal(new MyMessage()
+                .WithEndpoint<Endpoint>(b => b.When((session, ctx) => session.SendLocal(new MyMessage() { Id = ctx.TestRunId })).DoNotFailOnErrorMessages().CustomConfig(c =>
+                {
+                    c.ConfigureTransport().TransportTransactionMode = transactionMode;
+                    if (enableOutbox)
                     {
-                        Id = ctx.TestRunId
-                    })).DoNotFailOnErrorMessages().CustomConfig(c =>
-                    {
-                        c.ConfigureTransport().TransportTransactionMode = transactionMode;
-                        if (enableOutbox)
-                        {
-                            c.EnableOutbox();
-                        }
-                    }))
+                        c.EnableOutbox();
+                    }
+                }))
                 .Done(c => c.ReplyReceived)
                 .Run();
 
@@ -86,22 +82,16 @@ create table if not exists ""public"".""{DataTableName}"" (
             {
                 public Task Handle(SagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s=>s.TestRunId).ToMessage<SagaMessage>(m=>m.Id);
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.TestRunId).ToMessage<SagaMessage>(m => m.Id);
+
                 public class SagaData : ContainSagaData
                 {
                     public Guid TestRunId { get; set; }
                 }
             }
 
-            public class MyMessageHandler : IHandleMessages<MyMessage>
+            public class MyMessageHandler(Context testContext) : IHandleMessages<MyMessage>
             {
-                Context testContext;
-
-                public MyMessageHandler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public async Task Handle(MyMessage message, IMessageHandlerContext context)
                 {
                     if (message.Id != testContext.TestRunId)
@@ -132,10 +122,7 @@ create table if not exists ""public"".""{DataTableName}"" (
                     testContext.RecordCount = count;
                     testContext.InvocationCount++;
 
-                    await context.SendLocal(new ReplyMessage
-                    {
-                        Id = message.Id
-                    });
+                    await context.SendLocal(new ReplyMessage { Id = message.Id });
                 }
             }
 
