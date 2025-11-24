@@ -1169,11 +1169,14 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.ConfigureFinderMapping<AMessage, CustomFinder>();
 
         public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
+
+        public class CustomFinder : ISagaFinder<SagaData, AMessage>
+        {
+            public Task<SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
+        }
     }
 
     [Test]
@@ -1223,11 +1226,6 @@ public abstract class SagaPersisterTests
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
             Assert.That(result, Is.Null);
         }
-    }
-
-    public class CustomFinder : ISagaFinder<SagaWithNoCorrelation.SagaData, AMessage>
-    {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);
