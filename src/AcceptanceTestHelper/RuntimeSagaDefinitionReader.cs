@@ -11,12 +11,9 @@ using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
-    static readonly MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
-    const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
-        //TODO: This won't work, we need the saga metadata registry?
+        //TODO: This won't work once we stop scanning sagas, we need the saga metadata registry?
         var sagaTypes = settings.Get<IList<Type>>("TypesToScan")
             .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type)).ToArray();
 
@@ -104,4 +101,7 @@ public static class RuntimeSagaDefinitionReader
 
         throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
     }
+
+    static readonly MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
+    const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 }
