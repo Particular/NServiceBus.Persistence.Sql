@@ -99,6 +99,7 @@ static class InstructionAnalyzer
             {
                 MethodRef = methodRef,
                 IsConfigureMapping = IsMessageMapping(methodRef),
+                IsConfigureCustomFinder = IsConfigureCustomFinderMapping(methodRef),
                 IsToSaga = IsSagaMapping(methodRef),
                 IsExpressionCall = IsExpressionCall(methodRef)
             })
@@ -134,7 +135,7 @@ static class InstructionAnalyzer
         }
 
         var badCalls = interestingCalls
-            .Where(item => !item.IsConfigureMapping && !item.IsToSaga)
+            .Where(item => !item.IsConfigureMapping && !item.IsToSaga && !item.IsConfigureCustomFinder)
             .Where(item => !(item.IsExpressionCall && item.ExpressionCallsAllowed.Value))
             .ToArray();
 
@@ -146,6 +147,7 @@ static class InstructionAnalyzer
         public MethodReference MethodRef { get; set; }
         public bool IsConfigureMapping { get; set; }
         public bool IsToSaga { get; set; }
+        public bool IsConfigureCustomFinder { get; set; }
         public bool IsExpressionCall { get; set; }
         public bool? ExpressionCallsAllowed { get; set; }
     }
@@ -160,26 +162,24 @@ static class InstructionAnalyzer
         IsToSagaMethodCall(methodRef)
         || IsMapSagaMappingMethodCall(methodRef);
 
-    static bool IsConfigureHeaderMapping(MethodReference methodRef)
-    {
+    static bool IsConfigureHeaderMapping(MethodReference methodRef) =>
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "ConfigureHeaderMapping"
-               && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
-    }
+        methodRef.Name == "ConfigureHeaderMapping"
+        && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
+    static bool IsConfigureCustomFinderMapping(MethodReference methodRef) =>
+        // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
+        methodRef.Name == "ConfigureFinderMapping"
+        && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
 
-    static bool IsConfigureMappingMethodCall(MethodReference methodRef)
-    {
+    static bool IsConfigureMappingMethodCall(MethodReference methodRef) =>
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "ConfigureMapping"
-               && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
-    }
+        methodRef.Name == "ConfigureMapping"
+        && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
 
-    static bool IsMapSagaMappingMethodCall(MethodReference methodRef)
-    {
+    static bool IsMapSagaMappingMethodCall(MethodReference methodRef) =>
         // FullName would be NServiceBus.SagaPropertyMapper<SagaData>
-        return methodRef.Name == "MapSaga"
-               && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
-    }
+        methodRef.Name == "MapSaga"
+        && methodRef.DeclaringType.FullName.StartsWith("NServiceBus.SagaPropertyMapper`");
 
     static bool IsToSagaMethodCall(MethodReference methodRef)
     {
