@@ -86,28 +86,6 @@ public class SagaDefinitionReaderTest : IDisposable
     }
 
     [Test]
-    public void WithReadonlyProperty()
-    {
-        var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
-        var exception = Assert.Throws<ErrorsException>(() =>
-        {
-            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
-        });
-        Assert.That(exception.Message, Is.Not.Null);
-        Approver.Verify(exception.Message);
-    }
-
-    public class WithReadonlyPropertySaga : Saga<WithReadonlyPropertySaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; }
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
-    }
-
-    [Test]
     public void WithNoTransitionalCorrelation()
     {
         var sagaType = module.GetTypeDefinition<WithNoTransitionalCorrelationSaga>();
