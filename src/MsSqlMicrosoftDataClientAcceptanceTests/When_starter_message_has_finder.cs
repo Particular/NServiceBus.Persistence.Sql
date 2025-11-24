@@ -6,7 +6,6 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NUnit.Framework;
 
@@ -42,10 +41,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
-        {
-            EndpointSetup<DefaultServer>();
-        }
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
 
         public class FindByStartSagaMessage(Context testContext) : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
@@ -87,11 +83,7 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                 public string Property { get; set; }
             }
 
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-            {
-                mapper.ConfigureFinderMapping<StartSagaMessage, FindByStartSagaMessage>();
-                mapper.MapSaga(s => s.Property).ToMessage<StartSagaMessage>(m => m.Property);
-            }
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.ConfigureFinderMapping<StartSagaMessage, FindByStartSagaMessage>();
         }
     }
 
