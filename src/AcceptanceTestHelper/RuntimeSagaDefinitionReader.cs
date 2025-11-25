@@ -6,6 +6,7 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
+using static TestTableNameCleaner;
 
 public static class RuntimeSagaDefinitionReader
 {
@@ -53,11 +54,8 @@ public static class RuntimeSagaDefinitionReader
             throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
         }
 
-        var tableSuffix = sagaDefinition.TableSuffix;
-        if (sqlDialect == BuildSqlDialect.Oracle)
-        {
-            tableSuffix = sagaDefinition.TableSuffix[..Math.Min(27, sagaDefinition.TableSuffix.Length)];
-        }
+        var tableSuffix = sqlDialect == BuildSqlDialect.Oracle ?
+            Clean(sagaDefinition.TableSuffix, maxLength: 27) : sagaDefinition.TableSuffix;
 
         return new SagaDefinition(
             tableSuffix: tableSuffix,
