@@ -8,4 +8,8 @@
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup Label="Local source generator">
+    <ProjectReference Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>

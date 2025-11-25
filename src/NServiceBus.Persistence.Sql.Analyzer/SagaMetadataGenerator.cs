@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -11,6 +12,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 
+[Generator]
 public class SagaMetadataGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -84,7 +86,12 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             return null;
         }
 
-        var correlation = new CorrelationDetails(propertyReference.Property.Type.ToDisplayString(), propertyReference.Property.Name);
+        if (!TryGetCorrelationSqlPropertyType(propertyReference.Property.Type, out var correlationPropType))
+        {
+            return null;
+        }
+
+        var correlation = new CorrelationDetails(correlationPropType, propertyReference.Property.Name);
         CorrelationDetails? transitionalCorrelation = null;
         string tableSuffix = sagaType.Name;
 
@@ -138,12 +145,42 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             .OfType<IPropertySymbol>()
             .FirstOrDefault(propSymbol => propSymbol.Name == propertyName);
 
-        if (propSymbol is null)
+        if (propSymbol is null || !TryGetCorrelationSqlPropertyType(propSymbol.Type, out var sqlPropType))
         {
             return null;
         }
 
-        return new CorrelationDetails(propSymbol.Type.ToDisplayString(), propSymbol.Name);
+        return new CorrelationDetails(sqlPropType, propSymbol.Name);
+    }
+
+
+    static bool TryGetCorrelationSqlPropertyType(ITypeSymbol type, [NotNullWhen(true)] out string? sqlPropertyType)
+    {
+        sqlPropertyType = null;
+
+        // Cases must cover allowed types in NServiceBus.SagaMapper:AllowedCorrelationPropertyTypes
+        // Output value must match NServiceBus.Persistence.Sql.ScriptBuilder.CorrelationPropertyType
+        if (type.SpecialType == SpecialType.System_String)
+        {
+            sqlPropertyType = "String";
+            return true;
+        }
+
+        if (type.SpecialType is SpecialType.System_Int64 or SpecialType.System_UInt64 or SpecialType.System_Int32 or SpecialType.System_UInt32 or SpecialType.System_Int16 or SpecialType.System_UInt16)
+        {
+            sqlPropertyType = "Int";
+            return true;
+        }
+
+        if (type is { Name: "Guid", ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true } })
+        {
+            sqlPropertyType = "Guid";
+            return true;
+        }
+
+        // Not going to cover DateTime or DateTimeOffset
+        // Don't map invalid values, just return null and let another analyzer handle it
+        return false;
     }
 
     static void GenerateMetadataCode(SourceProductionContext context, ImmutableArray<SagaDetails> sagas)

@@ -53,16 +53,15 @@ class AllSagaDefinitionReader(ModuleDefinition module)
 
     static CorrelationProperty? GetCorrelation(string? name, string? type)
     {
-        if (name is null || type is null)
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(type))
         {
             return null;
         }
 
-        var propType = type switch
+        if (!Enum.TryParse<CorrelationPropertyType>(type, out var propType))
         {
-            "string" => CorrelationPropertyType.String,
-            _ => throw new Exception("Unknown correlation property type")
-        };
+            throw new Exception($"Invalid correlation property type '{type}' found in metadata attribute.");
+        }
 
         return new CorrelationProperty(name, propType);
     }
