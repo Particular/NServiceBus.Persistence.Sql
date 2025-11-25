@@ -279,7 +279,7 @@ public partial class SourceGeneratorTest
                 _ = sb.AppendLine();
             }
 
-            var start = $"// == {heading} ";
+            var start = $"// == {heading} ==";
 
             _ = sb.Append(start);
 
