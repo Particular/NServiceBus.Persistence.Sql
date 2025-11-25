@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.IO;
 using Mono.Cecil;
@@ -7,7 +9,7 @@ class SagaWriter(bool clean,
     bool overwrite,
     string scriptPath,
     ModuleDefinition moduleDefinition,
-    Action<string, string> logError = null)
+    Action<string, string>? logError = null)
     : ScriptWriter(clean, overwrite, scriptPath)
 {
     public override void WriteScripts(BuildSqlDialect dialect)

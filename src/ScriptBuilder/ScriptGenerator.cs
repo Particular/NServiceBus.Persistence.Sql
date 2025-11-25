@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,9 +12,9 @@ public class ScriptGenerator(string assemblyPath,
     string destinationDirectory,
     bool clean = true,
     bool overwrite = true,
-    IReadOnlyList<BuildSqlDialect> dialectOptions = null,
-    Func<string, string> promotionFinder = null,
-    Action<string, string> logError = null)
+    IReadOnlyList<BuildSqlDialect>? dialectOptions = null,
+    Func<string, string>? promotionFinder = null,
+    Action<string, string>? logError = null)
 {
     public static void Generate(string assemblyPath, string targetDirectory,
         Action<string, string> logError, Func<string, string> promotionPathFinder)

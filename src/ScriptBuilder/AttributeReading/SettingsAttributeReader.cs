@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
@@ -14,7 +16,7 @@ static class SettingsAttributeReader
         return ReadFromAttribute(attribute);
     }
 
-    public static Settings ReadFromAttribute(ICustomAttribute attribute)
+    public static Settings ReadFromAttribute(ICustomAttribute? attribute)
     {
         return new Settings
         {
@@ -27,7 +29,7 @@ static class SettingsAttributeReader
         };
     }
 
-    static string ReadScriptPromotionPath(ICustomAttribute attribute)
+    static string? ReadScriptPromotionPath(ICustomAttribute? attribute)
     {
         var target = attribute?.GetStringProperty("ScriptPromotionPath");
         if (target == null)
@@ -41,7 +43,7 @@ static class SettingsAttributeReader
         throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
     }
 
-    static IEnumerable<BuildSqlDialect> ReadBuildDialects(ICustomAttribute attribute)
+    static IEnumerable<BuildSqlDialect> ReadBuildDialects(ICustomAttribute? attribute)
     {
         if (attribute == null)
         {

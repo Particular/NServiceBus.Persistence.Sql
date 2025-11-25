@@ -6,7 +6,6 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
-using static TestTableNameCleaner;
 
 public static class RuntimeSagaDefinitionReader
 {
