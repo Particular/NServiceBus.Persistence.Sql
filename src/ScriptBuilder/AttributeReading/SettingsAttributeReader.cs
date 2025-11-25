@@ -1,35 +1,50 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
+using System.Reflection;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class SettingsAttributeReader
 {
-    public static Settings Read(ModuleDefinition module)
+    public static Settings Read(Assembly assembly)
     {
-        var attribute = module.Assembly.CustomAttributes
+        var attribute = assembly.CustomAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "NServiceBus.Persistence.Sql.SqlPersistenceSettingsAttribute");
 
         return ReadFromAttribute(attribute);
     }
 
-    public static Settings ReadFromAttribute(ICustomAttribute attribute)
+    public static Settings ReadFromAttribute(CustomAttributeData? attribute) => new()
     {
-        return new Settings
+        BuildDialects = [.. ReadBuildDialects(attribute)],
+        ScriptPromotionPath = ReadScriptPromotionPath(attribute),
+        ProduceSagaScripts = GetAttributeValue(attribute, "ProduceSagaScripts", true),
+        ProduceTimeoutScripts = GetAttributeValue(attribute, "ProduceTimeoutScripts", true),
+        ProduceSubscriptionScripts = GetAttributeValue(attribute, "ProduceSubscriptionScripts", true),
+        ProduceOutboxScripts = GetAttributeValue(attribute, "ProduceOutboxScripts", true),
+    };
+
+    static T? GetAttributeValue<T>(CustomAttributeData? attribute, string namedAttributeKey, T? defaultValue)
+    {
+        if (attribute is null)
         {
-            BuildDialects = ReadBuildDialects(attribute).ToList(),
-            ScriptPromotionPath = ReadScriptPromotionPath(attribute),
-            ProduceSagaScripts = attribute.GetBoolProperty("ProduceSagaScripts", true),
-            ProduceTimeoutScripts = attribute.GetBoolProperty("ProduceTimeoutScripts", true),
-            ProduceSubscriptionScripts = attribute.GetBoolProperty("ProduceSubscriptionScripts", true),
-            ProduceOutboxScripts = attribute.GetBoolProperty("ProduceOutboxScripts", true),
-        };
+            return defaultValue;
+        }
+
+        var arg = attribute.NamedArguments.FirstOrDefault(na => na.MemberName == namedAttributeKey);
+        if (arg == default)
+        {
+            return defaultValue;
+        }
+
+        return (T?)arg.TypedValue.Value!;
     }
 
-    static string ReadScriptPromotionPath(ICustomAttribute attribute)
+    static string? ReadScriptPromotionPath(CustomAttributeData? attribute)
     {
-        var target = attribute?.GetStringProperty("ScriptPromotionPath");
+        var target = GetAttributeValue<string>(attribute, "ScriptPromotionPath", null);
         if (target == null)
         {
             return null;
@@ -41,7 +56,7 @@ static class SettingsAttributeReader
         throw new ErrorsException("SqlPersistenceSettingsAttribute contains an empty ScriptPromotionPath.");
     }
 
-    static IEnumerable<BuildSqlDialect> ReadBuildDialects(ICustomAttribute attribute)
+    static IEnumerable<BuildSqlDialect> ReadBuildDialects(CustomAttributeData? attribute)
     {
         if (attribute == null)
         {
@@ -52,25 +67,25 @@ static class SettingsAttributeReader
             yield break;
         }
 
-        var msSqlServerScripts = attribute.GetBoolProperty("MsSqlServerScripts");
+        var msSqlServerScripts = GetAttributeValue(attribute, "MsSqlServerScripts", false);
         if (msSqlServerScripts)
         {
             yield return BuildSqlDialect.MsSqlServer;
         }
 
-        var mySqlScripts = attribute.GetBoolProperty("MySqlScripts");
+        var mySqlScripts = GetAttributeValue(attribute, "MySqlScripts", false);
         if (mySqlScripts)
         {
             yield return BuildSqlDialect.MySql;
         }
 
-        var postgreSqlScripts = attribute.GetBoolProperty("PostgreSqlScripts");
+        var postgreSqlScripts = GetAttributeValue(attribute, "PostgreSqlScripts", false);
         if (postgreSqlScripts)
         {
             yield return BuildSqlDialect.PostgreSql;
         }
 
-        var oracleScripts = attribute.GetBoolProperty("OracleScripts");
+        var oracleScripts = GetAttributeValue(attribute, "OracleScripts", false);
         if (oracleScripts)
         {
             yield return BuildSqlDialect.Oracle;

@@ -1,29 +1,44 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using Mono.Cecil;
-using NServiceBus.Persistence.Sql;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class AllSagaDefinitionReader(ModuleDefinition module)
+class AllSagaDefinitionReader(Assembly assembly)
 {
-    public IList<SagaDefinition> GetSagas(Action<string, string> logger = null)
+    public IList<SagaDefinition> GetSagas(Action<string, string>? logger = null)
     {
         var sagas = new List<SagaDefinition>();
         var errors = new List<Exception>();
 
-        foreach (var type in module.AllClasses())
+        var attributes = assembly.CustomAttributes
+            .Where(att => att.AttributeType.FullName == "NServiceBusGeneratedSqlSagaMetadataAttribute")
+            .ToImmutableArray();
+
+        foreach (var att in attributes)
         {
             try
             {
-                if (SagaDefinitionReader.TryGetSagaDefinition(type, out var definition))
-                {
-                    sagas.Add(definition);
-                }
+                var sagaType = GetValue(att, "SagaType");
+                var corrName = GetValue(att, "CorrelationPropertyName");
+                var corrType = GetValue(att, "CorrelationPropertyType");
+                var transName = GetValue(att, "TransitionalCorrelationPropertyName");
+                var transType = GetValue(att, "TransitionalCorrelationPropertyType");
+                var tableSuffix = GetValue(att, "TableSuffix");
+
+                var correlation = GetCorrelation(corrName, corrType);
+                var transitionalCorrelation = GetCorrelation(transName, transType);
+
+                var definition = new SagaDefinition(tableSuffix, sagaType, correlation, transitionalCorrelation);
+                sagas.Add(definition);
             }
-            catch (ErrorsException exception)
+            catch (Exception exception)
             {
-                logger?.Invoke(exception.Message, type.FullName);
-                errors.Add(new Exception($"Error in '{type.FullName}' (Filename='{type.GetFileName()}'). Error: {exception.Message}", exception));
+                logger?.Invoke(exception.Message, att.ToString());
+                errors.Add(new Exception($"Error translating generated attribute '{att}' into saga metadata. Error: {exception.Message}", exception));
             }
         }
 
@@ -33,5 +48,24 @@ class AllSagaDefinitionReader(ModuleDefinition module)
         }
 
         return sagas;
+    }
+
+    static string? GetValue(CustomAttributeData attribute, string attributeName)
+        => attribute.NamedArguments?.FirstOrDefault(a => a.MemberName == attributeName).TypedValue.Value as string;
+
+    static CorrelationProperty? GetCorrelation(string? name, string? type)
+    {
+        if (name is null || type is null)
+        {
+            return null;
+        }
+
+        var propType = type switch
+        {
+            "string" => CorrelationPropertyType.String,
+            _ => throw new Exception("Unknown correlation property type")
+        };
+
+        return new CorrelationProperty(name, propType);
     }
 }
