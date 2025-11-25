@@ -7,22 +7,21 @@ using Mono.Cecil;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Sagas;
 using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
-        //TODO: This won't work once we stop scanning sagas, we need the saga metadata registry?
-        var sagaTypes = settings.Get<IList<Type>>("TypesToScan")
-            .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type)).ToArray();
+        var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? new SagaMetadataCollection();
 
-        if (!sagaTypes.Any())
+        if (!sagaMetadataCollection.Any())
         {
             return [];
         }
 
-        var sagaAssembly = sagaTypes.First().Assembly;
+        var sagaAssembly = sagaMetadataCollection.First().SagaType.Assembly;
         //Validate the saga definitions using script builder compile-time validation
         using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
         {
@@ -30,7 +29,7 @@ public static class RuntimeSagaDefinitionReader
             compileTimeReader.GetSagas();
         }
 
-        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
+        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sqlDialect));
     }
 
     public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
@@ -42,9 +41,7 @@ public static class RuntimeSagaDefinitionReader
 
         var saga = (Saga)RuntimeHelpers.GetUninitializedObject(sagaType);
         var mapper = new ConfigureHowToFindSagaWithMessage();
-        methodInfo.Invoke(saga, [
-            mapper
-        ]);
+        methodInfo.Invoke(saga, [mapper]);
         CorrelationProperty correlationProperty = null;
         if (mapper.CorrelationType != null)
         {
