@@ -2,20 +2,13 @@
 using System.IO;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-public abstract class ScriptWriter
+public abstract class ScriptWriter(bool clean, bool overwrite, string scriptPath)
 {
-    protected ScriptWriter(bool clean, bool overwrite, string scriptPath)
-    {
-        Clean = clean;
-        Overwrite = overwrite;
-        ScriptPath = scriptPath;
-    }
+    protected bool Clean { get; } = clean;
 
-    protected bool Clean { get; }
+    protected bool Overwrite { get; } = overwrite;
 
-    protected bool Overwrite { get; }
-
-    protected string ScriptPath { get; }
+    protected string ScriptPath { get; } = scriptPath;
 
     public abstract void WriteScripts(BuildSqlDialect dialect);
 
@@ -23,10 +16,8 @@ public abstract class ScriptWriter
     {
         var filePath = EnsureFile(fileName);
 
-        using (var writer = File.CreateText(filePath))
-        {
-            action(writer);
-        }
+        using var writer = File.CreateText(filePath);
+        action(writer);
     }
 
     string EnsureFile(string file)

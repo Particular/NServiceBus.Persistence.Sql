@@ -34,18 +34,14 @@ create table if not exists ""public"".""{DataTableName}"" (
             }
 
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(
-                    b => b.When((session, ctx) => session.SendLocal(new MyMessage()
+                .WithEndpoint<Endpoint>(b => b.When((session, ctx) => session.SendLocal(new MyMessage() { Id = ctx.TestRunId })).DoNotFailOnErrorMessages().CustomConfig(c =>
+                {
+                    c.ConfigureTransport().TransportTransactionMode = transactionMode;
+                    if (enableOutbox)
                     {
-                        Id = ctx.TestRunId
-                    })).DoNotFailOnErrorMessages().CustomConfig(c =>
-                    {
-                        c.ConfigureTransport().TransportTransactionMode = transactionMode;
-                        if (enableOutbox)
-                        {
-                            c.EnableOutbox();
-                        }
-                    }))
+                        c.EnableOutbox();
+                    }
+                }))
                 .Done(c => c.ReplyReceived)
                 .Run();
 
@@ -82,34 +78,20 @@ create table if not exists ""public"".""{DataTableName}"" (
             }
 
             // Only needed to force SQL persistence to set up the synchronized storage session
-            public class TestSaga : SqlSaga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
+            public class TestSaga : Saga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
             {
-                public Task Handle(SagaMessage message, IMessageHandlerContext context)
-                {
-                    throw new NotImplementedException();
-                }
+                public Task Handle(SagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-                {
-                    mapper.ConfigureMapping<SagaMessage>(m => null);
-                }
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.TestRunId).ToMessage<SagaMessage>(m => m.Id);
 
-                protected override string CorrelationPropertyName => "TestRunId";
                 public class SagaData : ContainSagaData
                 {
                     public Guid TestRunId { get; set; }
                 }
             }
 
-            public class MyMessageHandler : IHandleMessages<MyMessage>
+            public class MyMessageHandler(Context testContext) : IHandleMessages<MyMessage>
             {
-                Context testContext;
-
-                public MyMessageHandler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public async Task Handle(MyMessage message, IMessageHandlerContext context)
                 {
                     if (message.Id != testContext.TestRunId)
@@ -140,22 +122,12 @@ create table if not exists ""public"".""{DataTableName}"" (
                     testContext.RecordCount = count;
                     testContext.InvocationCount++;
 
-                    await context.SendLocal(new ReplyMessage
-                    {
-                        Id = message.Id
-                    });
+                    await context.SendLocal(new ReplyMessage { Id = message.Id });
                 }
             }
 
-            public class Handler : IHandleMessages<ReplyMessage>
+            public class Handler(Context testContext) : IHandleMessages<ReplyMessage>
             {
-                Context testContext;
-
-                public Handler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public Task Handle(ReplyMessage message, IMessageHandlerContext context)
                 {
                     if (testContext.TestRunId == message.Id)
@@ -167,15 +139,8 @@ create table if not exists ""public"".""{DataTableName}"" (
                 }
             }
 
-            class BehaviorThatThrowsAfterFirstMessage : Behavior<IIncomingLogicalMessageContext>
+            class BehaviorThatThrowsAfterFirstMessage(Context testContext) : Behavior<IIncomingLogicalMessageContext>
             {
-                Context testContext;
-
-                public BehaviorThatThrowsAfterFirstMessage(Context context)
-                {
-                    testContext = context;
-                }
-
                 public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
                 {
                     await next();
@@ -188,17 +153,13 @@ create table if not exists ""public"".""{DataTableName}"" (
                     }
                 }
 
-                public class Registration : RegisterStep
-                {
-                    public Registration() : base("BehaviorThatThrowsAfterFirstMessage", typeof(BehaviorThatThrowsAfterFirstMessage), "BehaviorThatThrowsAfterFirstMessage")
-                    {
-                    }
-                }
+                public class Registration() : RegisterStep("BehaviorThatThrowsAfterFirstMessage", typeof(BehaviorThatThrowsAfterFirstMessage), "BehaviorThatThrowsAfterFirstMessage");
             }
         }
 
         public class SagaMessage : IMessage
         {
+            public Guid Id { get; set; }
         }
 
         public class MyMessage : IMessage

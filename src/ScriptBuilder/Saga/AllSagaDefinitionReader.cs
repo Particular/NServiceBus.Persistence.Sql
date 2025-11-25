@@ -4,15 +4,8 @@ using Mono.Cecil;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class AllSagaDefinitionReader
+class AllSagaDefinitionReader(ModuleDefinition module)
 {
-    readonly ModuleDefinition module;
-
-    public AllSagaDefinitionReader(ModuleDefinition module)
-    {
-        this.module = module;
-    }
-
     public IList<SagaDefinition> GetSagas(Action<string, string> logger = null)
     {
         var sagas = new List<SagaDefinition>();

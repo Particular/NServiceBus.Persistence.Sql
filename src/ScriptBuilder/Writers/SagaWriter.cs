@@ -3,21 +3,13 @@ using System.IO;
 using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SagaWriter : ScriptWriter
+class SagaWriter(bool clean,
+    bool overwrite,
+    string scriptPath,
+    ModuleDefinition moduleDefinition,
+    Action<string, string> logError = null)
+    : ScriptWriter(clean, overwrite, scriptPath)
 {
-    ModuleDefinition moduleDefinition;
-    Action<string, string> logError;
-    string sagaPath;
-
-    public SagaWriter(bool clean, bool overwrite, string scriptPath,
-        ModuleDefinition moduleDefinition, Action<string, string> logError = null)
-        : base(clean, overwrite, scriptPath)
-    {
-        this.moduleDefinition = moduleDefinition;
-        this.logError = logError;
-        this.sagaPath = Path.Combine(scriptPath, "Sagas");
-    }
-
     public override void WriteScripts(BuildSqlDialect dialect)
     {
         Directory.CreateDirectory(sagaPath);
@@ -42,4 +34,6 @@ class SagaWriter : ScriptWriter
             WriteScript(dropPath, writer => SagaScriptBuilder.BuildDropScript(saga, dialect, writer));
         }
     }
+
+    readonly string sagaPath = Path.Combine(scriptPath, "Sagas");
 }

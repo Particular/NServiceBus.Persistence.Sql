@@ -1,12 +1,7 @@
 ﻿using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class SubscriptionWriter : ScriptWriter
+class SubscriptionWriter(bool clean, bool overwrite, string scriptPath) : ScriptWriter(clean, overwrite, scriptPath)
 {
-    public SubscriptionWriter(bool clean, bool overwrite, string scriptPath)
-        : base(clean, overwrite, scriptPath)
-    {
-    }
-
     public override void WriteScripts(BuildSqlDialect dialect)
     {
         WriteScript("Subscription_Create.sql", writer => SubscriptionScriptBuilder.BuildCreateScript(writer, dialect));

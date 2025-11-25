@@ -6,7 +6,6 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NUnit.Framework;
 
@@ -20,14 +19,12 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
         {
             return;
         }
+
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
                 {
-                    var startSagaMessage = new StartSagaMessage
-                    {
-                        Property = "Test"
-                    };
+                    var startSagaMessage = new StartSagaMessage { Property = "Test" };
                     return session.SendLocal(startSagaMessage);
                 }))
             .Done(c => c.HandledOtherMessage)
@@ -44,20 +41,10 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class FindByStartSagaMessage(Context testContext) : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class FindByStartSagaMessage : ISagaFinder<TestSaga.SagaData, StartSagaMessage>
-        {
-            Context testContext;
-
-            public FindByStartSagaMessage(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(StartSagaMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.StartSagaFinderUsed = true;
@@ -75,24 +62,14 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class TestSaga(Context testContext) : Saga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context context)
-            {
-                testContext = context;
-            }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;
-                return context.SendLocal(new SomeOtherMessage
-                {
-                    Property = Data.Property
-                });
+                return context.SendLocal(new SomeOtherMessage { Property = Data.Property });
             }
 
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
@@ -101,16 +78,15 @@ public class When_starter_message_has_finder : NServiceBusAcceptanceTest
                 return Task.CompletedTask;
             }
 
-            protected override string CorrelationPropertyName => nameof(SagaData.Property);
-
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-            {
-                mapper.ConfigureMapping<SomeOtherMessage>(m => m.Property);
-            }
-
             public class SagaData : ContainSagaData
             {
                 public string Property { get; set; }
+            }
+
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+            {
+                mapper.ConfigureFinderMapping<StartSagaMessage, FindByStartSagaMessage>();
+                mapper.MapSaga(s => s.Property).ToMessage<SomeOtherMessage>(m => m.Property);
             }
         }
     }

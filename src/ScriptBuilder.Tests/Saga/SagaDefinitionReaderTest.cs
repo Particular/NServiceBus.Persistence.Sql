@@ -30,18 +30,14 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(exception.Message);
     }
 
-    public class WithGenericSaga<T> : SqlSaga<WithGenericSaga<T>.SagaData>
+    public class WithGenericSaga<T> : Saga<WithGenericSaga<T>.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
 
@@ -57,7 +53,7 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(exception.Message);
     }
 
-    abstract class AbstractSaga : SqlSaga<AbstractSaga.SagaData>
+    abstract class AbstractSaga : Saga<AbstractSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
@@ -75,7 +71,8 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class SimpleSaga : SqlSaga<SimpleSaga.SagaData>
+    [SqlSaga(correlationProperty: nameof(SagaData.Correlation), transitionalCorrelationProperty: nameof(SagaData.Transitional))]
+    public class SimpleSaga : Saga<SimpleSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
@@ -83,37 +80,7 @@ public class SagaDefinitionReaderTest : IDisposable
             public string Transitional { get; set; }
         }
 
-        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.Transitional);
-
-        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
-    }
-
-    [Test]
-    public void WithReadonlyProperty()
-    {
-        var sagaType = module.GetTypeDefinition<WithReadonlyPropertySaga>();
-        var exception = Assert.Throws<ErrorsException>(() =>
-        {
-            SagaDefinitionReader.TryGetSagaDefinition(sagaType, out _);
-        });
-        Assert.That(exception.Message, Is.Not.Null);
-        Approver.Verify(exception.Message);
-    }
-
-    public class WithReadonlyPropertySaga : SqlSaga<WithReadonlyPropertySaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-            public string Correlation { get; }
-        }
-
-        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
         {
         }
     }
@@ -127,18 +94,15 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class WithNoTransitionalCorrelationSaga : SqlSaga<WithNoTransitionalCorrelationSaga.SagaData>
+    [SqlSaga(correlationProperty: nameof(SagaData.Correlation))]
+    public class WithNoTransitionalCorrelationSaga : Saga<WithNoTransitionalCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
     [Test]
@@ -150,19 +114,15 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class TableSuffixSaga : SqlSaga<TableSuffixSaga.SagaData>
+    [SqlSaga(tableSuffix: "TheTableSuffix", correlationProperty: nameof(SagaData.Correlation))]
+    public class TableSuffixSaga : Saga<TableSuffixSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
             public string Correlation { get; set; }
         }
 
-        protected override string TableSuffix => "TheTableSuffix";
-        protected override string CorrelationPropertyName => nameof(SagaData.Correlation);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
     [Test]
@@ -174,45 +134,13 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class WithNoCorrelationSaga : SqlSaga<WithNoCorrelationSaga.SagaData>
+    public class WithNoCorrelationSaga : Saga<WithNoCorrelationSaga.SagaData>
     {
         public class SagaData : ContainSagaData
         {
         }
 
-        protected override string CorrelationPropertyName => null;
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
-    }
-
-    [Test]
-    public void WithStatementBodyProperty()
-    {
-        var sagaType = module.GetTypeDefinition<WithStatementBodyPropertySaga>();
-        SagaDefinitionReader.TryGetSagaDefinition(sagaType, out var definition);
-        Assert.That(definition, Is.Not.Null);
-        Approver.Verify(definition);
-    }
-
-    public class WithStatementBodyPropertySaga : SqlSaga<WithStatementBodyPropertySaga.SagaData>
-    {
-        public class SagaData : ContainSagaData
-        {
-        }
-
-        protected override string CorrelationPropertyName
-        {
-            //Explicitly not use expression body
-#pragma warning disable IDE0025 // Use expression body for properties
-            get { return null; }
-#pragma warning restore IDE0025 // Use expression body for properties
-        }
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
     [Test]
@@ -224,22 +152,19 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class SqlSagaWithDataBaseClass : SqlSaga<SqlSagaWithDataBaseClass.SagaData>
+    [SqlSaga(tableSuffix: "TheTableSuffix", correlationProperty: nameof(SagaData.MyId))]
+    public class SqlSagaWithDataBaseClass : Saga<SqlSagaWithDataBaseClass.SagaData>
     {
         public abstract class SagaDataBaseClass : ContainSagaData
         {
             public string MyId { get; set; }
         }
+
         public class SagaData : SagaDataBaseClass
         {
         }
 
-        protected override string TableSuffix => "TheTableSuffix";
-        protected override string CorrelationPropertyName => nameof(SagaData.MyId);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
     [Test]
@@ -251,26 +176,24 @@ public class SagaDefinitionReaderTest : IDisposable
         Approver.Verify(definition);
     }
 
-    public class SqlSagaWithTwoLevelsDeepDataBaseClass : SqlSaga<SqlSagaWithTwoLevelsDeepDataBaseClass.SagaData>
+    [SqlSaga(tableSuffix: "TheTableSuffix", correlationProperty: nameof(SagaData.MyId))]
+    public class SqlSagaWithTwoLevelsDeepDataBaseClass : Saga<SqlSagaWithTwoLevelsDeepDataBaseClass.SagaData>
     {
         public abstract class SagaDataBaseClassOne : ContainSagaData
         {
             public abstract string MyId { get; set; }
         }
+
         public class SagaDataBaseClassTwo : SagaDataBaseClassOne
         {
             public override string MyId { get; set; }
         }
+
         public class SagaData : SagaDataBaseClassTwo
         {
         }
 
-        protected override string TableSuffix => "TheTableSuffix";
-        protected override string CorrelationPropertyName => nameof(SagaData.MyId);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => throw new NotImplementedException();
     }
 
     [Test]
@@ -289,6 +212,7 @@ public class SagaDefinitionReaderTest : IDisposable
         {
             public string MyId { get; set; }
         }
+
         public class SagaData : SagaDataBaseClass
         {
         }

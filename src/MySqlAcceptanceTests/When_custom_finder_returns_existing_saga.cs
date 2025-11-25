@@ -7,7 +7,6 @@ using NServiceBus.AcceptanceTests;
 using NServiceBus.AcceptanceTests.EndpointTemplates;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
 using NUnit.Framework;
 
@@ -21,10 +20,7 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             .WithEndpoint<SagaEndpoint>(b => b
                 .When(session =>
                 {
-                    var startSagaMessage = new StartSagaMessage
-                    {
-                        Property = "Test"
-                    };
+                    var startSagaMessage = new StartSagaMessage { Property = "Test" };
                     return session.SendLocal(startSagaMessage);
                 }))
             .Done(c => c.HandledOtherMessage)
@@ -41,20 +37,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
 
     public class SagaEndpoint : EndpointConfigurationBuilder
     {
-        public SagaEndpoint()
+        public SagaEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class CustomFinder(Context testContext) : ISagaFinder<TestSaga.SagaData, SomeOtherMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class CustomFinder : ISagaFinder<TestSaga.SagaData, SomeOtherMessage>
-        {
-            Context testContext;
-
-            public CustomFinder(Context context)
-            {
-                testContext = context;
-            }
-
             public Task<TestSaga.SagaData> FindBy(SomeOtherMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
             {
                 testContext.FinderUsed = true;
@@ -72,23 +58,13 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
             }
         }
 
-        public class TestSaga : SqlSaga<TestSaga.SagaData>,
+        public class TestSaga(Context testContext) : Saga<TestSaga.SagaData>,
             IAmStartedByMessages<StartSagaMessage>,
             IHandleMessages<SomeOtherMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context context)
-            {
-                testContext = context;
-            }
-
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
-                var otherMessage = new SomeOtherMessage
-                {
-                    SagaId = Data.Id
-                };
+                var otherMessage = new SomeOtherMessage { SagaId = Data.Id };
                 return context.SendLocal(otherMessage);
             }
 
@@ -103,11 +79,10 @@ public class When_custom_finder_returns_existing_saga : NServiceBusAcceptanceTes
                 public string Property { get; set; }
             }
 
-            protected override string CorrelationPropertyName => nameof(SagaData.Property);
-
-            protected override void ConfigureMapping(IMessagePropertyMapper mapper)
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
             {
-                mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property);
+                mapper.MapSaga(s => s.Property).ToMessage<StartSagaMessage>(m => m.Property);
+                mapper.ConfigureFinderMapping<SomeOtherMessage, CustomFinder>();
             }
         }
     }

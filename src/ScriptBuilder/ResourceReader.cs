@@ -4,15 +4,13 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 static class ResourceReader
 {
-    static Assembly assembly = typeof(ResourceReader).GetTypeInfo().Assembly;
+    static readonly Assembly assembly = typeof(ResourceReader).GetTypeInfo().Assembly;
 
     public static string ReadResource(BuildSqlDialect sqlDialect, string prefix)
     {
         var text = $"NServiceBus.Persistence.Sql.ScriptBuilder.{prefix}_{sqlDialect}.sql";
-        using (var stream = assembly.GetManifestResourceStream(text))
-        using (var streamReader = new StreamReader(stream))
-        {
-            return streamReader.ReadToEnd();
-        }
+        using var stream = assembly.GetManifestResourceStream(text);
+        using var streamReader = new StreamReader(stream);
+        return streamReader.ReadToEnd();
     }
 }

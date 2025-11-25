@@ -58,6 +58,7 @@ public abstract class SagaPersisterTests
             {
                 yield return nestedType;
             }
+
             if (nestedType.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISagaFinder<,>)))
             {
                 yield return nestedType;
@@ -133,6 +134,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
+
             Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
@@ -188,6 +190,7 @@ public abstract class SagaPersisterTests
             {
                 exceptionMessage = exception.Message;
             }
+
             Assert.That(exceptionMessage, Is.Not.Null, "Expected ExecuteCommand to throw");
             Assert.That(exceptionMessage, Does.Contain("Incorrect data type for Correlation_"));
         }
@@ -277,7 +280,7 @@ public abstract class SagaPersisterTests
     }
 
     public class SagaWithWeirdCharactersಠ_ಠ :
-        SqlSaga<SagaWithWeirdCharactersಠ_ಠ.SagaData>,
+        Saga<SagaWithWeirdCharactersಠ_ಠ.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -286,17 +289,9 @@ public abstract class SagaPersisterTests
             public string Contentಠ_ಠ { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.SimplePropertyಠ_ಠ);
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
-        }
-
-        public Task Handle(AMessage message, IMessageHandlerContext context)
-        {
-            return Task.CompletedTask;
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.SimplePropertyಠ_ಠ).ToMessage<AMessage>(m => m.StringId);
     }
 
     public class AMessage : IMessage
@@ -548,8 +543,9 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [SqlSaga(tableSuffix: "SagaWith SpaceInName")]
     public class SagaWithSpaceInName :
-        SqlSaga<SagaWithSpaceInName.SagaData>,
+        Saga<SagaWithSpaceInName.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -557,19 +553,8 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.SimpleProperty);
-
-        protected override string TableSuffix => "SagaWith SpaceInName";
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
-        }
-
-        public Task Handle(AMessage message, IMessageHandlerContext context)
-        {
-            return Task.CompletedTask;
-        }
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.SimpleProperty).ToMessage<AMessage>(m => m.StringId);
     }
 
     [Test]
@@ -775,10 +760,12 @@ public abstract class SagaPersisterTests
                     {
                         return false;
                     }
+
                     if (!reader.Read())
                     {
                         return false;
                     }
+
                     return reader.GetInt32(0) > 0;
                 }
             }
@@ -878,8 +865,9 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [SqlSaga(transitionalCorrelationProperty: nameof(SagaData.TransitionalCorrelationProperty))]
     public class CorrAndTransitionalSaga :
-        SqlSaga<CorrAndTransitionalSaga.SagaData>,
+        Saga<CorrAndTransitionalSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -889,22 +877,12 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
-        protected override string TransitionalCorrelationPropertyName => nameof(SagaData.TransitionalCorrelationProperty);
-
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
-        }
-
-        public Task Handle(AMessage message, IMessageHandlerContext context)
-        {
-            return Task.CompletedTask;
-        }
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.CorrelationProperty).ToMessage<AMessage>(m => m.StringId);
     }
 
     public class SagaWithCorrelation :
-        SqlSaga<SagaWithCorrelation.SagaData>,
+        Saga<SagaWithCorrelation.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -913,27 +891,17 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.CorrelationProperty).ToMessage<AMessage>(m => m.StringId);
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
-        }
-
-        public Task Handle(AMessage message, IMessageHandlerContext context)
-        {
-            return Task.CompletedTask;
-        }
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
     }
 
     [Test]
     [Explicit]
     public void TransitionId()
     {
-        using (var connection = dbConnection())
-        {
-            TransitionIdInner(connection);
-        }
+        using var connection = dbConnection();
+        TransitionIdInner(connection);
     }
 
     void TransitionIdInner(DbConnection connection)
@@ -1024,7 +992,7 @@ public abstract class SagaPersisterTests
     }
 
     public class SagaWithStringCorrelation :
-        SqlSaga<SagaWithStringCorrelation.SagaData>,
+        Saga<SagaWithStringCorrelation.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -1032,17 +1000,9 @@ public abstract class SagaPersisterTests
             public string CorrelationProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.CorrelationProperty).ToMessage<AMessage>(m => m.StringId);
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.StringId);
-        }
-
-        public Task Handle(AMessage message, IMessageHandlerContext context)
-        {
-            return Task.CompletedTask;
-        }
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
     }
 
     [Test]
@@ -1088,7 +1048,7 @@ public abstract class SagaPersisterTests
     }
 
     public class NonStringCorrelationSaga :
-        SqlSaga<NonStringCorrelationSaga.SagaData>,
+        Saga<NonStringCorrelationSaga.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -1096,12 +1056,8 @@ public abstract class SagaPersisterTests
             public int CorrelationProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName => nameof(SagaData.CorrelationProperty);
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.CorrelationProperty).ToMessage<AMessage>(m => m.IntId);
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-            mapper.ConfigureMapping<AMessage>(_ => _.IntId);
-        }
 
         public Task Handle(AMessage message, IMessageHandlerContext context)
         {
@@ -1205,7 +1161,7 @@ public abstract class SagaPersisterTests
     }
 
     public class SagaWithNoCorrelation :
-        SqlSaga<SagaWithNoCorrelation.SagaData>,
+        Saga<SagaWithNoCorrelation.SagaData>,
         IAmStartedByMessages<AMessage>
     {
         public class SagaData : ContainSagaData
@@ -1213,15 +1169,13 @@ public abstract class SagaPersisterTests
             public string SimpleProperty { get; set; }
         }
 
-        protected override string CorrelationPropertyName { get; }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.ConfigureFinderMapping<AMessage, CustomFinder>();
 
-        protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-        {
-        }
+        public Task Handle(AMessage message, IMessageHandlerContext context) => Task.CompletedTask;
 
-        public Task Handle(AMessage message, IMessageHandlerContext context)
+        public class CustomFinder : ISagaFinder<SagaData, AMessage>
         {
-            return Task.CompletedTask;
+            public Task<SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
         }
     }
 
@@ -1272,11 +1226,6 @@ public abstract class SagaPersisterTests
             var result = (await schemaPersister.Get<SagaWithNoCorrelation.SagaData>(id, storageSession).ConfigureAwait(false)).Data;
             Assert.That(result, Is.Null);
         }
-    }
-
-    public class CustomFinder : ISagaFinder<SagaWithNoCorrelation.SagaData, AMessage>
-    {
-        public Task<SagaWithNoCorrelation.SagaData> FindBy(AMessage message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => null;
     }
 
     protected abstract bool IsConcurrencyException(Exception innerException);

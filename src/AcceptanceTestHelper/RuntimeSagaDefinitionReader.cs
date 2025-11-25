@@ -2,111 +2,68 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Mono.Cecil;
-using NServiceBus;
-using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
+using NServiceBus.Sagas;
 using NServiceBus.Settings;
+using static TestTableNameCleaner;
 
 public static class RuntimeSagaDefinitionReader
 {
-    static MethodInfo methodInfo = typeof(Saga).GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance);
-    const BindingFlags AnyInstanceMember = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
-        var sagaTypes = settings.Get<IList<Type>>("TypesToScan")
-            .Where(type => !type.IsAbstract && typeof(Saga).IsAssignableFrom(type)).ToArray();
+        var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? new SagaMetadataCollection();
 
-        if (!sagaTypes.Any())
+        if (!sagaMetadataCollection.Any())
         {
-            return Enumerable.Empty<SagaDefinition>();
+            return [];
         }
-        var sagaAssembly = sagaTypes.First().Assembly;
-        //Validate the saga definitions using script builder compile-time validation
-        using (var moduleDefinition = ModuleDefinition.ReadModule(sagaAssembly.Location, new ReaderParameters(ReadingMode.Deferred)))
-        {
-            var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
-            compileTimeReader.GetSagas();
-        }
-        return sagaTypes.Select(sagaType => GetSagaDefinition(sagaType, sqlDialect));
+
+        var sagaDefinitions = GetSagaDefinitions(sagaMetadataCollection.Select(m => m.SagaType.Assembly).Distinct());
+
+        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect));
     }
 
     public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
     {
-        if (SagaTypeHasIntermediateBaseClass(sagaType))
+        var sagaDefinitions = GetSagaDefinitions([sagaType.Assembly]);
+        var metadata = SagaMetadata.Create(sagaType);
+
+        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect);
+    }
+
+    static Dictionary<string, SagaDefinition> GetSagaDefinitions(IEnumerable<Assembly> sagaAssemblies)
+    {
+        var sagaDefinitions = new List<SagaDefinition>();
+        foreach (var assembly in sagaAssemblies)
         {
-            throw new Exception("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported.");
+            //Validate the saga definitions using script builder compile-time validation
+            using var moduleDefinition = ModuleDefinition.ReadModule(assembly.Location, new ReaderParameters(ReadingMode.Deferred));
+            var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
+            sagaDefinitions.AddRange(compileTimeReader.GetSagas());
         }
 
-        var saga = (Saga)RuntimeHelpers.GetUninitializedObject(sagaType);
-        var mapper = new ConfigureHowToFindSagaWithMessage();
-        methodInfo.Invoke(saga, new object[]
+        var definitions = sagaDefinitions.ToDictionary(static s => s.Name.Replace("/", "+"), static s => s);
+        return definitions;
+    }
+
+    static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, BuildSqlDialect sqlDialect)
+    {
+        if (!definitions.TryGetValue(sagaType.FullName!, out var sagaDefinition))
         {
-            mapper
-        });
-        CorrelationProperty correlationProperty = null;
-        if (mapper.CorrelationType != null)
-        {
-            correlationProperty = new CorrelationProperty(
-                name: mapper.CorrelationProperty,
-                type: CorrelationPropertyTypeReader.GetCorrelationPropertyType(mapper.CorrelationType));
+            throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
         }
 
-        var transitionalCorrelationPropertyName = GetSagaMetadataProperty(sagaType, saga, "TransitionalCorrelationPropertyName", att => att.TransitionalCorrelationProperty);
-
-        CorrelationProperty transitional = null;
-        if (transitionalCorrelationPropertyName != null)
-        {
-            var sagaDataType = sagaType.BaseType.GetGenericArguments()[0];
-            var transitionalProperty = sagaDataType.GetProperty(transitionalCorrelationPropertyName, AnyInstanceMember);
-            transitional = new CorrelationProperty(transitionalCorrelationPropertyName, CorrelationPropertyTypeReader.GetCorrelationPropertyType(transitionalProperty.PropertyType));
-        }
-
-        var tableSuffixOverride = GetSagaMetadataProperty(sagaType, saga, "TableSuffix", att => att.TableSuffix);
-        var tableSuffix = tableSuffixOverride ?? sagaType.Name;
-
+        var tableSuffix = sagaDefinition.TableSuffix;
         if (sqlDialect == BuildSqlDialect.Oracle)
         {
-            tableSuffix = tableSuffix.Substring(0, Math.Min(27, tableSuffix.Length));
+            tableSuffix = sagaDefinition.TableSuffix[..Math.Min(27, sagaDefinition.TableSuffix.Length)];
         }
 
         return new SagaDefinition(
             tableSuffix: tableSuffix,
             name: sagaType.FullName,
-            correlationProperty: correlationProperty,
-            transitionalCorrelationProperty: transitional);
-    }
-
-    static bool SagaTypeHasIntermediateBaseClass(Type sagaType)
-    {
-        var baseType = sagaType.BaseType;
-        if (!baseType.IsGenericType)
-        {
-            // Saga<T> and SqlSaga<T> are both generic types
-            return true;
-        }
-
-        var genericBase = baseType.GetGenericTypeDefinition();
-        return genericBase != typeof(Saga<>) && genericBase != typeof(SqlSaga<>);
-    }
-
-    static string GetSagaMetadataProperty(Type sagaType, Saga instance, string sqlSagaPropertyName, Func<SqlSagaAttribute, string> getSqlSagaAttributeValue)
-    {
-        if (sagaType.IsSubclassOfRawGeneric(typeof(SqlSaga<>)))
-        {
-            return (string)sagaType
-                .GetProperty(sqlSagaPropertyName, AnyInstanceMember)
-                .GetValue(instance);
-        }
-
-        if (sagaType.IsSubclassOfRawGeneric(typeof(Saga<>)))
-        {
-            var attr = sagaType.GetCustomAttribute<SqlSagaAttribute>();
-            return (attr != null) ? getSqlSagaAttributeValue(attr) : null;
-        }
-
-        throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
+            correlationProperty: sagaDefinition.CorrelationProperty,
+            transitionalCorrelationProperty: sagaDefinition.TransitionalCorrelationProperty);
     }
 }

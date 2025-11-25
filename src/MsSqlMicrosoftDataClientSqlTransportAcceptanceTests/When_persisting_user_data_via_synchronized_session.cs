@@ -43,18 +43,14 @@ end";
             }
 
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(
-                    b => b.When((session, ctx) => session.SendLocal(new MyMessage()
+                .WithEndpoint<Endpoint>(b => b.When((session, ctx) => session.SendLocal(new MyMessage() { Id = ctx.TestRunId })).DoNotFailOnErrorMessages().CustomConfig(c =>
+                {
+                    c.ConfigureTransport().TransportTransactionMode = transactionMode;
+                    if (enableOutbox)
                     {
-                        Id = ctx.TestRunId
-                    })).DoNotFailOnErrorMessages().CustomConfig(c =>
-                    {
-                        c.ConfigureTransport().TransportTransactionMode = transactionMode;
-                        if (enableOutbox)
-                        {
-                            c.EnableOutbox();
-                        }
-                    }))
+                        c.EnableOutbox();
+                    }
+                }))
                 .Done(c => c.ReplyReceived)
                 .Run();
 
@@ -91,34 +87,20 @@ end";
             }
 
             // Only needed to force SQL persistence to set up the synchronized storage session
-            public class TestSaga : SqlSaga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
+            public class TestSaga : Saga<TestSaga.SagaData>, IAmStartedByMessages<SagaMessage>
             {
-                public Task Handle(SagaMessage message, IMessageHandlerContext context)
-                {
-                    throw new NotImplementedException();
-                }
+                public Task Handle(SagaMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-                protected override void ConfigureMapping(IMessagePropertyMapper mapper)
-                {
-                    mapper.ConfigureMapping<SagaMessage>(m => null);
-                }
-
-                protected override string CorrelationPropertyName => "TestRunId";
                 public class SagaData : ContainSagaData
                 {
                     public Guid TestRunId { get; set; }
                 }
+
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.TestRunId).ToMessage<SagaMessage>(m => m.Id);
             }
 
-            public class MyMessageHandler : IHandleMessages<MyMessage>
+            public class MyMessageHandler(Context testContext) : IHandleMessages<MyMessage>
             {
-                Context testContext;
-
-                public MyMessageHandler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public async Task Handle(MyMessage message, IMessageHandlerContext context)
                 {
                     if (message.Id != testContext.TestRunId)
@@ -149,22 +131,12 @@ end";
                     testContext.RecordCount = count;
                     testContext.InvocationCount++;
 
-                    await context.SendLocal(new ReplyMessage
-                    {
-                        Id = message.Id
-                    });
+                    await context.SendLocal(new ReplyMessage { Id = message.Id });
                 }
             }
 
-            public class Handler : IHandleMessages<ReplyMessage>
+            public class Handler(Context testContext) : IHandleMessages<ReplyMessage>
             {
-                Context testContext;
-
-                public Handler(Context context)
-                {
-                    testContext = context;
-                }
-
                 public Task Handle(ReplyMessage message, IMessageHandlerContext context)
                 {
                     if (testContext.TestRunId == message.Id)
@@ -208,6 +180,7 @@ end";
 
         public class SagaMessage : IMessage
         {
+            public Guid Id { get; set; }
         }
 
         public class MyMessage : IMessage
