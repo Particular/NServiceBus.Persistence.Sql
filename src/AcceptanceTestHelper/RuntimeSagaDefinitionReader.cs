@@ -54,14 +54,16 @@ public static class RuntimeSagaDefinitionReader
             throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
         }
 
-        var tableSuffix = sqlDialect == BuildSqlDialect.Oracle ?
-            Clean(sagaDefinition.TableSuffix, maxLength: 27) : sagaDefinition.TableSuffix;
+        var tableSuffix = sagaDefinition.TableSuffix;
+        if (sqlDialect == BuildSqlDialect.Oracle)
+        {
+            tableSuffix = sagaDefinition.TableSuffix[..Math.Min(27, sagaDefinition.TableSuffix.Length)];
+        }
 
         return new SagaDefinition(
             tableSuffix: tableSuffix,
             name: sagaType.FullName,
             correlationProperty: sagaDefinition.CorrelationProperty,
             transitionalCorrelationProperty: sagaDefinition.TransitionalCorrelationProperty);
-
     }
 }
