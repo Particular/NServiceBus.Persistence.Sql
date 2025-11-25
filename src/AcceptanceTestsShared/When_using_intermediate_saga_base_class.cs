@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting;
 using NServiceBus.AcceptanceTests;
@@ -10,72 +9,57 @@ using NUnit.Framework;
 public class When_using_intermediate_saga_base_class : NServiceBusAcceptanceTest
 {
     [Test]
-    public void Ensure_Core_Saga_will_throw()
+    public async Task Should_work()
     {
-        PerformTestOn<CoreSagaBaseClassEndpoint>();
-    }
+        var context = await Scenario.Define<Context>()
+            .WithEndpoint<CoreSagaBaseClassEndpoint>(c => { c.When(session => session.SendLocal(new StartSaga { Correlation = "Corr" })); })
+            .Done(c => c.Received)
+            .Run();
 
-    void PerformTestOn<TEndpointSelection>()
-        where TEndpointSelection : EndpointConfigurationBuilder, new()
-    {
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-        {
-            await Scenario.Define<Context>()
-                .WithEndpoint<TEndpointSelection>(c => { c.When(session => session.SendLocal(new StartSaga { Correlation = "Corr" })); })
-                .Done(c => c.EndpointsStarted)
-                .Run();
-        });
-
-        Assert.That(ex.Message, Is.EqualTo("Saga implementations must inherit from either Saga<T> or SqlSaga<T> directly. Deep class hierarchies are not supported."));
+        Assert.That(context.Received, Is.True);
     }
 
     public class Context : ScenarioContext
     {
+        public bool Received { get; set; }
     }
 
     public class CoreSagaBaseClassEndpoint : EndpointConfigurationBuilder
     {
-        public CoreSagaBaseClassEndpoint()
-        {
+        public CoreSagaBaseClassEndpoint() =>
             EndpointSetup<DefaultServer>(c =>
             {
                 c.Sagas().DisableBestPracticeValidation();
             });
+
+        public class CoreSagaWithBase(Context testContext) : BaseSaga
+        {
+            public override Task Handle(StartSaga message, IMessageHandlerContext context)
+            {
+                Data.Correlation = message.Correlation;
+                testContext.Received = true;
+                return Task.CompletedTask;
+            }
         }
 
-        public class CoreSagaWithBase : BaseSaga
+        public class BaseSaga : Saga<BaseSaga.SagaData>,
+            IAmStartedByMessages<StartSaga>
         {
             public class SagaData : ContainSagaData
             {
                 public string Correlation { get; set; }
             }
 
-            public override Task Handle(StartSaga message, IMessageHandlerContext context)
-            {
-                return Task.CompletedTask;
-            }
+            protected sealed override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) =>
+                mapper.MapSaga(s => s.Correlation)
+                    .ToMessage<StartSaga>(s => s.Correlation);
+
+            public virtual Task Handle(StartSaga message, IMessageHandlerContext context) => Task.CompletedTask;
         }
-
-        public class BaseSaga : Saga<CoreSagaWithBase.SagaData>,
-            IAmStartedByMessages<StartSaga>
-        {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CoreSagaWithBase.SagaData> mapper)
-            {
-                mapper.ConfigureMapping<StartSaga>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-            }
-
-
-            public virtual Task Handle(StartSaga message, IMessageHandlerContext context)
-            {
-                return Task.CompletedTask;
-            }
-        }
-
     }
 
     public class StartSaga : ICommand
     {
         public string Correlation { get; set; }
     }
-
 }
