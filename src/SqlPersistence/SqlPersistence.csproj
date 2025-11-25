@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Analyzer">
-    <None Include="..\NServiceBus.Persistence.Sql.Analyzer\bin\$(Configuration)\netstandard2.1\NServiceBus.Persistence.Sql.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs/NServiceBus.Persistence.Sql.Analyzer.dll" Visible="false" />
+    <None Include="..\NServiceBus.Persistence.Sql.Analyzer\bin\$(Configuration)\netstandard2.0\NServiceBus.Persistence.Sql.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs/NServiceBus.Persistence.Sql.Analyzer.dll" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

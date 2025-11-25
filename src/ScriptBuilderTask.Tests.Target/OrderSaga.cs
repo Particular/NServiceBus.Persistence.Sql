@@ -8,7 +8,6 @@ public class OrderSaga :
 {
     protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.OrderId).ToMessage<StartOrder>(m => m.OrderId);
 
-
     public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
 
     public class SagaData :
@@ -16,4 +15,6 @@ public class OrderSaga :
     {
         public Guid OrderId { get; set; }
     }
+
+
 }

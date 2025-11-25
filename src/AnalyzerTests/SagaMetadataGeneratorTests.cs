@@ -8,9 +8,20 @@ using NUnit.Framework;
 public class SagaMetadataGeneratorTests
 {
     [Test]
-    public void BasicSaga()
+    [TestCase("string")]
+    [TestCase("long")]
+    [TestCase("ulong")]
+    [TestCase("int")]
+    [TestCase("uint")]
+    [TestCase("short")]
+    [TestCase("ushort")]
+    [TestCase("Guid")]
+
+    public void BasicSaga(string correlationType)
     {
+        var usingSystem = correlationType == "Guid" ? "using System;" : "";
         var code = $$"""
+                   {{usingSystem}}
                    using System.Threading.Tasks;
                    using NServiceBus;
                    
@@ -25,13 +36,14 @@ public class SagaMetadataGeneratorTests
                    }
                    public class OrderSagaData : ContainSagaData
                    {
-                       public string OrderId { get; set; }
+                       public {{correlationType}} OrderId { get; set; }
                    }
-                   public record class StartOrder(string OrderId);
+                   public record class StartOrder({{correlationType}} OrderId);
                    """;
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .WithScenarioName(correlationType)
             .WithGeneratorStages("Candidates", "Collected")
             .Approve()
             .AssertRunsAreEqual();
