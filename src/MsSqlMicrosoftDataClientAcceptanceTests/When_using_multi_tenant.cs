@@ -49,7 +49,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     [Test]
     public async Task Should_throw_if_no_tenant_id()
     {
-
         var context = await Scenario.Define<Context>()
             .WithEndpoint<MultiTenantHandlerEndpoint>(b =>
             {
@@ -280,7 +279,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
         public class TestSaga(Context testContext) : Saga<TestSaga.TestSagaData>,
             IAmStartedByMessages<TestMessage>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper) => mapper.MapSaga(s=>s.TenantId).ToMessage<TestMessage>(msg => msg.TenantId);
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper) => mapper.MapSaga(s => s.TenantId).ToMessage<TestMessage>(msg => msg.TenantId);
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
@@ -310,5 +309,4 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         public string TenantId { get; set; }
     }
-
 }
