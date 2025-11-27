@@ -23,104 +23,52 @@ public partial class CoreSagaMetadataTests
     public void TearDown() => module.Dispose();
 
     [Test]
-    public void SingleMapping()
-    {
-        TestSagaDefinition<SingleMappingSaga>();
-    }
+    public void SingleMapping() => TestSagaDefinition<SingleMappingSaga>();
 
     [Test]
-    public void SingleMappingValueType()
-    {
-        TestSagaDefinition<SingleMappingValueTypeSaga>();
-    }
+    public void SingleMappingValueType() => TestSagaDefinition<SingleMappingValueTypeSaga>();
 
     [Test]
-    public void DualMapping()
-    {
-        TestSagaDefinition<DualMappingSaga>();
-    }
+    public void DualMapping() => TestSagaDefinition<DualMappingSaga>();
 
     [Test]
-    public void DontMapWithIntermediateBase()
-    {
+    public void DontMapWithIntermediateBase() =>
         // Won't map to a saga definition (result will be null) but won't throw either.
         // Behavior is the same as SqlSaga. Throw will occur at runtime.
         TestSagaDefinition<HasBaseSagaClass>();
-    }
 
     [Test]
-    public void DontAllowMethodCallInMapping()
-    {
-        TestSagaDefinition<MethodCallInMappingSaga>();
-    }
+    public void DontAllowMethodCallInMapping() => TestSagaDefinition<MethodCallInMappingSaga>();
 
     [Test]
-    public void DontAllowPassingMapper()
-    {
-        TestSagaDefinition<PassingMapperSaga>();
-
-    }
+    public void DontAllowPassingMapper() => TestSagaDefinition<PassingMapperSaga>();
 
     [Test]
-    public void DontMapConflictingCorrelationIds()
-    {
-        TestSagaDefinition<ConflictingCorrelationSaga>();
-    }
+    public void DontMapSwitchingLogic() => TestSagaDefinition<SwitchingLogicSaga>();
 
     [Test]
-    public void DontMapSwitchingLogic()
-    {
-        TestSagaDefinition<SwitchingLogicSaga>();
-
-    }
+    public void DontMapDelegateCalls() => TestSagaDefinition<DelegateCallingSaga>();
 
     [Test]
-    public void DontMapDelegateCalls()
-    {
-        TestSagaDefinition<DelegateCallingSaga>();
-    }
+    public void DontAllowForLoop() => TestSagaDefinition<ForLoopSaga>();
 
     [Test]
-    public void DontAllowForLoop()
-    {
-        TestSagaDefinition<ForLoopSaga>();
-    }
+    public void DontAllowWhileLoop() => TestSagaDefinition<WhileLoopSaga>();
 
     [Test]
-    public void DontAllowWhileLoop()
-    {
-        TestSagaDefinition<WhileLoopSaga>();
-    }
+    public void AllowConcatenatingMsgProperties() => TestSagaDefinition<ConcatMsgPropertiesSaga>();
 
     [Test]
-    public void AllowConcatenatingMsgProperties()
-    {
-        TestSagaDefinition<ConcatMsgPropertiesSaga>();
-    }
+    public void AllowConcatenatingMsgPropertiesWithFormat() => TestSagaDefinition<ConcatMsgPropertiesWithFormatSaga>();
 
     [Test]
-    public void AllowConcatenatingMsgPropertiesWithFormat()
-    {
-        TestSagaDefinition<ConcatMsgPropertiesWithFormatSaga>();
-    }
+    public void AllowConcatenatingMsgPropertiesWithInterpolation() => TestSagaDefinition<ConcatMsgPropertiesWithInterpolationSaga>();
 
     [Test]
-    public void AllowConcatenatingMsgPropertiesWithInterpolation()
-    {
-        TestSagaDefinition<ConcatMsgPropertiesWithInterpolationSaga>();
-    }
+    public void AllowConcatenatingMsgPropertiesWithOtherMethods() => TestSagaDefinition<ConcatMsgPropertiesWithOtherMethods>();
 
     [Test]
-    public void AllowConcatenatingMsgPropertiesWithOtherMethods()
-    {
-        TestSagaDefinition<ConcatMsgPropertiesWithOtherMethods>();
-    }
-
-    [Test]
-    public void SupplyAdditionalMetadataViaAttribute()
-    {
-        TestSagaDefinition<MetadataInAttributeSaga>();
-    }
+    public void SupplyAdditionalMetadataViaAttribute() => TestSagaDefinition<MetadataInAttributeSaga>();
 
     [Test]
     public void TestSagaInVB()
@@ -132,22 +80,13 @@ public partial class CoreSagaMetadataTests
     }
 
     [Test]
-    public void TestReverseMapping()
-    {
-        TestSagaDefinition<ReverseMappingSaga>();
-    }
+    public void TestReverseMapping() => TestSagaDefinition<ReverseMappingSaga>();
 
     [Test]
-    public void TestHeaderMapping()
-    {
-        TestSagaDefinition<HeaderMappingSaga>();
-    }
+    public void TestHeaderMapping() => TestSagaDefinition<HeaderMappingSaga>();
 
     [Test]
-    public void TestReverseHeaderMapping()
-    {
-        TestSagaDefinition<ReverseHeaderMappingSaga>();
-    }
+    public void TestReverseHeaderMapping() => TestSagaDefinition<ReverseHeaderMappingSaga>();
 
     void TestSagaDefinition<TSagaType>(ModuleDefinition moduleToUse = null, [CallerMemberName] string callerMemberName = null)
     {
