@@ -9,20 +9,8 @@ public partial class CoreSagaMetadataTests
             public string Correlation { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
-        {
-            PassTheMapper(mapper);
-        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => PassTheMapper(mapper);
 
-        static void PassTheMapper(SagaPropertyMapper<SagaData> mapper)
-        {
-            mapper.ConfigureMapping<MessageA>(msg => msg.Correlation).ToSaga(saga => saga.Correlation);
-        }
+        static void PassTheMapper(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.Correlation).ToMessage<MessageA>(msg => msg.Correlation);
     }
 }
-/* IL:
-PassingMapperSaga.ConfigureHowToFindSaga:
-IL_0000:  ldarg.1
-IL_0001:  call        UserQuery+PassingMapperSaga.PassTheMapper
-IL_0006:  ret
-*/

@@ -23,7 +23,7 @@
             });
 
             Supports<StorageType.Outbox, SqlOutboxFeature>();
-            Supports<StorageType.Sagas, SqlSagaFeature>();
+            Supports<StorageType.Sagas, SqlSagaFeature>(new StorageType.SagasOptions { SupportsFinders = true });
             Supports<StorageType.Subscriptions, SqlSubscriptionFeature>();
         }
 

@@ -217,7 +217,7 @@ public class SagaDefinitionReaderTest : IDisposable
         {
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.ConfigureMapping<AMessage>(m => m.MyId).ToSaga(s => s.MyId);
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) => mapper.MapSaga(s => s.MyId).ToMessage<AMessage>(m => m.MyId);
     }
 
     class AMessage

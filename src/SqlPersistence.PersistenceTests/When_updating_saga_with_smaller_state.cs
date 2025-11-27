@@ -67,15 +67,9 @@
 
         public class SagaWithCorrelationProperty : Saga<SagaWithCorrelationPropertyData>, IAmStartedByMessages<StartMessage>
         {
-            public Task Handle(StartMessage message, IMessageHandlerContext context)
-            {
-                throw new NotImplementedException();
-            }
+            public Task Handle(StartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithCorrelationPropertyData> mapper)
-            {
-                mapper.ConfigureMapping<StartMessage>(msg => msg.SomeId).ToSaga(saga => saga.CorrelatedProperty);
-            }
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithCorrelationPropertyData> mapper) => mapper.MapSaga(s => s.CorrelatedProperty).ToMessage<StartMessage>(msg => msg.SomeId);
         }
 
         public class SagaWithCorrelationPropertyData : ContainSagaData

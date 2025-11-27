@@ -49,7 +49,6 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     [Test]
     public async Task Should_throw_if_no_tenant_id()
     {
-
         var context = await Scenario.Define<Context>()
             .WithEndpoint<MultiTenantHandlerEndpoint>(b =>
             {
@@ -250,20 +249,10 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
     public class MultiTenantHandlerEndpoint : EndpointConfigurationBuilder
     {
-        public MultiTenantHandlerEndpoint()
+        public MultiTenantHandlerEndpoint() => EndpointSetup<DefaultServer>();
+
+        public class TestHandler(Context testContext) : IHandleMessages<TestMessage>
         {
-            EndpointSetup<DefaultServer>();
-        }
-
-        public class TestHandler : IHandleMessages<TestMessage>
-        {
-            Context testContext;
-
-            public TestHandler(Context testContext)
-            {
-                this.testContext = testContext;
-            }
-
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 var session = context.SynchronizedStorageSession.SqlPersistenceSession();
@@ -285,25 +274,12 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
 
     public class MultiTenantSagaEndpoint : EndpointConfigurationBuilder
     {
-        public MultiTenantSagaEndpoint()
-        {
-            EndpointSetup<DefaultServer>();
-        }
+        public MultiTenantSagaEndpoint() => EndpointSetup<DefaultServer>();
 
-        public class TestSaga : Saga<TestSaga.TestSagaData>,
+        public class TestSaga(Context testContext) : Saga<TestSaga.TestSagaData>,
             IAmStartedByMessages<TestMessage>
         {
-            Context testContext;
-
-            public TestSaga(Context testContext)
-            {
-                this.testContext = testContext;
-            }
-
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
-            {
-                mapper.ConfigureMapping<TestMessage>(msg => msg.TenantId).ToSaga(saga => saga.TenantId);
-            }
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper) => mapper.MapSaga(s => s.TenantId).ToMessage<TestMessage>(msg => msg.TenantId);
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
@@ -333,5 +309,4 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     {
         public string TenantId { get; set; }
     }
-
 }
