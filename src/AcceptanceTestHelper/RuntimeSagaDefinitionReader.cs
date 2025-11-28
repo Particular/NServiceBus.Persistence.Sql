@@ -12,7 +12,7 @@ public static class RuntimeSagaDefinitionReader
 {
     public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
     {
-        var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? new SagaMetadataCollection();
+        var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? [];
 
         if (!sagaMetadataCollection.Any())
         {
