@@ -36,7 +36,7 @@ public abstract class SagaPersisterTests
         var runtimeSqlDialect = sqlDialect.Convert(theSchema);
 
         var sagaMetadataCollection = new SagaMetadataCollection();
-        sagaMetadataCollection.Initialize(GetSagasAndFinders());
+        sagaMetadataCollection.AddRange(SagaMetadata.CreateMany(GetSagasAndFinders()));
 
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
