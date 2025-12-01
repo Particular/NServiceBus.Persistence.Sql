@@ -25,4 +25,8 @@
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
   </ItemGroup>
 
+  <ItemGroup Label="Local source generator">
+    <ProjectReference Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
