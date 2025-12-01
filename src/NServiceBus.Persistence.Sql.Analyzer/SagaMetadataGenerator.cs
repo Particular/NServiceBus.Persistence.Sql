@@ -112,7 +112,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             }
         }
 
-        return new SagaDetails(sagaType.Name, correlation, transitionalCorrelation, tableSuffix);
+        return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
     }
 
     static INamedTypeSymbol? GetSagaDataType(INamedTypeSymbol sagaType)
