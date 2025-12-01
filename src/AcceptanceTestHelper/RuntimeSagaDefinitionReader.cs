@@ -48,7 +48,7 @@ public static class RuntimeSagaDefinitionReader
 
     static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, BuildSqlDialect sqlDialect)
     {
-        if (!definitions.TryGetValue(sagaType.FullName!, out var sagaDefinition))
+        if (!definitions.TryGetValue(sagaType.FullName!.Replace('+', '.'), out var sagaDefinition))
         {
             throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
         }
