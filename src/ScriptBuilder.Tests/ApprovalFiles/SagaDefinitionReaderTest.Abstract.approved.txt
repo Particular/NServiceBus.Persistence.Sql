@@ -1,1 +1,0 @@
-﻿The type 'SagaDefinitionReaderTest/AbstractSaga' is abstract.

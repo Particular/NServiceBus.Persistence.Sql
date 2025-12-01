@@ -6,6 +6,18 @@ using Mono.Collections.Generic;
 
 public class CustomAttributeMock : ICustomAttribute
 {
+    static CustomAttributeMock()
+    {
+        var path = new Uri(typeof(string).Assembly.Location).LocalPath;
+        var parameters = new ReaderParameters(ReadingMode.Immediate)
+        {
+            ReadWrite = false
+        };
+        MsCoreLib = ModuleDefinition.ReadModule(path, parameters);
+    }
+
+    static readonly ModuleDefinition MsCoreLib;
+
     public CustomAttributeMock(Dictionary<string, object> dictionary) => Properties = [.. BuildProperties(dictionary).ToArray()];
 
     IEnumerable<CustomAttributeNamedArgument> BuildProperties(Dictionary<string, object> objects)
@@ -17,11 +29,11 @@ public class CustomAttributeMock : ICustomAttribute
     {
         if (value is string)
         {
-            return CecilTestExtensions.MsCoreLib.TypeSystem.String;
+            return MsCoreLib.TypeSystem.String;
         }
         if (value is bool)
         {
-            return CecilTestExtensions.MsCoreLib.TypeSystem.Boolean;
+            return MsCoreLib.TypeSystem.Boolean;
         }
         throw new Exception();
     }

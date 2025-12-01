@@ -1,9 +1,0 @@
-{
-  "TableSuffix": "TheTableSuffix",
-  "CorrelationProperty": {
-    "Type": "String",
-    "Name": "MyId"
-  },
-  "TransitionalCorrelationProperty": null,
-  "Name": "SagaDefinitionReaderTest/SqlSagaWithTwoLevelsDeepDataBaseClass"
-}

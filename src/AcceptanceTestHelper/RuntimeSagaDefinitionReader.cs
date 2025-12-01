@@ -50,7 +50,7 @@ public static class RuntimeSagaDefinitionReader
     {
         if (!definitions.TryGetValue(sagaType.FullName!.Replace('+', '.'), out var sagaDefinition))
         {
-            throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
+            throw new Exception($"Could not find metadata for '{sagaType.FullName}' in the collected assembly metadata.");
         }
 
         var tableSuffix = sagaDefinition.TableSuffix;
