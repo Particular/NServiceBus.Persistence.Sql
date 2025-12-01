@@ -84,4 +84,48 @@ public class SagaMetadataGeneratorTests
             .Approve()
             .AssertRunsAreEqual();
     }
+
+    [Test]
+    public void OnlyFindersNoCorrelation()
+    {
+        var code = $$"""
+                     using System.Threading;
+                     using System.Threading.Tasks;
+                     using NServiceBus;
+                     using NServiceBus.Extensibility;
+                     using NServiceBus.Persistence;
+                     using NServiceBus.Sagas;
+
+                     namespace My.NameSpace;
+
+                     public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
+                     {
+                         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                         {
+                             mapper.ConfigureFinderMapping<StartOrder, FindByStartOrder>();
+                         }
+                         public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
+                     }
+                     public class OrderSagaData : ContainSagaData
+                     {
+                         public string OrderId { get; set; }
+                     }
+                     public record class StartOrder(string OrderId);
+                     public class FindByStartOrder : ISagaFinder<OrderSagaData, StartOrder>
+                     {
+                         public Task<OrderSagaData> FindBy(StartOrder message, ISynchronizedStorageSession session, IReadOnlyContextBag context, CancellationToken cancellationToken = default)
+                         {
+                             // Completely invalid in real life but simple for the test
+                             return Task.FromResult(new OrderSagaData());
+                         }
+                     }
+                     """;
+
+        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
+            .WithSource(code)
+            .WithGeneratorStages("Candidates", "Collected")
+            .ToConsole()
+            //.Approve()
+            .AssertRunsAreEqual();
+    }
 }

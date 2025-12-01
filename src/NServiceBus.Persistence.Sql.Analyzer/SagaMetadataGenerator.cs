@@ -69,11 +69,6 @@ public class SagaMetadataGenerator : IIncrementalGenerator
                 ]
             });
 
-        if ((mapSagaInvocation?.ArgumentList.Arguments[0].Expression as LambdaExpressionSyntax)?.ExpressionBody is not MemberAccessExpressionSyntax correlationIdSyntax)
-        {
-            return null;
-        }
-
         var configureMethod = context.SemanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
         var sagaType = configureMethod?.ContainingType;
         if (configureMethod is null || sagaType is null)
@@ -81,19 +76,19 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             return null;
         }
 
-        if (context.SemanticModel.GetOperation(correlationIdSyntax, cancellationToken) is not IPropertyReferenceOperation propertyReference)
-        {
-            return null;
-        }
-
-        if (!TryGetCorrelationSqlPropertyType(propertyReference.Property.Type, out var correlationPropType))
-        {
-            return null;
-        }
-
-        var correlation = new CorrelationDetails(correlationPropType, propertyReference.Property.Name);
-        CorrelationDetails? transitionalCorrelation = null;
         string tableSuffix = sagaType.Name;
+        CorrelationDetails? correlation = null, transitionalCorrelation = null;
+
+        if (mapSagaInvocation?.ArgumentList.Arguments[0].Expression is LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax correlationIdSyntax })
+        {
+            if (context.SemanticModel.GetOperation(correlationIdSyntax, cancellationToken) is IPropertyReferenceOperation propertyReference)
+            {
+                if (TryGetCorrelationSqlPropertyType(propertyReference.Property.Type, out var correlationPropType))
+                {
+                    correlation = new CorrelationDetails(correlationPropType, propertyReference.Property.Name);
+                }
+            }
+        }
 
         var sqlSagaAttribute = sagaType.GetAttributes()
             .FirstOrDefault(att => att.AttributeClass?.Name == "SqlSagaAttribute");
@@ -206,8 +201,8 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         {
             _ = b.Append("[assembly:NServiceBusGeneratedSqlSagaMetadataAttribute(");
             WriteProperty(b, "SagaType", saga.SagaType, skipComma: true);
-            WriteProperty(b, "CorrelationPropertyName", saga.CorrelationProperty.Name);
-            WriteProperty(b, "CorrelationPropertyType", saga.CorrelationProperty.Type);
+            WriteProperty(b, "CorrelationPropertyName", saga.CorrelationProperty?.Name);
+            WriteProperty(b, "CorrelationPropertyType", saga.CorrelationProperty?.Type);
             WriteProperty(b, "TransitionalCorrelationPropertyName", saga.TransitionalProperty?.Name);
             WriteProperty(b, "TransitionalCorrelationPropertyType", saga.TransitionalProperty?.Type);
             WriteProperty(b, "TableSuffix", saga.TableSuffix);
@@ -249,6 +244,6 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         b.Append("\"");
     }
 
-    record SagaDetails(string SagaType, CorrelationDetails CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
+    record SagaDetails(string SagaType, CorrelationDetails? CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
     readonly record struct CorrelationDetails(string Type, string Name);
 }
