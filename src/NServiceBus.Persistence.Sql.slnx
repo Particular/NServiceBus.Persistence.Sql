@@ -15,7 +15,6 @@
     <Project Path="SqlPersistence.Tests/SqlPersistence.Tests.csproj" />
     <Project Path="TestHelper/TestHelper.csproj" />
     <Project Path="TransactionalSession.Tests/TransactionalSession.Tests.csproj" />
-    <Project Path="VBTestCode/VBTestCode.vbproj" />
   </Folder>
   <Folder Name="/Tests/AcceptanceTests/">
     <Project Path="AcceptanceTestHelper/AcceptanceTestHelper.csproj" />
