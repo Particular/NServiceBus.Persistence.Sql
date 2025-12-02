@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.Persistence.Sql.Analyzer;
 
-using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,12 +16,12 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var first = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
+        var sagaDetails = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
             .Where(static d => d is not null)
             .Select(static (d, _) => d!)
-            .WithTrackingName("Candidates");
+            .WithTrackingName("SagaDetails");
 
-        var collected = first.Collect()
+        var collected = sagaDetails.Collect()
             .WithTrackingName("Collected");
 
         context.RegisterSourceOutput(collected, GenerateMetadataCode);
@@ -36,10 +35,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             ReturnType: PredefinedTypeSyntax predefinedType
         } methodSyntax
         && predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword)
-        && methodSyntax.ParameterList.Parameters[0].Type is SimpleNameSyntax
-        {
-            Identifier.Text: "SagaPropertyMapper"
-        };
+        && methodSyntax.ParameterList.Parameters[0].Type is NameSyntax and (QualifiedNameSyntax { Right.Identifier.Text: "SagaPropertyMapper" } or SimpleNameSyntax { Identifier.Text: "SagaPropertyMapper" });
 
     static SagaDetails? TransformToSagaDetails(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
@@ -58,15 +54,13 @@ public class SagaMetadataGenerator : IIncrementalGenerator
                     },
 
                 },
-                ArgumentList.Arguments:
-                [
+                ArgumentList.Arguments: [
+                {
+                    Expression: LambdaExpressionSyntax
                     {
-                        Expression: LambdaExpressionSyntax
-                        {
-                            ExpressionBody: MemberAccessExpressionSyntax
-                        }
+                        ExpressionBody: MemberAccessExpressionSyntax
                     }
-                ]
+                }]
             });
 
         var configureMethod = context.SemanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
@@ -117,7 +111,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         {
             current = current.BaseType;
             var def = current.OriginalDefinition;
-            if (def.Name == "Saga" && def.IsGenericType && def.TypeParameters.Length == 1 && def.ContainingNamespace.Name == "NServiceBus" && def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
+            if (def.Name == "Saga" && def is { IsGenericType: true, TypeParameters.Length: 1 } && def.ContainingNamespace.Name == "NServiceBus" && def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
             {
                 if (current.TypeArguments[0] is INamedTypeSymbol dataType)
                 {

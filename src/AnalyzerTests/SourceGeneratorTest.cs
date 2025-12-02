@@ -338,18 +338,15 @@ public partial class SourceGeneratorTest
             _ = Run();
         }
 
-        try
-        {
-            var output = GetCompilationOutput();
-            var toApprove = ScrubPlatformSpecificInterceptorData().Replace(output, m => m.Value.Replace(m.Groups["InterceptData"].Value, "{PLATFORM-SPECIFIC-BASE64-DATA}"));
-            Approver.Verify(toApprove, scrubber, scenarioName, callerFilePath, callerMemberName);
-            return this;
-        }
-        catch (Exception)
+        if (Environment.GetEnvironmentVariable("CI") != "true")
         {
             _ = ToConsole();
-            throw;
         }
+
+        var output = GetCompilationOutput();
+        var toApprove = ScrubPlatformSpecificInterceptorData().Replace(output, m => m.Value.Replace(m.Groups["InterceptData"].Value, "{PLATFORM-SPECIFIC-BASE64-DATA}"));
+        Approver.Verify(toApprove, scrubber, scenarioName, callerFilePath, callerMemberName);
+        return this;
     }
 
     [GeneratedRegex(@"System\.Runtime\.CompilerServices\.InterceptsLocationAttribute\(1, ""(?<InterceptData>[A-Za-z0-9+=/]{36})""\)", RegexOptions.Compiled | RegexOptions.NonBacktracking)]
