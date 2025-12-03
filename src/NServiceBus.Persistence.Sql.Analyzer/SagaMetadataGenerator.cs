@@ -16,6 +16,8 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        context.RegisterPostInitializationOutput(ctx => ctx.AddEmbeddedAttributeDefinition());
+
         var sagaDetails = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
             .Where(static d => d is not null)
             .Select(static (d, _) => d!)
@@ -205,6 +207,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
         _ = b.AppendLine();
         _ = b.Append("""
+                     [Microsoft.CodeAnalysis.EmbeddedAttribute]
                      [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
                      public sealed class NServiceBusGeneratedSqlSagaMetadataAttribute : System.Attribute
                      {

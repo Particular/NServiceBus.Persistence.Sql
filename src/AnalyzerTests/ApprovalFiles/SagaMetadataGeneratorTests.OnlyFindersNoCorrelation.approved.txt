@@ -9,6 +9,7 @@
 
 [assembly:NServiceBusGeneratedSqlSagaMetadataAttribute(SagaType = "My.NameSpace.OrderSaga", TableSuffix = "OrderSaga")]
 
+[Microsoft.CodeAnalysis.EmbeddedAttribute]
 [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
 public sealed class NServiceBusGeneratedSqlSagaMetadataAttribute : System.Attribute
 {

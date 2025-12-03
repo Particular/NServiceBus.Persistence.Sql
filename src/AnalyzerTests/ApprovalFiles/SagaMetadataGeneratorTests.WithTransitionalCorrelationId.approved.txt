@@ -9,6 +9,7 @@
 
 [assembly:NServiceBusGeneratedSqlSagaMetadataAttribute(SagaType = "OrderSaga", CorrelationPropertyName = "OrderId", CorrelationPropertyType = "String", TransitionalCorrelationPropertyName = "TransitionalId", TransitionalCorrelationPropertyType = "String", TableSuffix = "OrderSaga")]
 
+[Microsoft.CodeAnalysis.EmbeddedAttribute]
 [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
 public sealed class NServiceBusGeneratedSqlSagaMetadataAttribute : System.Attribute
 {
