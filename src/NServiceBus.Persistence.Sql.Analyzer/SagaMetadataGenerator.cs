@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Persistence.Sql.Analyzer;
 
+using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,6 +17,9 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var disabled = context.AnalyzerConfigOptionsProvider
+            .Select((opts, x) => opts.GlobalOptions.TryGetValue(DisableGeneratorPropertyName, out var value) && value.Equals("true", StringComparison.OrdinalIgnoreCase));
+
         context.RegisterPostInitializationOutput(ctx => ctx.AddEmbeddedAttributeDefinition());
 
         var sagaDetails = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
@@ -26,7 +30,15 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         var collected = sagaDetails.Collect()
             .WithTrackingName("Collected");
 
-        context.RegisterSourceOutput(collected, GenerateMetadataCode);
+        var filtered = collected.Combine(disabled)
+            .Select((sagasAndDisableFag, _) =>
+            {
+                var (sagas, isDisabled) = sagasAndDisableFag;
+                return isDisabled ? [] : sagas;
+            })
+            .WithTrackingName("Filtered");
+
+        context.RegisterSourceOutput(filtered, GenerateMetadataCode);
     }
 
     static bool SyntaxLooksLikeConfigureMethod(SyntaxNode node, CancellationToken cancellationToken) =>
@@ -237,4 +249,6 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
     record SagaDetails(string SagaType, CorrelationDetails? CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
     readonly record struct CorrelationDetails(string Type, string Name);
+
+    const string DisableGeneratorPropertyName = "build_property.NServiceBusDisableSagaSourceGenerator";
 }
