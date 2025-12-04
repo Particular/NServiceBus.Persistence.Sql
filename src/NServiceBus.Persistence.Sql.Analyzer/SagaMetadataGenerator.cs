@@ -209,7 +209,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         _ = b.Append("""
                      [Microsoft.CodeAnalysis.EmbeddedAttribute]
                      [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
-                     public sealed class NServiceBusGeneratedSqlSagaMetadataAttribute : System.Attribute
+                     internal sealed class NServiceBusGeneratedSqlSagaMetadataAttribute : System.Attribute
                      {
                          public string? SagaType { get; set; }
                          public string? CorrelationPropertyName { get; set; }
