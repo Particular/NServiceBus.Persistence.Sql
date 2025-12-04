@@ -7,6 +7,10 @@
     /// <summary>
     /// Base class for all sagas being stored by the SQL Persistence. Replaces <see cref="Saga{TSagaData}"/>.
     /// </summary>
+    [ObsoleteEx(
+        Message = "The SqlSaga base class is no longer supported, use 'NServiceBus.Saga<T>' with the 'mapper.MapSaga(…).ToMessage(…)' API. Other SqlSaga features can be added applying the 'SqlSagaAttribute' the saga class",
+        RemoveInVersion = "10",
+        TreatAsErrorFromVersion = "9")]
     public abstract class SqlSaga<TSagaData> : Saga
         where TSagaData :
         IContainSagaData,
