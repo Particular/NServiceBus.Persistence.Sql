@@ -56,13 +56,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
                     },
 
                 },
-                ArgumentList.Arguments: [
-                {
-                    Expression: LambdaExpressionSyntax
-                    {
-                        ExpressionBody: MemberAccessExpressionSyntax
-                    }
-                }]
+                ArgumentList.Arguments: [{ Expression: LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax } }]
             });
 
         var configureMethod = context.SemanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
