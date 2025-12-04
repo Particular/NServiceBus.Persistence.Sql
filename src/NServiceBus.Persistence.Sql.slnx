@@ -6,7 +6,7 @@
     <File Path="Custom.Build.props" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="AnalyzerTests\AnalyzerTests.csproj" Type="Classic C#" />
+    <Project Path="AnalyzerTests\AnalyzerTests.csproj" />
     <Project Path="AuroraSetup/AuroraSetup.csproj" />
     <Project Path="ScriptBuilder.Tests/ScriptBuilder.Tests.csproj" />
     <Project Path="ScriptBuilderTask.Tests.Target/ScriptBuilderTask.Tests.Target.csproj" />
