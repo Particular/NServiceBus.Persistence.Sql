@@ -1,0 +1,7 @@
+<Project>
+
+  <ItemGroup Label="Compiler visible properties">
+    <CompilerVisibleProperty Include="NServiceBusDisableSagaSourceGenerator" />
+  </ItemGroup>
+
+</Project>

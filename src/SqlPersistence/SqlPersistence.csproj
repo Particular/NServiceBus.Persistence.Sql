@@ -25,11 +25,18 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Persistence.Sql</PackageId>
     <Description>Sql persistence for NServiceBus</Description>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddPropsFileToPackage</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup Label="Analyzer">
     <None Include="..\NServiceBus.Persistence.Sql.Analyzer\bin\$(Configuration)\netstandard2.0\NServiceBus.Persistence.Sql.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs/NServiceBus.Persistence.Sql.Analyzer.dll" Visible="false" />
   </ItemGroup>
+
+  <Target Name="AddPropsFileToPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="NServiceBus.Persistence.Sql.props" PackagePath="build/$(TargetFramework);buildTransitive/$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework);buildTransitive\$(ScriptBuilderTargetFramework)" Visible="false" />
