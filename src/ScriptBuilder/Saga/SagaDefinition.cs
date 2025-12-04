@@ -2,12 +2,14 @@
 
 namespace NServiceBus.Persistence.Sql.ScriptBuilder;
 
+using System;
+
 public class SagaDefinition
 {
     public SagaDefinition(string tableSuffix, string name, CorrelationProperty? correlationProperty = null, CorrelationProperty? transitionalCorrelationProperty = null)
     {
-        Guard.AgainstNullAndEmpty(nameof(tableSuffix), tableSuffix);
-        Guard.AgainstNullAndEmpty(nameof(name), name);
+        ArgumentException.ThrowIfNullOrEmpty(tableSuffix, nameof(tableSuffix));
+        ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
         TableSuffix = tableSuffix;
         Name = name;
         CorrelationProperty = correlationProperty;
