@@ -360,7 +360,7 @@ public partial class SourceGeneratorTest
             .Where(tree => tree.FilePath.EndsWith(".g.cs"))
             .ToImmutableArray();
 
-        Assert.That(generatedOutputs.Length, Is.EqualTo(0));
+        Assert.That(generatedOutputs.Length, Is.Zero);
         return this;
     }
 
