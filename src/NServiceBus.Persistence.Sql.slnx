@@ -27,7 +27,7 @@
     <Project Path="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests/TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj" />
   </Folder>
   <Project Path="CommandLine/NServiceBus.Persistence.Sql.CommandLine.csproj" />
-  <Project Path="NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" Type="Classic C#" />
+  <Project Path="NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" />
   <Project Path="NServiceBus.Persistence.Sql.TransactionalSession/NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
   <Project Path="ScriptBuilder/ScriptBuilder.csproj" />
   <Project Path="ScriptBuilderTask/ScriptBuilderTask.csproj" />
