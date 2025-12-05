@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Label="Local source generator" Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -18,10 +19,6 @@
 
   <ItemGroup>
     <Compile Include="..\AcceptanceTestsShared\**\*.cs" LinkBase="Shared" />
-  </ItemGroup>
-
-  <ItemGroup Label="Local source generator">
-    <ProjectReference Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

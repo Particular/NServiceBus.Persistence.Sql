@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
+    <ProjectReference Label="Local source generator" Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,10 +24,6 @@
 
   <ItemGroup Label="Flaky tests on Oracle" Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\Sagas\When_handling_concurrent_messages.cs" />
-  </ItemGroup>
-
-  <ItemGroup Label="Local source generator">
-    <ProjectReference Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
