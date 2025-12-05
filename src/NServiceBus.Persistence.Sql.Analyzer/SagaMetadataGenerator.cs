@@ -22,7 +22,29 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
         context.RegisterPostInitializationOutput(ctx => ctx.AddEmbeddedAttributeDefinition());
 
-        var sagaDetails = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
+        // inexpensive syntactic filtering
+        var sagaConfigureMethods = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                SyntaxLooksLikeConfigureMethod,
+                static (syntaxContext, _) => (MethodDeclarationSyntax)syntaxContext.Node)
+            .WithTrackingName("SagaConfigureMethods");
+
+        var sagaDetails = sagaConfigureMethods
+            .Combine(context.CompilationProvider)
+            .Combine(disabled)
+            .Select(static (triple, ct) =>
+            {
+                var ((methodSyntax, compilation), isDisabled) = triple;
+
+                if (isDisabled)
+                {
+                    // When disabled, we do not even create a SemanticModel and do the transformation.
+                    return null;
+                }
+
+                var semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
+                return TransformToSagaDetails(semanticModel, methodSyntax, ct);
+            })
             .Where(static d => d is not null)
             .Select(static (d, _) => d!)
             .WithTrackingName("SagaDetails");
@@ -30,15 +52,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         var collected = sagaDetails.Collect()
             .WithTrackingName("Collected");
 
-        var filtered = collected.Combine(disabled)
-            .Select((sagasAndDisableFag, _) =>
-            {
-                var (sagas, isDisabled) = sagasAndDisableFag;
-                return isDisabled ? [] : sagas;
-            })
-            .WithTrackingName("Filtered");
-
-        context.RegisterSourceOutput(filtered, GenerateMetadataCode);
+        context.RegisterSourceOutput(collected, GenerateMetadataCode);
     }
 
     static bool SyntaxLooksLikeConfigureMethod(SyntaxNode node, CancellationToken cancellationToken) =>
@@ -51,10 +65,8 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         && predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword)
         && methodSyntax.ParameterList.Parameters[0].Type is NameSyntax and (QualifiedNameSyntax { Right.Identifier.Text: "SagaPropertyMapper" } or SimpleNameSyntax { Identifier.Text: "SagaPropertyMapper" });
 
-    static SagaDetails? TransformToSagaDetails(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    static SagaDetails? TransformToSagaDetails(SemanticModel semanticModel, MethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
     {
-        var methodSyntax = (MethodDeclarationSyntax)context.Node;
-
         var mapSagaInvocation = methodSyntax
             .DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
@@ -71,7 +83,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
                 ArgumentList.Arguments: [{ Expression: LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax } }]
             });
 
-        var configureMethod = context.SemanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
+        var configureMethod = semanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
         var sagaType = configureMethod?.ContainingType;
         if (configureMethod is null || sagaType is null)
         {
@@ -83,7 +95,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
         if (mapSagaInvocation?.ArgumentList.Arguments[0].Expression is LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax correlationIdSyntax })
         {
-            if (context.SemanticModel.GetOperation(correlationIdSyntax, cancellationToken) is IPropertyReferenceOperation propertyReference)
+            if (semanticModel.GetOperation(correlationIdSyntax, cancellationToken) is IPropertyReferenceOperation propertyReference)
             {
                 if (TryGetCorrelationSqlPropertyType(propertyReference.Property.Type, out var correlationPropType))
                 {
