@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
@@ -37,8 +36,7 @@ public static class RuntimeSagaDefinitionReader
         foreach (var assembly in sagaAssemblies)
         {
             //Validate the saga definitions using script builder compile-time validation
-            using var moduleDefinition = ModuleDefinition.ReadModule(assembly.Location, new ReaderParameters(ReadingMode.Deferred));
-            var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
+            var compileTimeReader = new AllSagaDefinitionReader(assembly);
             sagaDefinitions.AddRange(compileTimeReader.GetSagas());
         }
 

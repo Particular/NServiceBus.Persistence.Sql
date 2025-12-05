@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
@@ -22,22 +23,19 @@ static class CecilExtensions
         return result;
     }
 
-    public static string GetStringProperty(this ICustomAttribute attribute, string name)
-    {
-        return (string)attribute.Properties
-            .SingleOrDefault(argument => argument.Name == name)
-            .Argument.Value;
-    }
+    public static string GetStringProperty(this CustomAttributeData attribute, string name) =>
+        (string)attribute.NamedArguments?.SingleOrDefault(argument => argument.MemberName == name).TypedValue.Value;
 
-    public static bool GetBoolProperty(this ICustomAttribute attribute, string name, bool fallback = false)
+    public static bool GetBoolProperty(this CustomAttributeData attribute, string name, bool fallback = false)
     {
-        if (attribute == null)
+        if (attribute is null)
         {
             return fallback;
         }
-        var value = attribute.Properties
-            .SingleOrDefault(argument => argument.Name == name)
-            .Argument.Value;
+
+        var value = attribute.NamedArguments?
+            .SingleOrDefault(argument => argument.MemberName == name)
+            .TypedValue.Value;
         if (value == null)
         {
             return fallback;

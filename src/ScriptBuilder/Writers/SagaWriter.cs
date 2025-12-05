@@ -2,13 +2,13 @@
 
 using System;
 using System.IO;
-using Mono.Cecil;
+using System.Reflection;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class SagaWriter(bool clean,
     bool overwrite,
     string scriptPath,
-    ModuleDefinition moduleDefinition,
+    Assembly assembly,
     Action<string, string>? logError = null)
     : ScriptWriter(clean, overwrite, scriptPath)
 {
@@ -16,7 +16,7 @@ class SagaWriter(bool clean,
     {
         Directory.CreateDirectory(sagaPath);
 
-        var metaDataReader = new AllSagaDefinitionReader(moduleDefinition);
+        var metaDataReader = new AllSagaDefinitionReader(assembly);
 
         var index = 0;
         foreach (var saga in metaDataReader.GetSagas(logError))

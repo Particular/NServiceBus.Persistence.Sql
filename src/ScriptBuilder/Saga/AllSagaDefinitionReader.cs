@@ -4,19 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Mono.Cecil;
+using System.Reflection;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class AllSagaDefinitionReader(ModuleDefinition module)
+class AllSagaDefinitionReader(Assembly assembly)
 {
     public IList<SagaDefinition> GetSagas(Action<string, string>? logger = null)
     {
         var sagas = new List<SagaDefinition>();
         var errors = new List<Exception>();
 
-        var attributes = module.Assembly.CustomAttributes
-            .Where(att => att is not null && att.AttributeType.FullName == "NServiceBusGeneratedSqlSagaMetadataAttribute")
-            .Select(att => att!)
+        var attributes = assembly.CustomAttributes
+            .Where(att => att.AttributeType.FullName == "NServiceBusGeneratedSqlSagaMetadataAttribute")
             .ToImmutableArray();
 
         foreach (var att in attributes)
