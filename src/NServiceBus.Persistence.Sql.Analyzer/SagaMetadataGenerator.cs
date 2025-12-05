@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.Persistence.Sql.Analyzer;
 
-using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,34 +16,9 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var disabled = context.AnalyzerConfigOptionsProvider
-            .Select((opts, x) => opts.GlobalOptions.TryGetValue(DisableGeneratorPropertyName, out var value) && value.Equals("true", StringComparison.OrdinalIgnoreCase));
-
         context.RegisterPostInitializationOutput(ctx => ctx.AddEmbeddedAttributeDefinition());
 
-        // inexpensive syntactic filtering
-        var sagaConfigureMethods = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                SyntaxLooksLikeConfigureMethod,
-                static (syntaxContext, _) => (MethodDeclarationSyntax)syntaxContext.Node)
-            .WithTrackingName("SagaConfigureMethods");
-
-        var sagaDetails = sagaConfigureMethods
-            .Combine(context.CompilationProvider)
-            .Combine(disabled)
-            .Select(static (triple, ct) =>
-            {
-                var ((methodSyntax, compilation), isDisabled) = triple;
-
-                if (isDisabled)
-                {
-                    // When disabled, we do not even create a SemanticModel and do the transformation.
-                    return null;
-                }
-
-                var semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
-                return TransformToSagaDetails(semanticModel, methodSyntax, ct);
-            })
+        var sagaDetails = context.SyntaxProvider.CreateSyntaxProvider(SyntaxLooksLikeConfigureMethod, TransformToSagaDetails)
             .Where(static d => d is not null)
             .Select(static (d, _) => d!)
             .WithTrackingName("SagaDetails");
@@ -65,8 +39,10 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         && predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword)
         && methodSyntax.ParameterList.Parameters[0].Type is NameSyntax and (QualifiedNameSyntax { Right.Identifier.Text: "SagaPropertyMapper" } or SimpleNameSyntax { Identifier.Text: "SagaPropertyMapper" });
 
-    static SagaDetails? TransformToSagaDetails(SemanticModel semanticModel, MethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
+    static SagaDetails? TransformToSagaDetails(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
+        var methodSyntax = (MethodDeclarationSyntax)context.Node;
+
         var mapSagaInvocation = methodSyntax
             .DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
@@ -83,7 +59,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
                 ArgumentList.Arguments: [{ Expression: LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax } }]
             });
 
-        var configureMethod = semanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
+        var configureMethod = context.SemanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
         var sagaType = configureMethod?.ContainingType;
         if (configureMethod is null || sagaType is null)
         {
@@ -95,7 +71,7 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
         if (mapSagaInvocation?.ArgumentList.Arguments[0].Expression is LambdaExpressionSyntax { ExpressionBody: MemberAccessExpressionSyntax correlationIdSyntax })
         {
-            if (semanticModel.GetOperation(correlationIdSyntax, cancellationToken) is IPropertyReferenceOperation propertyReference)
+            if (context.SemanticModel.GetOperation(correlationIdSyntax, cancellationToken) is IPropertyReferenceOperation propertyReference)
             {
                 if (TryGetCorrelationSqlPropertyType(propertyReference.Property.Type, out var correlationPropType))
                 {
@@ -107,23 +83,20 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         var sqlSagaAttribute = sagaType.GetAttributes()
             .FirstOrDefault(att => att.AttributeClass?.Name == "SqlSagaAttribute");
 
-        if (sqlSagaAttribute is null || sqlSagaAttribute.ConstructorArguments.Length != 3)
+        if (sqlSagaAttribute is not null && sqlSagaAttribute.ConstructorArguments.Length == 3)
         {
-            return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
+            var attCorrelation = sqlSagaAttribute.ConstructorArguments[0].Value as string;
+            var attTransitional = sqlSagaAttribute.ConstructorArguments[1].Value as string;
+
+            tableSuffix = sqlSagaAttribute.ConstructorArguments[2].Value as string ?? tableSuffix;
+
+            if ((attCorrelation is not null || attTransitional is not null) && GetSagaDataType(sagaType) is { } dataType)
+            {
+                correlation = GetCorrelationData(dataType, attCorrelation) ?? correlation;
+                transitionalCorrelation = GetCorrelationData(dataType, attTransitional);
+            }
         }
 
-        var attCorrelation = sqlSagaAttribute.ConstructorArguments[0].Value as string;
-        var attTransitional = sqlSagaAttribute.ConstructorArguments[1].Value as string;
-
-        tableSuffix = sqlSagaAttribute.ConstructorArguments[2].Value as string ?? tableSuffix;
-
-        if ((attCorrelation is null && attTransitional is null) || GetSagaDataType(sagaType) is not { } dataType)
-        {
-            return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
-        }
-
-        correlation = GetCorrelationData(dataType, attCorrelation) ?? correlation;
-        transitionalCorrelation = GetCorrelationData(dataType, attTransitional);
         return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
     }
 
@@ -134,14 +107,12 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         {
             current = current.BaseType;
             var def = current.OriginalDefinition;
-            if (def.Name != "Saga" || def is not { IsGenericType: true, TypeParameters.Length: 1 } || def.ContainingNamespace.Name != "NServiceBus" || !def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
+            if (def.Name == "Saga" && def is { IsGenericType: true, TypeParameters.Length: 1 } && def.ContainingNamespace.Name == "NServiceBus" && def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
             {
-                continue;
-            }
-
-            if (current.TypeArguments[0] is INamedTypeSymbol dataType)
-            {
-                return dataType;
+                if (current.TypeArguments[0] is INamedTypeSymbol dataType)
+                {
+                    return dataType;
+                }
             }
         }
 
@@ -266,6 +237,4 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
     record SagaDetails(string SagaType, CorrelationDetails? CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
     readonly record struct CorrelationDetails(string Type, string Name);
-
-    const string DisableGeneratorPropertyName = "build_property.NServiceBusSqlPersistenceDisableSagaSourceGenerator";
 }

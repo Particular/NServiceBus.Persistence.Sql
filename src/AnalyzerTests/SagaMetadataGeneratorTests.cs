@@ -46,7 +46,7 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .WithScenarioName(correlationType)
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -80,7 +80,7 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -113,7 +113,7 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -144,7 +144,7 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -187,7 +187,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -216,41 +216,8 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
+            .WithGeneratorStages("SagaDetails", "Collected")
             .Approve()
-            .AssertRunsAreEqual();
-    }
-
-    [Test]
-    public void DisableGeneration()
-    {
-        var code = $$"""
-                     using System.Threading.Tasks;
-                     using NServiceBus;
-
-                     public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
-                     {
-                         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
-                         {
-                             mapper.MapSaga(saga => saga.OrderId)
-                                 .ToMessage<StartOrder>(message => message.OrderId);
-                         }
-
-                         public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
-                     }
-                     public class OrderSagaData : ContainSagaData
-                     {
-                         public string OrderId { get; set; }
-                     }
-                     public record class StartOrder(string OrderId);
-                     """;
-
-        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
-            .WithSource(code)
-            .WithProperty("build_property.NServiceBusSqlPersistenceDisableSagaSourceGenerator", "true")
-            .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
-            .ShouldNotGenerateCode()
             .AssertRunsAreEqual();
     }
 }
