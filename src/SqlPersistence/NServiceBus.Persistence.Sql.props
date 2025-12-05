@@ -1,7 +1,0 @@
-<Project>
-
-  <ItemGroup Label="Compiler visible properties">
-    <CompilerVisibleProperty Include="NServiceBusSqlPersistenceDisableSagaSourceGenerator" />
-  </ItemGroup>
-
-</Project>
