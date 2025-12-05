@@ -247,7 +247,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .WithProperty("build_property.NServiceBusDisableSagaSourceGenerator", "true")
+            .WithProperty("build_property.NServiceBusSqlPersistenceDisableSagaSourceGenerator", "true")
             .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
             .WithGeneratorStages("SagaConfigureMethods", "SagaDetails", "Collected")
             .ShouldNotGenerateCode()
