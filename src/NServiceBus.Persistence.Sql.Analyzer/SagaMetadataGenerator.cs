@@ -107,20 +107,23 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         var sqlSagaAttribute = sagaType.GetAttributes()
             .FirstOrDefault(att => att.AttributeClass?.Name == "SqlSagaAttribute");
 
-        if (sqlSagaAttribute is not null && sqlSagaAttribute.ConstructorArguments.Length == 3)
+        if (sqlSagaAttribute is null || sqlSagaAttribute.ConstructorArguments.Length != 3)
         {
-            var attCorrelation = sqlSagaAttribute.ConstructorArguments[0].Value as string;
-            var attTransitional = sqlSagaAttribute.ConstructorArguments[1].Value as string;
-
-            tableSuffix = sqlSagaAttribute.ConstructorArguments[2].Value as string ?? tableSuffix;
-
-            if ((attCorrelation is not null || attTransitional is not null) && GetSagaDataType(sagaType) is { } dataType)
-            {
-                correlation = GetCorrelationData(dataType, attCorrelation) ?? correlation;
-                transitionalCorrelation = GetCorrelationData(dataType, attTransitional);
-            }
+            return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
         }
 
+        var attCorrelation = sqlSagaAttribute.ConstructorArguments[0].Value as string;
+        var attTransitional = sqlSagaAttribute.ConstructorArguments[1].Value as string;
+
+        tableSuffix = sqlSagaAttribute.ConstructorArguments[2].Value as string ?? tableSuffix;
+
+        if ((attCorrelation is null && attTransitional is null) || GetSagaDataType(sagaType) is not { } dataType)
+        {
+            return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
+        }
+
+        correlation = GetCorrelationData(dataType, attCorrelation) ?? correlation;
+        transitionalCorrelation = GetCorrelationData(dataType, attTransitional);
         return new SagaDetails(sagaType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), correlation, transitionalCorrelation, tableSuffix);
     }
 
@@ -131,12 +134,14 @@ public class SagaMetadataGenerator : IIncrementalGenerator
         {
             current = current.BaseType;
             var def = current.OriginalDefinition;
-            if (def.Name == "Saga" && def is { IsGenericType: true, TypeParameters.Length: 1 } && def.ContainingNamespace.Name == "NServiceBus" && def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
+            if (def.Name != "Saga" || def is not { IsGenericType: true, TypeParameters.Length: 1 } || def.ContainingNamespace.Name != "NServiceBus" || !def.ContainingNamespace.ContainingNamespace.IsGlobalNamespace)
             {
-                if (current.TypeArguments[0] is INamedTypeSymbol dataType)
-                {
-                    return dataType;
-                }
+                continue;
+            }
+
+            if (current.TypeArguments[0] is INamedTypeSymbol dataType)
+            {
+                return dataType;
             }
         }
 
