@@ -267,5 +267,5 @@ public class SagaMetadataGenerator : IIncrementalGenerator
     record SagaDetails(string SagaType, CorrelationDetails? CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
     readonly record struct CorrelationDetails(string Type, string Name);
 
-    const string DisableGeneratorPropertyName = "build_property.NServiceBusDisableSagaSourceGenerator";
+    const string DisableGeneratorPropertyName = "build_property.NServiceBusSqlPersistenceDisableSagaSourceGenerator";
 }
