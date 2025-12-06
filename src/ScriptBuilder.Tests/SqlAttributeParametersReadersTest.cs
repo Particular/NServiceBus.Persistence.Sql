@@ -8,15 +8,14 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void Minimal()
     {
-        var result = SettingsAttributeReader.ReadFromAttribute(
-            new CustomAttributeMock(
+        var result = SettingsAttributeReader.ReadFromProperties(
                 new Dictionary<string, object>
                 {
                     {
                         //At least one is required
                         "MsSqlServerScripts", true
                     }
-                }));
+                });
 
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
@@ -25,7 +24,7 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void Defaults()
     {
-        var result = SettingsAttributeReader.ReadFromAttribute(null);
+        var result = SettingsAttributeReader.ReadFromProperties([]);
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
@@ -33,8 +32,7 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void NonDefaults()
     {
-        var result = SettingsAttributeReader.ReadFromAttribute(
-            new CustomAttributeMock(
+        var result = SettingsAttributeReader.ReadFromProperties(
                 new Dictionary<string, object>
                 {
                     {
@@ -61,7 +59,7 @@ public class SqlAttributeParametersReadersTest
                     {
                         "ProduceOutboxScripts", false
                     }
-                }));
+                });
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }

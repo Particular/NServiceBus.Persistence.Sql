@@ -15,6 +15,15 @@
     Runtime="NET"
     Condition="'$(SqlPersistenceGenerateScripts)' != 'false'" />
 
+  <Target Name="SqlPersistenceDisableAnalyzer" AfterTargets="ResolvePackageDependenciesForBuild;ResolveNuGetPackageAssets" Condition="'$(SqlPersistenceGenerateScripts)' == 'false'">
+    <ItemGroup>
+      <SqlPersistenceAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'NServiceBus.Persistence.Sql'" />
+    </ItemGroup>
+    <ItemGroup>
+      <Analyzer Remove="@(SqlPersistenceAnalyzer)"/>
+    </ItemGroup>
+  </Target>
+
   <Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
     <SqlPersistenceScriptBuilderTask
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"

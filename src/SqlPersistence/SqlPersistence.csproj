@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Needed for build ordering">
+    <ProjectReference Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" ReferenceOutputAssembly="false" Private="false" />
     <ProjectReference Include="..\ScriptBuilderTask\ScriptBuilderTask.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
@@ -27,9 +28,13 @@
     <Description>Sql persistence for NServiceBus</Description>
   </PropertyGroup>
 
+  <ItemGroup Label="Analyzer">
+    <None Include="..\NServiceBus.Persistence.Sql.Analyzer\bin\$(Configuration)\$(AnalyzerTargetFramework)\NServiceBus.Persistence.Sql.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs/NServiceBus.Persistence.Sql.Analyzer.dll" Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework);buildTransitive\$(ScriptBuilderTargetFramework)" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\Mono.Cecil.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
+    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\System.Reflection.MetadataLoadContext.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
   </ItemGroup>

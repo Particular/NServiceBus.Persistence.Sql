@@ -1,10 +1,12 @@
 namespace NServiceBus.Persistence.Sql.ScriptBuilder
 {
+    using System;
+
     public class CorrelationProperty
     {
         public CorrelationProperty(string name, CorrelationPropertyType type)
         {
-            Guard.AgainstNullAndEmpty(nameof(name), name);
+            ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
             Name = name;
             Type = type;
         }

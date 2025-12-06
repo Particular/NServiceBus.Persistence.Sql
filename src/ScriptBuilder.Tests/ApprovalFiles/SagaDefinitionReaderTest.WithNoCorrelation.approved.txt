@@ -1,6 +1,0 @@
-﻿{
-  "TableSuffix": "WithNoCorrelationSaga",
-  "CorrelationProperty": null,
-  "TransitionalCorrelationProperty": null,
-  "Name": "SagaDefinitionReaderTest/WithNoCorrelationSaga"
-}

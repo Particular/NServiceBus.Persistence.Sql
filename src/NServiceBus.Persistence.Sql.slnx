@@ -6,6 +6,7 @@
     <File Path="Custom.Build.props" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="AnalyzerTests\AnalyzerTests.csproj" />
     <Project Path="AuroraSetup/AuroraSetup.csproj" />
     <Project Path="ScriptBuilder.Tests/ScriptBuilder.Tests.csproj" />
     <Project Path="ScriptBuilderTask.Tests.Target/ScriptBuilderTask.Tests.Target.csproj" />
@@ -14,7 +15,6 @@
     <Project Path="SqlPersistence.Tests/SqlPersistence.Tests.csproj" />
     <Project Path="TestHelper/TestHelper.csproj" />
     <Project Path="TransactionalSession.Tests/TransactionalSession.Tests.csproj" />
-    <Project Path="VBTestCode/VBTestCode.vbproj" />
   </Folder>
   <Folder Name="/Tests/AcceptanceTests/">
     <Project Path="AcceptanceTestHelper/AcceptanceTestHelper.csproj" />
@@ -27,6 +27,7 @@
     <Project Path="TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests/TransactionalSession.MsSqlMicrosoftDataClient.AcceptanceTests.csproj" />
   </Folder>
   <Project Path="CommandLine/NServiceBus.Persistence.Sql.CommandLine.csproj" />
+  <Project Path="NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" />
   <Project Path="NServiceBus.Persistence.Sql.TransactionalSession/NServiceBus.Persistence.Sql.TransactionalSession.csproj" />
   <Project Path="ScriptBuilder/ScriptBuilder.csproj" />
   <Project Path="ScriptBuilderTask/ScriptBuilderTask.csproj" />

@@ -18,8 +18,8 @@
 
         public static void BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
-            Guard.AgainstNull(nameof(saga), saga);
-            Guard.AgainstNull(nameof(writer), writer);
+            ArgumentNullException.ThrowIfNull(saga, nameof(saga));
+            ArgumentNullException.ThrowIfNull(writer, nameof(writer));
 
             SagaDefinitionValidator.ValidateSagaDefinition(
                 correlationProperty: saga.CorrelationProperty?.Name,

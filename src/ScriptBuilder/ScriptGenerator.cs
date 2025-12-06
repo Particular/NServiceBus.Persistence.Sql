@@ -1,8 +1,11 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Mono.Cecil;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -10,9 +13,9 @@ public class ScriptGenerator(string assemblyPath,
     string destinationDirectory,
     bool clean = true,
     bool overwrite = true,
-    IReadOnlyList<BuildSqlDialect> dialectOptions = null,
-    Func<string, string> promotionFinder = null,
-    Action<string, string> logError = null)
+    IReadOnlyList<BuildSqlDialect>? dialectOptions = null,
+    Func<string, string>? promotionFinder = null,
+    Action<string, string>? logError = null)
 {
     public static void Generate(string assemblyPath, string targetDirectory,
         Action<string, string> logError, Func<string, string> promotionPathFinder)
@@ -30,40 +33,49 @@ public class ScriptGenerator(string assemblyPath,
 
         CreateDirectories();
 
-        Settings settings;
-        using (var module = ModuleDefinition.ReadModule(assemblyPath, new ReaderParameters(ReadingMode.Deferred)))
+        var assemblyFolderPath = Path.GetDirectoryName(assemblyPath);
+        if (assemblyFolderPath is null)
         {
-            settings = SettingsAttributeReader.Read(module);
-            foreach (var dialect in settings.BuildDialects)
+            return;
+        }
+
+        var assemblyFiles = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
+            .Concat(Directory.GetFiles(assemblyFolderPath, "*.dll"))
+            .ToArray();
+        var resolver = new PathAssemblyResolver(assemblyFiles);
+        var metadataLoadContext = new MetadataLoadContext(resolver);
+        var assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
+
+        var settings = SettingsAttributeReader.Read(assembly);
+        foreach (var dialect in settings.BuildDialects)
+        {
+            if (!ShouldGenerateDialect(dialect))
             {
-                if (!ShouldGenerateDialect(dialect))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                var dialectPath = Path.Combine(scriptBasePath, dialect.ToString());
+            var dialectPath = Path.Combine(scriptBasePath, dialect.ToString());
 
-                CreateDialectDirectory(dialectPath);
+            CreateDialectDirectory(dialectPath);
 
-                if (settings.ProduceSagaScripts)
-                {
-                    new SagaWriter(clean, overwrite, dialectPath, module, logError).WriteScripts(dialect);
-                }
+            if (settings.ProduceSagaScripts)
+            {
+                new SagaWriter(clean, overwrite, dialectPath, assembly, logError).WriteScripts(dialect);
+            }
 
-                if (settings.ProduceTimeoutScripts)
-                {
-                    new TimeoutWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
-                }
+            if (settings.ProduceTimeoutScripts)
+            {
+                new TimeoutWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
+            }
 
-                if (settings.ProduceSubscriptionScripts)
-                {
-                    new SubscriptionWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
-                }
+            if (settings.ProduceSubscriptionScripts)
+            {
+                new SubscriptionWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
+            }
 
-                if (settings.ProduceOutboxScripts)
-                {
-                    new OutboxWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
-                }
+            if (settings.ProduceOutboxScripts)
+            {
+                new OutboxWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
             }
         }
 
