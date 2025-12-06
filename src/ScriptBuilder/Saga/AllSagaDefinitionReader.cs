@@ -20,20 +20,25 @@ class AllSagaDefinitionReader(Assembly assembly)
 
         foreach (var att in attributes)
         {
+            var properties = att.NamedArguments.ToDictionary(arg => arg.MemberName, arg => arg.TypedValue.Value as string);
+
             try
             {
-                var sagaType = att.GetStringProperty("SagaType");
-                var corrName = att.GetStringProperty("CorrelationPropertyName");
-                var corrType = att.GetStringProperty("CorrelationPropertyType");
-                var transName = att.GetStringProperty("TransitionalCorrelationPropertyName");
-                var transType = att.GetStringProperty("TransitionalCorrelationPropertyType");
-                var tableSuffix = att.GetStringProperty("TableSuffix");
+                var sagaType = properties.GetValueOrDefault("SagaType");
+                var corrName = properties.GetValueOrDefault("CorrelationPropertyName");
+                var corrType = properties.GetValueOrDefault("CorrelationPropertyType");
+                var transName = properties.GetValueOrDefault("TransitionalCorrelationPropertyName");
+                var transType = properties.GetValueOrDefault("TransitionalCorrelationPropertyType");
+                var tableSuffix = properties.GetValueOrDefault("TableSuffix");
 
                 var correlation = GetCorrelation(corrName, corrType);
                 var transitionalCorrelation = GetCorrelation(transName, transType);
 
-                var definition = new SagaDefinition(tableSuffix, sagaType, correlation, transitionalCorrelation);
-                sagas.Add(definition);
+                if (tableSuffix is not null && sagaType is not null)
+                {
+                    var definition = new SagaDefinition(tableSuffix, sagaType, correlation, transitionalCorrelation);
+                    sagas.Add(definition);
+                }
             }
             catch (Exception exception)
             {
@@ -64,5 +69,4 @@ class AllSagaDefinitionReader(Assembly assembly)
 
         return new CorrelationProperty(name, propType);
     }
-
 }
