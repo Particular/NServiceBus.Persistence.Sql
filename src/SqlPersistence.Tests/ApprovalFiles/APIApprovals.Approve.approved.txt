@@ -10,7 +10,7 @@ namespace NServiceBus.Persistence.Sql
 {
     [System.Obsolete("The SqlSaga base class is no longer supported, use \'NServiceBus.Saga<T>\' with the" +
         " \'mapper.MapSaga(…).ToMessage(…)\' API. Other SqlSaga features can be added apply" +
-        "ing the \'SqlSagaAttribute\' the saga class. Will be removed in version 10.0.0.", true)]
+        "ing the \'SqlSagaAttribute\' to the saga class. Will be removed in version 10.0.0.", true)]
     public interface IMessagePropertyMapper
     {
         void ConfigureMapping<TMessage>(System.Linq.Expressions.Expression<System.Func<TMessage, object>> messageProperty);
@@ -58,7 +58,7 @@ namespace NServiceBus.Persistence.Sql
     }
     [System.Obsolete("The SqlSaga base class is no longer supported, use \'NServiceBus.Saga<T>\' with the" +
         " \'mapper.MapSaga(…).ToMessage(…)\' API. Other SqlSaga features can be added apply" +
-        "ing the \'SqlSagaAttribute\' the saga class. Will be removed in version 10.0.0.", true)]
+        "ing the \'SqlSagaAttribute\' to the saga class. Will be removed in version 10.0.0.", true)]
     public abstract class SqlSaga<TSagaData>
     {
         protected SqlSaga() { }
