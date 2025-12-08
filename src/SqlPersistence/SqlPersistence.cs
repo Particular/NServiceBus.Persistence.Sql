@@ -20,6 +20,7 @@
                     dialect.Name,
                     CustomDiagnostics = diagnostics
                 });
+                s.SetDefault(new InstallerSettings());
             });
 
             Supports<StorageType.Outbox, SqlOutboxFeature>();
