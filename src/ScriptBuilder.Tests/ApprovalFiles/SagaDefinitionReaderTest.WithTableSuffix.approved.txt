@@ -1,9 +1,0 @@
-﻿{
-  "TableSuffix": "TheTableSuffix",
-  "CorrelationProperty": {
-    "Type": "String",
-    "Name": "Correlation"
-  },
-  "TransitionalCorrelationProperty": null,
-  "Name": "SagaDefinitionReaderTest/TableSuffixSaga"
-}

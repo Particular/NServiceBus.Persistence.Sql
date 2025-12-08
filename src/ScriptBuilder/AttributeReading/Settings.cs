@@ -1,11 +1,13 @@
+#nullable enable
+
 using System.Collections.Generic;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class Settings
 {
-    public List<BuildSqlDialect> BuildDialects { get; set; }
+    public List<BuildSqlDialect> BuildDialects { get; set; } = [];
 
-    public string ScriptPromotionPath { get; set; }
+    public string? ScriptPromotionPath { get; set; }
 
     public bool ProduceOutboxScripts { get; set; }
 

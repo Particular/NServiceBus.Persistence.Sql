@@ -1,7 +1,0 @@
-﻿{
-  "HasUnmanagedCalls": false,
-  "HasUnexpectedCalls": false,
-  "HasBranchingLogic": false,
-  "SagaDefinition": null,
-  "Exception": "Saga can only have one correlation property identified by .ToSaga() expressions. Fix mappings in ConfigureHowToFindSaga to map to a single correlation property or decorate the saga with [SqlSaga] attribute."
-}

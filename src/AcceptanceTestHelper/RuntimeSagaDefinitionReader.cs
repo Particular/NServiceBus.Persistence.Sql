@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Mono.Cecil;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
-using static TestTableNameCleaner;
 
 public static class RuntimeSagaDefinitionReader
 {
@@ -38,8 +36,7 @@ public static class RuntimeSagaDefinitionReader
         foreach (var assembly in sagaAssemblies)
         {
             //Validate the saga definitions using script builder compile-time validation
-            using var moduleDefinition = ModuleDefinition.ReadModule(assembly.Location, new ReaderParameters(ReadingMode.Deferred));
-            var compileTimeReader = new AllSagaDefinitionReader(moduleDefinition);
+            var compileTimeReader = new AllSagaDefinitionReader(assembly);
             sagaDefinitions.AddRange(compileTimeReader.GetSagas());
         }
 
@@ -49,9 +46,9 @@ public static class RuntimeSagaDefinitionReader
 
     static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, BuildSqlDialect sqlDialect)
     {
-        if (!definitions.TryGetValue(sagaType.FullName!, out var sagaDefinition))
+        if (!definitions.TryGetValue(sagaType.FullName!.Replace('+', '.'), out var sagaDefinition))
         {
-            throw new Exception($"Type '{sagaType.FullName}' is not a Saga<T>.");
+            throw new Exception($"Could not find metadata for '{sagaType.FullName}' in the collected assembly metadata.");
         }
 
         var tableSuffix = sagaDefinition.TableSuffix;

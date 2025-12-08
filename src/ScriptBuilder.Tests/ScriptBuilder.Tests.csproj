@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
-    <ProjectReference Include="..\VBTestCode\VBTestCode.vbproj" />
   </ItemGroup>
 
   <ItemGroup>
