@@ -105,7 +105,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 });
             })
             .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
-            .Run(TimeSpan.FromSeconds(30));
+            .Run();
 
         Assert.Multiple(() =>
         {
@@ -145,7 +145,7 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
                 });
             })
             .Done(c => c.TenantADbName != null && c.TenantBDbName != null)
-            .Run(TimeSpan.FromSeconds(30));
+            .Run();
 
         Assert.Multiple(() =>
         {
