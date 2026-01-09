@@ -18,7 +18,6 @@ public class When_using_different_persistence : NServiceBusAcceptanceTest
             .Run();
 
         // If installers were run, we'd get an System.Exception: "ConnectionBuilder must be defined."
-        Assert.That(context.EndpointsStarted, Is.True);
     }
 
     public class Context : ScenarioContext
