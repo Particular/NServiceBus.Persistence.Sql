@@ -16,9 +16,9 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
     public async Task Should_remove_old_property_after_phase_three()
     {
         var dialect = BuildSqlDialect.MsSqlServer;
-        var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
-        var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
-        var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
+        var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase1Saga>(dialect);
+        var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase2Saga>(dialect);
+        var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase3Saga>(dialect);
 
         using (var connection = MsSqlMicrosoftDataClientConnectionBuilder.Build())
         {

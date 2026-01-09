@@ -23,7 +23,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             connection.Open();
 
             //HACK: Thread Sleeps required since information_schema.statistics takes some time to update
-            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase1Saga), dialect);
+            var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase1Saga>(dialect);
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
             Thread.Sleep(200);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
@@ -32,14 +32,14 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             Assert.That(phase1Schema, Has.Member("Correlation_OrderNumber"));
             Assert.That(phase1Schema, Has.No.Member("Correlation_OrderId"));
 
-            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase2Saga), dialect);
+            var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase2Saga>(dialect);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
             Thread.Sleep(200);
             var phase2Schema = GetSchema(connection);
             Assert.That(phase2Schema, Has.Member("Correlation_OrderNumber"));
             Assert.That(phase2Schema, Has.Member("Correlation_OrderId"));
 
-            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition(typeof(Phase3Saga), dialect);
+            var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase3Saga>(dialect);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
             Thread.Sleep(200);
             var phase3Schema = GetSchema(connection);

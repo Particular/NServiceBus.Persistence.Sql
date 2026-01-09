@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NServiceBus;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NServiceBus.Sagas;
 using NServiceBus.Settings;
@@ -22,10 +23,11 @@ public static class RuntimeSagaDefinitionReader
         return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect));
     }
 
-    public static SagaDefinition GetSagaDefinition(Type sagaType, BuildSqlDialect sqlDialect)
+    public static SagaDefinition GetSagaDefinition<TSagaType>(BuildSqlDialect sqlDialect)
+        where TSagaType : Saga
     {
-        var sagaDefinitions = GetSagaDefinitions([sagaType.Assembly]);
-        var metadata = SagaMetadata.Create(sagaType);
+        var sagaDefinitions = GetSagaDefinitions([typeof(TSagaType).Assembly]);
+        var metadata = SagaMetadata.Create<TSagaType>();
 
         return GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect);
     }
