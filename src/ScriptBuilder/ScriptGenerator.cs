@@ -157,14 +157,21 @@ public class ScriptGenerator(string assemblyPath,
 
     static IEnumerable<string> CollectAssemblyFiles(string assemblyFolderPath, IReadOnlyList<string>? referencePaths)
     {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var file in Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll"))
         {
-            yield return file;
+            if (seen.Add(Path.GetFileName(file)))
+            {
+                yield return file;
+            }
         }
 
         foreach (var file in Directory.EnumerateFiles(assemblyFolderPath, "*.dll", SearchOption.AllDirectories))
         {
-            yield return file;
+            if (seen.Add(Path.GetFileName(file)))
+            {
+                yield return file;
+            }
         }
 
         if (referencePaths is null)
@@ -174,7 +181,7 @@ public class ScriptGenerator(string assemblyPath,
 
         foreach (var referencePath in referencePaths)
         {
-            if (File.Exists(referencePath))
+            if (File.Exists(referencePath) && seen.Add(Path.GetFileName(referencePath)))
             {
                 yield return referencePath;
             }

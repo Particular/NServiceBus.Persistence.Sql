@@ -90,7 +90,11 @@ class InnerTaskTests
         File.Copy(sourceAssembly, isolatedAssembly);
 
         // With reference paths pointing to the actual dependency location, should succeed
-        string[] referencePaths = [Path.Combine(testDirectory, "NServiceBus.Persistence.Sql.dll")];
+        string[] referencePaths =
+        [
+            Path.Combine(testDirectory, "NServiceBus.Persistence.Sql.dll"),
+            Path.Combine(testDirectory, "NServiceBus.Persistence.Sql.dll") // deliberately adding duplicates
+        ];
 
         var innerTask = new InnerTask(
             assemblyPath: isolatedAssembly,
