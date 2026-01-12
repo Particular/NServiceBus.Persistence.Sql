@@ -1,4 +1,4 @@
-﻿{
+{
   "BuildDialects": [
     "MsSqlServer"
   ],
@@ -6,5 +6,6 @@
   "ProduceOutboxScripts": true,
   "ProduceSubscriptionScripts": true,
   "ProduceTimeoutScripts": true,
-  "ProduceSagaScripts": true
+  "ProduceSagaScripts": true,
+  "SagaDefinitions": []
 }

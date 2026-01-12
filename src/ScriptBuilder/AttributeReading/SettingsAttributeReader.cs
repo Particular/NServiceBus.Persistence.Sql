@@ -36,7 +36,7 @@ static class SettingsAttributeReader
                     var attNamespace = reader.GetString(typeReference.Namespace);
                     if (attNamespace == "NServiceBus.Persistence.Sql")
                     {
-                        var args = attribute.DecodeValue(new AttributeTypeProvider());
+                        var args = attribute.DecodeValue(AttributeTypeProvider.Instance);
                         var properties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
                         settings = ReadFromProperties(properties);
                     }
@@ -53,7 +53,7 @@ static class SettingsAttributeReader
                     var attNamespace = reader.GetString(typeReference.Namespace);
                     if (string.IsNullOrEmpty(attNamespace))
                     {
-                        var args = attribute.DecodeValue(new AttributeTypeProvider());
+                        var args = attribute.DecodeValue(AttributeTypeProvider.Instance);
                         var properties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
 
                         var sagaType = properties.GetValueOrDefault("SagaType") as string;
@@ -168,6 +168,10 @@ static class SettingsAttributeReader
     // Minimal implementation that only supports primitive types
     sealed class AttributeTypeProvider : ICustomAttributeTypeProvider<object?>
     {
+        AttributeTypeProvider() { }
+
+        public static readonly AttributeTypeProvider Instance = new();
+
         public object? GetPrimitiveType(PrimitiveTypeCode typeCode) => typeCode;
         public object? GetSystemType() => typeof(Type);
         public object? GetTypeFromDefinition(MetadataReader r, TypeDefinitionHandle h, byte raw) => null;
