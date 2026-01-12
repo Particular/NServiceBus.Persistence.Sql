@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.CDK.Lib" Version="2.232.1" />
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="1.120.0" />
-    <PackageReference Include="Constructs" Version="10.4.3" />
+    <PackageReference Include="Constructs" Version="10.4.4" />
   </ItemGroup>
 
 </Project>
