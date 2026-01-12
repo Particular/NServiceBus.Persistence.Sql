@@ -1,25 +1,21 @@
 #nullable enable
 
-using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
 class SagaWriter(bool clean,
     bool overwrite,
     string scriptPath,
-    Assembly assembly,
-    Action<string, string>? logError = null)
+    IReadOnlyList<SagaDefinition> sagaDefinitions)
     : ScriptWriter(clean, overwrite, scriptPath)
 {
     public override void WriteScripts(BuildSqlDialect dialect)
     {
         Directory.CreateDirectory(sagaPath);
 
-        var metaDataReader = new AllSagaDefinitionReader(assembly);
-
         var index = 0;
-        foreach (var saga in metaDataReader.GetSagas(logError))
+        foreach (var saga in sagaDefinitions)
         {
             var sagaFileName = saga.TableSuffix;
             var maximumNameLength = 244 - ScriptPath.Length;

@@ -38,8 +38,8 @@ public static class RuntimeSagaDefinitionReader
         foreach (var assembly in sagaAssemblies)
         {
             //Validate the saga definitions using script builder compile-time validation
-            var compileTimeReader = new AllSagaDefinitionReader(assembly);
-            sagaDefinitions.AddRange(compileTimeReader.GetSagas());
+            var settings = SettingsAttributeReader.Read(assembly.Location);
+            sagaDefinitions.AddRange(settings.SagaDefinitions);
         }
 
         var definitions = sagaDefinitions.ToDictionary(static s => s.Name.Replace("/", "+"), static s => s);
