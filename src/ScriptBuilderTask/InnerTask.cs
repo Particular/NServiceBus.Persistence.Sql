@@ -2,27 +2,9 @@
 using System.IO;
 using NServiceBus.Persistence.Sql;
 
-class InnerTask
+class InnerTask(string assemblyPath, string intermediateDirectory, string projectDirectory, string solutionDirectory, string[] referencePaths, Action<string, string> logError)
 {
-    string assemblyPath;
-    string intermediateDirectory;
-    string projectDirectory;
-    string solutionDirectory;
-    Action<string, string> logError;
-
-    public InnerTask(string assemblyPath, string intermediateDirectory, string projectDirectory, string solutionDirectory, Action<string, string> logError)
-    {
-        this.assemblyPath = assemblyPath;
-        this.intermediateDirectory = intermediateDirectory;
-        this.projectDirectory = projectDirectory;
-        this.solutionDirectory = solutionDirectory;
-        this.logError = logError;
-    }
-
-    public void Execute()
-    {
-        ScriptGenerator.Generate(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
-    }
+    public void Execute() => ScriptGenerator.Generate(assemblyPath, intermediateDirectory, referencePaths, logError, FindPromotionPath);
 
     string FindPromotionPath(string promotionPath)
     {
@@ -51,8 +33,5 @@ Possible workarounds:
         return promotionPath;
     }
 
-    static string GetFullPathWithEndingSlashes(string input)
-    {
-        return input.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
-    }
+    static string GetFullPathWithEndingSlashes(string input) => input.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
 }

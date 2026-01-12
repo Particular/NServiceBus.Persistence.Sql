@@ -26,6 +26,7 @@ class InnerTaskTests
             intermediateDirectory: intermediatePath,
             projectDirectory: "TheProjectDir",
             solutionDirectory: Path.Combine(temp, "PromotePath"),
+            referencePaths: [],
             logError: (error, type) => throw new Exception(error));
         innerTask.Execute();
         var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories)

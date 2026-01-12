@@ -18,18 +18,16 @@ static class SettingsAttributeReader
         return ReadFromProperties(properties);
     }
 
-    public static Settings ReadFromProperties(Dictionary<string, object?> properties)
-    {
-        return new Settings
+    public static Settings ReadFromProperties(Dictionary<string, object?> properties) =>
+        new()
         {
-            BuildDialects = ReadBuildDialects(properties).ToList(),
+            BuildDialects = [.. ReadBuildDialects(properties)],
             ScriptPromotionPath = ReadScriptPromotionPath(properties),
             ProduceSagaScripts = GetBoolProperty(properties, "ProduceSagaScripts", true),
             ProduceTimeoutScripts = GetBoolProperty(properties, "ProduceTimeoutScripts", true),
             ProduceSubscriptionScripts = GetBoolProperty(properties, "ProduceSubscriptionScripts", true),
             ProduceOutboxScripts = GetBoolProperty(properties, "ProduceOutboxScripts", true),
         };
-    }
 
     static bool GetBoolProperty(Dictionary<string, object?> properties, string key, bool defaultValue = false)
         => properties.GetValueOrDefault(key) as bool? ?? defaultValue;

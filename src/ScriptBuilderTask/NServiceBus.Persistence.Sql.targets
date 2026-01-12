@@ -29,7 +29,8 @@
       AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
       IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
       ProjectDirectory="$(ProjectDir)"
-      SolutionDirectory="$(SqlPersistenceSolutionDir)" />
+      SolutionDirectory="$(SqlPersistenceSolutionDir)"
+      ReferencePath="@(ReferencePath)" />
   </Target>
 
   <Target Name="SqlPersistenceAddScriptsToContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems" AfterTargets="SqlPersistenceScriptBuilder" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">

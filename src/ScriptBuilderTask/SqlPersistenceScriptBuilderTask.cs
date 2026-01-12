@@ -4,6 +4,7 @@
     using System.Reflection;
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
@@ -22,7 +23,9 @@
 
         public string SolutionDirectory { get; set; }
 
-        static Version assemblyVersion = typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
+        public ITaskItem[] ReferencePath { get; set; }
+
+        static readonly Version assemblyVersion = typeof(SqlPersistenceScriptBuilderTask).GetTypeInfo().Assembly.GetName().Version;
 
         public override bool Execute()
         {
@@ -34,11 +37,9 @@
             try
             {
                 ValidateInputs();
-                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory,
-                    logError: (error, file) =>
-                    {
-                        logger.LogError(error, file);
-                    });
+                var referencePaths = ReferencePath?.Select(item => item.ItemSpec).ToArray() ?? [];
+                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory, referencePaths,
+                    logError: (error, file) => logger.LogError(error, file));
                 innerTask.Execute();
             }
             catch (ErrorsException exception)

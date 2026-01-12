@@ -14,6 +14,7 @@ public class ScriptGenerator(string assemblyPath,
     bool clean = true,
     bool overwrite = true,
     IReadOnlyList<BuildSqlDialect>? dialectOptions = null,
+    IReadOnlyList<string>? referencePaths = null,
     Func<string, string>? promotionFinder = null,
     Action<string, string>? logError = null)
 {
@@ -21,6 +22,13 @@ public class ScriptGenerator(string assemblyPath,
         Action<string, string> logError, Func<string, string> promotionPathFinder)
     {
         var writer = new ScriptGenerator(assemblyPath, targetDirectory, promotionFinder: promotionPathFinder, logError: logError);
+        writer.Generate();
+    }
+
+    public static void Generate(string assemblyPath, string targetDirectory, string[] referencePaths,
+        Action<string, string> logError, Func<string, string> promotionPathFinder)
+    {
+        var writer = new ScriptGenerator(assemblyPath, targetDirectory, referencePaths: referencePaths, promotionFinder: promotionPathFinder, logError: logError);
         writer.Generate();
     }
 
@@ -39,11 +47,9 @@ public class ScriptGenerator(string assemblyPath,
             return;
         }
 
-        var assemblyFiles = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
-            .Concat(Directory.GetFiles(assemblyFolderPath, "*.dll"))
-            .ToArray();
+        var assemblyFiles = CollectAssemblyFiles(assemblyFolderPath, referencePaths);
         var resolver = new PathAssemblyResolver(assemblyFiles);
-        var metadataLoadContext = new MetadataLoadContext(resolver);
+        using var metadataLoadContext = new MetadataLoadContext(resolver);
         var assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
 
         var settings = SettingsAttributeReader.Read(assembly);
@@ -148,4 +154,30 @@ public class ScriptGenerator(string assemblyPath,
 
     readonly string scriptBasePath = Path.Combine(destinationDirectory, "NServiceBus.Persistence.Sql");
     readonly IReadOnlyList<BuildSqlDialect> dialectOptions = dialectOptions ?? [];
+
+    static IEnumerable<string> CollectAssemblyFiles(string assemblyFolderPath, IReadOnlyList<string>? referencePaths)
+    {
+        foreach (var file in Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll"))
+        {
+            yield return file;
+        }
+
+        foreach (var file in Directory.EnumerateFiles(assemblyFolderPath, "*.dll", SearchOption.AllDirectories))
+        {
+            yield return file;
+        }
+
+        if (referencePaths is null)
+        {
+            yield break;
+        }
+
+        foreach (var referencePath in referencePaths)
+        {
+            if (File.Exists(referencePath))
+            {
+                yield return referencePath;
+            }
+        }
+    }
 }
