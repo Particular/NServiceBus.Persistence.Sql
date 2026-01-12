@@ -34,7 +34,6 @@
 
   <ItemGroup>
     <None Include="..\ScriptBuilderTask\NServiceBus.Persistence.Sql.targets" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework);buildTransitive\$(ScriptBuilderTargetFramework)" Visible="false" />
-    <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\System.Reflection.MetadataLoadContext.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilder.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
     <None Include="..\ScriptBuilderTask\bin\$(Configuration)\$(ScriptBuilderTargetFramework)\NServiceBus.Persistence.Sql.ScriptBuilderTask.dll" Pack="true" PackagePath="build\$(ScriptBuilderTargetFramework)\task" Visible="false" />
   </ItemGroup>

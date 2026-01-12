@@ -7,7 +7,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 class SagaWriter(bool clean,
     bool overwrite,
     string scriptPath,
-    IReadOnlyList<SagaDefinition> sagaDefinitions)
+    List<SagaDefinition> sagaDefinitions)
     : ScriptWriter(clean, overwrite, scriptPath)
 {
     public override void WriteScripts(BuildSqlDialect dialect)

@@ -80,7 +80,7 @@ static class SettingsAttributeReader
         settings ??= ReadFromProperties([]);
 
         // Then apply the saga definitions
-        settings.SagaDefinitions = sagas.ToArray();
+        settings.SagaDefinitions = sagas;
         return settings;
     }
 

@@ -17,5 +17,5 @@ class Settings
 
     public bool ProduceSagaScripts { get; set; }
 
-    public SagaDefinition[] SagaDefinitions { get; set; } = [];
+    public List<SagaDefinition> SagaDefinitions { get; set; } = [];
 }
