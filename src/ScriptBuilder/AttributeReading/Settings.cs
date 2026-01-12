@@ -16,4 +16,6 @@ class Settings
     public bool ProduceTimeoutScripts { get; set; }
 
     public bool ProduceSagaScripts { get; set; }
+
+    public List<SagaDefinition> SagaDefinitions { get; set; } = [];
 }
