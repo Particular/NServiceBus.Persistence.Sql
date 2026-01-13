@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Particular.Approvals;
@@ -25,8 +24,7 @@ class InnerTaskTests
             assemblyPath: Path.Combine(testDirectory, "ScriptBuilderTask.Tests.Target.dll"),
             intermediateDirectory: intermediatePath,
             projectDirectory: "TheProjectDir",
-            solutionDirectory: Path.Combine(temp, "PromotePath"),
-            logError: (error, type) => throw new Exception(error));
+            solutionDirectory: Path.Combine(temp, "PromotePath"));
         innerTask.Execute();
         var files = Directory.EnumerateFiles(temp, "*.*", SearchOption.AllDirectories)
                         .Select(s => s.Replace(temp, "temp").ConvertPathSeparators("/"))

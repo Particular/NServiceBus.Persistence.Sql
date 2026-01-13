@@ -88,7 +88,7 @@ public class ScriptGenerator
 {
     public ScriptGenerator(string assemblyPath, string destinationDirectory, bool clean = true, bool overwrite = true, System.Collections.Generic.IReadOnlyList<NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect>? dialectOptions = null, System.Func<string, string>? promotionFinder = null) { }
     public void Generate() { }
-    public static void Generate(string assemblyPath, string targetDirectory, System.Action<string, string> logError, System.Func<string, string> promotionPathFinder) { }
+    public static void Generate(string assemblyPath, string targetDirectory, System.Func<string, string> promotionPathFinder) { }
 }
 public abstract class ScriptWriter
 {

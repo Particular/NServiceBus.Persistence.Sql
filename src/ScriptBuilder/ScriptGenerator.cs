@@ -14,8 +14,7 @@ public class ScriptGenerator(string assemblyPath,
     IReadOnlyList<BuildSqlDialect>? dialectOptions = null,
     Func<string, string>? promotionFinder = null)
 {
-    public static void Generate(string assemblyPath, string targetDirectory,
-        Action<string, string> logError, Func<string, string> promotionPathFinder)
+    public static void Generate(string assemblyPath, string targetDirectory, Func<string, string> promotionPathFinder)
     {
         var writer = new ScriptGenerator(assemblyPath, targetDirectory, promotionFinder: promotionPathFinder);
         writer.Generate();
