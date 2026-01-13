@@ -13,8 +13,8 @@ static class SettingsAttributeReader
 {
     public static Settings Read(string assemblyPath)
     {
-        Settings? settings = null;
-        List<SagaDefinition> sagas = [];
+        List<SagaDefinition> sagaDefinitions = [];
+        Dictionary<string, object?>? properties = null;
 
         using var stream = File.OpenRead(assemblyPath);
         using var peReader = new PEReader(stream);
@@ -37,8 +37,12 @@ static class SettingsAttributeReader
                     if (attNamespace == "NServiceBus.Persistence.Sql")
                     {
                         var args = attribute.DecodeValue(AttributeTypeProvider.Instance);
-                        var properties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
-                        settings = ReadFromProperties(properties);
+                        // This assembly level attribute can only exists once per assembly. This is an additional safe guard to make this code more intention revealing
+                        if (properties is not null)
+                        {
+                            throw new InvalidOperationException("Only one SqlPersistenceSettingsAttribute can be defined per assembly");
+                        }
+                        properties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
                     }
                 }
             }
@@ -54,14 +58,14 @@ static class SettingsAttributeReader
                     if (string.IsNullOrEmpty(attNamespace))
                     {
                         var args = attribute.DecodeValue(AttributeTypeProvider.Instance);
-                        var properties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
+                        var sagaProperties = args.NamedArguments.ToDictionary(o => o.Name!, o => o.Value);
 
-                        var sagaType = properties.GetValueOrDefault("SagaType") as string;
-                        var corrName = properties.GetValueOrDefault("CorrelationPropertyName") as string;
-                        var corrType = properties.GetValueOrDefault("CorrelationPropertyType") as string;
-                        var transName = properties.GetValueOrDefault("TransitionalCorrelationPropertyName") as string;
-                        var transType = properties.GetValueOrDefault("TransitionalCorrelationPropertyType") as string;
-                        var tableSuffix = properties.GetValueOrDefault("TableSuffix") as string;
+                        var sagaType = sagaProperties.GetValueOrDefault("SagaType") as string;
+                        var corrName = sagaProperties.GetValueOrDefault("CorrelationPropertyName") as string;
+                        var corrType = sagaProperties.GetValueOrDefault("CorrelationPropertyType") as string;
+                        var transName = sagaProperties.GetValueOrDefault("TransitionalCorrelationPropertyName") as string;
+                        var transType = sagaProperties.GetValueOrDefault("TransitionalCorrelationPropertyType") as string;
+                        var tableSuffix = sagaProperties.GetValueOrDefault("TableSuffix") as string;
 
                         var correlation = GetCorrelation(corrName, corrType);
                         var transitionalCorrelation = GetCorrelation(transName, transType);
@@ -69,7 +73,7 @@ static class SettingsAttributeReader
                         if (tableSuffix is not null && sagaType is not null)
                         {
                             var definition = new SagaDefinition(tableSuffix, sagaType, correlation, transitionalCorrelation);
-                            sagas.Add(definition);
+                            sagaDefinitions.Add(definition);
                         }
                     }
                 }
@@ -77,16 +81,11 @@ static class SettingsAttributeReader
         }
 
         // If no attribute, generate the default
-        settings ??= ReadFromProperties([]);
-
-        // Then apply the saga definitions
-        settings.SagaDefinitions = sagas;
-        return settings;
+        return ReadFromProperties(properties ?? [], sagaDefinitions);
     }
 
-    public static Settings ReadFromProperties(Dictionary<string, object?> properties)
-    {
-        return new Settings
+    public static Settings ReadFromProperties(Dictionary<string, object?> properties, IReadOnlyCollection<SagaDefinition> sagas) =>
+        new()
         {
             BuildDialects = ReadBuildDialects(properties).ToList(),
             ScriptPromotionPath = ReadScriptPromotionPath(properties),
@@ -94,8 +93,8 @@ static class SettingsAttributeReader
             ProduceTimeoutScripts = GetBoolProperty(properties, "ProduceTimeoutScripts", true),
             ProduceSubscriptionScripts = GetBoolProperty(properties, "ProduceSubscriptionScripts", true),
             ProduceOutboxScripts = GetBoolProperty(properties, "ProduceOutboxScripts", true),
+            SagaDefinitions = sagas
         };
-    }
 
     static bool GetBoolProperty(Dictionary<string, object?> properties, string key, bool defaultValue = false)
         => properties.GetValueOrDefault(key) as bool? ?? defaultValue;

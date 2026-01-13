@@ -3,19 +3,19 @@
 using System.Collections.Generic;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
-class Settings
+sealed class Settings
 {
-    public List<BuildSqlDialect> BuildDialects { get; set; } = [];
+    public required IReadOnlyCollection<BuildSqlDialect> BuildDialects { get; init; }
 
-    public string? ScriptPromotionPath { get; set; }
+    public string? ScriptPromotionPath { get; init; }
 
-    public bool ProduceOutboxScripts { get; set; }
+    public required bool ProduceOutboxScripts { get; init; }
 
-    public bool ProduceSubscriptionScripts { get; set; }
+    public required bool ProduceSubscriptionScripts { get; init; }
 
-    public bool ProduceTimeoutScripts { get; set; }
+    public required bool ProduceTimeoutScripts { get; init; }
 
-    public bool ProduceSagaScripts { get; set; }
+    public required bool ProduceSagaScripts { get; init; }
 
-    public List<SagaDefinition> SagaDefinitions { get; set; } = [];
+    public required IReadOnlyCollection<SagaDefinition> SagaDefinitions { get; init; }
 }
