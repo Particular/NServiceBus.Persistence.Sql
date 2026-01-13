@@ -166,8 +166,8 @@ static class SettingsAttributeReader
 
         public static readonly AttributeTypeProvider Instance = new();
 
-        public object? GetPrimitiveType(PrimitiveTypeCode typeCode) => typeCode;
-        public object? GetSystemType() => typeof(Type);
+        public object GetPrimitiveType(PrimitiveTypeCode typeCode) => typeCode;
+        public object GetSystemType() => typeof(Type);
         public object? GetTypeFromDefinition(MetadataReader r, TypeDefinitionHandle h, byte raw) => null;
         public object? GetTypeFromReference(MetadataReader r, TypeReferenceHandle h, byte raw) => null;
         public object? GetSZArrayType(object? elementType) => null;
