@@ -21,7 +21,7 @@ class SagaWriter(bool clean,
             var maximumNameLength = 244 - ScriptPath.Length;
             if (sagaFileName.Length > maximumNameLength)
             {
-                sagaFileName = $"{sagaFileName.Substring(0, maximumNameLength)}_{index}";
+                sagaFileName = $"{sagaFileName[..maximumNameLength]}_{index}";
                 index++;
             }
 
