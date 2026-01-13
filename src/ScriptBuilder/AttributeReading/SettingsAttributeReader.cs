@@ -156,12 +156,7 @@ static class SettingsAttributeReader
             return null;
         }
 
-        if (!Enum.TryParse<CorrelationPropertyType>(type, out var propType))
-        {
-            throw new Exception($"Invalid correlation property type '{type}' found in metadata attribute.");
-        }
-
-        return new CorrelationProperty(name, propType);
+        return !Enum.TryParse<CorrelationPropertyType>(type, out var propType) ? throw new Exception($"Invalid correlation property type '{type}' found in metadata attribute.") : new CorrelationProperty(name, propType);
     }
 
     // Minimal implementation that only supports primitive types
