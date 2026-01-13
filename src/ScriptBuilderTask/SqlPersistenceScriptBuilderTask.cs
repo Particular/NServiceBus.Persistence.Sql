@@ -34,11 +34,7 @@
             try
             {
                 ValidateInputs();
-                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory,
-                    logError: (error, file) =>
-                    {
-                        logger.LogError(error, file);
-                    });
+                var innerTask = new InnerTask(AssemblyPath, IntermediateDirectory, ProjectDirectory, SolutionDirectory);
                 innerTask.Execute();
             }
             catch (ErrorsException exception)

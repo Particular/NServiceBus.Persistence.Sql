@@ -7,7 +7,7 @@ using NServiceBus.Persistence.Sql.ScriptBuilder;
 class SagaWriter(bool clean,
     bool overwrite,
     string scriptPath,
-    List<SagaDefinition> sagaDefinitions)
+    IReadOnlyCollection<SagaDefinition> sagaDefinitions)
     : ScriptWriter(clean, overwrite, scriptPath)
 {
     public override void WriteScripts(BuildSqlDialect dialect)
@@ -21,7 +21,7 @@ class SagaWriter(bool clean,
             var maximumNameLength = 244 - ScriptPath.Length;
             if (sagaFileName.Length > maximumNameLength)
             {
-                sagaFileName = $"{sagaFileName.Substring(0, maximumNameLength)}_{index}";
+                sagaFileName = $"{sagaFileName[..maximumNameLength]}_{index}";
                 index++;
             }
 

@@ -1,28 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using NServiceBus.Persistence.Sql;
 
-class InnerTask
+sealed class InnerTask(string assemblyPath, string intermediateDirectory, string projectDirectory, string solutionDirectory)
 {
-    string assemblyPath;
-    string intermediateDirectory;
-    string projectDirectory;
-    string solutionDirectory;
-    Action<string, string> logError;
-
-    public InnerTask(string assemblyPath, string intermediateDirectory, string projectDirectory, string solutionDirectory, Action<string, string> logError)
-    {
-        this.assemblyPath = assemblyPath;
-        this.intermediateDirectory = intermediateDirectory;
-        this.projectDirectory = projectDirectory;
-        this.solutionDirectory = solutionDirectory;
-        this.logError = logError;
-    }
-
-    public void Execute()
-    {
-        ScriptGenerator.Generate(assemblyPath, intermediateDirectory, logError, FindPromotionPath);
-    }
+    public void Execute() => ScriptGenerator.Generate(assemblyPath, intermediateDirectory, FindPromotionPath);
 
     string FindPromotionPath(string promotionPath)
     {

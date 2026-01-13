@@ -15,7 +15,7 @@ public class SqlAttributeParametersReadersTest
                         //At least one is required
                         "MsSqlServerScripts", true
                     }
-                });
+                }, []);
 
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
@@ -24,7 +24,7 @@ public class SqlAttributeParametersReadersTest
     [Test]
     public void Defaults()
     {
-        var result = SettingsAttributeReader.ReadFromProperties([]);
+        var result = SettingsAttributeReader.ReadFromProperties([], []);
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
@@ -59,10 +59,8 @@ public class SqlAttributeParametersReadersTest
                     {
                         "ProduceOutboxScripts", false
                     }
-                });
+                }, []);
         Assert.That(result, Is.Not.Null);
         Approver.Verify(result);
     }
-
-
 }
