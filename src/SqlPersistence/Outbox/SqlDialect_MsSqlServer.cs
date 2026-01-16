@@ -77,9 +77,11 @@ where MessageId = @MessageId";
             {
                 // Rowlock hint to prevent lock escalation which can result in INSERT's and competing cleanup to dead-lock
                 return $@"
-delete top (@BatchSize) from {tableName} with (rowlock)
+delete top (@BatchSize) from {tableName} with (rowlock, readpast)
 where Dispatched = 'true' and
-      DispatchedAt < @DispatchedBefore";
+      DispatchedAt < @DispatchedBefore
+options (maxdop 1)";
+
             }
 
             internal override string AddOutboxPadding(string json)
