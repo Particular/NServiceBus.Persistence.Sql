@@ -11,4 +11,10 @@
     <AnalyzerTargetFramework>netstandard2.0</AnalyzerTargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Package needs to stay on 5.0.x to ensure we run on the 10.0.10x SDK and Visual Studio 18.0 -->
+    <RoslynPackageVersion>5.0.0</RoslynPackageVersion>
+    <RoslynPackagePathVersion>$(RoslynPackageVersion.Split(`.`)[0]).$(RoslynPackageVersion.Split(`.`)[1])</RoslynPackagePathVersion>
+  </PropertyGroup>
+
 </Project>
