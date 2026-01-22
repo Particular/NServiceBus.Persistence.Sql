@@ -8,14 +8,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcceptanceTestHelper\AcceptanceTestHelper.csproj" />
-    <ProjectReference Label="Local source generator" Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <ProjectReference Label="Local source generator" Include="..\NServiceBus.Persistence.Sql.Analyzer\NServiceBus.Persistence.Sql.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="3.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="10.0.0" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.Transport.PostgreSql" Version="9.0.0-alpha.4" />
+    <PackageReference Include="NServiceBus.Transport.PostgreSql" Version="9.0.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
   </ItemGroup>
 
