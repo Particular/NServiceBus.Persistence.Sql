@@ -8,7 +8,11 @@ public class CustomAttributeMock : ICustomAttribute
 {
     public CustomAttributeMock(Dictionary<string, object> dictionary)
     {
+#if NET10_0_OR_GREATER
+        Properties = [.. BuildProperties(dictionary).ToArray()];
+#else
         Properties = new Collection<CustomAttributeNamedArgument>(BuildProperties(dictionary).ToArray());
+#endif
     }
 
     IEnumerable<CustomAttributeNamedArgument> BuildProperties(Dictionary<string, object> objects)
