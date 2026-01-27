@@ -1,5 +1,5 @@
 ﻿
 delete top (@BatchSize) from [TheSchema].[TheTablePrefixOutboxData] with (rowlock, readpast)
-where Dispatched = 'true' and
+where Dispatched = true and
       DispatchedAt < @DispatchedBefore
 option (maxdop 1)
