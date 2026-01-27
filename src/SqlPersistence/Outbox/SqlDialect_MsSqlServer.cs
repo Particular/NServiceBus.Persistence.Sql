@@ -78,7 +78,7 @@ where MessageId = @MessageId";
                 // Rowlock hint to prevent lock escalation which can result in INSERT's and competing cleanup to dead-lock
                 return $@"
 delete top (@BatchSize) from {tableName} with (rowlock, readpast)
-where Dispatched = true and
+where Dispatched = 1 and
       DispatchedAt < @DispatchedBefore
 option (maxdop 1)";
 
