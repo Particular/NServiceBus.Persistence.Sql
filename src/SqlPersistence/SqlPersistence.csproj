@@ -46,7 +46,6 @@
     <InternalsVisibleTo Include="PostgreSqlTransportAcceptanceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="SqlPersistence.PersistenceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="SqlPersistence.Tests" Key="$(NServiceBusTestsKey)" />
-    <InternalsVisibleTo Include="TransactionalSession.MsSqlSystemDataClient.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
   </ItemGroup>
 
 </Project>
