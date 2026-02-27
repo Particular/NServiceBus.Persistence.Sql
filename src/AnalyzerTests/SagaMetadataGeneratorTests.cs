@@ -8,6 +8,14 @@ using Particular.AnalyzerTesting;
 
 public class SagaMetadataGeneratorTests
 {
+    [SetUp]
+    public void LoadDependencies()
+    {
+        // Force load of the assemblies, which are then available to all the tests
+        MetadataReference.CreateFromFile(typeof(IMessage).Assembly.Location);
+        MetadataReference.CreateFromFile(typeof(EndpointConfiguration).Assembly.Location);
+    }
+
     [Test]
     [TestCase("string")]
     [TestCase("long")]
