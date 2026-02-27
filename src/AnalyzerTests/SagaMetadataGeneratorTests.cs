@@ -14,6 +14,7 @@ public class SagaMetadataGeneratorTests
         // Force load of the assemblies, which are then available to all the tests
         MetadataReference.CreateFromFile(typeof(IMessage).Assembly.Location);
         MetadataReference.CreateFromFile(typeof(EndpointConfiguration).Assembly.Location);
+        MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location);
     }
 
     [Test]
@@ -87,7 +88,6 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReferences(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -119,7 +119,6 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReferences(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -149,7 +148,6 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReferences(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -219,7 +217,6 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReferences(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
             .Approve()
             .AssertRunsAreEqual();
     }
