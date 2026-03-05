@@ -237,4 +237,12 @@ public class SagaMetadataGenerator : IIncrementalGenerator
 
     record SagaDetails(string SagaType, CorrelationDetails? CorrelationProperty, CorrelationDetails? TransitionalProperty, string? TableSuffix);
     readonly record struct CorrelationDetails(string Type, string Name);
+
+    internal static class TrackingNames
+    {
+        public const string SagaDetails = nameof(SagaDetails);
+        public const string Collected = nameof(Collected);
+
+        public static readonly string[] All = [SagaDetails, Collected];
+    }
 }
