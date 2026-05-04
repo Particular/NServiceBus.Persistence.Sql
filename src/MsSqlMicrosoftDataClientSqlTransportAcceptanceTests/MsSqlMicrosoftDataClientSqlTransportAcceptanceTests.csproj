@@ -24,7 +24,7 @@
      Once the package provides support for .NET 10, this change can be re-evaluated. -->
   <PropertyGroup>
     <ResolvedTargetFramework>$(TargetFramework)</ResolvedTargetFramework>
-    <ResolvedTargetFramework Condition="'$(TargetFramework)' == 'net10.0'">net8.0</ResolvedTargetFramework>
+    <ResolvedTargetFramework Condition="'$(TargetFramework)' == 'net10.0'">net10.0</ResolvedTargetFramework>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
