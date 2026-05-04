@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NServiceBus" Version="10.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ScriptBuilder\ScriptBuilder.csproj" />
     <ProjectReference Include="..\SqlPersistence\SqlPersistence.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
