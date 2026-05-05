@@ -20,12 +20,9 @@
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
   </ItemGroup>
 
-  <!-- The referenced source package does not currently include support for .NET 10 sources. 
-     This change addresses that limitation to ensure compatibility with .NET 10. 
-     Once the package provides support for .NET 10, this change can be re-evaluated. -->
+  <!-- Only the shared acceptance-test infrastructure sources are needed from the source package. -->
   <PropertyGroup>
     <ResolvedTargetFramework>$(TargetFramework)</ResolvedTargetFramework>
-    <ResolvedTargetFramework Condition="'$(TargetFramework)' == 'net10.0'">net8.0</ResolvedTargetFramework>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
