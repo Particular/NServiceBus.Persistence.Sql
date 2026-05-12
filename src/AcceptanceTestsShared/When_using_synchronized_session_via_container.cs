@@ -16,7 +16,18 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
     {
         // The EndpointsStarted flag is set by acceptance framework
         var context = await Scenario.Define<Context>()
-            .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
+            .WithEndpoint<Endpoint>(b =>
+            {
+                b.Services(c =>
+                {
+                    c.AddScoped(b =>
+                    {
+                        var session = b.GetRequiredService<ISqlStorageSession>();
+                        return new DataContext(session.Connection);
+                    });
+                });
+                b.When(s => s.SendLocal(new MyMessage()));
+            })
             .Done(c => c.Done)
             .Run();
 
@@ -43,20 +54,7 @@ public class When_using_synchronized_session_via_container : NServiceBusAcceptan
 
     public class Endpoint : EndpointConfigurationBuilder
     {
-        public Endpoint()
-        {
-            EndpointSetup<DefaultServer>(config =>
-            {
-                config.RegisterComponents(c =>
-                {
-                    c.AddScoped(b =>
-                    {
-                        var session = b.GetRequiredService<ISqlStorageSession>();
-                        return new DataContext(session.Connection);
-                    });
-                });
-            });
-        }
+        public Endpoint() => EndpointSetup<DefaultServer>();
 
         public class MyMessageHandler : IHandleMessages<MyMessage>
         {

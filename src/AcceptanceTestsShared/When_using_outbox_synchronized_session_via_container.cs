@@ -16,7 +16,15 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
     {
         // The EndpointsStarted flag is set by acceptance framework
         var context = await Scenario.Define<Context>()
-            .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
+            .WithEndpoint<Endpoint>(b =>
+            {
+                b.Services(services =>
+                {
+                    services.AddScoped<MyRepository>();
+                    services.AddScoped(b => b.GetRequiredService<ISqlStorageSession>().Connection);
+                });
+                b.When(s => s.SendLocal(new MyMessage()));
+            })
             .Done(c => c.Done)
             .Run();
 
@@ -37,11 +45,6 @@ public class When_using_outbox_synchronized_session_via_container : NServiceBusA
             {
                 c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                 c.EnableOutbox();
-                c.RegisterComponents(cc =>
-                {
-                    cc.AddScoped<MyRepository>();
-                    cc.AddScoped(b => b.GetRequiredService<ISqlStorageSession>().Connection);
-                });
             });
         }
 
