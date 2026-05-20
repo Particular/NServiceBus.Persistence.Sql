@@ -454,7 +454,7 @@ public abstract class SagaPersisterTests
             )
         );
 
-        var execute = new TestDelegate(() =>
+        var execute = new Action(() =>
         {
             DropAndCreate(definition, endpointName, schema);
 
