@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynPackageVersion)" />
-    <PackageReference Include="Particular.AnalyzerTesting" Version="1.0.1" />
+    <PackageReference Include="Particular.AnalyzerTesting" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

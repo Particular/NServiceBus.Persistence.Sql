@@ -56,6 +56,7 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .WithScenarioName(correlationType)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -88,6 +89,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -119,6 +121,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -148,6 +151,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -190,6 +194,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -217,6 +222,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
