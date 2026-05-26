@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -22,9 +22,9 @@
   
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)\**\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\EndpointTemplates\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\ScenarioDescriptors\*.cs" />
-    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\$(TargetFramework)\**\NServiceBusAcceptanceTest.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net10.0\**\EndpointTemplates\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net10.0\**\ScenarioDescriptors\*.cs" />
+    <Compile Include="$(PkgNServiceBus_AcceptanceTests_Sources)\contentFiles\cs\net10.0\**\NServiceBusAcceptanceTest.cs" />
   </ItemGroup>
 
 </Project>
