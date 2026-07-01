@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -110,11 +111,11 @@ end
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> N'Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> N'Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> N'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> N'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
 
         writer.Write($@"
@@ -138,11 +139,11 @@ exec sp_executesql @dropPropertiesQuery
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        Name <> N'Index_Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        Name <> N'Index_Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        Name <> N'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        Name <> N'Index_Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
 
         writer.Write($@"

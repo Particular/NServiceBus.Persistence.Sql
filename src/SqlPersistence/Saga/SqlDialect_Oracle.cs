@@ -27,13 +27,13 @@
 
                 if (correlationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    {CorrelationPropertyName(correlationProperty)}");
-                    valuesBuilder.Append(",\r\n    :CorrelationId");
+                    insertBuilder.Append($",{Environment.NewLine}    {CorrelationPropertyName(correlationProperty)}");
+                    valuesBuilder.Append($",{Environment.NewLine}    :CorrelationId");
                 }
                 if (transitionalCorrelationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    {CorrelationPropertyName(transitionalCorrelationProperty)}");
-                    valuesBuilder.Append(",\r\n    :TransitionalCorrelationId");
+                    insertBuilder.Append($",{Environment.NewLine}    {CorrelationPropertyName(transitionalCorrelationProperty)}");
+                    valuesBuilder.Append($",{Environment.NewLine}    :TransitionalCorrelationId");
                 }
 
                 return $@"
@@ -63,7 +63,7 @@ values
                 var correlationSet = "";
                 if (transitionalCorrelationProperty != null)
                 {
-                    correlationSet = $",\r\n    {CorrelationPropertyName(transitionalCorrelationProperty)} = :TransitionalCorrelationId";
+                    correlationSet = $",{Environment.NewLine}    {CorrelationPropertyName(transitionalCorrelationProperty)} = :TransitionalCorrelationId";
                 }
 
                 return $@"

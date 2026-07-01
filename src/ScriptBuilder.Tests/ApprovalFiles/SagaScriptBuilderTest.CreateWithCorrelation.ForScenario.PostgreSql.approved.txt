@@ -1,4 +1,4 @@
-﻿
+
 /* TableNameVariable */
 
 /* Initialize */
@@ -65,7 +65,7 @@ for columnToDelete in
         column_name <> 'Correlation_CorrelationProperty'
 )
 loop
-	script = '
+    script = '
 alter table "' || schema || '"."' || tableNameNonQuoted || '"
 drop column "' || columnToDelete || '"';
     execute script;
