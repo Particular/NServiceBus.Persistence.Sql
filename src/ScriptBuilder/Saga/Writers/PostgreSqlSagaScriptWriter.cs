@@ -93,11 +93,11 @@ class PostgreSqlSagaScriptWriter : ISagaScriptWriter
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> 'Correlation_{saga.CorrelationProperty.Name}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> 'Correlation_{saga.TransitionalCorrelationProperty.Name}'");
         }
         writer.Write($@"
 for columnToDelete in
@@ -109,7 +109,7 @@ for columnToDelete in
         column_name LIKE 'Correlation_%'{builder}
 )
 loop
-	script = '
+    script = '
 alter table ""' || schema || '"".""' || tableNameNonQuoted || '""
 drop column ""' || columnToDelete || '""';
     execute script;
