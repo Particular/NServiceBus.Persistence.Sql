@@ -71,8 +71,7 @@
 
         static void WriteComment(TextWriter writer, string text)
         {
-            writer.WriteLine($@"
-/* {text} */");
+            writer.WriteLine($"{Environment.NewLine}/* {text} */");
         }
 
         static ISagaScriptWriter GetSqlDialectWriter(BuildSqlDialect sqlDialect, TextWriter textWriter, SagaDefinition saga)

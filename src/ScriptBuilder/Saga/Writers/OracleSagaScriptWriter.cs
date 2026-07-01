@@ -111,11 +111,11 @@ end if;
 
         if (saga.CorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> '{OracleCorrelationPropertyName(saga.CorrelationProperty)}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> '{OracleCorrelationPropertyName(saga.CorrelationProperty)}'");
         }
         if (saga.TransitionalCorrelationProperty != null)
         {
-            builder.Append($" and\r\n        column_name <> '{OracleCorrelationPropertyName(saga.TransitionalCorrelationProperty)}'");
+            builder.Append($" and{Environment.NewLine}        column_name <> '{OracleCorrelationPropertyName(saga.TransitionalCorrelationProperty)}'");
         }
         writer.Write($@"
 select count(*) into n
