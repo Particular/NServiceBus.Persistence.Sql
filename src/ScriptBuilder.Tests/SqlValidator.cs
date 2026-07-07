@@ -21,7 +21,7 @@ public static class SqlValidator
             return;
         }
 
-        var message = $"Sql errors:{string.Join("\r\n", errors.Select(error => error.Message))}";
+        var message = $"Sql errors:{string.Join(Environment.NewLine, errors.Select(error => error.Message))}";
         throw new Exception(message);
     }
 }

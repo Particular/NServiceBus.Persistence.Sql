@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 
@@ -115,12 +116,12 @@ deallocate prepare script;
         var correlation = saga.CorrelationProperty;
         if (correlation != null)
         {
-            builder.Append($" and\r\n    index_name <> 'Index_Correlation_{correlation.Name}'");
+            builder.Append($" and{Environment.NewLine}    index_name <> 'Index_Correlation_{correlation.Name}'");
         }
         var transitional = saga.TransitionalCorrelationProperty;
         if (transitional != null)
         {
-            builder.Append($" and\r\n    index_name <> 'Index_Correlation_{transitional.Name}'");
+            builder.Append($" and{Environment.NewLine}    index_name <> 'Index_Correlation_{transitional.Name}'");
         }
 
         writer.Write($@"
@@ -151,12 +152,12 @@ deallocate prepare script;
         var correlation = saga.CorrelationProperty;
         if (correlation != null)
         {
-            builder.Append($" and\r\n    column_name <> 'Correlation_{correlation.Name}'");
+            builder.Append($" and{Environment.NewLine}    column_name <> 'Correlation_{correlation.Name}'");
         }
         var transitional = saga.TransitionalCorrelationProperty;
         if (transitional != null)
         {
-            builder.Append($" and\r\n    column_name <> 'Correlation_{transitional.Name}'");
+            builder.Append($" and{Environment.NewLine}    column_name <> 'Correlation_{transitional.Name}'");
         }
         writer.Write($@"
 select concat('alter table ', table_name, ' drop column ', column_name, ';')

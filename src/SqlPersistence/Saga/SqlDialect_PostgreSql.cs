@@ -46,13 +46,13 @@
 
                 if (correlationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    \"Correlation_{correlationProperty}\"");
-                    valuesBuilder.Append(",\r\n    @CorrelationId");
+                    insertBuilder.Append($",{Environment.NewLine}    \"Correlation_{correlationProperty}\"");
+                    valuesBuilder.Append($",{Environment.NewLine}    @CorrelationId");
                 }
                 if (transitionalCorrelationProperty != null)
                 {
-                    insertBuilder.Append($",\r\n    \"Correlation_{transitionalCorrelationProperty}\"");
-                    valuesBuilder.Append(",\r\n    @TransitionalCorrelationId");
+                    insertBuilder.Append($",{Environment.NewLine}    \"Correlation_{transitionalCorrelationProperty}\"");
+                    valuesBuilder.Append($",{Environment.NewLine}    @TransitionalCorrelationId");
                 }
 
                 return $@"
@@ -82,7 +82,7 @@ values
                 var correlationSet = "";
                 if (transitionalCorrelationProperty != null)
                 {
-                    correlationSet = $",\r\n    \"Correlation_{transitionalCorrelationProperty}\" = @TransitionalCorrelationId";
+                    correlationSet = $",{Environment.NewLine}    \"Correlation_{transitionalCorrelationProperty}\" = @TransitionalCorrelationId";
                 }
 
                 return $@"
