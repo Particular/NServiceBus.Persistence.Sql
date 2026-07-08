@@ -25,6 +25,8 @@ public class TimeoutScriptBuilderTest
             SqlValidator.Validate(script);
         }
 
+        Assert.That(script, Is.EqualTo(script.ReplaceLineEndings()), "Line endings are not consistent");
+
         Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }
 
@@ -45,6 +47,8 @@ public class TimeoutScriptBuilderTest
         {
             SqlValidator.Validate(script);
         }
+
+        Assert.That(script, Is.EqualTo(script.ReplaceLineEndings()), "Line endings are not consistent");
 
         Approver.Verify(script, scenario: "ForScenario." + sqlDialect);
     }

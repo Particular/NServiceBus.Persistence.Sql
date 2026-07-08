@@ -6,21 +6,28 @@
 
     public static class SagaScriptBuilder
     {
+        public static void BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
+        {
+            writer.Write(BuildCreateScript(saga, sqlDialect));
+        }
+
         public static string BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
         {
             var stringBuilder = new StringBuilder();
+
             using (var stringWriter = new StringWriter(stringBuilder))
             {
-                BuildCreateScript(saga, sqlDialect, stringWriter);
+                WriteCreateScript(saga, sqlDialect, stringWriter);
             }
-            return stringBuilder.ToString();
+
+            var script = stringBuilder.ToString();
+            script = script.ReplaceLineEndings();
+
+            return script;
         }
 
-        public static void BuildCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
+        static void WriteCreateScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
-            ArgumentNullException.ThrowIfNull(saga, nameof(saga));
-            ArgumentNullException.ThrowIfNull(writer, nameof(writer));
-
             SagaDefinitionValidator.ValidateSagaDefinition(
                 correlationProperty: saga.CorrelationProperty?.Name,
                 sagaName: saga.Name,
@@ -37,6 +44,7 @@
 
             WriteComment(writer, "CreateTable");
             sqlDialectWriter.WriteCreateTable();
+
             if (saga.CorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.CorrelationProperty.Name}");
@@ -48,6 +56,7 @@
                 WriteComment(writer, $"WriteCreateIndex {saga.CorrelationProperty.Name}");
                 sqlDialectWriter.WriteCreateIndex(saga.CorrelationProperty);
             }
+
             if (saga.TransitionalCorrelationProperty != null)
             {
                 WriteComment(writer, $"AddProperty {saga.TransitionalCorrelationProperty.Name}");
@@ -59,6 +68,7 @@
                 WriteComment(writer, $"CreateIndex {saga.TransitionalCorrelationProperty.Name}");
                 sqlDialectWriter.WriteCreateIndex(saga.TransitionalCorrelationProperty);
             }
+
             WriteComment(writer, "PurgeObsoleteIndex");
             sqlDialectWriter.WritePurgeObsoleteIndex();
 
@@ -71,8 +81,7 @@
 
         static void WriteComment(TextWriter writer, string text)
         {
-            writer.WriteLine($@"
-/* {text} */");
+            writer.WriteLine($"{Environment.NewLine}/* {text} */");
         }
 
         static ISagaScriptWriter GetSqlDialectWriter(BuildSqlDialect sqlDialect, TextWriter textWriter, SagaDefinition saga)
@@ -99,6 +108,26 @@
 
         public static void BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
         {
+            writer.Write(BuildDropScript(saga, sqlDialect));
+        }
+
+        public static string BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
+        {
+            var stringBuilder = new StringBuilder();
+
+            using (var stringWriter = new StringWriter(stringBuilder))
+            {
+                WriteDropScript(saga, sqlDialect, stringWriter);
+            }
+
+            var script = stringBuilder.ToString();
+            script = script.ReplaceLineEndings();
+
+            return script;
+        }
+
+        static void WriteDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect, TextWriter writer)
+        {
             var sqlDialectWriter = GetSqlDialectWriter(sqlDialect, writer, saga);
 
             WriteComment(writer, "TableNameVariable");
@@ -106,16 +135,6 @@
 
             WriteComment(writer, "DropTable");
             sqlDialectWriter.WriteDropTable();
-        }
-
-        public static string BuildDropScript(SagaDefinition saga, BuildSqlDialect sqlDialect)
-        {
-            var stringBuilder = new StringBuilder();
-            using (var stringWriter = new StringWriter(stringBuilder))
-            {
-                BuildDropScript(saga, sqlDialect, stringWriter);
-            }
-            return stringBuilder.ToString();
         }
     }
 }
