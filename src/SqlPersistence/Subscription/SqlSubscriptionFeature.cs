@@ -18,7 +18,7 @@ sealed class SqlSubscriptionFeature : Feature
         var settings = context.Settings;
 
         var connectionManager = settings.GetConnectionBuilder<StorageType.Subscriptions>();
-        var tablePrefix = settings.GetTablePrefix(context.Settings.EndpointName());
+        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor);
@@ -43,9 +43,11 @@ sealed class SqlSubscriptionFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
+            // Uses the same prefix as the persister above, so the manifest cannot report a
+            // different table to the one subscriptions are read from and written to.
             manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
             {
-                TableName = sqlDialect.GetSubscriptionTableName($"{manifest.Prefix}_")
+                TableName = sqlDialect.GetSubscriptionTableName(tablePrefix)
             });
         }
     }
