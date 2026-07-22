@@ -31,7 +31,12 @@ sealed class SqlSagaFeature : Feature
         var sqlDialect = settings.GetSqlDialect();
         var services = context.Services;
 
-        services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings));
+        // Resolved once and shared by the persister and the manifest so the two cannot report
+        // different tables for the same saga.
+        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
+        Func<string, string> nameFilter = SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName);
+
+        services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings, tablePrefix, nameFilter));
         services.AddSingleton<ISagaPersister>(provider => new SagaPersister(provider.GetRequiredService<SagaInfoCache>(), sqlDialect));
 
         var installerSettings = settings.GetOrDefault<InstallerSettings>();
@@ -56,19 +61,13 @@ sealed class SqlSagaFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            ConfigureSagaManifest(manifest, settings, sqlDialect);
+            manifest.SetSagas(() => BuildSagaManifests(
+                settings.Get<SagaMetadataCollection>(),
+                sqlDialect,
+                tablePrefix,
+                nameFilter));
         }
     }
-
-    internal static void ConfigureSagaManifest(
-        ManifestOutput.PersistenceManifest manifest,
-        IReadOnlySettings settings,
-        SqlDialect sqlDialect) =>
-        manifest.SetSagas(() => BuildSagaManifests(
-            settings.Get<SagaMetadataCollection>(),
-            sqlDialect,
-            settings.GetTablePrefix(settings.EndpointName()),
-            SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName)));
 
     internal static ManifestOutput.PersistenceManifest.SagaManifest[] BuildSagaManifests(
         SagaMetadataCollection metadataCollection,
@@ -97,7 +96,11 @@ sealed class SqlSagaFeature : Feature
             };
         }).ToArray();
 
-    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)
+    static SagaInfoCache BuildSagaInfoCache(
+        SqlDialect sqlDialect,
+        IReadOnlySettings settings,
+        string tablePrefix,
+        Func<string, string> nameFilter)
     {
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
@@ -106,10 +109,7 @@ sealed class SqlSagaFeature : Feature
         readerCreator ??= reader => new JsonTextReader(reader);
         var writerCreator = SagaSettings.GetWriterCreator(settings);
         writerCreator ??= writer => new JsonTextWriter(writer);
-        var nameFilter = SagaSettings.GetNameFilter(settings);
-        nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
-        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,

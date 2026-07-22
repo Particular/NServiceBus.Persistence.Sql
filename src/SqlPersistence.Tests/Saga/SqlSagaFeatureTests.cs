@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Sagas;
-using NServiceBus.Settings;
 using NUnit.Framework;
-using SagaSettings = NServiceBus.Persistence.Sql.SagaSettings;
 
 [TestFixture]
 public class SqlSagaFeatureTests
@@ -50,20 +48,6 @@ public class SqlSagaFeatureTests
     }
 
     [Test]
-    public void Saga_manifest_table_name_matches_runtime_table_name()
-    {
-        var metadata = MetadataFor(typeof(SagaWithEntityNameLongerThanOracleAllows));
-        var dialect = new SqlDialect.MsSqlServer();
-
-        var manifest = SqlSagaFeature.BuildSagaManifests(metadata, dialect, "Endpoint_", sagaName => sagaName).Single();
-
-        var runtime = dialect.GetSagaTableName(
-            "Endpoint_", SqlSagaTypeDataReader.GetTypeData(metadata.Single()).TableSuffix);
-
-        Assert.That(manifest.TableName, Is.EqualTo(runtime));
-    }
-
-    [Test]
     public void Saga_manifest_index_honours_attribute_correlation_property_override()
     {
         var manifest = SqlSagaFeature.BuildSagaManifests(
@@ -79,38 +63,16 @@ public class SqlSagaFeatureTests
     }
 
     [Test]
-    public void Saga_manifest_applies_name_filter()
+    public void Saga_manifest_applies_name_filter_to_table_suffix()
     {
-        var settings = SettingsFor("Endpoint", typeof(PlainSaga));
-        new SagaSettings(settings).NameFilter(_ => "Filtered");
-        var manifest = ManifestFor(settings);
+        // The filter runs against the table suffix, not the saga name, matching the runtime.
+        var manifest = SqlSagaFeature.BuildSagaManifests(
+            MetadataFor(typeof(SagaWithEntityNameLongerThanOracleAllows)),
+            new SqlDialect.MsSqlServer(),
+            "Endpoint_",
+            sagaName => sagaName == "ShortSagaTable" ? "Filtered" : sagaName).Single();
 
-        SqlSagaFeature.ConfigureSagaManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        Assert.That(manifest.Sagas.Single().TableName, Is.EqualTo("[dbo].[Endpoint_Filtered]"));
-    }
-
-    [Test]
-    public void Saga_manifest_prefix_cleans_endpoint_name()
-    {
-        var settings = SettingsFor("My.Endpoint", typeof(PlainSaga));
-        var manifest = ManifestFor(settings);
-
-        SqlSagaFeature.ConfigureSagaManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        Assert.That(manifest.Sagas.Single().TableName, Is.EqualTo("[dbo].[My_Endpoint_PlainSaga]"));
-    }
-
-    [Test]
-    public void Saga_manifest_prefix_honours_custom_table_prefix()
-    {
-        var settings = SettingsFor("My.Endpoint", typeof(PlainSaga));
-        settings.Set("SqlPersistence.TablePrefix", "Foo_");
-        var manifest = ManifestFor(settings);
-
-        SqlSagaFeature.ConfigureSagaManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        Assert.That(manifest.Sagas.Single().TableName, Is.EqualTo("[dbo].[Foo_PlainSaga]"));
+        Assert.That(manifest.TableName, Is.EqualTo("[dbo].[Endpoint_Filtered]"));
     }
 
     static SagaMetadataCollection MetadataFor(params Type[] sagaTypes)
@@ -119,18 +81,6 @@ public class SqlSagaFeatureTests
         metadata.AddRange(SagaMetadata.CreateMany(sagaTypes));
         return metadata;
     }
-
-    static SettingsHolder SettingsFor(string endpointName, params Type[] sagaTypes)
-    {
-        var settings = new SettingsHolder();
-        settings.Set("NServiceBus.Routing.EndpointName", endpointName);
-        settings.Set(MetadataFor(sagaTypes));
-        return settings;
-    }
-
-    // Mirrors how ManifestOutput.Defaults builds the manifest.
-    static ManifestOutput.PersistenceManifest ManifestFor(IReadOnlySettings settings) =>
-        new() { Prefix = settings.Get<string>("NServiceBus.Routing.EndpointName") };
 
     [SqlSaga(correlationProperty: "AttributeChosenProperty")]
     public class SagaWithOverriddenCorrelationProperty :

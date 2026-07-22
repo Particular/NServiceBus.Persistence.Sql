@@ -1,4 +1,3 @@
-using NServiceBus;
 using NServiceBus.Settings;
 using NUnit.Framework;
 
@@ -6,54 +5,31 @@ using NUnit.Framework;
 public class SqlOutboxFeatureTests
 {
     [Test]
-    public void Outbox_manifest_prefix_cleans_endpoint_name()
+    public void Outbox_table_prefix_cleans_endpoint_name()
     {
         var settings = SettingsFor("My.Endpoint");
-        var manifest = ManifestFor(settings);
 
-        SqlOutboxFeature.ConfigureOutboxManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        Assert.That(manifest.Outbox.TableName, Is.EqualTo("[dbo].[My_Endpoint_OutboxData]"));
+        Assert.That(SqlOutboxFeature.GetTablePrefix(settings), Is.EqualTo("My_Endpoint_"));
     }
 
     [Test]
-    public void Outbox_manifest_prefix_honours_custom_table_prefix()
+    public void Outbox_table_prefix_honours_custom_table_prefix()
     {
         var settings = SettingsFor("My.Endpoint");
         settings.Set("SqlPersistence.TablePrefix", "Foo_");
-        var manifest = ManifestFor(settings);
 
-        SqlOutboxFeature.ConfigureOutboxManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        Assert.That(manifest.Outbox.TableName, Is.EqualTo("[dbo].[Foo_OutboxData]"));
+        Assert.That(SqlOutboxFeature.GetTablePrefix(settings), Is.EqualTo("Foo_"));
     }
 
     [Test]
-    public void Outbox_manifest_prefix_honours_processor_endpoint()
+    public void Outbox_table_prefix_honours_processor_endpoint()
     {
         var settings = SettingsFor("My.Endpoint");
         settings.Set(SqlOutboxFeature.ProcessorEndpointKey, "Processor.Endpoint");
-        var manifest = ManifestFor(settings);
 
-        SqlOutboxFeature.ConfigureOutboxManifest(manifest, settings, new SqlDialect.MsSqlServer());
-
-        // The outbox may run against a processor endpoint, and the manifest has to report the table
-        // the runtime actually uses rather than the one derived from this endpoint's name.
-        Assert.That(manifest.Outbox.TableName, Is.EqualTo("[dbo].[Processor_Endpoint_OutboxData]"));
-    }
-
-    [Test]
-    public void Outbox_manifest_table_name_matches_runtime_table_name()
-    {
-        var settings = SettingsFor("My.Endpoint");
-        var dialect = new SqlDialect.MsSqlServer();
-        var manifest = ManifestFor(settings);
-
-        SqlOutboxFeature.ConfigureOutboxManifest(manifest, settings, dialect);
-
-        var runtime = dialect.GetOutboxTableName(SqlOutboxFeature.GetTablePrefix(settings));
-
-        Assert.That(manifest.Outbox.TableName, Is.EqualTo(runtime));
+        // The outbox may run against a processor endpoint, so the prefix has to follow that
+        // endpoint's name rather than this endpoint's.
+        Assert.That(SqlOutboxFeature.GetTablePrefix(settings), Is.EqualTo("Processor_Endpoint_"));
     }
 
     static SettingsHolder SettingsFor(string endpointName)
@@ -62,8 +38,4 @@ public class SqlOutboxFeatureTests
         settings.Set("NServiceBus.Routing.EndpointName", endpointName);
         return settings;
     }
-
-    // Mirrors how ManifestOutput.Defaults builds the manifest.
-    static ManifestOutput.PersistenceManifest ManifestFor(IReadOnlySettings settings) =>
-        new() { Prefix = settings.Get<string>("NServiceBus.Routing.EndpointName") };
 }

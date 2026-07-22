@@ -2,7 +2,6 @@
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
-using NServiceBus.Settings;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 sealed class SqlSubscriptionFeature : Feature
@@ -19,7 +18,7 @@ sealed class SqlSubscriptionFeature : Feature
         var settings = context.Settings;
 
         var connectionManager = settings.GetConnectionBuilder<StorageType.Subscriptions>();
-        var tablePrefix = settings.GetTablePrefix(context.Settings.EndpointName());
+        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         var sqlDialect = settings.GetSqlDialect();
         var cacheFor = SubscriptionSettings.GetCacheFor(settings);
         var persister = new SubscriptionPersister(connectionManager, tablePrefix, sqlDialect, cacheFor);
@@ -44,16 +43,12 @@ sealed class SqlSubscriptionFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            ConfigureSubscriptionManifest(manifest, settings, sqlDialect);
+            // Uses the same prefix as the persister above, so the manifest cannot report a
+            // different table to the one subscriptions are read from and written to.
+            manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
+            {
+                TableName = sqlDialect.GetSubscriptionTableName(tablePrefix)
+            });
         }
     }
-
-    internal static void ConfigureSubscriptionManifest(
-        ManifestOutput.PersistenceManifest manifest,
-        IReadOnlySettings settings,
-        SqlDialect sqlDialect) =>
-        manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
-        {
-            TableName = sqlDialect.GetSubscriptionTableName(settings.GetTablePrefix(settings.EndpointName()))
-        });
 }

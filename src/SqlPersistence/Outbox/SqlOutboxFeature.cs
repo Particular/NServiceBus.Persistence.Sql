@@ -59,7 +59,12 @@ sealed class SqlOutboxFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            ConfigureOutboxManifest(manifest, settings, sqlDialect);
+            // Uses the same prefix as the commands above, so the manifest cannot report a
+            // different table to the one the outbox reads and writes.
+            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
+            {
+                TableName = sqlDialect.GetOutboxTableName(tablePrefix)
+            });
         }
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -92,18 +97,9 @@ sealed class SqlOutboxFeature : Feature
     }
 
     // The outbox may run against a processor endpoint rather than this endpoint, so the
-    // endpoint name is resolved here and shared by Setup and the manifest to stop the two drifting.
+    // prefix is derived from that endpoint name where one is configured.
     internal static string GetTablePrefix(IReadOnlySettings settings) =>
         settings.GetTablePrefix(settings.GetOrDefault<string>(ProcessorEndpointKey) ?? settings.EndpointName());
-
-    internal static void ConfigureOutboxManifest(
-        ManifestOutput.PersistenceManifest manifest,
-        IReadOnlySettings settings,
-        SqlDialect sqlDialect) =>
-        manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
-        {
-            TableName = sqlDialect.GetOutboxTableName(GetTablePrefix(settings))
-        });
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
     internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";
