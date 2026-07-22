@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NServiceBus;
@@ -55,24 +56,36 @@ sealed class SqlSagaFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray());
-
-            ManifestOutput.PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
-            {
-                Name = sagaName,
-                TableName = sqlDialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
-                Indexes = !string.IsNullOrEmpty(correlationProperty)
-                    ?
-                    [
-                        new()
-                        {
-                            Name = $"Index_Correlation_{correlationProperty}",
-                            Columns = correlationProperty
-                        }
-                    ]
-                    : []
-            };
+            var nameFilter = GetNameFilter(settings);
+            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(saga => CreateSagaManifest(saga, sqlDialect, $"{manifest.Prefix}_", nameFilter)).ToArray());
         }
+    }
+
+    internal static ManifestOutput.PersistenceManifest.SagaManifest CreateSagaManifest(SagaMetadata sagaMetadata, SqlDialect sqlDialect, string tablePrefix, Func<string, string> nameFilter)
+    {
+        var sqlSagaData = SqlSagaTypeDataReader.GetTypeData(sagaMetadata);
+        var tableSuffix = nameFilter(sqlSagaData.TableSuffix);
+
+        return new()
+        {
+            Name = sagaMetadata.Name,
+            TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix),
+            Indexes = !string.IsNullOrEmpty(sqlSagaData.CorrelationProperty)
+                ?
+                [
+                    new()
+                    {
+                        Name = $"Index_Correlation_{sqlSagaData.CorrelationProperty}",
+                        Columns = sqlSagaData.CorrelationProperty
+                    }
+                ]
+                : []
+        };
+    }
+
+    static Func<string, string> GetNameFilter(IReadOnlySettings settings)
+    {
+        return SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName);
     }
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)
@@ -84,8 +97,7 @@ sealed class SqlSagaFeature : Feature
         readerCreator ??= reader => new JsonTextReader(reader);
         var writerCreator = SagaSettings.GetWriterCreator(settings);
         writerCreator ??= writer => new JsonTextWriter(writer);
-        var nameFilter = SagaSettings.GetNameFilter(settings);
-        nameFilter ??= sagaName => sagaName;
+        var nameFilter = GetNameFilter(settings);
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         return new SagaInfoCache(
