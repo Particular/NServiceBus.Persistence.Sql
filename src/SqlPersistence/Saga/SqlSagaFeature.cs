@@ -56,37 +56,46 @@ sealed class SqlSagaFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            var nameFilter = GetNameFilter(settings);
-            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(saga => CreateSagaManifest(saga, sqlDialect, $"{manifest.Prefix}_", nameFilter)).ToArray());
+            ConfigureSagaManifest(manifest, settings, sqlDialect);
         }
     }
 
-    internal static ManifestOutput.PersistenceManifest.SagaManifest CreateSagaManifest(SagaMetadata sagaMetadata, SqlDialect sqlDialect, string tablePrefix, Func<string, string> nameFilter)
-    {
-        var sqlSagaData = SqlSagaTypeDataReader.GetTypeData(sagaMetadata);
-        var tableSuffix = nameFilter(sqlSagaData.TableSuffix);
+    internal static void ConfigureSagaManifest(
+        ManifestOutput.PersistenceManifest manifest,
+        IReadOnlySettings settings,
+        SqlDialect sqlDialect) =>
+        manifest.SetSagas(() => BuildSagaManifests(
+            settings.Get<SagaMetadataCollection>(),
+            sqlDialect,
+            settings.GetTablePrefix(settings.EndpointName()),
+            SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName)));
 
-        return new()
+    internal static ManifestOutput.PersistenceManifest.SagaManifest[] BuildSagaManifests(
+        SagaMetadataCollection metadataCollection,
+        SqlDialect sqlDialect,
+        string tablePrefix,
+        Func<string, string> nameFilter) =>
+        metadataCollection.Select(metadata =>
         {
-            Name = sagaMetadata.Name,
-            TableName = sqlDialect.GetSagaTableName(tablePrefix, tableSuffix),
-            Indexes = !string.IsNullOrEmpty(sqlSagaData.CorrelationProperty)
-                ?
-                [
-                    new()
-                    {
-                        Name = $"Index_Correlation_{sqlSagaData.CorrelationProperty}",
-                        Columns = sqlSagaData.CorrelationProperty
-                    }
-                ]
-                : []
-        };
-    }
-
-    static Func<string, string> GetNameFilter(IReadOnlySettings settings)
-    {
-        return SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName);
-    }
+            // Resolve suffix and correlation property the same way the runtime does, so the manifest
+            // can't drift from it, including honouring an explicit [SqlSaga(correlationProperty: ...)].
+            var typeData = SqlSagaTypeDataReader.GetTypeData(metadata);
+            return new ManifestOutput.PersistenceManifest.SagaManifest
+            {
+                Name = metadata.Name,
+                TableName = sqlDialect.GetSagaTableName(tablePrefix, nameFilter(typeData.TableSuffix)),
+                Indexes = !string.IsNullOrEmpty(typeData.CorrelationProperty)
+                    ?
+                    [
+                        new()
+                        {
+                            Name = $"Index_Correlation_{typeData.CorrelationProperty}",
+                            Columns = typeData.CorrelationProperty
+                        }
+                    ]
+                    : []
+            };
+        }).ToArray();
 
     static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)
     {
@@ -97,7 +106,8 @@ sealed class SqlSagaFeature : Feature
         readerCreator ??= reader => new JsonTextReader(reader);
         var writerCreator = SagaSettings.GetWriterCreator(settings);
         writerCreator ??= writer => new JsonTextWriter(writer);
-        var nameFilter = GetNameFilter(settings);
+        var nameFilter = SagaSettings.GetNameFilter(settings);
+        nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         return new SagaInfoCache(

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Outbox;
+using NServiceBus.Settings;
 
 sealed class SqlOutboxFeature : Feature
 {
@@ -19,8 +20,7 @@ sealed class SqlOutboxFeature : Feature
     {
         var settings = context.Settings;
         var connectionManager = settings.GetConnectionBuilder<StorageType.Outbox>();
-        var endpointName = settings.GetOrDefault<string>(ProcessorEndpointKey) ?? settings.EndpointName();
-        var tablePrefix = settings.GetTablePrefix(endpointName);
+        var tablePrefix = GetTablePrefix(settings);
         var sqlDialect = settings.GetSqlDialect();
 
         var pessimisticMode = context.Settings.GetOrDefault<bool>(ConcurrencyMode);
@@ -59,10 +59,7 @@ sealed class SqlOutboxFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
-            {
-                TableName = sqlDialect.GetOutboxTableName($"{manifest.Prefix}_")
-            });
+            ConfigureOutboxManifest(manifest, settings, sqlDialect);
         }
 
         if (settings.GetOrDefault<bool>(DisableCleanup))
@@ -93,6 +90,20 @@ sealed class SqlOutboxFeature : Feature
         context.RegisterStartupTask(b =>
             new OutboxCleaner(outboxPersister.RemoveEntriesOlderThan, b.GetRequiredService<CriticalError>().Raise, timeToKeepDeduplicationData, frequencyToRunCleanup, new AsyncTimer()));
     }
+
+    // The outbox may run against a processor endpoint rather than this endpoint, so the
+    // endpoint name is resolved here and shared by Setup and the manifest to stop the two drifting.
+    internal static string GetTablePrefix(IReadOnlySettings settings) =>
+        settings.GetTablePrefix(settings.GetOrDefault<string>(ProcessorEndpointKey) ?? settings.EndpointName());
+
+    internal static void ConfigureOutboxManifest(
+        ManifestOutput.PersistenceManifest manifest,
+        IReadOnlySettings settings,
+        SqlDialect sqlDialect) =>
+        manifest.SetOutbox(() => new ManifestOutput.PersistenceManifest.OutboxManifest
+        {
+            TableName = sqlDialect.GetOutboxTableName(GetTablePrefix(settings))
+        });
 
     internal const string TimeToKeepDeduplicationData = "Persistence.Sql.Outbox.TimeToKeepDeduplicationData";
     internal const string FrequencyToRunDeduplicationDataCleanup = "Persistence.Sql.Outbox.FrequencyToRunDeduplicationDataCleanup";

@@ -2,6 +2,7 @@
 using NServiceBus;
 using NServiceBus.Features;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Settings;
 using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
 sealed class SqlSubscriptionFeature : Feature
@@ -43,10 +44,16 @@ sealed class SqlSubscriptionFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
-            {
-                TableName = sqlDialect.GetSubscriptionTableName($"{manifest.Prefix}_")
-            });
+            ConfigureSubscriptionManifest(manifest, settings, sqlDialect);
         }
     }
+
+    internal static void ConfigureSubscriptionManifest(
+        ManifestOutput.PersistenceManifest manifest,
+        IReadOnlySettings settings,
+        SqlDialect sqlDialect) =>
+        manifest.SetSqlSubscriptions(() => new ManifestOutput.PersistenceManifest.SubscriptionManifest
+        {
+            TableName = sqlDialect.GetSubscriptionTableName(settings.GetTablePrefix(settings.EndpointName()))
+        });
 }
