@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.CDK.Lib" Version="2.152.0" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.253.0" />
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="1.111.0" />
-    <PackageReference Include="Constructs" Version="10.4.2" />
+    <PackageReference Include="Constructs" Version="10.5.0" />
   </ItemGroup>
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
