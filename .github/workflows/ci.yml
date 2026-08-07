@@ -65,7 +65,6 @@ jobs:
         uses: Particular/setup-postgres-action@v2.0.0
         with:
           connection-string-name: PostgreSqlConnectionString
-          tag: SqlPersistence
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Setup MySQL
