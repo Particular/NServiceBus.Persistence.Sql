@@ -70,42 +70,10 @@ jobs:
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Setup MySQL
-        id: setup-mysql
         if: matrix.engine == 'MySql'
-        run: |
-          echo '[client]
-          user=root
-          host=localhost' >> mysql-login
-
-          if ($Env:RUNNER_OS -eq 'Windows') {
-            echo "Installing MySQL from Chocolatey"
-            choco install mysql --limitoutput
-            echo 'password=' >> mysql-login
-          } else {
-            echo "Starting MySQL service preinstalled on Linux agent"
-            sudo systemctl start mysql.service
-            echo 'password=root' >> mysql-login
-          }
-
-          for ($i = 0; $i -lt 30; $i++) { ## 2.5 minute timeout
-            echo "Checking for MySQL connectivity $($i+1)/30..."
-            $ignore = mysql --defaults-extra-file=mysql-login -e "show databases;"
-            if ($?) {
-              echo "Connection successful"
-              break;
-            }
-            sleep 5
-          }
-
-          echo "Creating nservicebus database"
-          mysql --defaults-extra-file=mysql-login -D mysql -e "create database if not exists nservicebus ;"
-          echo "Creating user particular"
-          mysql --defaults-extra-file=mysql-login -D mysql -e "create user particular identified by 'Welcome1' ;"
-          echo "Giving user particular access to schema nservicebus"
-          mysql --defaults-extra-file=mysql-login -D mysql -e "grant all on *.* to particular@'%' ;"
-
-          $connectionString = "Data Source=localhost;Initial Catalog=nservicebus;User ID=particular;Password=Welcome1;AllowUserVariables=True;AutoEnlist=false;ConnectionReset=true;Connect Timeout=60"
-          echo "MySQLConnectionString=$connectionString" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+        uses: Particular/setup-mysql-action@5175716308b76df41603a3f88ab0ae47087cf43f
+        with:
+          connection-string-name: MySQLConnectionString
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
