@@ -74,6 +74,8 @@ jobs:
         uses: Particular/setup-mysql-action@v1.0.0
         with:
           connection-string-name: MySQLConnectionString
+          registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          registry-password: ${{ secrets.DOCKERHUB_TOKEN }}          
       - name: Setup Oracle
         id: setup-oracle
         if: matrix.engine == 'Oracle'
