@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NServiceBus;
@@ -30,7 +31,12 @@ sealed class SqlSagaFeature : Feature
         var sqlDialect = settings.GetSqlDialect();
         var services = context.Services;
 
-        services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings));
+        // Resolved once and shared by the persister and the manifest so the two cannot report
+        // different tables for the same saga.
+        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
+        Func<string, string> nameFilter = SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName);
+
+        services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings, tablePrefix, nameFilter));
         services.AddSingleton<ISagaPersister>(provider => new SagaPersister(provider.GetRequiredService<SagaInfoCache>(), sqlDialect));
 
         var installerSettings = settings.GetOrDefault<InstallerSettings>();
@@ -55,27 +61,46 @@ sealed class SqlSagaFeature : Feature
 
         if (settings.TryGet<ManifestOutput.PersistenceManifest>(out var manifest))
         {
-            manifest.SetSagas(() => settings.Get<SagaMetadataCollection>().Select(saga => GetSagaTableSchema(saga.Name, saga.EntityName, saga.TryGetCorrelationProperty(out var correlationProperty) ? correlationProperty.Name : null)).ToArray());
+            manifest.SetSagas(() => BuildSagaManifests(
+                settings.Get<SagaMetadataCollection>(),
+                sqlDialect,
+                tablePrefix,
+                nameFilter));
+        }
+    }
 
-            ManifestOutput.PersistenceManifest.SagaManifest GetSagaTableSchema(string sagaName, string entityName, string correlationProperty) => new()
+    internal static ManifestOutput.PersistenceManifest.SagaManifest[] BuildSagaManifests(
+        SagaMetadataCollection metadataCollection,
+        SqlDialect sqlDialect,
+        string tablePrefix,
+        Func<string, string> nameFilter) =>
+        metadataCollection.Select(metadata =>
+        {
+            // Resolve suffix and correlation property the same way the runtime does, so the manifest
+            // can't drift from it, including honouring an explicit [SqlSaga(correlationProperty: ...)].
+            var typeData = SqlSagaTypeDataReader.GetTypeData(metadata);
+            return new ManifestOutput.PersistenceManifest.SagaManifest
             {
-                Name = sagaName,
-                TableName = sqlDialect.GetSagaTableName($"{manifest.Prefix}_", entityName),
-                Indexes = !string.IsNullOrEmpty(correlationProperty)
+                Name = metadata.Name,
+                TableName = sqlDialect.GetSagaTableName(tablePrefix, nameFilter(typeData.TableSuffix)),
+                Indexes = !string.IsNullOrEmpty(typeData.CorrelationProperty)
                     ?
                     [
                         new()
                         {
-                            Name = $"Index_Correlation_{correlationProperty}",
-                            Columns = correlationProperty
+                            Name = $"Index_Correlation_{typeData.CorrelationProperty}",
+                            Columns = typeData.CorrelationProperty
                         }
                     ]
                     : []
             };
-        }
-    }
+        }).ToArray();
 
-    static SagaInfoCache BuildSagaInfoCache(SqlDialect sqlDialect, IReadOnlySettings settings)
+    static SagaInfoCache BuildSagaInfoCache(
+        SqlDialect sqlDialect,
+        IReadOnlySettings settings,
+        string tablePrefix,
+        Func<string, string> nameFilter)
     {
         var jsonSerializerSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
@@ -84,10 +109,7 @@ sealed class SqlSagaFeature : Feature
         readerCreator ??= reader => new JsonTextReader(reader);
         var writerCreator = SagaSettings.GetWriterCreator(settings);
         writerCreator ??= writer => new JsonTextWriter(writer);
-        var nameFilter = SagaSettings.GetNameFilter(settings);
-        nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
-        var tablePrefix = settings.GetTablePrefix(settings.EndpointName());
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,
