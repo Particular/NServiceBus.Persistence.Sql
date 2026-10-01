@@ -68,7 +68,7 @@ namespace NServiceBus
             {
                 return new
                 {
-                    CustomSchema = string.IsNullOrEmpty(Schema),
+                    CustomSchema = Schema != "dbo",
                     DoNotUseTransportConnection
                 };
             }
