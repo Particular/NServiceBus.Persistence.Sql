@@ -131,6 +131,34 @@ public class SqlSagaAttributeAnalyzerTests : AnalyzerTestFixture<SqlSagaAttribut
     }
 
     [Test]
+    public Task ReportsWhenBothCorrelationPropertiesMissingPlusTableSuffix()
+    {
+        const string code = """
+                            using NServiceBus;
+                            using NServiceBus.Persistence.Sql;
+
+                            [SqlSaga(tableSuffix: "TableSuffix", correlationProperty: [|"MissingCorrelationProperty"|], transitionalCorrelationProperty: [|"MissingTransitionalCorrelation"|])]
+                            public class OrderSaga : Saga<OrderSagaData>
+                            {
+                                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                                {
+                                    mapper.MapSaga(saga => saga.OrderId)
+                                        .ToMessage<StartOrder>(message => message.OrderId);
+                                }
+                            }
+
+                            public class OrderSagaData : ContainSagaData
+                            {
+                                public string OrderId { get; set; }
+                            }
+
+                            public record class StartOrder(string OrderId);
+                            """;
+
+        return Assert(code, DiagnosticIds.CorrelationPropertyNotFound);
+    }
+
+    [Test]
     public Task DoesNotReportWhenPropertyIsDefined()
     {
         const string code = """
@@ -188,5 +216,61 @@ public class SqlSagaAttributeAnalyzerTests : AnalyzerTestFixture<SqlSagaAttribut
                             """;
 
         return Assert(code);
+    }
+
+    [Test]
+    public Task DoesNotReportForTableSuffix()
+    {
+        const string code = """
+                            using NServiceBus;
+                            using NServiceBus.Persistence.Sql;
+
+                            [SqlSaga(tableSuffix: "CustomTableSuffix")]
+                            public class OrderSaga : Saga<OrderSagaData>
+                            {
+                                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                                {
+                                    mapper.MapSaga(saga => saga.OrderId)
+                                        .ToMessage<StartOrder>(message => message.OrderId);
+                                }
+                            }
+
+                            public class OrderSagaData : ContainSagaData
+                            {
+                                public string OrderId { get; set; }
+                            }
+
+                            public record class StartOrder(string OrderId);
+                            """;
+
+        return Assert(code);
+    }
+
+    [Test]
+    public Task ReportsCorrectlyWhenOnlyPositionalValuesUsed()
+    {
+        const string code = """
+                            using NServiceBus;
+                            using NServiceBus.Persistence.Sql;
+
+                            [SqlSaga([|"MissingCorrelationProperty"|], [|"MissingTransitionalCorrelation"|], "CustomTableSuffix")]
+                            public class OrderSaga : Saga<OrderSagaData>
+                            {
+                                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                                {
+                                    mapper.MapSaga(saga => saga.OrderId)
+                                        .ToMessage<StartOrder>(message => message.OrderId);
+                                }
+                            }
+
+                            public class OrderSagaData : ContainSagaData
+                            {
+                                public string OrderId { get; set; }
+                            }
+
+                            public record class StartOrder(string OrderId);
+                            """;
+
+        return Assert(code, DiagnosticIds.CorrelationPropertyNotFound);
     }
 }

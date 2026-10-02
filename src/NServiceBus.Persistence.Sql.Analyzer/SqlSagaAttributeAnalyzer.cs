@@ -1,7 +1,6 @@
 namespace NServiceBus.Persistence.Sql.Analyzer;
 
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -65,19 +64,20 @@ public sealed class SqlSagaAttributeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeProperty(context, attributeSyntax, sagaDataType, parameterName: "correlationProperty", constructorIndex: 0);
-        AnalyzeProperty(context, attributeSyntax, sagaDataType, parameterName: "transitionalCorrelationProperty", constructorIndex: 1);
+        AnalyzeProperty(context, attributeSyntax, sagaDataType, parameterName: "correlationProperty", positionalIndex: 0);
+        AnalyzeProperty(context, attributeSyntax, sagaDataType, parameterName: "transitionalCorrelationProperty", positionalIndex: 1);
     }
 
-    static void AnalyzeProperty(SyntaxNodeAnalysisContext context, AttributeSyntax attributeSyntax, INamedTypeSymbol sagaDataType, string parameterName, int constructorIndex)
+    static void AnalyzeProperty(SyntaxNodeAnalysisContext context, AttributeSyntax attributeSyntax, INamedTypeSymbol sagaDataType, string parameterName, int positionalIndex)
     {
-        var argumentSyntax = GetArgumentSyntax(attributeSyntax, parameterName, constructorIndex);
-        if (argumentSyntax is null)
+        var argument = GetArgumentSyntax(attributeSyntax, parameterName, positionalIndex);
+
+        if (argument is null)
         {
             return;
         }
 
-        var constantValue = context.SemanticModel.GetConstantValue(argumentSyntax.Expression, context.CancellationToken);
+        var constantValue = context.SemanticModel.GetConstantValue(argument.Expression, context.CancellationToken);
         if (!constantValue.HasValue || constantValue.Value is not string propertyName)
         {
             return;
@@ -88,8 +88,35 @@ public sealed class SqlSagaAttributeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var diagnostic = Diagnostic.Create(CorrelationPropertyNotFound, argumentSyntax.Expression.GetLocation(), propertyName);
+        var diagnostic = Diagnostic.Create(CorrelationPropertyNotFound, argument.Expression.GetLocation(), propertyName);
         context.ReportDiagnostic(diagnostic);
+    }
+
+    static AttributeArgumentSyntax? GetArgumentSyntax(AttributeSyntax attributeSyntax, string parameterName, int positionalIndex)
+    {
+        var arguments = attributeSyntax.ArgumentList?.Arguments;
+        if (arguments is null)
+        {
+            return null;
+        }
+
+        for (var i = 0; i < arguments.Value.Count; i++)
+        {
+            var argument = arguments.Value[i];
+
+            if (argument.NameColon?.Name.Identifier.Text == parameterName ||
+                argument.NameEquals?.Name.Identifier.Text == parameterName)
+            {
+                return argument;
+            }
+
+            if (argument.NameColon is null && argument.NameEquals is null && i == positionalIndex)
+            {
+                return argument;
+            }
+        }
+
+        return null;
     }
 
     static bool IsSqlSagaAttributeName(NameSyntax nameSyntax) =>
@@ -100,28 +127,4 @@ public sealed class SqlSagaAttributeAnalyzer : DiagnosticAnalyzer
             AliasQualifiedNameSyntax { Name: var name } => IsSqlSagaAttributeName(name),
             _ => false
         };
-
-    static AttributeArgumentSyntax? GetArgumentSyntax(AttributeSyntax attributeSyntax, string parameterName, int constructorIndex)
-    {
-        var arguments = attributeSyntax.ArgumentList?.Arguments;
-        if (arguments is null || arguments.Value.Count == 0)
-        {
-            return null;
-        }
-
-        var namedArgument = arguments.Value.FirstOrDefault(argument =>
-            argument.NameColon?.Name.Identifier.Text == parameterName ||
-            argument.NameEquals?.Name.Identifier.Text == parameterName);
-        if (namedArgument is not null)
-        {
-            return namedArgument;
-        }
-
-        if (constructorIndex < arguments.Value.Count)
-        {
-            return arguments.Value[constructorIndex];
-        }
-
-        return null;
-    }
 }
