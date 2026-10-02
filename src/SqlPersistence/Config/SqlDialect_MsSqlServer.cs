@@ -11,12 +11,14 @@ namespace NServiceBus
         /// </summary>
         public partial class MsSqlServer : SqlDialect
         {
+            const string DefaultSchema = "dbo";
+
             /// <summary>
             /// Microsoft SQL Server
             /// </summary>
             public MsSqlServer()
             {
-                Schema = "dbo";
+                Schema = DefaultSchema;
             }
 
             internal override void AddCreationScriptParameters(DbCommand command)
@@ -68,7 +70,7 @@ namespace NServiceBus
             {
                 return new
                 {
-                    CustomSchema = string.IsNullOrEmpty(Schema),
+                    CustomSchema = Schema != DefaultSchema,
                     DoNotUseTransportConnection
                 };
             }
