@@ -4,9 +4,19 @@ using Microsoft.CodeAnalysis;
 using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.Analyzer;
 using NUnit.Framework;
+using Particular.AnalyzerTesting;
 
 public class SagaMetadataGeneratorTests
 {
+    [SetUp]
+    public void LoadDependencies()
+    {
+        // Force load of the assemblies, which are then available to all the tests
+        MetadataReference.CreateFromFile(typeof(IMessage).Assembly.Location);
+        MetadataReference.CreateFromFile(typeof(EndpointConfiguration).Assembly.Location);
+        MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location);
+    }
+
     [Test]
     [TestCase("string")]
     [TestCase("long")]
@@ -24,9 +34,9 @@ public class SagaMetadataGeneratorTests
                    {{usingSystem}}
                    using System.Threading.Tasks;
                    using NServiceBus;
-                   
+
                    namespace My.NameSpace;
-                   
+
                    public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
                    {
                        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
@@ -46,7 +56,40 @@ public class SagaMetadataGeneratorTests
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
             .WithScenarioName(correlationType)
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
+            .Approve()
+            .AssertRunsAreEqual();
+    }
+
+    [Test]
+    public void BasicSagaWithCorrelationOnDataBaseClass()
+    {
+        var code = """
+                   using System.Threading.Tasks;
+                   using NServiceBus;
+
+                   namespace My.NameSpace;
+
+                   public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
+                   {
+                       protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                       {
+                           mapper.MapSaga(saga => saga.OrderId)
+                               .ToMessage<StartOrder>(message => message.OrderId);
+                       }
+                       public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
+                   }
+                   public class OrderSagaData : BaseSagaData { }
+                   public class BaseSagaData : ContainSagaData
+                   {
+                       public string OrderId { get; set; }
+                   }
+                   public record class StartOrder(string OrderId);
+                   """;
+
+        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
+            .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -79,8 +122,43 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
+            .Approve()
+            .AssertRunsAreEqual();
+    }
+
+    [Test]
+    public void WithTransitionalCorrelationIdOnBaseClass()
+    {
+        var code = $$"""
+                     using System.Threading.Tasks;
+                     using NServiceBus;
+                     using NServiceBus.Persistence.Sql;
+
+                     [SqlSaga(transitionalCorrelationProperty: nameof(OrderSagaDataBase.TransitionalId))]
+                     public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
+                     {
+                         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                         {
+                             mapper.MapSaga(saga => saga.OrderId)
+                                 .ToMessage<StartOrder>(message => message.OrderId);
+                         }
+                         public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
+                     }
+                     public class OrderSagaData : OrderSagaDataBase
+                     {
+                         public string OrderId { get; set; }
+                     }
+                     public class OrderSagaDataBase : ContainSagaData
+                     {
+                        public string TransitionalId { get; set; }
+                     }
+                     public record class StartOrder(string OrderId);
+                     """;
+
+        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
+            .WithSource(code)
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -112,8 +190,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -123,7 +200,7 @@ public class SagaMetadataGeneratorTests
     {
         var code = $$"""
                      namespace User.NameSpace;
-                     
+
                      [NServiceBus.Persistence.Sql.SqlSaga(tableSuffix: "CustomTableName")]
                      public class OrderSaga : NServiceBus.Saga<OrderSagaData>, NServiceBus.IAmStartedByMessages<User.NameSpace.StartOrder>
                      {
@@ -143,8 +220,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -187,7 +263,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
@@ -215,8 +291,7 @@ public class SagaMetadataGeneratorTests
 
         SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
             .WithSource(code)
-            .AddReference(MetadataReference.CreateFromFile(typeof(SqlSagaAttribute).Assembly.Location))
-            .WithGeneratorStages("SagaDetails", "Collected")
+            .Run()
             .Approve()
             .AssertRunsAreEqual();
     }
