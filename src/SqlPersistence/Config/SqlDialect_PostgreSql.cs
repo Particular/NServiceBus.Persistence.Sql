@@ -11,12 +11,14 @@ namespace NServiceBus
         /// </summary>
         public partial class PostgreSql : SqlDialect
         {
+            const string DefaultSchema = "public";
+
             /// <summary>
             /// PostgreSQL
             /// </summary>
             public PostgreSql()
             {
-                Schema = "public";
+                Schema = DefaultSchema;
             }
 
             internal override void AddCreationScriptParameters(DbCommand command)
@@ -87,7 +89,7 @@ dialect.JsonBParameterModifier(
             {
                 return new
                 {
-                    CustomSchema = Schema != "public",
+                    CustomSchema = Schema != DefaultSchema,
                     CustomJsonBParameterModifier = JsonBParameterModifier != null,
                     DoNotUseTransportConnection
                 };
