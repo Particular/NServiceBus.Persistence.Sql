@@ -34,9 +34,9 @@ public class SagaMetadataGeneratorTests
                    {{usingSystem}}
                    using System.Threading.Tasks;
                    using NServiceBus;
-                   
+
                    namespace My.NameSpace;
-                   
+
                    public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
                    {
                        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
@@ -200,7 +200,7 @@ public class SagaMetadataGeneratorTests
     {
         var code = $$"""
                      namespace User.NameSpace;
-                     
+
                      [NServiceBus.Persistence.Sql.SqlSaga(tableSuffix: "CustomTableName")]
                      public class OrderSaga : NServiceBus.Saga<OrderSagaData>, NServiceBus.IAmStartedByMessages<User.NameSpace.StartOrder>
                      {

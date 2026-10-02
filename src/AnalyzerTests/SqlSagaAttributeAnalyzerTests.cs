@@ -67,7 +67,7 @@ public class SqlSagaAttributeAnalyzerTests : AnalyzerTestFixture<SqlSagaAttribut
                             }
 
                             public record class StartOrder(string OrderId);
-                            
+
                             public record class WrongClass(string MissingCorrelation);
                             """;
 
