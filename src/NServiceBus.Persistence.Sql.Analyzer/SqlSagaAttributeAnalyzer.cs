@@ -2,6 +2,7 @@ namespace NServiceBus.Persistence.Sql.Analyzer;
 
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -33,7 +34,7 @@ public sealed class SqlSagaAttributeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        context.RegisterSyntaxNodeAction(syntaxContext => AnalyzeAttribute(syntaxContext, sqlSagaAttribute), Microsoft.CodeAnalysis.CSharp.SyntaxKind.Attribute);
+        context.RegisterSyntaxNodeAction(syntaxContext => AnalyzeAttribute(syntaxContext, sqlSagaAttribute), SyntaxKind.Attribute);
     }
 
     static void AnalyzeAttribute(SyntaxNodeAnalysisContext context, INamedTypeSymbol sqlSagaAttribute)
