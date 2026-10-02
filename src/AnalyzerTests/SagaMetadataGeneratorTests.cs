@@ -62,6 +62,39 @@ public class SagaMetadataGeneratorTests
     }
 
     [Test]
+    public void BasicSagaWithCorrelationOnDataBaseClass()
+    {
+        var code = """
+                   using System.Threading.Tasks;
+                   using NServiceBus;
+
+                   namespace My.NameSpace;
+
+                   public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
+                   {
+                       protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                       {
+                           mapper.MapSaga(saga => saga.OrderId)
+                               .ToMessage<StartOrder>(message => message.OrderId);
+                       }
+                       public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
+                   }
+                   public class OrderSagaData : BaseSagaData { }
+                   public class BaseSagaData : ContainSagaData
+                   {
+                       public string OrderId { get; set; }
+                   }
+                   public record class StartOrder(string OrderId);
+                   """;
+
+        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
+            .WithSource(code)
+            .Run()
+            .Approve()
+            .AssertRunsAreEqual();
+    }
+
+    [Test]
     public void WithTransitionalCorrelationId()
     {
         var code = $$"""
@@ -83,6 +116,42 @@ public class SagaMetadataGeneratorTests
                      {
                          public string OrderId { get; set; }
                          public string TransitionalId { get; set; }
+                     }
+                     public record class StartOrder(string OrderId);
+                     """;
+
+        SourceGeneratorTest.ForIncrementalGenerator<SagaMetadataGenerator>()
+            .WithSource(code)
+            .Run()
+            .Approve()
+            .AssertRunsAreEqual();
+    }
+
+    [Test]
+    public void WithTransitionalCorrelationIdOnBaseClass()
+    {
+        var code = $$"""
+                     using System.Threading.Tasks;
+                     using NServiceBus;
+                     using NServiceBus.Persistence.Sql;
+
+                     [SqlSaga(transitionalCorrelationProperty: nameof(OrderSagaDataBase.TransitionalId))]
+                     public class OrderSaga : Saga<OrderSagaData>, IAmStartedByMessages<StartOrder>
+                     {
+                         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OrderSagaData> mapper)
+                         {
+                             mapper.MapSaga(saga => saga.OrderId)
+                                 .ToMessage<StartOrder>(message => message.OrderId);
+                         }
+                         public Task Handle(StartOrder message, IMessageHandlerContext context) => Task.CompletedTask;
+                     }
+                     public class OrderSagaData : OrderSagaDataBase
+                     {
+                         public string OrderId { get; set; }
+                     }
+                     public class OrderSagaDataBase : ContainSagaData
+                     {
+                        public string TransitionalId { get; set; }
                      }
                      public record class StartOrder(string OrderId);
                      """;

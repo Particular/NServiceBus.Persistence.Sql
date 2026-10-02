@@ -126,9 +126,18 @@ public class SagaMetadataGenerator : IIncrementalGenerator
             return null;
         }
 
-        var propSymbol = sagaDataType.GetMembers()
-            .OfType<IPropertySymbol>()
-            .FirstOrDefault(propSymbol => propSymbol.Name == propertyName);
+        IPropertySymbol? propSymbol = null;
+        for (var type = sagaDataType; type is not null && type.ContainingAssembly.Name != "NServiceBus.Core"; type = type.BaseType)
+        {
+            propSymbol = type.GetMembers(propertyName)
+                .OfType<IPropertySymbol>()
+                .FirstOrDefault(symbol => symbol.Name == propertyName);
+
+            if (propSymbol is not null)
+            {
+                break;
+            }
+        }
 
         if (propSymbol is null || !TryGetCorrelationSqlPropertyType(propSymbol.Type, out var sqlPropType))
         {
