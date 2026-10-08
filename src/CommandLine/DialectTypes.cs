@@ -19,7 +19,6 @@
         {
             [DialectTypes.Oracle] = BuildSqlDialect.Oracle,
             [DialectTypes.MySql] = BuildSqlDialect.MySql,
-            [DialectTypes.MySql] = BuildSqlDialect.MySql,
             [DialectTypes.PostgreSql] = BuildSqlDialect.PostgreSql,
             [DialectTypes.SqlServer] = BuildSqlDialect.MsSqlServer,
         };
