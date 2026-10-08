@@ -76,6 +76,12 @@ class SubscriptionPersister : ISubscriptionStorage
             return GetSubscriptions(types, cancellationToken);
         }
 
+        return GetCachedSubscriptions(types, cancellationToken);
+    }
+
+    async Task<IEnumerable<Subscriber>> GetCachedSubscriptions(List<MessageType> types, CancellationToken cancellationToken)
+    {
+
         var key = GetKey(types);
 
         var cacheItem = Cache.GetOrAdd(key,
@@ -93,7 +99,16 @@ class SubscriptionPersister : ISubscriptionStorage
             cacheItem.Stored = DateTime.UtcNow;
         }
 
-        return cacheItem.Subscribers;
+        try
+        {
+            return await cacheItem.Subscribers.ConfigureAwait(false);
+        }
+        catch
+        {
+            // Evict so a transient failure or cancellation doesn't stay in the cache
+            Cache.TryRemove(new KeyValuePair<string, CacheItem>(key, cacheItem));
+            throw;
+        }
     }
 
     static object Nullable(object value)
