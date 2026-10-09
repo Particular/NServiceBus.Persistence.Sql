@@ -9,7 +9,7 @@ using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings)
     {
         var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? [];
 
@@ -20,17 +20,23 @@ public static class RuntimeSagaDefinitionReader
 
         var sagaDefinitions = GetSagaDefinitions(sagaMetadataCollection.Select(m => m.SagaType.Assembly).Distinct());
 
-        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect));
+        // The runtime applies this filter to every saga table suffix, so the tables created here must use it too.
+        var tableSuffixFilter = NServiceBus.Persistence.Sql.SagaSettings.GetNameFilter(settings) ?? NoFilter;
+
+        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter));
     }
 
-    public static SagaDefinition GetSagaDefinition<TSagaType>(BuildSqlDialect sqlDialect)
+    // For sagas defined outside an endpoint, pass the filter the dialect's tests would configure on the endpoint.
+    public static SagaDefinition GetSagaDefinition<TSagaType>(Func<string, string> tableSuffixFilter = null)
         where TSagaType : Saga
     {
         var sagaDefinitions = GetSagaDefinitions([typeof(TSagaType).Assembly]);
         var metadata = SagaMetadata.Create<TSagaType>();
 
-        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect);
+        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter ?? NoFilter);
     }
+
+    static string NoFilter(string tableSuffix) => tableSuffix;
 
     static Dictionary<string, SagaDefinition> GetSagaDefinitions(IEnumerable<Assembly> sagaAssemblies)
     {
@@ -46,21 +52,15 @@ public static class RuntimeSagaDefinitionReader
         return definitions;
     }
 
-    static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, BuildSqlDialect sqlDialect)
+    static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, Func<string, string> tableSuffixFilter)
     {
         if (!definitions.TryGetValue(sagaType.FullName!.Replace('+', '.'), out var sagaDefinition))
         {
             throw new Exception($"Could not find metadata for '{sagaType.FullName}' in the collected assembly metadata.");
         }
 
-        var tableSuffix = sagaDefinition.TableSuffix;
-        if (sqlDialect == BuildSqlDialect.Oracle)
-        {
-            tableSuffix = OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, sagaDefinition.TableSuffix);
-        }
-
         return new SagaDefinition(
-            tableSuffix: tableSuffix,
+            tableSuffix: tableSuffixFilter(sagaDefinition.TableSuffix),
             name: sagaType.FullName,
             correlationProperty: sagaDefinition.CorrelationProperty,
             transitionalCorrelationProperty: sagaDefinition.TransitionalCorrelationProperty);
