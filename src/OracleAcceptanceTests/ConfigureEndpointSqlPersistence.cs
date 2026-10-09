@@ -43,7 +43,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         persistence.DisableInstaller();
 
         var sagaSettings = persistence.SagaSettings();
-        sagaSettings.NameFilter(sagaName => OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, sagaName));
+        sagaSettings.NameFilter(OracleSagaTableNames.ForEndpoint(OracleSagaTableNames.AcceptanceTestsPrefix, endpointName));
 
         return Task.CompletedTask;
     }
