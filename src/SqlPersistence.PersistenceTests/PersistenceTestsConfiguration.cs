@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -108,7 +109,7 @@ public partial class PersistenceTestsConfiguration
             Serializer.JsonSerializer,
             reader => new JsonTextReader(reader),
             writer => new JsonTextWriter(writer),
-            "PersistenceTests_",
+            TablePrefix,
             dialect,
             SagaMetadataCollection,
             sagaName => SagaTableSuffix(buildDialect, sagaName));
@@ -137,29 +138,70 @@ public partial class PersistenceTestsConfiguration
         {
             connection.Open();
 
-            foreach (var saga in SagaMetadataCollection)
+            // Dropping and recreating every table for every fixture dominated the run time, so the schema is created once per engine and each fixture only empties it.
+            lock (schemaLock)
             {
-                CorrelationProperty correlationProperty = null;
-                if (saga.TryGetCorrelationProperty(out var propertyMetadata))
+                if (createdSchemas.Add(buildDialect))
                 {
-                    correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String);
+                    CreateSchema(connection, buildDialect);
                 }
-
-                var tableName = SagaTableSuffix(buildDialect, saga.SagaType.Name);
-                var definition = new SagaDefinition(tableName, saga.EntityName, correlationProperty);
-
-                connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, buildDialect), "PersistenceTests");
-                connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, buildDialect), "PersistenceTests");
             }
 
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(buildDialect), "PersistenceTests");
-            connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(buildDialect), "PersistenceTests");
+            ClearTables(connection, variant.DatabaseEngine.SqlDialect, buildDialect);
         }
 
         return Task.CompletedTask;
 
         DbConnection ConnectionFactory() => variant.Open();
     }
+
+    // Saga tables come from every Saga type in this assembly, so a new saga or test needs no change here.
+    void CreateSchema(DbConnection connection, BuildSqlDialect buildDialect)
+    {
+        foreach (var definition in GetSagaDefinitions(buildDialect))
+        {
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, buildDialect), "PersistenceTests");
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, buildDialect), "PersistenceTests");
+        }
+
+        connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(buildDialect), "PersistenceTests");
+        connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(buildDialect), "PersistenceTests");
+    }
+
+    // Uses the table names the persistence itself resolves, so it covers exactly the tables CreateSchema made.
+    void ClearTables(DbConnection connection, SqlDialect dialect, BuildSqlDialect buildDialect)
+    {
+        var deletes = GetSagaDefinitions(buildDialect)
+            .Select(definition => dialect.GetSagaTableName(TablePrefix, definition.TableSuffix))
+            .Append(dialect.GetOutboxTableName(TablePrefix))
+            .Select(tableName => $"delete from {tableName};");
+
+        // One round trip per fixture instead of one per table. Oracle only runs several statements inside a PL/SQL block.
+        var batch = string.Join(Environment.NewLine, deletes);
+
+        using var command = connection.CreateCommand();
+        command.CommandText = buildDialect == BuildSqlDialect.Oracle ? $"begin{Environment.NewLine}{batch}{Environment.NewLine}end;" : batch;
+        command.ExecuteNonQuery();
+    }
+
+    IEnumerable<SagaDefinition> GetSagaDefinitions(BuildSqlDialect buildDialect)
+    {
+        foreach (var saga in SagaMetadataCollection)
+        {
+            CorrelationProperty correlationProperty = null;
+            if (saga.TryGetCorrelationProperty(out var propertyMetadata))
+            {
+                correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String);
+            }
+
+            yield return new SagaDefinition(SagaTableSuffix(buildDialect, saga.SagaType.Name), saga.EntityName, correlationProperty);
+        }
+    }
+
+    static readonly object schemaLock = new();
+    static readonly HashSet<BuildSqlDialect> createdSchemas = [];
+
+    const string TablePrefix = "PersistenceTests_";
 
     static string SagaTableSuffix(BuildSqlDialect dialect, string sagaName) =>
         dialect == BuildSqlDialect.Oracle
@@ -179,7 +221,7 @@ public partial class PersistenceTestsConfiguration
         TransactionMode transactionMode,
         OutboxLockMode outboxLockMode)
     {
-        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, "PersistenceTests_");
+        var outboxCommands = OutboxCommandBuilder.Build(sqlDialect, TablePrefix);
 
         ConcurrencyControlStrategy concurrencyControlStrategy = outboxLockMode switch
         {
