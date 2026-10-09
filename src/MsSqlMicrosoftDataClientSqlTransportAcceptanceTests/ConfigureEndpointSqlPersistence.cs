@@ -34,6 +34,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
+        persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();
