@@ -46,10 +46,7 @@ jobs:
         uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
-      - name: Build
-        id: build
-        run: dotnet build src --configuration Release -graph
-        background: true
+      # Publishes fixed port 51000 (DTC), which is in the ephemeral range. Start it before the build so restore traffic cannot hold it.
       - name: Setup SQL Server
         if: matrix.engine == 'SqlServer'
         uses: Particular/install-sql-server-action@v3.0.0
@@ -58,6 +55,10 @@ jobs:
           catalog: nservicebus
           extra-params: "Encrypt=False;"
           enable-distributed-transactions: true
+      - name: Build
+        id: build
+        run: dotnet build src --configuration Release -graph
+        background: true
       - name: Setup PostgreSql 15.x
         if: matrix.engine == 'PostgreSql'
         uses: Particular/setup-postgres-action@v3.0.0
