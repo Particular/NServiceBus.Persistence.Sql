@@ -18,7 +18,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.CompletedTask;
         }
-        var tablePrefix = TestTableNameCleaner.Clean(endpointName);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, "Tr_");
         configuration.RegisterStartupTask(sp =>
         {
             setupFeature = new SetupAndTeardownDatabase(
