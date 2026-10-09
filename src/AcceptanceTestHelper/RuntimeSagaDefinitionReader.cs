@@ -20,7 +20,10 @@ public static class RuntimeSagaDefinitionReader
 
         var sagaDefinitions = GetSagaDefinitions(sagaMetadataCollection.Select(m => m.SagaType.Assembly).Distinct());
 
-        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect));
+        // The runtime applies this filter to every saga table suffix, so the tables created here must use it too.
+        var tableSuffixFilter = NServiceBus.Persistence.Sql.SagaSettings.GetNameFilter(settings) ?? (static suffix => suffix);
+
+        return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter));
     }
 
     public static SagaDefinition GetSagaDefinition<TSagaType>(BuildSqlDialect sqlDialect)
@@ -29,7 +32,11 @@ public static class RuntimeSagaDefinitionReader
         var sagaDefinitions = GetSagaDefinitions([typeof(TSagaType).Assembly]);
         var metadata = SagaMetadata.Create<TSagaType>();
 
-        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, sqlDialect);
+        Func<string, string> tableSuffixFilter = sqlDialect == BuildSqlDialect.Oracle
+            ? suffix => OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, suffix)
+            : static suffix => suffix;
+
+        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter);
     }
 
     static Dictionary<string, SagaDefinition> GetSagaDefinitions(IEnumerable<Assembly> sagaAssemblies)
@@ -46,21 +53,15 @@ public static class RuntimeSagaDefinitionReader
         return definitions;
     }
 
-    static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, BuildSqlDialect sqlDialect)
+    static SagaDefinition GetSagaDefinition(Type sagaType, Dictionary<string, SagaDefinition> definitions, Func<string, string> tableSuffixFilter)
     {
         if (!definitions.TryGetValue(sagaType.FullName!.Replace('+', '.'), out var sagaDefinition))
         {
             throw new Exception($"Could not find metadata for '{sagaType.FullName}' in the collected assembly metadata.");
         }
 
-        var tableSuffix = sagaDefinition.TableSuffix;
-        if (sqlDialect == BuildSqlDialect.Oracle)
-        {
-            tableSuffix = OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, sagaDefinition.TableSuffix);
-        }
-
         return new SagaDefinition(
-            tableSuffix: tableSuffix,
+            tableSuffix: tableSuffixFilter(sagaDefinition.TableSuffix),
             name: sagaType.FullName,
             correlationProperty: sagaDefinition.CorrelationProperty,
             transitionalCorrelationProperty: sagaDefinition.TransitionalCorrelationProperty);
