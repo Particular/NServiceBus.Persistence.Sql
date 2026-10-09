@@ -30,7 +30,7 @@ public class SetupAndTeardownDatabase(
 
         try
         {
-            sagaDefinitions = [.. RuntimeSagaDefinitionReader.GetSagaDefinitions(settings, sqlDialect)];
+            sagaDefinitions = [.. RuntimeSagaDefinitionReader.GetSagaDefinitions(settings)];
             await using var connection = connectionBuilder();
             await connection.OpenAsync(cancellationToken);
             foreach (var definition in sagaDefinitions)

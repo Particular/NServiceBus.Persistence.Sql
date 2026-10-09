@@ -16,9 +16,9 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
     public async Task Should_remove_old_property_after_phase_three()
     {
         var dialect = BuildSqlDialect.Oracle;
-        var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase1Saga>(dialect);
-        var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase2Saga>(dialect);
-        var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase3Saga>(dialect);
+        var sagaPhase1 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase1Saga>(AcceptanceTestsSuffixFilter);
+        var sagaPhase2 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase2Saga>(AcceptanceTestsSuffixFilter);
+        var sagaPhase3 = RuntimeSagaDefinitionReader.GetSagaDefinition<Phase3Saga>(AcceptanceTestsSuffixFilter);
 
         string[] phase1Schema, phase2Schema, phase3Schema;
 
@@ -68,6 +68,8 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
         });
         Assert.That(phase3Schema, Has.Member("CORR_ORDERID"));
     }
+
+    static string AcceptanceTestsSuffixFilter(string tableSuffix) => OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, tableSuffix);
 
     static string[] GetSchema(OracleConnection connection, SagaDefinition saga)
     {
