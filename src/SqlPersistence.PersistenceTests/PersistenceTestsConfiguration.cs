@@ -111,7 +111,7 @@ public partial class PersistenceTestsConfiguration
             "PersistenceTests_",
             dialect,
             SagaMetadataCollection,
-            ShortenSagaName);
+            sagaName => SagaTableSuffix(buildDialect, sagaName));
 
         var connectionManager = new ConnectionManager(ConnectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
@@ -145,7 +145,7 @@ public partial class PersistenceTestsConfiguration
                     correlationProperty = new CorrelationProperty(propertyMetadata.Name, CorrelationPropertyType.String);
                 }
 
-                var tableName = ShortenSagaName(saga.SagaType.Name);
+                var tableName = SagaTableSuffix(buildDialect, saga.SagaType.Name);
                 var definition = new SagaDefinition(tableName, saga.EntityName, correlationProperty);
 
                 connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, buildDialect), "PersistenceTests");
@@ -160,6 +160,11 @@ public partial class PersistenceTestsConfiguration
 
         DbConnection ConnectionFactory() => variant.Open();
     }
+
+    static string SagaTableSuffix(BuildSqlDialect dialect, string sagaName) =>
+        dialect == BuildSqlDialect.Oracle
+            ? OracleSagaTableNames.Create(OracleSagaTableNames.PersistenceTestsPrefix, ShortenSagaName(sagaName))
+            : ShortenSagaName(sagaName);
 
     static string ShortenSagaName(string sagaName) =>
         sagaName

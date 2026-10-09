@@ -12,4 +12,8 @@
 
         return tablePrefix;
     }
+
+    // Acceptance test assemblies that share a database and compile the same scenarios would otherwise use the same tables.
+    public static string Clean(string tableName, string assemblyPrefix, int maxLength = int.MaxValue) =>
+        Clean(assemblyPrefix + tableName, maxLength);
 }
