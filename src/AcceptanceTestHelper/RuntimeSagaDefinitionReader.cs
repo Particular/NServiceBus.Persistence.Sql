@@ -56,7 +56,7 @@ public static class RuntimeSagaDefinitionReader
         var tableSuffix = sagaDefinition.TableSuffix;
         if (sqlDialect == BuildSqlDialect.Oracle)
         {
-            tableSuffix = sagaDefinition.TableSuffix[..Math.Min(27, sagaDefinition.TableSuffix.Length)];
+            tableSuffix = OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, sagaDefinition.TableSuffix);
         }
 
         return new SagaDefinition(
