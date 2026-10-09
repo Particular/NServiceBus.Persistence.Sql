@@ -9,7 +9,7 @@ using NServiceBus.Settings;
 
 public static class RuntimeSagaDefinitionReader
 {
-    public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings, BuildSqlDialect sqlDialect)
+    public static IEnumerable<SagaDefinition> GetSagaDefinitions(IReadOnlySettings settings)
     {
         var sagaMetadataCollection = settings.GetOrDefault<SagaMetadataCollection>() ?? [];
 
@@ -21,23 +21,22 @@ public static class RuntimeSagaDefinitionReader
         var sagaDefinitions = GetSagaDefinitions(sagaMetadataCollection.Select(m => m.SagaType.Assembly).Distinct());
 
         // The runtime applies this filter to every saga table suffix, so the tables created here must use it too.
-        var tableSuffixFilter = NServiceBus.Persistence.Sql.SagaSettings.GetNameFilter(settings) ?? (static suffix => suffix);
+        var tableSuffixFilter = NServiceBus.Persistence.Sql.SagaSettings.GetNameFilter(settings) ?? NoFilter;
 
         return sagaMetadataCollection.Select(metadata => GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter));
     }
 
-    public static SagaDefinition GetSagaDefinition<TSagaType>(BuildSqlDialect sqlDialect)
+    // For sagas defined outside an endpoint, pass the filter the dialect's tests would configure on the endpoint.
+    public static SagaDefinition GetSagaDefinition<TSagaType>(Func<string, string> tableSuffixFilter = null)
         where TSagaType : Saga
     {
         var sagaDefinitions = GetSagaDefinitions([typeof(TSagaType).Assembly]);
         var metadata = SagaMetadata.Create<TSagaType>();
 
-        Func<string, string> tableSuffixFilter = sqlDialect == BuildSqlDialect.Oracle
-            ? suffix => OracleSagaTableNames.Create(OracleSagaTableNames.AcceptanceTestsPrefix, suffix)
-            : static suffix => suffix;
-
-        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter);
+        return GetSagaDefinition(metadata.SagaType, sagaDefinitions, tableSuffixFilter ?? NoFilter);
     }
+
+    static string NoFilter(string tableSuffix) => tableSuffix;
 
     static Dictionary<string, SagaDefinition> GetSagaDefinitions(IEnumerable<Assembly> sagaAssemblies)
     {
