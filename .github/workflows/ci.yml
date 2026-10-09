@@ -30,30 +30,26 @@ jobs:
         env:
           SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
         run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
-      - name: Checkout
-        uses: actions/checkout@v7.0.1
-        with:
-          fetch-depth: 0
-      - name: Setup WSL
-        uses: Particular/setup-wsl-action@v1.2.0
+      - parallel:
+        - name: Checkout
+          uses: actions/checkout@v7.0.1
+          with:
+            fetch-depth: 0
+        - name: Setup WSL
+          uses: Particular/setup-wsl-action@v1.2.0
+        - name: Azure login
+          uses: azure/login@v3.1.0
+          if: matrix.engine == 'Oracle' && matrix.name == 'Windows'
+          with:
+            creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
       - name: Build
+        id: build
         run: dotnet build src --configuration Release -graph
-      - name: Upload packages
-        if: matrix.name == 'Windows' && matrix.engine == 'SqlServer'
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: NuGet packages
-          path: nugets/
-          retention-days: 7
-      - name: Azure login
-        uses: azure/login@v3.1.0
-        if: matrix.engine == 'Oracle' && matrix.name == 'Windows'
-        with:
-          creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
+        background: true
       - name: Setup SQL Server
         if: matrix.engine == 'SqlServer'
         uses: Particular/install-sql-server-action@v3.0.0
@@ -91,5 +87,14 @@ jobs:
           $connectionString = $Env:OracleConnectionString
           "OracleConnectionString=$($connectionString.Replace('system', 'particular'))" >> $Env:GITHUB_ENV
           "OracleConnectionString_Particular2=$($connectionString.Replace('system', 'particular2'))" >> $Env:GITHUB_ENV
+      - name: Wait for build
+        wait: build
+      - name: Upload packages
+        if: matrix.name == 'Windows' && matrix.engine == 'SqlServer'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: NuGet packages
+          path: nugets/
+          retention-days: 7
       - name: Run tests
         uses: Particular/run-tests-action@v1.9.0
