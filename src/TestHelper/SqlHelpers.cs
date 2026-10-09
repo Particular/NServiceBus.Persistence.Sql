@@ -47,35 +47,53 @@ public static class SqlHelpers
         }
     }
 
-    // The MySQL saga script drops and recreates the database-wide sqlpersistence_raiseerror procedure, so scripts from concurrent test processes must not interleave.
+    // MySQL scripts recreate the database-wide sqlpersistence_raiseerror procedure and PostgreSQL outbox scripts create schema-wide, unprefixed indexes,
+    // so scripts from concurrent test processes must not interleave.
     static IDisposable AcquireScriptLock(DbConnection connection)
     {
-        if (connection is not MySql.Data.MySqlClient.MySqlConnection)
+        string acquire;
+        string release;
+
+        if (connection is MySql.Data.MySqlClient.MySqlConnection)
+        {
+            acquire = $"select get_lock('{ScriptLockName}', 120)";
+            release = $"select release_lock('{ScriptLockName}')";
+        }
+        else if (connection is Npgsql.NpgsqlConnection)
+        {
+            acquire = $"select pg_advisory_lock({PostgreSqlScriptLockKey})";
+            release = $"select pg_advisory_unlock({PostgreSqlScriptLockKey})";
+        }
+        else
         {
             return null;
         }
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"select get_lock('{ScriptLockName}', 120)";
-        if (Convert.ToInt32(command.ExecuteScalar()) != 1)
+        command.CommandText = acquire;
+        var result = command.ExecuteScalar();
+
+        // get_lock returns 0 or null on timeout, pg_advisory_lock blocks and returns void (DBNull)
+        if (connection is MySql.Data.MySqlClient.MySqlConnection && Convert.ToInt32(result) != 1)
         {
             throw new Exception("Could not acquire the MySQL script lock within 120 seconds.");
         }
 
-        return new ScriptLock(connection);
+        return new ScriptLock(connection, release);
     }
 
-    sealed class ScriptLock(DbConnection connection) : IDisposable
+    sealed class ScriptLock(DbConnection connection, string release) : IDisposable
     {
         public void Dispose()
         {
             using var command = connection.CreateCommand();
-            command.CommandText = $"select release_lock('{ScriptLockName}')";
+            command.CommandText = release;
             command.ExecuteScalar();
         }
     }
 
     const string ScriptLockName = "sqlpersistence_test_scripts";
+    const long PostgreSqlScriptLockKey = 7340198256;
 
     static void AddParameter(this DbCommand command, string name, object value)
     {
