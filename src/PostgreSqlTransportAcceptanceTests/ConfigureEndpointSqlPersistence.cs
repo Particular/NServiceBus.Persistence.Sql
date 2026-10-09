@@ -23,7 +23,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         }
 
         //Why is it 19? Answer: because we constrain the tablePrefix in PostgreSQL to 20 and we add '_' to the prefix later on
-        var tablePrefix = TestTableNameCleaner.Clean(endpointName, 19);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, "Tr_", 19);
         Console.WriteLine($"Using EndpointName='{endpointName}', TablePrefix='{tablePrefix}'");
 
         configuration.RegisterStartupTask(sp =>
