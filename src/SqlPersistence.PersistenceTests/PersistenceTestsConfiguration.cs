@@ -171,16 +171,17 @@ public partial class PersistenceTestsConfiguration
     // Uses the table names the persistence itself resolves, so it covers exactly the tables CreateSchema made.
     void ClearTables(DbConnection connection, SqlDialect dialect, BuildSqlDialect buildDialect)
     {
-        var tableNames = GetSagaDefinitions(buildDialect)
+        var deletes = GetSagaDefinitions(buildDialect)
             .Select(definition => dialect.GetSagaTableName(TablePrefix, definition.TableSuffix))
-            .Append(dialect.GetOutboxTableName(TablePrefix));
+            .Append(dialect.GetOutboxTableName(TablePrefix))
+            .Select(tableName => $"delete from {tableName};");
 
-        foreach (var tableName in tableNames)
-        {
-            using var command = connection.CreateCommand();
-            command.CommandText = $"delete from {tableName}";
-            command.ExecuteNonQuery();
-        }
+        // One round trip per fixture instead of one per table. Oracle only runs several statements inside a PL/SQL block.
+        var batch = string.Join(Environment.NewLine, deletes);
+
+        using var command = connection.CreateCommand();
+        command.CommandText = buildDialect == BuildSqlDialect.Oracle ? $"begin{Environment.NewLine}{batch}{Environment.NewLine}end;" : batch;
+        command.ExecuteNonQuery();
     }
 
     IEnumerable<SagaDefinition> GetSagaDefinitions(BuildSqlDialect buildDialect)
