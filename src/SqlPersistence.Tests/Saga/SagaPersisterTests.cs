@@ -740,6 +740,46 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [Test]
+    public void CreateWithSameTableInAnotherSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        var endpointName = nameof(CreateWithSameTableInAnotherSchema);
+        var definitionWithTransitional = new SagaDefinition(
+            tableSuffix: "CorrAndTransitionalSaga",
+            name: "CorrAndTransitionalSaga",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "Property1",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "Property2",
+                type: CorrelationPropertyType.String
+            )
+        );
+        var definition = new SagaDefinition(
+            tableSuffix: "CorrAndTransitionalSaga",
+            name: "CorrAndTransitionalSaga",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "Property1",
+                type: CorrelationPropertyType.String
+            )
+        );
+
+        // The same table in the default schema has a correlation column that the table in the custom schema does not
+        DropAndCreate(definitionWithTransitional, endpointName, null);
+
+        // Purging obsolete columns in the custom schema must not pick up the column from the default schema
+        Assert.DoesNotThrow(() => DropAndCreate(definition, endpointName, schema));
+    }
+
     protected virtual string CorrelationPropertyName(string propertyName) => $"Correlation_{propertyName}";
 
     protected virtual string TestTableName(string testName, string tableSuffix) => $"{testName}_{tableSuffix}";
