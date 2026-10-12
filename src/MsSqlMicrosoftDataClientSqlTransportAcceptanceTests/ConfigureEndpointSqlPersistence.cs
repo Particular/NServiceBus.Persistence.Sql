@@ -18,7 +18,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         {
             return Task.CompletedTask;
         }
-        var tablePrefix = TestTableNameCleaner.Clean(endpointName);
+        var tablePrefix = TestTableNameCleaner.Clean(endpointName, "Tr_");
         configuration.RegisterStartupTask(sp =>
         {
             setupFeature = new SetupAndTeardownDatabase(
@@ -34,6 +34,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
         var persistence = configuration.UsePersistence<SqlPersistence>();
         persistence.ConnectionBuilder(MsSqlMicrosoftDataClientConnectionBuilder.Build);
         persistence.SqlDialect<SqlDialect.MsSqlServer>();
+        persistence.TablePrefix($"{tablePrefix}_");
         var subscriptions = persistence.SubscriptionSettings();
         subscriptions.DisableCache();
         persistence.DisableInstaller();

@@ -28,7 +28,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(sagaPhase1, dialect), "");
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase1, dialect), "");
-            phase1Schema = GetSchema(connection);
+            phase1Schema = GetSchema(connection, sagaPhase1);
 
             connection.PurgeStatementCache();
         }
@@ -38,7 +38,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             await connection.OpenAsync();
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase2, dialect), "");
-            phase2Schema = GetSchema(connection);
+            phase2Schema = GetSchema(connection, sagaPhase2);
 
             connection.PurgeStatementCache();
         }
@@ -48,7 +48,7 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
             await connection.OpenAsync();
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(sagaPhase3, dialect), "");
-            phase3Schema = GetSchema(connection);
+            phase3Schema = GetSchema(connection, sagaPhase3);
 
             connection.PurgeStatementCache();
         }
@@ -69,11 +69,11 @@ public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
         Assert.That(phase3Schema, Has.Member("CORR_ORDERID"));
     }
 
-    static string[] GetSchema(OracleConnection connection)
+    static string[] GetSchema(OracleConnection connection, SagaDefinition saga)
     {
         using (var command = connection.CreateCommand())
         {
-            command.CommandText = "SELECT * FROM TRANSCORRPROPSAGA";
+            command.CommandText = $"SELECT * FROM \"{saga.TableSuffix.ToUpper()}\"";
             command.CommandType = CommandType.Text;
 
             using (var reader = command.ExecuteReader())

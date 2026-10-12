@@ -27,8 +27,7 @@ public class ConfigureEndpointSqlPersistence : IConfigureEndpointTestExecution
                 sp.GetRequiredService<IReadOnlySettings>(),
                 tablePrefix,
                 MySqlConnectionBuilder.Build,
-                BuildSqlDialect.MySql,
-                e => e.Message.Contains("sqlpersistence_raiseerror already exists"));
+                BuildSqlDialect.MySql);
 
             return setupFeature;
         });
