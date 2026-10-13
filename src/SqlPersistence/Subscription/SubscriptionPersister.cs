@@ -81,33 +81,52 @@ class SubscriptionPersister : ISubscriptionStorage
 
     async Task<IEnumerable<Subscriber>> GetCachedSubscriptions(List<MessageType> types, CancellationToken cancellationToken)
     {
-
         var key = GetKey(types);
+        while (true)
+        {
+            var currentItem = Cache.GetOrAdd(key,
+                valueFactory: _ => new CacheItem { Stored = DateTime.UtcNow, Subscribers = GetSubscriptions(types, cancellationToken) });
 
-        var cacheItem = Cache.GetOrAdd(key,
-            valueFactory: _ => new CacheItem
+            var age = DateTime.UtcNow - currentItem.Stored;
+
+            if (age < cacheFor)
             {
-                Stored = DateTime.UtcNow,
-                Subscribers = GetSubscriptions(types, cancellationToken)
-            });
+                try
+                {
+                    return await currentItem.Subscribers.ConfigureAwait(false);
+                }
+                catch
+                {
+                    EvictFromCache(key, currentItem);
 
-        var age = DateTime.UtcNow - cacheItem.Stored;
+                    throw;
+                }
+            }
 
-        if (age >= cacheFor)
-        {
-            cacheItem.Subscribers = GetSubscriptions(types, cancellationToken);
-            cacheItem.Stored = DateTime.UtcNow;
+            var refreshedItem = new CacheItem { Subscribers = GetSubscriptions(types, cancellationToken), Stored = DateTime.UtcNow };
+            if (Cache.TryUpdate(key, refreshedItem, currentItem))
+            {
+                try
+                {
+                    return await refreshedItem.Subscribers.ConfigureAwait(false);
+                }
+                catch
+                {
+                    EvictFromCache(key, refreshedItem);
+
+                    throw;
+                }
+            }
         }
+        // Another thread updated the cache before we could, so we loop and try again with the new value.
+    }
 
-        try
+    void EvictFromCache(string key, CacheItem cacheItem)
+    {
+        // Evict so a transient failure or cancellation doesn't stay in the cache
+        if (Cache.TryGetValue(key, out var live) && ReferenceEquals(live, cacheItem))
         {
-            return await cacheItem.Subscribers.ConfigureAwait(false);
-        }
-        catch
-        {
-            // Evict so a transient failure or cancellation doesn't stay in the cache
-            Cache.TryRemove(new KeyValuePair<string, CacheItem>(key, cacheItem));
-            throw;
+            Cache.TryRemove(key, out _);
         }
     }
 
