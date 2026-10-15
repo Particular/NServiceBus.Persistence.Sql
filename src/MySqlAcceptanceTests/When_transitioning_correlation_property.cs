@@ -10,7 +10,8 @@ using NServiceBus.Persistence.Sql;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
 using NUnit.Framework;
 
-[TestFixture]
+[TestFixture, NonParallelizable]
+// Uses a fixed table and waits on information_schema, which is slow to update under load.
 public class When_transitioning_correlation_property : NServiceBusAcceptanceTest
 {
     [Test]
