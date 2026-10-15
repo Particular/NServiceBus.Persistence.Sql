@@ -81,22 +81,24 @@ class SubscriptionPersister : ISubscriptionStorage
 
     async Task<IEnumerable<Subscriber>> GetCachedSubscriptions(List<MessageType> types, CancellationToken cancellationToken)
     {
-
         var key = GetKey(types);
-
         var cacheItem = Cache.GetOrAdd(key,
-            valueFactory: _ => new CacheItem
-            {
-                Stored = DateTime.UtcNow,
-                Subscribers = GetSubscriptions(types, cancellationToken)
-            });
+            valueFactory: _ => new CacheItem { Stored = DateTime.UtcNow, Subscribers = GetSubscriptions(types, cancellationToken) });
 
         var age = DateTime.UtcNow - cacheItem.Stored;
 
         if (age >= cacheFor)
         {
-            cacheItem.Subscribers = GetSubscriptions(types, cancellationToken);
-            cacheItem.Stored = DateTime.UtcNow;
+            var refreshed = new CacheItem { Stored = DateTime.UtcNow, Subscribers = GetSubscriptions(types, cancellationToken) };
+            if (Cache.TryUpdate(key, refreshed, cacheItem))
+            {
+                cacheItem = refreshed;
+            }
+            else if (Cache.TryGetValue(key, out var latest))
+            {
+                // Another thread refreshed the entry first, so use its value
+                cacheItem = latest;
+            }
         }
 
         try
