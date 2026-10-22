@@ -50,7 +50,16 @@
                 }
 
                 var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
-                connection.EnlistTransaction(scopeTx);
+                try
+                {
+                    connection.EnlistTransaction(scopeTx);
+                }
+                catch
+                {
+                    await connection.DisposeAsync().ConfigureAwait(false);
+                    throw;
+                }
+
 
                 return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }
