@@ -74,9 +74,9 @@ sealed class StorageSession : ICompletableSynchronizedStorageSession, ISqlStorag
 
     public async Task Open(ContextBag contextBag, CancellationToken cancellationToken = default)
     {
+        ownsTransaction = true;
         Connection = await connectionManager.OpenConnection(contextBag.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
         Transaction = await Connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-        ownsTransaction = true;
     }
 
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
