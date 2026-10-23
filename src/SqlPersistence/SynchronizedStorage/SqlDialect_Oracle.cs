@@ -39,16 +39,7 @@
                     return (WasAdapted: false, Connection: null, Transaction: null, OwnsTransaction: false);
                 }
 
-                var connection = await connectionBuilder.OpenConnection(context.GetIncomingMessage(), cancellationToken).ConfigureAwait(false);
-                try
-                {
-                    connection.EnlistTransaction(ambientTransaction);
-                }
-                catch
-                {
-                    await connection.DisposeAsync().ConfigureAwait(false);
-                    throw;
-                }
+                var connection = await connectionBuilder.OpenConnectionAndEnlistInTransaction(context.GetIncomingMessage(), ambientTransaction, cancellationToken).ConfigureAwait(false);
 
                 return (WasAdapted: true, Connection: connection, Transaction: null, OwnsTransaction: true);
             }

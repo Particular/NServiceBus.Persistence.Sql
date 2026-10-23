@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using NServiceBus.Extensibility;
 using NServiceBus.Settings;
 using NServiceBus.Transport;
@@ -39,34 +40,46 @@ static class Extensions
         return OpenConnection(connection, cancellationToken);
     }
 
-    static async Task<DbConnection> OpenConnection(DbConnection connection, CancellationToken cancellationToken)
+    public static Task<DbConnection> OpenConnectionAndEnlistInTransaction(this IConnectionManager connectionManager, IncomingMessage incomingMessage, Transaction transactionToEnlistIn, CancellationToken cancellationToken = default)
+    {
+        var connection = connectionManager.Build(incomingMessage);
+        return OpenConnection(connection, cancellationToken, transactionToEnlistIn);
+    }
+
+    static async Task<DbConnection> OpenConnection(DbConnection connection, CancellationToken cancellationToken, Transaction transactionToEnlistIn = null)
     {
         try
         {
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            if (transactionToEnlistIn != null)
+            {
+                connection.EnlistTransaction(transactionToEnlistIn);
+            }
             return connection;
         }
         catch (Exception ex) when (ex.IsCausedBy(cancellationToken))
         {
-            // copy the general catch but don't let another exception mask the OCE
-            try
-            {
-                connection?.Dispose();
-            }
-            catch { }
-
+            DisposeConnection(connection);
             throw;
         }
         catch (Exception)
         {
-            connection?.Dispose();
+            DisposeConnection(connection);
             throw;
         }
     }
 
-    public static void AddParameter(this DbCommand command, string name, Version value)
+    static void DisposeConnection(DbConnection connection)
     {
-        command.AddParameter(name, value.ToString());
+        // don't let a failing dispose hide a previous exception
+        try
+        {
+            connection?.Dispose();
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     public static async Task<bool> GetBoolAsync(this DbDataReader reader, int position, CancellationToken cancellationToken = default)
