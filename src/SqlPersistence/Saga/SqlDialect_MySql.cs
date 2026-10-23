@@ -61,6 +61,7 @@ values
                 return $@"
 update {tableName}
 set
+    Metadata = @Metadata,
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,
