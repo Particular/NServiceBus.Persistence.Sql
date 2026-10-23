@@ -18,6 +18,7 @@
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
     <PackageReference Include="System.Text.Json" Version="9.0.4" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
   </ItemGroup>
 
   <!-- Workaround to prevent VS test discovery error -->
