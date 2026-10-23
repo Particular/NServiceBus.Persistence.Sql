@@ -4,7 +4,7 @@ using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Sagas;
 
-partial class SagaPersister : ISagaPersister, ISupportTimeoutManagement
+partial class SagaPersister : ISagaPersister
 {
     SagaInfoCache sagaInfoCache;
     SqlDialect sqlDialect;

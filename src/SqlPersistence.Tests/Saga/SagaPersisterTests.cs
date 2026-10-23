@@ -275,7 +275,7 @@ public abstract class SagaPersisterTests
             await persister.Save(sagaData, storageSession, "theProperty");
 
             const int invalidConcurrencyVersion = 42;
-            Assert.ThrowsAsync<Exception>(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion));
+            await Assert.ThatAsync(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion), Throws.TypeOf<Exception>());
         }
     }
 
@@ -710,6 +710,7 @@ public abstract class SagaPersisterTests
     {
         TimeoutId = Guid.NewGuid().ToString(),
         TriggerId = Guid.NewGuid().ToString(),
+        Version = 1,
         DueTime = dueTime,
         MessageType = "MyNamespace.MyTimeout",
         ContentType = "application/json",
@@ -722,6 +723,7 @@ public abstract class SagaPersisterTests
         {
             Assert.That(actual.TimeoutId, Is.EqualTo(expected.TimeoutId));
             Assert.That(actual.TriggerId, Is.EqualTo(expected.TriggerId));
+            Assert.That(actual.Version, Is.EqualTo(expected.Version));
             Assert.That(actual.DueTime, Is.EqualTo(expected.DueTime));
             Assert.That(actual.DueTime.Offset, Is.EqualTo(expected.DueTime.Offset));
             Assert.That(actual.MessageType, Is.EqualTo(expected.MessageType));
@@ -929,7 +931,7 @@ public abstract class SagaPersisterTests
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
+            var exception = await Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
             Assert.That(exception.Message, Does.Contain("Optimistic concurrency violation"));
         }
     }
@@ -1226,7 +1228,7 @@ public abstract class SagaPersisterTests
                 CorrelationProperty = "theCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
-            var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
+            var throwsAsync = await Assert.ThrowsAsync<Exception>(async () =>
             {
                 await persister.Save(data, storageSession, "theCorrelationProperty");
                 await storageSession.CompleteAsync();

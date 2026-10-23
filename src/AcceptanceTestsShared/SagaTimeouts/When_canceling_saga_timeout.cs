@@ -50,7 +50,8 @@ public class When_canceling_saga_timeout : NServiceBusAcceptanceTest
 
             public async Task Handle(CancelTimeout message, IMessageHandlerContext context)
             {
-                CancelTimeout(FindTimeouts<CanceledTimeout>(_ => true).Single().TimeoutId);
+                var timeouts = await FindTimeouts<CanceledTimeout>(_ => true);
+                await CancelTimeout(timeouts.Single().TimeoutId);
 
                 // Fires after the canceled timeout would have, so the scenario observes its trigger being dropped
                 await RequestTimeout<MarkerTimeout>(context, TimeSpan.FromSeconds(4));

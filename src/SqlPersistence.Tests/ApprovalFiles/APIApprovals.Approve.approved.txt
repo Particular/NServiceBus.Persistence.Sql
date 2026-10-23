@@ -107,7 +107,7 @@ namespace NServiceBus
     {
         public SqlDialectSettings() { }
     }
-    public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition, NServiceBus.Persistence.IPersistenceDefinitionFactory<NServiceBus.SqlPersistence>
+    public class SqlPersistence : NServiceBus.Persistence.PersistenceDefinition, NServiceBus.Persistence.IPersistenceDefinitionFactory<NServiceBus.SqlPersistence>, NServiceBus.Sagas.ISupportTimeoutManagement
     {
         [System.Obsolete("The SqlPersistence class is not supposed to be instantiated directly. Will be rem" +
             "oved in version 10.0.0.", true)]

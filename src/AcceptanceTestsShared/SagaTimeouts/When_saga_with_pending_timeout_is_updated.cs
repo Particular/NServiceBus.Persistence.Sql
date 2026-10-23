@@ -58,7 +58,7 @@ public class When_saga_with_pending_timeout_is_updated : NServiceBusAcceptanceTe
             public async Task Handle(UpdateSaga message, IMessageHandlerContext context)
             {
                 Data.Updates++;
-                testContext.TimeoutsFoundAfterUpdate = FindTimeouts<MyTimeout>(_ => true).Count();
+                testContext.TimeoutsFoundAfterUpdate = (await FindTimeouts<MyTimeout>(_ => true)).Count;
 
                 if (message.Remaining > 1)
                 {

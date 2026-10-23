@@ -1,11 +1,12 @@
 ﻿namespace NServiceBus
 {
     using Persistence;
+    using Sagas;
 
     /// <summary>
     /// The <see cref="PersistenceDefinition"/> for the SQL Persistence.
     /// </summary>
-    public partial class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>
+    public partial class SqlPersistence : PersistenceDefinition, IPersistenceDefinitionFactory<SqlPersistence>, ISupportTimeoutManagement
     {
         // constructor parameter is a temporary workaround until the public constructor is removed
         SqlPersistence(object _)
