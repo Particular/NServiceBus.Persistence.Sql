@@ -22,4 +22,8 @@
     <PackageReference Include="PublicApiGenerator" Version="11.5.4" />
   </ItemGroup>
 
+  <ItemGroup Label="Addressing-CVEs">
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
+  </ItemGroup>
+
 </Project>
