@@ -17,7 +17,7 @@
   </ItemGroup>
   
   <ItemGroup Label="Addressing-CVEs">
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
 </Project>
