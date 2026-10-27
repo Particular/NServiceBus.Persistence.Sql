@@ -26,6 +26,7 @@ namespace PostgreSql
 select count(*)
 from information_schema.columns
 where
+table_schema = '{schema}' and
 table_name = '{table}' and
 column_name = '{propertyName}';
 ";
