@@ -105,6 +105,7 @@ for columnToDelete in
     select column_name
     from information_schema.columns
     where
+        table_schema = schema and
         table_name = tableNameNonQuoted and
         column_name LIKE 'Correlation_%'{builder}
 )
