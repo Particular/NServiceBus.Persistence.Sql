@@ -118,20 +118,17 @@ end if;
             builder.Append($" and{Environment.NewLine}        column_name <> '{OracleCorrelationPropertyName(saga.TransitionalCorrelationProperty)}'");
         }
         writer.Write($@"
-select count(*) into n
-from all_tab_columns
-where table_name = '{tableName}' and column_name like 'CORR_%'{builder} and owner = currentSchema;
-
-if(n > 0)
-then
-
-  select 'alter table ""{tableName}"" drop column ' || column_name into sqlStatement
+for columnToDelete in
+(
+  select column_name
   from all_tab_columns
-  where table_name = '{tableName}' and column_name like 'CORR_%'{builder} and owner = currentSchema;
+  where table_name = '{tableName}' and column_name like 'CORR_%'{builder} and owner = currentSchema
+)
+loop
+  sqlStatement := 'alter table ""{tableName}"" drop column ' || columnToDelete.column_name;
 
   execute immediate sqlStatement;
-
-end if;
+end loop;
 ");
     }
 
