@@ -119,16 +119,13 @@ end
         }
 
         writer.Write($@"
-declare @dropPropertiesQuery nvarchar(max);
-select @dropPropertiesQuery =
-(
-    select 'alter table ' + @tableName + ' drop column ' + column_name + ';'
-    from INFORMATION_SCHEMA.COLUMNS
-    where
-        table_name = @tableNameWithoutSchema and
-        table_schema = @schema and
-        column_name like 'Correlation_%'{builder}
-);
+declare @dropPropertiesQuery nvarchar(max) = '';
+select @dropPropertiesQuery += 'alter table ' + @tableName + ' drop column ' + column_name + ';'
+from INFORMATION_SCHEMA.COLUMNS
+where
+    table_name = @tableNameWithoutSchema and
+    table_schema = @schema and
+    column_name like 'Correlation_%'{builder};
 exec sp_executesql @dropPropertiesQuery
 ");
     }
@@ -147,16 +144,13 @@ exec sp_executesql @dropPropertiesQuery
         }
 
         writer.Write($@"
-declare @dropIndexQuery nvarchar(max);
-select @dropIndexQuery =
-(
-    select 'drop index ' + name + ' on ' + @tableName + ';'
-    from sysindexes
-    where
-        Id = object_id(@tableName) and
-        Name is not null and
-        Name like 'Index_Correlation_%'{builder}
-);
+declare @dropIndexQuery nvarchar(max) = '';
+select @dropIndexQuery += 'drop index ' + name + ' on ' + @tableName + ';'
+from sysindexes
+where
+    Id = object_id(@tableName) and
+    Name is not null and
+    Name like 'Index_Correlation_%'{builder};
 exec sp_executesql @dropIndexQuery
 ");
     }
