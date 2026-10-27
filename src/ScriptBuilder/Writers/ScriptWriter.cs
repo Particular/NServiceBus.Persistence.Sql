@@ -32,7 +32,7 @@ public abstract class ScriptWriter
     string EnsureFile(string file)
     {
         var filePath = Path.Combine(ScriptPath, file);
-        if (Clean && File.Exists(file))
+        if (Clean && File.Exists(filePath))
         {
             File.Delete(filePath);
         }
