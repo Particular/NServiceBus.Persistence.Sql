@@ -778,9 +778,9 @@ public abstract class SagaPersisterTests
 
         // Purging obsolete columns in the custom schema must not pick up the column from the default schema
         Assert.DoesNotThrow(() => DropAndCreate(definition, endpointName, schema));
-	}
+    }
 
-	[Test]
+    [Test]
     public void ReplaceCorrelationAndTransitional()
     {
         var endpointName = nameof(ReplaceCorrelationAndTransitional);
