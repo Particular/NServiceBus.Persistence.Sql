@@ -76,24 +76,41 @@ class SubscriptionPersister : ISubscriptionStorage
             return GetSubscriptions(types, cancellationToken);
         }
 
-        var key = GetKey(types);
+        return GetCachedSubscriptions(types, cancellationToken);
+    }
 
+    async Task<IEnumerable<Subscriber>> GetCachedSubscriptions(List<MessageType> types, CancellationToken cancellationToken)
+    {
+        var key = GetKey(types);
         var cacheItem = Cache.GetOrAdd(key,
-            valueFactory: _ => new CacheItem
-            {
-                Stored = DateTime.UtcNow,
-                Subscribers = GetSubscriptions(types, cancellationToken)
-            });
+            valueFactory: _ => new CacheItem { Stored = DateTime.UtcNow, Subscribers = GetSubscriptions(types, cancellationToken) });
 
         var age = DateTime.UtcNow - cacheItem.Stored;
 
         if (age >= cacheFor)
         {
-            cacheItem.Subscribers = GetSubscriptions(types, cancellationToken);
-            cacheItem.Stored = DateTime.UtcNow;
+            var refreshed = new CacheItem { Stored = DateTime.UtcNow, Subscribers = GetSubscriptions(types, cancellationToken) };
+            if (Cache.TryUpdate(key, refreshed, cacheItem))
+            {
+                cacheItem = refreshed;
+            }
+            else if (Cache.TryGetValue(key, out var latest))
+            {
+                // Another thread refreshed the entry first, so use its value
+                cacheItem = latest;
+            }
         }
 
-        return cacheItem.Subscribers;
+        try
+        {
+            return await cacheItem.Subscribers.ConfigureAwait(false);
+        }
+        catch
+        {
+            // Evict so a transient failure or cancellation doesn't stay in the cache
+            Cache.TryRemove(new KeyValuePair<string, CacheItem>(key, cacheItem));
+            throw;
+        }
     }
 
     static object Nullable(object value)
