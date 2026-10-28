@@ -740,6 +740,96 @@ public abstract class SagaPersisterTests
         }
     }
 
+    [Test]
+    public void CreateWithSameTableInAnotherSchema()
+    {
+        if (!SupportsSchemas())
+        {
+            Assert.Ignore();
+        }
+
+        var endpointName = nameof(CreateWithSameTableInAnotherSchema);
+        var definitionWithTransitional = new SagaDefinition(
+            tableSuffix: "CorrAndTransitionalSaga",
+            name: "CorrAndTransitionalSaga",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "Property1",
+                type: CorrelationPropertyType.String
+            ),
+            transitionalCorrelationProperty: new CorrelationProperty
+            (
+                name: "Property2",
+                type: CorrelationPropertyType.String
+            )
+        );
+        var definition = new SagaDefinition(
+            tableSuffix: "CorrAndTransitionalSaga",
+            name: "CorrAndTransitionalSaga",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "Property1",
+                type: CorrelationPropertyType.String
+            )
+        );
+
+        // The same table in the default schema has a correlation column that the table in the custom schema does not
+        DropAndCreate(definitionWithTransitional, endpointName, null);
+
+        // Purging obsolete columns in the custom schema must not pick up the column from the default schema
+        Assert.DoesNotThrow(() => DropAndCreate(definition, endpointName, schema));
+    }
+
+    [Test]
+    public void ReplaceCorrelationAndTransitional()
+    {
+        var endpointName = nameof(ReplaceCorrelationAndTransitional);
+        var table = TestTableName(endpointName, "CorrAndTransitionalSaga");
+        using (var connection = dbConnection())
+        {
+            var definition1 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property1",
+                    type: CorrelationPropertyType.String
+                ),
+                transitionalCorrelationProperty: new CorrelationProperty
+                (
+                    name: "Property2",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.Open();
+            connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition1, sqlDialect), endpointName, schema: schema);
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition1, sqlDialect), endpointName, schema: schema);
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(table, CorrelationPropertyName("Property1")), Is.True);
+                Assert.That(PropertyExists(table, CorrelationPropertyName("Property2")), Is.True);
+            });
+
+            // Neither of the existing correlation columns is kept, so two columns (and their indexes) need to be purged
+            var definition2 = new SagaDefinition(
+                tableSuffix: "CorrAndTransitionalSaga",
+                name: "CorrAndTransitionalSaga",
+                correlationProperty: new CorrelationProperty
+                (
+                    name: "Property3",
+                    type: CorrelationPropertyType.String
+                )
+            );
+            connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition2, sqlDialect), endpointName, schema: schema);
+            Assert.Multiple(() =>
+            {
+                Assert.That(PropertyExists(table, CorrelationPropertyName("Property1")), Is.False);
+                Assert.That(PropertyExists(table, CorrelationPropertyName("Property2")), Is.False);
+                Assert.That(PropertyExists(table, CorrelationPropertyName("Property3")), Is.True);
+            });
+        }
+    }
+
     protected virtual string CorrelationPropertyName(string propertyName) => $"Correlation_{propertyName}";
 
     protected virtual string TestTableName(string testName, string tableSuffix) => $"{testName}_{tableSuffix}";

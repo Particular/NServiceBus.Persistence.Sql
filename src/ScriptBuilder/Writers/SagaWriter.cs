@@ -25,13 +25,15 @@ class SagaWriter(bool clean,
                 index++;
             }
 
-            var createPath = Path.Combine(sagaPath, $"{sagaFileName}_Create.sql");
+            var createPath = Path.Combine(SagaDirectoryName, $"{sagaFileName}_Create.sql");
             WriteScript(createPath, writer => SagaScriptBuilder.BuildCreateScript(saga, dialect, writer));
 
-            var dropPath = Path.Combine(sagaPath, $"{sagaFileName}_Drop.sql");
+            var dropPath = Path.Combine(SagaDirectoryName, $"{sagaFileName}_Drop.sql");
             WriteScript(dropPath, writer => SagaScriptBuilder.BuildDropScript(saga, dialect, writer));
         }
     }
 
-    readonly string sagaPath = Path.Combine(scriptPath, "Sagas");
+    const string SagaDirectoryName = "Sagas";
+
+    readonly string sagaPath = Path.Combine(scriptPath, SagaDirectoryName);
 }

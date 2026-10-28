@@ -28,6 +28,11 @@ static class SettingsAttributeReader
             if (attribute.Constructor.Kind == HandleKind.MemberReference)
             {
                 var typeHandle = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor).Parent;
+                if (typeHandle.Kind != HandleKind.TypeReference)
+                {
+                    continue;
+                }
+
                 var typeReference = reader.GetTypeReference((TypeReferenceHandle)typeHandle);
                 var attName = reader.GetString(typeReference.Name);
 
@@ -37,7 +42,7 @@ static class SettingsAttributeReader
                     if (attNamespace == "NServiceBus.Persistence.Sql")
                     {
                         var args = attribute.DecodeValue(AttributeTypeProvider.Instance);
-                        // This assembly level attribute can only exists once per assembly. This is an additional safe guard to make this code more intention revealing
+                        // This assembly level attribute can only exist once per assembly. This is an additional safeguard to make this code more intention revealing
                         if (properties is not null)
                         {
                             throw new InvalidOperationException("Only one SqlPersistenceSettingsAttribute can be defined per assembly");

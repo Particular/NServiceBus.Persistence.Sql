@@ -49,7 +49,8 @@
             return $@"
 select count(*)
 from all_tab_columns
-where table_name = '{table}' and
+where owner = user and
+      table_name = '{table}' and
       column_name = '{propertyName}'
 ";
         }
