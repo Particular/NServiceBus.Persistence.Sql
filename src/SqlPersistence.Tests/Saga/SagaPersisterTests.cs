@@ -275,7 +275,7 @@ public abstract class SagaPersisterTests
             await persister.Save(sagaData, storageSession, "theProperty");
 
             const int invalidConcurrencyVersion = 42;
-            Assert.ThrowsAsync<Exception>(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion));
+            await Assert.ThatAsync(() => persister.Complete(sagaData, storageSession, invalidConcurrencyVersion), Throws.TypeOf<Exception>());
         }
     }
 
@@ -617,6 +617,122 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
+    public async Task SaveAndUpdateWithTimeouts()
+    {
+        var endpointName = nameof(SaveAndUpdateWithTimeouts);
+        var definition = new SagaDefinition(
+            tableSuffix: "SagaWithCorrelation",
+            name: "SagaWithCorrelation",
+            correlationProperty: new CorrelationProperty
+            (
+                name: "CorrelationProperty",
+                type: CorrelationPropertyType.String
+            )
+        );
+        DropAndCreate(definition, endpointName, schema);
+        var id = Guid.NewGuid();
+        var sagaData = new SagaWithCorrelation.SagaData
+        {
+            Id = id,
+            CorrelationProperty = "theCorrelationProperty",
+            OriginalMessageId = "theOriginalMessageId",
+            Originator = "theOriginator",
+            SimpleProperty = "PropertyValue"
+        };
+        var first = CreateStoredTimeout("first", new DateTimeOffset(2030, 1, 2, 3, 4, 5, TimeSpan.FromHours(2)));
+        var second = CreateStoredTimeout("second", new DateTimeOffset(2031, 1, 2, 3, 4, 5, TimeSpan.Zero));
+
+        var (persister, infoCache, dialect) = SetUp(endpointName, schema);
+
+        using (var connection = dbConnection())
+        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
+        {
+            await storageSession.Open(null);
+
+            var context = new ContextBag();
+            context.SetSagaTimeouts(sagaData, [first, second]);
+            await persister.Save(sagaData, new SagaCorrelationProperty("CorrelationProperty", "theCorrelationProperty"), storageSession, context);
+            await storageSession.CompleteAsync();
+        }
+
+        using (var connection = dbConnection())
+        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
+        {
+            await storageSession.Open(null);
+
+            var context = new ContextBag();
+            var loaded = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, context);
+            var timeouts = context.GetSagaTimeouts(loaded);
+
+            Assert.That(timeouts, Has.Count.EqualTo(2));
+            AssertTimeoutsAreEqual(timeouts[0], first);
+            AssertTimeoutsAreEqual(timeouts[1], second);
+
+            // Core removes a fired or canceled timeout from the list it gets back with the loaded saga
+            context.SetSagaTimeouts(loaded, [timeouts[1]]);
+            await persister.Update(loaded, storageSession, context);
+            await storageSession.CompleteAsync();
+        }
+
+        using (var connection = dbConnection())
+        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
+        {
+            await storageSession.Open(null);
+
+            var context = new ContextBag();
+            var loaded = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, context);
+            var timeouts = context.GetSagaTimeouts(loaded);
+
+            Assert.That(timeouts, Has.Count.EqualTo(1));
+            AssertTimeoutsAreEqual(timeouts[0], second);
+            Assert.That(loaded.Originator, Is.EqualTo("theOriginator"));
+            Assert.That(loaded.OriginalMessageId, Is.EqualTo("theOriginalMessageId"));
+
+            context.SetSagaTimeouts(loaded, []);
+            await persister.Update(loaded, storageSession, context);
+            await storageSession.CompleteAsync();
+        }
+
+        using (var connection = dbConnection())
+        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
+        {
+            await storageSession.Open(null);
+
+            var context = new ContextBag();
+            var loaded = await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, context);
+
+            Assert.That(context.GetSagaTimeouts(loaded), Is.Empty);
+            Assert.That(loaded.Originator, Is.EqualTo("theOriginator"));
+        }
+    }
+
+    static StoredSagaTimeout CreateStoredTimeout(string value, DateTimeOffset dueTime) => new()
+    {
+        TimeoutId = Guid.NewGuid().ToString(),
+        TriggerId = Guid.NewGuid().ToString(),
+        Version = 1,
+        DueTime = dueTime,
+        MessageType = "MyNamespace.MyTimeout",
+        ContentType = "application/json",
+        Payload = System.Text.Encoding.UTF8.GetBytes($$"""{"Value":"{{value}}"}""")
+    };
+
+    static void AssertTimeoutsAreEqual(StoredSagaTimeout actual, StoredSagaTimeout expected)
+    {
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(actual.TimeoutId, Is.EqualTo(expected.TimeoutId));
+            Assert.That(actual.TriggerId, Is.EqualTo(expected.TriggerId));
+            Assert.That(actual.Version, Is.EqualTo(expected.Version));
+            Assert.That(actual.DueTime, Is.EqualTo(expected.DueTime));
+            Assert.That(actual.DueTime.Offset, Is.EqualTo(expected.DueTime.Offset));
+            Assert.That(actual.MessageType, Is.EqualTo(expected.MessageType));
+            Assert.That(actual.ContentType, Is.EqualTo(expected.ContentType));
+            Assert.That(actual.Payload, Is.EqualTo(expected.Payload));
+        }
+    }
+
+    [Test]
     public async Task UpdateWithTransitional()
     {
         var endpointName = nameof(UpdateWithTransitional);
@@ -905,7 +1021,7 @@ public abstract class SagaPersisterTests
             var sagaData = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession);
             sagaData.Data.SimpleProperty = "UpdatedValue";
 
-            var exception = Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
+            var exception = await Assert.ThrowsAsync<Exception>(() => persister.Update(sagaData.Data, storageSession, wrongVersion));
             Assert.That(exception.Message, Does.Contain("Optimistic concurrency violation"));
         }
     }
@@ -1202,7 +1318,7 @@ public abstract class SagaPersisterTests
                 CorrelationProperty = "theCorrelationProperty",
                 SimpleProperty = "theSimpleProperty"
             };
-            var throwsAsync = Assert.ThrowsAsync<Exception>(async () =>
+            var throwsAsync = await Assert.ThrowsAsync<Exception>(async () =>
             {
                 await persister.Save(data, storageSession, "theCorrelationProperty");
                 await storageSession.CompleteAsync();
