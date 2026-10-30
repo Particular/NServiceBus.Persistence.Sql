@@ -30,5 +30,7 @@ partial class SagaPersister
                 throw new Exception($"Optimistic concurrency violation when trying to complete saga {sagaInfo.SagaType.FullName} {sagaData.Id}. Expected version {concurrency}.");
             }
         }
+
+        await timeoutPersister.RemoveAll(sagaData.Id, session, cancellationToken).ConfigureAwait(false);
     }
 }

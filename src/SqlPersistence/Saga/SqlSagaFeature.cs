@@ -37,7 +37,9 @@ sealed class SqlSagaFeature : Feature
         Func<string, string> nameFilter = SagaSettings.GetNameFilter(settings) ?? (sagaName => sagaName);
 
         services.AddSingleton(BuildSagaInfoCache(sqlDialect, settings, tablePrefix, nameFilter));
-        services.AddSingleton<ISagaPersister>(provider => new SagaPersister(provider.GetRequiredService<SagaInfoCache>(), sqlDialect));
+        var timeoutPersister = new SqlTimeoutPersister(sqlDialect, tablePrefix);
+        services.AddSingleton<ITimeoutPersister>(timeoutPersister);
+        services.AddSingleton<ISagaPersister>(provider => new SagaPersister(provider.GetRequiredService<SagaInfoCache>(), sqlDialect, timeoutPersister));
 
         var installerSettings = settings.GetOrDefault<InstallerSettings>();
 

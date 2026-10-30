@@ -15,7 +15,7 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NServiceBus" Version="10.3.0-alpha.timeouts-local.a7c2b718" />
+    <PackageReference Include="NServiceBus" Version="10.3.0-alpha.timeouts-explicit.f2318953" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
