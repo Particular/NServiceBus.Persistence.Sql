@@ -1,0 +1,24 @@
+﻿create or replace function pg_temp.create_saga_timeouts_table(tablePrefix varchar, schema varchar)
+  returns integer as
+  $body$
+    declare
+      tableName varchar;
+      createTable text;
+    begin
+        tableName := tablePrefix || 'SagaTimeoutData';
+        createTable = 'create table if not exists "' || schema || '"."' || tableName || '"
+    (
+        "SagaId" uuid not null,
+        "TimeoutId" character varying(200) not null,
+        "Data" text not null,
+        "PersistenceVersion" character varying(23) not null,
+        primary key ("SagaId", "TimeoutId")
+    );
+';
+        execute createTable;
+        return 0;
+    end;
+  $body$
+  language 'plpgsql';
+
+select pg_temp.create_saga_timeouts_table(@tablePrefix, @schema);

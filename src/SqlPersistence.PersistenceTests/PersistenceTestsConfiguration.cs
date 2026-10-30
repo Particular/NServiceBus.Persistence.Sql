@@ -116,7 +116,7 @@ public partial class PersistenceTestsConfiguration
 
         var connectionManager = new ConnectionManager(ConnectionFactory);
         SagaIdGenerator = new DefaultSagaIdGenerator();
-        SagaStorage = new SagaPersister(infoCache, dialect);
+        SagaStorage = new SagaPersister(infoCache, dialect, new SqlTimeoutPersister(dialect, TablePrefix));
         OutboxStorage = CreateOutboxPersister(connectionManager, dialect, variant.TransactionMode, variant.OutboxLockMode);
         CreateStorageSession = () => new StorageSession(connectionManager, infoCache, dialect);
 
@@ -164,6 +164,9 @@ public partial class PersistenceTestsConfiguration
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, buildDialect), "PersistenceTests");
         }
 
+        connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(buildDialect), "PersistenceTests");
+        connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildCreateScript(buildDialect), "PersistenceTests");
+
         connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(buildDialect), "PersistenceTests");
         connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(buildDialect), "PersistenceTests");
     }
@@ -173,6 +176,7 @@ public partial class PersistenceTestsConfiguration
     {
         var deletes = GetSagaDefinitions(buildDialect)
             .Select(definition => dialect.GetSagaTableName(TablePrefix, definition.TableSuffix))
+            .Append(dialect.GetTimeoutTableName(TablePrefix))
             .Append(dialect.GetOutboxTableName(TablePrefix))
             .Select(tableName => $"delete from {tableName};");
 
