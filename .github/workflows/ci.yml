@@ -43,7 +43,7 @@ jobs:
           with:
             creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6.0.0
+        uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
       # Publishes fixed port 51000 (DTC), which is in the ephemeral range. Start it before the build so restore traffic cannot hold it.
