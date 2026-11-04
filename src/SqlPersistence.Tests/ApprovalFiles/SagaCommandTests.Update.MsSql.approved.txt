@@ -1,6 +1,7 @@
-﻿
+
 update TheTableName
 set
+    Metadata = @Metadata,
     Data = @Data,
     PersistenceVersion = @PersistenceVersion,
     SagaTypeVersion = @SagaTypeVersion,

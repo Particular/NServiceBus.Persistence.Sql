@@ -22,11 +22,11 @@ namespace PostgreSql
         });
 
         [Test]
-        public void It_throws_if_transport_transaction_scope_exists()
+        public async Task It_throws_if_transport_transaction_scope_exists()
         {
             using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
-                var ex = Assert.ThrowsAsync<Exception>(async () =>
+                var ex = await Assert.ThrowsAsync<Exception>(async () =>
                 {
                     var transportTransaction = new TransportTransaction();
                     transportTransaction.Set(Transaction.Current);

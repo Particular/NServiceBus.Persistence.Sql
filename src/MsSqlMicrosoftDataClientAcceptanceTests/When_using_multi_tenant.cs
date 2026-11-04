@@ -31,9 +31,9 @@ public class When_using_multi_tenant : NServiceBusAcceptanceTest
     }
 
     [Test]
-    public void Should_not_run_if_Outbox_cleanup_enabled()
+    public async Task Should_not_run_if_Outbox_cleanup_enabled()
     {
-        var exception = Assert.ThrowsAsync<Exception>(async () =>
+        var exception = await Assert.ThrowsAsync<Exception>(async () =>
         {
             await Scenario.Define<Context>()
                 .WithEndpoint<MultiTenantHandlerEndpoint>(b => b.CustomConfig(c => ConfigureMultiTenant(c, true, true)))

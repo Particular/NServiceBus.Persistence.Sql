@@ -10,10 +10,13 @@ partial class SagaPersister
 {
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
     {
-        return Save(sagaData, session, correlationProperty?.Value, cancellationToken);
+        return Save(sagaData, session, correlationProperty?.Value, context.GetSagaTimeouts(sagaData), cancellationToken);
     }
 
-    internal async Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default)
+    internal Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default) =>
+        Save(sagaData, session, correlationId, [], cancellationToken);
+
+    internal async Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, IReadOnlyList<StoredSagaTimeout> timeouts, CancellationToken cancellationToken = default)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
@@ -23,16 +26,7 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
-            var metadata = new Dictionary<string, string>();
-            if (sagaData.OriginalMessageId != null)
-            {
-                metadata.Add("OriginalMessageId", sagaData.OriginalMessageId);
-            }
-            if (sagaData.Originator != null)
-            {
-                metadata.Add("Originator", sagaData.Originator);
-            }
-            command.AddParameter("Metadata", Serializer.Serialize(metadata));
+            command.AddParameter("Metadata", BuildMetadata(sagaData, timeouts));
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);

@@ -23,7 +23,7 @@ abstract class AdaptTransportConnectionTests
     }
 
     [Test]
-    public void It_throws_if_non_transport_transaction_scope_exists()
+    public async Task It_throws_if_non_transport_transaction_scope_exists()
     {
         if (!SupportsDistributedTransactions)
         {
@@ -35,7 +35,7 @@ abstract class AdaptTransportConnectionTests
             transportTransaction.Set(Transaction.Current);
             using (new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
             {
-                var ex = Assert.ThrowsAsync<Exception>(async () => await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager));
+                var ex = await Assert.ThrowsAsync<Exception>(async () => await sqlDialect.Convert().TryAdaptTransportConnection(transportTransaction, new ContextBag(), connectionManager));
 
                 Assert.That(ex.Message, Does.StartWith("A TransactionScope has been opened in the current context overriding the one created by the transport."));
             }

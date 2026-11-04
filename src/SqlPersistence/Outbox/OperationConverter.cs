@@ -13,7 +13,7 @@ static class OperationConverter
                 Body = operation.Body,
                 Headers = operation.Headers,
                 MessageId = operation.MessageId,
-                Options = operation.Options
+                Options = new Dictionary<string, string>(operation.Options)
             });
     }
 

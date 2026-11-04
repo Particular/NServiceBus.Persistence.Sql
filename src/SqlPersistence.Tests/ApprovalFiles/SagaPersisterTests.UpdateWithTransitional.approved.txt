@@ -1,4 +1,4 @@
-﻿{
+{
   "Data": {
     "CorrelationProperty": "theCorrelationProperty",
     "TransitionalCorrelationProperty": "theTransitionalCorrelationProperty",
@@ -7,5 +7,6 @@
     "Originator": "theOriginator",
     "OriginalMessageId": "theOriginalMessageId"
   },
-  "Version": 2
+  "Version": 2,
+  "Timeouts": []
 }

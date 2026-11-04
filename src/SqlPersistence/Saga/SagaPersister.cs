@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Sagas;
@@ -35,10 +36,12 @@ partial class SagaPersister : ISagaPersister
         return concurrency;
     }
 
-    internal readonly struct Concurrency<TSagaData>(TSagaData data, int version) where TSagaData : IContainSagaData
+    internal readonly struct Concurrency<TSagaData>(TSagaData data, int version, IReadOnlyList<StoredSagaTimeout> timeouts = null) where TSagaData : IContainSagaData
     {
         public TSagaData Data { get; } = data;
 
         public int Version { get; } = version;
+
+        public IReadOnlyList<StoredSagaTimeout> Timeouts { get; } = timeouts ?? [];
     }
 }
