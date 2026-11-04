@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
@@ -10,13 +9,10 @@ partial class SagaPersister
 {
     public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
     {
-        return Save(sagaData, session, correlationProperty?.Value, context.GetSagaTimeouts(sagaData), cancellationToken);
+        return Save(sagaData, session, correlationProperty?.Value, cancellationToken);
     }
 
-    internal Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default) =>
-        Save(sagaData, session, correlationId, [], cancellationToken);
-
-    internal async Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, IReadOnlyList<StoredSagaTimeout> timeouts, CancellationToken cancellationToken = default)
+    internal async Task Save(IContainSagaData sagaData, ISynchronizedStorageSession session, object correlationId, CancellationToken cancellationToken = default)
     {
         var sqlSession = session.SqlPersistenceSession();
         var sagaInfo = sagaInfoCache.GetInfo(sagaData.GetType());
@@ -26,7 +22,7 @@ partial class SagaPersister
             command.Transaction = sqlSession.Transaction;
             command.CommandText = sagaInfo.SaveCommand;
             command.AddParameter("Id", sagaData.Id);
-            command.AddParameter("Metadata", BuildMetadata(sagaData, timeouts));
+            command.AddParameter("Metadata", BuildMetadata(sagaData));
             command.AddJsonParameter("Data", sqlDialect.BuildSagaData(command, sagaInfo, sagaData));
             command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
             command.AddParameter("SagaTypeVersion", sagaInfo.CurrentVersion);

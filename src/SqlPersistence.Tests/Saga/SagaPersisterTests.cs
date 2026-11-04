@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ public abstract class SagaPersisterTests
             sqlDialect: runtimeSqlDialect,
             metadataCollection: sagaMetadataCollection,
             nameFilter: sagaName => sagaName);
-        return (new SagaPersister(infoCache, runtimeSqlDialect), infoCache, runtimeSqlDialect);
+        return (new SagaPersister(infoCache, runtimeSqlDialect, new SqlTimeoutPersister(runtimeSqlDialect, $"{TimeoutEndpointName(endpointName)}_")), infoCache, runtimeSqlDialect);
     }
 
     IEnumerable<Type> GetSagasAndFinders()
@@ -330,6 +331,8 @@ public abstract class SagaPersisterTests
 
             connection.ExecuteCommand(SagaScriptBuilder.BuildDropScript(definition, sqlDialect), endpointName, schema: theSchema);
             connection.ExecuteCommand(SagaScriptBuilder.BuildCreateScript(definition, sqlDialect), endpointName, schema: theSchema);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(sqlDialect), TimeoutEndpointName(endpointName), schema: theSchema);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildCreateScript(sqlDialect), TimeoutEndpointName(endpointName), schema: theSchema);
         }
     }
 
@@ -617,9 +620,135 @@ public abstract class SagaPersisterTests
     }
 
     [Test]
-    public async Task SaveAndUpdateWithTimeouts()
+    public async Task InstallerCreatesTimeoutTable()
     {
-        var endpointName = nameof(SaveAndUpdateWithTimeouts);
+        var endpointName = nameof(InstallerCreatesTimeoutTable);
+        var (_, infoCache, dialect) = SetUp(endpointName, schema);
+        var prefix = TimeoutEndpointName(endpointName);
+        var timeoutPersister = new SqlTimeoutPersister(dialect, $"{prefix}_");
+        var directory = Directory.CreateTempSubdirectory("sql-timeout-install-");
+        try
+        {
+            using (var connection = dbConnection())
+            {
+                connection.Open();
+                connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(sqlDialect), prefix, schema: schema);
+            }
+
+            // An outbox-only script directory has no Sagas folder and needs no timeout script.
+            await ScriptRunner.Install(dialect, $"{prefix}_", dbConnection, directory.FullName, shouldInstallOutbox: false, shouldInstallSubscriptions: false);
+
+            Directory.CreateDirectory(Path.Combine(directory.FullName, "Sagas"));
+            File.WriteAllText(Path.Combine(directory.FullName, "SagaTimeout_Create.sql"), SagaTimeoutScriptBuilder.BuildCreateScript(sqlDialect));
+            await ScriptRunner.Install(dialect, $"{prefix}_", dbConnection, directory.FullName, shouldInstallOutbox: false, shouldInstallSubscriptions: false);
+
+            await InSession(infoCache, dialect, async session =>
+            {
+                var saga = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid() };
+                var timeout = CreateStoredTimeout("installed", DateTimeOffset.UtcNow);
+                await timeoutPersister.Request(saga, timeout, session, new ContextBag());
+                AssertTimeoutsAreEqual((await timeoutPersister.Get(saga, session, new ContextBag())).Single(), timeout);
+            });
+        }
+        finally
+        {
+            directory.Delete(true);
+        }
+    }
+
+    [Test]
+    public async Task RequestRescheduleCancelAndMarkFiredTimeouts()
+    {
+        var endpointName = nameof(RequestRescheduleCancelAndMarkFiredTimeouts);
+        CreateTimeoutSchema(endpointName);
+        var saga = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid() };
+        var first = CreateStoredTimeout("first", new DateTimeOffset(2030, 1, 2, 3, 4, 5, TimeSpan.FromHours(2)).AddTicks(1234));
+        var second = CreateStoredTimeout("second", new DateTimeOffset(2031, 1, 2, 3, 4, 5, TimeSpan.Zero));
+        var third = CreateStoredTimeout("third", new DateTimeOffset(2032, 1, 2, 3, 4, 5, TimeSpan.FromHours(-5)));
+        var (_, infoCache, dialect) = SetUp(endpointName, schema);
+        var timeoutPersister = new SqlTimeoutPersister(dialect, $"{TimeoutEndpointName(endpointName)}_");
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            await timeoutPersister.Request(saga, first, session, new ContextBag());
+            await timeoutPersister.Request(saga, second, session, new ContextBag());
+            await timeoutPersister.Request(saga, third, session, new ContextBag());
+        });
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            var timeouts = await timeoutPersister.Get(saga, session, new ContextBag());
+
+            Assert.That(timeouts, Has.Count.EqualTo(3));
+            AssertTimeoutsAreEqual(timeouts.Single(t => t.TimeoutId == first.TimeoutId), first);
+            AssertTimeoutsAreEqual(timeouts.Single(t => t.TimeoutId == second.TimeoutId), second);
+            AssertTimeoutsAreEqual(timeouts.Single(t => t.TimeoutId == third.TimeoutId), third);
+        });
+
+        first.DueTime = new DateTimeOffset(2040, 6, 7, 8, 9, 10, TimeSpan.FromHours(10)).AddTicks(7);
+        first.TriggerId = "rescheduled";
+        first.Version = 2;
+        first.Payload = [4, 5, 6];
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            await timeoutPersister.Reschedule(saga, first, session, new ContextBag());
+            await timeoutPersister.Cancel(saga, second.TimeoutId, session, new ContextBag());
+            await timeoutPersister.MarkFired(saga, third.TimeoutId, session, new ContextBag());
+        });
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            var timeouts = await timeoutPersister.Get(saga, session, new ContextBag());
+
+            Assert.That(timeouts, Has.Count.EqualTo(1));
+            AssertTimeoutsAreEqual(timeouts[0], first);
+            await timeoutPersister.Cancel(saga, second.TimeoutId, session, new ContextBag());
+            await timeoutPersister.MarkFired(saga, third.TimeoutId, session, new ContextBag());
+            await Assert.ThatAsync(() => timeoutPersister.Reschedule(saga, second, session, new ContextBag()), Throws.TypeOf<Exception>().With.Message.Contains("does not exist"));
+        });
+    }
+
+    [Test]
+    public async Task TimeoutsAreScopedBySagaAndRolledBack()
+    {
+        var endpointName = nameof(TimeoutsAreScopedBySagaAndRolledBack);
+        CreateTimeoutSchema(endpointName);
+        var saga1 = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid() };
+        var saga2 = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid() };
+        var timeout1 = CreateStoredTimeout("one", DateTimeOffset.UtcNow);
+        var timeout2 = CreateStoredTimeout("two", DateTimeOffset.UtcNow);
+        timeout2.TimeoutId = timeout1.TimeoutId;
+        var (_, infoCache, dialect) = SetUp(endpointName, schema);
+        var timeoutPersister = new SqlTimeoutPersister(dialect, $"{TimeoutEndpointName(endpointName)}_");
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            await timeoutPersister.Request(saga1, timeout1, session, new ContextBag());
+            await timeoutPersister.Request(saga2, timeout2, session, new ContextBag());
+        });
+        await InSession(infoCache, dialect, async session =>
+        {
+            await timeoutPersister.Cancel(saga1, timeout1.TimeoutId, session, new ContextBag());
+            await timeoutPersister.Request(saga1, CreateStoredTimeout("rolled back", DateTimeOffset.UtcNow), session, new ContextBag());
+        }, commit: false);
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            var timeouts1 = await timeoutPersister.Get(saga1, session, new ContextBag());
+            var timeouts2 = await timeoutPersister.Get(saga2, session, new ContextBag());
+
+            Assert.That(timeouts1, Has.Count.EqualTo(1));
+            AssertTimeoutsAreEqual(timeouts1[0], timeout1);
+            Assert.That(timeouts2, Has.Count.EqualTo(1));
+            AssertTimeoutsAreEqual(timeouts2[0], timeout2);
+        });
+    }
+
+    [Test]
+    public async Task CompleteRemovesAllTimeoutsOfTheSaga()
+    {
+        var endpointName = nameof(CompleteRemovesAllTimeoutsOfTheSaga);
         var definition = new SagaDefinition(
             tableSuffix: "SagaWithCorrelation",
             name: "SagaWithCorrelation",
@@ -630,79 +759,63 @@ public abstract class SagaPersisterTests
             )
         );
         DropAndCreate(definition, endpointName, schema);
-        var id = Guid.NewGuid();
-        var sagaData = new SagaWithCorrelation.SagaData
-        {
-            Id = id,
-            CorrelationProperty = "theCorrelationProperty",
-            OriginalMessageId = "theOriginalMessageId",
-            Originator = "theOriginator",
-            SimpleProperty = "PropertyValue"
-        };
-        var first = CreateStoredTimeout("first", new DateTimeOffset(2030, 1, 2, 3, 4, 5, TimeSpan.FromHours(2)));
-        var second = CreateStoredTimeout("second", new DateTimeOffset(2031, 1, 2, 3, 4, 5, TimeSpan.Zero));
-
+        var saga = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid(), CorrelationProperty = "completed" };
+        var otherSaga = new SagaWithCorrelation.SagaData { Id = Guid.NewGuid(), CorrelationProperty = "other" };
         var (persister, infoCache, dialect) = SetUp(endpointName, schema);
+        var timeoutPersister = new SqlTimeoutPersister(dialect, $"{TimeoutEndpointName(endpointName)}_");
 
+        await InSession(infoCache, dialect, async session =>
+        {
+            await persister.Save(saga, session, saga.CorrelationProperty);
+            await persister.Save(otherSaga, session, otherSaga.CorrelationProperty);
+            await timeoutPersister.Request(saga, CreateStoredTimeout("a", DateTimeOffset.UtcNow), session, new ContextBag());
+            await timeoutPersister.Request(saga, CreateStoredTimeout("b", DateTimeOffset.UtcNow), session, new ContextBag());
+            await timeoutPersister.Request(otherSaga, CreateStoredTimeout("c", DateTimeOffset.UtcNow), session, new ContextBag());
+        });
+
+        // a failed concurrency check must not remove the timeouts
+        await InSession(infoCache, dialect, async session =>
+        {
+            await Assert.ThatAsync(() => persister.Complete(saga, session, 99), Throws.TypeOf<Exception>());
+            Assert.That(await timeoutPersister.Get(saga, session, new ContextBag()), Has.Count.EqualTo(2));
+        }, commit: false);
+
+        await InSession(infoCache, dialect, session => persister.Complete(saga, session, 1));
+
+        await InSession(infoCache, dialect, async session =>
+        {
+            Assert.That(await timeoutPersister.Get(saga, session, new ContextBag()), Is.Empty);
+            Assert.That(await timeoutPersister.Get(otherSaga, session, new ContextBag()), Has.Count.EqualTo(1));
+        });
+    }
+
+#pragma warning disable PS0013, PS0018 // test helper, no cancellation needed
+    async Task InSession(SagaInfoCache infoCache, SqlDialect dialect, Func<StorageSession, Task> action, bool commit = true)
+    {
         using (var connection = dbConnection())
         using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
         {
             await storageSession.Open(null);
-
-            var context = new ContextBag();
-            context.SetSagaTimeouts(sagaData, [first, second]);
-            await persister.Save(sagaData, new SagaCorrelationProperty("CorrelationProperty", "theCorrelationProperty"), storageSession, context);
-            await storageSession.CompleteAsync();
+            await action(storageSession);
+            if (commit)
+            {
+                await storageSession.CompleteAsync();
+            }
         }
+    }
 
-        using (var connection = dbConnection())
-        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
+#pragma warning restore PS0013, PS0018
+
+    // Oracle's existing saga tables are shared between these sequential tests; keep the timeout prefix within its identifier limit too.
+    string TimeoutEndpointName(string endpointName) => sqlDialect == BuildSqlDialect.Oracle ? "SagaTests" : endpointName;
+
+    void CreateTimeoutSchema(string endpointName)
+    {
+        using (var connection = GetConnection()(schema))
         {
-            await storageSession.Open(null);
-
-            var context = new ContextBag();
-            var loaded = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, context);
-            var timeouts = context.GetSagaTimeouts(loaded);
-
-            Assert.That(timeouts, Has.Count.EqualTo(2));
-            AssertTimeoutsAreEqual(timeouts[0], first);
-            AssertTimeoutsAreEqual(timeouts[1], second);
-
-            // Core removes a fired or canceled timeout from the list it gets back with the loaded saga
-            context.SetSagaTimeouts(loaded, [timeouts[1]]);
-            await persister.Update(loaded, storageSession, context);
-            await storageSession.CompleteAsync();
-        }
-
-        using (var connection = dbConnection())
-        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
-        {
-            await storageSession.Open(null);
-
-            var context = new ContextBag();
-            var loaded = await persister.Get<SagaWithCorrelation.SagaData>(id, storageSession, context);
-            var timeouts = context.GetSagaTimeouts(loaded);
-
-            Assert.That(timeouts, Has.Count.EqualTo(1));
-            AssertTimeoutsAreEqual(timeouts[0], second);
-            Assert.That(loaded.Originator, Is.EqualTo("theOriginator"));
-            Assert.That(loaded.OriginalMessageId, Is.EqualTo("theOriginalMessageId"));
-
-            context.SetSagaTimeouts(loaded, []);
-            await persister.Update(loaded, storageSession, context);
-            await storageSession.CompleteAsync();
-        }
-
-        using (var connection = dbConnection())
-        using (var storageSession = new StorageSession(new FakeConnectionManager(connection), infoCache, dialect))
-        {
-            await storageSession.Open(null);
-
-            var context = new ContextBag();
-            var loaded = await persister.Get<SagaWithCorrelation.SagaData>("CorrelationProperty", "theCorrelationProperty", storageSession, context);
-
-            Assert.That(context.GetSagaTimeouts(loaded), Is.Empty);
-            Assert.That(loaded.Originator, Is.EqualTo("theOriginator"));
+            connection.Open();
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(sqlDialect), TimeoutEndpointName(endpointName), schema: schema);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildCreateScript(sqlDialect), TimeoutEndpointName(endpointName), schema: schema);
         }
     }
 

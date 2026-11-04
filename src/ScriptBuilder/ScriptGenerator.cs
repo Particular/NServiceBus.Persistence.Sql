@@ -44,6 +44,7 @@ public class ScriptGenerator(string assemblyPath,
             if (settings.ProduceSagaScripts)
             {
                 new SagaWriter(clean, overwrite, dialectPath, settings.SagaDefinitions).WriteScripts(dialect);
+                new SagaTimeoutWriter(clean, overwrite, dialectPath).WriteScripts(dialect);
             }
 
             if (settings.ProduceTimeoutScripts)

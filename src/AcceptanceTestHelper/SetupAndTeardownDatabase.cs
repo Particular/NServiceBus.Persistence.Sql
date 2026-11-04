@@ -48,6 +48,8 @@ public class SetupAndTeardownDatabase(
 
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildCreateScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
@@ -81,6 +83,7 @@ public class SetupAndTeardownDatabase(
             }
 
             connection.ExecuteCommand(TimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
+            connection.ExecuteCommand(SagaTimeoutScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(SubscriptionScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), tablePrefix, exceptionFilter);
         }

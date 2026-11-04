@@ -69,6 +69,13 @@ namespace NServiceBus.Persistence.Sql.ScriptBuilder
         public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
         public static void BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.SagaDefinition saga, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect, System.IO.TextWriter writer) { }
     }
+    public static class SagaTimeoutScriptBuilder
+    {
+        public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildCreateScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static string BuildDropScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+        public static void BuildDropScript(System.IO.TextWriter writer, NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }
+    }
     public static class SubscriptionScriptBuilder
     {
         public static string BuildCreateScript(NServiceBus.Persistence.Sql.ScriptBuilder.BuildSqlDialect sqlDialect) { }

@@ -48,6 +48,18 @@
             return impl.GetSubscriptionQueryFactory(tableName);
         }
 
+        internal override string GetTimeoutTableName(string tablePrefix) => impl.GetTimeoutTableName(tablePrefix);
+
+        internal override string GetTimeoutGetCommand(string tableName) => impl.GetTimeoutGetCommand(tableName);
+
+        internal override string GetTimeoutRequestCommand(string tableName) => impl.GetTimeoutRequestCommand(tableName);
+
+        internal override string GetTimeoutRescheduleCommand(string tableName) => impl.GetTimeoutRescheduleCommand(tableName);
+
+        internal override string GetTimeoutRemoveCommand(string tableName) => impl.GetTimeoutRemoveCommand(tableName);
+
+        internal override string GetTimeoutRemoveBySagaIdCommand(string tableName) => impl.GetTimeoutRemoveBySagaIdCommand(tableName);
+
         internal override string GetSagaTableName(string tablePrefix, string tableSuffix)
         {
             return impl.GetSagaTableName(tablePrefix, tableSuffix);

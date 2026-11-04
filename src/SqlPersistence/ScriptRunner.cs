@@ -106,6 +106,11 @@
                 return;
             }
 
+            var timeoutScript = Path.Combine(scriptDirectory, "SagaTimeout_Create.sql");
+            ScriptLocation.ValidateScriptExists(timeoutScript);
+            log.Info($"Executing '{timeoutScript}'");
+            await sqlDialect.ExecuteTableCommand(connection, transaction, File.ReadAllText(timeoutScript), tablePrefix, cancellationToken).ConfigureAwait(false);
+
             var scriptFiles = Directory.EnumerateFiles(sagasDirectory, "*_Create.sql").ToList();
             log.Info($@"Executing saga creation scripts:
 {string.Join(Environment.NewLine, scriptFiles)}");

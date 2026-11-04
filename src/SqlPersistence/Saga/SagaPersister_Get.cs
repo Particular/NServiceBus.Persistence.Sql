@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
-using NServiceBus.Sagas;
 
 partial class SagaPersister
 {
@@ -91,14 +90,14 @@ partial class SagaPersister
                 var sagaTypeVersionString = await dataReader.GetFieldValueAsync<string>(1, cancellationToken).ConfigureAwait(false);
                 var sagaTypeVersion = Version.Parse(sagaTypeVersionString);
                 var concurrency = await dataReader.GetFieldValueAsync<int>(2, cancellationToken).ConfigureAwait(false);
-                ReadMetadata(dataReader, out var originator, out var originalMessageId, out var timeouts);
+                ReadMetadata(dataReader, out var originator, out var originalMessageId);
                 using (var textReader = dataReader.GetTextReader(4))
                 {
                     var sagaData = sagaInfo.FromString<TSagaData>(textReader, sagaTypeVersion);
                     sagaData.Id = id;
                     sagaData.Originator = originator;
                     sagaData.OriginalMessageId = originalMessageId;
-                    return new Concurrency<TSagaData>(sagaData, concurrency, timeouts);
+                    return new Concurrency<TSagaData>(sagaData, concurrency);
                 }
             }
         }
@@ -125,7 +124,6 @@ partial class SagaPersister
             return null;
         }
         context.Set("NServiceBus.Persistence.Sql.Concurrency", result.Version);
-        context.SetSagaTimeouts(result.Data, result.Timeouts);
         return result.Data;
     }
 }

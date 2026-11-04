@@ -1,0 +1,21 @@
+﻿declare @tableName nvarchar(max) = '[' + @schema + '].[' + @tablePrefix + 'SagaTimeoutData]';
+
+if not exists (
+    select * from sys.objects
+    where
+        object_id = object_id(@tableName)
+        and type in ('U')
+)
+begin
+declare @createTable nvarchar(max);
+set @createTable = '
+    create table ' + @tableName + '(
+        SagaId uniqueidentifier not null,
+        TimeoutId nvarchar(200) collate Latin1_General_100_BIN2 not null,
+        Data nvarchar(max) not null,
+        PersistenceVersion varchar(23) not null,
+        primary key (SagaId, TimeoutId)
+    )
+';
+exec(@createTable);
+end
