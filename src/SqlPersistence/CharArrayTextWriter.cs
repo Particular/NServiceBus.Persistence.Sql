@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 sealed class CharArrayTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
-    // Keeps pooled buffers below the large object heap threshold
+    // Larger writers aren't pooled so one large saga can't keep its buffer for the process lifetime.
+    // 32K chars is the largest capacity step whose buffer stays below the large object heap threshold.
     internal const int MaxPooledSize = 32 * 1024;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
     char[] chars = new char[InitialSize];
