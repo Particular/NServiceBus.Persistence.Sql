@@ -33,7 +33,7 @@ public class SqlServerSagaDataParameterTests
     static RuntimeSagaInfo BuildSagaInfo(SqlDialect dialect)
     {
         var metadata = new SagaMetadataCollection();
-        metadata.AddRange(SagaMetadata.CreateMany([typeof(TheSaga)]));
+        metadata.Initialize([typeof(TheSaga)]);
 
         var infoCache = new SagaInfoCache(
             versionSpecificSettings: null,
