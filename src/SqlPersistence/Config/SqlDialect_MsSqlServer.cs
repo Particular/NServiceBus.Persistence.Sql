@@ -1,6 +1,5 @@
 namespace NServiceBus
 {
-    using System;
     using System.Data;
     using System.Data.Common;
 
@@ -31,15 +30,7 @@ namespace NServiceBus
 
             internal override void SetParameterValue(DbParameter parameter, object value)
             {
-                if (value is ArraySegment<char> charSegment)
-                {
-                    parameter.Value = charSegment.Array;
-                    parameter.Size = charSegment.Count;
-                }
-                else
-                {
-                    parameter.Value = value;
-                }
+                parameter.Value = value;
             }
 
             internal override CommandWrapper CreateCommand(DbConnection connection)
@@ -77,13 +68,7 @@ namespace NServiceBus
             {
                 foreach (DbParameter parameter in command.Parameters)
                 {
-                    if (parameter.Value is ArraySegment<char> charSegment)
-                    {
-                        // Set to 4000 or -1 to improve query execution plan reuse
-                        // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
-                        parameter.Size = charSegment.Count > 4000 ? -1 : 4000;
-                    }
-                    else if (parameter.Value is string stringValue)
+                    if (parameter.Value is string stringValue)
                     {
                         // Set to 4000 or -1 to improve query execution plan reuse
                         // Must be set when exceeding 4000 characters for nvarchar(max)  https://stackoverflow.com/a/973269/199551
