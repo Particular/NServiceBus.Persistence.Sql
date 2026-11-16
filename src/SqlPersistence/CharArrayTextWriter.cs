@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 sealed class CharArrayTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
+    // Larger writers aren't pooled so one large saga can't keep its buffer for the process lifetime.
+    // 32K chars (64 KiB) is the largest capacity step that stays below the 85,000-byte large object heap threshold.
+    internal const int MaxPooledSize = 32 * 1024;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
     char[] chars = new char[InitialSize];
 #pragma warning disable IDE0032 // Use auto property
@@ -97,6 +100,12 @@ sealed class CharArrayTextWriter : TextWriter
     public void Release()
     {
         Clear();
+
+        if (length > MaxPooledSize)
+        {
+            return;
+        }
+
         pool.Push(this);
     }
 
@@ -113,9 +122,9 @@ sealed class CharArrayTextWriter : TextWriter
         return new CharArrayTextWriter();
     }
 
-    public ArraySegment<char> ToCharSegment()
+    public override string ToString()
     {
-        return new ArraySegment<char>(chars, 0, next);
+        return new string(chars, 0, next);
     }
 
     void Clear()

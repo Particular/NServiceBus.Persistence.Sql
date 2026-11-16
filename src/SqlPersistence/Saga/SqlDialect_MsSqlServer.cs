@@ -16,7 +16,7 @@
             {
                 var writer = command.LeaseWriter();
                 sagaInfo.ToJson(sagaData, writer);
-                return writer.ToCharSegment();
+                return writer.ToString();
             }
 
             internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
