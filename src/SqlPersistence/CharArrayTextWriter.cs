@@ -8,7 +8,7 @@ sealed class CharArrayTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
     // Larger writers aren't pooled so one large saga can't keep its buffer for the process lifetime.
-    // 32K chars is the largest capacity step whose buffer stays below the large object heap threshold.
+    // 32K chars (64 KiB) is the largest capacity step that stays below the 85,000-byte large object heap threshold.
     internal const int MaxPooledSize = 32 * 1024;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
     char[] chars = new char[InitialSize];
