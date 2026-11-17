@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 public class CharArrayTextWriterTests
 {
@@ -10,7 +9,7 @@ public class CharArrayTextWriterTests
 
         writer.Write('z');
 
-        var written = writer.ToCharSegment();
+        var written = writer.ToString();
 
         Assert.That(written, Is.EqualTo('z'.ToString()).AsCollection);
     }
@@ -26,9 +25,9 @@ public class CharArrayTextWriterTests
         const int take = 1;
 
         writer.Write(chars, offset, take);
-        var written = writer.ToCharSegment();
+        var written = writer.ToString();
 
-        Assert.That(written, Is.EqualTo(chars.Skip(offset).Take(take)).AsCollection);
+        Assert.That(written, Is.EqualTo(new string(chars, offset, take)));
     }
 
     [Test]
@@ -38,7 +37,7 @@ public class CharArrayTextWriterTests
 
         writer.Write("test");
 
-        var written = writer.ToCharSegment();
+        var written = writer.ToString();
 
         Assert.That(written, Is.EqualTo("test").AsCollection);
     }
@@ -52,7 +51,7 @@ public class CharArrayTextWriterTests
 
         writer.Write(s);
 
-        var written = writer.ToCharSegment();
+        var written = writer.ToString();
 
         Assert.That(written, Is.EqualTo(s).AsCollection);
     }
@@ -66,7 +65,7 @@ public class CharArrayTextWriterTests
 
         writer.Write(s);
 
-        var written = writer.ToCharSegment();
+        var written = writer.ToString();
 
         Assert.That(written, Is.EqualTo(s).AsCollection);
     }
@@ -79,5 +78,15 @@ public class CharArrayTextWriterTests
         writer.Release();
 
         Assert.That(writer.Size, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void OversizedWriterIsNotReusedAfterRelease()
+    {
+        var writer = CharArrayTextWriter.Lease();
+        writer.Write(new string('a', CharArrayTextWriter.MaxPooledSize));
+        writer.Release();
+
+        Assert.That(CharArrayTextWriter.Lease(), Is.Not.SameAs(writer));
     }
 }
