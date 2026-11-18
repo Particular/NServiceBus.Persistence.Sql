@@ -36,7 +36,7 @@ jobs:
           with:
             fetch-depth: 0
         - name: Setup WSL
-          uses: Particular/setup-wsl-action@v1.2.0
+          uses: Particular/setup-wsl-action@v1.3.0
         - name: Azure login
           uses: azure/login@v3.1.0
           if: matrix.engine == 'Oracle' && matrix.name == 'Windows'
