@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading;
@@ -9,7 +8,6 @@ using NServiceBus;
 class CommandWrapper : IDisposable
 {
     protected DbCommand command;
-    List<CharArrayTextWriter> writers;
     SqlDialect dialect;
     int disposeSignaled;
 
@@ -75,14 +73,6 @@ class CommandWrapper : IDisposable
         return command.ExecuteReaderAsync(resultingBehavior, cancellationToken);
     }
 
-    public CharArrayTextWriter LeaseWriter()
-    {
-        var writer = CharArrayTextWriter.Lease();
-        writers ??= [];
-        writers.Add(writer);
-        return writer;
-    }
-
     public void Dispose()
     {
         if (Interlocked.Exchange(ref disposeSignaled, 1) != 0)
@@ -91,14 +81,5 @@ class CommandWrapper : IDisposable
         }
         var temp = Interlocked.Exchange(ref command, null);
         temp?.Dispose();
-
-        var tempWriters = Interlocked.Exchange(ref writers, null);
-        if (tempWriters != null)
-        {
-            foreach (var writer in tempWriters)
-            {
-                writer.Release();
-            }
-        }
     }
 }

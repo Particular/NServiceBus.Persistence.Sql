@@ -12,13 +12,6 @@
                 return $"[{Schema}].[{tablePrefix}{tableSuffix}]";
             }
 
-            internal override object BuildSagaData(CommandWrapper command, RuntimeSagaInfo sagaInfo, IContainSagaData sagaData)
-            {
-                var writer = command.LeaseWriter();
-                sagaInfo.ToJson(sagaData, writer);
-                return writer.ToString();
-            }
-
             internal override string BuildSaveCommand(string correlationProperty, string transitionalCorrelationProperty, string tableName)
             {
                 var valuesBuilder = new StringBuilder();
