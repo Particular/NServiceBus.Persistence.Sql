@@ -99,13 +99,15 @@ sealed class PooledCharTextWriter : TextWriter
 
     void Grow(int count)
     {
+        // Saga data becomes a string, which is shorter than the longest array
+        const int MaxStringLength = 0x3FFFFFDF;
         var required = (long)length + count;
-        if (required > Array.MaxLength)
+        if (required > MaxStringLength)
         {
-            throw new OutOfMemoryException($"Saga data exceeds the maximum array length of {Array.MaxLength} characters.");
+            throw new OutOfMemoryException($"Saga data exceeds the maximum string length of {MaxStringLength} characters.");
         }
 
-        var newSize = (int)Math.Max(required, Math.Min(buffer.Length * 2L, Array.MaxLength));
+        var newSize = (int)Math.Max(required, Math.Min(buffer.Length * 2L, MaxStringLength));
         var newBuffer = ArrayPool<char>.Shared.Rent(newSize);
         buffer.AsSpan(0, length).CopyTo(newBuffer);
 
