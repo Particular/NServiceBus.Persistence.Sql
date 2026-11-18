@@ -41,7 +41,9 @@ public class PooledCharTextWriterTests
 
     [TestCase(PooledCharTextWriter.InitialSize + 1)]
     [TestCase(PooledCharTextWriter.InitialSize * 8)]
+    [TestCase(PooledCharTextWriter.MaxPooledSize)]
     [TestCase(PooledCharTextWriter.MaxPooledSize + 1)]
+    [TestCase(PooledCharTextWriter.MaxPooledSize * 3)]
     public void WritingBeyondCapacity(int size)
     {
         var writer = new PooledCharTextWriter();
@@ -53,6 +55,49 @@ public class PooledCharTextWriterTests
         }
 
         Assert.That(writer.ToString(), Is.EqualTo(s));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void WritingSingleCharsBeyondPooledSize()
+    {
+        var writer = new PooledCharTextWriter();
+        var expected = new char[PooledCharTextWriter.MaxPooledSize + 20_000];
+
+        for (var i = 0; i < expected.Length; i++)
+        {
+            expected[i] = (char)('a' + (i % 26));
+            writer.Write(expected[i]);
+        }
+
+        Assert.That(writer.ToString(), Is.EqualTo(new string(expected)));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void WritingOneLargeStringBeyondPooledSize()
+    {
+        var writer = new PooledCharTextWriter();
+        var large = new string('x', (PooledCharTextWriter.MaxPooledSize * 2) + 3);
+
+        writer.Write("start");
+        writer.Write(large);
+        writer.Write('!');
+
+        Assert.That(writer.ToString(), Is.EqualTo("start" + large + "!"));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void WriterIsUsableAfterReturningALargeBuffer()
+    {
+        var writer = new PooledCharTextWriter();
+        writer.Write(new string('a', PooledCharTextWriter.MaxPooledSize + 1));
+        writer.ReturnBuffer();
+
+        writer.Write("again");
+
+        Assert.That(writer.ToString(), Is.EqualTo("again"));
         writer.ReturnBuffer();
     }
 

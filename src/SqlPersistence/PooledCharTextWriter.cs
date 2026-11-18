@@ -8,19 +8,33 @@ using System.Threading.Tasks;
 sealed class PooledCharTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
-    // Larger buffers are dropped so a rare huge saga doesn't park its whole growth chain in the shared pool.
+    // Beyond this the writer moves to StringBuilder chunks, so huge payloads never need one large contiguous buffer.
     internal const int MaxPooledSize = 1024 * 1024;
+    const int MaxChunkSize = 8000;
+    const int MaxStringLength = 0x3FFFFFDF;
     static readonly Encoding EncodingValue = new UnicodeEncoding(false, false);
 
     char[] buffer = ArrayPool<char>.Shared.Rent(InitialSize);
     int length;
+    StringBuilder overflow;
 
     public override Encoding Encoding => EncodingValue;
 
     public override void Write(char value)
     {
-        EnsureCapacity(1);
-        buffer[length++] = value;
+        if ((uint)length < (uint)buffer.Length)
+        {
+            buffer[length++] = value;
+            return;
+        }
+
+        if (overflow is not null && overflow.Length < MaxStringLength)
+        {
+            overflow.Append(value);
+            return;
+        }
+
+        Write(new ReadOnlySpan<char>(in value));
     }
 
     public override void Write(char[] chars, int index, int count) => Write(chars.AsSpan(index, count));
@@ -29,7 +43,17 @@ sealed class PooledCharTextWriter : TextWriter
 
     public override void Write(ReadOnlySpan<char> chars)
     {
-        EnsureCapacity(chars.Length);
+        if (overflow is null && buffer.Length - length < chars.Length)
+        {
+            MakeRoom(chars.Length);
+        }
+
+        if (overflow is not null)
+        {
+            AppendToOverflow(chars);
+            return;
+        }
+
         chars.CopyTo(buffer.AsSpan(length));
         length += chars.Length;
     }
@@ -78,37 +102,27 @@ sealed class PooledCharTextWriter : TextWriter
 
     public override Task FlushAsync() => Task.CompletedTask;
 
-    public override string ToString() => new(buffer, 0, length);
+    public override string ToString() => overflow?.ToString() ?? new string(buffer, 0, length);
 
     // Not done in Dispose because JsonTextWriter closes the writer before ToString is called.
     public void ReturnBuffer()
     {
-        var toReturn = buffer;
+        Return(buffer);
         buffer = [];
         length = 0;
-        Return(toReturn);
+        overflow = null;
     }
 
-    void EnsureCapacity(int count)
+    void MakeRoom(int count)
     {
-        if (buffer.Length - length < count)
-        {
-            Grow(count);
-        }
-    }
-
-    void Grow(int count)
-    {
-        // Saga data becomes a string, which is shorter than the longest array
-        const int MaxStringLength = 0x3FFFFFDF;
         var required = (long)length + count;
-        if (required > MaxStringLength)
+        if (required > MaxPooledSize)
         {
-            throw new OutOfMemoryException($"Saga data exceeds the maximum string length of {MaxStringLength} characters.");
+            MoveToOverflow();
+            return;
         }
 
-        var newSize = (int)Math.Max(required, Math.Min(buffer.Length * 2L, MaxStringLength));
-        var newBuffer = ArrayPool<char>.Shared.Rent(newSize);
+        var newBuffer = ArrayPool<char>.Shared.Rent((int)Math.Max(required, Math.Min(buffer.Length * 2L, MaxPooledSize)));
         buffer.AsSpan(0, length).CopyTo(newBuffer);
 
         var oldBuffer = buffer;
@@ -116,9 +130,41 @@ sealed class PooledCharTextWriter : TextWriter
         Return(oldBuffer);
     }
 
+    void MoveToOverflow()
+    {
+        overflow = new StringBuilder();
+        AppendToOverflow(buffer.AsSpan(0, length));
+
+        Return(buffer);
+        buffer = [];
+        length = 0;
+    }
+
+    void AppendToOverflow(ReadOnlySpan<char> chars)
+    {
+        if ((long)overflow.Length + chars.Length > MaxStringLength)
+        {
+            throw new OutOfMemoryException($"Serialized data exceeds the maximum string length of {MaxStringLength} characters.");
+        }
+
+        if (chars.Length <= MaxChunkSize)
+        {
+            overflow.Append(chars);
+            return;
+        }
+
+        // Appended in slices because one large append makes StringBuilder allocate one large chunk.
+        while (!chars.IsEmpty)
+        {
+            var slice = chars[..Math.Min(chars.Length, MaxChunkSize)];
+            overflow.Append(slice);
+            chars = chars[slice.Length..];
+        }
+    }
+
     static void Return(char[] array)
     {
-        if (array.Length is > 0 and <= MaxPooledSize)
+        if (array.Length > 0)
         {
             ArrayPool<char>.Shared.Return(array);
         }
