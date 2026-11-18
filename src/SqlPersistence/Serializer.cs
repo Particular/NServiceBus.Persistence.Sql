@@ -21,7 +21,7 @@ static class Serializer
 
     public static T Deserialize<T>(TextReader reader)
     {
-        using (var jsonReader = new JsonTextReader(reader))
+        using (var jsonReader = new JsonTextReader(reader) { ArrayPool = JsonArrayPool.Instance })
         {
             try
             {
@@ -38,7 +38,7 @@ static class Serializer
     {
         var stringBuilder = new StringBuilder();
         var stringWriter = new StringWriter(stringBuilder);
-        using (var jsonWriter = new JsonTextWriter(stringWriter))
+        using (var jsonWriter = new JsonTextWriter(stringWriter) { ArrayPool = JsonArrayPool.Instance })
         {
             try
             {

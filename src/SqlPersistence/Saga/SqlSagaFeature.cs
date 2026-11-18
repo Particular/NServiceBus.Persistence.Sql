@@ -106,9 +106,9 @@ sealed class SqlSagaFeature : Feature
         var jsonSerializer = BuildJsonSerializer(jsonSerializerSettings);
         sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
-        readerCreator ??= reader => new JsonTextReader(reader);
+        readerCreator ??= reader => new JsonTextReader(reader) { ArrayPool = JsonArrayPool.Instance };
         var writerCreator = SagaSettings.GetWriterCreator(settings);
-        writerCreator ??= writer => new JsonTextWriter(writer);
+        writerCreator ??= writer => new JsonTextWriter(writer) { ArrayPool = JsonArrayPool.Instance };
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
