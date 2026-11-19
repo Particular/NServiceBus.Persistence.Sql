@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Data.Common;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -89,14 +88,16 @@ class RuntimeSagaInfo
 
     public string ToJson(IContainSagaData sagaData)
     {
-        var builder = new StringBuilder();
-        using (var stringWriter = new StringWriter(builder))
+        var writer = new PooledCharTextWriter();
+        try
         {
-            ToJson(sagaData, stringWriter);
-            stringWriter.Flush();
+            ToJson(sagaData, writer);
+            return writer.ToString();
         }
-
-        return builder.ToString();
+        finally
+        {
+            writer.ReturnBuffer();
+        }
     }
 
     public void ToJson(IContainSagaData sagaData, TextWriter textWriter)
