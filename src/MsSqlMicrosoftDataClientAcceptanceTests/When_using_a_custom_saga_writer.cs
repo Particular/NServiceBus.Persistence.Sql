@@ -11,7 +11,7 @@ using NUnit.Framework;
 public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
 {
     [Test]
-    public async Task Should_serialize_saga_data_with_the_custom_writer()
+    public async Task Should_store_the_json_written_by_the_custom_writer()
     {
         var context = await Scenario.Define<Context>()
             .WithEndpoint<SagaEndpoint>(b => b
@@ -23,6 +23,7 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
         {
             Assert.That(context.CustomWriterUsed, Is.True);
             Assert.That(context.LoadedProperty, Is.EqualTo("Test"));
+            Assert.That(context.LoadedNote, Is.EqualTo(UppercaseNoteWriter.WrittenNote));
         }
     }
 
@@ -31,6 +32,7 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
         public bool CustomWriterUsed { get; set; }
         public bool HandledOtherMessage { get; set; }
         public string LoadedProperty { get; set; }
+        public string LoadedNote { get; set; }
     }
 
     public class SagaEndpoint : EndpointConfigurationBuilder
@@ -43,10 +45,7 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
                 persistence.SagaSettings().WriterCreator(builder =>
                 {
                     testContext.CustomWriterUsed = true;
-                    return new JsonTextWriter(new StringWriter(builder))
-                    {
-                        Formatting = Formatting.None
-                    };
+                    return new UppercaseNoteWriter(new StringWriter(builder));
                 });
             });
 
@@ -57,12 +56,14 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
             public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
             {
                 Data.Property = message.Property;
+                Data.Note = UppercaseNoteWriter.OriginalNote;
                 return context.SendLocal(new SomeOtherMessage { Property = message.Property });
             }
 
             public Task Handle(SomeOtherMessage message, IMessageHandlerContext context)
             {
                 testContext.LoadedProperty = Data.Property;
+                testContext.LoadedNote = Data.Note;
                 testContext.HandledOtherMessage = true;
                 return Task.CompletedTask;
             }
@@ -75,8 +76,17 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
             public class SagaData : ContainSagaData
             {
                 public string Property { get; set; }
+                public string Note { get; set; }
             }
         }
+    }
+
+    class UppercaseNoteWriter(TextWriter writer) : JsonTextWriter(writer)
+    {
+        public const string OriginalNote = "written by the saga";
+        public const string WrittenNote = "WRITTEN BY THE SAGA";
+
+        public override void WriteValue(string value) => base.WriteValue(value == OriginalNote ? WrittenNote : value);
     }
 
     public class StartSagaMessage : IMessage

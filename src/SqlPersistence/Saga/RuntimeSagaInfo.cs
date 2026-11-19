@@ -112,7 +112,7 @@ class RuntimeSagaInfo
             return;
         }
 
-        // The public WriterCreator API hands out a StringBuilder, so the JSON is copied over afterwards.
+        // Buffered because the public factory accepts a StringBuilder, not the dialect's TextWriter.
         var builder = new StringBuilder();
         Serialize(sagaData, stringBuilderWriterCreator(builder));
         textWriter.Write(builder);
