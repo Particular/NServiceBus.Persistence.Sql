@@ -21,7 +21,7 @@ static class Serializer
 
     public static T Deserialize<T>(TextReader reader)
     {
-        using (var jsonReader = new JsonTextReader(reader))
+        using (var jsonReader = new JsonTextReader(reader) { ArrayPool = JsonArrayPool.Instance })
         {
             try
             {
