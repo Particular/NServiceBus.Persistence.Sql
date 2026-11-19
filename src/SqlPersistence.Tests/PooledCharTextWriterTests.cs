@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -98,6 +100,44 @@ public class PooledCharTextWriterTests
         writer.Write("again");
 
         Assert.That(writer.ToString(), Is.EqualTo("again"));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void WriterIsUsableAfterReturningAPooledBuffer()
+    {
+        var writer = new PooledCharTextWriter();
+        writer.Write("first");
+        writer.ReturnBuffer();
+
+        writer.Write("second");
+
+        Assert.That(writer.ToString(), Is.EqualTo("second"));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void WritingALargeLineDoesNotLoseContent()
+    {
+        var writer = new PooledCharTextWriter();
+        var large = new string('x', PooledCharTextWriter.MaxPooledSize + 10);
+
+        writer.WriteLine(large.AsSpan());
+
+        Assert.That(writer.ToString(), Is.EqualTo(large + writer.NewLine));
+        writer.ReturnBuffer();
+    }
+
+    [Test]
+    public void CanceledWriteLeavesContentUnchanged()
+    {
+        var writer = new PooledCharTextWriter();
+        writer.Write("kept");
+
+        var task = writer.WriteAsync("dropped".AsMemory(), new CancellationToken(canceled: true));
+
+        Assert.That(task.IsCanceled, Is.True);
+        Assert.That(writer.ToString(), Is.EqualTo("kept"));
         writer.ReturnBuffer();
     }
 

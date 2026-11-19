@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 sealed class PooledCharTextWriter : TextWriter
 {
     internal const int InitialSize = 4096;
-    // Beyond this the writer moves to StringBuilder chunks, so huge payloads never need one large contiguous buffer.
+    // Beyond this the writer moves to StringBuilder chunks, so huge payloads don't need one large contiguous working buffer.
     internal const int MaxPooledSize = 1024 * 1024;
     const int MaxChunkSize = 8000;
     const int MaxStringLength = 0x3FFFFFDF;
@@ -37,7 +37,11 @@ sealed class PooledCharTextWriter : TextWriter
         Write(new ReadOnlySpan<char>(in value));
     }
 
-    public override void Write(char[] chars, int index, int count) => Write(chars.AsSpan(index, count));
+    public override void Write(char[] chars, int index, int count)
+    {
+        ArgumentNullException.ThrowIfNull(chars);
+        Write(chars.AsSpan(index, count));
+    }
 
     public override void Write(string value) => Write(value.AsSpan());
 
@@ -76,8 +80,19 @@ sealed class PooledCharTextWriter : TextWriter
         return Task.CompletedTask;
     }
 
+    public override void WriteLine(ReadOnlySpan<char> chars)
+    {
+        Write(chars);
+        WriteLine();
+    }
+
     public override Task WriteAsync(ReadOnlyMemory<char> chars, CancellationToken cancellationToken = default)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return Task.FromCanceled(cancellationToken);
+        }
+
         Write(chars.Span);
         return Task.CompletedTask;
     }
@@ -166,7 +181,7 @@ sealed class PooledCharTextWriter : TextWriter
     {
         if (array.Length > 0)
         {
-            ArrayPool<char>.Shared.Return(array);
+            ArrayPool<char>.Shared.Return(array, clearArray: true);
         }
     }
 }
