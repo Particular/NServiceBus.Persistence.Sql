@@ -48,7 +48,7 @@ sealed class SqlSagaFeature : Feature
 
         var customJsonSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var versionSpecificJsonSettings = SagaSettings.GetVersionSettings(settings);
-        var customSagaWriter = SagaSettings.GetWriterCreator(settings);
+        var customSagaWriter = (object)SagaSettings.GetTextWriterCreator(settings) ?? SagaSettings.GetWriterCreator(settings);
         var customSagaReader = SagaSettings.GetReaderCreator(settings);
 
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Sagas", new
@@ -107,13 +107,14 @@ sealed class SqlSagaFeature : Feature
         sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
         readerCreator ??= reader => new JsonTextReader(reader) { ArrayPool = JsonArrayPool.Instance };
-        var stringBuilderWriterCreator = SagaSettings.GetWriterCreator(settings);
+        var textWriterCreator = SagaSettings.GetTextWriterCreator(settings);
+        var stringBuilderWriterCreator = textWriterCreator is null ? SagaSettings.GetWriterCreator(settings) : null;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
         return new SagaInfoCache(
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
-            writerCreator: writer => new JsonTextWriter(writer),
+            writerCreator: textWriterCreator ?? (writer => new JsonTextWriter(writer)),
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
             metadataCollection: settings.Get<SagaMetadataCollection>(),
