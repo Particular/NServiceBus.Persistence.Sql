@@ -1,24 +1,21 @@
 ﻿using System.Buffers;
 using Newtonsoft.Json;
 
-sealed class JsonArrayPool : IArrayPool<char>
+// Only for JsonTextReader: JsonTextWriter returns its old buffer before renting a new one, so a failed rent would return it twice.
+sealed class JsonArrayPool(ArrayPool<char> pool) : IArrayPool<char>
 {
     // Larger buffers are dropped so one huge saga or outbox record doesn't keep them in the shared pool.
     internal const int MaxPooledSize = 1024 * 1024;
 
-    public static readonly JsonArrayPool Instance = new();
+    public static readonly JsonArrayPool Instance = new(ArrayPool<char>.Shared);
 
-    JsonArrayPool()
-    {
-    }
-
-    public char[] Rent(int minimumLength) => ArrayPool<char>.Shared.Rent(minimumLength);
+    public char[] Rent(int minimumLength) => pool.Rent(minimumLength);
 
     public void Return(char[] array)
     {
-        if (array.Length is > 0 and <= MaxPooledSize)
+        if (array is { Length: > 0 and <= MaxPooledSize })
         {
-            ArrayPool<char>.Shared.Return(array);
+            pool.Return(array, clearArray: true);
         }
     }
 }
