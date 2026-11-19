@@ -14,7 +14,9 @@
         /// </summary>
         /// <remarks>
         /// The <see cref="TextWriter"/> is owned by the persister and only valid while the saga data is serialized.
-        /// Don't keep a reference to it.
+        /// Don't keep a reference to it or close it before serialization completes. The persister disposes the returned
+        /// <see cref="Newtonsoft.Json.JsonWriter"/>, which may close the <see cref="TextWriter"/>.
+        /// When both overloads are configured, this one is used.
         /// </remarks>
         public void WriterCreator(Func<TextWriter, JsonWriter> writerCreator)
         {

@@ -48,14 +48,13 @@ sealed class SqlSagaFeature : Feature
 
         var customJsonSettings = SagaSettings.GetJsonSerializerSettings(settings);
         var versionSpecificJsonSettings = SagaSettings.GetVersionSettings(settings);
-        var customSagaWriter = (object)SagaSettings.GetTextWriterCreator(settings) ?? SagaSettings.GetWriterCreator(settings);
         var customSagaReader = SagaSettings.GetReaderCreator(settings);
 
         settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.Sql.Sagas", new
         {
             CustomJsonSettings = customJsonSettings != null,
             VersionSpecificJsonSettings = versionSpecificJsonSettings != null,
-            CustomSagaWriter = customSagaWriter != null,
+            CustomSagaWriter = SagaSettings.GetTextWriterCreator(settings) != null || SagaSettings.GetWriterCreator(settings) != null,
             CustomSagaReader = customSagaReader != null
         });
 
