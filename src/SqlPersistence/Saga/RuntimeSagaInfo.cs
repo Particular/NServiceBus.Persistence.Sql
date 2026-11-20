@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Data.Common;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -16,6 +17,7 @@ class RuntimeSagaInfo
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    Func<StringBuilder, JsonWriter> stringBuilderWriterCreator;
     SqlDialect sqlDialect;
     ConcurrentDictionary<Version, JsonSerializer> deserializers;
     public readonly Version CurrentVersion;
@@ -41,7 +43,8 @@ class RuntimeSagaInfo
         Func<TextWriter, JsonWriter> writerCreator,
         string tablePrefix,
         SqlDialect sqlDialect,
-        Func<string, string> nameFilter)
+        Func<string, string> nameFilter,
+        Func<StringBuilder, JsonWriter> stringBuilderWriterCreator = null)
     {
         this.sagaDataType = sagaDataType;
         if (versionSpecificSettings != null)
@@ -53,6 +56,7 @@ class RuntimeSagaInfo
         this.jsonSerializer = jsonSerializer;
         this.readerCreator = readerCreator;
         this.writerCreator = writerCreator;
+        this.stringBuilderWriterCreator = stringBuilderWriterCreator;
         this.sqlDialect = sqlDialect;
         CurrentVersion = sagaDataType.Assembly.GetFileVersion();
         var sqlSagaAttributeData = SqlSagaTypeDataReader.GetTypeData(metadata);
@@ -102,6 +106,20 @@ class RuntimeSagaInfo
 
     public void ToJson(IContainSagaData sagaData, TextWriter textWriter)
     {
+        if (stringBuilderWriterCreator is null)
+        {
+            Serialize(sagaData, writerCreator(textWriter));
+            return;
+        }
+
+        // Buffered because the public factory accepts a StringBuilder, not the dialect's TextWriter.
+        var builder = new StringBuilder();
+        Serialize(sagaData, stringBuilderWriterCreator(builder));
+        textWriter.Write(builder);
+    }
+
+    void Serialize(IContainSagaData sagaData, JsonWriter jsonWriter)
+    {
         var originalMessageId = sagaData.OriginalMessageId;
         var originator = sagaData.Originator;
         var id = sagaData.Id;
@@ -110,7 +128,7 @@ class RuntimeSagaInfo
         sagaData.Id = Guid.Empty;
         try
         {
-            using (var writer = writerCreator(textWriter))
+            using (var writer = jsonWriter)
             {
                 try
                 {

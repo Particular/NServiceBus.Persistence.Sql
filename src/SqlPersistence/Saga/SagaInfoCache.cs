@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
@@ -14,6 +15,7 @@ class SagaInfoCache
     JsonSerializer jsonSerializer;
     Func<TextReader, JsonReader> readerCreator;
     Func<TextWriter, JsonWriter> writerCreator;
+    Func<StringBuilder, JsonWriter> stringBuilderWriterCreator;
     Func<string, string> nameFilter;
     string tablePrefix;
     SqlDialect sqlDialect;
@@ -26,10 +28,12 @@ class SagaInfoCache
         string tablePrefix,
         SqlDialect sqlDialect,
         SagaMetadataCollection metadataCollection,
-        Func<string, string> nameFilter)
+        Func<string, string> nameFilter,
+        Func<StringBuilder, JsonWriter> stringBuilderWriterCreator = null)
     {
         this.versionSpecificSettings = versionSpecificSettings;
         this.writerCreator = writerCreator;
+        this.stringBuilderWriterCreator = stringBuilderWriterCreator;
         this.readerCreator = readerCreator;
         this.jsonSerializer = jsonSerializer;
         this.tablePrefix = tablePrefix;
@@ -76,6 +80,7 @@ class SagaInfoCache
             writerCreator: writerCreator,
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
-            nameFilter: nameFilter);
+            nameFilter: nameFilter,
+            stringBuilderWriterCreator: stringBuilderWriterCreator);
     }
 }

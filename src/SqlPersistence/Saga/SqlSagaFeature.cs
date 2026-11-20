@@ -51,8 +51,7 @@ class SqlSagaFeature : Feature
         sqlDialect.ValidateJsonSettings(jsonSerializer);
         var readerCreator = SagaSettings.GetReaderCreator(settings);
         readerCreator ??= reader => new JsonTextReader(reader) { ArrayPool = JsonArrayPool.Instance };
-        var writerCreator = SagaSettings.GetWriterCreator(settings);
-        writerCreator ??= writer => new JsonTextWriter(writer);
+        var stringBuilderWriterCreator = SagaSettings.GetWriterCreator(settings);
         var nameFilter = SagaSettings.GetNameFilter(settings);
         nameFilter ??= sagaName => sagaName;
         var versionDeserializeBuilder = SagaSettings.GetVersionSettings(settings);
@@ -61,11 +60,12 @@ class SqlSagaFeature : Feature
             versionSpecificSettings: versionDeserializeBuilder,
             jsonSerializer: jsonSerializer,
             readerCreator: readerCreator,
-            writerCreator: writerCreator,
+            writerCreator: writer => new JsonTextWriter(writer),
             tablePrefix: tablePrefix,
             sqlDialect: sqlDialect,
             metadataCollection: settings.Get<SagaMetadataCollection>(),
-            name => nameFilter(name));
+            name => nameFilter(name),
+            stringBuilderWriterCreator);
     }
 
     static JsonSerializer BuildJsonSerializer(JsonSerializerSettings jsonSerializerSettings)
