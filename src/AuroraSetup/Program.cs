@@ -42,6 +42,7 @@ securityGroup.AddIngressRule(Peer.AnyIpv4(), Port.Tcp(3306), "allow CI for MySQL
 
 var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseClusterProps
 {
+    DeletionProtection = false,
     Engine = DatabaseClusterEngine.AuroraMysql(new AuroraMysqlClusterEngineProps
     {
         Version = AuroraMysqlEngineVersion.VER_3_04_0
@@ -58,11 +59,13 @@ var mysqlCluster = new DatabaseCluster(stack, "MySqlCluster", new DatabaseCluste
     SecurityGroups = new[]
     {
         securityGroup
-    }
+    },
+    RemovalPolicy = RemovalPolicy.DESTROY
 });
 
 var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new DatabaseClusterProps
 {
+    DeletionProtection = false,
     Engine = DatabaseClusterEngine.AuroraPostgres(new AuroraPostgresClusterEngineProps
     {
         Version = AuroraPostgresEngineVersion.VER_15_10
@@ -79,7 +82,8 @@ var postgresCluster = new DatabaseCluster(stack, "PostgreSqlCluster", new Databa
     SecurityGroups = new[]
     {
         securityGroup
-    }
+    },
+    RemovalPolicy = RemovalPolicy.DESTROY
 });
 
 _ = new CfnOutput(stack, "postgres_secrets", new CfnOutputProps { Value = postgresCluster.Secret!.SecretName });
