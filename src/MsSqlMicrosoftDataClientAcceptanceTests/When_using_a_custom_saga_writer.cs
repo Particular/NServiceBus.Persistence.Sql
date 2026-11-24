@@ -42,11 +42,13 @@ public class When_using_a_custom_saga_writer : NServiceBusAcceptanceTest
             {
                 var testContext = (Context)runDescriptor.ScenarioContext;
                 var persistence = configuration.UsePersistence<SqlPersistence>();
+#pragma warning disable CS0618 // Covers the obsolete StringBuilder overload until it is removed
                 persistence.SagaSettings().WriterCreator(builder =>
                 {
                     testContext.CustomWriterUsed = true;
                     return new UppercaseNoteWriter(new StringWriter(builder));
                 });
+#pragma warning restore CS0618
             });
 
         public class TestSaga(Context testContext) : Saga<TestSaga.SagaData>,

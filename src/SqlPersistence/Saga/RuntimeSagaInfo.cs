@@ -112,7 +112,7 @@ class RuntimeSagaInfo
             return;
         }
 
-        // Buffered because the public factory accepts a StringBuilder, not the dialect's TextWriter.
+        // Buffered because the obsolete factory accepts a StringBuilder, not the dialect's TextWriter.
         var builder = new StringBuilder();
         Serialize(sagaData, stringBuilderWriterCreator(builder));
         textWriter.Write(builder);
