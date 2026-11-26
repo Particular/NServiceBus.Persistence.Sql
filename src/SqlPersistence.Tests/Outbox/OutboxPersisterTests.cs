@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql.ScriptBuilder;
@@ -31,7 +33,9 @@ public abstract class OutboxPersisterTests
     }
 
 
-    OutboxPersister Setup(string theSchema)
+    OutboxPersister Setup(string theSchema) => Build(theSchema).Persister;
+
+    PersisterSetup Build(string theSchema)
     {
         var dialect = sqlDialect.Convert(theSchema);
         var outboxCommands = OutboxCommandBuilder.Build(dialect, $"{GetTablePrefix()}_");
@@ -64,8 +68,10 @@ public abstract class OutboxPersisterTests
             connection.ExecuteCommand(OutboxScriptBuilder.BuildDropScript(sqlDialect), GetTablePrefix(), schema: theSchema);
             connection.ExecuteCommand(OutboxScriptBuilder.BuildCreateScript(sqlDialect), GetTablePrefix(), schema: theSchema);
         }
-        return persister;
+        return new PersisterSetup(persister, dialect, outboxCommands);
     }
+
+    sealed record PersisterSetup(OutboxPersister Persister, SqlDialect Dialect, OutboxCommands Commands);
 
     [TearDown]
     public void TearDown()
@@ -170,43 +176,102 @@ public abstract class OutboxPersisterTests
     {
         var persister = Setup(schema);
         var messageId = "a";
-        var headers = new Dictionary<string, string>
-        {
-            ["Quote"] = "\"quoted\"",
-            ["Backslash"] = "a\\b",
-            ["NewLine"] = "a\nb",
-            ["Plus"] = "a+b",
-            ["Backtick"] = "a`b",
-            ["Html"] = "<a href='x'>&</a>",
-            ["Unicode"] = "Zürich 😀",
-            ["Null"] = null,
-            ["Empty"] = ""
-        };
-        var operations = new[]
-        {
-            new TransportOperation("Id1", new DispatchProperties(new Dictionary<string, string> { ["Option"] = "a\"b" }), new byte[0], headers),
-            new TransportOperation("Id2", [], new byte[] { 1, 2, 3 }, new Dictionary<string, string> { ["Key"] = "Value" })
-        };
-
         var contextBag = CreateContextBag(messageId);
         using (var transaction = await persister.BeginTransaction(contextBag))
         {
-            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag);
+            await persister.Store(new OutboxMessage(messageId, SpecialOperations()), transaction, contextBag);
             await transaction.Commit();
         }
         var result = await persister.Get(messageId, contextBag);
 
-        Assert.That(result.TransportOperations, Has.Length.EqualTo(2));
+        AssertSpecialOperations(result.TransportOperations);
+    }
+
+    [Test]
+    public async Task GetReadsRecordWrittenByNewtonsoft()
+    {
+        var setup = Build(schema);
+        var messageId = "a";
+        var json = Serializer.Serialize(SpecialOperations().ToSerializable());
+        json = setup.Dialect.AddOutboxPadding(json);
+
+        using (var connection = GetConnection()(schema))
+        {
+            connection.Open();
+            using var command = setup.Dialect.CreateCommand(connection);
+            command.CommandText = setup.Commands.OptimisticStore;
+            command.AddParameter("MessageId", messageId);
+            command.AddJsonParameter("Operations", json);
+            command.AddParameter("PersistenceVersion", StaticVersions.PersistenceVersion);
+            await command.ExecuteNonQueryEx();
+        }
+
+        var result = await setup.Persister.Get(messageId, CreateContextBag(messageId));
+
+        AssertSpecialOperations(result.TransportOperations);
+    }
+
+    [Test]
+    public async Task NewtonsoftReadsRecordWrittenBySystemTextJson()
+    {
+        var setup = Build(schema);
+        var messageId = "a";
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await setup.Persister.BeginTransaction(contextBag))
+        {
+            await setup.Persister.Store(new OutboxMessage(messageId, SpecialOperations()), transaction, contextBag);
+            await transaction.Commit();
+        }
+
+        SerializableOperation[] stored;
+        using (var connection = GetConnection()(schema))
+        {
+            connection.Open();
+            using var command = setup.Dialect.CreateCommand(connection);
+            command.CommandText = setup.Commands.Get;
+            command.AddParameter("MessageId", messageId);
+            using var dataReader = await command.ExecuteReaderAsync(System.Data.CommandBehavior.SequentialAccess | System.Data.CommandBehavior.SingleRow);
+            Assert.That(await dataReader.ReadAsync(), Is.True);
+            _ = await dataReader.GetBoolAsync(0);
+            using var textReader = dataReader.GetTextReader(1);
+            stored = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader).ToArray();
+        }
+
+        AssertSpecialOperations(stored.FromSerializable());
+    }
+
+    static Dictionary<string, string> SpecialHeaders() => new()
+    {
+        ["Quote"] = "\"quoted\"",
+        ["Backslash"] = "a\\b",
+        ["NewLine"] = "a\nb",
+        ["Plus"] = "a+b",
+        ["Backtick"] = "a`b",
+        ["Html"] = "<a href='x'>&</a>",
+        ["Unicode"] = "Zürich 😀",
+        ["Null"] = null,
+        ["Empty"] = ""
+    };
+
+    static TransportOperation[] SpecialOperations() =>
+    [
+        new TransportOperation("Id1", new DispatchProperties(new Dictionary<string, string> { ["Option"] = "a\"b" }), new byte[0], SpecialHeaders()),
+        new TransportOperation("Id2", [], new byte[] { 1, 2, 3 }, new Dictionary<string, string> { ["Key"] = "Value" })
+    ];
+
+    static void AssertSpecialOperations(TransportOperation[] operations)
+    {
+        Assert.That(operations, Has.Length.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.That(result.TransportOperations[0].MessageId, Is.EqualTo("Id1"));
-            Assert.That(result.TransportOperations[0].Body.ToArray(), Is.Empty);
-            Assert.That(result.TransportOperations[0].Headers, Is.EqualTo(headers));
-            Assert.That(result.TransportOperations[0].Options, Is.EqualTo(new Dictionary<string, string> { ["Option"] = "a\"b" }));
-            Assert.That(result.TransportOperations[1].MessageId, Is.EqualTo("Id2"));
-            Assert.That(result.TransportOperations[1].Body.ToArray(), Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(result.TransportOperations[1].Headers, Is.EqualTo(new Dictionary<string, string> { ["Key"] = "Value" }));
-            Assert.That(result.TransportOperations[1].Options, Is.Empty);
+            Assert.That(operations[0].MessageId, Is.EqualTo("Id1"));
+            Assert.That(operations[0].Body.ToArray(), Is.Empty);
+            Assert.That(operations[0].Headers, Is.EqualTo(SpecialHeaders()));
+            Assert.That(operations[0].Options, Is.EqualTo(new Dictionary<string, string> { ["Option"] = "a\"b" }));
+            Assert.That(operations[1].MessageId, Is.EqualTo("Id2"));
+            Assert.That(operations[1].Body.ToArray(), Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(operations[1].Headers, Is.EqualTo(new Dictionary<string, string> { ["Key"] = "Value" }));
+            Assert.That(operations[1].Options, Is.Empty);
         });
     }
 

@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Buffers;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.Unicode;
 using NServiceBus.Persistence.Sql;
 
 static class JsonPersistenceSerializer
 {
+    const int ChunkSize = 4096;
+    const int MaxUtf8BytesPerChar = 3;
+
     public static string Serialize<T>(T value, JsonTypeInfo<T> typeInfo)
     {
         var buffer = new PooledBufferWriter<byte>(ArrayPool<byte>.Shared);
@@ -33,17 +36,12 @@ static class JsonPersistenceSerializer
 
     public static T Deserialize<T>(TextReader reader, JsonTypeInfo<T> typeInfo)
     {
-        PooledBufferWriter<char> chars = null;
+        var chunk = ArrayPool<char>.Shared.Rent(ChunkSize);
         PooledBufferWriter<byte> utf8 = null;
         try
         {
-            chars = new PooledBufferWriter<char>(ArrayPool<char>.Shared);
-            ReadAll(reader, chars);
-
-            // Exact size instead of GetMaxByteCount, which would be three times larger and could cross the pooling limit.
-            var utf8Length = Encoding.UTF8.GetByteCount(chars.WrittenSpan);
-            utf8 = new PooledBufferWriter<byte>(ArrayPool<byte>.Shared, Math.Max(utf8Length, 1));
-            utf8.Advance(Encoding.UTF8.GetBytes(chars.WrittenSpan, utf8.GetSpan(utf8Length)));
+            utf8 = new PooledBufferWriter<byte>(ArrayPool<byte>.Shared);
+            Transcode(reader, chunk, utf8);
 
             return JsonSerializer.Deserialize(utf8.WrittenSpan, typeInfo);
         }
@@ -54,21 +52,40 @@ static class JsonPersistenceSerializer
         finally
         {
             utf8?.Dispose();
-            chars?.Dispose();
+            ArrayPool<char>.Shared.Return(chunk, clearArray: true);
         }
     }
 
-    // The array overload is used because the default TextReader.Read(Span<char>) copies through an uncleared shared pool array.
-    static void ReadAll(TextReader reader, PooledBufferWriter<char> destination)
+    static void Transcode(TextReader reader, char[] chunk, PooledBufferWriter<byte> utf8)
     {
-        int read;
-        do
+        var carried = 0;
+        while (true)
         {
-            var memory = destination.GetMemory();
-            MemoryMarshal.TryGetArray<char>(memory, out var segment);
-            read = reader.Read(segment.Array, segment.Offset, segment.Count);
-            destination.Advance(read);
-        } while (read > 0);
+            // The array overload is used because the default Read(Span<char>) copies through an uncleared shared pool array.
+            var read = reader.Read(chunk, carried, ChunkSize - carried);
+            var isFinalBlock = read == 0;
+            var source = chunk.AsSpan(0, carried + read);
+
+            var status = Utf8.FromUtf16(source, utf8.GetSpan(source.Length * MaxUtf8BytesPerChar), out var charsRead, out var bytesWritten, replaceInvalidSequences: true, isFinalBlock);
+            utf8.Advance(bytesWritten);
+
+            var completed = status switch
+            {
+                OperationStatus.Done => isFinalBlock,
+                OperationStatus.NeedMoreData when !isFinalBlock => false,
+                OperationStatus.NeedMoreData or OperationStatus.DestinationTooSmall or OperationStatus.InvalidData =>
+                    throw new InvalidOperationException($"Unexpected transcoding status {status}."),
+                _ => throw new InvalidOperationException($"Unknown transcoding status {status}.")
+            };
+
+            if (completed)
+            {
+                return;
+            }
+
+            carried = source.Length - charsRead;
+            source[charsRead..].CopyTo(chunk);
+        }
     }
 
     // The writer ignores JsonSerializerOptions, so Encoder and indentation are copied from them to keep both in sync.
