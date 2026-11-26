@@ -53,11 +53,11 @@ public class PooledBufferWriterTests
         writer.Dispose();
         writer.Dispose();
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(pool.Returned, Has.Count.EqualTo(1));
             Assert.That(pool.ClearedOnReturn, Is.EqualTo(new[] { true }));
-        });
+        }
     }
 
     [Test]
@@ -69,12 +69,12 @@ public class PooledBufferWriterTests
 
         writer.GetSpan(1000);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(pool.Returned, Has.Count.EqualTo(1));
             Assert.That(pool.Returned[0], Is.SameAs(first));
             Assert.That(pool.ClearedOnReturn, Is.EqualTo(new[] { true }));
-        });
+        }
     }
 
     [TestCase(1, true)]
@@ -101,12 +101,12 @@ public class PooledBufferWriterTests
         writer.GetSpan(PooledBufferWriter<byte>.MaxPooledSize * 3);
         writer.Dispose();
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(pool.Rented, Has.Count.EqualTo(3));
             Assert.That(pool.Returned, Has.Count.EqualTo(1));
             Assert.That(pool.Returned[0].Length, Is.LessThanOrEqualTo(PooledBufferWriter<byte>.MaxPooledSize));
-        });
+        }
     }
 
     [Test]

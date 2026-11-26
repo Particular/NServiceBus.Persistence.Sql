@@ -217,12 +217,12 @@ public class NonAsciiPreservingJavaScriptEncoderTests
     {
         var destination = new char[expected.Length];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(NonAsciiPreservingJavaScriptEncoder.TryEncode(scalar, destination, out var written), Is.True);
             Assert.That(written, Is.EqualTo(expected.Length));
             Assert.That(new string(destination), Is.EqualTo(expected));
-        });
+        }
     }
 
     [TestCase('"', 1)]
@@ -235,12 +235,12 @@ public class NonAsciiPreservingJavaScriptEncoderTests
         var destination = new char[length + 2];
         Array.Fill(destination, 'x');
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(NonAsciiPreservingJavaScriptEncoder.TryEncode(scalar, destination.AsSpan(0, length), out var written), Is.False);
             Assert.That(written, Is.Zero);
             Assert.That(destination[length..], Is.All.EqualTo('x'));
-        });
+        }
     }
 
     static string Serialize(string value) => JsonSerializer.Serialize(value, Options);

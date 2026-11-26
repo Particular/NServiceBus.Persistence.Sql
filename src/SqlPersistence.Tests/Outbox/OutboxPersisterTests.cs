@@ -319,7 +319,7 @@ public abstract class OutboxPersisterTests
     static void AssertSpecialOperations(TransportOperation[] operations)
     {
         Assert.That(operations, Has.Length.EqualTo(2));
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(operations[0].MessageId, Is.EqualTo("Id1"));
             Assert.That(operations[0].Body.ToArray(), Is.Empty);
@@ -329,7 +329,7 @@ public abstract class OutboxPersisterTests
             Assert.That(operations[1].Body.ToArray(), Is.EqualTo(new byte[] { 1, 2, 3 }));
             Assert.That(operations[1].Headers, Is.EqualTo(new Dictionary<string, string> { ["Key"] = "Value" }));
             Assert.That(operations[1].Options, Is.Empty);
-        });
+        }
     }
 
     [Test]

@@ -39,7 +39,7 @@ public class OutboxSerializationTests
         var operations = OutboxSerializer.Deserialize(new StringReader(Golden9x));
 
         Assert.That(operations, Has.Length.EqualTo(2));
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(operations[0].Body.ToArray(), Is.EqualTo(new byte[] { 0x20, 0x21 }));
             Assert.That(operations[0].Headers, Is.EqualTo(new Dictionary<string, string>
@@ -56,7 +56,7 @@ public class OutboxSerializationTests
             Assert.That(operations[1].Headers, Is.Null);
             Assert.That(operations[1].MessageId, Is.Null);
             Assert.That(operations[1].Options, Is.Null);
-        });
+        }
     }
 
     [TestCaseSource(nameof(CaseNames))]
@@ -172,12 +172,12 @@ public class OutboxSerializationTests
         foreach (var result in new[] { readByNew, readByVersionNine })
         {
             var resultProperties = new DispatchProperties(result[0].Options);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(resultProperties.DelayDeliveryWith.Delay, Is.EqualTo(delayDeliveryWith));
                 Assert.That(resultProperties.DoNotDeliverBefore.At, Is.EqualTo(doNotDeliverBefore));
                 Assert.That(resultProperties.DiscardIfNotReceivedBefore.MaxTime, Is.EqualTo(discardIfNotReceivedBefore));
-            });
+            }
         }
     }
 
@@ -296,13 +296,13 @@ public class OutboxSerializationTests
         Assert.That(actual, Has.Length.EqualTo(expected.Length));
         for (var i = 0; i < expected.Length; i++)
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(actual[i].Body.ToArray(), Is.EqualTo(expected[i].Body.ToArray()), "Body");
                 Assert.That(actual[i].Headers, Is.EqualTo(expected[i].Headers), "Headers");
                 Assert.That(actual[i].Options, Is.EqualTo(expected[i].Options), "Options");
                 Assert.That(actual[i].MessageId, Is.EqualTo(expected[i].MessageId), "MessageId");
-            });
+            }
         }
     }
 
