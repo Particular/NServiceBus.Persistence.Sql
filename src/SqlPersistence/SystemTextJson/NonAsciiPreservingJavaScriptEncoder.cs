@@ -24,11 +24,29 @@ sealed class NonAsciiPreservingJavaScriptEncoder : JavaScriptEncoder
 
     static bool IsEscaped(int unicodeScalar) => unicodeScalar is < 0x20 or '"' or '\\' or '<' or '>' or '&' or '\'' or '+' or '`' or 0x85 or 0x2028 or 0x2029;
 
-    public override unsafe int FindFirstCharacterToEncode(char* text, int textLength) =>
-        FindFirstCharacterToEncode(new ReadOnlySpan<char>(text, textLength));
+    public override unsafe int FindFirstCharacterToEncode(char* text, int textLength)
+    {
+        ReadOnlySpan<char> span;
+        // SAFETY: TextEncoder passes textLength readable chars that stay fixed for this call; the span does not escape it.
+        unsafe
+        {
+            span = new ReadOnlySpan<char>(text, textLength);
+        }
 
-    public override unsafe bool TryEncodeUnicodeScalar(int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten) =>
-        TryEncode(unicodeScalar, new Span<char>(buffer, bufferLength), out numberOfCharactersWritten);
+        return FindFirstCharacterToEncode(span);
+    }
+
+    public override unsafe bool TryEncodeUnicodeScalar(int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten)
+    {
+        Span<char> destination;
+        // SAFETY: TextEncoder passes bufferLength writable chars that stay fixed for this call; the span does not escape it.
+        unsafe
+        {
+            destination = new Span<char>(buffer, bufferLength);
+        }
+
+        return TryEncode(unicodeScalar, destination, out numberOfCharactersWritten);
+    }
 
     internal static int FindFirstCharacterToEncode(ReadOnlySpan<char> text)
     {
@@ -53,7 +71,7 @@ sealed class NonAsciiPreservingJavaScriptEncoder : JavaScriptEncoder
         }
     }
 
-    static bool TryEncode(int unicodeScalar, Span<char> destination, out int written)
+    internal static bool TryEncode(int unicodeScalar, Span<char> destination, out int written)
     {
         // The base class asks for the replacement character of an invalid sequence without checking WillEncode.
         if (!IsEscaped(unicodeScalar))

@@ -208,5 +208,40 @@ public class NonAsciiPreservingJavaScriptEncoderTests
         yield return new TestCaseData(emoji + '\ude00', 2);
     }
 
+    [TestCase('"', "\\\"")]
+    [TestCase('<', "\\u003C")]
+    [TestCase(0x2028, "\\u2028")]
+    [TestCase(0xE4, "ä")]
+    [TestCase(0x1F600, "\U0001F600")]
+    public void EncodesIntoADestinationOfExactlyTheRequiredLength(int scalar, string expected)
+    {
+        var destination = new char[expected.Length];
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NonAsciiPreservingJavaScriptEncoder.TryEncode(scalar, destination, out var written), Is.True);
+            Assert.That(written, Is.EqualTo(expected.Length));
+            Assert.That(new string(destination), Is.EqualTo(expected));
+        });
+    }
+
+    [TestCase('"', 1)]
+    [TestCase('<', 5)]
+    [TestCase(0x2028, 5)]
+    [TestCase(0xE4, 0)]
+    [TestCase(0x1F600, 1)]
+    public void DoesNotWriteIntoATooSmallDestination(int scalar, int length)
+    {
+        var destination = new char[length + 2];
+        Array.Fill(destination, 'x');
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(NonAsciiPreservingJavaScriptEncoder.TryEncode(scalar, destination.AsSpan(0, length), out var written), Is.False);
+            Assert.That(written, Is.Zero);
+            Assert.That(destination[length..], Is.All.EqualTo('x'));
+        });
+    }
+
     static string Serialize(string value) => JsonSerializer.Serialize(value, Options);
 }
