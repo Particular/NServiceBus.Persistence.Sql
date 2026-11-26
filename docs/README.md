@@ -28,6 +28,6 @@ NServiceBus.Persistence.Sql provides NServiceBus persistence using SQL databases
 ### Decisions recorded in pull requests
 
 - Bound pooled saga serialization buffers and pass only the serialized data to SqlClient so a large saga does not inflate later small writes — [#2180](https://github.com/Particular/NServiceBus.Persistence.Sql/pull/2180)
-- Serialize outbox records with System.Text.Json ahead of sagas, which stored-text differences are accepted, and why mixed-version endpoints keep working — [#2206](https://github.com/Particular/NServiceBus.Persistence.Sql/pull/2206)
+- Why outbox operations are serialized with System.Text.Json before sagas, which stored-text differences are accepted, and why mixed-version endpoints keep working — [#2206](https://github.com/Particular/NServiceBus.Persistence.Sql/pull/2206)
 
 Keep this index current when a canonical source is added, replaced, or retired; link, do not copy.
