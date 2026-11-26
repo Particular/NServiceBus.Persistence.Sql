@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault, PropertyNameCaseInsensitive = true)]
+// Metadata only, because a custom encoder rules out the generated fast path; options come from Create().
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(SerializableOperation[]))]
 sealed partial class OutboxJsonContext : JsonSerializerContext
 {
