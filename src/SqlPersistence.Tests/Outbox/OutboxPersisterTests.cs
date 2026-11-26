@@ -166,6 +166,51 @@ public abstract class OutboxPersisterTests
     }
 
     [Test]
+    public async Task StoreAndGetPreservesSpecialCharactersNullsAndEmptyBodies()
+    {
+        var persister = Setup(schema);
+        var messageId = "a";
+        var headers = new Dictionary<string, string>
+        {
+            ["Quote"] = "\"quoted\"",
+            ["Backslash"] = "a\\b",
+            ["NewLine"] = "a\nb",
+            ["Plus"] = "a+b",
+            ["Backtick"] = "a`b",
+            ["Html"] = "<a href='x'>&</a>",
+            ["Unicode"] = "Zürich 😀",
+            ["Null"] = null,
+            ["Empty"] = ""
+        };
+        var operations = new[]
+        {
+            new TransportOperation("Id1", new DispatchProperties(new Dictionary<string, string> { ["Option"] = "a\"b" }), new byte[0], headers),
+            new TransportOperation("Id2", [], new byte[] { 1, 2, 3 }, new Dictionary<string, string> { ["Key"] = "Value" })
+        };
+
+        var contextBag = CreateContextBag(messageId);
+        using (var transaction = await persister.BeginTransaction(contextBag))
+        {
+            await persister.Store(new OutboxMessage(messageId, operations), transaction, contextBag);
+            await transaction.Commit();
+        }
+        var result = await persister.Get(messageId, contextBag);
+
+        Assert.That(result.TransportOperations, Has.Length.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TransportOperations[0].MessageId, Is.EqualTo("Id1"));
+            Assert.That(result.TransportOperations[0].Body.ToArray(), Is.Empty);
+            Assert.That(result.TransportOperations[0].Headers, Is.EqualTo(headers));
+            Assert.That(result.TransportOperations[0].Options, Is.EqualTo(new Dictionary<string, string> { ["Option"] = "a\"b" }));
+            Assert.That(result.TransportOperations[1].MessageId, Is.EqualTo("Id2"));
+            Assert.That(result.TransportOperations[1].Body.ToArray(), Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(result.TransportOperations[1].Headers, Is.EqualTo(new Dictionary<string, string> { ["Key"] = "Value" }));
+            Assert.That(result.TransportOperations[1].Options, Is.Empty);
+        });
+    }
+
+    [Test]
     public async Task TransactionScope()
     {
         if (!transactionScope)

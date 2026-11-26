@@ -10,7 +10,7 @@ public class OperationConverterTests
     [Test]
     public void ToSerializable()
     {
-        var operations = new List<TransportOperation>
+        var operations = new[]
         {
             new TransportOperation(
                 messageId: "Id1",
@@ -29,7 +29,7 @@ public class OperationConverterTests
                 }
             )
         };
-        var serializableOperations = Serializer.Serialize(operations.ToSerializable());
+        var serializableOperations = OutboxSerializer.Serialize(operations.ToSerializable());
         Approver.Verify(serializableOperations);
     }
 }

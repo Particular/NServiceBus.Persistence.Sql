@@ -1,30 +1,39 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DispatchProperties = NServiceBus.Transport.DispatchProperties;
+﻿using DispatchProperties = NServiceBus.Transport.DispatchProperties;
 using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
 static class OperationConverter
 {
-    public static IEnumerable<SerializableOperation> ToSerializable(this IEnumerable<TransportOperation> operations)
+    public static SerializableOperation[] ToSerializable(this TransportOperation[] operations)
     {
-        return operations.Select(
-            operation => new SerializableOperation
+        var result = new SerializableOperation[operations.Length];
+        for (var i = 0; i < operations.Length; i++)
+        {
+            var operation = operations[i];
+            result[i] = new SerializableOperation
             {
                 Body = operation.Body,
                 Headers = operation.Headers,
                 MessageId = operation.MessageId,
                 Options = operation.Options
-            });
+            };
+        }
+
+        return result;
     }
 
-    public static IEnumerable<TransportOperation> FromSerializable(this IEnumerable<SerializableOperation> operations)
+    public static TransportOperation[] FromSerializable(this SerializableOperation[] operations)
     {
-        return operations.Select(
-            operation => new TransportOperation(
+        var result = new TransportOperation[operations.Length];
+        for (var i = 0; i < operations.Length; i++)
+        {
+            var operation = operations[i];
+            result[i] = new TransportOperation(
                 body: operation.Body,
                 headers: operation.Headers,
                 messageId: operation.MessageId,
-                properties: new DispatchProperties(operation.Options)
-            ));
+                properties: new DispatchProperties(operation.Options));
+        }
+
+        return result;
     }
 }
