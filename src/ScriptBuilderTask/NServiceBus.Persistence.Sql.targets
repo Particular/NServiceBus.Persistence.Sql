@@ -26,15 +26,15 @@
 
   <Target Name="SqlPersistenceScriptBuilder" AfterTargets="AfterCompile" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
     <SqlPersistenceScriptBuilderTask
-      AssemblyPath="$(ProjectDir)@(IntermediateAssembly)"
-      IntermediateDirectory="$(ProjectDir)$(IntermediateOutputPath)"
+      AssemblyPath="@(IntermediateAssembly->'%(FullPath)')"
+      IntermediateDirectory="$([MSBuild]::NormalizeDirectory('$(IntermediateOutputPath)'))"
       ProjectDirectory="$(ProjectDir)"
       SolutionDirectory="$(SqlPersistenceSolutionDir)" />
   </Target>
 
   <Target Name="SqlPersistenceAddScriptsToContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems" AfterTargets="SqlPersistenceScriptBuilder" Condition="'$(SqlPersistenceGenerateScripts)' != 'false' AND '$(DesignTimeBuild)' != 'true'">
     <PropertyGroup>
-      <SqlPersistenceScriptDirectory>$(ProjectDir)$(IntermediateOutputPath)NServiceBus.Persistence.Sql\</SqlPersistenceScriptDirectory>
+      <SqlPersistenceScriptDirectory>$([MSBuild]::NormalizeDirectory("$(IntermediateOutputPath)", "NServiceBus.Persistence.Sql"))</SqlPersistenceScriptDirectory>
     </PropertyGroup>
     <ItemGroup>
       <SqlPersistenceScripts Include="$(SqlPersistenceScriptDirectory)**\*.sql" />
