@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-class SerializableOperation
+sealed class SerializableOperation
 {
-    public ReadOnlyMemory<byte> Body;
-    public Dictionary<string, string> Headers;
-    public string MessageId;
-    public Dictionary<string, string> Options;
+    public ReadOnlyMemory<byte> Body { get; set; }
+    public Dictionary<string, string> Headers { get; set; }
+    public string MessageId { get; set; }
+    public Dictionary<string, string> Options { get; set; }
 }
