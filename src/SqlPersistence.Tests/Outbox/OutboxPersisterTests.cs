@@ -214,6 +214,37 @@ public abstract class OutboxPersisterTests
     }
 
     [Test]
+    public async Task StoreAndGetLargeRecordWithSurrogatePairsAcrossChunks()
+    {
+        var persister = Setup(schema);
+        var messageId = "a";
+        var contextBag = CreateContextBag(messageId);
+        var body = new byte[1024 * 1024];
+        new Random(42).NextBytes(body);
+        var emoji = string.Concat(Enumerable.Repeat("\U0001F600", 3000));
+        // The second run is shifted by one char so a chunk boundary splits a surrogate pair whatever the parity.
+        var headers = new Dictionary<string, string>
+        {
+            ["Emoji"] = emoji,
+            ["ShiftedEmoji"] = "a" + emoji
+        };
+        using (var transaction = await persister.BeginTransaction(contextBag))
+        {
+            await persister.Store(new OutboxMessage(messageId, [new TransportOperation("Id1", [], body, headers)]), transaction, contextBag);
+            await transaction.Commit();
+        }
+
+        var result = await persister.Get(messageId, contextBag);
+
+        Assert.That(result.TransportOperations, Has.Length.EqualTo(1));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.TransportOperations[0].Body.ToArray(), Is.EqualTo(body));
+            Assert.That(result.TransportOperations[0].Headers, Is.EqualTo(headers));
+        }
+    }
+
+    [Test]
     public async Task GetReadsRecordWrittenByNewtonsoft()
     {
         var setup = Build(schema);
