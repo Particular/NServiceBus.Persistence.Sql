@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 using NServiceBus.Outbox;
 using NServiceBus.Persistence.Sql;
@@ -100,6 +101,31 @@ public class OutboxSerializationTests
         var json = OutboxSerializer.Serialize(operations);
 
         Assert.That(json, Is.EqualTo(JsonSerializer.Serialize(operations, typeInfo)));
+    }
+
+    [TestCaseSource(nameof(CaseNames))]
+    public void NeverWritesUnicodeEscapesAboveAsciiThatPostgreSqlRejectsInNonUtf8Databases(string caseName)
+    {
+        var operations = CaseData[caseName].Append(new SerializableOperation
+        {
+            Headers = new Dictionary<string, string>
+            {
+                ["nbsp"] = "a\u00a0b",
+                ["c1"] = "\u0080\u009f",
+                ["ideographic"] = "\u3000",
+                ["umlaut"] = "\u00e4",
+                ["bom"] = "a\ufeffb",
+                ["emoji"] = "\U0001F600",
+                ["lone\u00a0key"] = "\ud800"
+            }
+        }).ToArray();
+
+        var json = OutboxSerializer.Serialize(operations);
+
+        var escapesAboveAscii = Regex.Matches(json, @"\\u([0-9A-Fa-f]{4})")
+            .Select(match => Convert.ToInt32(match.Groups[1].Value, 16))
+            .Where(codePoint => codePoint is > 0x7F and not (0x85 or 0x2028 or 0x2029));
+        Assert.That(escapesAboveAscii, Is.Empty);
     }
 
     [Test]
@@ -210,7 +236,7 @@ public class OutboxSerializationTests
         TestContext.Out.WriteLine(json);
         var result = OutboxSerializer.Deserialize(new StringReader(json));
 
-        Assert.That(json, Is.EqualTo("""[{"Headers":{"k":"a\uFFFDb"}}]"""));
+        Assert.That(json, Is.EqualTo("[{\"Headers\":{\"k\":\"a\ufffdb\"}}]"));
         Assert.That(result[0].Headers["k"], Is.EqualTo("a\ufffdb"));
     }
 

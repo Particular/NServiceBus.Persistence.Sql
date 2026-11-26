@@ -188,6 +188,32 @@ public abstract class OutboxPersisterTests
     }
 
     [Test]
+    public async Task StoreAndGetPreservesLatin1Characters()
+    {
+        var persister = Setup(schema);
+        var messageId = "a";
+        var contextBag = CreateContextBag(messageId);
+        var headers = new Dictionary<string, string>
+        {
+            ["NonBreakingSpace"] = "a\u00a0b",
+            ["Umlaut"] = "ä",
+            ["Accent"] = "é",
+            ["Sharp"] = "ß",
+            ["City"] = "Zürich"
+        };
+        using (var transaction = await persister.BeginTransaction(contextBag))
+        {
+            await persister.Store(new OutboxMessage(messageId, [new TransportOperation("Id1", [], new byte[] { 1 }, headers)]), transaction, contextBag);
+            await transaction.Commit();
+        }
+
+        var result = await persister.Get(messageId, contextBag);
+
+        Assert.That(result.TransportOperations, Has.Length.EqualTo(1));
+        Assert.That(result.TransportOperations[0].Headers, Is.EqualTo(headers));
+    }
+
+    [Test]
     public async Task GetReadsRecordWrittenByNewtonsoft()
     {
         var setup = Build(schema);
