@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 // Arrays larger than MaxPooledSize are dropped on return so one huge record doesn't keep them in the shared pool.
 sealed class PooledBufferWriter<T> : IBufferWriter<T>, IDisposable
@@ -32,7 +34,7 @@ sealed class PooledBufferWriter<T> : IBufferWriter<T>, IDisposable
         ArgumentOutOfRangeException.ThrowIfNegative(count);
         if (count > buffer.Length - written)
         {
-            throw new InvalidOperationException("Cannot advance past the end of the buffer.");
+            ThrowAdvancedTooFar();
         }
 
         written += count;
@@ -68,14 +70,18 @@ sealed class PooledBufferWriter<T> : IBufferWriter<T>, IDisposable
         ArgumentOutOfRangeException.ThrowIfNegative(sizeHint);
 
         var required = (long)written + Math.Max(sizeHint, 1);
-        if (required <= buffer.Length)
+        if (required > buffer.Length)
         {
-            return;
+            Grow(required);
         }
+    }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    void Grow(long required)
+    {
         if (required > Array.MaxLength)
         {
-            throw new OutOfMemoryException($"Buffer exceeds the maximum array length of {Array.MaxLength}.");
+            ThrowExceedsMaxLength();
         }
 
         var newBuffer = pool.Rent((int)Math.Min(Math.Max(required, buffer.Length * 2L), Array.MaxLength));
@@ -93,4 +99,10 @@ sealed class PooledBufferWriter<T> : IBufferWriter<T>, IDisposable
             pool.Return(array, clearArray: true);
         }
     }
+
+    [DoesNotReturn]
+    static void ThrowAdvancedTooFar() => throw new InvalidOperationException("Cannot advance past the end of the buffer.");
+
+    [DoesNotReturn]
+    static void ThrowExceedsMaxLength() => throw new OutOfMemoryException($"Buffer exceeds the maximum array length of {Array.MaxLength}.");
 }
