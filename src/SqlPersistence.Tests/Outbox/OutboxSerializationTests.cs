@@ -233,7 +233,6 @@ public class OutboxSerializationTests
         var operations = new[] { new SerializableOperation { Headers = new Dictionary<string, string> { ["k"] = "a\ud800b" } } };
 
         var json = OutboxSerializer.Serialize(operations);
-        TestContext.Out.WriteLine(json);
         var result = OutboxSerializer.Deserialize(new StringReader(json));
 
         Assert.That(json, Is.EqualTo("[{\"Headers\":{\"k\":\"a\ufffdb\"}}]"));
