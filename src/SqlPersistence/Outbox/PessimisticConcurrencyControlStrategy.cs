@@ -32,7 +32,7 @@ class PessimisticConcurrencyControlStrategy : ConcurrencyControlStrategy
 
     public override async Task Complete(OutboxMessage outboxMessage, DbConnection connection, DbTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
     {
-        string json = Serializer.Serialize(outboxMessage.TransportOperations.ToSerializable());
+        string json = OutboxSerializer.Serialize(outboxMessage.TransportOperations.ToSerializable());
         json = sqlDialect.AddOutboxPadding(json);
 
         using (var command = sqlDialect.CreateCommand(connection))

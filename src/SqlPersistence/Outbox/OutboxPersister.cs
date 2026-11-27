@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -108,9 +106,7 @@ class OutboxPersister : IOutboxStorage
                         }
                         else
                         {
-                            var transportOperations = Serializer.Deserialize<IEnumerable<SerializableOperation>>(textReader)
-                                .FromSerializable()
-                                .ToArray();
+                            var transportOperations = OutboxSerializer.Deserialize(textReader).FromSerializable();
                             result = new OutboxMessage(messageId, transportOperations);
                         }
                     }
