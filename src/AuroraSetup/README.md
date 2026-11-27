@@ -16,6 +16,8 @@ This project uses the **[AWS Cloud Development Kit (CDK)](https://aws.amazon.com
 This project uses **CDK context parameters** for configuration, such as the stack name.  
 You can set these parameters in two ways:
 
+> **Important:** The default stack name `AuroraTestInfrastructure` is reserved for CI. The CI workflow destroys any stack with that name before it deploys. When you deploy into the CI account, pass your own stack name with `-c stackName=<name>`.
+
 ### 1. **Edit `cdk.json`**
 
 In the `context` section of your `cdk.json` file, set your desired values:
@@ -114,6 +116,6 @@ cdk destroy --force
 ## Troubleshooting
 
 - **Leftover secrets:**  
-  A stack that reaches `DELETE_FAILED` keeps its clusters and secrets. Run `cdk destroy --force` again; the secrets are deleted together with the stack. The CI workflow runs `cdk destroy` before each deploy, so it removes a stack that an earlier run left behind.
+  A stack that reaches `DELETE_FAILED` or `ROLLBACK_FAILED` can keep some of its clusters and secrets. Check the stack events in the CloudFormation console to find the resource that failed, fix the cause, and run `cdk destroy --force` again. The CI workflow runs `cdk destroy` before each deploy, so it retries the deletion of a stack that an earlier run left behind. A stack deleted with the option to retain resources leaves those resources in the account; delete them manually.
 - **IAM Permission Errors:**  
   Ensure your CDK/CloudFormation execution role has the necessary IAM permissions (see project documentation or ask your AWS admin).
